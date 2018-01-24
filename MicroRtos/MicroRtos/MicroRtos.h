@@ -32,7 +32,7 @@ namespace MicroRtos
 		std::multimap<unsigned int, Task*> _taskMap;
 		std::multimap<int, Task*> _executingTasks;
 		std::multimap<unsigned int, Task*>::iterator FirstTask(void);
-		void TaskHandler();
+		void TaskHandler(unsigned int currentTick);
 	public:
 		MicroRtos(HardwareAbstraction::ITimerService *service);
 		Task *ScheduleTask(std::function<void()> callBack, unsigned int tick, int Priority, bool deleteOnExecution = true);
