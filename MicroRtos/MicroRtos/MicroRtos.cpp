@@ -33,26 +33,37 @@ namespace MicroRtos
 
 	void MicroRtos::TaskHandler()
 	{
-		if (_taskMap.empty())
+		if (_taskMap.empty() && _executingTasks.empty())
 			return;
-		
-		unsigned int currentTick = _service->GetTick();;
-		
+				
 		//add task to exicuting queue
-		std::multimap<unsigned int, Task*>::iterator task;
-		while ((currentTick < 2863311531 && (task = _taskMap.begin())->first < currentTick) || (currentTick >= 2863311531 && (task = FirstTask())->first >= 1431655765))
-		{
-			_executingTasks.insert(std::pair<int, Task*>(task->second->Priority, task->second));
-			_taskMap.erase(task);
-		}
-
+		unsigned int currentTick = _service->GetTick(); 
+		
 		//execute queue
-		std::multimap<int, Task*>::iterator executingTask = _executingTasks.begin();
-		while (!_executingTasks.empty() && executingTask->second->Status == TaskStatus::Pending)
+		std::multimap<int, Task*>::iterator executingTask;
+		do
 		{
-			//schedule timer before executing
+			//add tasks to executing queue
 			if (!_taskMap.empty())
-				_service->ScheduleCallBack(FirstTask()->first);
+			{
+				unsigned int lastTick = currentTick;
+				currentTick = _service->GetTick(); 
+				if (lastTick != currentTick)
+				{
+					std::multimap<unsigned int, Task*>::iterator task;
+					while ((currentTick < 2863311531 && (task = _taskMap.begin())->first < currentTick) || (currentTick >= 2863311531 && (task = FirstTask())->first >= 1431655765))
+					{
+						_executingTasks.insert(std::pair<int, Task*>(task->second->Priority, task->second));
+						_taskMap.erase(task);
+					}
+					
+					//schedule timer before executing
+					if (!_taskMap.empty())
+						_service->ScheduleCallBack(FirstTask()->first);
+				}
+			}
+			
+			executingTask = _executingTasks.begin();
 			
 			executingTask->second->Status = TaskStatus::Running;
 
@@ -64,9 +75,8 @@ namespace MicroRtos
 				delete executingTask->second;
 
 			_executingTasks.erase(executingTask);
-
-			executingTask = _executingTasks.begin();
 		}
+		while (!_executingTasks.empty() && executingTask->second->Status == TaskStatus::Pending)
 	}
 
 	Task *MicroRtos::ScheduleTask(std::function<void()> callBack, unsigned int tick, int priority, bool deleteOnExecution)
