@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{41CFC6D8-0C3C-48C0-9F70-4590099B2DC4}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IFuelTrimService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IgnitionService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIgnitionService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IInjectorService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IMapService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineConfig.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MapServiceLinear.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineSDConfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)InjectorService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MapServiceLinear.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineSDConfig.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\IgnitionAdvanceFile.dat" />
+    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\MapLinearConfigFile.dat" />
+    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\PistonEngineSDConfigFile.dat" />
+    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\VolumetricEfficiencyFile.dat" />
+  </ItemGroup>
+</Project>

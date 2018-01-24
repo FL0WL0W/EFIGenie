@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MicroRtos", "MicroRtos\MicroRtos.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{47A1C713-26FE-4685-A4E3-E4C12D0CC697}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HardwareAbstraction", "..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems", "{A7BFBBA3-7F98-48AA-9F2C-F6C9C80A064F}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		MicroRtos\MicroRtos.vcxitems*{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}*SharedItemsImports = 9
+		..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems*{47a1c713-26fe-4685-a4e3-e4c12d0cc697}*SharedItemsImports = 4
+		MicroRtos\MicroRtos.vcxitems*{47a1c713-26fe-4685-a4e3-e4c12d0cc697}*SharedItemsImports = 4
+		..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems*{a7bfbba3-7f98-48aa-9f2c-f6c9c80a064f}*SharedItemsImports = 9
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Debug|x64.ActiveCfg = Debug|x64
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Debug|x64.Build.0 = Debug|x64
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Debug|x86.ActiveCfg = Debug|Win32
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Debug|x86.Build.0 = Debug|Win32
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Release|x64.ActiveCfg = Release|x64
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Release|x64.Build.0 = Release|x64
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Release|x86.ActiveCfg = Release|Win32
+		{47A1C713-26FE-4685-A4E3-E4C12D0CC697}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
