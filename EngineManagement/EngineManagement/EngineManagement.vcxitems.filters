@@ -59,10 +59,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineSDConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorServicecpp.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitionService.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

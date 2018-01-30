@@ -41,29 +41,77 @@ namespace EngineManagement
 	
 	int16_t PistonEngineSDConfig::GetIgnitionAdvance64thDegree()
 	{
-		//no interpolation
-		uint8_t rpmIndex = (_decoder->GetRpm() + _maxRpm * (0.5 / (IGNITION_RPM_RESOLUTION - 1))) / (_maxRpm * (1 / (IGNITION_RPM_RESOLUTION - 1)));
-		if (rpmIndex > IGNITION_RPM_RESOLUTION - 1)
-			rpmIndex = IGNITION_RPM_RESOLUTION - 1;
-		float mapKpa = _mapService->MapKpa;
-		uint8_t mapKpaIndex = (uint8_t)((mapKpa + _mapService->MaxMapKpa*(0.5 / (IGNITION_MAP_RESOLUTION - 1))) / (_mapService->MaxMapKpa*(1 / (IGNITION_MAP_RESOLUTION - 1))));
-		if (mapKpaIndex > IGNITION_MAP_RESOLUTION - 1)
-			mapKpaIndex = IGNITION_MAP_RESOLUTION - 1;
-		return _ignitionAdvanceMap[rpmIndex + IGNITION_RPM_RESOLUTION * mapKpaIndex];
+		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpmDivision = _maxRpm / IGNITION_RPM_RESOLUTION;
+		unsigned char rpmIndexL = rpm / rpmDivision;
+		unsigned char rpmIndexH = rpmIndexL + 1;
+		float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
+		if (rpmIndexL > IGNITION_RPM_RESOLUTION - 1)
+		{
+			rpmIndexL = rpmIndexH = IGNITION_RPM_RESOLUTION - 1;
+		}
+		else if (rpmIndexH > IGNITION_RPM_RESOLUTION - 1)
+		{
+			rpmIndexH = IGNITION_RPM_RESOLUTION - 1;
+		}
+		
+		unsigned short map = _mapService->MapKpa;
+		unsigned short mapDivision = _mapService->MaxMapKpa / IGNITION_MAP_RESOLUTION;
+		unsigned char mapIndexL = map / mapDivision;
+		unsigned char mapIndexH = mapIndexL + 1;
+		float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
+		if (mapIndexL > IGNITION_MAP_RESOLUTION - 1)
+		{
+			mapIndexL = rpmIndexH = IGNITION_MAP_RESOLUTION - 1;
+		}
+		else if (mapIndexH > IGNITION_MAP_RESOLUTION - 1)
+		{
+			mapIndexH = IGNITION_MAP_RESOLUTION - 1;
+		}
+		
+		return	_ignitionAdvanceMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
+		+		_ignitionAdvanceMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+		+		_ignitionAdvanceMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+		+		_ignitionAdvanceMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
 	}
 	
 	InjectorTiming PistonEngineSDConfig::GetInjectorTiming(uint8_t cylinder)
 	{
-		//no interpolation
-		uint8_t rpmIndex = (_decoder->GetRpm() + _maxRpm * (0.5 / (VE_RPM_RESOLUTION - 1))) / (_maxRpm * (1 / (VE_RPM_RESOLUTION - 1)));
-		if (rpmIndex > VE_RPM_RESOLUTION - 1)
-			rpmIndex = VE_RPM_RESOLUTION - 1;
-		float mapKpa = _mapService->MapKpa;
-		uint8_t mapKpaIndex = (uint8_t)((mapKpa + _mapService->MaxMapKpa*(0.5 / (VE_MAP_RESOLUTION - 1))) / (_mapService->MaxMapKpa*(1 / (VE_MAP_RESOLUTION - 1))));
-		if (mapKpaIndex > VE_MAP_RESOLUTION - 1)
-			mapKpaIndex = VE_MAP_RESOLUTION - 1;
-		//uint16_t *volumetricEfficiency = (uint16_t *)EmbeddedResources::VolumetricEfficiencyFile_dat.data();
-		float VE = _volumetricEfficiencyMap[rpmIndex + VE_RPM_RESOLUTION * mapKpaIndex] / 128.0f;
+		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpmDivision = _maxRpm / VE_RPM_RESOLUTION;
+		unsigned char rpmIndexL = rpm / rpmDivision;
+		unsigned char rpmIndexH = rpmIndexL + 1;
+		float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
+		if (rpmIndexL > VE_RPM_RESOLUTION - 1)
+		{
+			rpmIndexL = rpmIndexH = VE_RPM_RESOLUTION - 1;
+		}
+		else if (rpmIndexH > VE_RPM_RESOLUTION - 1)
+		{
+			rpmIndexH = VE_RPM_RESOLUTION - 1;
+		}
+		
+		unsigned short map = _mapService->MapKpa;
+		unsigned short mapDivision = _mapService->MaxMapKpa / VE_MAP_RESOLUTION;
+		unsigned char mapIndexL = map / mapDivision;
+		unsigned char mapIndexH = mapIndexL + 1;
+		float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
+		if (mapIndexL > VE_MAP_RESOLUTION - 1)
+		{
+			mapIndexL = rpmIndexH = VE_MAP_RESOLUTION - 1;
+		}
+		else if (mapIndexH > VE_MAP_RESOLUTION - 1)
+		{
+			mapIndexH = VE_MAP_RESOLUTION - 1;
+		}
+		
+		float VE =	_volumetricEfficiencyMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
+		+			_volumetricEfficiencyMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+		+			_volumetricEfficiencyMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+		+			_volumetricEfficiencyMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		
+		VE *= 0.0078125;
+		
 		if (_fuelTrimService != NULL)
 			VE += _fuelTrimService->GetFuelTrim(cylinder);
 		float cylinderVolume = _mlPerCylinder / 8.0f * VE ;

@@ -110,7 +110,6 @@ int main()
 	_injectorServices[6] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_7, false, false); 
 	_injectorServices[7] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_8, false, false); 
 	
-	//TODO: make analog service more robust when more than one analog read is done from different tasks
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
 	//TODO: create unit tests
@@ -132,6 +131,7 @@ int main()
 	
 	for (;;)
 	{
+		_mapService->ReadMap();
 		_pistonEngineController->ScheduleEvents();
 	}
 }

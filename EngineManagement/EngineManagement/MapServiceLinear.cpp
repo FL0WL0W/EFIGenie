@@ -10,12 +10,7 @@
 #define MAP_READ_TASK_PRIORITY 3
 
 namespace EngineManagement
-{
-	void MapServiceLinear::ReadMapTask(void *mapServiceLinear)
-	{
-		((MapServiceLinear *)mapServiceLinear)->ReadMap();
-	}
-	
+{	
 	MapServiceLinear::MapServiceLinear(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
 	{
 		_timerService = timerService;
@@ -23,8 +18,6 @@ namespace EngineManagement
 		
 		_adcPin = adcPin;
 		_analogService->InitPin(_adcPin);
-		
-		_readMapTask = _timerService->ScheduleTask(&MapServiceLinear::ReadMapTask, this, _timerService->GetTick() + 10000, MAP_READ_TASK_PRIORITY, false);
 		
 		LoadConfig(config);
 	}
@@ -38,12 +31,17 @@ namespace EngineManagement
 		uint16_t minVolt12Bit = ((uint16_t *)config)[5];
 		_slope = (MaxMapKpa - minMapKpa) / (maxVolt12Bit - minVolt12Bit);
 		_offset = minMapKpa / _slope - minVolt12Bit;
-		_sampleRate = ((unsigned int *)config)[3];
 	}
 	
 	void MapServiceLinear::ReadMap()
 	{
+		float prevMapKpa = MapKpa;
 		MapKpa = _slope * _analogService->ReadPin(_adcPin) + _offset;
-		_timerService->ReScheduleTask(_readMapTask, _timerService->GetTick() + _sampleRate);
+		unsigned int readTick = _timerService->GetTick();
+		//if ther hasn't been a full tick between reads then return;
+		if (_lastReadTick == readTick)
+			return;
+		MapKpaDerivative = ((MapKpa - prevMapKpa) / (_lastReadTick - readTick)) * _timerService->GetTicksPerSecond();
+		_lastReadTick = readTick;
 	}
 }
