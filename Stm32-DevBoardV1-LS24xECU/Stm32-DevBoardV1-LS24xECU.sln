@@ -6,8 +6,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Stm32-DevBoardV1-LS24xECU",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{1A09BB02-0FEC-4160-B5F6-1325F2C62927}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MicroRtos", "..\MicroRtos\MicroRtos\MicroRtos.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReluctorDecoders", "..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems", "{B410EAA9-0A97-4339-A669-BAB737706124}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HardwareAbstraction", "..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems", "{A7BFBBA3-7F98-48AA-9F2C-F6C9C80A064F}"
@@ -18,10 +16,8 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\EngineManagement\EngineManagement\EngineManagement.vcxitems*{3bdc8863-6a37-45cd-abce-7f495e5ecc87}*SharedItemsImports = 4
 		..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems*{3bdc8863-6a37-45cd-abce-7f495e5ecc87}*SharedItemsImports = 4
-		..\MicroRtos\MicroRtos\MicroRtos.vcxitems*{3bdc8863-6a37-45cd-abce-7f495e5ecc87}*SharedItemsImports = 4
 		..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems*{3bdc8863-6a37-45cd-abce-7f495e5ecc87}*SharedItemsImports = 4
 		..\EngineManagement\EngineManagement\EngineManagement.vcxitems*{41cfc6d8-0c3c-48c0-9f70-4590099b2dc4}*SharedItemsImports = 9
-		..\MicroRtos\MicroRtos\MicroRtos.vcxitems*{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}*SharedItemsImports = 9
 		..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems*{a7bfbba3-7f98-48aa-9f2c-f6c9c80a064f}*SharedItemsImports = 9
 		..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems*{b410eaa9-0a97-4339-a669-bab737706124}*SharedItemsImports = 9
 	EndGlobalSection

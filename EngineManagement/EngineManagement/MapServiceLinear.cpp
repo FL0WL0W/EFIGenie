@@ -3,7 +3,6 @@
 #include <map>
 #include <functional>
 #include "ITimerService.h"
-#include "MicroRtos.h"
 #include "IMapService.h"
 #include "IAnalogService.h"
 #include "MapServiceLinear.h"
@@ -12,15 +11,20 @@
 
 namespace EngineManagement
 {
-	MapServiceLinear::MapServiceLinear(MicroRtos::MicroRtos *microRtos, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	void MapServiceLinear::ReadMapTask(void *mapServiceLinear)
 	{
-		_microRtos = microRtos;
+		((MapServiceLinear *)mapServiceLinear)->ReadMap();
+	}
+	
+	MapServiceLinear::MapServiceLinear(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	{
+		_timerService = timerService;
 		_analogService = analogService;
 		
 		_adcPin = adcPin;
 		_analogService->InitPin(_adcPin);
 		
-		_readMapTask = _microRtos->ScheduleTask(std::bind(&MapServiceLinear::ReadMap, this), _microRtos->GetTick() + 10000, MAP_READ_TASK_PRIORITY, false);
+		_readMapTask = _timerService->ScheduleTask(&MapServiceLinear::ReadMapTask, this, _timerService->GetTick() + 10000, MAP_READ_TASK_PRIORITY, false);
 		
 		LoadConfig(config);
 	}
@@ -40,6 +44,6 @@ namespace EngineManagement
 	void MapServiceLinear::ReadMap()
 	{
 		MapKpa = _slope * _analogService->ReadPin(_adcPin) + _offset;
-		_microRtos->ReScheduleTask(_readMapTask, _microRtos->GetTick() + _sampleRate);
+		_timerService->ReScheduleTask(_readMapTask, _timerService->GetTick() + _sampleRate);
 	}
 }

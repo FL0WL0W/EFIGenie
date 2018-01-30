@@ -59,6 +59,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineSDConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorServicecpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\IgnitionAdvanceFile.dat">

@@ -16,11 +16,6 @@ namespace Stm32
 			MainTimerService->Interrupt();
 		}
 	}
-	
-	void Stm32F10xTimerService::SetCallBack(std::function<void(unsigned int)> callBack)
-	{
-		_callBack = callBack;
-	}
 
 	Stm32F10xTimerService::Stm32F10xTimerService()
 	{	
@@ -97,7 +92,18 @@ namespace Stm32
 	{
 		_futureTick = false;
 		_futureTock = false;
-		_callBack(_callTick);
+		HardwareAbstraction::Task callTask;
+		do
+		{
+			callTask = *CallBackStackPointer[StackSize - 1];
+			callTask.CallBack(callTask.Parameters);
+			if (callTask.DeleteOnExecution)
+				delete &callTask;
+			
+			StackSize--;
+		} while ((CallBackStackPointer[StackSize-1])->Tick == callTask.Tick);
+		
+		ScheduleCallBack((*CallBackStackPointer)->Tick);
 	}
 	
 	void Stm32F10xTimerService::Interrupt(void)

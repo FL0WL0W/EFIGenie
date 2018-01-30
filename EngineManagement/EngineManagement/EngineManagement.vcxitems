@@ -27,6 +27,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitionService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorServicecpp.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)InjectorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MapServiceLinear.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp" />

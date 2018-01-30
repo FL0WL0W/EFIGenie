@@ -8,14 +8,14 @@ namespace EngineManagement
 		IIgnitionService *_ignitionServices[MAX_CYLINDERS];
 		IInjectorService *_injectorServices[MAX_CYLINDERS];
 		Decoder::IDecoder *_decoder;
-		MicroRtos::MicroRtos *_microRtos;
+		HardwareAbstraction::ITimerService *_timerService;
 		IPistonEngineConfig *_pistonEngineConfig;
-		MicroRtos::Task *_injectorOpenTask[MAX_CYLINDERS];
-		MicroRtos::Task *_injectorCloseTask[MAX_CYLINDERS];
-		MicroRtos::Task *_ignitionDwellTask[MAX_CYLINDERS];
-		MicroRtos::Task *_ignitionFireTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task *_injectorOpenTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task *_injectorCloseTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task *_ignitionDwellTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task *_ignitionFireTask[MAX_CYLINDERS];
 	public:
-		PistonEngineController(MicroRtos::MicroRtos *microRtos, Decoder::IDecoder *decoder, IIgnitionService *ignitionServices[MAX_CYLINDERS], IInjectorService *injectorServices[MAX_CYLINDERS], IPistonEngineConfig *pistonEngineConfig);
+		PistonEngineController(HardwareAbstraction::ITimerService *timerService, Decoder::IDecoder *decoder, IIgnitionService *ignitionServices[MAX_CYLINDERS], IInjectorService *injectorServices[MAX_CYLINDERS], IPistonEngineConfig *pistonEngineConfig);
 		void ScheduleEvents(void);
 	};
 }

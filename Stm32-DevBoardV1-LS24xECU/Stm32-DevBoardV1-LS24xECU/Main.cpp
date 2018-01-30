@@ -4,7 +4,6 @@
 #include <functional>
 #include "ITimerService.h"
 #include "Stm32F10xTimerService.h"
-#include "MicroRtos.h"
 #include "IDigitalService.h"
 #include "Stm32F10xDigitalService.h"
 #include "IAnalogService.h"
@@ -44,7 +43,6 @@
 #define MAP_PIN 0
 
 HardwareAbstraction::ITimerService *_timerService;
-MicroRtos::MicroRtos *_microRtos;
 HardwareAbstraction::IDigitalService *_digitalService;
 EngineManagement::IIgnitionService *_ignitionServices[MAX_CYLINDERS];
 EngineManagement::IInjectorService *_injectorServices[MAX_CYLINDERS];
@@ -83,13 +81,18 @@ void clock_init() {
 	SystemCoreClockUpdate();
 }
 
+void test(void *param)
+{
+	
+}
+
 int main()
 {
 	clock_init();
 	
 	_timerService = new Stm32::Stm32F10xTimerService();
 	
-	_microRtos = new MicroRtos::MicroRtos(_timerService);
+	_timerService->ScheduleTask(test, NULL, _timerService->GetTick() + 26, 0, true);
 	
 	_digitalService = new Stm32::Stm32F10xDigitalService();
 	
@@ -117,7 +120,7 @@ int main()
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
 	//TODO: create unit tests
-	_mapService = new EngineManagement::MapServiceLinear(_microRtos, _analogService, MAP_PIN, EmbeddedResources::MapLinearConfigFile_dat.data());
+	_mapService = new EngineManagement::MapServiceLinear(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapLinearConfigFile_dat.data());
   
 	_decoder = new Decoder::Gm24xDecoder(_timerService);
 	
@@ -131,7 +134,7 @@ int main()
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks
-	_pistonEngineController = new EngineManagement::PistonEngineController(_microRtos, _decoder, _ignitionServices, _injectorServices, _pistonEngineConfig);
+	_pistonEngineController = new EngineManagement::PistonEngineController(_timerService, _decoder, _ignitionServices, _injectorServices, _pistonEngineConfig);
 	
 	for (;;)
 	{

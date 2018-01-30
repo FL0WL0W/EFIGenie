@@ -3,7 +3,6 @@
 #include <map>
 #include <functional>
 #include "ITimerService.h"
-#include "MicroRtos.h"
 #include "IMapService.h"
 #include "IDigitalService.h"
 #include "IIgnitionService.h"

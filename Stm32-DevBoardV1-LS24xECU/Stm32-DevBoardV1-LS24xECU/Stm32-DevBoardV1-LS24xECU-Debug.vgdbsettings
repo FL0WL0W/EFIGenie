@@ -10,8 +10,20 @@
     <EmbeddedProfileFile>stm32.xml</EmbeddedProfileFile>
   </Project>
   <Build xsi:type="com.visualgdb.build.msbuild">
+    <ToolchainID>
+      <ID>com.visualgdb.arm-eabi</ID>
+      <Version>
+        <GCC>7.2.0</GCC>
+        <GDB>8.0.1</GDB>
+        <Revision>2</Revision>
+      </Version>
+    </ToolchainID>
     <ProjectFile>Stm32-DevBoardV1-LS24xECU.vcxproj</ProjectFile>
-    <ParallelJobCount>0</ParallelJobCount>
+    <RemoteBuildEnvironment>
+      <Records />
+    </RemoteBuildEnvironment>
+    <ParallelJobCount>1</ParallelJobCount>
+    <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
   </Build>
   <Debug xsi:type="com.visualgdb.debug.embedded">
     <AdditionalStartupCommands />
@@ -43,9 +55,11 @@
       <DisableSignals>false</DisableSignals>
       <EnableAsyncExecutionMode>false</EnableAsyncExecutionMode>
       <EnableNonStopMode>false</EnableNonStopMode>
+      <MaxBreakpointLimit>0</MaxBreakpointLimit>
     </AdditionalGDBSettings>
-    <DebugMethodID>com.sysprogs.arm.openocd</DebugMethodID>
-    <DebugMethodProperties>
+    <DebugMethod>
+      <ID>com.sysprogs.arm.openocd</ID>
+      <Configuration>
       <Entries>
         <KeyValue>
           <Key>com.sysprogs.arm.openocd.interface</Key>
@@ -112,15 +126,18 @@
           <Value>stlink-v2</Value>
         </KeyValue>
       </Entries>
-    </DebugMethodProperties>
+    </Configuration>
+    </DebugMethod>
     <AutoDetectRTOS>true</AutoDetectRTOS>
     <SemihostingSupport>Auto</SemihostingSupport>
     <StepIntoEntryPoint>false</StepIntoEntryPoint>
     <ReloadFirmwareOnReset>false</ReloadFirmwareOnReset>
     <ValidateEndOfStackAddress>true</ValidateEndOfStackAddress>
     <StopAtEntryPoint>false</StopAtEntryPoint>
+    <CheckInterfaceDrivers>true</CheckInterfaceDrivers>
     <DynamicAnalysisSettings />
     <EndOfStackSymbol>_estack</EndOfStackSymbol>
+    <TimestampProviderTicksPerSecond>0</TimestampProviderTicksPerSecond>
   </Debug>
   <CustomBuild>
     <PreSyncActions />
@@ -142,10 +159,26 @@
   <UserDefinedVariables />
   <ImportedPropertySheets />
   <CodeSense>
-    <Enabled>Unknown</Enabled>
+    <Enabled>True</Enabled>
+    <CFLAGS />
+    <CXXFLAGS />
+    <ExternalSourceFileList />
     <ExtraSettings>
       <HideErrorsInSystemHeaders>true</HideErrorsInSystemHeaders>
+      <SupportLightweightReferenceAnalysis>false</SupportLightweightReferenceAnalysis>
+      <DiscoverySettings>
+        <Mode>Enabled</Mode>
+        <SearchInProjectDir>true</SearchInProjectDir>
+        <SearchInSourceDirs>true</SearchInSourceDirs>
+        <SearchInIncludeSubdirs>true</SearchInIncludeSubdirs>
+        <IgnoredDirs />
+        <IgnoredHeaders />
+      </DiscoverySettings>
     </ExtraSettings>
+    <CodeAnalyzerSettings>
+      <Enabled>false</Enabled>
+    </CodeAnalyzerSettings>
   </CodeSense>
   <BuildContextDirectory>VisualGDB\VisualGDBCache</BuildContextDirectory>
+  <ProgramArgumentsSuggestions />
 </VisualGDBProjectSettings2>

@@ -1,7 +1,6 @@
 #include <map>
 #include <functional>
 #include "ITimerService.h"
-#include "MicroRtos.h"
 #include "IIgnitionService.h"
 #include "IInjectorService.h"
 #include "IMapService.h"

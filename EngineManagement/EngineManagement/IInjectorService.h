@@ -5,5 +5,7 @@ namespace EngineManagement
 	public:
 		virtual void InjectorOpen() = 0;
 		virtual void InjectorClose() = 0;
+		static void InjectorOpenTask(void *parameters);
+		static void InjectorCloseTask(void *parameters);
 	};
 }
