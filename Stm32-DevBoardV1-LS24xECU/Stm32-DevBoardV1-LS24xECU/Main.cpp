@@ -120,9 +120,10 @@ int main()
 	//TODO: Finish fuel trim
 	
 	//TODO: create unit tests
-	//make map interpolated.
-	//create volts
-	//finsh injector offset
+	//temperature
+	//air fuel ratio
+	//interpolate short pulse adder
+	//voltage
 	_pistonEngineConfig = new EngineManagement::PistonEngineSDConfig(_decoder, NULL, _mapService, EmbeddedResources::PistonEngineSDConfigFile_dat.data());
 	
 	//TODO: create unit tests

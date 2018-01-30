@@ -2,6 +2,10 @@
 #define VE_MAP_RESOLUTION 16
 #define IGNITION_RPM_RESOLUTION 16
 #define IGNITION_MAP_RESOLUTION 16
+#define INJECTOR_OFFSET_MAP_RESOLUTION 16
+#define INJECTOR_OFFSET_VOLTAGE_RESOLUTION 16
+#define INJECTOR_OFFSET_VOLTAGE_MAX 16
+#define INJECTOR_OFFSET_VOLTAGE_MIN 8
 
 namespace EngineManagement
 {	
@@ -18,7 +22,8 @@ namespace EngineManagement
 		uint16_t *_injectorGramsPerMinute;
 		short *_shortPulseAdder;
 		short *_offset;
-		uint16_t _mlPerCylinder;
+		uint16_t _mlPerCylinder; //ml * 8
+		unsigned short _gasConstant;
 		void LoadConfig(void *config);
 	public:
 		PistonEngineSDConfig( Decoder::IDecoder *decoder, IFuelTrimService *fuelTrimService, IMapService *mapService, void *config);
