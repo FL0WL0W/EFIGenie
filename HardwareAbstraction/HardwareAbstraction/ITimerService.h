@@ -29,11 +29,11 @@ namespace HardwareAbstraction
 		virtual void ScheduleCallBack(unsigned int tick) = 0;
 	public:
 #if TIMERSERVICE_MAX_STACK_SIZE <= 2^8
-		unsigned char StackSize;
+		unsigned char StackSize = 0;
 #elif TIMERSERVICE_MAX_STACK_SIZE <= 2^16
-		unsigned short StackSize;
+		unsigned short StackSize = 0;
 #elif TIMERSERVICE_MAX_STACK_SIZE <= 2^32
-		unsigned int StackSize;
+		unsigned int StackSize = 0;
 #endif
 		Task *CallBackStackPointer[TIMERSERVICE_MAX_STACK_SIZE];
 		virtual unsigned int GetTick(void) = 0;

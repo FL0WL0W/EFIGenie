@@ -5,7 +5,7 @@
 #include "ITimerService.h"
 
 namespace HardwareAbstraction
-{
+{	
 	bool LessThan(Task *i, Task *j)
 	{
 		if (i->Tick == j->Tick)
@@ -42,8 +42,8 @@ namespace HardwareAbstraction
 	{
 		task->Tick = tick;
 		CallBackStackPointer[StackSize] = task;
-		SortCallBackStack();
 		StackSize++;
+		SortCallBackStack();
 		if (CallBackStackPointer[StackSize - 1] == task)
 		{
 			ScheduleCallBack(task->Tick);

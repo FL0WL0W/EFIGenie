@@ -21,6 +21,7 @@
 #include "PistonEngineSDConfig.h"
 #include "PistonEngineController.h"
 #include "EmbeddedResources.h"
+#include "stm32f10x_tim.h"
 
 #define INJECTOR_PIN_1 0
 #define INJECTOR_PIN_2 0
@@ -81,19 +82,12 @@ void clock_init() {
 	SystemCoreClockUpdate();
 }
 
-void test(void *param)
-{
-	
-}
-
 int main()
 {
 	clock_init();
 	
 	_timerService = new Stm32::Stm32F10xTimerService();
-	
-	_timerService->ScheduleTask(test, NULL, _timerService->GetTick() + 26, 0, true);
-	
+		
 	_digitalService = new Stm32::Stm32F10xDigitalService();
 	
 	//TODO: create unit tests

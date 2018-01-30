@@ -62,7 +62,9 @@ namespace Stm32
 
 	void Stm32F10xTimerService::ScheduleCallBack(unsigned int tick)
 	{
-		unsigned int counter = GetTick();
+		//1 tick of overhead
+		tick--;
+		unsigned int counter = _tick | TIM_GetCounter(TIM2);
 		if (_tick == (tick & 0xFFFF0000))
 		{
 			if (tick <= counter)
@@ -109,19 +111,19 @@ namespace Stm32
 	void Stm32F10xTimerService::Interrupt(void)
 	{
 		if (TIM_GetITStatus(TIM2, TIM_IT_CC1) != RESET) {
-			TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
 			if (_futureTick)
 			{
 				ReturnCallBack();
 			}
+			TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
 		}
 		if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-			TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 			_tick += 0x00010000;	
 			if (_futureTock)
 			{
 				ScheduleCallBack(_callTick);
 			}
+			TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 		}
 	}
 
