@@ -6,17 +6,33 @@
 #include "IMapService.h"
 #include "IDecoder.h"
 #include "IFuelTrimService.h"
+#include "IEngineCoolantTemperatureService.h"
+#include "IIntakeAirTemperatureService.h"
+#include "IVoltageService.h"
+#include "IAfrService.h"
 #include "IPistonEngineConfig.h"
 #include "PistonEngineSDConfig.h"
 
 
 namespace EngineManagement
 {
-	PistonEngineSDConfig::PistonEngineSDConfig(Decoder::IDecoder *decoder, IFuelTrimService *fuelTrimService, IMapService *mapService, void *config)
+	PistonEngineSDConfig::PistonEngineSDConfig(
+		Decoder::IDecoder *decoder, 
+		IFuelTrimService *fuelTrimService, 
+		IMapService *mapService, 
+		IIntakeAirTemperatureService *iacService, 
+		IEngineCoolantTemperatureService *ectService, 
+		IVoltageService *voltageService, 
+		IAfrService *afrService,
+		void *config)
 	{
 		_decoder = decoder;
 		_mapService = mapService;
 		_fuelTrimService = fuelTrimService;
+		_iacService = iacService;
+		_ectService = ectService;
+		_voltageService = voltageService;
+		_afrService = afrService;
 		
 		LoadConfig(config);
 	}
@@ -33,6 +49,8 @@ namespace EngineManagement
 		_ignitionAdvanceMap = _offset + (VE_MAP_RESOLUTION * 32);
 		_volumetricEfficiencyMap = ((unsigned short *)_ignitionAdvanceMap) + 2 * IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION;
 		//gas constant
+		//temperature bias
+		//injector open position
 	}
 	
 	unsigned int PistonEngineSDConfig::GetIgnitionDwellTime10Us()
@@ -116,13 +134,11 @@ namespace EngineManagement
 			VE += _fuelTrimService->GetFuelTrim(cylinder);
 		float cylinderVolume = _mlPerCylinder / 8.0f * VE;
 		
-		//TODO:temperature creation/calculation
-		float temperature;
+		float temperature = (_iacService->IntakeAirTemperature * _temperatureBias + _ectService->EngineCoolantTemperature * (255 - _temperatureBias))/255;
 		
 		float airDensity = map / (1000.0f * _gasConstant * temperature);
 		
-		//TODO:air fuel ratio calculation
-		float airFuelRatio;
+		float airFuelRatio = _afrService->GetAfr();
 		
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
@@ -130,8 +146,7 @@ namespace EngineManagement
 		if(injectorDuration < 0.004f)
 			injectorDuration += _shortPulseAdder[(int)(injectorDuration * 16666.666666666666666666666666667f)];
 		
-		//TODO:Voltage
-		float voltage = 12;
+		float voltage = _voltageService->Voltage;
 		float voltageDivision = (INJECTOR_OFFSET_VOLTAGE_MAX - INJECTOR_OFFSET_VOLTAGE_MIN) / INJECTOR_OFFSET_VOLTAGE_RESOLUTION;
 		unsigned char voltageIndexL = ((voltage - INJECTOR_OFFSET_VOLTAGE_MIN) / voltageDivision);
 		unsigned char voltageIndexH = voltageIndexL + 1;
@@ -167,6 +182,7 @@ namespace EngineManagement
 				
 		InjectorTiming timing = InjectorTiming();
 		timing.PulseWidth = injectorDuration;
+		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;
 		return timing;// { PulseWidthTick = injectorDuration ; }
 	}
 }

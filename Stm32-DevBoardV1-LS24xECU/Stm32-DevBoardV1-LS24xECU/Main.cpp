@@ -13,6 +13,10 @@
 #include "IInjectorService.h"
 #include "InjectorService.h"
 #include "IMapService.h"
+#include "IEngineCoolantTemperatureService.h"
+#include "IIntakeAirTemperatureService.h"
+#include "IVoltageService.h"
+#include "IAfrService.h"
 #include "MapServiceLinear.h"
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
@@ -49,6 +53,11 @@ EngineManagement::IIgnitionService *_ignitionServices[MAX_CYLINDERS];
 EngineManagement::IInjectorService *_injectorServices[MAX_CYLINDERS];
 HardwareAbstraction::IAnalogService *_analogService;
 EngineManagement::IMapService *_mapService;
+EngineManagement::IFuelTrimService *_fuelTrimService;
+EngineManagement::IEngineCoolantTemperatureService *_engineCoolantTemperatureService;
+EngineManagement::IIntakeAirTemperatureService *_intakeAirTemperatureService;
+EngineManagement::IVoltageService *_voltageService;
+EngineManagement::IAfrService *_afrService;
 Decoder::IDecoder *_decoder;
 EngineManagement::IPistonEngineConfig *_pistonEngineConfig;
 EngineManagement::PistonEngineController *_pistonEngineController;
@@ -118,13 +127,23 @@ int main()
 	_decoder = new Decoder::Gm24xDecoder(_timerService);
 	
 	//TODO: Finish fuel trim
+	_fuelTrimService = NULL;
+	
+	//TODO: Finish Engine Coolant Temperature Service
+	_engineCoolantTemperatureService = NULL;
+	
+	//TODO: Finish Intake Air Temperature Service
+	_intakeAirTemperatureService = NULL;
+	
+	//TODO: Voltage Service
+	_voltageService = NULL;
+	
+	//TODO: Afr Service
+	_afrService = NULL;
 	
 	//TODO: create unit tests
-	//temperature
-	//air fuel ratio
 	//interpolate short pulse adder
-	//voltage
-	_pistonEngineConfig = new EngineManagement::PistonEngineSDConfig(_decoder, NULL, _mapService, EmbeddedResources::PistonEngineSDConfigFile_dat.data());
+	_pistonEngineConfig = new EngineManagement::PistonEngineSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, EmbeddedResources::PistonEngineSDConfigFile_dat.data());
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks
@@ -133,6 +152,9 @@ int main()
 	for (;;)
 	{
 		_mapService->ReadMap();
+		_engineCoolantTemperatureService->ReadEct();
+		_intakeAirTemperatureService->ReadIat();
+		_voltageService->ReadVoltage();
 		_pistonEngineController->ScheduleEvents();
 	}
 }

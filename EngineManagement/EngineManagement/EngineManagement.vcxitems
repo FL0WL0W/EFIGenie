@@ -14,13 +14,17 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IAfrService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelTrimService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IgnitionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IIgnitionService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IInjectorService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IMapService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineConfig.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IVoltageService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MapServiceLinear.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineSDConfig.h" />

@@ -8,7 +8,7 @@ namespace EngineManagement
 {	
 	struct InjectorTiming
 	{
-		uint16_t OpenPosition;
+		unsigned short OpenPosition64thDegree;
 		float PulseWidth;
 	};
 	

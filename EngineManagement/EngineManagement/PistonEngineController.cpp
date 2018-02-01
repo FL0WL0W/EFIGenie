@@ -4,6 +4,10 @@
 #include "IIgnitionService.h"
 #include "IInjectorService.h"
 #include "IMapService.h"
+#include "IEngineCoolantTemperatureService.h"
+#include "IIntakeAirTemperatureService.h"
+#include "IVoltageService.h"
+#include "IAfrService.h"
 #include "IDecoder.h"
 #include "IPistonEngineConfig.h"
 #include "PistonEngineController.h"
@@ -52,7 +56,7 @@ namespace EngineManagement
 				if (currentTickPlusSome < _injectorOpenTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _injectorOpenTask[cylinder]->Tick < 1431655765))
 				{
 					InjectorTiming injectorTiming = _pistonEngineConfig->GetInjectorTiming(cylinder);
-					uint16_t injectorStartPosition = injectorTiming.OpenPosition % 720;
+					float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
 					unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * _timerService->GetTicksPerSecond();
 					
 					//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
@@ -114,7 +118,7 @@ namespace EngineManagement
 					{
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
 						InjectorTiming injectorTiming = _pistonEngineConfig->GetInjectorTiming(cylinder);
-						uint16_t injectorStartPosition = injectorTiming.OpenPosition % 720;
+						float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
 						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * _timerService->GetTicksPerSecond();
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
@@ -129,7 +133,7 @@ namespace EngineManagement
 						_timerService->ReScheduleTask(_injectorCloseTask[cylinder], injectorCloseTick);
 						
 						injectorTiming = _pistonEngineConfig->GetInjectorTiming(cylinder + cylindersToGoTo);
-						injectorStartPosition = injectorTiming.OpenPosition % 720;
+						injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
 						injectorPulseWidthTick = injectorTiming.PulseWidth * _timerService->GetTicksPerSecond();
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
