@@ -1,5 +1,3 @@
-#define MAX_CYLINDERS 8
-
 namespace EngineManagement
 {
 	class PistonEngineController

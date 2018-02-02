@@ -125,10 +125,10 @@
     <ResourceCompile Include="Stm32-DevBoardV1-LS24xECU.rc" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="IgnitionAdvanceFile.dat" />
     <EmbeddedBinaryFile Include="MapLinearConfigFile.dat" />
-    <EmbeddedBinaryFile Include="PistonEngineSDConfigFile.dat" />
-    <EmbeddedBinaryFile Include="VolumetricEfficiencyFile.dat" />
+    <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat" />
+    <EmbeddedBinaryFile Include="PistonEngineInjectionSDConfigFile.dat" />
+    <EmbeddedBinaryFile Include="PistonEngineIgnitionMapConfigFile.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

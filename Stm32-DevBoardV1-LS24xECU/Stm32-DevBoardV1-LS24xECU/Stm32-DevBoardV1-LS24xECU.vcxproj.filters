@@ -248,16 +248,16 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="IgnitionAdvanceFile.dat">
+    <EmbeddedBinaryFile Include="PistonEngineInjectionSDConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
     <EmbeddedBinaryFile Include="MapLinearConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="PistonEngineSDConfigFile.dat">
+    <EmbeddedBinaryFile Include="PistonEngineIgnitionMapConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="VolumetricEfficiencyFile.dat">
+    <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
   </ItemGroup>

@@ -1,4 +1,4 @@
-#define MAX_CYLINDERS 12
+#define MAX_CYLINDERS 8
 
 namespace EngineManagement
 {
@@ -10,14 +10,14 @@ namespace EngineManagement
 			Cylinders = *((unsigned char *)config);
 			config = (void *)(((unsigned char *)config) + 1);
 			
-			MlPerCylinder = *((unsigned short *)config);
+			Ml8thPerCylinder = *((unsigned short *)config); //1/8 ml
 			config = (void *)(((unsigned short *)config) + 1);
 			
 			MaxRpm = *((unsigned short *)config);
 			config = (void *)(((unsigned short *)config) + 1);
 		}
 		unsigned char Cylinders;
-		unsigned short MlPerCylinder;
+		unsigned short Ml8thPerCylinder;
 		unsigned short MaxRpm;
 	};
 }

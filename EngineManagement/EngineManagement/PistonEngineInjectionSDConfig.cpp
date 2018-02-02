@@ -41,23 +41,37 @@ namespace EngineManagement
 	}
 	void PistonEngineInjectionSDConfig::LoadConfig(void *config)
 	{
-		//void *config = EmbeddedResources::PistonEngineSDConfigFile_dat.data();
-		//Cylinders = ((uint8_t *)config)[0];
-		//_mlPerCylinder = ((uint16_t *)config)[1]; //left shifted 2
-		//_ignitionDwellTime10Us = ((uint16_t *)config)[2];
-		//_maxRpm = ((uint16_t *)config)[3];
-		_injectorGramsPerMinute = (unsigned short *)(config) + 8;
-		_shortPulseAdder = (short *)(_injectorGramsPerMinute) + (_pistonEngineConfig->Cylinders << 1);//0-4ms, 60us increments
-		_offset = _shortPulseAdder + (67 * 2);//8V to 16V in 0.5 increments
-		//_ignitionAdvanceMap = _offset + (VE_MAP_RESOLUTION * 32);
-		_volumetricEfficiencyMap = ((unsigned short *)_offset) + 2 * IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION;
-		//gas constant
-		//temperature bias
-		//injector open position
+		_injectorOpenPosition64thDegree = *((unsigned short *)config);   //value in 1/64 degrees
+		config = (void*)((unsigned short *)config + 1);
+		
+		_injectorGramsPerMinute = (unsigned short *)config;
+		config = (void*)((unsigned short *)config + MAX_CYLINDERS);
+		
+		_shortPulseLimit = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
+		_shortPulseAdder = (short *)config;//60us increments (value in us)
+		config = (void*)((short *)config + (int)(_shortPulseLimit / 0.00006f) + 1);
+		
+		_offset = (short *)config;
+		config = (void*)((short *)config + (INJECTOR_OFFSET_VOLTAGE_RESOLUTION * INJECTOR_OFFSET_MAP_RESOLUTION));
+		
+		_volumetricEfficiencyMap = ((unsigned short *)config);
+		config = (void*)((unsigned short *)config + (VE_RPM_RESOLUTION * VE_MAP_RESOLUTION));
+		
+		_gasConstant = *((unsigned short *)config); //value in 0.1 units
+		config = (void*)((unsigned short *)config + 1);
+		
+		_temperatureBias = *((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT)
+		config = (void*)((unsigned char *)config + 1);
 	}
 	
 	InjectorTiming PistonEngineInjectionSDConfig::GetInjectorTiming(uint8_t cylinder)
 	{
+		InjectorTiming timing = InjectorTiming();
+		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;
+		timing.PulseWidth = 0;
+		
 		unsigned short rpm = _decoder->GetRpm();
 		unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / VE_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
@@ -94,19 +108,22 @@ namespace EngineManagement
 				
 		if (_fuelTrimService != NULL)
 			VE += _fuelTrimService->GetFuelTrim(cylinder);
-		float cylinderVolume = _mlPerCylinder / 8.0f * VE;
+		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder / 8.0f * VE;
 		
 		float temperature = (_iatService->IntakeAirTemperature * _temperatureBias + _ectService->EngineCoolantTemperature * (255 - _temperatureBias))/255;
 		
-		float airDensity = map / (1000.0f * _gasConstant * temperature);
+		float airDensity = map / (100.0f * _gasConstant * temperature);
 		
 		float airFuelRatio = _afrService->GetAfr();
 		
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
+		if (injectorDuration <= 0) 
+			return timing;
+			
 		//TODO interpolate this
-		if(injectorDuration < 0.004f)
-			injectorDuration += _shortPulseAdder[(int)(injectorDuration * 16666.666666666666666666666666667f)];
+		if(injectorDuration < _shortPulseLimit)
+			injectorDuration += _shortPulseAdder[(int)(injectorDuration * 16666.666666666666666666666666667f)] * 0.000001f;
 		
 		float voltage = _voltageService->Voltage;
 		float voltageDivision = (INJECTOR_OFFSET_VOLTAGE_MAX - INJECTOR_OFFSET_VOLTAGE_MIN) / INJECTOR_OFFSET_VOLTAGE_RESOLUTION;
@@ -142,9 +159,10 @@ namespace EngineManagement
 		
 		injectorDuration += offset;
 				
-		InjectorTiming timing = InjectorTiming();
+		if (injectorDuration <= 0) 
+			return timing;
+		
 		timing.PulseWidth = injectorDuration;
-		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;
 		return timing;
 	}
 }

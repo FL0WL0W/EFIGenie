@@ -131,13 +131,13 @@ int main()
   
 	_decoder = new Decoder::Gm24xDecoder(_timerService);
 	
-	//TODO: Finish fuel trim
+	//TODO: Fuel Trim Service
 	_fuelTrimService = NULL;
 	
-	//TODO: Finish Engine Coolant Temperature Service
+	//TODO: Engine Coolant Temperature Service
 	_engineCoolantTemperatureService = NULL;
 	
-	//TODO: Finish Intake Air Temperature Service
+	//TODO: Intake Air Temperature Service
 	_intakeAirTemperatureService = NULL;
 	
 	//TODO: Voltage Service
@@ -147,17 +147,15 @@ int main()
 	_afrService = NULL;
 	
 	//TODO: create unit tests
-	//implement config
-	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(NULL);
+	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(EmbeddedResources::PistonEngineConfigFile_dat.data());
 	
 	//TODO: create unit tests
 	//interpolate short pulse adder
-	//implement config
-	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, NULL);
+	//make temperature bias relative to cylinder volume
+	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineInjectionSDConfigFile_dat.data());
 	
 	//TODO: create unit tests
-	//implement config
-	_pistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionMapConfig(_decoder, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, NULL);
+	_pistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionMapConfig(_decoder, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineIgnitionMapConfigFile_dat.data());
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks

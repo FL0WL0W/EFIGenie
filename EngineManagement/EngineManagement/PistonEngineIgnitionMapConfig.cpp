@@ -40,7 +40,10 @@ namespace EngineManagement
 	void PistonEngineIgnitionMapConfig::LoadConfig(void *config)
 	{
 		_ignitionDwellTime = ((float *)config)[0];
-		_ignitionAdvanceMap = ((short *)config) + 4;
+		config = (void*)(((float *)config) + 1);
+		
+		_ignitionAdvanceMap = ((short *)config);
+		config = (void*)(((short *)config) + (IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION));
 	}
 				
 	IgnitionTiming PistonEngineIgnitionMapConfig::GetIgnitionTiming()

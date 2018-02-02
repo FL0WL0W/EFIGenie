@@ -1,3 +1,6 @@
+#define IGNITION_RPM_RESOLUTION 16
+#define IGNITION_MAP_RESOLUTION 16
+
 namespace EngineManagement
 {
 	class PistonEngineIgnitionMapConfig : public IPistonEngineIgnitionConfig

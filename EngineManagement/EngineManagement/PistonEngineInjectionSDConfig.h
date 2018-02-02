@@ -1,7 +1,5 @@
 #define VE_RPM_RESOLUTION 16
 #define VE_MAP_RESOLUTION 16
-#define IGNITION_RPM_RESOLUTION 16
-#define IGNITION_MAP_RESOLUTION 16
 #define INJECTOR_OFFSET_MAP_RESOLUTION 16
 #define INJECTOR_OFFSET_VOLTAGE_RESOLUTION 16
 #define INJECTOR_OFFSET_VOLTAGE_MAX 16
@@ -22,9 +20,9 @@ namespace EngineManagement
 		IFuelTrimService *_fuelTrimService;
 		unsigned short *_volumetricEfficiencyMap;
 		unsigned short *_injectorGramsPerMinute;
+		float _shortPulseLimit;
 		short *_shortPulseAdder;
 		short *_offset;
-		unsigned short _mlPerCylinder; //ml * 8
 		unsigned short _gasConstant;
 		unsigned char _temperatureBias;
 		unsigned short _injectorOpenPosition64thDegree;
