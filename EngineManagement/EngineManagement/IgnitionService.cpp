@@ -5,12 +5,12 @@
 #include "ITimerService.h"
 #include "IMapService.h"
 #include "IDigitalService.h"
-#include "IIgnitionService.h"
-#include "IgnitionService.h"
+#include "IIgnitorService.h"
+#include "IgnitorService.h"
 
 namespace EngineManagement
 {
-	IgnitionService::IgnitionService(HardwareAbstraction::IDigitalService *digitalService, uint8_t ignitionPin, bool normalOn, bool highZ)
+	IgnitorService::IgnitorService(HardwareAbstraction::IDigitalService *digitalService, uint8_t ignitionPin, bool normalOn, bool highZ)
 	{
 		_digitalService = digitalService;
 		_ignitionPin = ignitionPin;
@@ -21,7 +21,7 @@ namespace EngineManagement
 		_digitalService->WritePin(_ignitionPin, _normalOn);
 	}
 	
-	void IgnitionService::CoilDwell()
+	void IgnitorService::CoilDwell()
 	{
 		if (_highZ && !_normalOn)
 		{
@@ -33,7 +33,7 @@ namespace EngineManagement
 		}
 	}
 	
-	void IgnitionService::CoilFire()
+	void IgnitorService::CoilFire()
 	{
 		if (_highZ && _normalOn)
 		{

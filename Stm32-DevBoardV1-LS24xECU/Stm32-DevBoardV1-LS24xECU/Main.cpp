@@ -8,8 +8,8 @@
 #include "Stm32F10xDigitalService.h"
 #include "IAnalogService.h"
 #include "Stm32F10xAnalogService.h"
-#include "IIgnitionService.h"
-#include "IgnitionService.h"
+#include "IIgnitorService.h"
+#include "IgnitorService.h"
 #include "IInjectorService.h"
 #include "InjectorService.h"
 #include "IMapService.h"
@@ -21,8 +21,11 @@
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
 #include "IFuelTrimService.h"
-#include "IPistonEngineConfig.h"
-#include "PistonEngineSDConfig.h"
+#include "PistonEngineConfig.h"
+#include "IPistonEngineIgnitionConfig.h"
+#include "PistonEngineIgnitionMapConfig.h"
+#include "IPistonEngineInjectionConfig.h"
+#include "PistonEngineInjectionSDConfig.h"
 #include "PistonEngineController.h"
 #include "EmbeddedResources.h"
 #include "stm32f10x_tim.h"
@@ -49,7 +52,7 @@
 
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
-EngineManagement::IIgnitionService *_ignitionServices[MAX_CYLINDERS];
+EngineManagement::IIgnitorService *_ignitorServices[MAX_CYLINDERS];
 EngineManagement::IInjectorService *_injectorServices[MAX_CYLINDERS];
 HardwareAbstraction::IAnalogService *_analogService;
 EngineManagement::IMapService *_mapService;
@@ -59,7 +62,9 @@ EngineManagement::IIntakeAirTemperatureService *_intakeAirTemperatureService;
 EngineManagement::IVoltageService *_voltageService;
 EngineManagement::IAfrService *_afrService;
 Decoder::IDecoder *_decoder;
-EngineManagement::IPistonEngineConfig *_pistonEngineConfig;
+EngineManagement::PistonEngineConfig *_pistonEngineConfig;
+EngineManagement::IPistonEngineInjectionConfig *_pistonEngineInjectionConfig;
+EngineManagement::IPistonEngineIgnitionConfig *_pistonEngineIgnitionConfig;
 EngineManagement::PistonEngineController *_pistonEngineController;
 
 void clock_init() {
@@ -100,14 +105,14 @@ int main()
 	_digitalService = new Stm32::Stm32F10xDigitalService();
 	
 	//TODO: create unit tests
-	_ignitionServices[0] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_1, false, true); 
-	_ignitionServices[1] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_2, false, true); 
-	_ignitionServices[2] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_3, false, true); 
-	_ignitionServices[3] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_4, false, true); 
-	_ignitionServices[4] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_5, false, true); 
-	_ignitionServices[5] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_6, false, true); 
-	_ignitionServices[6] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_7, false, true); 
-	_ignitionServices[7] = new EngineManagement::IgnitionService(_digitalService, IGNITION_PIN_8, false, true); 
+	_ignitorServices[0] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_1, false, true); 
+	_ignitorServices[1] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_2, false, true); 
+	_ignitorServices[2] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_3, false, true); 
+	_ignitorServices[3] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_4, false, true); 
+	_ignitorServices[4] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_5, false, true); 
+	_ignitorServices[5] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_6, false, true); 
+	_ignitorServices[6] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_7, false, true); 
+	_ignitorServices[7] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_8, false, true); 
 	
 	//TODO: create unit tests
 	_injectorServices[0] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_1, false, false); 
@@ -142,12 +147,21 @@ int main()
 	_afrService = NULL;
 	
 	//TODO: create unit tests
+	//implement config
+	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(NULL);
+	
+	//TODO: create unit tests
 	//interpolate short pulse adder
-	_pistonEngineConfig = new EngineManagement::PistonEngineSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, EmbeddedResources::PistonEngineSDConfigFile_dat.data());
+	//implement config
+	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, NULL);
+	
+	//TODO: create unit tests
+	//implement config
+	_pistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionMapConfig(_decoder, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, NULL);
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks
-	_pistonEngineController = new EngineManagement::PistonEngineController(_timerService, _decoder, _ignitionServices, _injectorServices, _pistonEngineConfig);
+	_pistonEngineController = new EngineManagement::PistonEngineController(_timerService, _decoder, _ignitorServices, _injectorServices, _pistonEngineInjectionConfig, _pistonEngineIgnitionConfig, _pistonEngineConfig);
 	
 	for (;;)
 	{

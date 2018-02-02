@@ -1,6 +1,6 @@
 namespace EngineManagement
 {
-	class IIgnitionService
+	class IIgnitorService
 	{
 	public:
 		virtual void CoilDwell() = 0;
