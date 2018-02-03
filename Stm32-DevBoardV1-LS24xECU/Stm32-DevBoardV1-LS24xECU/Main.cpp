@@ -113,6 +113,8 @@ int main()
 		
 	_digitalService = new Stm32::Stm32F10xDigitalService();
 	
+	_analogService = new Stm32::Stm32F10xAnalogService();
+	
 	//TODO: create unit tests
 	_ignitorServices[0] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_1, false, true); 
 	_ignitorServices[1] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_2, false, true); 
@@ -132,9 +134,7 @@ int main()
 	_injectorServices[5] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_6, false, false); 
 	_injectorServices[6] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_7, false, false); 
 	_injectorServices[7] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_8, false, false); 
-	
-	_analogService = new Stm32::Stm32F10xAnalogService();
-	
+		
 	//TODO: create unit tests
 	_mapService = new EngineManagement::MapService(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data());
   
@@ -160,7 +160,6 @@ int main()
 	
 	//TODO: create unit tests
 	//interpolate short pulse adder
-	//make temperature bias relative to cylinder volume
 	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineInjectionSDConfigFile_dat.data());
 	
 	//TODO: create unit tests

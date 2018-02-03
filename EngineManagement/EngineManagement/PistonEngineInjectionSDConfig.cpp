@@ -56,14 +56,14 @@ namespace EngineManagement
 		_offset = (short *)config;
 		config = (void*)((short *)config + (INJECTOR_OFFSET_VOLTAGE_RESOLUTION * INJECTOR_OFFSET_MAP_RESOLUTION));
 		
-		_volumetricEfficiencyMap = ((unsigned short *)config);
+		_volumetricEfficiencyMap = ((unsigned short *)config); // value in 1/128%
 		config = (void*)((unsigned short *)config + (VE_RPM_RESOLUTION * VE_MAP_RESOLUTION));
 		
 		_gasConstant = *((unsigned short *)config); //value in 0.1 units
 		config = (void*)((unsigned short *)config + 1);
 		
-		_temperatureBias = *((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT)
-		config = (void*)((unsigned char *)config + 1);
+		_temperatureBias = ((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
+		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
 	}
 	
 	InjectorTiming PistonEngineInjectionSDConfig::GetInjectorTiming(uint8_t cylinder)
@@ -76,7 +76,7 @@ namespace EngineManagement
 		unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / VE_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
-		float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
+		float rpmMultiplier = ((float)rpm) / rpmDivision - rpmIndexL;
 		if (rpmIndexL > VE_RPM_RESOLUTION - 1)
 		{
 			rpmIndexL = rpmIndexH = VE_RPM_RESOLUTION - 1;
@@ -90,7 +90,7 @@ namespace EngineManagement
 		unsigned short mapDivision = _mapService->MaxMapKpa / VE_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
-		float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
+		float mapMultiplier = ((float)map) / mapDivision - mapIndexL;
 		if (mapIndexL > VE_MAP_RESOLUTION - 1)
 		{
 			mapIndexL = mapIndexH = VE_MAP_RESOLUTION - 1;
@@ -100,17 +100,33 @@ namespace EngineManagement
 			mapIndexH = VE_MAP_RESOLUTION - 1;
 		}
 		
-		float VE =	_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
-		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-		+			_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);	
-		VE *= 0.0078125;
+		float VE =	_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * (1 - mapMultiplier)
+		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
+		+			_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
+		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * mapMultiplier;
+		VE *= 0.0078125f;
 				
 		if (_fuelTrimService != NULL)
 			VE += _fuelTrimService->GetFuelTrim(cylinder);
-		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder / 8.0f * VE;
+		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
-		float temperature = (_iatService->IntakeAirTemperature * _temperatureBias + _ectService->EngineCoolantTemperature * (255 - _temperatureBias))/255;
+		unsigned int temperatureBiasCalc = map * rpm * VE;
+		unsigned int temperatureBiasDivision = (_mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120) / TEMPERATURE_BIAS_RESOLUTION;
+		unsigned char temperatureBiasIndexL = temperatureBiasCalc / temperatureBiasDivision;
+		unsigned char temperatureBiasIndexH = temperatureBiasIndexL + 1;
+		float temperatureBiasMultiplier = ((float)temperatureBiasCalc) / temperatureBiasDivision - temperatureBiasIndexL;
+		if (temperatureBiasIndexL > TEMPERATURE_BIAS_RESOLUTION - 1)
+		{
+			temperatureBiasIndexL = temperatureBiasIndexH = TEMPERATURE_BIAS_RESOLUTION - 1;
+		}
+		else if (temperatureBiasIndexH > TEMPERATURE_BIAS_RESOLUTION - 1)
+		{
+			temperatureBiasIndexH = TEMPERATURE_BIAS_RESOLUTION - 1;
+		}
+		
+		unsigned char temperatureBias = _temperatureBias[temperatureBiasIndexL] * (1 - temperatureBiasMultiplier) + _temperatureBias[temperatureBiasIndexH] * temperatureBiasMultiplier;
+		
+		float temperature = (_iatService->IntakeAirTemperature * temperatureBias + _ectService->EngineCoolantTemperature * (255 - temperatureBias))/255;
 		
 		float airDensity = map / (100.0f * _gasConstant * temperature);
 		
@@ -142,7 +158,7 @@ namespace EngineManagement
 		unsigned short mapOffsetDivision = _mapService->MaxMapKpa / INJECTOR_OFFSET_MAP_RESOLUTION;
 		unsigned char mapOffsetIndexL = map / mapDivision;
 		unsigned char mapOffsetIndexH = mapOffsetIndexL + 1;
-		float mapOffsetMultiplier = (map + 0.0f) / mapDivision - mapOffsetIndexL;
+		float mapOffsetMultiplier = ((float)map) / mapDivision - mapOffsetIndexL;
 		if (mapOffsetIndexL > INJECTOR_OFFSET_MAP_RESOLUTION - 1)
 		{
 			mapOffsetIndexL = mapOffsetIndexH = INJECTOR_OFFSET_MAP_RESOLUTION - 1;
@@ -152,10 +168,10 @@ namespace EngineManagement
 			mapOffsetIndexH = INJECTOR_OFFSET_MAP_RESOLUTION - 1;
 		}
 		
-		float offset =	(_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * voltageMultiplier * mapOffsetMultiplier
-		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * (1 - voltageMultiplier) * mapOffsetMultiplier
-		+				_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * voltageMultiplier * (1 - mapOffsetMultiplier)
-		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * (1 - voltageMultiplier) * (1 - mapOffsetMultiplier)) * (1 / 1048576);
+		float offset =	(_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * (1 - voltageMultiplier) * (1 - mapOffsetMultiplier)) * (1 / 1048576)
+		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * voltageMultiplier * (1 - mapOffsetMultiplier)
+		+				_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * (1 - voltageMultiplier) * mapOffsetMultiplier
+		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * voltageMultiplier * mapOffsetMultiplier;
 		
 		injectorDuration += offset;
 				

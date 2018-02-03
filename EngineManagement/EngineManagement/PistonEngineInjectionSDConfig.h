@@ -4,6 +4,7 @@
 #define INJECTOR_OFFSET_VOLTAGE_RESOLUTION 16
 #define INJECTOR_OFFSET_VOLTAGE_MAX 16
 #define INJECTOR_OFFSET_VOLTAGE_MIN 8
+#define TEMPERATURE_BIAS_RESOLUTION 16
 
 namespace EngineManagement
 {	
@@ -24,7 +25,7 @@ namespace EngineManagement
 		short *_shortPulseAdder;
 		short *_offset;
 		unsigned short _gasConstant;
-		unsigned char _temperatureBias;
+		unsigned char *_temperatureBias;
 		unsigned short _injectorOpenPosition64thDegree;
 		void LoadConfig(void *config);
 	public:
