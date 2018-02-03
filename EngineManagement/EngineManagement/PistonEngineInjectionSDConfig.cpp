@@ -139,7 +139,22 @@ namespace EngineManagement
 			
 		//TODO interpolate this
 		if(injectorDuration < _shortPulseLimit)
-			injectorDuration += _shortPulseAdder[(int)(injectorDuration * 16666.666666666666666666666666667f)] * 0.000001f;
+		{
+			unsigned short shortPulseResolution = (_shortPulseLimit / 0.00006f);
+			unsigned short injectorDurationDivision = _shortPulseLimit / (shortPulseResolution + 1);
+			unsigned short injectorDurationIndexL = injectorDuration / injectorDurationDivision;
+			unsigned short injectorDurationIndexH = injectorDurationIndexL + 1;
+			float injectorDurationMultiplier = ((float)injectorDuration) / injectorDurationDivision - injectorDurationIndexL;
+			if (injectorDurationIndexL > shortPulseResolution)
+			{
+				injectorDurationIndexL = injectorDurationIndexH = shortPulseResolution;
+			}
+			else if (injectorDurationIndexH > shortPulseResolution)
+			{
+				injectorDurationIndexH = shortPulseResolution;
+			}
+			injectorDuration += (_shortPulseAdder[injectorDurationIndexL] * (1 - injectorDurationMultiplier) + _shortPulseAdder[injectorDurationIndexH] * injectorDurationMultiplier) * 0.000001f;
+		}
 		
 		float voltage = _voltageService->Voltage;
 		float voltageDivision = (INJECTOR_OFFSET_VOLTAGE_MAX - INJECTOR_OFFSET_VOLTAGE_MIN) / INJECTOR_OFFSET_VOLTAGE_RESOLUTION;

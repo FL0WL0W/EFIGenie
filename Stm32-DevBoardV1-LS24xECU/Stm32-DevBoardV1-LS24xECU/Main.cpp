@@ -116,6 +116,7 @@ int main()
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
 	//TODO: create unit tests
+	//set all to the same pin for distributor
 	_ignitorServices[0] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_1, false, true); 
 	_ignitorServices[1] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_2, false, true); 
 	_ignitorServices[2] = new EngineManagement::IgnitorService(_digitalService, IGNITION_PIN_3, false, true); 
@@ -159,7 +160,6 @@ int main()
 	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(EmbeddedResources::PistonEngineConfigFile_dat.data());
 	
 	//TODO: create unit tests
-	//interpolate short pulse adder
 	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineInjectionSDConfigFile_dat.data());
 	
 	//TODO: create unit tests
@@ -167,6 +167,7 @@ int main()
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks
+	//finish Throttle Body Injection
 	_pistonEngineController = new EngineManagement::PistonEngineController(_timerService, _decoder, _ignitorServices, _injectorServices, _pistonEngineInjectionConfig, _pistonEngineIgnitionConfig, _pistonEngineConfig);
 	
 	//wait until the decoder is synced before any scheduling
