@@ -100,7 +100,7 @@ namespace Stm32
 		}
 	}
 	
-	unsigned short Stm32F10xAnalogService::ReadPin(uint8_t pin)
+	float Stm32F10xAnalogService::ReadPin(uint8_t pin)
 	{
 		//set the channel to the pin we want to read
 		ADC_RegularChannelConfig(ADC1, pin, 1, ADC_SampleTime_1Cycles5);
@@ -111,6 +111,6 @@ namespace Stm32
 		while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
 			;
 		//return the value
-		return ADC_GetConversionValue(ADC1) << 4; //convert from 12 bit to 16 bit
+		return ADC_GetConversionValue(ADC1) * 0.000244140625f;  //convert from 12 bit to 16 bit
 	}
 }

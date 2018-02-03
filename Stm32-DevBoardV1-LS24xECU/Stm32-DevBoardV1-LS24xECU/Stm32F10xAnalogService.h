@@ -5,6 +5,6 @@ namespace Stm32
 	public:
 		Stm32F10xAnalogService();
 		void InitPin(uint8_t pin);
-		unsigned short ReadPin(uint8_t pin);
+		float ReadPin(uint8_t pin);
 	};
 }

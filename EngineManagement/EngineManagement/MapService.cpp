@@ -43,7 +43,7 @@ namespace EngineManagement
 	void MapService::ReadMap()
 	{
 		float prevMapKpa = MapKpa;
-		unsigned short adcValue = _analogService->ReadPin(_adcPin);
+		float adcValue = _analogService->ReadPin(_adcPin);
 		MapKpa = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTick = _timerService->GetTick();
 		//if ther hasn't been a full tick between reads then return;
