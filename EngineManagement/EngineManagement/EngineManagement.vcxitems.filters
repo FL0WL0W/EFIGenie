@@ -69,6 +69,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

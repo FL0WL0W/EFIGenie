@@ -18,7 +18,7 @@ namespace Decoder
 		float GetCrankPosition(void);
 		float GetCamPosition(void);
 		unsigned int GetTickPerDegree(void);
-		uint16_t GetRpm(void);
+		unsigned short GetRpm(void);
 		void CrankEdgeTrigger(EdgeTrigger edgeTrigger);
 		void CamEdgeTrigger(EdgeTrigger edgeTrigger);
 		bool IsSynced();

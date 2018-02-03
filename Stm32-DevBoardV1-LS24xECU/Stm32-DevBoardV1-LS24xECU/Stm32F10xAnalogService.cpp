@@ -100,9 +100,7 @@ namespace Stm32
 		}
 	}
 	
-	//if something interupts to use analog during the 14 ticks then that sucks
-	//definitely something to defend against in the future when reading multiple adcs from different tasks
-	unsigned int Stm32F10xAnalogService::ReadPin(uint8_t pin)
+	unsigned short Stm32F10xAnalogService::ReadPin(uint8_t pin)
 	{
 		//set the channel to the pin we want to read
 		ADC_RegularChannelConfig(ADC1, pin, 1, ADC_SampleTime_1Cycles5);
@@ -113,6 +111,6 @@ namespace Stm32
 		while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
 			;
 		//return the value
-		return ADC_GetConversionValue(ADC1);
+		return ADC_GetConversionValue(ADC1) << 4; //convert from 12 bit to 16 bit
 	}
 }

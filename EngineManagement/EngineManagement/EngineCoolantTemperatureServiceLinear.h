@@ -12,7 +12,5 @@ namespace EngineManagement
 	public:
 		EngineCoolantTemperatureServiceLinear(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
 		void ReadEct();
-		float EngineCoolantTemperature;
-		float EngineCoolantTemperatureDerivative;
 	};
 }

@@ -50,9 +50,9 @@ namespace EngineManagement
 		float scheduleCamPosition = _decoder->GetCamPosition();
 		if (isSequential && scheduleCamPosition > 360)
 			scheduleCamPosition -= 360;
-		uint16_t camResolution = isSequential ? 720 : 360;
+		unsigned short camResolution = isSequential ? 720 : 360;
 		unsigned int scheduleTickPerDegree = _decoder->GetTickPerDegree();
-		//uint16_t scheduleRpm = (360000000 / 60) / scheduleTickPerDegree;
+		//unsigned short scheduleRpm = (360000000 / 60) / scheduleTickPerDegree;
 		unsigned int scheduleTick = _timerService->GetTick();
 		unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();
 						

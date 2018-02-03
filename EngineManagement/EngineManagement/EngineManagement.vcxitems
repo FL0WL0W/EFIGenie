@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)StaticAfrService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IAfrService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)InjectorService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MapServiceLinear.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionMapConfig.cpp" />

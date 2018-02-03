@@ -4,7 +4,7 @@
 #include "IDigitalService.h"
 #include "Stm32F10xDigitalService.h"
 
-uint16_t PinToGPIO_Pin(uint8_t pin)
+unsigned short PinToGPIO_Pin(uint8_t pin)
 {
 	switch (pin)
 	{

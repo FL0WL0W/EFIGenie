@@ -45,7 +45,7 @@ namespace Decoder
 		return _crankPeriod / 15;
 	}
 	
-	uint16_t Gm24xDecoder::GetRpm(void)
+	unsigned short Gm24xDecoder::GetRpm(void)
 	{
 		return ((60 * _timerService->GetTicksPerSecond()) / 24) / _crankPeriod;
 	}

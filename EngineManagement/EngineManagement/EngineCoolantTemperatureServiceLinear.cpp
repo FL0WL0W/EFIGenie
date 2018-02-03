@@ -30,14 +30,14 @@ namespace EngineManagement
 		float minEct = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
-		uint16_t maxVolt12Bit = *((unsigned short *)config);
+		unsigned short maxVolt16Bit = *((unsigned short *)config);
 		config = (void*)((unsigned short *)config + 1);
 		
-		uint16_t minVolt12Bit = *((unsigned short *)config);
+		unsigned short minVolt16Bit = *((unsigned short *)config);
 		config = (void*)((unsigned short *)config + 1);
 		
-		_slope = (MaxEngineCoolantTemperature - minEct) / (maxVolt12Bit - minVolt12Bit);
-		_offset = minEct / _slope - minVolt12Bit;
+		_slope = (MaxEngineCoolantTemperature - minEct) / (maxVolt16Bit - minVolt16Bit);
+		_offset = minEct / _slope - minVolt16Bit;
 	}
 	
 	void EngineCoolantTemperatureServiceLinear::ReadEct()
