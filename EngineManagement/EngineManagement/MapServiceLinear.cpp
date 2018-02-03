@@ -24,11 +24,18 @@ namespace EngineManagement
 	
 	void MapServiceLinear::LoadConfig(void *config)
 	{
-		//void *config = EmbeddedResources::MapLinearConfigFile_dat.data();
-		MaxMapKpa = ((float *)config)[0];
-		float minMapKpa = ((float *)config)[1];
-		uint16_t maxVolt12Bit = ((uint16_t *)config)[4];
-		uint16_t minVolt12Bit = ((uint16_t *)config)[5];
+		MaxMapKpa = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
+		float minMapKpa = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
+		uint16_t maxVolt12Bit = *((unsigned short *)config);
+		config = (void*)((unsigned short *)config + 1);
+		
+		uint16_t minVolt12Bit = *((unsigned short *)config);
+		config = (void*)((unsigned short *)config + 1);
+		
 		_slope = (MaxMapKpa - minMapKpa) / (maxVolt12Bit - minVolt12Bit);
 		_offset = minMapKpa / _slope - minVolt12Bit;
 	}

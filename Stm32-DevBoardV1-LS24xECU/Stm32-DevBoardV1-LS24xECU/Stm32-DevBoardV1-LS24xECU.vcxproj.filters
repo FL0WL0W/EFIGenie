@@ -260,5 +260,8 @@
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="EctLinearConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
   </ItemGroup>
 </Project>

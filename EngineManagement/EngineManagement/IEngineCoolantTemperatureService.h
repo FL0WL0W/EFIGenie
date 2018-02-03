@@ -6,5 +6,6 @@ namespace EngineManagement
 		virtual void ReadEct() = 0;
 		float EngineCoolantTemperature;
 		float EngineCoolantTemperatureDerivative;
+		float MaxEngineCoolantTemperature;
 	};
 }

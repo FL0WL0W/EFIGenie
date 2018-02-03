@@ -63,6 +63,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionMapConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)StaticAfrService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp">
@@ -87,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionMapConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

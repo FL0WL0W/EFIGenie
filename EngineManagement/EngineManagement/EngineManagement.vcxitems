@@ -14,6 +14,8 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)StaticAfrService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IAfrService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelTrimService.h" />
@@ -33,6 +35,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionSDConfig.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorService.cpp" />

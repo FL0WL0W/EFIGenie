@@ -5,7 +5,6 @@ namespace EngineManagement
 	protected:
 		HardwareAbstraction::ITimerService *_timerService;
 		HardwareAbstraction::IAnalogService *_analogService;
-		HardwareAbstraction::Task *_readMapTask;
 		uint8_t _adcPin;
 		int _offset;
 		int _slope;

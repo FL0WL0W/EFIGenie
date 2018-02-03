@@ -14,9 +14,11 @@
 #include "InjectorService.h"
 #include "IMapService.h"
 #include "IEngineCoolantTemperatureService.h"
+#include "EngineCoolantTemperatureServiceLinear.h"
 #include "IIntakeAirTemperatureService.h"
 #include "IVoltageService.h"
 #include "IAfrService.h"
+#include "StaticAfrService.h"
 #include "MapServiceLinear.h"
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
@@ -49,6 +51,7 @@
 #define IGNITION_PIN_8 0
 
 #define MAP_PIN 0
+#define ECT_PIN 0
 
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
@@ -135,7 +138,7 @@ int main()
 	_fuelTrimService = NULL;
 	
 	//TODO: Engine Coolant Temperature Service
-	_engineCoolantTemperatureService = NULL;
+	_engineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureServiceLinear(_timerService, _analogService, ECT_PIN, EmbeddedResources::EctLinearConfigFile_dat.data());
 	
 	//TODO: Intake Air Temperature Service
 	_intakeAirTemperatureService = NULL;
@@ -144,7 +147,7 @@ int main()
 	_voltageService = NULL;
 	
 	//TODO: Afr Service
-	_afrService = NULL;
+	_afrService = new EngineManagement::StaticAfrService(14.7);
 	
 	//TODO: create unit tests
 	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(EmbeddedResources::PistonEngineConfigFile_dat.data());
