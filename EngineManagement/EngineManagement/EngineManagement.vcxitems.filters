@@ -21,9 +21,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MapServiceLinear.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,10 +63,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)StaticAfrService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MapService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,9 +81,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)InjectorService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MapServiceLinear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -98,10 +98,16 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionMapConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureServiceLinear.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureServiceLinear.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MapService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)VoltageService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

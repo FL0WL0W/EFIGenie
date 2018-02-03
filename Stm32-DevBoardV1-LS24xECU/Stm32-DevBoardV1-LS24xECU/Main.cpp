@@ -13,13 +13,15 @@
 #include "IInjectorService.h"
 #include "InjectorService.h"
 #include "IMapService.h"
+#include "MapService.h"
 #include "IEngineCoolantTemperatureService.h"
-#include "EngineCoolantTemperatureServiceLinear.h"
+#include "EngineCoolantTemperatureService.h"
 #include "IIntakeAirTemperatureService.h"
+#include "IntakeAirTemperatureService.h"
 #include "IVoltageService.h"
+#include "VoltageService.h"
 #include "IAfrService.h"
 #include "StaticAfrService.h"
-#include "MapServiceLinear.h"
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
 #include "IFuelTrimService.h"
@@ -52,6 +54,8 @@
 
 #define MAP_PIN 0
 #define ECT_PIN 0
+#define IAT_PIN 0
+#define VOLTAGE_PIN 0
 
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
@@ -103,6 +107,8 @@ int main()
 {
 	clock_init();
 	
+	//TODO: create factory
+	
 	_timerService = new Stm32::Stm32F10xTimerService();
 		
 	_digitalService = new Stm32::Stm32F10xDigitalService();
@@ -130,7 +136,7 @@ int main()
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
 	//TODO: create unit tests
-	_mapService = new EngineManagement::MapServiceLinear(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapLinearConfigFile_dat.data());
+	_mapService = new EngineManagement::MapService(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data());
   
 	_decoder = new Decoder::Gm24xDecoder(_timerService);
 	
@@ -138,13 +144,13 @@ int main()
 	_fuelTrimService = NULL;
 	
 	//TODO: Ceate Unit Tests
-	_engineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureServiceLinear(_timerService, _analogService, ECT_PIN, EmbeddedResources::EctLinearConfigFile_dat.data());
+	_engineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService(_timerService, _analogService, ECT_PIN, EmbeddedResources::EctConfigFile_dat.data());
 	
-	//TODO: Intake Air Temperature Service
-	_intakeAirTemperatureService = NULL;
+	//TODO: Create Unit Tests
+	_intakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService(_timerService, _analogService, IAT_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
 	
-	//TODO: Voltage Service
-	_voltageService = NULL;
+	//TODO: Create Unit Tests
+	_voltageService = new EngineManagement::VoltageService(_timerService, _analogService, VOLTAGE_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
 	
 	//TODO: Afr Service
 	_afrService = new EngineManagement::StaticAfrService(14.7);
@@ -163,6 +169,9 @@ int main()
 	//TODO: create unit tests
 	//finish odd cylinder banks
 	_pistonEngineController = new EngineManagement::PistonEngineController(_timerService, _decoder, _ignitorServices, _injectorServices, _pistonEngineInjectionConfig, _pistonEngineIgnitionConfig, _pistonEngineConfig);
+	
+	//wait until the decoder is synced before any scheduling
+	while (!_decoder->IsSynced()) ;
 	
 	for (;;)
 	{

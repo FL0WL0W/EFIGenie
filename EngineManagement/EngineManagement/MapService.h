@@ -1,17 +1,16 @@
 namespace EngineManagement
 {
-	class MapServiceLinear : public IMapService
+	class MapService : public IMapService
 	{
 	protected:
 		HardwareAbstraction::ITimerService *_timerService;
 		HardwareAbstraction::IAnalogService *_analogService;
 		uint8_t _adcPin;
-		int _offset;
-		int _slope;
+		float A0, A1, A2, A3;
 		unsigned int _lastReadTick;
 		void LoadConfig(void *config);
 	public:
-		MapServiceLinear(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
+		MapService(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
 		void ReadMap();
 		float MapKpa;
 		float MaxMapKpa;

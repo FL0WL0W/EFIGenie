@@ -125,8 +125,9 @@
     <ResourceCompile Include="Stm32-DevBoardV1-LS24xECU.rc" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="EctLinearConfigFile.dat" />
-    <EmbeddedBinaryFile Include="MapLinearConfigFile.dat" />
+    <EmbeddedBinaryFile Include="EctConfigFile.dat" />
+    <EmbeddedBinaryFile Include="IatConfigFile.dat" />
+    <EmbeddedBinaryFile Include="MapConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineInjectionSDConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineIgnitionMapConfigFile.dat" />

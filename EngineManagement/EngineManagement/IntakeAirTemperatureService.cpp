@@ -5,13 +5,13 @@
 #include "ITimerService.h"
 #include "IIntakeAirTemperatureService.h"
 #include "IAnalogService.h"
-#include "IntakeAirTemperatureServiceLinear.h"
+#include "IntakeAirTemperatureService.h"
 
 #define MAP_READ_TASK_PRIORITY 3
 
 namespace EngineManagement
 {	
-	IntakeAirTemperatureServiceLinear::IntakeAirTemperatureServiceLinear(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	IntakeAirTemperatureService::IntakeAirTemperatureService(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;
@@ -22,28 +22,29 @@ namespace EngineManagement
 		LoadConfig(config);
 	}
 	
-	void IntakeAirTemperatureServiceLinear::LoadConfig(void *config)
+	void IntakeAirTemperatureService::LoadConfig(void *config)
 	{
 		MaxIntakeAirTemperature = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
-		float minIat = *((float *)config);
+		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
-		unsigned short maxVolt16Bit = *((unsigned short *)config);
-		config = (void*)((unsigned short *)config + 1);
+		A1 = *((float *)config);
+		config = (void*)((float *)config + 1);
 		
-		unsigned short minVolt16Bit = *((unsigned short *)config);
-		config = (void*)((unsigned short *)config + 1);
+		A2 = *((float *)config);
+		config = (void*)((float *)config + 1);
 		
-		_slope = (MaxIntakeAirTemperature - minIat) / (maxVolt16Bit - minVolt16Bit);
-		_offset = minIat / _slope - minVolt16Bit;
+		A3 = *((float *)config);
+		config = (void*)((float *)config + 1);
 	}
 	
-	void IntakeAirTemperatureServiceLinear::ReadIat()
+	void IntakeAirTemperatureService::ReadIat()
 	{
 		float prevEct = IntakeAirTemperature;
-		IntakeAirTemperature = _slope * _analogService->ReadPin(_adcPin) + _offset;
+		unsigned short adcValue = _analogService->ReadPin(_adcPin);
+		IntakeAirTemperature = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTick = _timerService->GetTick();
 		//if ther hasn't been a full tick between reads then return;
 		if(_lastReadTick == readTick)

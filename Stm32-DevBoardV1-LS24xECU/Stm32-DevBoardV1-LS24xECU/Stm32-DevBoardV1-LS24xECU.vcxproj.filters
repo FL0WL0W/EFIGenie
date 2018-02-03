@@ -251,16 +251,19 @@
     <EmbeddedBinaryFile Include="PistonEngineInjectionSDConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="MapLinearConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
     <EmbeddedBinaryFile Include="PistonEngineIgnitionMapConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="EctLinearConfigFile.dat">
+    <EmbeddedBinaryFile Include="EctConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="IatConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="MapConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
   </ItemGroup>
