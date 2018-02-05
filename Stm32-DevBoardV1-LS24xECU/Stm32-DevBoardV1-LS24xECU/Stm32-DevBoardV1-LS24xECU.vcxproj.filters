@@ -272,5 +272,8 @@
     <EmbeddedBinaryFile Include="EthanolConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="VoltageConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
   </ItemGroup>
 </Project>

@@ -16,7 +16,9 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Analog.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEthanolService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h" />
@@ -29,6 +31,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IMapService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IVoltageService.h" />
@@ -38,6 +41,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Analog.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Static.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />

@@ -133,6 +133,7 @@
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineInjectionConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineIgnitionConfigFile.dat" />
+    <EmbeddedBinaryFile Include="VoltageConfigFile.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
