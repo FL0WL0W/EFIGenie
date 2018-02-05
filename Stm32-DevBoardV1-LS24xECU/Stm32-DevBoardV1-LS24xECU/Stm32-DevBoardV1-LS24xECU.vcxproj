@@ -128,6 +128,7 @@
     <EmbeddedBinaryFile Include="AfrConfigFile.dat" />
     <EmbeddedBinaryFile Include="EctConfigFile.dat" />
     <EmbeddedBinaryFile Include="EthanolConfigFile.dat" />
+    <EmbeddedBinaryFile Include="FuelTrimConfigFile.dat" />
     <EmbeddedBinaryFile Include="IatConfigFile.dat" />
     <EmbeddedBinaryFile Include="MapConfigFile.dat" />
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat" />

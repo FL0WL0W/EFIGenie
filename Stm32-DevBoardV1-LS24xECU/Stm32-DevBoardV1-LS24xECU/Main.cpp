@@ -177,7 +177,13 @@ int main()
 	}
 	
 	//TODO: Fuel Trim Service
-	_fuelTrimService = NULL;
+	unsigned char fuelTrimId =  *((unsigned char*)EmbeddedResources::FuelTrimConfigFile_dat.data());
+	switch (fuelTrimId)
+	{
+	case 0:
+		_fuelTrimService = NULL;
+		break;
+	}
 	
 	//TODO: Ceate Unit Tests
 	unsigned char ectId =  *((unsigned char*)EmbeddedResources::EctConfigFile_dat.data());
