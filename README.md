@@ -14,4 +14,4 @@ Create Fuel Trim Service<br>
 Create TPS Service<br>
 Use TPS for "Accelerator Pump"<br>
 AFR Service to use TPS override and ECT for warm up enrichment<br>
-Create Fuel Prim<br>
+Create Fuel Prime<br>
