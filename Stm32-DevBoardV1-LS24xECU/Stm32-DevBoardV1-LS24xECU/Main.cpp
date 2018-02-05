@@ -278,6 +278,7 @@ int main()
 		_engineCoolantTemperatureService->ReadEct();
 		_intakeAirTemperatureService->ReadIat();
 		_voltageService->ReadVoltage();
+		_ethanolService->ReadEthanolContent();
 		_pistonEngineController->ScheduleEvents();
 	}
 }
