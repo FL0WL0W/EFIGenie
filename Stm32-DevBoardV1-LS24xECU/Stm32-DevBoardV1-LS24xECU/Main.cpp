@@ -221,7 +221,9 @@ int main()
 		break;
 	}
 	
-	//TODO: make a PWM service
+	//TODO: Create PWM service
+	
+	//TODO: Create EthanolService_Pwm
 	//Create Unit Tests
 	unsigned char ethanolServiceId = *((unsigned char*)EmbeddedResources::EthanolConfigFile_dat.data());
 	switch (ethanolServiceId)
@@ -235,6 +237,7 @@ int main()
 	}
 	
 	//TODO: Create Unit Tests
+	//AFR Service to use TPS override and ECT for warm up enrichment
 	unsigned char afrServiceId = *((unsigned char*)EmbeddedResources::AfrConfigFile_dat.data());
 	switch (afrServiceId)
 	{
@@ -246,7 +249,10 @@ int main()
 		break;
 	}
 	
+	//TODO: Create TPS Service
+	
 	//TODO: create unit tests
+	//Use TPS for "Accelerator Pump"
 	unsigned char pistonEngineInjectionConfigId = *((unsigned char*)EmbeddedResources::PistonEngineInjectionConfigFile_dat.data());
 	switch (pistonEngineInjectionConfigId)
 	{
@@ -271,6 +277,8 @@ int main()
 	
 	//wait until the decoder is synced before any scheduling
 	while (!_decoder->IsSynced()) ;
+	
+	//TODO: Create Fuel Prime
 	
 	for (;;)
 	{
