@@ -4,14 +4,14 @@ An open source engine management. It uses a taskmanager and is coded in a servic
 
 Currently in a state where i can start testing but still have some stuff to add
 
-TODO LIST
-Create unit tests
-Create odd cylinder banks code
-Create Throttle Body Injection code
-Create a PWM service
-Create Ethanol Service with pwm
-Create Fuel Trim Service
-Create TPS Service
-Use TPS for "Accelerator Pump"
-AFR Service to use TPS override and ECT for warm up enrichment
-Create Fuel Prim
+TODO LIST<br>
+Create unit tests<br>
+Create odd cylinder banks code<br>
+Create Throttle Body Injection code<br>
+Create a PWM service<br>
+Create Ethanol Service with pwm<br>
+Create Fuel Trim Service<br>
+Create TPS Service<br>
+Use TPS for "Accelerator Pump"<br>
+AFR Service to use TPS override and ECT for warm up enrichment<br>
+Create Fuel Prim<br>
