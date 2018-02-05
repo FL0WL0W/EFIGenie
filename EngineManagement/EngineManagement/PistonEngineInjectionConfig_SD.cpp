@@ -12,12 +12,12 @@
 #include "IAfrService.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineInjectionConfig.h"
-#include "PistonEngineInjectionSDConfig.h"
+#include "PistonEngineInjectionConfig_SD.h"
 
 
 namespace EngineManagement
 {
-	PistonEngineInjectionSDConfig::PistonEngineInjectionSDConfig(
+	PistonEngineInjectionConfig_SD::PistonEngineInjectionConfig_SD(
 		Decoder::IDecoder *decoder, 
 		IFuelTrimService *fuelTrimService, 
 		IMapService *mapService, 
@@ -39,7 +39,7 @@ namespace EngineManagement
 		
 		LoadConfig(config);
 	}
-	void PistonEngineInjectionSDConfig::LoadConfig(void *config)
+	void PistonEngineInjectionConfig_SD::LoadConfig(void *config)
 	{
 		_injectorOpenPosition64thDegree = *((unsigned short *)config);   //value in 1/64 degrees
 		config = (void*)((unsigned short *)config + 1);
@@ -66,7 +66,7 @@ namespace EngineManagement
 		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
 	}
 	
-	InjectorTiming PistonEngineInjectionSDConfig::GetInjectorTiming(uint8_t cylinder)
+	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(uint8_t cylinder)
 	{
 		InjectorTiming timing = InjectorTiming();
 		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;

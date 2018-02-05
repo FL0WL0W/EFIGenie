@@ -13,26 +13,29 @@
 #include "IInjectorService.h"
 #include "InjectorService.h"
 #include "IMapService.h"
-#include "MapService.h"
+#include "IEthanolService.h"
+#include "MapService_Analog.h"
 #include "IEngineCoolantTemperatureService.h"
-#include "EngineCoolantTemperatureService.h"
+#include "EngineCoolantTemperatureService_Analog.h"
 #include "IIntakeAirTemperatureService.h"
-#include "IntakeAirTemperatureService.h"
+#include "IntakeAirTemperatureService_Analog.h"
 #include "IVoltageService.h"
-#include "VoltageService.h"
+#include "VoltageService_Analog.h"
 #include "IAfrService.h"
-#include "StaticAfrService.h"
+#include "AfrService_Static.h"
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
 #include "IFuelTrimService.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
-#include "PistonEngineIgnitionMapConfig.h"
+#include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 #include "IPistonEngineInjectionConfig.h"
-#include "PistonEngineInjectionSDConfig.h"
+#include "PistonEngineInjectionConfig_SD.h"
 #include "PistonEngineController.h"
 #include "EmbeddedResources.h"
 #include "stm32f10x_tim.h"
+#include "AfrService_Map_Ethanol.h"
+#include "EthanolService_Analog.h"
 
 #define INJECTOR_PIN_1 0
 #define INJECTOR_PIN_2 0
@@ -56,6 +59,7 @@
 #define ECT_PIN 0
 #define IAT_PIN 0
 #define VOLTAGE_PIN 0
+#define ETHANOL_PIN 0
 
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
@@ -73,6 +77,7 @@ EngineManagement::PistonEngineConfig *_pistonEngineConfig;
 EngineManagement::IPistonEngineInjectionConfig *_pistonEngineInjectionConfig;
 EngineManagement::IPistonEngineIgnitionConfig *_pistonEngineIgnitionConfig;
 EngineManagement::PistonEngineController *_pistonEngineController;
+EngineManagement::IEthanolService *_ethanolService;
 
 void clock_init() {
   /*Configure all clocks to max for best performance.
@@ -137,7 +142,7 @@ int main()
 	_injectorServices[7] = new EngineManagement::InjectorService(_digitalService, INJECTOR_PIN_8, false, false); 
 		
 	//TODO: create unit tests
-	_mapService = new EngineManagement::MapService(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data());
+	_mapService = new EngineManagement::MapService_Analog(_timerService, _analogService, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data());
   
 	_decoder = new Decoder::Gm24xDecoder(_timerService);
 	
@@ -145,25 +150,29 @@ int main()
 	_fuelTrimService = NULL;
 	
 	//TODO: Ceate Unit Tests
-	_engineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService(_timerService, _analogService, ECT_PIN, EmbeddedResources::EctConfigFile_dat.data());
+	_engineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Analog(_timerService, _analogService, ECT_PIN, EmbeddedResources::EctConfigFile_dat.data());
 	
 	//TODO: Create Unit Tests
-	_intakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService(_timerService, _analogService, IAT_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
+	_intakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Analog(_timerService, _analogService, IAT_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
 	
 	//TODO: Create Unit Tests
-	_voltageService = new EngineManagement::VoltageService(_timerService, _analogService, VOLTAGE_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
+	_voltageService = new EngineManagement::VoltageService_Analog(_timerService, _analogService, VOLTAGE_PIN, EmbeddedResources::IatConfigFile_dat.data()); 
 	
-	//TODO: Afr Service
-	_afrService = new EngineManagement::StaticAfrService(14.7);
+	//TODO: make a PWM service
+	//Create Unit Tests
+	_ethanolService = new EngineManagement::EthanolService_Analog(_analogService, ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data());
+	
+	//TODO: Create Unit Tests
+	_afrService = new EngineManagement::AfrService_Map_Ethanol(_decoder, _pistonEngineConfig, _mapService, _ethanolService, EmbeddedResources::AfrConfigFile_dat.data());
 	
 	//TODO: create unit tests
 	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(EmbeddedResources::PistonEngineConfigFile_dat.data());
 	
 	//TODO: create unit tests
-	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionSDConfig(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineInjectionSDConfigFile_dat.data());
+	_pistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionConfig_SD(_decoder, _fuelTrimService, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineInjectionConfigFile_dat.data());
 	
 	//TODO: create unit tests
-	_pistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionMapConfig(_decoder, _mapService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineIgnitionMapConfigFile_dat.data());
+	_pistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(_decoder, _mapService, _ethanolService, _intakeAirTemperatureService, _engineCoolantTemperatureService, _voltageService, _afrService, _pistonEngineConfig, EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
 	
 	//TODO: create unit tests
 	//finish odd cylinder banks

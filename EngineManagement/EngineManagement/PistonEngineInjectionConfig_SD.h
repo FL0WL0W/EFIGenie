@@ -8,7 +8,7 @@
 
 namespace EngineManagement
 {	
-	class PistonEngineInjectionSDConfig : public IPistonEngineInjectionConfig
+	class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	{
 	protected:
 		Decoder::IDecoder *_decoder;
@@ -29,7 +29,7 @@ namespace EngineManagement
 		unsigned short _injectorOpenPosition64thDegree;
 		void LoadConfig(void *config);
 	public:
-		PistonEngineInjectionSDConfig(
+		PistonEngineInjectionConfig_SD(
 			Decoder::IDecoder *decoder, 
 			IFuelTrimService *fuelTrimService, 
 			IMapService *mapService, 

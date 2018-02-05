@@ -4,6 +4,7 @@
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
 #include "IMapService.h"
+#include "IEthanolService.h"
 #include "IDecoder.h"
 #include "IFuelTrimService.h"
 #include "IEngineCoolantTemperatureService.h"
@@ -12,14 +13,15 @@
 #include "IAfrService.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
-#include "PistonEngineIgnitionMapConfig.h"
+#include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 
 
 namespace EngineManagement
 {
-	PistonEngineIgnitionMapConfig::PistonEngineIgnitionMapConfig(
+	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(
 		Decoder::IDecoder *decoder, 
-		IMapService *mapService, 
+		IMapService *mapService,
+		IEthanolService *ethanolService,
 		IIntakeAirTemperatureService *iatService, 
 		IEngineCoolantTemperatureService *ectService, 
 		IVoltageService *voltageService, 
@@ -29,6 +31,7 @@ namespace EngineManagement
 	{
 		_decoder = decoder;
 		_mapService = mapService;
+		_ethanolService = ethanolService;
 		_iatService = iatService;
 		_ectService = ectService;
 		_voltageService = voltageService;
@@ -37,16 +40,19 @@ namespace EngineManagement
 		
 		LoadConfig(config);
 	}
-	void PistonEngineIgnitionMapConfig::LoadConfig(void *config)
+	void PistonEngineIgnitionConfig_Map_Ethanol::LoadConfig(void *config)
 	{
 		_ignitionDwellTime = ((float *)config)[0];
 		config = (void*)(((float *)config) + 1);
 		
-		_ignitionAdvanceMap = ((short *)config);
+		_ignitionAdvanceMapGas = ((short *)config);
+		config = (void*)(((short *)config) + (IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION));
+		
+		_ignitionAdvanceMapEthanol = ((short *)config);
 		config = (void*)(((short *)config) + (IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION));
 	}
 				
-	IgnitionTiming PistonEngineIgnitionMapConfig::GetIgnitionTiming()
+	IgnitionTiming PistonEngineIgnitionConfig_Map_Ethanol::GetIgnitionTiming()
 		{
 			unsigned short rpm = _decoder->GetRpm();
 			unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / IGNITION_RPM_RESOLUTION;
@@ -76,11 +82,18 @@ namespace EngineManagement
 				mapIndexH = IGNITION_MAP_RESOLUTION - 1;
 			}
 			
+			short ignitionGas = _ignitionAdvanceMapGas[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
+			+					_ignitionAdvanceMapGas[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+			+					_ignitionAdvanceMapGas[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+			+					_ignitionAdvanceMapGas[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+			
+			short ignitionEthanol = _ignitionAdvanceMapEthanol[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
+			+						_ignitionAdvanceMapEthanol[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+			+						_ignitionAdvanceMapEthanol[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+			+						_ignitionAdvanceMapEthanol[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+			
 			IgnitionTiming timing = IgnitionTiming();
-			timing.IgnitionAdvance64thDegree = _ignitionAdvanceMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
-			+		_ignitionAdvanceMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-			+		_ignitionAdvanceMap[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-			+		_ignitionAdvanceMap[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+			timing.IgnitionAdvance64thDegree = ignitionEthanol * _ethanolService->EthanolContent + ignitionGas * (1 - _ethanolService->EthanolContent);
 			timing.IgnitionDwellTime = _ignitionDwellTime;
 		}
 }

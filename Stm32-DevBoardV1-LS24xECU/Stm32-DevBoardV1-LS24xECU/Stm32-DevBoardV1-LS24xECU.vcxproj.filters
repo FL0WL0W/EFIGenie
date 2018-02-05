@@ -248,12 +248,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="PistonEngineInjectionSDConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="PistonEngineIgnitionMapConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
     <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
@@ -264,6 +258,18 @@
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
     <EmbeddedBinaryFile Include="MapConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="PistonEngineIgnitionConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="PistonEngineInjectionConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="AfrConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="EthanolConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
   </ItemGroup>

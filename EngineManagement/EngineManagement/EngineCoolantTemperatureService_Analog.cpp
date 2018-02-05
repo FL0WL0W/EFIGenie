@@ -5,13 +5,13 @@
 #include "ITimerService.h"
 #include "IEngineCoolantTemperatureService.h"
 #include "IAnalogService.h"
-#include "EngineCoolantTemperatureService.h"
+#include "EngineCoolantTemperatureService_Analog.h"
 
 #define MAP_READ_TASK_PRIORITY 3
 
 namespace EngineManagement
 {	
-	EngineCoolantTemperatureService::EngineCoolantTemperatureService(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	EngineCoolantTemperatureService_Analog::EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;
@@ -22,7 +22,7 @@ namespace EngineManagement
 		LoadConfig(config);
 	}
 	
-	void EngineCoolantTemperatureService::LoadConfig(void *config)
+	void EngineCoolantTemperatureService_Analog::LoadConfig(void *config)
 	{
 		MaxEngineCoolantTemperature = *((float *)config);
 		config = (void*)((float *)config + 1);
@@ -40,7 +40,7 @@ namespace EngineManagement
 		config = (void*)((float *)config + 1);
 	}
 	
-	void EngineCoolantTemperatureService::ReadEct()
+	void EngineCoolantTemperatureService_Analog::ReadEct()
 	{
 		float prevEct = EngineCoolantTemperature;
 		float adcValue = _analogService->ReadPin(_adcPin);

@@ -5,13 +5,13 @@
 #include "ITimerService.h"
 #include "IMapService.h"
 #include "IAnalogService.h"
-#include "MapService.h"
+#include "MapService_Analog.h"
 
 #define MAP_READ_TASK_PRIORITY 3
 
 namespace EngineManagement
 {	
-	MapService::MapService(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	MapService_Analog::MapService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;
@@ -22,7 +22,7 @@ namespace EngineManagement
 		LoadConfig(config);
 	}
 	
-	void MapService::LoadConfig(void *config)
+	void MapService_Analog::LoadConfig(void *config)
 	{
 		MaxMapKpa = *((float *)config);
 		config = (void*)((float *)config + 1);
@@ -40,7 +40,7 @@ namespace EngineManagement
 		config = (void*)((float *)config + 1);
 	}
 	
-	void MapService::ReadMap()
+	void MapService_Analog::ReadMap()
 	{
 		float prevMapKpa = MapKpa;
 		float adcValue = _analogService->ReadPin(_adcPin);

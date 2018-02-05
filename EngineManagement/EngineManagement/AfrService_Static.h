@@ -1,9 +1,9 @@
 namespace EngineManagement
 {
-	class StaticAfrService : public IAfrService
+	class AfrService_Static : public IAfrService
 	{
 	public:
-		StaticAfrService(float afr) { Afr = afr; }
+		AfrService_Static(float afr) { Afr = afr; }
 		float Afr;
 		float GetAfr() { return Afr; }
 	};

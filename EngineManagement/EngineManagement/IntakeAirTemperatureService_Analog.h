@@ -1,6 +1,6 @@
 namespace EngineManagement
 {
-	class IntakeAirTemperatureService : public IIntakeAirTemperatureService
+	class IntakeAirTemperatureService_Analog : public IIntakeAirTemperatureService
 	{
 		HardwareAbstraction::ITimerService *_timerService;
 		HardwareAbstraction::IAnalogService *_analogService;
@@ -9,7 +9,7 @@ namespace EngineManagement
 		unsigned int _lastReadTick;
 		void LoadConfig(void *config);
 	public:
-		IntakeAirTemperatureService(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
+		IntakeAirTemperatureService_Analog(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
 		void ReadIat();
 	};
 }
