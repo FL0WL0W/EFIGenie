@@ -67,9 +67,9 @@
 
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
+HardwareAbstraction::IAnalogService *_analogService;
 EngineManagement::IIgnitorService *_ignitorServices[MAX_CYLINDERS];
 EngineManagement::IInjectorService *_injectorServices[MAX_CYLINDERS];
-HardwareAbstraction::IAnalogService *_analogService;
 EngineManagement::IMapService *_mapService;
 EngineManagement::IFuelTrimService *_fuelTrimService;
 EngineManagement::IEngineCoolantTemperatureService *_engineCoolantTemperatureService;
@@ -121,6 +121,8 @@ int main()
 	_digitalService = new Stm32::Stm32F10xDigitalService();
 	
 	_analogService = new Stm32::Stm32F10xAnalogService();
+	
+	//TODO: Create PWM service
 	
 	//TODO: create unit tests
 	_pistonEngineConfig = new EngineManagement::PistonEngineConfig(EmbeddedResources::PistonEngineConfigFile_dat.data());
@@ -176,15 +178,6 @@ int main()
 		break;
 	}
 	
-	//TODO: Fuel Trim Service
-	unsigned char fuelTrimId =  *((unsigned char*)EmbeddedResources::FuelTrimConfigFile_dat.data());
-	switch (fuelTrimId)
-	{
-	case 0:
-		_fuelTrimService = NULL;
-		break;
-	}
-	
 	//TODO: Ceate Unit Tests
 	unsigned char ectId =  *((unsigned char*)EmbeddedResources::EctConfigFile_dat.data());
 	switch (ectId)
@@ -220,9 +213,7 @@ int main()
 		_voltageService = new EngineManagement::VoltageService_Analog(_timerService, _analogService, VOLTAGE_PIN, ((void *)((unsigned char*)EmbeddedResources::VoltageConfigFile_dat.data() + 1)));
 		break;
 	}
-	
-	//TODO: Create PWM service
-	
+		
 	//TODO: Create EthanolService_Pwm
 	//Create Unit Tests
 	unsigned char ethanolServiceId = *((unsigned char*)EmbeddedResources::EthanolConfigFile_dat.data());
@@ -233,6 +224,17 @@ int main()
 		break;
 	case 1:
 		_ethanolService = new EngineManagement::EthanolService_Analog(_analogService, ETHANOL_PIN, (void*)((unsigned char*)EmbeddedResources::EthanolConfigFile_dat.data() + 1));
+		break;
+	}
+	
+	//TODO: Create TPS Service
+		
+	//TODO: Fuel Trim Service
+	unsigned char fuelTrimId =  *((unsigned char*)EmbeddedResources::FuelTrimConfigFile_dat.data());
+	switch (fuelTrimId)
+	{
+	case 0:
+		_fuelTrimService = NULL;
 		break;
 	}
 	
@@ -248,9 +250,7 @@ int main()
 		_afrService = new EngineManagement::AfrService_Map_Ethanol(_decoder, _pistonEngineConfig, _mapService, _ethanolService, (void*)((unsigned char*)EmbeddedResources::AfrConfigFile_dat.data() + 1));
 		break;
 	}
-	
-	//TODO: Create TPS Service
-	
+		
 	//TODO: create unit tests
 	//Use TPS for "Accelerator Pump"
 	unsigned char pistonEngineInjectionConfigId = *((unsigned char*)EmbeddedResources::PistonEngineInjectionConfigFile_dat.data());
