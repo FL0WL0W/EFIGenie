@@ -8,7 +8,7 @@ namespace EngineManagement
 		bool _normalOn;
 		bool _highZ;
 	public:
-		IgnitorService(HardwareAbstraction::IDigitalService *digitalService, uint8_t ignitionPin, bool normalOn, bool highZ);
+		IgnitorService(HardwareAbstraction::IDigitalService *digitalService, unsigned char ignitionPin, bool normalOn, bool highZ);
 		void CoilDwell();
 		void CoilFire();
 	};

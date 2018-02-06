@@ -96,6 +96,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp">

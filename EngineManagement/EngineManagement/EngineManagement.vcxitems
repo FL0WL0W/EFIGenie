@@ -19,6 +19,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Static.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEthanolService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h" />
