@@ -57,14 +57,17 @@ namespace Stm32
 		switch (pin / 16)
 		{
 		case 0: //PA
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 			GPIO_InitStruct.GPIO_Pin = PinToGPIO_Pin(pin);
 			GPIO_Init(GPIOA, &GPIO_InitStruct);
 			break;
 		case 1: //PB
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 			GPIO_InitStruct.GPIO_Pin = PinToGPIO_Pin(pin - 16);
 			GPIO_Init(GPIOB, &GPIO_InitStruct);
 			break;
 		case 2: //PC
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 			GPIO_InitStruct.GPIO_Pin = PinToGPIO_Pin(pin - 32);
 			GPIO_Init(GPIOC, &GPIO_InitStruct);
 			break;

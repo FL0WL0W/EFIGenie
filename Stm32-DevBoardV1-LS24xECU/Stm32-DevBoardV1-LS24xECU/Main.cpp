@@ -8,6 +8,8 @@
 #include "Stm32F10xAnalogService.h"
 #include "EmbeddedResources.h"
 #include "stm32f10x_tim.h"
+#include <stm32f10x_gpio.h>
+#include "stm32f10x_exti.h"
 
 #define INJECTOR_PIN_1 0
 #define INJECTOR_PIN_2 0
@@ -106,6 +108,66 @@ int main()
 	}
 }
 
+void ConfigureInterrupts()
+{
+	/* Set variables used */
+	GPIO_InitTypeDef GPIO_InitStruct;
+	EXTI_InitTypeDef EXTI_InitStruct;
+    
+	/* Enable clock for GPIOB */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+	
+	
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15 | GPIO_Pin_14;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-//TODO: create and enable intterupts for decoder
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);
+	EXTI_InitStruct.EXTI_Line = EXTI_Line15 | EXTI_Line14;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStruct);
+
+}
+
+extern "C" 
+{
+	void EXTI15_IRQHandler(void)
+	{
+		if (EXTI_GetITStatus(EXTI_Line15) != RESET) 
+		{
+			Decoder::EdgeTrigger edgeTrigger;
+			
+			if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_15))
+				edgeTrigger = Decoder::EdgeTrigger::Up;
+			else
+				edgeTrigger = Decoder::EdgeTrigger::Down;
+			
+			EngineManagement::CurrentDecoder->CrankEdgeTrigger(edgeTrigger);
+			
+			EXTI_ClearITPendingBit(EXTI_Line15);
+		}
+	}
+	
+	void EXTI14_IRQHandler(void)
+	{
+		if (EXTI_GetITStatus(EXTI_Line14) != RESET) 
+		{
+			Decoder::EdgeTrigger edgeTrigger;
+			
+			if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14))
+				edgeTrigger = Decoder::EdgeTrigger::Up;
+			else
+				edgeTrigger = Decoder::EdgeTrigger::Down;
+			
+			EngineManagement::CurrentDecoder->CamEdgeTrigger(edgeTrigger);
+			
+			EXTI_ClearITPendingBit(EXTI_Line14);
+		}
+	}
+}
 
