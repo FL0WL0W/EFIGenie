@@ -15,4 +15,3 @@ Create TPS Service<br>
 Use TPS for "Accelerator Pump"<br>
 AFR Service to use TPS override and ECT for warm up enrichment<br>
 Create Fuel Prime<br>
-Connect decoder to interrupt pins
