@@ -99,6 +99,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,8 +7,6 @@
 #include "IAnalogService.h"
 #include "EngineCoolantTemperatureService_Analog.h"
 
-#define MAP_READ_TASK_PRIORITY 3
-
 namespace EngineManagement
 {	
 	EngineCoolantTemperatureService_Analog::EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)

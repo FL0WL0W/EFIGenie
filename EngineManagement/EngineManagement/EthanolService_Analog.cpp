@@ -6,8 +6,6 @@
 #include "IAnalogService.h"
 #include "EthanolService_Analog.h"
 
-#define MAP_READ_TASK_PRIORITY 3
-
 namespace EngineManagement
 {	
 	EthanolService_Analog::EthanolService_Analog(HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)

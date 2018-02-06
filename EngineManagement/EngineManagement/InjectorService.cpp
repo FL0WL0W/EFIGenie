@@ -4,6 +4,7 @@
 #include <functional>
 #include "ITimerService.h"
 #include "IMapService.h"
+#include "PinDirection.h"
 #include "IDigitalService.h"
 #include "IInjectorService.h"
 #include "InjectorService.h"

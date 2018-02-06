@@ -67,6 +67,7 @@ void clock_init() {
 HardwareAbstraction::ITimerService *_timerService;
 HardwareAbstraction::IDigitalService *_digitalService;
 HardwareAbstraction::IAnalogService *_analogService;
+HardwareAbstraction::IPwmService *_pwmService;
 
 int main()
 {
@@ -78,7 +79,8 @@ int main()
 	
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
-	//TODO: Create PWM service
+	//TODO: Implement PWM service
+	_pwmService = NULL;
 	
 	unsigned char ignitionPins[MAX_CYLINDERS];
 	ignitionPins[0] = IGNITION_PIN_1;
@@ -100,7 +102,7 @@ int main()
 	injectorPins[6] = INJECTOR_PIN_7;
 	injectorPins[7] = INJECTOR_PIN_8;
 	
-	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, EmbeddedResources::PistonEngineConfigFile_dat.data(), ignitionPins, false, true, injectorPins, false, false, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data(), ECT_PIN, EmbeddedResources::EctConfigFile_dat.data(), IAT_PIN, EmbeddedResources::IatConfigFile_dat.data(), VOLTAGE_PIN, EmbeddedResources::VoltageConfigFile_dat.data(), ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data(), EmbeddedResources::FuelTrimConfigFile_dat.data(), EmbeddedResources::AfrConfigFile_dat.data(), EmbeddedResources::PistonEngineInjectionConfigFile_dat.data(), EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
+	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::PistonEngineConfigFile_dat.data(), ignitionPins, false, true, injectorPins, false, false, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data(), ECT_PIN, EmbeddedResources::EctConfigFile_dat.data(), IAT_PIN, EmbeddedResources::IatConfigFile_dat.data(), VOLTAGE_PIN, EmbeddedResources::VoltageConfigFile_dat.data(), ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data(), EmbeddedResources::FuelTrimConfigFile_dat.data(), EmbeddedResources::AfrConfigFile_dat.data(), EmbeddedResources::PistonEngineInjectionConfigFile_dat.data(), EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
 	
 	for (;;)
 	{
@@ -131,7 +133,6 @@ void ConfigureInterrupts()
 	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
-
 }
 
 extern "C" 

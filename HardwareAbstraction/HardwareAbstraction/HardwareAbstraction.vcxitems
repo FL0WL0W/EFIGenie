@@ -16,7 +16,9 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)IAnalogService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IDigitalService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IPwmService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ITimerService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PinDirection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)TimerService.cpp" />

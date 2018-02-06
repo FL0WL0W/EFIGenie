@@ -1,6 +1,8 @@
 #include "ITimerService.h"
+#include "PinDirection.h"
 #include "IDigitalService.h"
 #include "IAnalogService.h"
+#include "IPwmService.h"
 #include "IIgnitorService.h"
 #include "IgnitorService.h"
 #include "IInjectorService.h"
@@ -31,12 +33,14 @@
 #include "PistonEngineController.h"
 #include "AfrService_Map_Ethanol.h"
 #include "EthanolService_Analog.h"
+#include "EthanolService_Pwm.h"
 
 namespace EngineManagement
 {
 	HardwareAbstraction::ITimerService *CurrentTimerService;
 	HardwareAbstraction::IDigitalService *CurrentDigitalService;
 	HardwareAbstraction::IAnalogService *CurrentAnalogService;
+	HardwareAbstraction::IPwmService *CurrentPwmService;
 	PistonEngineController *CurrentPistonEngineController;
 	Decoder::IDecoder *CurrentDecoder;
 	IIgnitorService *CurrentIgnitorServices[MAX_CYLINDERS];
@@ -56,6 +60,7 @@ namespace EngineManagement
 		HardwareAbstraction::ITimerService *timerService,
 		HardwareAbstraction::IDigitalService *digitalService,
 		HardwareAbstraction::IAnalogService *analogService,
+		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
 		unsigned char ignitionPins[MAX_CYLINDERS],
 		bool ignitionNormalOn,
@@ -81,6 +86,8 @@ namespace EngineManagement
 		CurrentTimerService = timerService;
 		CurrentDigitalService = digitalService;
 		CurrentAnalogService = analogService;
+		CurrentPwmService = CurrentPwmService;
+
 		//TODO: create unit tests
 		CurrentPistonEngineConfig = new EngineManagement::PistonEngineConfig(pistonEngineConfigFile);
 
@@ -159,8 +166,7 @@ namespace EngineManagement
 			break;
 		}
 
-		//TODO: Create EthanolService_Pwm
-		//Create Unit Tests
+		//TODO: Create Unit Tests
 		unsigned char ethanolServiceId = *((unsigned char*)ethanolConfigFile);
 		switch (ethanolServiceId)
 		{
@@ -169,6 +175,9 @@ namespace EngineManagement
 			break;
 		case 1:
 			CurrentEthanolService = new EngineManagement::EthanolService_Analog(CurrentAnalogService, ethanolPin, (void*)((unsigned char*)ethanolConfigFile + 1));
+			break;
+		case 2:
+			CurrentEthanolService = new EngineManagement::EthanolService_Pwm(CurrentPwmService, ethanolPin, (void*)((unsigned char*)ethanolConfigFile + 1));
 			break;
 		}
 

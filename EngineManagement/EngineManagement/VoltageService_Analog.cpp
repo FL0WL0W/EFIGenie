@@ -7,8 +7,6 @@
 #include "IAnalogService.h"
 #include "VoltageService_Analog.h"
 
-#define MAP_READ_TASK_PRIORITY 3
-
 namespace EngineManagement
 {	
 	VoltageService_Analog::VoltageService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)

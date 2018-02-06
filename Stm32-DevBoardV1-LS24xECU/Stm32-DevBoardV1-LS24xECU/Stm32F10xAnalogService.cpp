@@ -58,11 +58,11 @@ namespace Stm32
 		switch (pin)
 		{
 		case 0:
-		case 8:
+		case 16:
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
 			break;
 		case 1:
-		case 9:
+		case 17:
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
 			break;
 		case 2:
@@ -94,7 +94,7 @@ namespace Stm32
 		{
 			GPIO_Init(GPIOA, &GPIO_InitStruct);
 		}
-		else if (pin < 10)
+		else if (pin > 15 && pin < 18)
 		{
 			GPIO_Init(GPIOB, &GPIO_InitStruct);
 		}

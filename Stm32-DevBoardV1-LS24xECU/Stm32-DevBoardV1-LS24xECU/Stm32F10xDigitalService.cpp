@@ -1,6 +1,7 @@
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
 #include <stdint.h>
+#include "PinDirection.h"
 #include "IDigitalService.h"
 #include "Stm32F10xDigitalService.h"
 
