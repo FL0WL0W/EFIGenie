@@ -204,7 +204,7 @@ namespace EngineManagement
 			CurrentAfrService = new EngineManagement::AfrService_Static(*((float*)((unsigned char*)afrConfigFile + 1)));
 			break;
 		case 1:
-			CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol(CurrentDecoder, CurrentPistonEngineConfig, CurrentMapService, CurrentEthanolService, (void*)((unsigned char*)afrConfigFile + 1));
+			CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol(CurrentDecoder, CurrentPistonEngineConfig, CurrentMapService, CurrentEngineCoolantTemperatureService, CurrentEthanolService, (void*)((unsigned char*)afrConfigFile + 1));
 			break;
 		}
 
