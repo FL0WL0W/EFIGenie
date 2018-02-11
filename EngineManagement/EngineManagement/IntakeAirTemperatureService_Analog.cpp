@@ -22,9 +22,6 @@ namespace EngineManagement
 	
 	void IntakeAirTemperatureService_Analog::LoadConfig(void *config)
 	{
-		MaxIntakeAirTemperature = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		

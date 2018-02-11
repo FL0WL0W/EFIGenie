@@ -140,7 +140,7 @@ namespace EngineManagement
 		switch (ectId)
 		{
 		case 0:
-			CurrentEngineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Static(*((float *)((unsigned char*)ectConfigFile + 1)), *((float *)((unsigned char*)ectConfigFile + 1) + 1), *((float *)((unsigned char*)ectConfigFile + 1) + 2));
+			CurrentEngineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Static(*((float *)((unsigned char*)ectConfigFile + 1)), *((float *)((unsigned char*)ectConfigFile + 1) + 1));
 			break;
 		case 1:
 			CurrentEngineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Analog(CurrentTimerService, CurrentAnalogService, ectPin, ((void *)((unsigned char*)ectConfigFile + 1)));
@@ -152,7 +152,7 @@ namespace EngineManagement
 		switch (iatId)
 		{
 		case 0:
-			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1), *((float *)((unsigned char*)iatConfigFile + 1) + 2));
+			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1));
 			break;
 		case 1:
 			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Analog(CurrentTimerService, CurrentAnalogService, iatPin, ((void *)((unsigned char*)iatConfigFile + 1)));
@@ -176,7 +176,7 @@ namespace EngineManagement
 		switch (voltageId)
 		{
 		case 0:
-			CurrentVoltageService = new EngineManagement::VoltageService_Static(*((float *)((unsigned char*)voltageConfigFile + 1)), *((float *)((unsigned char*)voltageConfigFile + 1) + 1), *((float *)((unsigned char*)voltageConfigFile + 1) + 2));
+			CurrentVoltageService = new EngineManagement::VoltageService_Static(*((float *)((unsigned char*)voltageConfigFile + 1)), *((float *)((unsigned char*)voltageConfigFile + 1) + 1));
 			break;
 		case 1:
 			CurrentVoltageService = new EngineManagement::VoltageService_Analog(CurrentTimerService, CurrentAnalogService, voltagePin, ((void *)((unsigned char*)voltageConfigFile + 1)));

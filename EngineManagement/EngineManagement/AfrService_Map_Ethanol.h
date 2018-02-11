@@ -12,6 +12,8 @@ namespace EngineManagement
 		PistonEngineConfig *_pistonEngineConfig;
 		unsigned short *_gasMap;
 		unsigned short *_ethanolMap;
+		unsigned short _maxRpm;
+		float _maxMapKpa;
 		void LoadConfig(void *config);
 	public:
 		AfrService_Map_Ethanol(Decoder::IDecoder *decoder, PistonEngineConfig *pistonEngineConfig, IMapService *mapService, IEthanolService *ethanolService, void *config);

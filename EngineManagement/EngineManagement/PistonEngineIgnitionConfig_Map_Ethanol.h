@@ -17,6 +17,8 @@ namespace EngineManagement
 		float _ignitionDwellTime;
 		short *_ignitionAdvanceMapGas;
 		short *_ignitionAdvanceMapEthanol;
+		unsigned short _maxRpm;
+		float _maxMapKpa;
 		void LoadConfig(void *config);
 	public:
 		PistonEngineIgnitionConfig_Map_Ethanol(

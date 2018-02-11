@@ -18,16 +18,23 @@ namespace EngineManagement
 	
 	void AfrService_Map_Ethanol::LoadConfig(void *config)
 	{
+		_maxRpm = *(unsigned short *)config;
+		config = (void*)((unsigned short *)config + 1);
+		
+		_maxMapKpa = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
 		_gasMap = (unsigned short *)config;// value in 1/1024
 		config = (void*)((unsigned short *)config + AFR_RPM_RESOLUTION * AFR_MAP_RESOLUTION);
-		
+				
 		_ethanolMap = (unsigned short *)config; // value in 1/1024
+		config = (void*)((unsigned short *)config + AFR_RPM_RESOLUTION * AFR_MAP_RESOLUTION);
 	}
 	
 	float AfrService_Map_Ethanol::GetAfr()
 	{
 		unsigned short rpm = _decoder->GetRpm();
-		unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / AFR_RPM_RESOLUTION;
+		unsigned short rpmDivision = _maxRpm / AFR_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
 		float rpmMultiplier = ((float)rpm) / rpmDivision - rpmIndexL;
@@ -41,7 +48,7 @@ namespace EngineManagement
 		}
 		
 		unsigned short map = _mapService->MapKpa;
-		unsigned short mapDivision = _mapService->MaxMapKpa / AFR_MAP_RESOLUTION;
+		unsigned short mapDivision = _maxMapKpa / AFR_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
 		float mapMultiplier = ((float)map) / mapDivision - mapIndexL;

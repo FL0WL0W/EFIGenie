@@ -21,10 +21,7 @@ namespace EngineManagement
 	}
 	
 	void EngineCoolantTemperatureService_Analog::LoadConfig(void *config)
-	{
-		MaxEngineCoolantTemperature = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
+	{		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		

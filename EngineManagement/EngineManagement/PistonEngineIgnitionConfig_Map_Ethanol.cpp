@@ -42,6 +42,12 @@ namespace EngineManagement
 	}
 	void PistonEngineIgnitionConfig_Map_Ethanol::LoadConfig(void *config)
 	{
+		_maxRpm = *(unsigned short *)config;
+		config = (void*)((unsigned short *)config + 1);
+		
+		_maxMapKpa = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
 		_ignitionDwellTime = ((float *)config)[0];
 		config = (void*)(((float *)config) + 1);
 		
@@ -55,7 +61,7 @@ namespace EngineManagement
 	IgnitionTiming PistonEngineIgnitionConfig_Map_Ethanol::GetIgnitionTiming()
 		{
 			unsigned short rpm = _decoder->GetRpm();
-			unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / IGNITION_RPM_RESOLUTION;
+			unsigned short rpmDivision = _maxRpm / IGNITION_RPM_RESOLUTION;
 			unsigned char rpmIndexL = rpm / rpmDivision;
 			unsigned char rpmIndexH = rpmIndexL + 1;
 			float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
@@ -69,7 +75,7 @@ namespace EngineManagement
 			}
 			
 			unsigned short map = _mapService->MapKpa;
-			unsigned short mapDivision = _mapService->MaxMapKpa / IGNITION_MAP_RESOLUTION;
+			unsigned short mapDivision = _maxMapKpa / IGNITION_MAP_RESOLUTION;
 			unsigned char mapIndexL = map / mapDivision;
 			unsigned char mapIndexH = mapIndexL + 1;
 			float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;

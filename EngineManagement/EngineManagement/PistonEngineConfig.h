@@ -12,10 +12,7 @@ namespace EngineManagement
 			
 			Ml8thPerCylinder = *((unsigned short *)config); //1/8 ml
 			config = (void *)(((unsigned short *)config) + 1);
-			
-			MaxRpm = *((unsigned short *)config);
-			config = (void *)(((unsigned short *)config) + 1);
-			
+						
 			IsThrottleBodyInjection = *((bool *)config);
 			config = (void *)(((bool *)config) + 1);
 			
@@ -27,7 +24,6 @@ namespace EngineManagement
 		}
 		unsigned char Cylinders;
 		unsigned short Ml8thPerCylinder;
-		unsigned short MaxRpm;
 		bool IsThrottleBodyInjection;
 		bool IsDistributor;
 		unsigned char DecoderId;

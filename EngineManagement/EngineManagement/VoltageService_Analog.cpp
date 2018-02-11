@@ -22,9 +22,6 @@ namespace EngineManagement
 	
 	void VoltageService_Analog::LoadConfig(void *config)
 	{
-		MaxVoltage = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		

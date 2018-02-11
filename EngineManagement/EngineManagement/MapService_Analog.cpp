@@ -22,9 +22,6 @@ namespace EngineManagement
 	
 	void MapService_Analog::LoadConfig(void *config)
 	{
-		MaxMapKpa = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		

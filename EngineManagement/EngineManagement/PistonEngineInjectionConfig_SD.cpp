@@ -41,6 +41,18 @@ namespace EngineManagement
 	}
 	void PistonEngineInjectionConfig_SD::LoadConfig(void *config)
 	{
+		_maxRpm = *(unsigned short *)config;
+		config = (void*)((unsigned short *)config + 1);
+		
+		_maxMapKpa = *(float *)config;
+		config = (void*)((float *)config + 1);
+				
+		_maxMapKpaDot = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		_maxTpsDot = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
 		_injectorOpenPosition64thDegree = *((unsigned short *)config);   //value in 1/64 degrees
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -64,6 +76,12 @@ namespace EngineManagement
 		
 		_temperatureBias = ((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
 		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
+		
+		_tpsDotAdder = ((short *)config);
+		config = (void*)((short *)config + TPSDOT_ADDER_RESOLUTION);
+		
+		_mapDotAdder = ((short *)config);
+		config = (void*)((short *)config + MAPDOT_ADDER_RESOLUTION);
 	}
 	
 	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(uint8_t cylinder)
@@ -73,7 +91,7 @@ namespace EngineManagement
 		timing.PulseWidth = 0;
 		
 		unsigned short rpm = _decoder->GetRpm();
-		unsigned short rpmDivision = _pistonEngineConfig->MaxRpm / VE_RPM_RESOLUTION;
+		unsigned short rpmDivision = _maxRpm / VE_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
 		float rpmMultiplier = ((float)rpm) / rpmDivision - rpmIndexL;
@@ -87,7 +105,7 @@ namespace EngineManagement
 		}
 		
 		unsigned short map = _mapService->MapKpa;
-		unsigned short mapDivision = _mapService->MaxMapKpa / VE_MAP_RESOLUTION;
+		unsigned short mapDivision = _maxMapKpa / VE_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
 		float mapMultiplier = ((float)map) / mapDivision - mapIndexL;
@@ -111,7 +129,7 @@ namespace EngineManagement
 		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
 		unsigned int temperatureBiasCalc = map * rpm * VE;
-		unsigned int temperatureBiasDivision = (_mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120) / TEMPERATURE_BIAS_RESOLUTION;
+		unsigned int temperatureBiasDivision = (_maxMapKpa * _maxRpm * 120) / TEMPERATURE_BIAS_RESOLUTION;
 		unsigned char temperatureBiasIndexL = temperatureBiasCalc / temperatureBiasDivision;
 		unsigned char temperatureBiasIndexH = temperatureBiasIndexL + 1;
 		float temperatureBiasMultiplier = ((float)temperatureBiasCalc) / temperatureBiasDivision - temperatureBiasIndexL;
@@ -170,7 +188,7 @@ namespace EngineManagement
 			voltageIndexH = INJECTOR_OFFSET_VOLTAGE_RESOLUTION - 1;
 		}
 		
-		unsigned short mapOffsetDivision = _mapService->MaxMapKpa / INJECTOR_OFFSET_MAP_RESOLUTION;
+		unsigned short mapOffsetDivision = _maxMapKpa / INJECTOR_OFFSET_MAP_RESOLUTION;
 		unsigned char mapOffsetIndexL = map / mapDivision;
 		unsigned char mapOffsetIndexH = mapOffsetIndexL + 1;
 		float mapOffsetMultiplier = ((float)map) / mapDivision - mapOffsetIndexL;
