@@ -1,5 +1,6 @@
 #include "IDecoder.h"
 #include "IMapService.h"
+#include "ITPSService.h"
 #include "IEthanolService.h"
 #include "IEngineCoolantTemperatureService.h"
 #include "IAfrService.h"
@@ -8,13 +9,14 @@
 
 namespace EngineManagement
 {
-	AfrService_Map_Ethanol::AfrService_Map_Ethanol(Decoder::IDecoder *decoder, PistonEngineConfig *pistonEngineConfig, IMapService *mapService, IEngineCoolantTemperatureService *ectService, IEthanolService *ethanolService, void *config)
+	AfrService_Map_Ethanol::AfrService_Map_Ethanol(Decoder::IDecoder *decoder, PistonEngineConfig *pistonEngineConfig, IMapService *mapService, ITpsService *tpsService, IEngineCoolantTemperatureService *ectService, IEthanolService *ethanolService, void *config)
 	{
 		_decoder = decoder;
 		_mapService = mapService;
 		_ethanolService = ethanolService;
 		_pistonEngineConfig = pistonEngineConfig;
 		_ectService = ectService;
+		_tpsService = tpsService;
 		LoadConfig(config);
 	}
 	
@@ -40,6 +42,9 @@ namespace EngineManagement
 		
 		_ectMultiplierTable = (float *)config;
 		config = (void*)((float *)config + AFR_ECT_RESOLUTION);
+		
+		_tpsMinAfr = (float *)config;
+		config = (void*)((float *)config + AFR_TPS_RESOLUTION);
 	}
 	
 	float AfrService_Map_Ethanol::GetAfr()
@@ -95,9 +100,30 @@ namespace EngineManagement
 		{
 			ectIndexH = AFR_ECT_RESOLUTION - 1;
 		}
-		
+				
 		float ectAfrMultiplier = _ectMultiplierTable[ectIndexL] * (1 - ectMultiplier) + _ectMultiplierTable[ectIndexH] * ectMultiplier;
 		
-		return ((ethanolAfr * _ethanolService->EthanolContent + gasAfr * (1 - _ethanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
+		float tps = _tpsService->Tps;
+		float tpsDivision = 1 / AFR_TPS_RESOLUTION;
+		unsigned char tpsIndexL = tps / tpsDivision;
+		unsigned char tpsIndexH = tpsIndexL + 1;
+		float tpsMultiplier = tps / tpsDivision - tpsIndexL;
+		if (tpsIndexL > AFR_TPS_RESOLUTION - 1)
+		{
+			tpsIndexL = tpsIndexH = AFR_TPS_RESOLUTION - 1;
+		}
+		else if (tpsIndexH > AFR_TPS_RESOLUTION - 1)
+		{
+			tpsIndexH = AFR_TPS_RESOLUTION - 1;
+		}
+		
+		float minAfr = _tpsMinAfr[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfr[tpsIndexH] * tpsMultiplier;
+		
+		float afr = ((ethanolAfr * _ethanolService->EthanolContent + gasAfr * (1 - _ethanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
+		
+		if (minAfr < afr)
+			return afr;
+		
+		return minAfr;
 	}
 }

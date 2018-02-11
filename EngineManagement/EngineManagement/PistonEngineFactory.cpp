@@ -24,25 +24,15 @@ namespace EngineManagement
 	IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
 	IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
 	
-	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(
-			Decoder::IDecoder *decoder, 
-		IFuelTrimService *fuelTrimService, 
-		IMapService *mapService, 
-		ITpsService *tpsService, 
-		IIntakeAirTemperatureService *iatService, 
-		IEngineCoolantTemperatureService *ectService, 
-		IVoltageService *voltageService, 
-		IAfrService *afrService,
-		PistonEngineConfig *pistonEngineConfig,
-		void *config)
+	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(void *config)
 	{
 		unsigned char pistonEngineInjectionConfigId = *((unsigned char*)config);
 		switch (pistonEngineInjectionConfigId)
 		{
 		case 1:
-			return new EngineManagement::PistonEngineInjectionConfig_SD(decoder, fuelTrimService, mapService, tpsService, iatService, ectService, voltageService, afrService, pistonEngineConfig, (void*)((unsigned char*)config + 1));
+			return new EngineManagement::PistonEngineInjectionConfig_SD(CurrentDecoder, CurrentFuelTrimService, CurrentMapService, CurrentThrottlePositionService, CurrentIntakeAirTemperatureService, CurrentEngineCoolantTemperatureService, CurrentVoltageService, CurrentAfrService, CurrentPistonEngineConfig, (void*)((unsigned char*)config + 1));
 		case 2:
-			return new EngineManagement::PistonEngineInjectionConfigWrapper_DFCO(decoder, fuelTrimService, mapService, tpsService, iatService, ectService, voltageService, afrService, pistonEngineConfig, (void*)((unsigned char*)config + 1));
+			return new EngineManagement::PistonEngineInjectionConfigWrapper_DFCO(CurrentDecoder, CurrentThrottlePositionService, (void*)((unsigned char*)config + 1));
 		}
 		return NULL;
 	}
@@ -204,12 +194,12 @@ namespace EngineManagement
 			CurrentAfrService = new EngineManagement::AfrService_Static(*((float*)((unsigned char*)afrConfigFile + 1)));
 			break;
 		case 1:
-			CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol(CurrentDecoder, CurrentPistonEngineConfig, CurrentMapService, CurrentEngineCoolantTemperatureService, CurrentEthanolService, (void*)((unsigned char*)afrConfigFile + 1));
+			CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol(CurrentDecoder, CurrentPistonEngineConfig, CurrentMapService, CurrentThrottlePositionService, CurrentEngineCoolantTemperatureService, CurrentEthanolService, (void*)((unsigned char*)afrConfigFile + 1));
 			break;
 		}
 
 		//TODO: create unit tests
-		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(CurrentDecoder, CurrentFuelTrimService, CurrentMapService, CurrentThrottlePositionService, CurrentIntakeAirTemperatureService, CurrentEngineCoolantTemperatureService, CurrentVoltageService, CurrentAfrService, CurrentPistonEngineConfig, pistonEngineInjectionConfigFile);
+		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
 		
 		//TODO: create unit tests
 		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)pistonEngineIgnitionConfigFile);

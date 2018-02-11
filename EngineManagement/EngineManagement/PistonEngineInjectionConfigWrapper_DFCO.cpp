@@ -6,14 +6,7 @@ namespace EngineManagement
 {
 	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(
 			Decoder::IDecoder *decoder,
-		IFuelTrimService *fuelTrimService,
-		IMapService *mapService,
 		ITpsService *tpsService,
-		IIntakeAirTemperatureService *iatService,
-		IEngineCoolantTemperatureService *ectService,
-		IVoltageService *voltageService,
-		IAfrService *afrService,
-		PistonEngineConfig *pistonEngineConfig,
 		void *config)
 	{
 		_decoder = decoder;
@@ -29,17 +22,7 @@ namespace EngineManagement
 		_rpmDisable = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
-		_child = CreatePistonEngineInjectionConfig(
-			decoder, 
-			fuelTrimService, 
-			mapService, 
-			tpsService, 
-			iatService, 
-			ectService, 
-			voltageService, 
-			afrService,
-			pistonEngineConfig,
-			config);
+		_child = CreatePistonEngineInjectionConfig(config);
 	}
 	
 	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(uint8_t cylinder)

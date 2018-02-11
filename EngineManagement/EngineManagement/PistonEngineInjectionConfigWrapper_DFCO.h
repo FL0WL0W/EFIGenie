@@ -13,14 +13,7 @@ namespace EngineManagement
 	public:
 		PistonEngineInjectionConfigWrapper_DFCO(
 			Decoder::IDecoder *decoder,
-			IFuelTrimService *fuelTrimService,
-			IMapService *mapService,
 			ITpsService *tpsService,
-			IIntakeAirTemperatureService *iatService,
-			IEngineCoolantTemperatureService *ectService,
-			IVoltageService *voltageService,
-			IAfrService *afrService,
-			PistonEngineConfig *pistonEngineConfig,
 			void *config);
 		InjectorTiming GetInjectorTiming(uint8_t cylinder);
 	};

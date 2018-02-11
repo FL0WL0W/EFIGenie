@@ -42,15 +42,6 @@
 namespace EngineManagement
 {
 	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(
-			Decoder::IDecoder *decoder, 
-		IFuelTrimService *fuelTrimService, 
-		IMapService *mapService, 
-		ITpsService *tpsService, 
-		IIntakeAirTemperatureService *iatService, 
-		IEngineCoolantTemperatureService *ectService, 
-		IVoltageService *voltageService, 
-		IAfrService *afrService,
-		PistonEngineConfig *pistonEngineConfig,
 		void *config);
 	
 	extern HardwareAbstraction::ITimerService *CurrentTimerService;
