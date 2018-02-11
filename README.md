@@ -14,10 +14,8 @@ Create Fuel Prime<br>
 
 Features<br>
 Customizable 3D Fuel and Ignition Maps (Speed Density)<br>
-Unlimited cylinder sequential injection and ignition (Depends on hardware)
-<p>
-  Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)
-</p>
+Unlimited cylinder sequential injection and ignition (Depends on hardware)<br>
+  nbsp;nbsp;nbsp;Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)<br>
 Build Defines for NOINJECTION Control (Ignition controller hardware)<br>
 Individual injector trims<br>
 Warm Up Enrichment<br>
@@ -26,9 +24,7 @@ Temperature Bias between ECT and IAT<br>
 Voltage and MAP Injector Offset<br>
 Short Pulse Adder<br>
 Flexible Crank Cam Decoder<br>
-<p>
-  GM 24x
-  --More to come
-</p>
+  nbsp;nbsp;nbsp;GM 24x<br>
+  nbsp;nbsp;nbsp;--More to come<br>
 Deceleration fuel cut off (DFCO)<br>
 Flex fuel<br>
