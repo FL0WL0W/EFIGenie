@@ -3,10 +3,10 @@ namespace EngineManagement
 	class EngineCoolantTemperatureService_Static : public IEngineCoolantTemperatureService
 	{
 	public:
-		EngineCoolantTemperatureService_Static(float engineCoolantTemperature, float engineCoolantTemperatureDerivative, float maxEngineCoolantTemperature) { EngineCoolantTemperature = engineCoolantTemperature; EngineCoolantTemperatureDerivative = engineCoolantTemperatureDerivative; MaxEngineCoolantTemperature = maxEngineCoolantTemperature; }
+		EngineCoolantTemperatureService_Static(float engineCoolantTemperature, float engineCoolantTemperatureDot, float maxEngineCoolantTemperature) { EngineCoolantTemperature = engineCoolantTemperature; EngineCoolantTemperatureDot = engineCoolantTemperatureDot; MaxEngineCoolantTemperature = maxEngineCoolantTemperature; }
 		void ReadEct() { };
 		float EngineCoolantTemperature;
-		float EngineCoolantTemperatureDerivative;
+		float EngineCoolantTemperatureDot;
 		float MaxEngineCoolantTemperature;
 	};
 }

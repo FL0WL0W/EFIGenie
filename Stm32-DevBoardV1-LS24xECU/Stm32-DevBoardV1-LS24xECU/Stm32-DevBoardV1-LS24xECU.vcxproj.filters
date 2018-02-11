@@ -278,5 +278,8 @@
     <EmbeddedBinaryFile Include="FuelTrimConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
+    <EmbeddedBinaryFile Include="TpsConfigFile.dat">
+      <Filter>Tune Files</Filter>
+    </EmbeddedBinaryFile>
   </ItemGroup>
 </Project>

@@ -3,13 +3,13 @@
 #include <map>
 #include <functional>
 #include "ITimerService.h"
-#include "IVoltageService.h"
+#include "ITpsService.h"
 #include "IAnalogService.h"
-#include "VoltageService_Analog.h"
+#include "TpsService_Analog.h"
 
 namespace EngineManagement
 {	
-	VoltageService_Analog::VoltageService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	TpsService_Analog::TpsService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;
@@ -20,11 +20,8 @@ namespace EngineManagement
 		LoadConfig(config);
 	}
 	
-	void VoltageService_Analog::LoadConfig(void *config)
+	void TpsService_Analog::LoadConfig(void *config)
 	{
-		MaxVoltage = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
@@ -41,11 +38,11 @@ namespace EngineManagement
 		config = (void*)((unsigned short *)config + 1);
 	}
 	
-	void VoltageService_Analog::ReadVoltage()
+	void TpsService_Analog::ReadTps()
 	{
-		float prevVoltage = Voltage;
+		float prevTps = Tps;
 		float adcValue = _analogService->ReadPin(_adcPin);
-		Voltage = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
+		Tps = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = _timerService->GetTick();
 		//if ther hasn't been a full tick between reads then return;
 		if(_lastReadTick == readTickOrig)
@@ -58,7 +55,7 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + _timerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		VoltageDot = ((Voltage - prevVoltage) / (_lastReadTick - readTick)) * _timerService->GetTicksPerSecond();
+		TpsDot = ((Tps - prevTps) / (_lastReadTick - readTick)) * _timerService->GetTicksPerSecond();
 		_lastReadTick = readTick;
 	}
 }

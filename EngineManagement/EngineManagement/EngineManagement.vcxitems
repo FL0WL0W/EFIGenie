@@ -20,6 +20,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Static.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ITpsService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEthanolService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.h" />
@@ -42,6 +43,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TpsService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Static.h" />
   </ItemGroup>
@@ -59,6 +61,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TpsService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)VoltageService_Analog.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -32,6 +32,7 @@
 #define MAP_PIN 0
 #define ECT_PIN 0
 #define IAT_PIN 0
+#define TPS_PIN 0
 #define VOLTAGE_PIN 0
 #define ETHANOL_PIN 0
 
@@ -102,7 +103,7 @@ int main()
 	injectorPins[6] = INJECTOR_PIN_7;
 	injectorPins[7] = INJECTOR_PIN_8;
 	
-	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::PistonEngineConfigFile_dat.data(), ignitionPins, false, true, injectorPins, false, false, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data(), ECT_PIN, EmbeddedResources::EctConfigFile_dat.data(), IAT_PIN, EmbeddedResources::IatConfigFile_dat.data(), VOLTAGE_PIN, EmbeddedResources::VoltageConfigFile_dat.data(), ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data(), EmbeddedResources::FuelTrimConfigFile_dat.data(), EmbeddedResources::AfrConfigFile_dat.data(), EmbeddedResources::PistonEngineInjectionConfigFile_dat.data(), EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
+	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::PistonEngineConfigFile_dat.data(), ignitionPins, false, true, injectorPins, false, false, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data(), ECT_PIN, EmbeddedResources::EctConfigFile_dat.data(), IAT_PIN, EmbeddedResources::IatConfigFile_dat.data(), TPS_PIN, EmbeddedResources::TpsConfigFile_dat.data(), VOLTAGE_PIN, EmbeddedResources::VoltageConfigFile_dat.data(), ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data(), EmbeddedResources::FuelTrimConfigFile_dat.data(), EmbeddedResources::AfrConfigFile_dat.data(), EmbeddedResources::PistonEngineInjectionConfigFile_dat.data(), EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
 	
 	for (;;)
 	{

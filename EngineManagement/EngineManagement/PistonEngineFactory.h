@@ -20,6 +20,8 @@
 #include "IVoltageService.h"
 #include "VoltageService_Static.h"
 #include "VoltageService_Analog.h"
+#include "ITpsService.h"
+#include "TpsService_Analog.h"
 #include "IAfrService.h"
 #include "AfrService_Static.h"
 #include "IDecoder.h"
@@ -52,6 +54,7 @@ namespace EngineManagement
 	IVoltageService *CurrentVoltageService;
 	IEthanolService *CurrentEthanolService;
 	IAfrService *CurrentAfrService;
+	ITpsService *CurrentThrottlePositionService;
 	PistonEngineConfig *CurrentPistonEngineConfig;
 	IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
 	IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
@@ -75,6 +78,8 @@ namespace EngineManagement
 		unsigned char iatPin,
 		void *iatConfigFile,
 		unsigned char voltagePin,
+		void *tpsConfigFile,
+		unsigned char tpsPin,
 		void *voltageConfigFile,
 		unsigned char ethanolPin,
 		void *ethanolConfigFile,
@@ -99,9 +104,9 @@ namespace EngineManagement
 		}
 
 		//TODO: create unit tests
-		//set all to the same pin for distributor
 		if (CurrentPistonEngineConfig->IsDistributor)
 		{
+			//set all to the same pin for distributor
 			for (unsigned char cylinder = 0; cylinder < CurrentPistonEngineConfig->Cylinders; cylinder++)
 			{
 				CurrentIgnitorServices[cylinder] = new EngineManagement::IgnitorService(CurrentDigitalService, ignitionPins[cylinder], ignitionNormalOn, ignitionHighZ);
@@ -151,6 +156,18 @@ namespace EngineManagement
 			break;
 		case 1:
 			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Analog(CurrentTimerService, CurrentAnalogService, iatPin, ((void *)((unsigned char*)iatConfigFile + 1)));
+			break;
+		}
+
+		//TODO: Create Unit Tests
+		unsigned char tpsId = *((unsigned char*)tpsConfigFile);
+		switch (tpsId)
+		{
+		case 0:
+			//CurrentThrottlePositionService = new EngineManagement::TpsService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1), *((float *)((unsigned char*)iatConfigFile + 1) + 2));
+			break;
+		case 1:
+			CurrentThrottlePositionService = new EngineManagement::TpsService_Analog(CurrentTimerService, CurrentAnalogService, iatPin, ((void *)((unsigned char*)tpsConfigFile + 1)));
 			break;
 		}
 
@@ -206,7 +223,7 @@ namespace EngineManagement
 		}
 
 		//TODO: create unit tests
-		//Use TPS for "Accelerator Pump"
+		//Use TPS for "Acceleration Enrichment"
 		unsigned char pistonEngineInjectionConfigId = *((unsigned char*)pistonEngineInjectionConfigFile);
 		switch (pistonEngineInjectionConfigId)
 		{

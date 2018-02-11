@@ -6,6 +6,6 @@ namespace EngineManagement
 		virtual void ReadVoltage() = 0;
 		float Voltage;
 		float MaxVoltage;
-		float VoltageDerivative;
+		float VoltageDot;
 	};
 }

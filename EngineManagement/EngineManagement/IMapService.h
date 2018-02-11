@@ -5,7 +5,7 @@ namespace EngineManagement
 	public:
 		virtual void ReadMap() = 0;
 		float MapKpa;
-		float MapKpaDerivative;
+		float MapKpaDot;
 		float MaxMapKpa;
 	};
 }

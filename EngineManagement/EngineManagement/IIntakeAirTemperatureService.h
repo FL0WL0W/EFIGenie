@@ -5,7 +5,7 @@ namespace EngineManagement
 	public:
 		virtual void ReadIat() = 0;
 		float IntakeAirTemperature;
-		float IntakeAirTemperatureDerivative;
+		float IntakeAirTemperatureDot;
 		float MaxIntakeAirTemperature;
 	};
 }

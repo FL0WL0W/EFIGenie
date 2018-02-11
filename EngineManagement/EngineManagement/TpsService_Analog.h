@@ -1,7 +1,8 @@
 namespace EngineManagement
 {
-	class EngineCoolantTemperatureService_Analog : public IEngineCoolantTemperatureService
+	class TpsService_Analog : public ITpsService
 	{
+	protected:
 		HardwareAbstraction::ITimerService *_timerService;
 		HardwareAbstraction::IAnalogService *_analogService;
 		uint8_t _adcPin;
@@ -10,7 +11,7 @@ namespace EngineManagement
 		unsigned short _dotSampleRate;
 		void LoadConfig(void *config);
 	public:
-		EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
-		void ReadEct();
+		TpsService_Analog(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config);
+		void ReadTps();
 	};
 }
