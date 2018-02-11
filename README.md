@@ -7,11 +7,26 @@ The target microcontroller at the moment is the cheap but powerful STM32F103C8 b
 TODO LIST<br>
 <ul>
   <li>Create unit tests</li>
+  <li>Create integration tests with integration test hardware</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
-  <li>Create Fuel Trim Service</li>
   <li>Implement Stm32F10x PWM service</li>
-  <li>Create Fuel Prime</li>
+  <li>Fuel Prime</li>
+  <li>Fuel Trim (Wideband and Narrowband)</li>
+  <li>Rev Limiting</li>
+  <li>After Start Enrichment</li>
+  <li>Launch control (Wrapper)</li>
+  <li>Tach output</li>
+  <li>Fuel Pump (On/Off)</li>
+  <li>Fuel Pump (PWM)</li>
+  <li>Idle control</li>
+  <li>VVT control</li>
+  <li>Boost control</li>
+  <li>Logging</li>
+  <li>Tuner Studio</li>
+  <li>Alpha-N</li>
+  <li>CAN Bus/OBD2</li>
+  <li>Vehicle Speed Sensor</li>
 </ul  
 
 Features<br>
@@ -31,7 +46,7 @@ Unlimited cylinder sequential injection and ignition (Depends on hardware)<br>
   Flexible Crank Cam Decoder<br>
 </p>
 <ul>
-  <li>GM 24x</li>
+  <li>GM 24x (Cam + Crank and Crank Only</li>
   <li>--More to come</li>
 </ul>
 Deceleration fuel cut off (DFCO)<br>
