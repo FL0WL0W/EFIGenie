@@ -10,5 +10,4 @@ Create odd cylinder banks code<br>
 Create Throttle Body Injection code<br>
 Create Fuel Trim Service<br>
 Implement Stm32F10x PWM service<br>
-AFR Service to use TPS override and ECT for warm up enrichment<br>
 Create Fuel Prime<br>
