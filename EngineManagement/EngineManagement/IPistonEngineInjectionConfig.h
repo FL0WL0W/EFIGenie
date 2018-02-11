@@ -4,7 +4,7 @@
 #define IGNITION_MAP_RESOLUTION 16
 
 namespace EngineManagement
-{	
+{		
 	struct InjectorTiming
 	{
 		unsigned short OpenPosition64thDegree;

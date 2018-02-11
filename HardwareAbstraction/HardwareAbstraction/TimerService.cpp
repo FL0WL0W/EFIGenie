@@ -71,4 +71,21 @@ namespace HardwareAbstraction
 		}
 		return true;
 	}
+
+	bool ITimerService::UnScheduleTask(Task *task)
+	{
+		Task **end = CallBackStackPointer + StackSize;
+		if (CallBackStackPointer[StackSize - 1] == task)
+		{
+			ScheduleCallBack(CallBackStackPointer[StackSize - 2]->Tick);
+			std::remove(CallBackStackPointer, end, task);
+			StackSize--;
+		}
+		else
+		{
+			std::remove(CallBackStackPointer, end, task);
+			StackSize--;
+		}
+		return true;
+	}
 }

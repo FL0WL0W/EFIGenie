@@ -1,3 +1,4 @@
+#include "PistonEngineDefines.h"
 #include <map>
 #include <functional>
 #include "ITimerService.h"
@@ -66,54 +67,71 @@ namespace EngineManagement
 				if (currentTickPlusSome < _injectorOpenTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _injectorOpenTask[cylinder]->Tick < 1431655765))
 				{
 					InjectorTiming injectorTiming = _pistonEngineInjectionConfig->GetInjectorTiming(cylinder);
-					float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
-					unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
+					if (injectorTiming.PulseWidth == 0)
+					{
+						_timerService->UnScheduleTask(_injectorOpenTask[cylinder]);
+						_timerService->UnScheduleTask(_injectorCloseTask[cylinder]);
+					}
+					else
+					{
+						float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
+						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
 					
-					//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-					float degreesUntilOpen = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
-					if (degreesUntilOpen > 720)
-						degreesUntilOpen -= 1440;
-					if (degreesUntilOpen < 0)
-						degreesUntilOpen += 720;
-					unsigned int injectorOpenTick = scheduleTick + (scheduleTickPerDegree * degreesUntilOpen);
-					unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
-					_timerService->ReScheduleTask(_injectorOpenTask[cylinder], injectorOpenTick);
-					_timerService->ReScheduleTask(_injectorCloseTask[cylinder], injectorCloseTick);
+						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
+						float degreesUntilOpen = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
+						if (degreesUntilOpen > 720)
+							degreesUntilOpen -= 1440;
+						if (degreesUntilOpen < 0)
+							degreesUntilOpen += 720;
+						unsigned int injectorOpenTick = scheduleTick + (scheduleTickPerDegree * degreesUntilOpen);
+						unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
+						_timerService->ReScheduleTask(_injectorOpenTask[cylinder], injectorOpenTick);
+						_timerService->ReScheduleTask(_injectorCloseTask[cylinder], injectorCloseTick);
+					}
 				}
 			}
 			
 			if (currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765))
 			{
-				float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
-				if (degreesUntilFire < 0)
-					degreesUntilFire += camResolution;
-				if (degreesUntilFire > camResolution)
-					degreesUntilFire -= camResolution >> 2;
-				if (degreesUntilFire < 0)
-					degreesUntilFire += camResolution;
-				unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
-				_timerService->ReScheduleTask(_ignitorFireTask[cylinder], ignitionFireTick);
-				
-				//if ignition is not dwelling yet set both tasks
-				if (currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765))
+				if (!ignitionTiming.ignitionEnable)
 				{
-					unsigned int ignitionDwellTick = ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond );
-					_timerService->ReScheduleTask(_ignitorDwellTask[cylinder], ignitionDwellTick);
+					_timerService->UnScheduleTask(_ignitorFireTask[cylinder]);
+					_timerService->UnScheduleTask(_ignitorDwellTask[cylinder]);
+				}
+				else
+				{
+					float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
+					if (degreesUntilFire < 0)
+						degreesUntilFire += camResolution;
+					if (degreesUntilFire > camResolution)
+						degreesUntilFire -= camResolution >> 2;
+					if (degreesUntilFire < 0)
+						degreesUntilFire += camResolution;
+					unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
+					_timerService->ReScheduleTask(_ignitorFireTask[cylinder], ignitionFireTick);
+				
+					//if ignition is not dwelling yet set both tasks
+					if(currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765))
+					{
+						unsigned int ignitionDwellTick = ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond);
+						_timerService->ReScheduleTask(_ignitorDwellTask[cylinder], ignitionDwellTick);
+					}
 				}
 			}
-			else if (currentTickPlusSome < _ignitorFireTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorFireTask[cylinder]->Tick < 1431655765))
-			{	
-				//if ignition is dwelling but enough time before ignition set fire task
-				float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
-				if (degreesUntilFire < 0)
-					degreesUntilFire += camResolution;
-				if (degreesUntilFire > camResolution)
-					degreesUntilFire -= camResolution >> 2;
-				if (degreesUntilFire < 0)
-					degreesUntilFire += camResolution;
-				unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
-				_timerService->ReScheduleTask(_ignitorFireTask[cylinder], ignitionFireTick);
-			}
+			//a fast change in the ignition advance could cause insufficient dwell time
+//			else if (currentTickPlusSome < _ignitorFireTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorFireTask[cylinder]->Tick < 1431655765))
+//			{	
+//				//if ignition is dwelling but enough time before ignition set fire task
+//				float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
+//				if (degreesUntilFire < 0)
+//					degreesUntilFire += camResolution;
+//				if (degreesUntilFire > camResolution)
+//					degreesUntilFire -= camResolution >> 2;
+//				if (degreesUntilFire < 0)
+//					degreesUntilFire += camResolution;
+//				unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
+//				_timerService->ReScheduleTask(_ignitorFireTask[cylinder], ignitionFireTick);
+//			}
 		}
 		if (!isSequential)
 		{

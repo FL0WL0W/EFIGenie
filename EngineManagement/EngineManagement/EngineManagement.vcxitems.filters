@@ -37,6 +37,12 @@
     <Filter Include="Source Files\EthanolService">
       <UniqueIdentifier>{1e4d92e0-61e9-4ed0-9be6-ab6a88e94ddc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\PistonEngine\InjectionConfig">
+      <UniqueIdentifier>{a4bf6fbc-d198-4681-8bba-8b17ce18e834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PistonEngine\InjectionConfig">
+      <UniqueIdentifier>{252bd9bf-1a1d-49f3-9a6c-da409b169bd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h">
@@ -117,12 +123,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Static.h">
       <Filter>Header Files\VoltageService</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h">
-      <Filter>Header Files\PistonEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineConfig.h">
-      <Filter>Header Files\PistonEngine</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
@@ -134,6 +134,18 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)TpsService_Analog.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h">
+      <Filter>Header Files\PistonEngine\InjectionConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.h">
+      <Filter>Header Files\PistonEngine\InjectionConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineConfig.h">
+      <Filter>Header Files\PistonEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineDefines.h">
+      <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,9 +176,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MapService_Analog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">
-      <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
       <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
@@ -181,6 +190,15 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)TpsService_Analog.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">
+      <Filter>Source Files\PistonEngine\InjectionConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.cpp">
+      <Filter>Source Files\PistonEngine\InjectionConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineFactory.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

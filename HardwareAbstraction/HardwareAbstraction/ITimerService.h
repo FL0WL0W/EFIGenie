@@ -42,5 +42,6 @@ namespace HardwareAbstraction
 		Task *ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, int priority, bool deleteOnExecution);
 		bool ScheduleTask(Task *task, unsigned int tick);
 		bool ReScheduleTask(Task *task, unsigned int tick);
+		bool UnScheduleTask(Task *task);
 	};
 }

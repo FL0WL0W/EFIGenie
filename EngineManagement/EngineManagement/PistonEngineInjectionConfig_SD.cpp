@@ -1,3 +1,4 @@
+#include "PistonEngineDefines.h"
 #include <map>
 #include <functional>
 #include "ITimerService.h"
