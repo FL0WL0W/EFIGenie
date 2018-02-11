@@ -7,7 +7,7 @@ The target microcontroller at the moment is the cheap but powerful STM32F103C8 b
 <br>
 Features<br>
 <ul>
-  <li>Customizable 3D Fuel and Ignition Maps (Speed Density)</li>
+  <li>Customizable(size and limits) 3D Fuel and Ignition Maps (Speed Density)</li>
   <li>Unlimited cylinder sequential injection and ignition (Depends on hardware)</li>
     <ul>
       <li>Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)</li>
