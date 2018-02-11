@@ -24,6 +24,33 @@ namespace EngineManagement
 		_maxTpsDot = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
+		_voltageMax = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
+		_voltageMin = *((float *)config);
+		config = (void*)((float *)config + 1);
+				
+		_veRpmResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_veMapResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_offsetMapResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_offsetVoltageResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+				
+		_temperatureBiasResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_tpsDotAdderResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_mapDotAdderResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
 		_injectorOpenPosition64thDegree = *((unsigned short *)config);    //value in 1/64 degrees
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -37,22 +64,22 @@ namespace EngineManagement
 		config = (void*)((short *)config + (int)(_shortPulseLimit / 0.00006f) + 1);
 		
 		_offset = (short *)config;
-		config = (void*)((short *)config + (INJECTOR_OFFSET_VOLTAGE_RESOLUTION * INJECTOR_OFFSET_MAP_RESOLUTION));
+		config = (void*)((short *)config + (_offsetVoltageResolution * _offsetMapResolution));
 		
 		_volumetricEfficiencyMap = ((unsigned short *)config);  // value in 1/128%
-		config = (void*)((unsigned short *)config + (VE_RPM_RESOLUTION * VE_MAP_RESOLUTION));
+		config = (void*)((unsigned short *)config + (_veRpmResolution * _veMapResolution));
 		
 		_gasConstant = *((unsigned short *)config);  //value in 0.1 units
 		config = (void*)((unsigned short *)config + 1);
 		
 		_temperatureBias = ((unsigned char *)config);   //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
-		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
+		config = (void*)((unsigned char *)config + _temperatureBiasResolution);
 		
 		_tpsDotAdder = ((short *)config);  //(value in us)
-		config = (void*)((short *)config + TPSDOT_ADDER_RESOLUTION);
+		config = (void*)((short *)config + _tpsDotAdderResolution);
 		
 		_mapDotAdder = ((short *)config);  //(value in us)
-		config = (void*)((short *)config + MAPDOT_ADDER_RESOLUTION);
+		config = (void*)((short *)config + _mapDotAdderResolution);
 	}
 	
 	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(unsigned char cylinder)
@@ -62,37 +89,37 @@ namespace EngineManagement
 		timing.PulseWidth = 0;
 		
 		unsigned short rpm = CurrentDecoder->GetRpm();
-		unsigned short rpmDivision = _maxRpm / VE_RPM_RESOLUTION;
+		unsigned short rpmDivision = _maxRpm / _veRpmResolution;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
 		float rpmMultiplier = ((float)rpm) / rpmDivision - rpmIndexL;
-		if (rpmIndexL > VE_RPM_RESOLUTION - 1)
+		if (rpmIndexL > _veRpmResolution - 1)
 		{
-			rpmIndexL = rpmIndexH = VE_RPM_RESOLUTION - 1;
+			rpmIndexL = rpmIndexH = _veRpmResolution - 1;
 		}
-		else if (rpmIndexH > VE_RPM_RESOLUTION - 1)
+		else if (rpmIndexH > _veRpmResolution - 1)
 		{
-			rpmIndexH = VE_RPM_RESOLUTION - 1;
+			rpmIndexH = _veRpmResolution - 1;
 		}
 		
 		unsigned short map = CurrentMapService->MapKpa;
-		unsigned short mapDivision = _maxMapKpa / VE_MAP_RESOLUTION;
+		unsigned short mapDivision = _maxMapKpa / _veMapResolution;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
 		float mapMultiplier = ((float)map) / mapDivision - mapIndexL;
-		if (mapIndexL > VE_MAP_RESOLUTION - 1)
+		if (mapIndexL > _veMapResolution - 1)
 		{
-			mapIndexL = mapIndexH = VE_MAP_RESOLUTION - 1;
+			mapIndexL = mapIndexH = _veMapResolution - 1;
 		}
-		else if (mapIndexH > VE_MAP_RESOLUTION - 1)
+		else if (mapIndexH > _veMapResolution - 1)
 		{
-			mapIndexH = VE_MAP_RESOLUTION - 1;
+			mapIndexH = _veMapResolution - 1;
 		}
 		
-		float VE =	_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * (1 - mapMultiplier)
-		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
-		+			_volumetricEfficiencyMap[rpmIndexL + VE_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
-		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * mapMultiplier;
+		float VE =	_volumetricEfficiencyMap[rpmIndexL + _veRpmResolution * mapIndexL] * (1 - rpmMultiplier) * (1 - mapMultiplier)
+		+			_volumetricEfficiencyMap[rpmIndexH + _veRpmResolution * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
+		+			_volumetricEfficiencyMap[rpmIndexL + _veRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
+		+			_volumetricEfficiencyMap[rpmIndexH + _veRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
 		VE *= 0.0078125f;
 				
 		if (CurrentFuelTrimService != 0)
@@ -100,17 +127,17 @@ namespace EngineManagement
 		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
 		unsigned int temperatureBiasCalc = map * rpm * VE;
-		unsigned int temperatureBiasDivision = (_maxMapKpa * _maxRpm * 120) / TEMPERATURE_BIAS_RESOLUTION;
+		unsigned int temperatureBiasDivision = (_maxMapKpa * _maxRpm * 120) / _temperatureBiasResolution;
 		unsigned char temperatureBiasIndexL = temperatureBiasCalc / temperatureBiasDivision;
 		unsigned char temperatureBiasIndexH = temperatureBiasIndexL + 1;
 		float temperatureBiasMultiplier = ((float)temperatureBiasCalc) / temperatureBiasDivision - temperatureBiasIndexL;
-		if (temperatureBiasIndexL > TEMPERATURE_BIAS_RESOLUTION - 1)
+		if (temperatureBiasIndexL > _temperatureBiasResolution - 1)
 		{
-			temperatureBiasIndexL = temperatureBiasIndexH = TEMPERATURE_BIAS_RESOLUTION - 1;
+			temperatureBiasIndexL = temperatureBiasIndexH = _temperatureBiasResolution - 1;
 		}
-		else if (temperatureBiasIndexH > TEMPERATURE_BIAS_RESOLUTION - 1)
+		else if (temperatureBiasIndexH > _temperatureBiasResolution - 1)
 		{
-			temperatureBiasIndexH = TEMPERATURE_BIAS_RESOLUTION - 1;
+			temperatureBiasIndexH = _temperatureBiasResolution - 1;
 		}
 		
 		unsigned char temperatureBias = _temperatureBias[temperatureBiasIndexL] * (1 - temperatureBiasMultiplier) + _temperatureBias[temperatureBiasIndexH] * temperatureBiasMultiplier;
@@ -124,33 +151,33 @@ namespace EngineManagement
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
 		unsigned short mapDot = CurrentMapService->MapKpaDot;
-		unsigned short mapDotDivision = _maxMapKpa / MAPDOT_ADDER_RESOLUTION;
+		unsigned short mapDotDivision = _maxMapKpa / _mapDotAdderResolution;
 		unsigned char mapDotIndexL = mapDot / mapDotDivision;
 		unsigned char mapDotIndexH = mapDotIndexL + 1;
 		float mapDotMultiplier = ((float)mapDot) / mapDotDivision - mapDotIndexL;
-		if (mapDotIndexL > MAPDOT_ADDER_RESOLUTION - 1)
+		if (mapDotIndexL > _mapDotAdderResolution - 1)
 		{
-			mapDotIndexL = mapDotIndexH = MAPDOT_ADDER_RESOLUTION - 1;
+			mapDotIndexL = mapDotIndexH = _mapDotAdderResolution - 1;
 		}
-		else if (mapDotIndexH > MAPDOT_ADDER_RESOLUTION - 1)
+		else if (mapDotIndexH > _mapDotAdderResolution - 1)
 		{
-			mapDotIndexH = MAPDOT_ADDER_RESOLUTION - 1;
+			mapDotIndexH = _mapDotAdderResolution - 1;
 		}
 		
 		injectorDuration += (_mapDotAdder[mapDotIndexL] * (1 - mapDotMultiplier) + _mapDotAdder[mapDotIndexH] * mapDotMultiplier) * 0.000001f;
 		
 		unsigned short tpsDot = CurrentThrottlePositionService->TpsDot;
-		unsigned short tpsDotDivision = 1 / TPSDOT_ADDER_RESOLUTION;
+		unsigned short tpsDotDivision = 1 / _tpsDotAdderResolution;
 		unsigned char tpsDotIndexL = tpsDot / tpsDotDivision;
 		unsigned char tpsDotIndexH = tpsDotIndexL + 1;
 		float tpsDotMultiplier = ((float)tpsDot) / tpsDotDivision - tpsDotIndexL;
-		if (tpsDotIndexL > TPSDOT_ADDER_RESOLUTION - 1)
+		if (tpsDotIndexL > _tpsDotAdderResolution - 1)
 		{
-			tpsDotIndexL = tpsDotIndexH = TPSDOT_ADDER_RESOLUTION - 1;
+			tpsDotIndexL = tpsDotIndexH = _tpsDotAdderResolution - 1;
 		}
-		else if (tpsDotIndexH > TPSDOT_ADDER_RESOLUTION - 1)
+		else if (tpsDotIndexH > _tpsDotAdderResolution - 1)
 		{
-			tpsDotIndexH = TPSDOT_ADDER_RESOLUTION - 1;
+			tpsDotIndexH = _tpsDotAdderResolution - 1;
 		}
 		
 		injectorDuration += (_tpsDotAdder[tpsDotIndexL] * (1 - tpsDotMultiplier) + _tpsDotAdder[tpsDotIndexH] * tpsDotMultiplier) * 0.000001f;
@@ -177,36 +204,36 @@ namespace EngineManagement
 		}
 		
 		float voltage = CurrentVoltageService->Voltage;
-		float voltageDivision = (INJECTOR_OFFSET_VOLTAGE_MAX - INJECTOR_OFFSET_VOLTAGE_MIN) / INJECTOR_OFFSET_VOLTAGE_RESOLUTION;
-		unsigned char voltageIndexL = ((voltage - INJECTOR_OFFSET_VOLTAGE_MIN) / voltageDivision);
+		float voltageDivision = (_voltageMax - _voltageMin) / _offsetVoltageResolution;
+		unsigned char voltageIndexL = ((voltage - _voltageMin) / voltageDivision);
 		unsigned char voltageIndexH = voltageIndexL + 1;
-		float voltageMultiplier = ((voltage - INJECTOR_OFFSET_VOLTAGE_MIN) / voltageDivision) - voltageIndexL;
-		if (voltageIndexL > INJECTOR_OFFSET_VOLTAGE_RESOLUTION - 1)
+		float voltageMultiplier = ((voltage - _voltageMin) / voltageDivision) - voltageIndexL;
+		if (voltageIndexL > _offsetVoltageResolution - 1)
 		{
-			voltageIndexL = voltageIndexH = INJECTOR_OFFSET_VOLTAGE_RESOLUTION - 1;
+			voltageIndexL = voltageIndexH = _offsetVoltageResolution - 1;
 		}
-		else if (voltageIndexH > INJECTOR_OFFSET_VOLTAGE_RESOLUTION - 1)
+		else if (voltageIndexH > _offsetVoltageResolution - 1)
 		{
-			voltageIndexH = INJECTOR_OFFSET_VOLTAGE_RESOLUTION - 1;
+			voltageIndexH = _offsetVoltageResolution - 1;
 		}
 		
-		unsigned short mapOffsetDivision = _maxMapKpa / INJECTOR_OFFSET_MAP_RESOLUTION;
+		unsigned short mapOffsetDivision = _maxMapKpa / _offsetMapResolution;
 		unsigned char mapOffsetIndexL = map / mapDivision;
 		unsigned char mapOffsetIndexH = mapOffsetIndexL + 1;
 		float mapOffsetMultiplier = ((float)map) / mapDivision - mapOffsetIndexL;
-		if (mapOffsetIndexL > INJECTOR_OFFSET_MAP_RESOLUTION - 1)
+		if (mapOffsetIndexL > _offsetMapResolution - 1)
 		{
-			mapOffsetIndexL = mapOffsetIndexH = INJECTOR_OFFSET_MAP_RESOLUTION - 1;
+			mapOffsetIndexL = mapOffsetIndexH = _offsetMapResolution - 1;
 		}
-		else if (mapOffsetIndexH > INJECTOR_OFFSET_MAP_RESOLUTION - 1)
+		else if (mapOffsetIndexH > _offsetMapResolution - 1)
 		{
-			mapOffsetIndexH = INJECTOR_OFFSET_MAP_RESOLUTION - 1;
+			mapOffsetIndexH = _offsetMapResolution - 1;
 		}
 		
-		float offset =	(_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * (1 - voltageMultiplier) * (1 - mapOffsetMultiplier)) * (1 / 1048576)
-		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexL] * voltageMultiplier * (1 - mapOffsetMultiplier)
-		+				_offset[voltageIndexL + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * (1 - voltageMultiplier) * mapOffsetMultiplier
-		+				_offset[voltageIndexH + INJECTOR_OFFSET_VOLTAGE_RESOLUTION * mapOffsetIndexH] * voltageMultiplier * mapOffsetMultiplier;
+		float offset =	(_offset[voltageIndexL + _offsetVoltageResolution * mapOffsetIndexL] * (1 - voltageMultiplier) * (1 - mapOffsetMultiplier)) * (1 / 1048576)
+		+				_offset[voltageIndexH + _offsetVoltageResolution * mapOffsetIndexL] * voltageMultiplier * (1 - mapOffsetMultiplier)
+		+				_offset[voltageIndexL + _offsetVoltageResolution * mapOffsetIndexH] * (1 - voltageMultiplier) * mapOffsetMultiplier
+		+				_offset[voltageIndexH + _offsetVoltageResolution * mapOffsetIndexH] * voltageMultiplier * mapOffsetMultiplier;
 		
 		injectorDuration += offset;
 				

@@ -1,6 +1,3 @@
-#define IGNITION_RPM_RESOLUTION 16
-#define IGNITION_MAP_RESOLUTION 16
-
 namespace EngineManagement
 {
 	class PistonEngineIgnitionConfig_Map_Ethanol : public IPistonEngineIgnitionConfig
@@ -12,7 +9,8 @@ namespace EngineManagement
 		short *_ignitionAdvanceMapEthanol;
 		unsigned short _maxRpm;
 		float _maxMapKpa;
-		void LoadConfig(void *config);
+		unsigned char _ignitionRpmResolution;
+		unsigned char _ignitionMapResolution;
 	public:
 		PistonEngineIgnitionConfig_Map_Ethanol(
 			PistonEngineConfig *pistonEngineConfig,

@@ -18,55 +18,61 @@ namespace EngineManagement
 		_maxMapKpa = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
+		_ignitionRpmResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
+		_ignitionMapResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
+		
 		_ignitionDwellTime = ((float *)config)[0];
 		config = (void*)(((float *)config) + 1);
 		
 		_ignitionAdvanceMapGas = ((short *)config);
-		config = (void*)(((short *)config) + (IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION));
+		config = (void*)(((short *)config) + (_ignitionRpmResolution * _ignitionMapResolution));
 		
 		_ignitionAdvanceMapEthanol = ((short *)config);
-		config = (void*)(((short *)config) + (IGNITION_RPM_RESOLUTION * IGNITION_MAP_RESOLUTION));
+		config = (void*)(((short *)config) + (_ignitionRpmResolution * _ignitionMapResolution));
 	}
 				
 	IgnitionTiming PistonEngineIgnitionConfig_Map_Ethanol::GetIgnitionTiming()
 	{
 		unsigned short rpm = CurrentDecoder->GetRpm();
-		unsigned short rpmDivision = _maxRpm / IGNITION_RPM_RESOLUTION;
+		unsigned short rpmDivision = _maxRpm / _ignitionRpmResolution;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
 		float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
-		if (rpmIndexL > IGNITION_RPM_RESOLUTION - 1)
+		if (rpmIndexL > _ignitionRpmResolution - 1)
 		{
-			rpmIndexL = rpmIndexH = IGNITION_RPM_RESOLUTION - 1;
+			rpmIndexL = rpmIndexH = _ignitionRpmResolution - 1;
 		}
-		else if (rpmIndexH > IGNITION_RPM_RESOLUTION - 1)
+		else if (rpmIndexH > _ignitionRpmResolution - 1)
 		{
-			rpmIndexH = IGNITION_RPM_RESOLUTION - 1;
+			rpmIndexH = _ignitionRpmResolution - 1;
 		}
 			
 		unsigned short map = CurrentMapService->MapKpa;
-		unsigned short mapDivision = _maxMapKpa / IGNITION_MAP_RESOLUTION;
+		unsigned short mapDivision = _maxMapKpa / _ignitionMapResolution;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
 		float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
-		if (mapIndexL > IGNITION_MAP_RESOLUTION - 1)
+		if (mapIndexL > _ignitionMapResolution - 1)
 		{
-			mapIndexL = mapIndexH = IGNITION_MAP_RESOLUTION - 1;
+			mapIndexL = mapIndexH = _ignitionMapResolution - 1;
 		}
-		else if (mapIndexH > IGNITION_MAP_RESOLUTION - 1)
+		else if (mapIndexH > _ignitionMapResolution - 1)
 		{
-			mapIndexH = IGNITION_MAP_RESOLUTION - 1;
+			mapIndexH = _ignitionMapResolution - 1;
 		}
 			
-		short ignitionGas = _ignitionAdvanceMapGas[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
-		+					_ignitionAdvanceMapGas[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-		+					_ignitionAdvanceMapGas[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-		+					_ignitionAdvanceMapGas[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		short ignitionGas = _ignitionAdvanceMapGas[rpmIndexL + _ignitionRpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier
+		+					_ignitionAdvanceMapGas[rpmIndexH + _ignitionRpmResolution * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+		+					_ignitionAdvanceMapGas[rpmIndexL + _ignitionRpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+		+					_ignitionAdvanceMapGas[rpmIndexH + _ignitionRpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
 			
-		short ignitionEthanol = _ignitionAdvanceMapEthanol[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexL] * rpmMultiplier * mapMultiplier
-		+						_ignitionAdvanceMapEthanol[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-		+						_ignitionAdvanceMapEthanol[rpmIndexL + IGNITION_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-		+						_ignitionAdvanceMapEthanol[rpmIndexH + IGNITION_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		short ignitionEthanol = _ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier
+		+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+		+						_ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+		+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
 			
 		IgnitionTiming timing = IgnitionTiming();
 		timing.IgnitionDwellTime = true;

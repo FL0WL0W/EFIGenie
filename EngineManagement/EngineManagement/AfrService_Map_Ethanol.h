@@ -1,8 +1,3 @@
-#define AFR_RPM_RESOLUTION 16
-#define AFR_MAP_RESOLUTION 16
-#define AFR_ECT_RESOLUTION 8
-#define AFR_TPS_RESOLUTION 8
-
 namespace EngineManagement
 {
 	class AfrService_Map_Ethanol : public IAfrService
@@ -16,6 +11,10 @@ namespace EngineManagement
 		float _maxEct;
 		float *_ectMultiplierTable;
 		float *_tpsMinAfr;
+		unsigned char _afrRpmResolution;
+		unsigned char _afrMapResolution;
+		unsigned char _afrEctResolution;
+		unsigned char _afrTpsResolution;
 	public:
 		AfrService_Map_Ethanol(void *config);
 		float GetAfr();
