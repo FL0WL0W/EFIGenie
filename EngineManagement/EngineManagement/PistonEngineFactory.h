@@ -198,8 +198,6 @@ namespace EngineManagement
 			break;
 		}
 
-		//TODO: Create TPS Service
-
 		//TODO: Fuel Trim Service
 		unsigned char fuelTrimId = *((unsigned char*)fuelTrimConfigFile);
 		switch (fuelTrimId)
@@ -223,12 +221,11 @@ namespace EngineManagement
 		}
 
 		//TODO: create unit tests
-		//Use TPS for "Acceleration Enrichment"
 		unsigned char pistonEngineInjectionConfigId = *((unsigned char*)pistonEngineInjectionConfigFile);
 		switch (pistonEngineInjectionConfigId)
 		{
 		case 1:
-			CurrentPistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionConfig_SD(CurrentDecoder, CurrentFuelTrimService, CurrentMapService, CurrentIntakeAirTemperatureService, CurrentEngineCoolantTemperatureService, CurrentVoltageService, CurrentAfrService, CurrentPistonEngineConfig, (void*)((unsigned char*)pistonEngineInjectionConfigFile + 1));
+			CurrentPistonEngineInjectionConfig = new EngineManagement::PistonEngineInjectionConfig_SD(CurrentDecoder, CurrentFuelTrimService, CurrentMapService, CurrentThrottlePositionService, CurrentIntakeAirTemperatureService, CurrentEngineCoolantTemperatureService, CurrentVoltageService, CurrentAfrService, CurrentPistonEngineConfig, (void*)((unsigned char*)pistonEngineInjectionConfigFile + 1));
 			break;
 		}
 

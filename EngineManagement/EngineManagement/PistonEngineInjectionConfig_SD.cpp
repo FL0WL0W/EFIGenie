@@ -4,6 +4,7 @@
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
 #include "IMapService.h"
+#include "ITpsService.h"
 #include "IDecoder.h"
 #include "IFuelTrimService.h"
 #include "IEngineCoolantTemperatureService.h"
@@ -21,6 +22,7 @@ namespace EngineManagement
 		Decoder::IDecoder *decoder, 
 		IFuelTrimService *fuelTrimService, 
 		IMapService *mapService, 
+		ITpsService *tpsService,
 		IIntakeAirTemperatureService *iatService, 
 		IEngineCoolantTemperatureService *ectService, 
 		IVoltageService *voltageService, 
@@ -36,6 +38,7 @@ namespace EngineManagement
 		_voltageService = voltageService;
 		_afrService = afrService;
 		_pistonEngineConfig = pistonEngineConfig;
+		_tpsService = tpsService;
 		
 		LoadConfig(config);
 	}
@@ -77,10 +80,10 @@ namespace EngineManagement
 		_temperatureBias = ((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
 		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
 		
-		_tpsDotAdder = ((short *)config);
+		_tpsDotAdder = ((short *)config); //(value in us)
 		config = (void*)((short *)config + TPSDOT_ADDER_RESOLUTION);
 		
-		_mapDotAdder = ((short *)config);
+		_mapDotAdder = ((short *)config); //(value in us)
 		config = (void*)((short *)config + MAPDOT_ADDER_RESOLUTION);
 	}
 	
@@ -152,10 +155,41 @@ namespace EngineManagement
 		
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
+		unsigned short mapDot = _mapService->MapKpaDot;
+		unsigned short mapDotDivision = _maxMapKpa / MAPDOT_ADDER_RESOLUTION;
+		unsigned char mapDotIndexL = mapDot / mapDotDivision;
+		unsigned char mapDotIndexH = mapDotIndexL + 1;
+		float mapDotMultiplier = ((float)mapDot) / mapDotDivision - mapDotIndexL;
+		if (mapDotIndexL > MAPDOT_ADDER_RESOLUTION - 1)
+		{
+			mapDotIndexL = mapDotIndexH = MAPDOT_ADDER_RESOLUTION - 1;
+		}
+		else if (mapDotIndexH > MAPDOT_ADDER_RESOLUTION - 1)
+		{
+			mapDotIndexH = MAPDOT_ADDER_RESOLUTION - 1;
+		}
+		
+		injectorDuration += (_mapDotAdder[mapDotIndexL] * (1 - mapDotMultiplier) + _mapDotAdder[mapDotIndexH] * mapDotMultiplier) * 0.000001f;
+		
+		unsigned short tpsDot = _tpsService->TpsDot;
+		unsigned short tpsDotDivision = 1 / TPSDOT_ADDER_RESOLUTION;
+		unsigned char tpsDotIndexL = tpsDot / tpsDotDivision;
+		unsigned char tpsDotIndexH = tpsDotIndexL + 1;
+		float tpsDotMultiplier = ((float)tpsDot) / tpsDotDivision - tpsDotIndexL;
+		if (tpsDotIndexL > TPSDOT_ADDER_RESOLUTION - 1)
+		{
+			tpsDotIndexL = tpsDotIndexH = TPSDOT_ADDER_RESOLUTION - 1;
+		}
+		else if (tpsDotIndexH > TPSDOT_ADDER_RESOLUTION - 1)
+		{
+			tpsDotIndexH = TPSDOT_ADDER_RESOLUTION - 1;
+		}
+		
+		injectorDuration += (_tpsDotAdder[tpsDotIndexL] * (1 - tpsDotMultiplier) + _tpsDotAdder[tpsDotIndexH] * tpsDotMultiplier) * 0.000001f;
+		
 		if (injectorDuration <= 0) 
 			return timing;
 			
-		//TODO interpolate this
 		if(injectorDuration < _shortPulseLimit)
 		{
 			unsigned short shortPulseResolution = (_shortPulseLimit / 0.00006f);

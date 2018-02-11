@@ -14,7 +14,8 @@ namespace EngineManagement
 	{
 	protected:
 		Decoder::IDecoder *_decoder;
-		IMapService *_mapService;
+		IMapService *_mapService; 
+		ITpsService *_tpsService;
 		IIntakeAirTemperatureService *_iatService;
 		IEngineCoolantTemperatureService *_ectService;
 		IVoltageService *_voltageService;
@@ -41,6 +42,7 @@ namespace EngineManagement
 			Decoder::IDecoder *decoder, 
 			IFuelTrimService *fuelTrimService, 
 			IMapService *mapService, 
+			ITpsService *tpsService, 
 			IIntakeAirTemperatureService *iatService, 
 			IEngineCoolantTemperatureService *ectService, 
 			IVoltageService *voltageService, 
