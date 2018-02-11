@@ -30,24 +30,24 @@ TODO LIST<br>
 </ul  
 
 Features<br>
-Customizable 3D Fuel and Ignition Maps (Speed Density)<br>
-Unlimited cylinder sequential injection and ignition (Depends on hardware)<br>
 <ul>
-  <li>Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)</li>
+  <li>Customizable 3D Fuel and Ignition Maps (Speed Density)</li>
+  <li>Unlimited cylinder sequential injection and ignition (Depends on hardware)</li>
+    <ul>
+      <li>Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)</li>
+    </ul>
+  <li>Build Defines for NOINJECTION Control (Ignition only controller hardware)</li>
+  <li>Individual injector trims</li>
+  <li>Warm Up Enrichment</li>
+  <li>TPS and MAP acceleration enrichment</li>
+  <li>Temperature Bias between ECT and IAT</li>
+  <li>Voltage and MAP Injector Offset</li>
+  <li>Short Pulse Adder</li>
+  <li>Flexible Crank Cam Decoder</li>
+    <ul>
+      <li>GM 24x (Cam + Crank and Crank Only</li>
+      <li>--More to come</li>
+    </ul>
+  <li>Deceleration fuel cut off (DFCO)</li>
+  <li>Flex fuel</li>
 </ul>
-<p>
-  Build Defines for NOINJECTION Control (Ignition only controller hardware)<br>
-  Individual injector trims<br>
-  Warm Up Enrichment<br>
-  TPS and MAP acceleration enrichment<br>
-  Temperature Bias between ECT and IAT<br>
-  Voltage and MAP Injector Offset<br>
-  Short Pulse Adder<br>
-  Flexible Crank Cam Decoder<br>
-</p>
-<ul>
-  <li>GM 24x (Cam + Crank and Crank Only</li>
-  <li>--More to come</li>
-</ul>
-Deceleration fuel cut off (DFCO)<br>
-Flex fuel<br>
