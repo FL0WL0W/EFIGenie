@@ -1,1 +1,0 @@
-#define MAX_CYLINDERS 8

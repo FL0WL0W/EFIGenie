@@ -2,15 +2,12 @@ namespace EngineManagement
 {
 	class EngineCoolantTemperatureService_Analog : public IEngineCoolantTemperatureService
 	{
-		HardwareAbstraction::ITimerService *_timerService;
-		HardwareAbstraction::IAnalogService *_analogService;
 		unsigned char _adcPin;
 		float A0, A1, A2, A3;
 		unsigned int _lastReadTick;
 		unsigned short _dotSampleRate;
-		void LoadConfig(void *config);
 	public:
-		EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *_timerService, HardwareAbstraction::IAnalogService *analogService, unsigned char adcPin, void *config);
+		EngineCoolantTemperatureService_Analog(unsigned char adcPin, void *config);
 		void ReadEct();
 	};
 }

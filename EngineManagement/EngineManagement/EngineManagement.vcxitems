@@ -15,13 +15,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Services.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ITpsService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineDefines.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IEthanolService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.h" />
@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)CurrentServices.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.cpp" />

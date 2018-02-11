@@ -1,14 +1,4 @@
-#include "ITimerService.h"
-#include "IIgnitorService.h"
-#include "IInjectorService.h"
-#include "IMapService.h"
-#include "IEthanolService.h"
-#include "IDecoder.h"
-#include "IFuelTrimService.h"
-#include "IEngineCoolantTemperatureService.h"
-#include "IIntakeAirTemperatureService.h"
-#include "IVoltageService.h"
-#include "IAfrService.h"
+#include "Services.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
@@ -17,29 +7,11 @@
 namespace EngineManagement
 {
 	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(
-		Decoder::IDecoder *decoder, 
-		IMapService *mapService,
-		IEthanolService *ethanolService,
-		IIntakeAirTemperatureService *iatService, 
-		IEngineCoolantTemperatureService *ectService, 
-		IVoltageService *voltageService, 
-		IAfrService *afrService,
 		PistonEngineConfig *pistonEngineConfig,
 		void *config)
 	{
-		_decoder = decoder;
-		_mapService = mapService;
-		_ethanolService = ethanolService;
-		_iatService = iatService;
-		_ectService = ectService;
-		_voltageService = voltageService;
-		_afrService = afrService;
 		_pistonEngineConfig = pistonEngineConfig;
 		
-		LoadConfig(config);
-	}
-	void PistonEngineIgnitionConfig_Map_Ethanol::LoadConfig(void *config)
-	{
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -58,7 +30,7 @@ namespace EngineManagement
 				
 	IgnitionTiming PistonEngineIgnitionConfig_Map_Ethanol::GetIgnitionTiming()
 	{
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = CurrentDecoder->GetRpm();
 		unsigned short rpmDivision = _maxRpm / IGNITION_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
@@ -72,7 +44,7 @@ namespace EngineManagement
 			rpmIndexH = IGNITION_RPM_RESOLUTION - 1;
 		}
 			
-		unsigned short map = _mapService->MapKpa;
+		unsigned short map = CurrentMapService->MapKpa;
 		unsigned short mapDivision = _maxMapKpa / IGNITION_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
@@ -98,7 +70,7 @@ namespace EngineManagement
 			
 		IgnitionTiming timing = IgnitionTiming();
 		timing.IgnitionDwellTime = true;
-		timing.IgnitionAdvance64thDegree = ignitionEthanol * _ethanolService->EthanolContent + ignitionGas * (1 - _ethanolService->EthanolContent);
+		timing.IgnitionAdvance64thDegree = ignitionEthanol * CurrentEthanolService->EthanolContent + ignitionGas * (1 - CurrentEthanolService->EthanolContent);
 		timing.IgnitionDwellTime = _ignitionDwellTime;
 		return timing;
 	}

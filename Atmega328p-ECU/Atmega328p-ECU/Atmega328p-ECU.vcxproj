@@ -45,7 +45,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\EngineManagement\EngineManagement\;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\HardwareAbstraction\HardwareAbstraction\;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\ReluctorDecoders\ReluctorDecoders\;../../HardwareAbstraction/HardwareAbstraction;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\Atmega328p-ECU\avr-stl\avr-stl-master\include;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions);MAX_CYLINDERS=8;NOINJECTION</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
       <CPPLanguageStandard />

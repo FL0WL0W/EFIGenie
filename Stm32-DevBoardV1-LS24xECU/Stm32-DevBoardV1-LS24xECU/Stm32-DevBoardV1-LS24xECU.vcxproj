@@ -45,7 +45,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>C:/Users/fl0wl0w/AppData/Local/arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/lib/gcc/xtensa-lx106-elf/4.8.2/include;C:/Users/fl0wl0w/AppData/Local/arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include;C:/Users/fl0wl0w/AppData/Local/arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2;C:/Users/fl0wl0w/AppData/Local/arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2/xtensa-lx106-elf;../EngineManagement;../ReluctorDecoders;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(ClCompile.PreprocessorDefinitions);DEBUG=1;DEBUG_DEFAULT_INTERRUPT_HANDLERS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(ClCompile.PreprocessorDefinitions);DEBUG=1;DEBUG_DEFAULT_INTERRUPT_HANDLERS;MAX_CYLINDERS=8</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

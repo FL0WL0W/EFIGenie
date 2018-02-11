@@ -1,15 +1,4 @@
-#include "PistonEngineDefines.h"
-#include "ITimerService.h"
-#include "IIgnitorService.h"
-#include "IInjectorService.h"
-#include "IMapService.h"
-#include "ITpsService.h"
-#include "IDecoder.h"
-#include "IFuelTrimService.h"
-#include "IEngineCoolantTemperatureService.h"
-#include "IIntakeAirTemperatureService.h"
-#include "IVoltageService.h"
-#include "IAfrService.h"
+#include "Services.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"
@@ -18,31 +7,11 @@
 namespace EngineManagement
 {
 	PistonEngineInjectionConfig_SD::PistonEngineInjectionConfig_SD(
-		Decoder::IDecoder *decoder, 
-		IFuelTrimService *fuelTrimService, 
-		IMapService *mapService, 
-		ITpsService *tpsService,
-		IIntakeAirTemperatureService *iatService, 
-		IEngineCoolantTemperatureService *ectService, 
-		IVoltageService *voltageService, 
-		IAfrService *afrService,
 		PistonEngineConfig *pistonEngineConfig,
 		void *config)
 	{
-		_decoder = decoder;
-		_mapService = mapService;
-		_fuelTrimService = fuelTrimService;
-		_iatService = iatService;
-		_ectService = ectService;
-		_voltageService = voltageService;
-		_afrService = afrService;
 		_pistonEngineConfig = pistonEngineConfig;
-		_tpsService = tpsService;
 		
-		LoadConfig(config);
-	}
-	void PistonEngineInjectionConfig_SD::LoadConfig(void *config)
-	{
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -55,7 +24,7 @@ namespace EngineManagement
 		_maxTpsDot = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
-		_injectorOpenPosition64thDegree = *((unsigned short *)config);   //value in 1/64 degrees
+		_injectorOpenPosition64thDegree = *((unsigned short *)config);    //value in 1/64 degrees
 		config = (void*)((unsigned short *)config + 1);
 		
 		_injectorGramsPerMinute = (unsigned short *)config;
@@ -64,25 +33,25 @@ namespace EngineManagement
 		_shortPulseLimit = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
-		_shortPulseAdder = (short *)config;//60us increments (value in us)
+		_shortPulseAdder = (short *)config; //60us increments (value in us)
 		config = (void*)((short *)config + (int)(_shortPulseLimit / 0.00006f) + 1);
 		
 		_offset = (short *)config;
 		config = (void*)((short *)config + (INJECTOR_OFFSET_VOLTAGE_RESOLUTION * INJECTOR_OFFSET_MAP_RESOLUTION));
 		
-		_volumetricEfficiencyMap = ((unsigned short *)config); // value in 1/128%
+		_volumetricEfficiencyMap = ((unsigned short *)config);  // value in 1/128%
 		config = (void*)((unsigned short *)config + (VE_RPM_RESOLUTION * VE_MAP_RESOLUTION));
 		
-		_gasConstant = *((unsigned short *)config); //value in 0.1 units
+		_gasConstant = *((unsigned short *)config);  //value in 0.1 units
 		config = (void*)((unsigned short *)config + 1);
 		
-		_temperatureBias = ((unsigned char *)config);  //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
+		_temperatureBias = ((unsigned char *)config);   //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
 		config = (void*)((unsigned char *)config + TEMPERATURE_BIAS_RESOLUTION);
 		
-		_tpsDotAdder = ((short *)config); //(value in us)
+		_tpsDotAdder = ((short *)config);  //(value in us)
 		config = (void*)((short *)config + TPSDOT_ADDER_RESOLUTION);
 		
-		_mapDotAdder = ((short *)config); //(value in us)
+		_mapDotAdder = ((short *)config);  //(value in us)
 		config = (void*)((short *)config + MAPDOT_ADDER_RESOLUTION);
 	}
 	
@@ -92,7 +61,7 @@ namespace EngineManagement
 		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;
 		timing.PulseWidth = 0;
 		
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = CurrentDecoder->GetRpm();
 		unsigned short rpmDivision = _maxRpm / VE_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
@@ -106,7 +75,7 @@ namespace EngineManagement
 			rpmIndexH = VE_RPM_RESOLUTION - 1;
 		}
 		
-		unsigned short map = _mapService->MapKpa;
+		unsigned short map = CurrentMapService->MapKpa;
 		unsigned short mapDivision = _maxMapKpa / VE_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
@@ -126,8 +95,8 @@ namespace EngineManagement
 		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * mapMultiplier;
 		VE *= 0.0078125f;
 				
-		if (_fuelTrimService != 0)
-			VE += _fuelTrimService->GetFuelTrim(cylinder);
+		if (CurrentFuelTrimService != 0)
+			VE += CurrentFuelTrimService->GetFuelTrim(cylinder);
 		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
 		unsigned int temperatureBiasCalc = map * rpm * VE;
@@ -146,15 +115,15 @@ namespace EngineManagement
 		
 		unsigned char temperatureBias = _temperatureBias[temperatureBiasIndexL] * (1 - temperatureBiasMultiplier) + _temperatureBias[temperatureBiasIndexH] * temperatureBiasMultiplier;
 		
-		float temperature = (_iatService->IntakeAirTemperature * temperatureBias + _ectService->EngineCoolantTemperature * (255 - temperatureBias))/255;
+		float temperature = (CurrentIntakeAirTemperatureService->IntakeAirTemperature * temperatureBias + CurrentEngineCoolantTemperatureService->EngineCoolantTemperature * (255 - temperatureBias))/255;
 		
 		float airDensity = map / (100.0f * _gasConstant * temperature);
 		
-		float airFuelRatio = _afrService->GetAfr();
+		float airFuelRatio = CurrentAfrService->GetAfr();
 		
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
-		unsigned short mapDot = _mapService->MapKpaDot;
+		unsigned short mapDot = CurrentMapService->MapKpaDot;
 		unsigned short mapDotDivision = _maxMapKpa / MAPDOT_ADDER_RESOLUTION;
 		unsigned char mapDotIndexL = mapDot / mapDotDivision;
 		unsigned char mapDotIndexH = mapDotIndexL + 1;
@@ -170,7 +139,7 @@ namespace EngineManagement
 		
 		injectorDuration += (_mapDotAdder[mapDotIndexL] * (1 - mapDotMultiplier) + _mapDotAdder[mapDotIndexH] * mapDotMultiplier) * 0.000001f;
 		
-		unsigned short tpsDot = _tpsService->TpsDot;
+		unsigned short tpsDot = CurrentThrottlePositionService->TpsDot;
 		unsigned short tpsDotDivision = 1 / TPSDOT_ADDER_RESOLUTION;
 		unsigned char tpsDotIndexL = tpsDot / tpsDotDivision;
 		unsigned char tpsDotIndexH = tpsDotIndexL + 1;
@@ -207,7 +176,7 @@ namespace EngineManagement
 			injectorDuration += (_shortPulseAdder[injectorDurationIndexL] * (1 - injectorDurationMultiplier) + _shortPulseAdder[injectorDurationIndexH] * injectorDurationMultiplier) * 0.000001f;
 		}
 		
-		float voltage = _voltageService->Voltage;
+		float voltage = CurrentVoltageService->Voltage;
 		float voltageDivision = (INJECTOR_OFFSET_VOLTAGE_MAX - INJECTOR_OFFSET_VOLTAGE_MIN) / INJECTOR_OFFSET_VOLTAGE_RESOLUTION;
 		unsigned char voltageIndexL = ((voltage - INJECTOR_OFFSET_VOLTAGE_MIN) / voltageDivision);
 		unsigned char voltageIndexH = voltageIndexL + 1;

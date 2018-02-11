@@ -13,15 +13,7 @@ namespace EngineManagement
 	class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	{
 	protected:
-		Decoder::IDecoder *_decoder;
-		IMapService *_mapService; 
-		ITpsService *_tpsService;
-		IIntakeAirTemperatureService *_iatService;
-		IEngineCoolantTemperatureService *_ectService;
-		IVoltageService *_voltageService;
-		IAfrService *_afrService;
 		PistonEngineConfig *_pistonEngineConfig;
-		IFuelTrimService *_fuelTrimService;
 		unsigned short *_volumetricEfficiencyMap;
 		unsigned short *_injectorGramsPerMinute;
 		float _shortPulseLimit;
@@ -36,17 +28,8 @@ namespace EngineManagement
 		float _maxMapKpaDot;
 		float _maxTpsDot;
 		unsigned short _injectorOpenPosition64thDegree;
-		void LoadConfig(void *config);
 	public:
 		PistonEngineInjectionConfig_SD(
-			Decoder::IDecoder *decoder, 
-			IFuelTrimService *fuelTrimService, 
-			IMapService *mapService, 
-			ITpsService *tpsService, 
-			IIntakeAirTemperatureService *iatService, 
-			IEngineCoolantTemperatureService *ectService, 
-			IVoltageService *voltageService, 
-			IAfrService *afrService,
 			PistonEngineConfig *pistonEngineConfig,
 			void *config);
 		InjectorTiming GetInjectorTiming(unsigned char cylinder);

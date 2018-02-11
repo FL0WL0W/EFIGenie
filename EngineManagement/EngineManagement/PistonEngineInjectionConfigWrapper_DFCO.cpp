@@ -1,16 +1,11 @@
+#ifndef NOINJECTION
+#include "Services.h"
 #include "PistonEngineFactory.h"
 
 namespace EngineManagement
 {
-	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(
-			Decoder::IDecoder *decoder,
-		ITpsService *tpsService,
-		void *config)
+	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)
 	{
-		_decoder = decoder;
-		
-		_tpsService = tpsService;
-		
 		_tpsEnable = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
@@ -25,8 +20,8 @@ namespace EngineManagement
 	
 	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char cylinder)
 	{
-		float tps = _tpsService->Tps;
-		unsigned short rpm = _decoder->GetRpm();
+		float tps = CurrentThrottlePositionService->Tps;
+		unsigned short rpm = CurrentDecoder->GetRpm();
 		
 		if (tps < _tpsEnable && rpm > _rpmEnable)
 			_dfcoEnabled = true;
@@ -44,3 +39,5 @@ namespace EngineManagement
 		return _child->GetInjectorTiming(cylinder);
 	}
 }
+
+#endif

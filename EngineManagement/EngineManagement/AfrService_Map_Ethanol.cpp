@@ -1,26 +1,10 @@
-#include "IDecoder.h"
-#include "IMapService.h"
-#include "ITPSService.h"
-#include "IEthanolService.h"
-#include "IEngineCoolantTemperatureService.h"
-#include "IAfrService.h"
+#include "Services.h"
 #include "PistonEngineConfig.h"
 #include "AfrService_Map_Ethanol.h"
 
 namespace EngineManagement
 {
-	AfrService_Map_Ethanol::AfrService_Map_Ethanol(Decoder::IDecoder *decoder, PistonEngineConfig *pistonEngineConfig, IMapService *mapService, ITpsService *tpsService, IEngineCoolantTemperatureService *ectService, IEthanolService *ethanolService, void *config)
-	{
-		_decoder = decoder;
-		_mapService = mapService;
-		_ethanolService = ethanolService;
-		_pistonEngineConfig = pistonEngineConfig;
-		_ectService = ectService;
-		_tpsService = tpsService;
-		LoadConfig(config);
-	}
-	
-	void AfrService_Map_Ethanol::LoadConfig(void *config)
+	AfrService_Map_Ethanol::AfrService_Map_Ethanol(void *config)
 	{
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
@@ -34,10 +18,10 @@ namespace EngineManagement
 		_maxEct = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
-		_gasMap = (unsigned short *)config;// value in 1/1024
+		_gasMap = (unsigned short *)config; // value in 1/1024
 		config = (void*)((unsigned short *)config + AFR_RPM_RESOLUTION * AFR_MAP_RESOLUTION);
 				
-		_ethanolMap = (unsigned short *)config; // value in 1/1024
+		_ethanolMap = (unsigned short *)config;  // value in 1/1024
 		config = (void*)((unsigned short *)config + AFR_RPM_RESOLUTION * AFR_MAP_RESOLUTION);
 		
 		_ectMultiplierTable = (float *)config;
@@ -49,7 +33,7 @@ namespace EngineManagement
 	
 	float AfrService_Map_Ethanol::GetAfr()
 	{
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = CurrentDecoder->GetRpm();
 		unsigned short rpmDivision = _maxRpm / AFR_RPM_RESOLUTION;
 		unsigned char rpmIndexL = rpm / rpmDivision;
 		unsigned char rpmIndexH = rpmIndexL + 1;
@@ -63,7 +47,7 @@ namespace EngineManagement
 			rpmIndexH = AFR_RPM_RESOLUTION - 1;
 		}
 		
-		unsigned short map = _mapService->MapKpa;
+		unsigned short map = CurrentMapService->MapKpa;
 		unsigned short mapDivision = _maxMapKpa / AFR_MAP_RESOLUTION;
 		unsigned char mapIndexL = map / mapDivision;
 		unsigned char mapIndexH = mapIndexL + 1;
@@ -87,7 +71,7 @@ namespace EngineManagement
 		+					_ethanolMap[rpmIndexL + AFR_RPM_RESOLUTION * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
 		+					_ethanolMap[rpmIndexH + AFR_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * mapMultiplier;
 		
-		float ect = _ectService->EngineCoolantTemperature;
+		float ect = CurrentEngineCoolantTemperatureService->EngineCoolantTemperature;
 		float ectDivision = (_maxEct - _minEct) / AFR_ECT_RESOLUTION;
 		unsigned char ectIndexL = ect / ectDivision;
 		unsigned char ectIndexH = ectIndexL + 1;
@@ -103,7 +87,7 @@ namespace EngineManagement
 				
 		float ectAfrMultiplier = _ectMultiplierTable[ectIndexL] * (1 - ectMultiplier) + _ectMultiplierTable[ectIndexH] * ectMultiplier;
 		
-		float tps = _tpsService->Tps;
+		float tps = CurrentThrottlePositionService->Tps;
 		float tpsDivision = 1 / AFR_TPS_RESOLUTION;
 		unsigned char tpsIndexL = tps / tpsDivision;
 		unsigned char tpsIndexH = tpsIndexL + 1;
@@ -119,7 +103,7 @@ namespace EngineManagement
 		
 		float minAfr = _tpsMinAfr[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfr[tpsIndexH] * tpsMultiplier;
 		
-		float afr = ((ethanolAfr * _ethanolService->EthanolContent + gasAfr * (1 - _ethanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
+		float afr = ((ethanolAfr * CurrentEthanolService->EthanolContent + gasAfr * (1 - CurrentEthanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
 		
 		if (minAfr < afr)
 			return afr;

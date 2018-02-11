@@ -48,10 +48,14 @@ namespace Stm32
 {
 	void Stm32F10xDigitalService::InitPin(uint8_t pin, HardwareAbstraction::PinDirection direction)
 	{
+		if (pin == 0)
+			return;
+		pin -= 1;
+		
 		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_InitStruct.GPIO_Mode = direction == HardwareAbstraction::PinDirection::In ? GPIO_Mode_IN_FLOATING : GPIO_Mode_Out_PP;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-		
+				
 		//PA 0-15
 		//PB 16-31
 		//PC 32-47
@@ -77,6 +81,10 @@ namespace Stm32
 	
 	bool Stm32F10xDigitalService::ReadPin(uint8_t pin)
 	{
+		if (pin == 0)
+			return false;
+		pin -= 1;
+		
 		switch (pin / 16)
 		{
 		case 0: //PA
@@ -90,6 +98,10 @@ namespace Stm32
 	
 	void Stm32F10xDigitalService::WritePin(uint8_t pin, bool value)
 	{
+		if (pin == 0)
+			return;
+		pin -= 1;
+		
 		BitAction action = value ? BitAction::Bit_SET : BitAction::Bit_RESET;
 		
 		switch (pin / 16)

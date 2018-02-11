@@ -3,11 +3,9 @@ namespace EngineManagement
 	class PistonEngineController
 	{
 	protected:
-		IIgnitorService *_ignitorServices[MAX_CYLINDERS];
-		IInjectorService *_injectorServices[MAX_CYLINDERS];
-		Decoder::IDecoder *_decoder;
-		HardwareAbstraction::ITimerService *_timerService;
+#ifndef NOINJECTION
 		IPistonEngineInjectionConfig *_pistonEngineInjectionConfig;
+#endif
 		IPistonEngineIgnitionConfig *_pistonEngineIgnitionConfig;
 		PistonEngineConfig *_pistonEngineConfig;
 		HardwareAbstraction::Task *_injectorOpenTask[MAX_CYLINDERS];
@@ -16,11 +14,9 @@ namespace EngineManagement
 		HardwareAbstraction::Task *_ignitorFireTask[MAX_CYLINDERS];
 	public:
 		PistonEngineController(
-			HardwareAbstraction::ITimerService *timerService, 
-			Decoder::IDecoder *decoder, 
-			IIgnitorService *ignitorServices[MAX_CYLINDERS], 
-			IInjectorService *injectorServices[MAX_CYLINDERS], 
+#ifndef NOINJECTION
 			IPistonEngineInjectionConfig *pistonEngineInjectionConfig, 
+#endif
 			IPistonEngineIgnitionConfig *pistonEngineIgnitionConfig, 
 			PistonEngineConfig *pistonEngineConfig);
 		void ScheduleEvents(void);

@@ -1,8 +1,3 @@
-#include <stdint.h>
-#include "ITimerService.h"
-#include "IMapService.h"
-#include "PinDirection.h"
-#include "IDigitalService.h"
 #include "IIgnitorService.h"
 
 namespace EngineManagement

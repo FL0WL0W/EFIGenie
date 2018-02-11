@@ -52,6 +52,10 @@ namespace Stm32
 
 	void Stm32F10xAnalogService::InitPin(uint8_t pin)
 	{
+		if (pin == 0)
+			return;
+		pin -= 1;
+		
 		GPIO_InitTypeDef GPIO_InitStruct;
 
 	//we want to enable the selected pins
@@ -102,6 +106,10 @@ namespace Stm32
 	
 	float Stm32F10xAnalogService::ReadPin(uint8_t pin)
 	{
+		if (pin == 0)
+			return 0;
+		pin -= 1;
+		
 		//set the channel to the pin we want to read
 		ADC_RegularChannelConfig(ADC1, pin, 1, ADC_SampleTime_1Cycles5);
 	

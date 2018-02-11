@@ -1,24 +1,13 @@
-#include <stdint.h>
-#include "ITimerService.h"
-#include "IMapService.h"
-#include "IAnalogService.h"
+#include "Services.h"
 #include "MapService_Analog.h"
 
 namespace EngineManagement
 {	
-	MapService_Analog::MapService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, unsigned char adcPin, void *config)
+	MapService_Analog::MapService_Analog(unsigned char adcPin, void *config)
 	{
-		_timerService = timerService;
-		_analogService = analogService;
-		
 		_adcPin = adcPin;
-		_analogService->InitPin(_adcPin);
+		CurrentAnalogService->InitPin(_adcPin);
 		
-		LoadConfig(config);
-	}
-	
-	void MapService_Analog::LoadConfig(void *config)
-	{
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
@@ -38,9 +27,9 @@ namespace EngineManagement
 	void MapService_Analog::ReadMap()
 	{
 		float prevMapKpa = MapKpa;
-		float adcValue = _analogService->ReadPin(_adcPin);
+		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		MapKpa = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
-		unsigned int readTickOrig = _timerService->GetTick();
+		unsigned int readTickOrig = CurrentTimerService->GetTick();
 		//if ther hasn't been a full tick between reads then return;
 		if(_lastReadTick == readTickOrig)
 			return;
@@ -50,9 +39,9 @@ namespace EngineManagement
 			_lastReadTick = _lastReadTick + 2147483647;
 			readTick += 2147483647;
 		}
-		if (readTick < (_lastReadTick + _timerService->GetTicksPerSecond() / _dotSampleRate))
+		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		MapKpaDot = ((MapKpa - prevMapKpa) / (_lastReadTick - readTick)) * _timerService->GetTicksPerSecond();
+		MapKpaDot = ((MapKpa - prevMapKpa) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
 	}
 }

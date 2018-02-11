@@ -1,6 +1,7 @@
 #include <stm32f10x_rcc.h>
 #include <stm32f10x_flash.h>
 #include <map>
+#include "Services.h"
 #include "PistonEngineFactory.h"
 #include <functional>
 #include "Stm32F10xTimerService.h"
