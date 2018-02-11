@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{0574807f-3994-4313-8a4b-af39dc372313}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{4da45eee-7849-403e-82fe-4260acfd9337}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{60c6a1c9-714c-48db-aac8-61f32d1d54f8}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source files\Device-specific files">
+      <UniqueIdentifier>{728d26a7-a08c-484e-bde0-b5a38641f87f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Device-specific files">
+      <UniqueIdentifier>{b8c6c4cc-5526-45f4-a3f9-f4b07577e101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VisualGDB settings">
+      <UniqueIdentifier>{61ee97dc-a445-4f4c-a9ac-3150613dabc3}</UniqueIdentifier>
+      <Extensions>vgdbsettings</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LEDBlink.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atmega328pTimerService.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="avr.props">
+      <Filter>Source files\Device-specific files</Filter>
+    </None>
+    <None Include="Atmega328p-ECU-Debug.vgdbsettings">
+      <Filter>VisualGDB settings</Filter>
+    </None>
+    <None Include="Atmega328p-ECU-Release.vgdbsettings">
+      <Filter>VisualGDB settings</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="avr.xml">
+      <Filter>VisualGDB settings</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Atmega328pTimerService.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -15,6 +15,6 @@ namespace EngineManagement
 			Decoder::IDecoder *decoder,
 			ITpsService *tpsService,
 			void *config);
-		InjectorTiming GetInjectorTiming(uint8_t cylinder);
+		InjectorTiming GetInjectorTiming(unsigned char cylinder);
 	};
 }

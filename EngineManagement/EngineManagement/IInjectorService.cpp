@@ -1,7 +1,4 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IMapService.h"
 #include "PinDirection.h"

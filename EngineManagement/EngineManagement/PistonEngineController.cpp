@@ -1,6 +1,4 @@
 #include "PistonEngineDefines.h"
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
@@ -34,7 +32,7 @@ namespace EngineManagement
 		_decoder = decoder;
 		_pistonEngineInjectionConfig = pistonEngineInjectionConfig;
 		_pistonEngineConfig = pistonEngineConfig;
-		for (uint8_t cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
+		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
 		{
 			_ignitorServices[cylinder] = ignitorServices[cylinder];
 			_injectorServices[cylinder] = injectorServices[cylinder];
@@ -59,7 +57,7 @@ namespace EngineManagement
 						
 		IgnitionTiming ignitionTiming =  _pistonEngineIgnitionConfig->GetIgnitionTiming();
 				
-		for (uint8_t cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
+		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
 		{
 			unsigned int currentTickPlusSome = _timerService->GetTick() + 5;
 			if (isSequential)
@@ -138,8 +136,8 @@ namespace EngineManagement
 			if (_pistonEngineConfig->Cylinders % 2)
 			{
 				//even number of cylinders, run banks in dual cylinder mode
-				uint8_t cylindersToGoTo = _pistonEngineConfig->Cylinders >> 2;
-				for (uint8_t cylinder = 1; cylinder <= cylindersToGoTo; cylinder+=2)
+				unsigned char cylindersToGoTo = _pistonEngineConfig->Cylinders >> 2;
+				for (unsigned char cylinder = 1; cylinder <= cylindersToGoTo; cylinder+=2)
 				{
 					unsigned int currentTickPlusSome = _timerService->GetTick() + 5;
 					if (currentTickPlusSome < _injectorOpenTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _injectorOpenTask[cylinder]->Tick < 1431655765))

@@ -1,7 +1,4 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IVoltageService.h"
 #include "IAnalogService.h"
@@ -9,7 +6,7 @@
 
 namespace EngineManagement
 {	
-	VoltageService_Analog::VoltageService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	VoltageService_Analog::VoltageService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, unsigned char adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;

@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|VisualGDB">
+      <Configuration>Debug</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|VisualGDB">
+      <Configuration>Release</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>14.0</VCProjectVersion>
+    <ProjectGuid>{8DAB534C-034D-4BB2-BDDF-BCED5FB94200}</ProjectGuid>
+    <BSP_ID>com.sysprogs.avr.core</BSP_ID>
+    <BSP_VERSION>1.0</BSP_VERSION>
+    <InPlaceBSPSubdir />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)avr.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)avr.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+    <Import Project="..\..\EngineManagement\EngineManagement\EngineManagement.vcxitems" Label="Shared" />
+    <Import Project="..\..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems" Label="Shared" />
+    <Import Project="..\..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems" Label="Shared" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <GNUConfigurationType>Debug</GNUConfigurationType>
+    <ToolchainID>com.visualgdb.avr</ToolchainID>
+    <ToolchainVersion>5.3.0/7.11/r1</ToolchainVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ToolchainID>com.visualgdb.avr</ToolchainID>
+    <ToolchainVersion>5.3.0/7.11/r1</ToolchainVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\EngineManagement\EngineManagement\;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\HardwareAbstraction\HardwareAbstraction\;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\ReluctorDecoders\ReluctorDecoders\;../../HardwareAbstraction/HardwareAbstraction;C:\Users\fl0wl0w\Documents\visualgdb\Projects\DJTuningECU\Atmega328p-ECU\avr-stl\avr-stl-master\include;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions />
+      <CLanguageStandard />
+      <CPPLanguageStandard />
+    </ClCompile>
+    <Link>
+      <LibrarySearchDirectories>%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <LinkerScript />
+      <AdditionalOptions />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Atmega328pTimerService.cpp" />
+    <ClCompile Include="LEDBlink.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Atmega328p-ECU-Debug.vgdbsettings" />
+    <None Include="Atmega328p-ECU-Release.vgdbsettings" />
+    <None Include="avr.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="avr.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Atmega328pTimerService.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

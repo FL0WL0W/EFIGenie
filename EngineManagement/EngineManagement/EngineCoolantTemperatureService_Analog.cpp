@@ -1,7 +1,4 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IEngineCoolantTemperatureService.h"
 #include "IAnalogService.h"
@@ -9,7 +6,7 @@
 
 namespace EngineManagement
 {	
-	EngineCoolantTemperatureService_Analog::EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	EngineCoolantTemperatureService_Analog::EngineCoolantTemperatureService_Analog(HardwareAbstraction::ITimerService *timerService, HardwareAbstraction::IAnalogService *analogService, unsigned char adcPin, void *config)
 	{
 		_timerService = timerService;
 		_analogService = analogService;

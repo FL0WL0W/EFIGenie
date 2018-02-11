@@ -1,5 +1,3 @@
-#include <map>
-#include <functional>
 #include "PistonEngineFactory.h"
 
 namespace EngineManagement
@@ -25,7 +23,7 @@ namespace EngineManagement
 		_child = CreatePistonEngineInjectionConfig(config);
 	}
 	
-	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(uint8_t cylinder)
+	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char cylinder)
 	{
 		float tps = _tpsService->Tps;
 		unsigned short rpm = _decoder->GetRpm();

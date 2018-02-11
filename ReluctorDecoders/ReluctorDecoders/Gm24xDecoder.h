@@ -3,8 +3,8 @@ namespace Decoder
 	class Gm24xDecoder : public IDecoder
 	{
 	protected:
-		uint8_t _state;
-		uint8_t _crankState;
+		unsigned char _state;
+		unsigned char _crankState;
 		bool _camTicked;
 		bool _hasCamPosition;
 		bool _isSynced;

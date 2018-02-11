@@ -1,14 +1,11 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "IEthanolService.h"
 #include "IAnalogService.h"
 #include "EthanolService_Analog.h"
 
 namespace EngineManagement
 {	
-	EthanolService_Analog::EthanolService_Analog(HardwareAbstraction::IAnalogService *analogService, uint8_t adcPin, void *config)
+	EthanolService_Analog::EthanolService_Analog(HardwareAbstraction::IAnalogService *analogService, unsigned char adcPin, void *config)
 	{
 		_analogService = analogService;
 		

@@ -1,6 +1,4 @@
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IDecoder.h"
 #include "Gm24xDecoder.h"
@@ -52,7 +50,7 @@ namespace Decoder
 	
 	void Gm24xDecoder::CrankEdgeTrigger(EdgeTrigger edgeTrigger)
 	{
-		if (edgeTrigger == EdgeTrigger::Down)
+		if (edgeTrigger == Down)
 		{
 			unsigned int crankTick = _timerService->GetTick();
 			if (crankTick < _lastCrankTick)
@@ -77,7 +75,7 @@ namespace Decoder
 			
 			_lastCrankTick = crankTick;
 		}
-		else if (edgeTrigger == EdgeTrigger::Up && !_hasCamPosition)
+		else if (edgeTrigger == Up && !_hasCamPosition)
 		{
 			unsigned int crankTick = _timerService->GetTick();
 			unsigned int interumCrankPeriod = 0;
@@ -121,11 +119,11 @@ namespace Decoder
 		_camTicked = true;
 		_isSynced = true;
 		_hasCamPosition = true;
-		if (edgeTrigger == EdgeTrigger::Down)
+		if (edgeTrigger == Down)
 		{
 			_state = 0;
 		}
-		if (edgeTrigger == EdgeTrigger::Up)
+		if (edgeTrigger == Up)
 		{
 			_state = 24;
 		}

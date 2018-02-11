@@ -9,8 +9,8 @@ namespace HardwareAbstraction
 	class IPwmService
 	{
 	public:
-		virtual void InitPin(uint8_t pin, PinDirection direction) = 0;
-		virtual PwmValue ReadPin(uint8_t pin) = 0;
-		virtual void WritePin(uint8_t pin, PwmValue value) = 0;
+		virtual void InitPin(unsigned char pin, PinDirection direction) = 0;
+		virtual PwmValue ReadPin(unsigned char pin) = 0;
+		virtual void WritePin(unsigned char pin, PwmValue value) = 0;
 	};
 }

@@ -3,7 +3,7 @@ namespace HardwareAbstraction
 	class IAnalogService
 	{
 	public:
-		virtual void InitPin(uint8_t pin) = 0;
-		virtual float ReadPin(uint8_t pin) = 0;
+		virtual void InitPin(unsigned char pin) = 0;
+		virtual float ReadPin(unsigned char pin) = 0;
 	};
 }

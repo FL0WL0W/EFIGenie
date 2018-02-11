@@ -1,5 +1,3 @@
-#include <map>
-#include <functional>
 #include "PistonEngineFactory.h"
 
 namespace EngineManagement
@@ -34,7 +32,7 @@ namespace EngineManagement
 		case 2:
 			return new EngineManagement::PistonEngineInjectionConfigWrapper_DFCO(CurrentDecoder, CurrentThrottlePositionService, (void*)((unsigned char*)config + 1));
 		}
-		return NULL;
+		return 0;
 	}
 	
 	void CreateServices(
@@ -181,7 +179,7 @@ namespace EngineManagement
 		switch (fuelTrimId)
 		{
 		case 0:
-			CurrentFuelTrimService = NULL;
+			CurrentFuelTrimService = 0;
 			break;
 		}
 

@@ -3,7 +3,7 @@ namespace EngineManagement
 	class IgnitorService : public IIgnitorService
 	{
 	protected:
-		uint8_t _ignitionPin;
+		unsigned char _ignitionPin;
 		HardwareAbstraction::IDigitalService *_digitalService;
 		bool _normalOn;
 		bool _highZ;

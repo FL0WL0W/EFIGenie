@@ -1,7 +1,4 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IMapService.h"
 #include "PinDirection.h"
@@ -11,14 +8,14 @@
 
 namespace EngineManagement
 {
-	IgnitorService::IgnitorService(HardwareAbstraction::IDigitalService *digitalService, uint8_t ignitionPin, bool normalOn, bool highZ)
+	IgnitorService::IgnitorService(HardwareAbstraction::IDigitalService *digitalService, unsigned char ignitionPin, bool normalOn, bool highZ)
 	{
 		_digitalService = digitalService;
 		_ignitionPin = ignitionPin;
 		_normalOn = normalOn;
 		_highZ = highZ;
 		
-		_digitalService->InitPin(_ignitionPin, HardwareAbstraction::PinDirection::Out);
+		_digitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
 		_digitalService->WritePin(_ignitionPin, _normalOn);
 	}
 	
@@ -26,7 +23,7 @@ namespace EngineManagement
 	{
 		if (_highZ && !_normalOn)
 		{
-			_digitalService->InitPin(_ignitionPin, HardwareAbstraction::PinDirection::In);
+			_digitalService->InitPin(_ignitionPin, HardwareAbstraction::In);
 		}
 		else
 		{
@@ -38,7 +35,7 @@ namespace EngineManagement
 	{
 		if (_highZ && _normalOn)
 		{
-			_digitalService->InitPin(_ignitionPin, HardwareAbstraction::PinDirection::In);
+			_digitalService->InitPin(_ignitionPin, HardwareAbstraction::In);
 		}
 		else
 		{

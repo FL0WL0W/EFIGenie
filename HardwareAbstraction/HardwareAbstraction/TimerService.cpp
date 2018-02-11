@@ -1,7 +1,5 @@
-#include <stdint.h>
-#include <map>
-#include <functional>
 #include <algorithm>
+#include <stdint.h>
 #include "ITimerService.h"
 
 namespace HardwareAbstraction

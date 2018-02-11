@@ -1,6 +1,4 @@
 #include "PistonEngineDefines.h"
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
@@ -88,7 +86,7 @@ namespace EngineManagement
 		config = (void*)((short *)config + MAPDOT_ADDER_RESOLUTION);
 	}
 	
-	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(uint8_t cylinder)
+	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(unsigned char cylinder)
 	{
 		InjectorTiming timing = InjectorTiming();
 		timing.OpenPosition64thDegree = _injectorOpenPosition64thDegree;
@@ -128,7 +126,7 @@ namespace EngineManagement
 		+			_volumetricEfficiencyMap[rpmIndexH + VE_RPM_RESOLUTION * mapIndexH] * rpmMultiplier * mapMultiplier;
 		VE *= 0.0078125f;
 				
-		if (_fuelTrimService != NULL)
+		if (_fuelTrimService != 0)
 			VE += _fuelTrimService->GetFuelTrim(cylinder);
 		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		

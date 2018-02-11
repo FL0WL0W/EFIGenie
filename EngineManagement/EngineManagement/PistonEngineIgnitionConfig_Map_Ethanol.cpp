@@ -1,5 +1,3 @@
-#include <map>
-#include <functional>
 #include "ITimerService.h"
 #include "IIgnitorService.h"
 #include "IInjectorService.h"

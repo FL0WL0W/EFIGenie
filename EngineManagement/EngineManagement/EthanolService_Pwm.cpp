@@ -1,7 +1,4 @@
-#include <stm32f10x_gpio.h>
 #include <stdint.h>
-#include <map>
-#include <functional>
 #include "PinDirection.h"
 #include "IEthanolService.h"
 #include "IPwmService.h"
@@ -9,12 +6,12 @@
 
 namespace EngineManagement
 {	
-	EthanolService_Pwm::EthanolService_Pwm(HardwareAbstraction::IPwmService *pwmService, uint8_t pwmPin, void *config)
+	EthanolService_Pwm::EthanolService_Pwm(HardwareAbstraction::IPwmService *pwmService, unsigned char pwmPin, void *config)
 	{
 		_pwmService = pwmService;
 		
 		_pwmPin = pwmPin;
-		_pwmService->InitPin(_pwmPin, HardwareAbstraction::PinDirection::In);
+		_pwmService->InitPin(_pwmPin, HardwareAbstraction::In);
 		
 		LoadConfig(config);
 	}

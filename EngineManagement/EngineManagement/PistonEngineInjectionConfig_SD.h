@@ -49,6 +49,6 @@ namespace EngineManagement
 			IAfrService *afrService,
 			PistonEngineConfig *pistonEngineConfig,
 			void *config);
-		InjectorTiming GetInjectorTiming(uint8_t cylinder);
+		InjectorTiming GetInjectorTiming(unsigned char cylinder);
 	};
 }

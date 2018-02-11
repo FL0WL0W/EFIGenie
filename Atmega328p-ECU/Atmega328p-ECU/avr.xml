@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<EmbeddedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ToolchainID>com.visualgdb.avr</ToolchainID>
+  <ToolchainVersion>
+    <GCC>5.3.0</GCC>
+    <GDB>7.11</GDB>
+    <Revision>1</Revision>
+  </ToolchainVersion>
+  <BspID>com.sysprogs.avr.core</BspID>
+  <BspVersion>1.0</BspVersion>
+  <McuID>ATMEGA328P</McuID>
+  <MCUDefinitionFile>DeviceDefinitions/atmega328p.xml</MCUDefinitionFile>
+  <MCUProperties>
+    <Entries />
+  </MCUProperties>
+  <BSPSourceFolderName>Device-specific files</BSPSourceFolderName>
+  <MCUMakFile>avr.mak</MCUMakFile>
+  <FrameworkProperties>
+    <Entries />
+  </FrameworkProperties>
+  <TestFrameworkProperties>
+    <Entries />
+  </TestFrameworkProperties>
+</EmbeddedProfile>
