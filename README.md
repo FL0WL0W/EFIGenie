@@ -11,3 +11,19 @@ Create Throttle Body Injection code<br>
 Create Fuel Trim Service<br>
 Implement Stm32F10x PWM service<br>
 Create Fuel Prime<br>
+
+Features<br>
+Customizable 3D Fuel and Ignition Maps (Speed Density)<br>
+8 cylinder sequential injection and ignition (10, 12, 14, 16 possible using wasted spark and even cylinder banked injection)<br>
+Individual injector trims<br>
+Warm Up Enrichment<br>
+TPS and MAP acceleration enrichment<br>
+Voltage and MAP Injector Offset<br>
+Short Pulse Adder<br>
+Flexible Crank Cam Decoder<br>
+<p>
+  GM 24x
+  --More to come
+</p>
+Deceleration fuel cut off (DFCO)<br>
+Flex fuel<br>
