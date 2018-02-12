@@ -33,7 +33,7 @@ namespace EngineManagement
 		case 2:
 			return new EngineManagement::PistonEngineIgnitionConfigWrapper_HardRpmLimit((void*)((unsigned char*)config + 1));
 		case 3:
-			return new EngineManagement::PistonEngineIgnitionConfigWrapper_SoftRpmLimit((void*)((unsigned char*)config + 1));
+			return new EngineManagement::PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit((void*)((unsigned char*)config + 1));
 		}
 		return 0;
 	}

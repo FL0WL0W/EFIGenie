@@ -4,7 +4,7 @@
 
 namespace EngineManagement
 {
-	PistonEngineIgnitionConfigWrapper_SoftRpmLimit::PistonEngineIgnitionConfigWrapper_SoftRpmLimit(void *config)
+	PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit::PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(void *config)
 	{		
 		_pinEnable = *(unsigned char *)config;
 		config = (void*)((unsigned char *)config + 1);
@@ -21,7 +21,7 @@ namespace EngineManagement
 		_child = CreatePistonEngineIgnitionConfig(config);
 	}
 	
-	IgnitionTiming PistonEngineIgnitionConfigWrapper_SoftRpmLimit::GetIgnitionTiming()
+	IgnitionTiming PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit::GetIgnitionTiming()
 	{
 		unsigned short rpm = CurrentDecoder->GetRpm();
 		unsigned int rpmTimeOrig = CurrentTimerService->GetTick();

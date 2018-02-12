@@ -15,7 +15,7 @@
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
-#include "PistonEngineIgnitionConfigWrapper_SoftRpmLimit.h"
+#include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
 #ifndef NOINJECTION
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"

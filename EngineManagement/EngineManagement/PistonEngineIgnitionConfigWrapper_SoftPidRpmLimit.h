@@ -1,6 +1,6 @@
 namespace EngineManagement
 {
-	class PistonEngineIgnitionConfigWrapper_SoftRpmLimit : public IPistonEngineIgnitionConfig
+	class PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit : public IPistonEngineIgnitionConfig
 	{
 	protected:
 		IPistonEngineIgnitionConfig *_child;
@@ -15,7 +15,7 @@ namespace EngineManagement
 		float _rpmKi;
 		float _rpmKd;
 	public:
-		PistonEngineIgnitionConfigWrapper_SoftRpmLimit(void *config);
+		PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(void *config);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }
