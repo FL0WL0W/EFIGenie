@@ -16,6 +16,15 @@ namespace EngineManagement
 		
 		_rpmLimit = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
+		
+		_rpmKp = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		_rpmKi = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		_rpmKd = *(float *)config;
+		config = (void*)((float *)config + 1);
 				
 		_child = CreatePistonEngineIgnitionConfig(config);
 	}
