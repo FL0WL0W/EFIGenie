@@ -23,6 +23,19 @@ namespace EngineManagement
 	}
 #endif
 	
+	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config)
+	{
+		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)config);
+		switch (pistonEngineIgnitionConfigId)
+		{
+		case 1:
+			return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(CurrentPistonEngineConfig, (void*)((unsigned char*)config + 1));
+		case 2:
+			return new EngineManagement::PistonEngineIgnitionConfigWrapper_HardRpmLimit((void*)((unsigned char*)config + 1));
+		}
+		return 0;
+	}
+	
 	void CreateServices(
 		HardwareAbstraction::ITimerService *timerService,
 		HardwareAbstraction::IDigitalService *digitalService,
@@ -192,13 +205,7 @@ namespace EngineManagement
 #endif
 		
 		//TODO: create unit tests
-		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)pistonEngineIgnitionConfigFile);
-		switch (pistonEngineIgnitionConfigId)
-		{
-		case 1:
-			CurrentPistonEngineIgnitionConfig = new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(CurrentPistonEngineConfig, (void*)((unsigned char*)pistonEngineIgnitionConfigFile + 1));
-			break;
-		}
+		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
 
 		//TODO: create unit tests
 		//finish odd cylinder banks

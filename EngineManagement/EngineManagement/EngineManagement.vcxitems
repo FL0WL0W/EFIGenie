@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Services.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MapService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineFactory.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp" />

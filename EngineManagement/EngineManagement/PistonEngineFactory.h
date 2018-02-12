@@ -14,6 +14,7 @@
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
+#include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 #ifndef NOINJECTION
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"
@@ -27,16 +28,17 @@
 namespace EngineManagement
 {
 #ifndef NOINJECTION
-	
 	extern IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
 	
-	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(
-		void *config);
+	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(void *config);
 #endif
+	
+	extern IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
+	
+	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config);
 	
 	extern PistonEngineController *CurrentPistonEngineController;
 	extern PistonEngineConfig *CurrentPistonEngineConfig;
-	extern IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
 	
 	void CreateServices(
 		HardwareAbstraction::ITimerService *timerService,
