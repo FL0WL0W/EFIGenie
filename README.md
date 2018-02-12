@@ -26,6 +26,8 @@ Features<br>
     </ul>
   <li>Deceleration fuel cut off (DFCO)</li>
   <li>Flex fuel</li>
+  <li>Rev Limiting (Hard Spark)</li>
+  <li>Launch control (Hard Spark)</li>
 </ul>
 <br>
 TODO LIST<br>
@@ -37,9 +39,9 @@ TODO LIST<br>
   <li>Implement Stm32F10x PWM service</li>
   <li>Fuel Prime</li>
   <li>Fuel Trim (Wideband and Narrowband)</li>
-  <li>Rev Limiting</li>
   <li>After Start Enrichment</li>
-  <li>Launch control (Wrapper)</li>
+  <li>Rev Limiting (Soft Spark)</li>
+  <li>Launch control (Soft Spark)</li>
   <li>Tach output</li>
   <li>Fuel Pump (On/Off)</li>
   <li>Fuel Pump (PWM)</li>
