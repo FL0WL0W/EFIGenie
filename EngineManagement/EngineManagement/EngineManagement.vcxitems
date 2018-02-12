@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)CurrentServices.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Services.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.cpp" />
