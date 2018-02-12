@@ -27,7 +27,7 @@ namespace EngineManagement
 		
 		if (rpm < _rpmDisable)
 			_limitEnabled = false;
-		else if(rpm > _rpmEnable && (_pinEnable == 0 || CurrentDigitalService->ReadPin(_pinEnable) != _pinNormalOn))
+		else if (rpm > _rpmEnable && (_pinEnable == 0 || CurrentDigitalService->ReadPin(_pinEnable) != _pinNormalOn))
 			_limitEnabled = true;
 		
 		if (_limitEnabled)

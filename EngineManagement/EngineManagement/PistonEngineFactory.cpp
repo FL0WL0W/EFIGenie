@@ -32,6 +32,8 @@ namespace EngineManagement
 			return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(CurrentPistonEngineConfig, (void*)((unsigned char*)config + 1));
 		case 2:
 			return new EngineManagement::PistonEngineIgnitionConfigWrapper_HardRpmLimit((void*)((unsigned char*)config + 1));
+		case 3:
+			return new EngineManagement::PistonEngineIgnitionConfigWrapper_SoftRpmLimit((void*)((unsigned char*)config + 1));
 		}
 		return 0;
 	}

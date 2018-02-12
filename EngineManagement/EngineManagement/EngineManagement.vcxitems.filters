@@ -162,6 +162,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftRpmLimit.h">
+      <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionService.cpp">
@@ -219,6 +222,9 @@
       <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.cpp">
+      <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftRpmLimit.cpp">
       <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
     </ClCompile>
   </ItemGroup>
