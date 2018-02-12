@@ -26,8 +26,8 @@ Features<br>
     </ul>
   <li>Deceleration fuel cut off (DFCO)</li>
   <li>Flex fuel</li>
-  <li>Rev Limiting (Hard Spark)</li>
-  <li>Launch control (Hard Spark)</li>
+  <li>Rev Limiting (Hard and Soft Spark)</li>
+  <li>Launch control (Hard and Soft Spark)</li>
 </ul>
 <br>
 TODO LIST<br>
@@ -40,8 +40,6 @@ TODO LIST<br>
   <li>Fuel Prime</li>
   <li>Fuel Trim (Wideband and Narrowband)</li>
   <li>After Start Enrichment</li>
-  <li>Rev Limiting (Soft Spark)</li>
-  <li>Launch control (Soft Spark)</li>
   <li>Tach output</li>
   <li>Fuel Pump (On/Off)</li>
   <li>Fuel Pump (PWM)</li>
