@@ -14,6 +14,7 @@ Features<br>
     </ul>
   <li>Build Defines for NOINJECTION Control (Ignition only controller hardware)</li>
   <li>Individual injector trims</li>
+  <li>Fuel Pump (On/Off)</li>
   <li>Fuel Prime</li>
   <li>After Start Enrichment</li>
   <li>Warm Up Enrichment</li>
@@ -41,7 +42,6 @@ TODO LIST<br>
   <li>Implement Stm32F10x PWM service</li>
   <li>Fuel Trim (Wideband and Narrowband)</li>
   <li>Tach output</li>
-  <li>Fuel Pump (On/Off)</li>
   <li>Fuel Pump (PWM)</li>
   <li>Idle control</li>
   <li>VVT control</li>
