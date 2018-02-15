@@ -44,9 +44,9 @@ TODO LIST<br>
   <li>Fuel Trim (Wideband and Narrowband)</li>
   <li>Tach output</li>
   <li>Fuel Pump (PWM)</li>
-  <li>Idle control</li>
-  <li>VVT control</li>
-  <li>Boost control</li>
+  <li>Idle control (PWM/Stepper - PID control loop)</li>
+  <li>VVT control (PWM - Open loop or PID control loop)</li>
+  <li>Boost control (PWM - Open loop or PID control loop)</li>
   <li>Logging</li>
   <li>Tuner Studio</li>
   <li>Alpha-N</li>
