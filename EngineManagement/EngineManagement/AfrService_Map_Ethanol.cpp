@@ -1,3 +1,4 @@
+#ifndef NOINJECTION
 #include "Services.h"
 #include "PistonEngineConfig.h"
 #include "AfrService_Map_Ethanol.h"
@@ -148,3 +149,4 @@ namespace EngineManagement
 		return minAfr;
 	}
 }
+#endif

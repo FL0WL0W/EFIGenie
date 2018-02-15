@@ -1,6 +1,8 @@
 #include "Services.h"
 #include "PistonEngineConfig.h"
+#ifndef NOINJECTION
 #include "IPistonEngineInjectionConfig.h"
+#endif
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineController.h"
 
@@ -19,8 +21,10 @@ namespace EngineManagement
 		_pistonEngineConfig = pistonEngineConfig;
 		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
 		{
+#ifndef NOINJECTION
 			_injectorOpenTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorOpenTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
 			_injectorCloseTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
+#endif
 			_ignitorDwellTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilDwellTask, CurrentIgnitorServices[cylinder], IGNITION_DWELL_TASK_PRIORITY, false);
 			_ignitorFireTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilFireTask, CurrentIgnitorServices[cylinder], IGNITION_FIRE_TASK_PRIORITY, false);
 		}

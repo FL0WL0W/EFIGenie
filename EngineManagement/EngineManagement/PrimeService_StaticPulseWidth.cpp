@@ -1,6 +1,6 @@
 #ifndef NOINJECTION
 #include "Services.h"
-#include "PistonEngineFactory.h"
+#include "PrimeService_StaticPulseWidth.h"
 
 namespace EngineManagement
 {

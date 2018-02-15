@@ -13,9 +13,9 @@ namespace EngineManagement
 	IIntakeAirTemperatureService *CurrentIntakeAirTemperatureService;
 	IVoltageService *CurrentVoltageService;
 	IEthanolService *CurrentEthanolService;
-	IAfrService *CurrentAfrService;
 	ITpsService *CurrentThrottlePositionService;
 #ifndef NOINJECTION
+	IAfrService *CurrentAfrService;
 	IFuelTrimService *CurrentFuelTrimService;
 	IInjectorService *CurrentInjectorServices[MAX_CYLINDERS];
 	IPrimeService *CurrentPrimeService;

@@ -236,12 +236,16 @@ namespace EngineManagement
 #endif
 			CurrentPistonEngineIgnitionConfig, CurrentPistonEngineConfig);
 
+#ifndef NOINJECTION
 		CurrentFuelPumpService->Prime();
+#endif
 		
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
 
+#ifndef NOINJECTION
 		CurrentFuelPumpService->On();
+#endif
 	}
 
 	void ScheduleEvents()

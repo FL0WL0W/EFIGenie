@@ -1,3 +1,4 @@
+#ifndef NOINJECTION
 #include "Services.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineInjectionConfig.h"
@@ -244,3 +245,5 @@ namespace EngineManagement
 		return timing;
 	}
 }
+
+#endif

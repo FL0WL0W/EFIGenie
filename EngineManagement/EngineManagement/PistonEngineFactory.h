@@ -8,7 +8,6 @@
 #include "VoltageService_Static.h"
 #include "VoltageService_Analog.h"
 #include "TpsService_Analog.h"
-#include "AfrService_Static.h"
 #include "Gm24xDecoder.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
@@ -16,6 +15,8 @@
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 #include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
 #ifndef NOINJECTION
+#include "AfrService_Static.h"
+#include "AfrService_Map_Ethanol.h"
 #include "InjectorService.h"
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"
@@ -24,7 +25,6 @@
 #include "FuelPumpService.h"
 #endif
 #include "PistonEngineController.h"
-#include "AfrService_Map_Ethanol.h"
 #include "EthanolService_Analog.h"
 #include "EthanolService_Pwm.h"
 
