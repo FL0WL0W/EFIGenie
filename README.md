@@ -51,4 +51,5 @@ TODO LIST<br>
   <li>Alpha-N</li>
   <li>CAN Bus/OBD2</li>
   <li>Vehicle Speed Sensor</li>
+  <li>Variable table axis(I.E. RPM 400, 600, 800, 1200, 2400, 3600, 3800, 4000, 4200, 5400, 6600)</li>
 </ul  
