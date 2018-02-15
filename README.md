@@ -36,21 +36,22 @@ Features<br>
 TODO LIST<br>
 <ul>
   <li>Build defines for NOIGNITION (Injection only hardware / I.E. PiggyBack)</li>
-  <li>Create unit tests</li>
-  <li>Create integration tests with integration test hardware</li>
+  <li>*Create unit tests</li>
+  <li>*Create integration tests with integration test hardware</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
-  <li>Implement Stm32F10x PWM service</li>
-  <li>Fuel Trim (Wideband and Narrowband)</li>
-  <li>Tach output</li>
+  <li>*Implement Stm32F10x PWM service</li>
+  <li>*Fuel Trim (Wideband and Narrowband)</li>
+  <li>*Tach output</li>
   <li>Fuel Pump (PWM)</li>
-  <li>Idle control (PWM/Stepper - PID control loop)</li>
+  <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
-  <li>Logging</li>
-  <li>Tuner Studio</li>
+  <li>*Logging</li>
+  <li>*Tuner Studio</li>
   <li>Alpha-N</li>
   <li>CAN Bus/OBD2</li>
   <li>Vehicle Speed Sensor</li>
   <li>Variable table axis(I.E. RPM 400, 600, 800, 1200, 2400, 3600, 3800, 4000, 4200, 5400, 6600)</li>
 </ul  
+  *High Priority
