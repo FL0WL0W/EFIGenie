@@ -7,7 +7,7 @@ namespace EngineManagement
 		unsigned int _lastReadTick;
 		unsigned short _dotSampleRate;
 	public:
-		IntakeAirTemperatureService_Analog(unsigned char adcPin, void *config);
+		IntakeAirTemperatureService_Analog(void *config);
 		void ReadIat();
 	};
 }

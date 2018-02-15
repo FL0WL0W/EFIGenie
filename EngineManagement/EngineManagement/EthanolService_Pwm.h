@@ -6,7 +6,7 @@ namespace EngineManagement
 		float A0, A1, A2, A3;
 		unsigned int _lastReadTick;
 	public:
-		EthanolService_Pwm(unsigned char pwmPin, void *config);
+		EthanolService_Pwm(void *config);
 		void ReadEthanolContent();
 	};
 }

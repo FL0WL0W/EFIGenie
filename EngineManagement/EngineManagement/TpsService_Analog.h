@@ -8,7 +8,7 @@ namespace EngineManagement
 		unsigned int _lastReadTick;
 		unsigned short _dotSampleRate;
 	public:
-		TpsService_Analog(unsigned char adcPin, void *config);
+		TpsService_Analog(void *config);
 		void ReadTps();
 	};
 }

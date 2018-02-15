@@ -3,10 +3,10 @@
 
 namespace EngineManagement
 {	
-	EthanolService_Pwm::EthanolService_Pwm(unsigned char pwmPin, void *config)
+	EthanolService_Pwm::EthanolService_Pwm(void *config)
 	{
-		_pwmPin = pwmPin;
-		CurrentPwmService->InitPin(_pwmPin, HardwareAbstraction::In);
+		_pwmPin = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
 		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
@@ -19,6 +19,8 @@ namespace EngineManagement
 		
 		A3 = *((float *)config);
 		config = (void*)((float *)config + 1);
+		
+		CurrentPwmService->InitPin(_pwmPin, HardwareAbstraction::In);
 	}
 	
 	void EthanolService_Pwm::ReadEthanolContent()

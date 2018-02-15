@@ -248,37 +248,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="EctConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="IatConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="MapConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="PistonEngineIgnitionConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="PistonEngineInjectionConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="AfrConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="EthanolConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="VoltageConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="FuelTrimConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </EmbeddedBinaryFile>
-    <EmbeddedBinaryFile Include="TpsConfigFile.dat">
+    <EmbeddedBinaryFile Include="ConfigFile.dat">
       <Filter>Tune Files</Filter>
     </EmbeddedBinaryFile>
   </ItemGroup>

@@ -15,8 +15,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Services.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h" />
@@ -53,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Services.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Analog.cpp" />
@@ -72,11 +75,5 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TpsService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)VoltageService_Analog.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\IgnitionAdvanceFile.dat" />
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\MapLinearConfigFile.dat" />
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\PistonEngineSDConfigFile.dat" />
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\VolumetricEfficiencyFile.dat" />
   </ItemGroup>
 </Project>

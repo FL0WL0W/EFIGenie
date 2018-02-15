@@ -3,10 +3,10 @@
 
 namespace EngineManagement
 {	
-	MapService_Analog::MapService_Analog(unsigned char adcPin, void *config)
+	MapService_Analog::MapService_Analog(void *config)
 	{
-		_adcPin = adcPin;
-		CurrentAnalogService->InitPin(_adcPin);
+		_adcPin = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
 		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
@@ -22,6 +22,8 @@ namespace EngineManagement
 		
 		_dotSampleRate = *((unsigned short *)config);
 		config = (void*)((unsigned short *)config + 1);
+		
+		CurrentAnalogService->InitPin(_adcPin);
 	}
 	
 	void MapService_Analog::ReadMap()

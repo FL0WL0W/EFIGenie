@@ -8,7 +8,7 @@ namespace EngineManagement
 		unsigned short _dotSampleRate;
 		void LoadConfig(void *config);
 	public:
-		VoltageService_Analog(unsigned char adcPin, void *config);
+		VoltageService_Analog(void *config);
 		void ReadVoltage();
 	};
 }

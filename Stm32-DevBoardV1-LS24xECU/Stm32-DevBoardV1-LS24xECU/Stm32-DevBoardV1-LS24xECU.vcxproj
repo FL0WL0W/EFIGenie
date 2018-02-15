@@ -125,17 +125,7 @@
     <ResourceCompile Include="Stm32-DevBoardV1-LS24xECU.rc" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedBinaryFile Include="AfrConfigFile.dat" />
-    <EmbeddedBinaryFile Include="EctConfigFile.dat" />
-    <EmbeddedBinaryFile Include="EthanolConfigFile.dat" />
-    <EmbeddedBinaryFile Include="FuelTrimConfigFile.dat" />
-    <EmbeddedBinaryFile Include="IatConfigFile.dat" />
-    <EmbeddedBinaryFile Include="MapConfigFile.dat" />
-    <EmbeddedBinaryFile Include="PistonEngineConfigFile.dat" />
-    <EmbeddedBinaryFile Include="PistonEngineInjectionConfigFile.dat" />
-    <EmbeddedBinaryFile Include="PistonEngineIgnitionConfigFile.dat" />
-    <EmbeddedBinaryFile Include="TpsConfigFile.dat" />
-    <EmbeddedBinaryFile Include="VoltageConfigFile.dat" />
+    <EmbeddedBinaryFile Include="ConfigFile.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

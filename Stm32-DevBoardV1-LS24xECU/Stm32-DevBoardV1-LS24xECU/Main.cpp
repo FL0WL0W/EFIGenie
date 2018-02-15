@@ -83,28 +83,8 @@ int main()
 	
 	//TODO: Implement PWM service
 	_pwmService = NULL;
-	
-	unsigned char ignitionPins[MAX_CYLINDERS];
-	ignitionPins[0] = IGNITION_PIN_1;
-	ignitionPins[1] = IGNITION_PIN_2;
-	ignitionPins[2] = IGNITION_PIN_3;
-	ignitionPins[3] = IGNITION_PIN_4;
-	ignitionPins[4] = IGNITION_PIN_5;
-	ignitionPins[5] = IGNITION_PIN_6;
-	ignitionPins[6] = IGNITION_PIN_7;
-	ignitionPins[7] = IGNITION_PIN_8;
-	
-	unsigned char injectorPins[MAX_CYLINDERS];
-	injectorPins[0] = INJECTOR_PIN_1;
-	injectorPins[1] = INJECTOR_PIN_2;
-	injectorPins[2] = INJECTOR_PIN_3;
-	injectorPins[3] = INJECTOR_PIN_4;
-	injectorPins[4] = INJECTOR_PIN_5;
-	injectorPins[5] = INJECTOR_PIN_6;
-	injectorPins[6] = INJECTOR_PIN_7;
-	injectorPins[7] = INJECTOR_PIN_8;
-	
-	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::PistonEngineConfigFile_dat.data(), ignitionPins, false, true, injectorPins, false, false, MAP_PIN, EmbeddedResources::MapConfigFile_dat.data(), ECT_PIN, EmbeddedResources::EctConfigFile_dat.data(), IAT_PIN, EmbeddedResources::IatConfigFile_dat.data(), TPS_PIN, EmbeddedResources::TpsConfigFile_dat.data(), VOLTAGE_PIN, EmbeddedResources::VoltageConfigFile_dat.data(), ETHANOL_PIN, EmbeddedResources::EthanolConfigFile_dat.data(), EmbeddedResources::FuelTrimConfigFile_dat.data(), EmbeddedResources::AfrConfigFile_dat.data(), EmbeddedResources::PistonEngineInjectionConfigFile_dat.data(), EmbeddedResources::PistonEngineIgnitionConfigFile_dat.data());
+		
+	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false);
 	
 	for (;;)
 	{
@@ -114,19 +94,15 @@ int main()
 
 void ConfigureInterrupts()
 {
-	/* Set variables used */
 	GPIO_InitTypeDef GPIO_InitStruct;
 	EXTI_InitTypeDef EXTI_InitStruct;
     
-	/* Enable clock for GPIOB */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	
-	
+		
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15 | GPIO_Pin_14;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
-
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource6);

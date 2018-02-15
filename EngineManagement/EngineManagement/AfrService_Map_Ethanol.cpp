@@ -41,6 +41,17 @@ namespace EngineManagement
 		
 		_tpsMinAfr = (float *)config;
 		config = (void*)((float *)config + _afrTpsResolution);
+		
+		_startupAfrMultiplier = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		unsigned int tickPerSecond = CurrentTimerService->GetTicksPerSecond();
+		
+		_startupAfrTickDelay = (*(float *)config) * tickPerSecond;
+		config = (void*)((float *)config + 1);
+				
+		_startupAfrTickDecay = (*(float *)config) * tickPerSecond;
+		config = (void*)((float *)config + 1);
 	}
 	
 	float AfrService_Map_Ethanol::GetAfr()
@@ -117,6 +128,20 @@ namespace EngineManagement
 		
 		float afr = ((ethanolAfr * CurrentEthanolService->EthanolContent + gasAfr * (1 - CurrentEthanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
 		
+		unsigned int currentTick =  CurrentTimerService->GetTick();
+		if (!_started)
+			_startupTick = currentTick;
+		else if (_startupTick > currentTick + _startupAfrTickDecay)
+			_aeDone =  true;
+		
+		if (!_aeDone)
+		{
+			if (currentTick < _startupAfrTickDelay)
+				afr *= _startupAfrMultiplier;
+			else
+				afr *= (_startupAfrTickDecay - currentTick * 1.0f) / (_startupAfrTickDecay - _startupAfrTickDelay);
+		}
+				
 		if (minAfr < afr)
 			return afr;
 		

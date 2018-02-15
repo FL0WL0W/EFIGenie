@@ -6,7 +6,7 @@ namespace EngineManagement
 		float A0, A1, A2, A3;
 		unsigned int _lastReadTick;
 	public:
-		EthanolService_Analog(unsigned char adcPin, void *config);
+		EthanolService_Analog(void *config);
 		void ReadEthanolContent();
 	};
 }

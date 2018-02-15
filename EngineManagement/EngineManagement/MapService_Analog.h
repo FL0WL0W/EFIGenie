@@ -8,7 +8,7 @@ namespace EngineManagement
 		unsigned int _lastReadTick;
 		unsigned short _dotSampleRate;
 	public:
-		MapService_Analog(unsigned char adcPin, void *config);
+		MapService_Analog(void *config);
 		void ReadMap();
 	};
 }

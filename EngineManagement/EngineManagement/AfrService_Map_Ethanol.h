@@ -9,6 +9,12 @@ namespace EngineManagement
 		float _maxMapKpa;
 		float _minEct;
 		float _maxEct;
+		bool _started = false;
+		bool _aeDone = false;
+		unsigned int _startupTick;
+		float _startupAfrMultiplier;
+		unsigned int _startupAfrTickDelay;
+		unsigned int _startupAfrTickDecay;
 		float *_ectMultiplierTable;
 		float *_tpsMinAfr;
 		unsigned char _afrRpmResolution;

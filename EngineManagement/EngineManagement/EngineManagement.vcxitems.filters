@@ -7,9 +7,6 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{814598e9-e404-4e0b-9ebf-3b91f54765b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tune Files">
-      <UniqueIdentifier>{a177e23b-8738-4b72-8bf0-cfe3eea74097}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\PistonEngine">
       <UniqueIdentifier>{0c3dffe8-54b3-49c8-937f-2dacb267481b}</UniqueIdentifier>
     </Filter>
@@ -30,9 +27,6 @@
     </Filter>
     <Filter Include="Header Files\Services\IntakeAirTemperatureService">
       <UniqueIdentifier>{c8c0f3ff-79eb-4faa-9712-a207c4ee340a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Services\EthanolService">
-      <UniqueIdentifier>{912035ef-7564-4f03-9e24-144cbb9a9608}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Services\EngineCoolantTemperatureService">
       <UniqueIdentifier>{4a6751a8-4481-44ee-bd04-89ffd3c19bb1}</UniqueIdentifier>
@@ -60,6 +54,9 @@
     </Filter>
     <Filter Include="Source Files\Services\Interface">
       <UniqueIdentifier>{782ddfbb-7fda-4085-9b30-0add44e20fa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Services\EthanolService">
+      <UniqueIdentifier>{912035ef-7564-4f03-9e24-144cbb9a9608}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +168,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Services.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h">
+      <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -233,19 +236,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IIgnitorService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\IgnitionAdvanceFile.dat">
-      <Filter>Tune Files</Filter>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\MapLinearConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\PistonEngineSDConfigFile.dat">
-      <Filter>Tune Files</Filter>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\TuneFiles\VolumetricEfficiencyFile.dat">
-      <Filter>Tune Files</Filter>
-    </None>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

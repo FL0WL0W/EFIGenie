@@ -17,4 +17,5 @@ namespace EngineManagement
 	IEthanolService *CurrentEthanolService;
 	IAfrService *CurrentAfrService;
 	ITpsService *CurrentThrottlePositionService;
+	IPrimeService *CurrentPrimeService;
 }

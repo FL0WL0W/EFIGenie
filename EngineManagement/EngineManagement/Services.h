@@ -14,6 +14,11 @@
 #include "IAfrService.h"
 #include "IDecoder.h"
 #include "IFuelTrimService.h"
+#include "IPrimeService.h"
+
+#define INJECTOR_TASK_PRIORITY 1 //needs to be accurate but not as accurate as spark
+#define IGNITION_FIRE_TASK_PRIORITY 0 // needs to be accurate
+#define IGNITION_DWELL_TASK_PRIORITY 2 // needs to be close
 
 namespace EngineManagement
 {
@@ -32,4 +37,5 @@ namespace EngineManagement
 	extern IEthanolService *CurrentEthanolService;
 	extern IAfrService *CurrentAfrService;
 	extern ITpsService *CurrentThrottlePositionService;
+	extern IPrimeService *CurrentPrimeService;
 }

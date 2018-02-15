@@ -7,7 +7,7 @@ namespace EngineManagement
 		unsigned int _lastReadTick;
 		unsigned short _dotSampleRate;
 	public:
-		EngineCoolantTemperatureService_Analog(unsigned char adcPin, void *config);
+		EngineCoolantTemperatureService_Analog(void *config);
 		void ReadEct();
 	};
 }

@@ -1,5 +1,4 @@
 #include "IgnitorService.h"
-#include "InjectorService.h"
 #include "EthanolService_Static.h"
 #include "MapService_Analog.h"
 #include "EngineCoolantTemperatureService_Static.h"
@@ -17,9 +16,11 @@
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 #include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
 #ifndef NOINJECTION
+#include "InjectorService.h"
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"
 #include "PistonEngineInjectionConfigWrapper_DFCO.h"
+#include "PrimeService_StaticPulseWidth.h"
 #endif
 #include "PistonEngineController.h"
 #include "AfrService_Map_Ethanol.h"
@@ -47,30 +48,8 @@ namespace EngineManagement
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
-		unsigned char ignitionPins[MAX_CYLINDERS],
-		bool ignitionNormalOn,
 		bool ignitionHighZ,
-		unsigned char injectorPins[MAX_CYLINDERS],
-		bool injectorNormalOn,
-		bool injectorHighZ,
-		unsigned char mapPin,
-		void *mapConfigFile,
-		unsigned char ectPin,
-		void *ectConfigFile,
-		unsigned char iatPin,
-		void *iatConfigFile,
-		unsigned char voltagePin,
-		void *tpsConfigFile,
-		unsigned char tpsPin,
-		void *voltageConfigFile,
-		unsigned char ethanolPin,
-		void *ethanolConfigFile,
-		void *fuelTrimConfigFile,
-		void *afrConfigFile,
-#ifndef NOINJECTION
-		void *pistonEngineInjectionConfigFile,
-#endif
-		void *pistonEngineIgnitionConfigFile);
+		bool injectorHighZ);
 	
 	void ScheduleEvents();
 }
