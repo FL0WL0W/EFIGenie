@@ -24,7 +24,7 @@ Features<br>
   <li>Short Pulse Adder</li>
   <li>Flexible Crank Cam Decoder</li>
     <ul>
-      <li>GM 24x (Cam + Crank and Crank Only</li>
+      <li>GM 24x (Cam + Crank and Crank Only)</li>
       <li>--More to come</li>
     </ul>
   <li>Deceleration fuel cut off (DFCO)</li>
