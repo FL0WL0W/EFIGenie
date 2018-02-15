@@ -1,3 +1,4 @@
+#ifndef NOINJECTION
 #include "Services.h"
 #include "InjectorService.h"
 
@@ -10,7 +11,19 @@ namespace EngineManagement
 		_highZ = highZ;
 		
 		CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::Out);
-		CurrentDigitalService->WritePin(_injectorPin, _normalOn);
+		if (_highZ && !_normalOn)
+		{
+			CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::In);
+		}
+		else
+		{
+			if (_highZ)
+			{
+				CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::Out);
+			}
+			
+			CurrentDigitalService->WritePin(_injectorPin, !_normalOn);
+		}
 	}
 	
 	void InjectorService::InjectorOpen()
@@ -47,3 +60,4 @@ namespace EngineManagement
 		}
 	}
 }
+#endif

@@ -84,7 +84,7 @@ int main()
 	//TODO: Implement PWM service
 	_pwmService = NULL;
 		
-	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false);
+	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, false);
 	
 	for (;;)
 	{

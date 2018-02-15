@@ -21,6 +21,7 @@
 #include "PistonEngineInjectionConfig_SD.h"
 #include "PistonEngineInjectionConfigWrapper_DFCO.h"
 #include "PrimeService_StaticPulseWidth.h"
+#include "FuelPumpService.h"
 #endif
 #include "PistonEngineController.h"
 #include "AfrService_Map_Ethanol.h"
@@ -49,7 +50,11 @@ namespace EngineManagement
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
 		bool ignitionHighZ,
-		bool injectorHighZ);
+		bool injectorHighZ
+#ifndef NOINJECTION
+		, bool fuelPumpHighZ
+#endif
+		);
 	
 	void ScheduleEvents();
 }

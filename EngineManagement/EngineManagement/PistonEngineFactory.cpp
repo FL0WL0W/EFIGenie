@@ -45,7 +45,10 @@ namespace EngineManagement
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
 		bool ignitionHighZ,
-		bool injectorHighZ)
+		bool injectorHighZ
+#ifndef NOINJECTION
+		, bool fuelPumpHighZ
+#endif		)
 	{
 		CurrentTimerService = timerService;
 		CurrentDigitalService = digitalService;
@@ -169,6 +172,8 @@ namespace EngineManagement
 			break;
 		}
 
+#ifndef NOINJECTION
+		
 		//TODO: Fuel Trim Service
 		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 9));
 		unsigned char fuelTrimId = *((unsigned char*)fuelTrimConfigFile);
@@ -178,7 +183,7 @@ namespace EngineManagement
 			CurrentFuelTrimService = 0;
 			break;
 		}
-
+		
 		//TODO: Create Unit Tests
 		//AFR Service to use TPS override and ECT for warm up enrichment
 		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 10));
@@ -193,7 +198,6 @@ namespace EngineManagement
 			break;
 		}
 
-#ifndef NOINJECTION
 		//TODO: create unit tests
 		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 11));
 		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
@@ -204,13 +208,23 @@ namespace EngineManagement
 		switch (primeServiceId)
 		{
 		case 0:
-			CurrentPrimeService = new PrimeService_StaticPulseWidth(primeConfigFile);
+			CurrentPrimeService = new PrimeService_StaticPulseWidth((void*)((unsigned char*)primeConfigFile + 1));
+			break;
+		}
+		
+		//TODO: create unit test
+		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 13));
+		unsigned char fuelpumpServiceId = *((unsigned char*)fuelPumpConfigFile);
+		switch (fuelpumpServiceId)
+		{
+		case 0:
+			CurrentFuelPumpService = new FuelPumpService((void*)((unsigned char*)fuelPumpConfigFile + 1), fuelPumpHighZ);
 			break;
 		}
 #endif
 		
 		//TODO: create unit tests
-		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 13));
+		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 14));
 		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
 
 		//TODO: create unit tests
@@ -222,10 +236,12 @@ namespace EngineManagement
 #endif
 			CurrentPistonEngineIgnitionConfig, CurrentPistonEngineConfig);
 
+		CurrentFuelPumpService->Prime();
+		
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
 
-		//TODO: Create Fuel Prime
+		CurrentFuelPumpService->On();
 	}
 
 	void ScheduleEvents()
@@ -236,6 +252,7 @@ namespace EngineManagement
 		CurrentVoltageService->ReadVoltage();
 		CurrentEthanolService->ReadEthanolContent();
 #ifndef NOINJECTION
+		CurrentFuelPumpService->Tick();
 		CurrentPrimeService->PrimeTick();
 #endif
 		CurrentPistonEngineController->ScheduleEvents();

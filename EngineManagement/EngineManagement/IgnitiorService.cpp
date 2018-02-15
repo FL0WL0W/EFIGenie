@@ -10,7 +10,19 @@ namespace EngineManagement
 		_highZ = highZ;
 		
 		CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
-		CurrentDigitalService->WritePin(_ignitionPin, _normalOn);
+		if (_highZ && !_normalOn)
+		{
+			CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::In);
+		}
+		else
+		{
+			if (_highZ)
+			{
+				CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
+			}
+			
+			CurrentDigitalService->WritePin(_ignitionPin, !_normalOn);
+		}
 	}
 	
 	void IgnitorService::CoilDwell()
