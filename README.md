@@ -14,6 +14,8 @@ Features<br>
     </ul>
   <li>Build Defines for NOINJECTION Control (Ignition only controller hardware)</li>
   <li>Individual injector trims</li>
+  <li>Fuel Prime</li>
+  <li>After Start Enrichment</li>
   <li>Warm Up Enrichment</li>
   <li>TPS and MAP acceleration enrichment</li>
   <li>Temperature Bias between ECT and IAT</li>
@@ -37,9 +39,7 @@ TODO LIST<br>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
   <li>Implement Stm32F10x PWM service</li>
-  <li>Fuel Prime</li>
   <li>Fuel Trim (Wideband and Narrowband)</li>
-  <li>After Start Enrichment</li>
   <li>Tach output</li>
   <li>Fuel Pump (On/Off)</li>
   <li>Fuel Pump (PWM)</li>
