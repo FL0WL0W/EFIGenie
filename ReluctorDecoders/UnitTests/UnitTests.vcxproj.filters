@@ -16,9 +16,6 @@
     <Filter Include="Header Files\Helpers">
       <UniqueIdentifier>{de36d1e8-3a9c-43ba-b810-4d8d65a4f439}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Helpers">
-      <UniqueIdentifier>{2ef00d34-e229-4fd3-b9e2-14e8954e1792}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -38,8 +35,8 @@
     <ClCompile Include="Gm24xDecoderTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MockTimerService.cpp">
-      <Filter>Source Files\Helpers</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
