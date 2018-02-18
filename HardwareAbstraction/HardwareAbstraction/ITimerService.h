@@ -24,7 +24,7 @@ namespace HardwareAbstraction
 
 	class ITimerService
 	{
-	private:
+	protected:
 		void SortCallBackStack();
 		virtual void ScheduleCallBack(unsigned int tick) = 0;
 	public:
@@ -36,9 +36,11 @@ namespace HardwareAbstraction
 		unsigned int StackSize = 0;
 #endif
 		Task *CallBackStackPointer[TIMERSERVICE_MAX_STACK_SIZE];
+
 		virtual unsigned int GetTick(void) = 0;
 		virtual unsigned int GetTicksPerSecond() = 0;
-		
+
+		void ReturnCallBack(void);
 		Task *ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, int priority, bool deleteOnExecution);
 		bool ScheduleTask(Task *task, unsigned int tick);
 		bool ReScheduleTask(Task *task, unsigned int tick);

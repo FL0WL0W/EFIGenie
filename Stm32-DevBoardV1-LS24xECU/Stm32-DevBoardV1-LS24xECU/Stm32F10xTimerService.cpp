@@ -94,18 +94,7 @@ namespace Stm32
 	{
 		_futureTick = false;
 		_futureTock = false;
-		HardwareAbstraction::Task callTask;
-		do
-		{
-			callTask = *CallBackStackPointer[StackSize - 1];
-			callTask.CallBack(callTask.Parameters);
-			if (callTask.DeleteOnExecution)
-				delete &callTask;
-			
-			StackSize--;
-		} while ((CallBackStackPointer[StackSize-1])->Tick == callTask.Tick);
-		
-		ScheduleCallBack((*CallBackStackPointer)->Tick);
+		ITimerService::ReturnCallBack();
 	}
 	
 	void Stm32F10xTimerService::Interrupt(void)
