@@ -1,8 +1,8 @@
 namespace EngineManagement
 {
-	class MockMapService : IMapService
+	class MockMapService : public IMapService
 	{
 	public:
-		MOCK_METHOD0(ReadMap void())
+		MOCK_METHOD0(ReadMap, void());
 	};
 }

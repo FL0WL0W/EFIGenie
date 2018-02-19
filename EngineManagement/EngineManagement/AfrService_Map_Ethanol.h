@@ -16,7 +16,8 @@ namespace EngineManagement
 		unsigned int _startupAfrTickDelay;
 		unsigned int _startupAfrTickDecay;
 		float *_ectMultiplierTable;
-		float *_tpsMinAfr;
+		unsigned short *_tpsMinAfrGas;
+		unsigned short *_tpsMinAfrEthanol;
 		unsigned char _afrRpmResolution;
 		unsigned char _afrMapResolution;
 		unsigned char _afrEctResolution;

@@ -69,12 +69,18 @@
     <ClInclude Include="MockVoltageService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MockTimerService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MockDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="unittest1.cpp">
+    <ClCompile Include="AfrService_Map_EthanolTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
