@@ -1,4 +1,3 @@
-
 namespace EngineManagement
 {
 	class IFuelTrimService

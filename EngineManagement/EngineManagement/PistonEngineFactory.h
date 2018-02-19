@@ -42,7 +42,8 @@ namespace EngineManagement
 	
 	extern PistonEngineController *CurrentPistonEngineController;
 	extern PistonEngineConfig *CurrentPistonEngineConfig;
-	
+
+#ifndef NOINJECTION
 	void CreateServices(
 		HardwareAbstraction::ITimerService *timerService,
 		HardwareAbstraction::IDigitalService *digitalService,
@@ -50,11 +51,17 @@ namespace EngineManagement
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
 		bool ignitionHighZ,
-		bool injectorHighZ
-#ifndef NOINJECTION
-		, bool fuelPumpHighZ
+		bool injectorHighZ,
+		bool fuelPumpHighZ);
+#else
+	void CreateServices(
+		HardwareAbstraction::ITimerService *timerService,
+		HardwareAbstraction::IDigitalService *digitalService,
+		HardwareAbstraction::IAnalogService *analogService,
+		HardwareAbstraction::IPwmService *pwmService,
+		void *pistonEngineConfigFile,
+		bool ignitionHighZ);
 #endif
-		);
 	
 	void ScheduleEvents();
 }
