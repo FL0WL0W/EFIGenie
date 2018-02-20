@@ -101,6 +101,9 @@
     <ClCompile Include="VoltageService_AnalogTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="MapService_AnalogTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

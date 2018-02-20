@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "Services.h"
-#include "VoltageService_Analog.h"
+#include "MapService_Analog.h"
 #include "MockTimerService.h"
 #include "MockAnalogService.h"
 using ::testing::AtLeast;
@@ -13,7 +13,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTests
 {
-	TEST_CLASS(VoltageService_AnalogTests)
+	TEST_CLASS(MapService_AnalogTests)
 	{
 	public:
 		HardwareAbstraction::MockTimerService _timerService;
@@ -53,36 +53,36 @@ namespace UnitTests
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.WillRepeatedly(Return(5000));
 			EXPECT_CALL(_analogService, InitPin(1)).Times(1);
-			EngineManagement::CurrentVoltageService = new EngineManagement::VoltageService_Analog(config);
+			EngineManagement::CurrentMapService = new EngineManagement::MapService_Analog(config);
 		}
 
-		TEST_METHOD(WhenGettingVoltageThenCorrectVoltageIsReturned)
+		TEST_METHOD(WhenGettingMapKpaThenCorrectMapKpaIsReturned)
 		{
 			CreateServices();
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0));
-			EngineManagement::CurrentVoltageService->ReadVoltage();
-			Assert::AreEqual(-10.0f, EngineManagement::CurrentVoltageService->Voltage, 0.1f);
-			Assert::AreEqual(0.0f, EngineManagement::CurrentVoltageService->VoltageDot, 0.1f);
+			EngineManagement::CurrentMapService->ReadMap();
+			Assert::AreEqual(-10.0f, EngineManagement::CurrentMapService->MapKpa, 0.1f);
+			Assert::AreEqual(0.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(10));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(1));
-			EngineManagement::CurrentVoltageService->ReadVoltage();
-			Assert::AreEqual(20.0f, EngineManagement::CurrentVoltageService->Voltage, 0.1f);
-			Assert::AreEqual(10000.0f, EngineManagement::CurrentVoltageService->VoltageDot, 0.1f);
+			EngineManagement::CurrentMapService->ReadMap();
+			Assert::AreEqual(20.0f, EngineManagement::CurrentMapService->MapKpa, 0.1f);
+			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(15));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0.5));
-			EngineManagement::CurrentVoltageService->ReadVoltage();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentVoltageService->Voltage, 0.001f);
-			Assert::AreEqual(10000.0f, EngineManagement::CurrentVoltageService->VoltageDot, 0.1f);
+			EngineManagement::CurrentMapService->ReadMap();
+			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapKpa, 0.001f);
+			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(20));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0.5));
-			EngineManagement::CurrentVoltageService->ReadVoltage();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentVoltageService->Voltage, 0.001f);
-			Assert::AreEqual(-10625.0f, EngineManagement::CurrentVoltageService->VoltageDot, 0.1f);
+			EngineManagement::CurrentMapService->ReadMap();
+			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapKpa, 0.001f);
+			Assert::AreEqual(-10625.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
 		}
 	};
 }
