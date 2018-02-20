@@ -31,12 +31,29 @@ Features<br>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
+  <li>Unit Tests to ensure everything works</li>
 </ul>
 <br>
 TODO LIST<br>
 <ul>
   <li>Build defines for NOIGNITION (Injection only hardware / I.E. PiggyBack)</li>
   <li>*Create unit tests</li>
+    <ul>
+      <li>EthanolService_Analog</li>
+      <li>EthanolService_Pwm</li>
+      <li>IIgnitorService</li>
+      <li>IInjectorService</li>
+      <li>IgnitorService</li>
+      <li>InjectorService</li>
+      <li>FuelPumpService</li>
+      <li>PrimeService</li>
+      <li>PistonEngineController</li>
+      <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
+      <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
+      <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
+      <li>PistonEngineInjectionConfig_SD</li>
+      <li>PistonEngineInjectionConfigWrapper_DFCO</li>
+    </ul>
   <li>*Create integration tests with integration test hardware</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
