@@ -28,7 +28,6 @@ namespace EngineManagement
 	
 	void EngineCoolantTemperatureService_Analog::ReadEct()
 	{
-		float prevEct = EngineCoolantTemperature;
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		EngineCoolantTemperature = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -43,7 +42,8 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		EngineCoolantTemperatureDot = ((EngineCoolantTemperature - prevEct) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
+		EngineCoolantTemperatureDot = ((EngineCoolantTemperature - _lastEct) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTick;
+		_lastEct = EngineCoolantTemperature;
 	}
 }

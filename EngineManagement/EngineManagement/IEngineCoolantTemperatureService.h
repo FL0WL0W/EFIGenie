@@ -4,7 +4,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadEct() = 0;
-		float EngineCoolantTemperature;
-		float EngineCoolantTemperatureDot;
+		float EngineCoolantTemperature = 0;
+		float EngineCoolantTemperatureDot = 0;
 	};
 }

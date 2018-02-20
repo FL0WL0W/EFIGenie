@@ -28,7 +28,6 @@ namespace EngineManagement
 	
 	void MapService_Analog::ReadMap()
 	{
-		float prevMapKpa = MapKpa;
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		MapKpa = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -43,7 +42,8 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		MapKpaDot = ((MapKpa - prevMapKpa) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
+		MapKpaDot = ((MapKpa - _lastMapKpa) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
+		_lastMapKpa = MapKpa;
 	}
 }

@@ -28,7 +28,6 @@ namespace EngineManagement
 	
 	void IntakeAirTemperatureService_Analog::ReadIat()
 	{
-		float prevEct = IntakeAirTemperature;
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		IntakeAirTemperature = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -43,7 +42,8 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		IntakeAirTemperatureDot = ((IntakeAirTemperature - prevEct) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
+		IntakeAirTemperatureDot = ((IntakeAirTemperature - _lastIat) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
+		_lastIat = IntakeAirTemperature;
 	}
 }

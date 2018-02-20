@@ -19,6 +19,12 @@
     <Filter Include="Header Files\Services">
       <UniqueIdentifier>{d01e15ed-f4d1-4e09-bdaa-ac290db80e39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Services">
+      <UniqueIdentifier>{9471fcc2-35a7-4b22-9e5f-fd019921677d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PistonEngine">
+      <UniqueIdentifier>{46364c20-d07c-4218-9b0c-52dd58547fb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -75,13 +81,19 @@
     <ClInclude Include="MockDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockAnalogService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AfrService_Map_EthanolTests.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp">
+      <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

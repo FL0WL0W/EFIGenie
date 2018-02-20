@@ -28,7 +28,6 @@ namespace EngineManagement
 	
 	void TpsService_Analog::ReadTps()
 	{
-		float prevTps = Tps;
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		Tps = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -43,7 +42,8 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		TpsDot = ((Tps - prevTps) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
+		TpsDot = ((Tps - _lastTps) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTick;
+		_lastTps = Tps;
 	}
 }

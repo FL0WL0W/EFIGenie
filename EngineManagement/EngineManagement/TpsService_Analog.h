@@ -6,6 +6,7 @@ namespace EngineManagement
 		unsigned char _adcPin;
 		float A0, A1, A2, A3;
 		unsigned int _lastReadTick;
+		float _lastTps;
 		unsigned short _dotSampleRate;
 	public:
 		TpsService_Analog(void *config);

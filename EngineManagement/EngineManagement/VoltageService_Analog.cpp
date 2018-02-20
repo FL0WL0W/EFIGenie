@@ -28,7 +28,6 @@ namespace EngineManagement
 	
 	void VoltageService_Analog::ReadVoltage()
 	{
-		float prevVoltage = Voltage;
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		Voltage = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -43,7 +42,8 @@ namespace EngineManagement
 		}
 		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		VoltageDot = ((Voltage - prevVoltage) / (_lastReadTick - readTick)) * CurrentTimerService->GetTicksPerSecond();
+		VoltageDot = ((Voltage - _lastVoltage) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTick;
+		_lastVoltage = Voltage;
 	}
 }

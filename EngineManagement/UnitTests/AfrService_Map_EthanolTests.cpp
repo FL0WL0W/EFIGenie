@@ -59,7 +59,7 @@ namespace UnitTests
 			unsigned short tpsMinAfrTableEthanolTable[4] = { 11024, 10000, 9200, 9000 };
 
 
-			void *config = malloc(146); //142 bytes but causes loader lock when lower
+			void *config = malloc(142);
 			void *buildConfig = config;
 			//MaxRpm
 			*((unsigned short *)buildConfig) = 6000;
@@ -170,7 +170,7 @@ namespace UnitTests
 			Assert::AreEqual(14.9f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
 
 			_mapService.MapKpa = 0;
-			_tpsService.Tps = 100;
+			_tpsService.Tps = 1;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
 			Assert::AreEqual(12.94f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
 
