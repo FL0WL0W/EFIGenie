@@ -9,20 +9,16 @@ namespace EngineManagement
 		_injectorPin = injectorPin;
 		_normalOn = normalOn;
 		_highZ = highZ;
-		
-		CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::Out);
-		if (_highZ && !_normalOn)
+
+		if (_highZ && _normalOn)
 		{
 			CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::In);
 		}
 		else
 		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::Out);
-			}
+			CurrentDigitalService->InitPin(_injectorPin, HardwareAbstraction::Out);
 			
-			CurrentDigitalService->WritePin(_injectorPin, !_normalOn);
+			CurrentDigitalService->WritePin(_injectorPin, _normalOn);
 		}
 	}
 	

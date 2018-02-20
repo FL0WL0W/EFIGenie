@@ -9,19 +9,16 @@ namespace EngineManagement
 		_normalOn = normalOn;
 		_highZ = highZ;
 		
-		CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
-		if (_highZ && !_normalOn)
+
+		if (_highZ && _normalOn)
 		{
 			CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::In);
 		}
 		else
 		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
-			}
-			
-			CurrentDigitalService->WritePin(_ignitionPin, !_normalOn);
+			CurrentDigitalService->InitPin(_ignitionPin, HardwareAbstraction::Out);
+
+			CurrentDigitalService->WritePin(_ignitionPin, _normalOn);
 		}
 	}
 	

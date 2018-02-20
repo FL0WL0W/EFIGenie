@@ -156,6 +156,7 @@
     <ClInclude Include="MockAfrService.h" />
     <ClInclude Include="MockAnalogService.h" />
     <ClInclude Include="MockDecoder.h" />
+    <ClInclude Include="MockDigitalService.h" />
     <ClInclude Include="MockEngineCoolantTemperatureService.h" />
     <ClInclude Include="MockEthanolService.h" />
     <ClInclude Include="MockFuelPumpService.h" />
@@ -178,6 +179,9 @@
     <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp" />
     <ClCompile Include="EthanolService_AnalogTests.cpp" />
     <ClCompile Include="EthanolService_PwmTests.cpp" />
+    <ClCompile Include="gmock_initialize.cpp" />
+    <ClCompile Include="IgnitorServiceTests.cpp" />
+    <ClCompile Include="InjectorServiceTests.cpp" />
     <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp" />
     <ClCompile Include="MapService_AnalogTests.cpp" />
     <ClCompile Include="stdafx.cpp">

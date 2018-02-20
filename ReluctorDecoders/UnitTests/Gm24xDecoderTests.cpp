@@ -138,9 +138,8 @@ namespace UnitTests
 			{
 				tick += 8;
 				EXPECT_CALL(timerService, GetTick())
-					.Times(2)
-					.WillOnce(Return(tick))
-					.WillOnce(Return(tick + 4));
+					.Times(1)
+					.WillOnce(Return(tick));
 
 				decoder->CrankEdgeTrigger(Decoder::EdgeTrigger::Down);
 				Assert::IsTrue(decoder->HasCamPosition());
@@ -180,9 +179,8 @@ namespace UnitTests
 			{
 				tick += 8;
 				EXPECT_CALL(timerService, GetTick())
-					.Times(2)
-					.WillOnce(Return(tick))
-					.WillOnce(Return(tick + 4));
+					.Times(1)
+					.WillOnce(Return(tick));
 
 				decoder->CrankEdgeTrigger(Decoder::EdgeTrigger::Down);
 				Assert::IsTrue(decoder->HasCamPosition());

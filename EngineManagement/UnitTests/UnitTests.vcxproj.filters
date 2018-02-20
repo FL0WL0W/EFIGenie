@@ -87,6 +87,9 @@
     <ClInclude Include="MockPwmService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MockDigitalService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -114,6 +117,15 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="EthanolService_PwmTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="IgnitorServiceTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="gmock_initialize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InjectorServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
