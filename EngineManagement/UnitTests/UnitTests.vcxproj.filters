@@ -95,6 +95,9 @@
     <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

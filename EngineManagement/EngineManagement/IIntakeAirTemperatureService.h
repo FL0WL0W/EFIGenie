@@ -4,7 +4,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadIat() = 0;
-		float IntakeAirTemperature;
-		float IntakeAirTemperatureDot;
+		float IntakeAirTemperature = 0;
+		float IntakeAirTemperatureDot = 0;
 	};
 }

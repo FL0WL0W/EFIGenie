@@ -4,7 +4,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadMap() = 0;
-		float MapKpa;
-		float MapKpaDot;
+		float MapKpa = 0;
+		float MapKpaDot = 0;
 	};
 }

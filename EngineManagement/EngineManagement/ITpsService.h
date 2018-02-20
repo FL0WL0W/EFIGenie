@@ -4,7 +4,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadTps() = 0;
-		float Tps;
-		float TpsDot;
+		float Tps = 0;
+		float TpsDot = 0;
 	};
 }

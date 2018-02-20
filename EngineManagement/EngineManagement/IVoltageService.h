@@ -4,7 +4,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadVoltage() = 0;
-		float Voltage;
-		float VoltageDot;
+		float Voltage = 0;
+		float VoltageDot = 0;
 	};
 }
