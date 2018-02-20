@@ -159,16 +159,16 @@ namespace EngineManagement
 		unsigned int currentTick =  CurrentTimerService->GetTick();
 		if (!_started)
 			_startupTick = currentTick;
-		else if (_startupTick > currentTick + _startupAfrTickDecay)
+		else if (currentTick > _startupAfrTickDecay - _startupTick)
 			_aeDone =  true;
 		_started = true;
 		
 		if (!_aeDone)
 		{
-			if (currentTick < _startupAfrTickDelay)
+			if (currentTick < _startupAfrTickDelay - _startupTick)
 				afr *= _startupAfrMultiplier;
 			else
-				afr *= (_startupAfrTickDecay - currentTick * 1.0f) / (_startupAfrTickDecay - _startupAfrTickDelay);
+				afr *= 1 - (1 - _startupAfrMultiplier) * ((_startupAfrTickDecay - (currentTick - _startupTick)) * 1.0f / (_startupAfrTickDecay - _startupAfrTickDelay));
 		}
 				
 		if (minAfr > afr)

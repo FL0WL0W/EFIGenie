@@ -20,21 +20,21 @@ namespace UnitTests
 	TEST_CLASS(AfrService_Map_EthanolTests)
 	{
 	public:
-		HardwareAbstraction::MockTimerService *_timerService;
-		EngineManagement::MockMapService *_mapService;
-		EngineManagement::MockEngineCoolantTemperatureService *_ectService;
-		EngineManagement::MockTpsService *_tpsService;
-		EngineManagement::MockEthanolService *_ethanolService;
-		Decoder::MockDecoder *_decoder;
+		HardwareAbstraction::MockTimerService _timerService;
+		EngineManagement::MockMapService _mapService;
+		EngineManagement::MockEngineCoolantTemperatureService _ectService;
+		EngineManagement::MockTpsService _tpsService;
+		EngineManagement::MockEthanolService _ethanolService;
+		Decoder::MockDecoder _decoder;
 
 		void CreateServices()
 		{
-			EngineManagement::CurrentDecoder = _decoder = new Decoder::MockDecoder();
-			EngineManagement::CurrentTimerService = _timerService = new HardwareAbstraction::MockTimerService();
-			EngineManagement::CurrentMapService = _mapService = new EngineManagement::MockMapService();
-			EngineManagement::CurrentEngineCoolantTemperatureService = _ectService = new EngineManagement::MockEngineCoolantTemperatureService();
-			EngineManagement::CurrentThrottlePositionService = _tpsService = new EngineManagement::MockTpsService();
-			EngineManagement::CurrentEthanolService = _ethanolService = new EngineManagement::MockEthanolService();
+			EngineManagement::CurrentDecoder = &_decoder;
+			EngineManagement::CurrentTimerService = &_timerService;
+			EngineManagement::CurrentMapService = &_mapService;
+			EngineManagement::CurrentEngineCoolantTemperatureService = &_ectService;
+			EngineManagement::CurrentThrottlePositionService = &_tpsService;
+			EngineManagement::CurrentEthanolService = &_ethanolService;
 
 			
 			//GAS AFR TABLE, values in 1/1024	0	   2000	  4000	 6000
@@ -59,7 +59,7 @@ namespace UnitTests
 			unsigned short tpsMinAfrTableEthanolTable[4] = { 11024, 10000, 9200, 9000 };
 
 
-			void *config = malloc(142);
+			void *config = malloc(146); //142 bytes but causes loader lock when lower
 			void *buildConfig = config;
 			//MaxRpm
 			*((unsigned short *)buildConfig) = 6000;
@@ -125,7 +125,7 @@ namespace UnitTests
 			*((float *)buildConfig) = 10;
 			buildConfig = (void*)((float *)buildConfig + 1);
 
-			EXPECT_CALL(*_timerService, GetTicksPerSecond())
+			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.Times(1)
 				.WillOnce(Return(5000));
 			EngineManagement::CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol(config);
@@ -134,15 +134,57 @@ namespace UnitTests
 		TEST_METHOD(WhenGettingAfrThenCorrectAfrIsReturned)
 		{
 			CreateServices();
-
-			EXPECT_CALL(*_timerService, GetTick()).Times(1).WillOnce(Return(0));
-			EXPECT_CALL(*_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			_mapService->MapKpa = 0;
-			_ectService->EngineCoolantTemperature = -40;
-			_tpsService->Tps = 0;
-			_ethanolService->EthanolContent = 0;
+			
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(0));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			_mapService.MapKpa = 0;
+			_ectService.EngineCoolantTemperature = -40;
+			_tpsService.Tps = 0;
+			_ethanolService.EthanolContent = 0;
 			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
 
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5000));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(27500));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(11.93140625f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(50000));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(12.559375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EXPECT_CALL(_timerService, GetTick()).WillRepeatedly(Return(50001));
+
+			_mapService.MapKpa = 33;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
+			Assert::AreEqual(11.76f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_mapService.MapKpa = 16.5;
+			_ectService.EngineCoolantTemperature = 100;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(1000));
+			Assert::AreEqual(15.14f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_mapService.MapKpa = 16.5;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
+			Assert::AreEqual(14.9f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_mapService.MapKpa = 0;
+			_tpsService.Tps = 100;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(12.94f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_ethanolService.EthanolContent = 1;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(8.79f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_tpsService.Tps = 0;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(10.55f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+
+			_ethanolService.EthanolContent = 0.5;
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			Assert::AreEqual(12.97f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
 		}
 
 	};
