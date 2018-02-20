@@ -39,8 +39,6 @@ TODO LIST<br>
   <li>Build defines for NOIGNITION (Injection only hardware / I.E. PiggyBack)</li>
   <li>*Create unit tests</li>
     <ul>
-      <li>EthanolService_Analog</li>
-      <li>EthanolService_Pwm</li>
       <li>IIgnitorService</li>
       <li>IInjectorService</li>
       <li>IgnitorService</li>
