@@ -183,6 +183,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="AfrService_Map_EthanolTests.cpp" />
+    <ClCompile Include="VoltageService_AnalogTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
