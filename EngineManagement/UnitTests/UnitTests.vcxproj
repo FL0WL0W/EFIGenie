@@ -167,6 +167,7 @@
     <ClInclude Include="MockPistonEngineIgnitionConfig.h" />
     <ClInclude Include="MockPistonEngineInjectionConfig.h" />
     <ClInclude Include="MockPrimeService.h" />
+    <ClInclude Include="MockPwmService.h" />
     <ClInclude Include="MockTimerService.h" />
     <ClInclude Include="MockTpsService.h" />
     <ClInclude Include="MockVoltageService.h" />
@@ -175,6 +176,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp" />
+    <ClCompile Include="EthanolService_AnalogTests.cpp" />
+    <ClCompile Include="EthanolService_PwmTests.cpp" />
     <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp" />
     <ClCompile Include="MapService_AnalogTests.cpp" />
     <ClCompile Include="stdafx.cpp">
