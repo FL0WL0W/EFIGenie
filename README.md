@@ -42,9 +42,9 @@ TODO LIST<br>
       <li>EthanolService_Analog</li>
       <li>EthanolService_Pwm</li>
       <li>IIgnitorService</li>
-      <li>IInjectoService</li>
+      <li>IInjectorService</li>
       <li>IgnitorService</li>
-      <li>InjectoService</li>
+      <li>InjectorService</li>
       <li>FuelPumpService</li>
       <li>PrimeService</li>
       <li>PistonEngineController</li>
