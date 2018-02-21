@@ -72,7 +72,6 @@ namespace EngineManagement
 		}
 #ifndef NOIGNITION
 		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 1));
-		//TODO: create unit tests
 		if(CurrentPistonEngineConfig->IsDistributor)
 		{
 			//set all to the same pin for distributor
@@ -91,13 +90,11 @@ namespace EngineManagement
 #endif
 		
 		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 2));
-		//TODO: create unit tests
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{
 			CurrentInjectorServices[cylinder] = new EngineManagement::InjectorService(*((unsigned char*)injectorConfigFile + cylinder), (bool)((unsigned char*)injectorConfigFile + CurrentPistonEngineConfig->Cylinders), injectorHighZ);
 		}
 
-		//TODO: create unit tests
 		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 3));
 		unsigned char mapServiceId = *((unsigned char*)mapConfigFile);
 		switch (mapServiceId)
@@ -107,7 +104,6 @@ namespace EngineManagement
 			break;
 		}
 		
-		//TODO: Ceate Unit Tests
 		void *ectConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 4));
 		unsigned char ectId = *((unsigned char*)ectConfigFile);
 		switch (ectId)
@@ -120,7 +116,6 @@ namespace EngineManagement
 			break;
 		}
 
-		//TODO: Create Unit Tests
 		void *iatConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 5));
 		unsigned char iatId = *((unsigned char*)iatConfigFile);
 		switch (iatId)
@@ -133,20 +128,18 @@ namespace EngineManagement
 			break;
 		}
 
-		//TODO: Create Unit Tests
 		void *tpsConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 6));
 		unsigned char tpsId = *((unsigned char*)tpsConfigFile);
 		switch (tpsId)
 		{
 		case 0:
-			//CurrentThrottlePositionService = new EngineManagement::TpsService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1), *((float *)((unsigned char*)iatConfigFile + 1) + 2));
+			//TODO : CurrentThrottlePositionService = new EngineManagement::TpsService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1), *((float *)((unsigned char*)iatConfigFile + 1) + 2));
 			break;
 		case 1:
 			CurrentThrottlePositionService = new EngineManagement::TpsService_Analog((void *)((unsigned char*)tpsConfigFile + 1));
 			break;
 		}
 
-		//TODO: Create Unit Tests
 		void *voltageConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 7));
 		unsigned char voltageId = *((unsigned char*)voltageConfigFile);
 		switch (voltageId)
@@ -159,7 +152,6 @@ namespace EngineManagement
 			break;
 		}
 
-		//TODO: Create Unit Tests
 		void *ethanolConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 8));
 		unsigned char ethanolServiceId = *((unsigned char*)ethanolConfigFile);
 		switch (ethanolServiceId)
@@ -187,8 +179,6 @@ namespace EngineManagement
 			break;
 		}
 		
-		//TODO: Create Unit Tests
-		//AFR Service to use TPS override and ECT for warm up enrichment
 		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 10));
 		unsigned char afrServiceId = *((unsigned char*)afrConfigFile);
 		switch (afrServiceId)
@@ -205,7 +195,6 @@ namespace EngineManagement
 		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 11));
 		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
 		
-		//TODO: create unit test
 		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 12));
 		unsigned char primeServiceId = *((unsigned char*)primeConfigFile);
 		switch (primeServiceId)
