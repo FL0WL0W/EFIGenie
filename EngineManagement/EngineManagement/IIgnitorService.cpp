@@ -1,3 +1,4 @@
+#ifndef NOIGNITION
 #include "IIgnitorService.h"
 
 namespace EngineManagement
@@ -12,3 +13,4 @@ namespace EngineManagement
 		((IIgnitorService *)parameters)->CoilFire();
 	}
 }
+#endif

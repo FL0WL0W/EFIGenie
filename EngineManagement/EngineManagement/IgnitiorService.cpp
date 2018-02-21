@@ -1,3 +1,4 @@
+#ifndef NOIGNITION
 #include "Services.h"
 #include "IgnitorService.h"
 
@@ -56,3 +57,4 @@ namespace EngineManagement
 		}
 	}
 }
+#endif

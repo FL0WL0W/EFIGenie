@@ -3,9 +3,10 @@
 
 namespace EngineManagement
 {
+#if !defined(NOINJECTION ) && !defined(NOIGNITION )
 	PistonEngineController *CurrentPistonEngineController;
+#endif
 	PistonEngineConfig *CurrentPistonEngineConfig;
-	IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
 #ifndef NOINJECTION
 	IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
 	
@@ -22,6 +23,8 @@ namespace EngineManagement
 		return 0;
 	}
 #endif
+#ifndef NOIGNITION
+	IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
 	
 	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config)
 	{
@@ -37,26 +40,19 @@ namespace EngineManagement
 		}
 		return 0;
 	}
-
-#ifndef NOINJECTION
+#endif
+	
 	void CreateServices(
-		HardwareAbstraction::ITimerService *timerService,
+			HardwareAbstraction::ITimerService *timerService,
 		HardwareAbstraction::IDigitalService *digitalService,
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
+#ifndef NOIGNITION
 		bool ignitionHighZ,
+#endif
 		bool injectorHighZ,
 		bool fuelPumpHighZ)
-#else
-	void CreateServices(
-		HardwareAbstraction::ITimerService *timerService,
-		HardwareAbstraction::IDigitalService *digitalService,
-		HardwareAbstraction::IAnalogService *analogService,
-		HardwareAbstraction::IPwmService *pwmService,
-		void *pistonEngineConfigFile,
-		bool ignitionHighZ)
-#endif 
 	{
 		CurrentTimerService = timerService;
 		CurrentDigitalService = digitalService;
@@ -74,7 +70,7 @@ namespace EngineManagement
 			CurrentDecoder = new Decoder::Gm24xDecoder(CurrentTimerService);
 			break;
 		}
-
+#ifndef NOIGNITION
 		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 1));
 		//TODO: create unit tests
 		if(CurrentPistonEngineConfig->IsDistributor)
@@ -92,15 +88,14 @@ namespace EngineManagement
 				CurrentIgnitorServices[cylinder] = new EngineManagement::IgnitorService(*((unsigned char*)ignitorConfigFile + cylinder), (bool)((unsigned char*)ignitorConfigFile + CurrentPistonEngineConfig->Cylinders), ignitionHighZ);
 			}
 		}
-
-#ifndef NOINJECTION
+#endif
+		
 		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 2));
 		//TODO: create unit tests
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{
 			CurrentInjectorServices[cylinder] = new EngineManagement::InjectorService(*((unsigned char*)injectorConfigFile + cylinder), (bool)((unsigned char*)injectorConfigFile + CurrentPistonEngineConfig->Cylinders), injectorHighZ);
 		}
-#endif
 
 		//TODO: create unit tests
 		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 3));
@@ -219,8 +214,8 @@ namespace EngineManagement
 			CurrentPrimeService = new PrimeService_StaticPulseWidth((void*)((unsigned char*)primeConfigFile + 1));
 			break;
 		}
+#endif
 		
-		//TODO: create unit test
 		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 13));
 		unsigned char fuelpumpServiceId = *((unsigned char*)fuelPumpConfigFile);
 		switch (fuelpumpServiceId)
@@ -229,23 +224,26 @@ namespace EngineManagement
 			CurrentFuelPumpService = new FuelPumpService((void*)((unsigned char*)fuelPumpConfigFile + 1), fuelPumpHighZ);
 			break;
 		}
-#endif
-		
+#ifndef NOIGNITION
 		//TODO: create unit tests
 		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 14));
 		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
-
+#endif
 		//TODO: create unit tests
 		//finish odd cylinder banks
 		//finish Throttle Body Injection
+#if !defined(NOINJECTION ) && !defined(NOIGNITION )
 		CurrentPistonEngineController = new EngineManagement::PistonEngineController(
 #ifndef NOINJECTION
 			CurrentPistonEngineInjectionConfig, 
 #endif
-			CurrentPistonEngineIgnitionConfig, CurrentPistonEngineConfig);
+#ifndef NOIGNITION
+			CurrentPistonEngineIgnitionConfig, 
+#endif			CurrentPistonEngineConfig);
 
 #ifndef NOINJECTION
 		CurrentFuelPumpService->Prime();
+#endif
 #endif
 		
 		//wait until the decoder is synced before any scheduling
@@ -263,10 +261,10 @@ namespace EngineManagement
 		CurrentIntakeAirTemperatureService->ReadIat();
 		CurrentVoltageService->ReadVoltage();
 		CurrentEthanolService->ReadEthanolContent();
-#ifndef NOINJECTION
 		CurrentFuelPumpService->Tick();
 		CurrentPrimeService->PrimeTick();
-#endif
+#if !defined(NOINJECTION ) && !defined(NOIGNITION )
 		CurrentPistonEngineController->ScheduleEvents();
+#endif
 	}
 }

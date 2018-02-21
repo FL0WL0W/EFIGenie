@@ -1,3 +1,4 @@
+#ifndef NOIGNITION
 #include "Services.h"
 #include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
@@ -81,3 +82,4 @@ namespace EngineManagement
 		return timing;
 	}
 }
+#endif

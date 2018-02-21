@@ -1,4 +1,3 @@
-#ifndef NOINJECTION
 #include "Services.h"
 #include "PistonEngineFactory.h"
 
@@ -27,4 +26,3 @@ namespace EngineManagement
 		}
 	}
 }
-#endif

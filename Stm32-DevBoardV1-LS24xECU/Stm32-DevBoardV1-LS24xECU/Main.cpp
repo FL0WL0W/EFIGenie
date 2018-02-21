@@ -12,31 +12,6 @@
 #include <stm32f10x_gpio.h>
 #include "stm32f10x_exti.h"
 
-#define INJECTOR_PIN_1 0
-#define INJECTOR_PIN_2 0
-#define INJECTOR_PIN_3 0
-#define INJECTOR_PIN_4 0
-#define INJECTOR_PIN_5 0
-#define INJECTOR_PIN_6 0
-#define INJECTOR_PIN_7 0
-#define INJECTOR_PIN_8 0
-
-#define IGNITION_PIN_1 0
-#define IGNITION_PIN_2 0
-#define IGNITION_PIN_3 0
-#define IGNITION_PIN_4 0
-#define IGNITION_PIN_5 0
-#define IGNITION_PIN_6 0
-#define IGNITION_PIN_7 0
-#define IGNITION_PIN_8 0
-
-#define MAP_PIN 0
-#define ECT_PIN 0
-#define IAT_PIN 0
-#define TPS_PIN 0
-#define VOLTAGE_PIN 0
-#define ETHANOL_PIN 0
-
 void clock_init() {
   /*Configure all clocks to max for best performance.
    * If there are EMI, power, or noise problems, try slowing the clocks*/

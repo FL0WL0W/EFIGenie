@@ -1,3 +1,4 @@
+#ifndef NOIGNITION
 #include "Services.h"
 #include "PistonEngineFactory.h"
 
@@ -39,3 +40,4 @@ namespace EngineManagement
 		return _child->GetIgnitionTiming();
 	}
 }
+#endif

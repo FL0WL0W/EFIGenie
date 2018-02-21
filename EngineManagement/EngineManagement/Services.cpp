@@ -7,7 +7,9 @@ namespace EngineManagement
 	HardwareAbstraction::IAnalogService *CurrentAnalogService;
 	HardwareAbstraction::IPwmService *CurrentPwmService;
 	Decoder::IDecoder *CurrentDecoder;
+#ifndef NOIGNITION
 	IIgnitorService *CurrentIgnitorServices[MAX_CYLINDERS];
+#endif
 	IMapService *CurrentMapService;
 	IEngineCoolantTemperatureService *CurrentEngineCoolantTemperatureService;
 	IIntakeAirTemperatureService *CurrentIntakeAirTemperatureService;
@@ -17,8 +19,8 @@ namespace EngineManagement
 #ifndef NOINJECTION
 	IAfrService *CurrentAfrService;
 	IFuelTrimService *CurrentFuelTrimService;
+#endif
 	IInjectorService *CurrentInjectorServices[MAX_CYLINDERS];
 	IPrimeService *CurrentPrimeService;
 	IFuelPumpService *CurrentFuelPumpService;
-#endif
 }

@@ -1,9 +1,12 @@
+#if !defined(NOINJECTION ) && !defined(NOIGNITION )
 #include "Services.h"
 #include "PistonEngineConfig.h"
 #ifndef NOINJECTION
 #include "IPistonEngineInjectionConfig.h"
 #endif
+#ifndef NOIGNITION
 #include "IPistonEngineIgnitionConfig.h"
+#endif
 #include "PistonEngineController.h"
 
 namespace EngineManagement
@@ -12,7 +15,9 @@ namespace EngineManagement
 #ifndef NOINJECTION
 		IPistonEngineInjectionConfig *pistonEngineInjectionConfig, 
 #endif
+#ifndef NOIGNITION
 		IPistonEngineIgnitionConfig *pistonEngineIgnitionConfig, 
+#endif
 		PistonEngineConfig *pistonEngineConfig)
 	{
 #ifndef NOINJECTION
@@ -25,8 +30,10 @@ namespace EngineManagement
 			_injectorOpenTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorOpenTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
 			_injectorCloseTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
 #endif
+#ifndef NOIGNITION
 			_ignitorDwellTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilDwellTask, CurrentIgnitorServices[cylinder], IGNITION_DWELL_TASK_PRIORITY, false);
 			_ignitorFireTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilFireTask, CurrentIgnitorServices[cylinder], IGNITION_FIRE_TASK_PRIORITY, false);
+#endif
 		}
 	}
 	
@@ -41,9 +48,10 @@ namespace EngineManagement
 		//unsigned short scheduleRpm = (360000000 / 60) / scheduleTickPerDegree;
 		unsigned int scheduleTick = CurrentTimerService->GetTick();
 		unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();
-						
+#ifndef NOIGNITION	
 		IgnitionTiming ignitionTiming =  _pistonEngineIgnitionConfig->GetIgnitionTiming();
-				
+#endif
+		
 		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
 		{
 			unsigned int currentTickPlusSome = CurrentTimerService->GetTick() + 5;
@@ -77,7 +85,7 @@ namespace EngineManagement
 				}
 			}
 #endif
-			
+#ifndef NOIGNITION		
 			if (currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765))
 			{
 				if (!ignitionTiming.ignitionEnable)
@@ -105,20 +113,7 @@ namespace EngineManagement
 					}
 				}
 			}
-			//a fast change in the ignition advance could cause insufficient dwell time
-//			else if (currentTickPlusSome < _ignitorFireTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorFireTask[cylinder]->Tick < 1431655765))
-//			{	
-//				//if ignition is dwelling but enough time before ignition set fire task
-//				float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
-//				if (degreesUntilFire < 0)
-//					degreesUntilFire += camResolution;
-//				if (degreesUntilFire > camResolution)
-//					degreesUntilFire -= camResolution >> 2;
-//				if (degreesUntilFire < 0)
-//					degreesUntilFire += camResolution;
-//				unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
-//				CurrentTimerService->ReScheduleTask(_ignitorFireTask[cylinder], ignitionFireTick);
-//			}
+#endif
 		}
 #ifndef NOINJECTION
 		if (!isSequential)
@@ -169,3 +164,4 @@ namespace EngineManagement
 #endif
 	}
 }
+#endif

@@ -1,4 +1,3 @@
-#ifndef NOINJECTION
 #include "Services.h"
 #include "FuelPumpService.h"
 
@@ -95,4 +94,3 @@ namespace EngineManagement
 		
 	}
 }
-#endif

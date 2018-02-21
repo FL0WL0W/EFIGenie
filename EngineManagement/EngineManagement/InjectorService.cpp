@@ -1,4 +1,3 @@
-#ifndef NOINJECTION
 #include "Services.h"
 #include "InjectorService.h"
 
@@ -56,4 +55,3 @@ namespace EngineManagement
 		}
 	}
 }
-#endif
