@@ -69,7 +69,6 @@ namespace UnitTests
 
 			EXPECT_CALL(_digitalService, InitPin(4, HardwareAbstraction::In)).Times(1);
 			EngineManagement::IInjectorService::InjectorCloseTask(EngineManagement::CurrentInjectorServices[3]);
-
 		}
 	};
 }

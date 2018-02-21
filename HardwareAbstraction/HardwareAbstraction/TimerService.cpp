@@ -35,8 +35,11 @@ namespace HardwareAbstraction
 			
 			StackSize--;
 		}
-		
-		ScheduleCallBack((*CallBackStackPointer)->Tick);
+
+		if (StackSize == 0)
+			return;
+
+		ScheduleCallBack(CallBackStackPointer[StackSize - 1]->Tick);
 	}
 	
 	void ITimerService::SortCallBackStack()

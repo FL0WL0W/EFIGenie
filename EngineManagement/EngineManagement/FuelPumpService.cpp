@@ -16,26 +16,22 @@ namespace EngineManagement
 		config = (void*)((unsigned char *)config + 1);
 		
 		_highZ = highZ;
-		
-		CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
-		if (_highZ && !_normalOn)
+
+		if (_highZ && _normalOn)
 		{
 			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
 		}
 		else
 		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
-			}
+			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
 			
-			CurrentDigitalService->WritePin(_pin, !_normalOn);
+			CurrentDigitalService->WritePin(_pin, _normalOn);
 		}
 	}
 	
 	void FuelPumpService::Off()
 	{
-		if (_highZ && !_normalOn)
+		if (_highZ && _normalOn)
 		{
 			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
 		}
@@ -45,15 +41,15 @@ namespace EngineManagement
 			{
 				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
 			}
-			
-			CurrentDigitalService->WritePin(_pin, !_normalOn);
+
+			CurrentDigitalService->WritePin(_pin, _normalOn);
 		}
 	}
 	
 	void FuelPumpService::On()
 	{
 		Started = true;
-		if (_highZ && _normalOn)
+		if (_highZ && !_normalOn)
 		{
 			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
 		}
@@ -63,14 +59,14 @@ namespace EngineManagement
 			{
 				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
 			}
-			
-			CurrentDigitalService->WritePin(_pin, _normalOn);
+
+			CurrentDigitalService->WritePin(_pin, !_normalOn);
 		}
 	}
 	
 	void FuelPumpService::Prime()
 	{
-		if (_highZ && _normalOn)
+		if (_highZ && !_normalOn)
 		{
 			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
 		}
@@ -80,8 +76,8 @@ namespace EngineManagement
 			{
 				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
 			}
-			
-			CurrentDigitalService->WritePin(_pin, _normalOn);
+
+			CurrentDigitalService->WritePin(_pin, !_normalOn);
 		}
 		
 		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _primeTime + CurrentTimerService->GetTick(), 10, true);
