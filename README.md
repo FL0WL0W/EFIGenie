@@ -39,7 +39,6 @@ TODO LIST<br>
 <ul>
   <li>*Create unit tests</li>
     <ul>
-      <li>PrimeService</li>
       <li>PistonEngineController</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
