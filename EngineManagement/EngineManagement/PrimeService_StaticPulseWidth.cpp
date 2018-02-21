@@ -8,8 +8,8 @@ namespace EngineManagement
 		_pulseWidth = *(float *)config * CurrentTimerService->GetTicksPerSecond();
 		config = (void*)((float *)config + 1);
 	}
-	
-	void PrimeService_StaticPulseWidth::PrimeTick()
+
+	void PrimeService_StaticPulseWidth::Prime()
 	{
 		if (!_started)
 		{
@@ -20,9 +20,10 @@ namespace EngineManagement
 				CurrentTimerService->ScheduleTask(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], currentTick + _pulseWidth, INJECTOR_TASK_PRIORITY, true);
 			}
 		}
-		else
-		{
-			_started = true;
-		}
+	}
+
+	void PrimeService_StaticPulseWidth::Tick()
+	{
+		_started = true;
 	}
 }

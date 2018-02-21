@@ -3,6 +3,7 @@ namespace EngineManagement
 	class IPrimeService
 	{
 	public:
-		virtual void PrimeTick() = 0;
+		virtual void Prime() = 0;
+		virtual void Tick() = 0;
 	};
 }

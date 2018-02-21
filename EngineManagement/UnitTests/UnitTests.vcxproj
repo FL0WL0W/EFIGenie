@@ -185,6 +185,7 @@
     <ClCompile Include="InjectorServiceTests.cpp" />
     <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp" />
     <ClCompile Include="MapService_AnalogTests.cpp" />
+    <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

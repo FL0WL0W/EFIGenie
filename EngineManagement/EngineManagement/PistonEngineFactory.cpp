@@ -239,12 +239,11 @@ namespace EngineManagement
 #endif
 #ifndef NOIGNITION
 			CurrentPistonEngineIgnitionConfig, 
-#endif			CurrentPistonEngineConfig);
+#endif
+			CurrentPistonEngineConfig);
+#endif
 
-#ifndef NOINJECTION
 		CurrentFuelPumpService->Prime();
-#endif
-#endif
 		
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
@@ -262,7 +261,7 @@ namespace EngineManagement
 		CurrentVoltageService->ReadVoltage();
 		CurrentEthanolService->ReadEthanolContent();
 		CurrentFuelPumpService->Tick();
-		CurrentPrimeService->PrimeTick();
+		CurrentPrimeService->Tick();
 #if !defined(NOINJECTION ) && !defined(NOIGNITION )
 		CurrentPistonEngineController->ScheduleEvents();
 #endif

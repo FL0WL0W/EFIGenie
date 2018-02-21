@@ -131,6 +131,9 @@
     <ClCompile Include="FuelPumpServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
