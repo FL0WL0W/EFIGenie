@@ -12,8 +12,6 @@ Features<br>
     <ul>
       <li>Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)</li>
     </ul>
-  <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
-  <li>Build Defines for NOIGNITION (Injection only hardware / I.E. PiggyBack)</li>
   <li>Individual injector trims</li>
   <li>Fuel Pump (On/Off)</li>
   <li>Fuel Prime</li>
@@ -32,7 +30,14 @@ Features<br>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
-  <li>Unit Tests to ensure everything works</li>
+  <li>Firmware features</li>
+  <ul>
+    <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
+    <li>Build Defines for NOIGNITION Control (Injection only hardware / I.E. PiggyBack)</li>
+    <li>Unit Tests to ensure everything works</li>
+    <li>Service Oriented Architecture</li>
+    <li>Ability to easily remove services in order to conserve space/li>
+  </ul>
 </ul>
 <br>
 TODO LIST<br>
