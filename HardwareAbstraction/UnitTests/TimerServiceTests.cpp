@@ -32,10 +32,10 @@ namespace UnitTests
 			EXPECT_CALL(timerService, GetTick())
 				.WillRepeatedly(Return(0));
 
-			HardwareAbstraction::Task *task1 = timerService.ScheduleTask(testCallback1, 0, 100, 1, true);
+			HardwareAbstraction::Task *task1 = timerService.ScheduleTask(testCallback1, 0, 100, true);
 			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first");
 			
-			HardwareAbstraction::Task *task2 = timerService.ScheduleTask(testCallback2, 0, 150, 1, true);
+			HardwareAbstraction::Task *task2 = timerService.ScheduleTask(testCallback2, 0, 150, true);
 			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first after new later task added");
 			Assert::AreEqual((void *)task2, (void *)timerService.CallBackStackPointer[timerService.StackSize - 2], (const wchar_t*)"CallBackStackPointer-1 not set to second  after new later task added");
 
@@ -61,10 +61,10 @@ namespace UnitTests
 			EXPECT_CALL(timerService, GetTick())
 				.WillRepeatedly(Return(2900000000));
 
-			task1 = timerService.ScheduleTask(testCallback1, 0, 3000000000, 1, true);
+			task1 = timerService.ScheduleTask(testCallback1, 0, 3000000000, true);
 			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first");
 
-			task2 = timerService.ScheduleTask(testCallback2, 0, 300, 1, true);
+			task2 = timerService.ScheduleTask(testCallback2, 0, 300, true);
 			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first after new later task added");
 			Assert::AreEqual((void *)task2, (void *)timerService.CallBackStackPointer[timerService.StackSize - 2], (const wchar_t*)"CallBackStackPointer-1 not set to second  after new later task added");
 
@@ -85,45 +85,5 @@ namespace UnitTests
 			timerService.ReturnCallBack();
 			Assert::AreEqual(0, lastCallBack, (const wchar_t*)"callback was called");
 		}
-
-		TEST_METHOD(WhenAddingLowerPriorityTaskHigherPriorityTaskIsCalledFirst)
-		{
-			HardwareAbstraction::MockTimerService timerService;
-
-			HardwareAbstraction::Task *task1 = timerService.ScheduleTask(testCallback1, 0, 100, 1, true);
-			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first");
-
-			HardwareAbstraction::Task *task2 = timerService.ScheduleTask(testCallback2, 0, 100, 2, true);
-			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first after new later task added");
-			Assert::AreEqual((void *)task2, (void *)timerService.CallBackStackPointer[timerService.StackSize - 2], (const wchar_t*)"CallBackStackPointer-1 not set to second  after new later task added");
-
-			EXPECT_CALL(timerService, GetTick())
-				.WillRepeatedly(Return(100));
-			timerService.ReturnCallBack();
-			Assert::AreEqual(2, lastCallBack, (const wchar_t*)"first callback not called");
-
-			//make sure another callback doesnt mess it up
-			lastCallBack = 0;
-			timerService.ReturnCallBack();
-			Assert::AreEqual(0, lastCallBack, (const wchar_t*)"callback was called");
-
-			task1 = timerService.ScheduleTask(testCallback1, 0, 200, 2, true);
-			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer not set to first");
-
-			task2 = timerService.ScheduleTask(testCallback2, 0, 200, 1, true);
-			Assert::AreEqual((void *)task1, (void *)timerService.CallBackStackPointer[timerService.StackSize - 2], (const wchar_t*)"CallBackStackPointer not set to first after new later task added");
-			Assert::AreEqual((void *)task2, (void *)timerService.CallBackStackPointer[timerService.StackSize - 1], (const wchar_t*)"CallBackStackPointer-1 not set to second  after new later task added");
-
-			EXPECT_CALL(timerService, GetTick())
-				.WillRepeatedly(Return(200));
-			timerService.ReturnCallBack();
-			Assert::AreEqual(1, lastCallBack, (const wchar_t*)"second callback not called");
-			
-			//make sure another callback doesnt mess it up
-			lastCallBack = 0;
-			timerService.ReturnCallBack();
-			Assert::AreEqual(0, lastCallBack, (const wchar_t*)"callback was called");
-		}
-
 	};
 }
