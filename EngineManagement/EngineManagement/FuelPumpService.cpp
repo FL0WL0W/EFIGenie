@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "FuelPumpService.h"
 
+#ifdef FuelPumpServiceExists
 namespace EngineManagement
 {
 	FuelPumpService::FuelPumpService(void *config, bool highZ)
@@ -79,7 +80,7 @@ namespace EngineManagement
 			CurrentDigitalService->WritePin(_pin, !_normalOn);
 		}
 		
-		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _primeTime + CurrentTimerService->GetTick(), 10, true);
+		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _primeTime + CurrentTimerService->GetTick(), true);
 	}
 	
 	void FuelPumpService::PrimeTaskOff(void *parameter)
@@ -94,3 +95,4 @@ namespace EngineManagement
 		
 	}
 }
+#endif

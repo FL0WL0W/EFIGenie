@@ -1,3 +1,5 @@
+#if defined(IEngineCoolantTemperatureServiceExists)
+#define EngineCoolantTemperatureService_AnalogExists
 namespace EngineManagement
 {
 	class EngineCoolantTemperatureService_Analog : public IEngineCoolantTemperatureService
@@ -12,3 +14,4 @@ namespace EngineManagement
 		void ReadEct();
 	};
 }
+#endif

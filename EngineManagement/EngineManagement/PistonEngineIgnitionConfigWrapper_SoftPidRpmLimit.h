@@ -1,3 +1,5 @@
+#if defined(IPistonEngineIgnitionConfigExists)
+#define PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitExists
 namespace EngineManagement
 {
 	class PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit : public IPistonEngineIgnitionConfig
@@ -19,3 +21,4 @@ namespace EngineManagement
 		IgnitionTiming GetIgnitionTiming();
 	};
 }
+#endif

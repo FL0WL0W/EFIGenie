@@ -1,3 +1,4 @@
+#define IMapServiceExists
 namespace EngineManagement
 {
 	class IMapService
@@ -7,4 +8,8 @@ namespace EngineManagement
 		float MapKpa = 0;
 		float MapKpaDot = 0;
 	};
+
+	extern IMapService *CurrentMapService;
+
+	IMapService* CreateMapService(void *config);
 }

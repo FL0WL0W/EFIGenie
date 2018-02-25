@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "IntakeAirTemperatureService_Analog.h"
 
+#ifdef IntakeAirTemperatureService_AnalogExists
 namespace EngineManagement
 {	
 	IntakeAirTemperatureService_Analog::IntakeAirTemperatureService_Analog(void *config)
@@ -47,3 +48,4 @@ namespace EngineManagement
 		_lastIat = IntakeAirTemperature;
 	}
 }
+#endif

@@ -1,3 +1,5 @@
+#if defined(IAfrServiceExists)
+#define AfrService_StaticExists
 namespace EngineManagement
 {
 	class AfrService_Static : public IAfrService
@@ -8,3 +10,4 @@ namespace EngineManagement
 		float GetAfr() { return Afr; }
 	};
 }
+#endif

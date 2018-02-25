@@ -1,38 +1,23 @@
-#if !defined(NOINJECTION ) && !defined(NOIGNITION )
 #include "Services.h"
 #include "PistonEngineConfig.h"
-#ifndef NOINJECTION
 #include "IPistonEngineInjectionConfig.h"
-#endif
-#ifndef NOIGNITION
 #include "IPistonEngineIgnitionConfig.h"
-#endif
 #include "PistonEngineController.h"
 
+#ifdef PistonEngineControllerExists
 namespace EngineManagement
 {
-	PistonEngineController::PistonEngineController(
-#ifndef NOINJECTION
-		IPistonEngineInjectionConfig *pistonEngineInjectionConfig, 
-#endif
-#ifndef NOIGNITION
-		IPistonEngineIgnitionConfig *pistonEngineIgnitionConfig, 
-#endif
-		PistonEngineConfig *pistonEngineConfig)
+	PistonEngineController::PistonEngineController()
 	{
-#ifndef NOINJECTION
-		_pistonEngineInjectionConfig = pistonEngineInjectionConfig;
-#endif
-		_pistonEngineConfig = pistonEngineConfig;
-		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
+		for (unsigned char cylinder = 1; cylinder <= CurrentPistonEngineConfig->Cylinders; cylinder++)
 		{
-#ifndef NOINJECTION
-			_injectorOpenTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorOpenTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
-			_injectorCloseTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], INJECTOR_TASK_PRIORITY, false);
+#if defined(IInjectorServiceExists) && defined(IPistonEngineInjectionConfigExists)
+			_injectorOpenTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorOpenTask, CurrentInjectorServices[cylinder], false);
+			_injectorCloseTask[cylinder] = new HardwareAbstraction::Task(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], false);
 #endif
-#ifndef NOIGNITION
-			_ignitorDwellTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilDwellTask, CurrentIgnitorServices[cylinder], IGNITION_DWELL_TASK_PRIORITY, false);
-			_ignitorFireTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilFireTask, CurrentIgnitorServices[cylinder], IGNITION_FIRE_TASK_PRIORITY, false);
+#if defined(IIgnitorServiceExists) && defined(IPistonEngineIgnitionConfigExists)
+			_ignitorDwellTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilDwellTask, CurrentIgnitorServices[cylinder], false);
+			_ignitorFireTask[cylinder] = new HardwareAbstraction::Task(&IIgnitorService::CoilFireTask, CurrentIgnitorServices[cylinder], false);
 #endif
 		}
 	}
@@ -47,20 +32,18 @@ namespace EngineManagement
 		unsigned int scheduleTickPerDegree = CurrentDecoder->GetTickPerDegree();
 		//unsigned short scheduleRpm = (360000000 / 60) / scheduleTickPerDegree;
 		unsigned int scheduleTick = CurrentTimerService->GetTick();
-		unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();
-#ifndef NOIGNITION	
-		IgnitionTiming ignitionTiming =  _pistonEngineIgnitionConfig->GetIgnitionTiming();
-#endif
+		unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();	
+		IgnitionTiming ignitionTiming =  CurrentPistonEngineIgnitionConfig->GetIgnitionTiming();
 		
-		for (unsigned char cylinder = 1; cylinder <= _pistonEngineConfig->Cylinders; cylinder++)
+		for (unsigned char cylinder = 1; cylinder <= CurrentPistonEngineConfig->Cylinders; cylinder++)
 		{
 			unsigned int currentTickPlusSome = CurrentTimerService->GetTick() + 5;
-#ifndef NOINJECTION
+#if defined(IInjectorServiceExists) && defined(IPistonEngineInjectionConfigExists)
 			if (isSequential)
 			{
 				if (currentTickPlusSome < _injectorOpenTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _injectorOpenTask[cylinder]->Tick < 1431655765))
 				{
-					InjectorTiming injectorTiming = _pistonEngineInjectionConfig->GetInjectorTiming(cylinder);
+					InjectorTiming injectorTiming = CurrentPistonEngineInjectionConfig->GetInjectorTiming(cylinder);
 					if (injectorTiming.PulseWidth == 0)
 					{
 						CurrentTimerService->UnScheduleTask(_injectorOpenTask[cylinder]);
@@ -72,7 +55,7 @@ namespace EngineManagement
 						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = (((cylinder - 1) * 720) / CurrentPistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
@@ -85,7 +68,7 @@ namespace EngineManagement
 				}
 			}
 #endif
-#ifndef NOIGNITION		
+#if defined(IIgnitorServiceExists) && defined(IPistonEngineIgnitionConfigExists)
 			if (currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765))
 			{
 				if (!ignitionTiming.ignitionEnable)
@@ -95,7 +78,7 @@ namespace EngineManagement
 				}
 				else
 				{
-					float degreesUntilFire = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
+					float degreesUntilFire = (((cylinder - 1) * 720) / CurrentPistonEngineConfig->Cylinders) - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
 					if (degreesUntilFire < 0)
 						degreesUntilFire += camResolution;
 					if (degreesUntilFire > camResolution)
@@ -115,25 +98,25 @@ namespace EngineManagement
 			}
 #endif
 		}
-#ifndef NOINJECTION
+#if defined(IInjectorServiceExists) && defined(IPistonEngineInjectionConfigExists)
 		if (!isSequential)
 		{
-			if (_pistonEngineConfig->Cylinders % 2)
+			if (CurrentPistonEngineConfig->Cylinders % 2)
 			{
 				//even number of cylinders, run banks in dual cylinder mode
-				unsigned char cylindersToGoTo = _pistonEngineConfig->Cylinders >> 2;
+				unsigned char cylindersToGoTo = CurrentPistonEngineConfig->Cylinders >> 2;
 				for (unsigned char cylinder = 1; cylinder <= cylindersToGoTo; cylinder+=2)
 				{
 					unsigned int currentTickPlusSome = CurrentTimerService->GetTick() + 5;
 					if (currentTickPlusSome < _injectorOpenTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _injectorOpenTask[cylinder]->Tick < 1431655765))
 					{
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						InjectorTiming injectorTiming = _pistonEngineInjectionConfig->GetInjectorTiming(cylinder);
+						InjectorTiming injectorTiming = CurrentPistonEngineInjectionConfig->GetInjectorTiming(cylinder);
 						float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
 						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = (((cylinder - 1) * 720) / CurrentPistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
@@ -143,12 +126,12 @@ namespace EngineManagement
 						CurrentTimerService->ReScheduleTask(_injectorOpenTask[cylinder], injectorOpenTick);
 						CurrentTimerService->ReScheduleTask(_injectorCloseTask[cylinder], injectorCloseTick);
 						
-						injectorTiming = _pistonEngineInjectionConfig->GetInjectorTiming(cylinder + cylindersToGoTo);
+						injectorTiming = CurrentPistonEngineInjectionConfig->GetInjectorTiming(cylinder + cylindersToGoTo);
 						injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
 						injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						degreesUntilOpen = (((cylinder - 1) * 720) / _pistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
+						degreesUntilOpen = (((cylinder - 1) * 720) / CurrentPistonEngineConfig->Cylinders) + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
@@ -163,5 +146,7 @@ namespace EngineManagement
 		}
 #endif
 	}
+
+	PistonEngineController *CurrentPistonEngineController;
 }
 #endif

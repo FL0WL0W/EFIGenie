@@ -1,3 +1,4 @@
+#define ITpsServiceExists
 namespace EngineManagement
 {
 	class ITpsService
@@ -7,4 +8,8 @@ namespace EngineManagement
 		float Tps = 0;
 		float TpsDot = 0;
 	};
+
+	extern ITpsService *CurrentThrottlePositionService;
+
+	ITpsService* CreateThrottlePositionService(void *config);
 }

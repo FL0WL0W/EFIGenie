@@ -1,3 +1,5 @@
+#if defined(IIgnitorServiceExists)
+#define IgnitorServiceExists
 namespace EngineManagement
 {
 	class IgnitorService : public IIgnitorService
@@ -12,3 +14,4 @@ namespace EngineManagement
 		void CoilFire();
 	};
 }
+#endif

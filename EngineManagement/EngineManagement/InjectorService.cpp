@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "InjectorService.h"
 
+#ifdef InjectorServiceExists
 namespace EngineManagement
 {
 	InjectorService::InjectorService(unsigned char injectorPin, bool normalOn, bool highZ)
@@ -55,3 +56,4 @@ namespace EngineManagement
 		}
 	}
 }
+#endif

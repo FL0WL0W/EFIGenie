@@ -1,3 +1,4 @@
+#define PistonEngineConfigExists
 namespace EngineManagement
 {
 	class PistonEngineConfig
@@ -26,4 +27,6 @@ namespace EngineManagement
 		bool IsDistributor;
 		unsigned char DecoderId;
 	};
+
+	extern PistonEngineConfig *CurrentPistonEngineConfig;
 }

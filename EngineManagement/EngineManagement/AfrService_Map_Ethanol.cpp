@@ -1,8 +1,8 @@
-#ifndef NOINJECTION
 #include "Services.h"
 #include "PistonEngineConfig.h"
 #include "AfrService_Map_Ethanol.h"
 
+#ifdef AfrService_Map_EthanolExists
 namespace EngineManagement
 {
 	AfrService_Map_Ethanol::AfrService_Map_Ethanol(void *config)
@@ -110,6 +110,7 @@ namespace EngineManagement
 		+					_ethanolMap[rpmIndexL + _afrRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
 		+					_ethanolMap[rpmIndexH + _afrRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
 		
+#ifdef IEngineCoolantTemperatureServiceExists
 		unsigned char ectIndexL = 0;
 		unsigned char ectIndexH = 0;
 		float ectMultiplier = 0;
@@ -131,6 +132,9 @@ namespace EngineManagement
 		}
 				
 		float ectAfrMultiplier = _ectMultiplierTable[ectIndexL] * (1 - ectMultiplier) + _ectMultiplierTable[ectIndexH] * ectMultiplier;
+#else
+		float ectAfrMultiplier = 1l;
+#endif
 
 		unsigned char tpsIndexL = 0;
 		unsigned char tpsIndexH = 0;

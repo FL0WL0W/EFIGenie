@@ -1,3 +1,5 @@
+#if defined(IMapServiceExists)
+#define MapService_AnalogExists
 namespace EngineManagement
 {
 	class MapService_Analog : public IMapService
@@ -13,3 +15,4 @@ namespace EngineManagement
 		void ReadMap();
 	};
 }
+#endif

@@ -1,3 +1,5 @@
+#if defined(IPrimeServiceExists) && defined(IInjectorServiceExists)
+#define PrimeService_StaticPulseWidthExists
 namespace EngineManagement
 {
 	class PrimeService_StaticPulseWidth : public IPrimeService
@@ -10,3 +12,4 @@ namespace EngineManagement
 		void Tick();
 	};
 }
+#endif

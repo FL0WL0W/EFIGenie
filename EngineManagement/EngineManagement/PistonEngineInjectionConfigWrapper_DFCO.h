@@ -1,3 +1,5 @@
+#if defined(IPistonEngineInjectionConfigExists) && defined(ITpsServiceExists)
+#define PistonEngineInjectionConfigWrapper_DFCOExists
 namespace EngineManagement
 {
 	class PistonEngineInjectionConfigWrapper_DFCO : public IPistonEngineInjectionConfig
@@ -14,3 +16,4 @@ namespace EngineManagement
 		InjectorTiming GetInjectorTiming(unsigned char cylinder);
 	};
 }
+#endif

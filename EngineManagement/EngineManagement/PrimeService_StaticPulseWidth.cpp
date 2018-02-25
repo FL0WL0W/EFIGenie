@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "PistonEngineFactory.h"
 
+#ifdef PrimeService_StaticPulseWidthExists
 namespace EngineManagement
 {
 	PrimeService_StaticPulseWidth::PrimeService_StaticPulseWidth(void *config)
@@ -17,7 +18,7 @@ namespace EngineManagement
 			for (unsigned char cylinder = 0; cylinder < CurrentPistonEngineConfig->Cylinders; cylinder++)
 			{
 				CurrentInjectorServices[cylinder]->InjectorOpen();
-				CurrentTimerService->ScheduleTask(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], currentTick + _pulseWidth, INJECTOR_TASK_PRIORITY, true);
+				CurrentTimerService->ScheduleTask(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], currentTick + _pulseWidth, true);
 			}
 		}
 	}
@@ -27,3 +28,4 @@ namespace EngineManagement
 		_started = true;
 	}
 }
+#endif

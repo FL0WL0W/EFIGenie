@@ -233,9 +233,6 @@
     <ClInclude Include="Stm32F10xDigitalService.h">
       <Filter>Header files\Stm32</Filter>
     </ClInclude>
-    <ClInclude Include="..\EngineManagement\IAnalogService.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="stm32.xml">

@@ -1,5 +1,5 @@
-#include "IInjectorService.h"
-
+#include "Services.h"
+#ifdef IInjectorServiceExists
 namespace EngineManagement
 {
 	void IInjectorService::InjectorOpenTask(void *parameters)
@@ -11,4 +11,7 @@ namespace EngineManagement
 	{
 		((IInjectorService *)parameters)->InjectorClose();
 	}
+
+	IInjectorService *CurrentInjectorServices[MAX_CYLINDERS];
 }
+#endif

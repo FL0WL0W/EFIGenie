@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "EthanolService_Pwm.h"
 
+#ifdef EthanolService_PwmExists
 namespace EngineManagement
 {	
 	EthanolService_Pwm::EthanolService_Pwm(void *config)
@@ -31,3 +32,4 @@ namespace EngineManagement
 		EthanolContent = A3 * pulseWidth * pulseWidth * pulseWidth + A2 * pulseWidth * pulseWidth + A1 * pulseWidth + A0;
 	}
 }
+#endif

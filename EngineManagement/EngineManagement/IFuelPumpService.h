@@ -1,3 +1,4 @@
+#define IFuelPumpServiceExists
 namespace EngineManagement
 {
 	class IFuelPumpService
@@ -8,4 +9,8 @@ namespace EngineManagement
 		virtual void Off() = 0;
 		virtual void Tick() = 0;
 	};
+
+	extern IFuelPumpService *CurrentFuelPumpService;
+
+	IFuelPumpService* CreateFuelPumpService(void *config, bool fuelPumpHighZ);
 }

@@ -6,17 +6,11 @@ namespace HardwareAbstraction
 {	
 	bool GreaterThan(Task *i, Task *j)
 	{
-		if (i->Tick == j->Tick)
-			return i->Priority > j->Priority;
-		else
-			return (i->Tick > j->Tick);
+		return (i->Tick > j->Tick);
 	}
 	bool OverFlowGreaterThan(Task *i, Task *j)
 	{
-		if (i->Tick == j->Tick)
-			return i->Priority > j->Priority;
-		else
-			return (i->Tick + 2147483647 > j->Tick + 2147483647);
+		return (i->Tick + 2147483647 > j->Tick + 2147483647);
 	}
 
 	void ITimerService::ReturnCallBack(void)
@@ -50,9 +44,9 @@ namespace HardwareAbstraction
 			std::sort(CallBackStackPointer, CallBackStackPointer + StackSize, OverFlowGreaterThan);
 	}
 
-	Task *ITimerService::ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, int priority, bool deleteOnExecution)
+	Task *ITimerService::ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, bool deleteOnExecution)
 	{
-		Task *taskToSchedule = new Task(callBack, parameters, priority, deleteOnExecution);
+		Task *taskToSchedule = new Task(callBack, parameters, deleteOnExecution);
 
 		ScheduleTask(taskToSchedule, tick);
 

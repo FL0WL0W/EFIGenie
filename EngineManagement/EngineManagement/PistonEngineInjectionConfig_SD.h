@@ -1,3 +1,5 @@
+#if defined(IPistonEngineInjectionConfig) && defined(IAfrServiceExists) && defined(IMapServiceExists)
+#define PistonEngineInjectionConfig_SDExists
 namespace EngineManagement
 {	
 	class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
@@ -11,13 +13,18 @@ namespace EngineManagement
 		float _shortPulseLimit;
 		unsigned short _gasConstant;
 		unsigned char *_temperatureBias;
+		
+#ifdef ITpsServiceExists
+		float _maxTpsDot;
+		unsigned char _tpsDotAdderResolution;
 		short *_tpsDotAdder;
+#endif
+		
 		short *_mapDotAdder;
 		unsigned short _injectorOpenPosition64thDegree;
 		unsigned short _maxRpm;
 		float _maxMapKpa;
 		float _maxMapKpaDot;
-		float _maxTpsDot;
 		float _voltageMax;
 		float _voltageMin;
 		unsigned char _veRpmResolution;
@@ -25,13 +32,11 @@ namespace EngineManagement
 		unsigned char _offsetMapResolution;
 		unsigned char _offsetVoltageResolution;
 		unsigned char _temperatureBiasResolution;
-		unsigned char _tpsDotAdderResolution;
 		unsigned char _mapDotAdderResolution;
 		
 	public:
-		PistonEngineInjectionConfig_SD(
-			PistonEngineConfig *pistonEngineConfig,
-			void *config);
+		PistonEngineInjectionConfig_SD(void *config);
 		InjectorTiming GetInjectorTiming(unsigned char cylinder);
 	};
 }
+#endif

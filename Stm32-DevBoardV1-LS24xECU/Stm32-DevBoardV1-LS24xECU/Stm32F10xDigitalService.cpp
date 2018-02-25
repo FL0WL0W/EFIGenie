@@ -47,7 +47,7 @@ unsigned short PinToGPIO_Pin(uint8_t pin)
 namespace Stm32
 {
 	void Stm32F10xDigitalService::InitPin(uint8_t pin, HardwareAbstraction::PinDirection direction)
-	{
+	{		
 		if (pin == 0)
 			return;
 		pin -= 1;

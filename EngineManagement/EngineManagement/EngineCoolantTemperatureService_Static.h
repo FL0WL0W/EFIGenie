@@ -1,3 +1,5 @@
+#if defined(IEngineCoolantTemperatureServiceExists)
+#define EngineCoolantTemperatureService_StaticExists
 namespace EngineManagement
 {
 	class EngineCoolantTemperatureService_Static : public IEngineCoolantTemperatureService
@@ -7,3 +9,4 @@ namespace EngineManagement
 		void ReadEct() { };
 	};
 }
+#endif

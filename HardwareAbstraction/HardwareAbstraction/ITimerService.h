@@ -6,11 +6,10 @@ namespace HardwareAbstraction
 	{
 	public:
 		Task() {}
-		Task(void(*callBack)(void *), void *parameters, char priority, bool deleteOnExecution)
+		Task(void(*callBack)(void *), void *parameters, bool deleteOnExecution)
 		{
 			CallBack = callBack;
 			Parameters = parameters;
-			Priority = priority;
 			DeleteOnExecution = deleteOnExecution;
 		}
 
@@ -18,7 +17,6 @@ namespace HardwareAbstraction
 		void *Parameters;
 		bool DeleteOnExecution;
 		//only let TimerService edit these values
-		char Priority;
 		unsigned int Tick;
 	};
 
@@ -41,7 +39,7 @@ namespace HardwareAbstraction
 		virtual unsigned int GetTicksPerSecond() = 0;
 
 		void ReturnCallBack(void);
-		Task *ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, int priority, bool deleteOnExecution);
+		Task *ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, bool deleteOnExecution);
 		bool ScheduleTask(Task *task, unsigned int tick);
 		bool ReScheduleTask(Task *task, unsigned int tick);
 		bool UnScheduleTask(Task *task);

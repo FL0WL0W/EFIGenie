@@ -1,7 +1,7 @@
-#ifndef NOINJECTION
 #include "Services.h"
 #include "PistonEngineFactory.h"
 
+#ifdef PistonEngineInjectionConfigWrapper_DFCOExists
 namespace EngineManagement
 {
 	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)
@@ -39,5 +39,4 @@ namespace EngineManagement
 		return _child->GetInjectorTiming(cylinder);
 	}
 }
-
 #endif

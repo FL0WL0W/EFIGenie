@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "TpsService_Analog.h"
 
+#ifdef TpsService_AnalogExists
 namespace EngineManagement
 {	
 	TpsService_Analog::TpsService_Analog(void *config)
@@ -47,3 +48,4 @@ namespace EngineManagement
 		_lastTps = Tps;
 	}
 }
+#endif

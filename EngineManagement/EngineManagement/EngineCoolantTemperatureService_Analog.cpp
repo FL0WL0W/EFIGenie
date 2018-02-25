@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "EngineCoolantTemperatureService_Analog.h"
 
+#ifdef EngineCoolantTemperatureService_AnalogExists
 namespace EngineManagement
 {	
 	EngineCoolantTemperatureService_Analog::EngineCoolantTemperatureService_Analog(void *config)
@@ -47,3 +48,4 @@ namespace EngineManagement
 		_lastEct = EngineCoolantTemperature;
 	}
 }
+#endif

@@ -1,3 +1,5 @@
+#if defined(IAfrServiceExists) && defined(IMapServiceExists) && defined(ITpsServiceExists) && defined(IEthanolServiceExists)
+#define AfrService_Map_EthanolExists
 namespace EngineManagement
 {
 	class AfrService_Map_Ethanol : public IAfrService
@@ -27,3 +29,4 @@ namespace EngineManagement
 		float GetAfr();
 	};
 }
+#endif

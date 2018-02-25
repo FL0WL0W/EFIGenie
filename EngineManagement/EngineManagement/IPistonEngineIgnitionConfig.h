@@ -1,6 +1,5 @@
-#define IGNITION_RPM_RESOLUTION 16
-#define IGNITION_MAP_RESOLUTION 16
-
+#if !defined(NOIGNITION)
+#define IPistonEngineIgnitionConfigExists
 namespace EngineManagement
 {
 	struct IgnitionTiming
@@ -15,4 +14,9 @@ namespace EngineManagement
 	public:
 		virtual IgnitionTiming GetIgnitionTiming() = 0;
 	};
+
+	extern IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
+
+	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config);
 }
+#endif

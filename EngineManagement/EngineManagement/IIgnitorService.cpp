@@ -1,6 +1,5 @@
-#ifndef NOIGNITION
-#include "IIgnitorService.h"
-
+#include "Services.h"
+#ifdef IIgnitorServiceExists
 namespace EngineManagement
 {
 	void IIgnitorService::CoilDwellTask(void *parameters)
@@ -12,5 +11,7 @@ namespace EngineManagement
 	{
 		((IIgnitorService *)parameters)->CoilFire();
 	}
+
+	IIgnitorService *CurrentIgnitorServices[MAX_CYLINDERS];
 }
 #endif

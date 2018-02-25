@@ -1,3 +1,5 @@
+#if defined(IVoltageServiceExists)
+#define VoltageService_StaticExists
 namespace EngineManagement
 {
 	class VoltageService_Static : public IVoltageService
@@ -7,3 +9,4 @@ namespace EngineManagement
 		void ReadVoltage() { };
 	};
 }
+#endif

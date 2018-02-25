@@ -1,3 +1,5 @@
+#if defined(IFuelPumpServiceExists)
+#define FuelPumpServiceExists
 namespace EngineManagement
 {
 	class FuelPumpService : public IFuelPumpService
@@ -16,3 +18,4 @@ namespace EngineManagement
 		static void PrimeTaskOff(void *parameter);
 	};
 }
+#endif

@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "VoltageService_Analog.h"
 
+#ifdef VoltageService_AnalogExists
 namespace EngineManagement
 {	
 	VoltageService_Analog::VoltageService_Analog(void *config)
@@ -47,3 +48,4 @@ namespace EngineManagement
 		_lastVoltage = Voltage;
 	}
 }
+#endif

@@ -1,18 +1,12 @@
-#ifndef NOIGNITION
 #include "Services.h"
-#include "PistonEngineConfig.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 
-
+#ifdef PistonEngineIgnitionConfig_Map_EthanolExists
 namespace EngineManagement
 {
-	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(
-		PistonEngineConfig *pistonEngineConfig,
-		void *config)
-	{
-		_pistonEngineConfig = pistonEngineConfig;
-		
+	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(void *config)
+	{		
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -37,32 +31,44 @@ namespace EngineManagement
 				
 	IgnitionTiming PistonEngineIgnitionConfig_Map_Ethanol::GetIgnitionTiming()
 	{
-		unsigned short rpm = CurrentDecoder->GetRpm();
-		unsigned short rpmDivision = _maxRpm / _ignitionRpmResolution;
-		unsigned char rpmIndexL = rpm / rpmDivision;
-		unsigned char rpmIndexH = rpmIndexL + 1;
-		float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
-		if (rpmIndexL > _ignitionRpmResolution - 1)
+		unsigned char rpmIndexL = 0;
+		unsigned char rpmIndexH = 0;
+		float rpmMultiplier = 0;
+		if (_ignitionRpmResolution > 1)
 		{
-			rpmIndexL = rpmIndexH = _ignitionRpmResolution - 1;
-		}
-		else if (rpmIndexH > _ignitionRpmResolution - 1)
-		{
-			rpmIndexH = _ignitionRpmResolution - 1;
+			unsigned short rpm = CurrentDecoder->GetRpm();
+			unsigned short rpmDivision = _maxRpm / _ignitionRpmResolution;
+			unsigned char rpmIndexL = rpm / rpmDivision;
+			unsigned char rpmIndexH = rpmIndexL + 1;
+			float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
+			if (rpmIndexL > _ignitionRpmResolution - 1)
+			{
+				rpmIndexL = rpmIndexH = _ignitionRpmResolution - 1;
+			}
+			else if (rpmIndexH > _ignitionRpmResolution - 1)
+			{
+				rpmIndexH = _ignitionRpmResolution - 1;
+			}
 		}
 			
-		unsigned short map = CurrentMapService->MapKpa;
-		unsigned short mapDivision = _maxMapKpa / _ignitionMapResolution;
-		unsigned char mapIndexL = map / mapDivision;
-		unsigned char mapIndexH = mapIndexL + 1;
-		float mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
-		if (mapIndexL > _ignitionMapResolution - 1)
+		unsigned char mapIndexL = 0;
+		unsigned char mapIndexH = 0;
+		float mapMultiplier = 0;
+		if (_ignitionMapResolution > 1)
 		{
-			mapIndexL = mapIndexH = _ignitionMapResolution - 1;
-		}
-		else if (mapIndexH > _ignitionMapResolution - 1)
-		{
-			mapIndexH = _ignitionMapResolution - 1;
+			unsigned short map = CurrentMapService->MapKpa;
+			unsigned short mapDivision = _maxMapKpa / _ignitionMapResolution;
+			mapIndexL = map / mapDivision;
+			mapIndexH = mapIndexL + 1;
+			mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
+			if (mapIndexL > _ignitionMapResolution - 1)
+			{
+				mapIndexL = mapIndexH = _ignitionMapResolution - 1;
+			}
+			else if (mapIndexH > _ignitionMapResolution - 1)
+			{
+				mapIndexH = _ignitionMapResolution - 1;
+			}
 		}
 			
 		short ignitionGas = _ignitionAdvanceMapGas[rpmIndexL + _ignitionRpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier

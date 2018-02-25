@@ -1,8 +1,5 @@
-#define VE_RPM_RESOLUTION 16
-#define VE_MAP_RESOLUTION 16
-#define IGNITION_RPM_RESOLUTION 16
-#define IGNITION_MAP_RESOLUTION 16
-
+#if !defined(NOINJECTION)
+#define IPistonEngineInjectionConfigExists
 namespace EngineManagement
 {		
 	struct InjectorTiming
@@ -16,4 +13,9 @@ namespace EngineManagement
 	public:
 		virtual InjectorTiming GetInjectorTiming(unsigned char cylinder) = 0;
 	};
+
+	extern IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
+
+	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(void *config);
 }
+#endif

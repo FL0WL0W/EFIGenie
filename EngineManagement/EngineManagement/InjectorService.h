@@ -1,3 +1,5 @@
+#if defined (IInjectorServiceExists)
+#define InjectorServiceExists
 namespace EngineManagement
 {
 	class InjectorService : public IInjectorService
@@ -12,3 +14,4 @@ namespace EngineManagement
 		void InjectorClose();
 	};
 }
+#endif

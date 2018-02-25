@@ -2,66 +2,31 @@
 #include "PistonEngineFactory.h"
 
 namespace EngineManagement
-{
-#if !defined(NOINJECTION ) && !defined(NOIGNITION )
-	PistonEngineController *CurrentPistonEngineController;
-#endif
-	PistonEngineConfig *CurrentPistonEngineConfig;
-#ifndef NOINJECTION
-	IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
-	
-	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(void *config)
-	{
-		unsigned char pistonEngineInjectionConfigId = *((unsigned char*)config);
-		switch (pistonEngineInjectionConfigId)
-		{
-		case 1:
-			return new EngineManagement::PistonEngineInjectionConfig_SD(CurrentPistonEngineConfig, (void*)((unsigned char*)config + 1));
-		case 2:
-			return new EngineManagement::PistonEngineInjectionConfigWrapper_DFCO((void*)((unsigned char*)config + 1));
-		}
-		return 0;
-	}
-#endif
-#ifndef NOIGNITION
-	IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
-	
-	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config)
-	{
-		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)config);
-		switch (pistonEngineIgnitionConfigId)
-		{
-		case 1:
-			return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(CurrentPistonEngineConfig, (void*)((unsigned char*)config + 1));
-		case 2:
-			return new EngineManagement::PistonEngineIgnitionConfigWrapper_HardRpmLimit((void*)((unsigned char*)config + 1));
-		case 3:
-			return new EngineManagement::PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit((void*)((unsigned char*)config + 1));
-		}
-		return 0;
-	}
-#endif
-	
+{		
 	void CreateServices(
 			HardwareAbstraction::ITimerService *timerService,
 		HardwareAbstraction::IDigitalService *digitalService,
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile,
-#ifndef NOIGNITION
+#ifdef IIgnitorServiceExists
 		bool ignitionHighZ,
 #endif
+#ifdef IInjectorServiceExists
 		bool injectorHighZ,
-		bool fuelPumpHighZ)
+#endif
+#ifdef IFuelPumpServiceExists
+		bool fuelPumpHighZ
+#endif
+		)
 	{
 		CurrentTimerService = timerService;
 		CurrentDigitalService = digitalService;
 		CurrentAnalogService = analogService;
 		CurrentPwmService = pwmService;
+		
+		unsigned char fileSystemPointer = 0;
 
-		
-		
-		//TODO: create unit tests
 		CurrentPistonEngineConfig = new EngineManagement::PistonEngineConfig((void *)((unsigned int*)pistonEngineConfigFile + *((unsigned char*)pistonEngineConfigFile)));
 
 		switch (CurrentPistonEngineConfig->DecoderId)
@@ -70,8 +35,9 @@ namespace EngineManagement
 			CurrentDecoder = new Decoder::Gm24xDecoder(CurrentTimerService);
 			break;
 		}
-#ifndef NOIGNITION
-		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 1));
+		
+#ifdef IIgnitorServiceExists
+		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		if(CurrentPistonEngineConfig->IsDistributor)
 		{
 			//set all to the same pin for distributor
@@ -88,170 +54,123 @@ namespace EngineManagement
 			}
 		}
 #endif
-		
-		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 2));
+#ifdef IInjectorService
+		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{
 			CurrentInjectorServices[cylinder] = new EngineManagement::InjectorService(*((unsigned char*)injectorConfigFile + cylinder), (bool)((unsigned char*)injectorConfigFile + CurrentPistonEngineConfig->Cylinders), injectorHighZ);
 		}
+#endif
 
-		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 3));
-		unsigned char mapServiceId = *((unsigned char*)mapConfigFile);
-		switch (mapServiceId)
-		{
-		case 0:
-			CurrentMapService = new EngineManagement::MapService_Analog((void *)((unsigned char*)mapConfigFile + 1));
-			break;
-		}
-		
-		void *ectConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 4));
-		unsigned char ectId = *((unsigned char*)ectConfigFile);
-		switch (ectId)
-		{
-		case 0:
-			CurrentEngineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Static(*((float *)((unsigned char*)ectConfigFile + 1)), *((float *)((unsigned char*)ectConfigFile + 1) + 1));
-			break;
-		case 1:
-			CurrentEngineCoolantTemperatureService = new EngineManagement::EngineCoolantTemperatureService_Analog((void *)((unsigned char*)ectConfigFile + 1));
-			break;
-		}
-
-		void *iatConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 5));
-		unsigned char iatId = *((unsigned char*)iatConfigFile);
-		switch (iatId)
-		{
-		case 0:
-			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1));
-			break;
-		case 1:
-			CurrentIntakeAirTemperatureService = new EngineManagement::IntakeAirTemperatureService_Analog((void *)((unsigned char*)iatConfigFile + 1));
-			break;
-		}
-
-		void *tpsConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 6));
-		unsigned char tpsId = *((unsigned char*)tpsConfigFile);
-		switch (tpsId)
-		{
-		case 0:
-			//TODO : CurrentThrottlePositionService = new EngineManagement::TpsService_Static(*((float *)((unsigned char*)iatConfigFile + 1)), *((float *)((unsigned char*)iatConfigFile + 1) + 1), *((float *)((unsigned char*)iatConfigFile + 1) + 2));
-			break;
-		case 1:
-			CurrentThrottlePositionService = new EngineManagement::TpsService_Analog((void *)((unsigned char*)tpsConfigFile + 1));
-			break;
-		}
-
-		void *voltageConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 7));
-		unsigned char voltageId = *((unsigned char*)voltageConfigFile);
-		switch (voltageId)
-		{
-		case 0:
-			CurrentVoltageService = new EngineManagement::VoltageService_Static(*((float *)((unsigned char*)voltageConfigFile + 1)), *((float *)((unsigned char*)voltageConfigFile + 1) + 1));
-			break;
-		case 1:
-			CurrentVoltageService = new EngineManagement::VoltageService_Analog((void *)((unsigned char*)voltageConfigFile + 1));
-			break;
-		}
-
-		void *ethanolConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 8));
-		unsigned char ethanolServiceId = *((unsigned char*)ethanolConfigFile);
-		switch (ethanolServiceId)
-		{
-		case 0:
-			CurrentEthanolService = new EngineManagement::EthanolService_Static(*((float*)((unsigned char*)ethanolConfigFile + 1)));
-			break;
-		case 1:
-			CurrentEthanolService = new EngineManagement::EthanolService_Analog((void*)((unsigned char*)ethanolConfigFile + 1));
-			break;
-		case 2:
-			CurrentEthanolService = new EngineManagement::EthanolService_Pwm((void*)((unsigned char*)ethanolConfigFile + 1));
-			break;
-		}
-
-#ifndef NOINJECTION
-		
-		//TODO: Fuel Trim Service
-		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 9));
-		unsigned char fuelTrimId = *((unsigned char*)fuelTrimConfigFile);
-		switch (fuelTrimId)
-		{
-		case 0:
-			CurrentFuelTrimService = 0;
-			break;
-		}
-		
-		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 10));
-		unsigned char afrServiceId = *((unsigned char*)afrConfigFile);
-		switch (afrServiceId)
-		{
-		case 0:
-			CurrentAfrService = new EngineManagement::AfrService_Static(*((float*)((unsigned char*)afrConfigFile + 1)));
-			break;
-		case 1:
-			CurrentAfrService = new EngineManagement::AfrService_Map_Ethanol((void*)((unsigned char*)afrConfigFile + 1));
-			break;
-		}
-
-		//TODO: create unit tests
-		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 11));
-		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
-		
-		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 12));
-		unsigned char primeServiceId = *((unsigned char*)primeConfigFile);
-		switch (primeServiceId)
-		{
-		case 0:
-			CurrentPrimeService = new PrimeService_StaticPulseWidth((void*)((unsigned char*)primeConfigFile + 1));
-			break;
-		}
+#ifdef IMapServiceExists
+		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentMapService = CreateMapService(mapConfigFile);
 #endif
 		
-		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 13));
-		unsigned char fuelpumpServiceId = *((unsigned char*)fuelPumpConfigFile);
-		switch (fuelpumpServiceId)
-		{
-		case 0:
-			CurrentFuelPumpService = new FuelPumpService((void*)((unsigned char*)fuelPumpConfigFile + 1), fuelPumpHighZ);
-			break;
-		}
-#ifndef NOIGNITION
+#ifdef IEngineCoolantTemperatureServiceExists
+		void *ectConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentEngineCoolantTemperatureService = CreateEngineCoolantTemperatureService(ectConfigFile);
+#endif
+
+#ifdef IIntakeAirTemperatureServiceExists
+		void *iatConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentIntakeAirTemperatureService = CreateIntakeAirTemperatureService(iatConfigFile);
+#endif
+		
+#ifdef ITpsServiceExists
+		void *tpsConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentThrottlePositionService = CreateThrottlePositionService(tpsConfigFile);
+#endif
+		
+#ifdef IVoltageServiceExists
+		void *voltageConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentVoltageService = CreateVoltageService(voltageConfigFile);
+#endif
+		
+#ifdef IEthanolServiceExists
+		void *ethanolConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentEthanolService = CreateEthanolService(ethanolConfigFile);
+#endif
+
+#ifdef IFuelTrimServiceExists
+		//TODO: Fuel Trim Service
+		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentFuelTrimService = CreateFuelTrimService(fuelTrimConfigFile);
+#endif
+		
+#ifdef IAfrServiceExists
+		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentAfrService = CreateAfrService(afrConfigFile);
+#endif
+		
+#ifdef IFuelPumpServiceExists
+		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentFuelPumpService = CreateFuelPumpService(fuelPumpConfigFile, fuelPumpHighZ);
+#endif
+		
+#ifdef IPrimeServiceExists
+		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+#endif
+
+#ifdef IPistonEngineInjectionConfigExists
 		//TODO: create unit tests
-		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + 14));
+		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
+#endif
+
+#ifdef IPistonEngineIgnitionConfigExists
+		//TODO: create unit tests
+		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
 #endif
+
+#ifdef PistonEngineControllerExists
 		//TODO: create unit tests
 		//finish odd cylinder banks
 		//finish Throttle Body Injection
-#if !defined(NOINJECTION ) && !defined(NOIGNITION )
-		CurrentPistonEngineController = new EngineManagement::PistonEngineController(
-#ifndef NOINJECTION
-			CurrentPistonEngineInjectionConfig, 
-#endif
-#ifndef NOIGNITION
-			CurrentPistonEngineIgnitionConfig, 
-#endif
-			CurrentPistonEngineConfig);
+		CurrentPistonEngineController = new EngineManagement::PistonEngineController();
 #endif
 
+#ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->Prime();
+#endif
 		
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
 
-#ifndef NOINJECTION
+#ifdef IPrimeServiceExists
+		CurrentPrimeService->Prime();
+#endif
+		
+#ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->On();
 #endif
 	}
 
 	void ScheduleEvents()
 	{
+#ifdef IMapServiceExists
 		CurrentMapService->ReadMap();
+#endif
+#ifdef IEngineCoolantTemperatureServiceExists
 		CurrentEngineCoolantTemperatureService->ReadEct();
+#endif
+#ifdef IIntakeAirTemperatureServiceExists
 		CurrentIntakeAirTemperatureService->ReadIat();
+#endif
+#ifdef IVoltageServiceExists
 		CurrentVoltageService->ReadVoltage();
+#endif
+#ifdef IEthanolServiceExists
 		CurrentEthanolService->ReadEthanolContent();
+#endif
+#ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->Tick();
+#endif
+#ifdef IPrimeServiceExists
 		CurrentPrimeService->Tick();
-#if !defined(NOINJECTION ) && !defined(NOIGNITION )
+#endif
+#ifdef PistonEngineControllerExists
 		CurrentPistonEngineController->ScheduleEvents();
 #endif
 	}

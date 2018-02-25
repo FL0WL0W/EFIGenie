@@ -1,7 +1,7 @@
-#ifndef NOIGNITION
 #include "Services.h"
 #include "IgnitorService.h"
 
+#ifdef IgnitorServiceExists
 namespace EngineManagement
 {
 	IgnitorService::IgnitorService(unsigned char ignitionPin, bool normalOn, bool highZ)

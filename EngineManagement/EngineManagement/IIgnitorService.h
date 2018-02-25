@@ -1,3 +1,4 @@
+#define IIgnitorServiceExists
 namespace EngineManagement
 {
 	class IIgnitorService
@@ -8,4 +9,6 @@ namespace EngineManagement
 		static void CoilDwellTask(void *parameters);
 		static void CoilFireTask(void *parameters);
 	};
+
+	extern IIgnitorService *CurrentIgnitorServices[MAX_CYLINDERS];
 }

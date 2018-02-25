@@ -58,6 +58,19 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IEthanolService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IMapService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IPrimeService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ITpsService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IVoltageService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineConfig.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Services.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.cpp" />

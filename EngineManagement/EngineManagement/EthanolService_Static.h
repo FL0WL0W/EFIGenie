@@ -1,3 +1,5 @@
+#if defined(IEthanolServiceExists)
+#define EthanolService_StaticExists
 namespace EngineManagement
 {
 	class EthanolService_Static : public IEthanolService
@@ -7,3 +9,4 @@ namespace EngineManagement
 		void ReadEthanolContent() { };
 	};
 }
+#endif

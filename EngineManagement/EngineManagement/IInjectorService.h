@@ -1,3 +1,4 @@
+#define IInjectorServiceExists
 namespace EngineManagement
 {	
 	class IInjectorService
@@ -8,4 +9,6 @@ namespace EngineManagement
 		static void InjectorOpenTask(void *parameters);
 		static void InjectorCloseTask(void *parameters);
 	};
+
+	extern IInjectorService *CurrentInjectorServices[MAX_CYLINDERS];
 }

@@ -1,3 +1,5 @@
+#if defined(ITpsServiceExists)
+#define TpsService_AnalogExists
 namespace EngineManagement
 {
 	class TpsService_Analog : public ITpsService
@@ -13,3 +15,4 @@ namespace EngineManagement
 		void ReadTps();
 	};
 }
+#endif

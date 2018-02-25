@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "MapService_Analog.h"
 
+#ifdef MapService_AnalogExists
 namespace EngineManagement
 {	
 	MapService_Analog::MapService_Analog(void *config)
@@ -47,3 +48,4 @@ namespace EngineManagement
 		_lastMapKpa = MapKpa;
 	}
 }
+#endif

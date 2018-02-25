@@ -1,3 +1,5 @@
+#if defined(IEthanolServiceExists)
+#define EthanolService_PwmExists
 namespace EngineManagement
 {
 	class EthanolService_Pwm : public IEthanolService
@@ -10,3 +12,4 @@ namespace EngineManagement
 		void ReadEthanolContent();
 	};
 }
+#endif

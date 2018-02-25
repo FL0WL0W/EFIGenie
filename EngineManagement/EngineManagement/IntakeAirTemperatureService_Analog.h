@@ -1,3 +1,5 @@
+#if defined(IIntakeAirTemperatureServiceExists)
+#define IntakeAirTemperatureService_AnalogExists
 namespace EngineManagement
 {
 	class IntakeAirTemperatureService_Analog : public IIntakeAirTemperatureService
@@ -12,3 +14,4 @@ namespace EngineManagement
 		void ReadIat();
 	};
 }
+#endif

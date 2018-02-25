@@ -1,3 +1,5 @@
+#if defined(IPistonEngineIgnitionConfigExists)
+#define PistonEngineIgnitionConfigWrapper_HardRpmLimitExists
 namespace EngineManagement
 {
 	class PistonEngineIgnitionConfigWrapper_HardRpmLimit : public IPistonEngineIgnitionConfig
@@ -14,3 +16,4 @@ namespace EngineManagement
 		IgnitionTiming GetIgnitionTiming();
 	};
 }
+#endif

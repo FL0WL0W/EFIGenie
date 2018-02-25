@@ -1,6 +1,6 @@
-#ifndef NOIGNITION
 #include "Services.h"
-#include "PistonEngineFactory.h"
+#include "IPistonEngineIgnitionConfig.h"
+#include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 
 namespace EngineManagement
 {
@@ -40,4 +40,3 @@ namespace EngineManagement
 		return _child->GetIgnitionTiming();
 	}
 }
-#endif

@@ -1,3 +1,4 @@
+#define IIntakeAirTemperatureServiceExists
 namespace EngineManagement
 {
 	class IIntakeAirTemperatureService
@@ -7,4 +8,8 @@ namespace EngineManagement
 		float IntakeAirTemperature = 0;
 		float IntakeAirTemperatureDot = 0;
 	};
+
+	extern IIntakeAirTemperatureService *CurrentIntakeAirTemperatureService;
+
+	IIntakeAirTemperatureService* CreateIntakeAirTemperatureService(void *config);
 }

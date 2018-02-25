@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "EthanolService_Analog.h"
 
+#ifdef EthanolService_AnalogExists
 namespace EngineManagement
 {	
 	EthanolService_Analog::EthanolService_Analog(void *config)
@@ -30,3 +31,4 @@ namespace EngineManagement
 		EthanolContent = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 	}
 }
+#endif
