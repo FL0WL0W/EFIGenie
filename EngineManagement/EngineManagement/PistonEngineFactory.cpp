@@ -54,7 +54,7 @@ namespace EngineManagement
 			}
 		}
 #endif
-#ifdef IInjectorService
+#ifdef IInjectorServiceExists
 		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{
@@ -166,6 +166,9 @@ namespace EngineManagement
 #endif
 #ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->Tick();
+#endif
+#ifdef IAfrServiceExists
+		CurrentAfrService->CalculateAfr();
 #endif
 #ifdef IPrimeServiceExists
 		CurrentPrimeService->Tick();

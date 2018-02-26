@@ -64,7 +64,7 @@ namespace EngineManagement
 		config = (void*)((float *)config + 1);
 	}
 	
-	float AfrService_Map_Ethanol::GetAfr()
+	void AfrService_Map_Ethanol::CalculateAfr()
 	{
 		unsigned char rpmIndexL = 0;
 		unsigned char rpmIndexH = 0;
@@ -182,13 +182,10 @@ namespace EngineManagement
 		}
 				
 		if (minAfr > afr)
-			return afr;
-		
-		return minAfr;
-	}
+			Afr = afr;
+		else
+			Afr = minAfr;
 
-	float AfrService_Map_Ethanol::GetLambda()
-	{
 		unsigned char stoichIndexL = 0;
 		unsigned char stoichIndexH = 0;
 		float stoichMultiplier = 0;
@@ -211,7 +208,7 @@ namespace EngineManagement
 
 		float stoich = (_stoichTable[stoichIndexL] * (1 - stoichMultiplier) + _stoichTable[stoichIndexH] * stoichMultiplier) * 0.0009765625;
 
-		return GetAfr() / stoich;
+		Lambda = Afr / stoich;
 	}
 }
 #endif

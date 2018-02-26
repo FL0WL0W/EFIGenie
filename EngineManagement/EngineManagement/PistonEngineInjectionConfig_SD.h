@@ -1,4 +1,4 @@
-#if defined(IPistonEngineInjectionConfig) && defined(IAfrServiceExists) && defined(IMapServiceExists)
+#if defined(IPistonEngineInjectionConfigExists) && defined(IAfrServiceExists) && defined(IMapServiceExists)
 #define PistonEngineInjectionConfig_SDExists
 namespace EngineManagement
 {	

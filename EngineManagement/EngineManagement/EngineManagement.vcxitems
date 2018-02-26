@@ -16,7 +16,9 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Simple.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h" />
@@ -58,6 +60,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Simple.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IEthanolService.cpp" />

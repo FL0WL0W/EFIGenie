@@ -28,8 +28,7 @@ namespace EngineManagement
 		unsigned char _stoichResolution;
 	public:
 		AfrService_Map_Ethanol(void *config);
-		float GetAfr();
-		float GetLambda();
+		void CalculateAfr();
 	};
 }
 #endif

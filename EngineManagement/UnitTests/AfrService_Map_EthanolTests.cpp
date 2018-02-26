@@ -150,61 +150,72 @@ namespace UnitTests
 		{
 			CreateServices();
 			
-			EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
-			EXPECT_CALL(_decoder, GetRpm()).Times(2).WillRepeatedly(Return(0));
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(0));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
 			_mapService.MapKpa = 0;
 			_ectService.EngineCoolantTemperature = -40;
 			_tpsService.Tps = 0;
 			_ethanolService.EthanolContent = 0;
-			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
-			Assert::AreEqual(0.769f, EngineManagement::CurrentAfrService->GetLambda(), 0.01f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->Afr, 0.1f);
+			Assert::AreEqual(0.769f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 
-			EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(5000));
-			EXPECT_CALL(_decoder, GetRpm()).Times(2).WillRepeatedly(Return(0));
-			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
-			Assert::AreEqual(0.769f, EngineManagement::CurrentAfrService->GetLambda(), 0.01f);
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5000));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(11.3034375f, EngineManagement::CurrentAfrService->Afr, 0.1f);
+			Assert::AreEqual(0.769f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 
-			EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(27500));
-			EXPECT_CALL(_decoder, GetRpm()).Times(2).WillRepeatedly(Return(0));
-			Assert::AreEqual(11.93140625f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
-			Assert::AreEqual(0.81f, EngineManagement::CurrentAfrService->GetLambda(), 0.01f);
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(27500));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(11.93140625f, EngineManagement::CurrentAfrService->Afr, 0.1f);
+			Assert::AreEqual(0.81f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 
-			EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(50000));
-			EXPECT_CALL(_decoder, GetRpm()).Times(2).WillRepeatedly(Return(0));
-			Assert::AreEqual(12.559375f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
-			Assert::AreEqual(0.855f, EngineManagement::CurrentAfrService->GetLambda(), 0.01f);
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(50000));
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(12.559375f, EngineManagement::CurrentAfrService->Afr, 0.1f);
+			Assert::AreEqual(0.855f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 			EXPECT_CALL(_timerService, GetTick()).WillRepeatedly(Return(50001));
 
 			_mapService.MapKpa = 33;
-			EXPECT_CALL(_decoder, GetRpm()).Times(2).WillRepeatedly(Return(2000));
-			Assert::AreEqual(11.76f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
-			Assert::AreEqual(0.8f, EngineManagement::CurrentAfrService->GetLambda(), 0.01f);
+			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(11.76f, EngineManagement::CurrentAfrService->Afr, 0.1f);
+			Assert::AreEqual(0.8f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 
 			_mapService.MapKpa = 16.5;
 			_ectService.EngineCoolantTemperature = 100;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(1000));
-			Assert::AreEqual(15.14f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(15.14f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
 			_mapService.MapKpa = 16.5;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
-			Assert::AreEqual(14.9f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(14.9f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
 			_mapService.MapKpa = 0;
 			_tpsService.Tps = 1;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			Assert::AreEqual(12.94f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(12.94f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
 			_ethanolService.EthanolContent = 1;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			Assert::AreEqual(8.79f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(8.79f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
 			_tpsService.Tps = 0;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			Assert::AreEqual(10.55f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(10.55f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
 			_ethanolService.EthanolContent = 0.5;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			Assert::AreEqual(12.97f, EngineManagement::CurrentAfrService->GetAfr(), 0.1f);
+			EngineManagement::CurrentAfrService->CalculateAfr();
+			Assert::AreEqual(12.97f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 		}
 
 	};

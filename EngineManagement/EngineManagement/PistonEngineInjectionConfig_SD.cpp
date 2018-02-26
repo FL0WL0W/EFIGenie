@@ -177,7 +177,7 @@ namespace EngineManagement
 		
 		float airDensity = map / (100.0f * _gasConstant * temperature);
 		
-		float airFuelRatio = CurrentAfrService->GetAfr();
+		float airFuelRatio = CurrentAfrService->Afr;
 		
 		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
 		
