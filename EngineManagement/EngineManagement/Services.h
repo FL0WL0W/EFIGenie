@@ -16,6 +16,7 @@
 #include "IPrimeService.h"
 #include "IFuelPumpService.h"
 #include "IEngineCoolantTemperatureService.h"
+#include "ILambdaSensorService.h"
 #include "IAfrService.h"
 
 namespace EngineManagement

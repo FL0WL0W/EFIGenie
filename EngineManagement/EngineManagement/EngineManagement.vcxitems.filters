@@ -299,5 +299,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Simple.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ILambdaSensorService.cpp">
+      <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

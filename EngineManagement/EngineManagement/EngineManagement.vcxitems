@@ -67,6 +67,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ILambdaSensorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IMapService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.cpp" />
