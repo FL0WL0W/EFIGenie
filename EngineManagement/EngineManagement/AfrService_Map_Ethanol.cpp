@@ -27,10 +27,16 @@ namespace EngineManagement
 		
 		_afrEctResolution = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
-		
+
 		_afrTpsResolution = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
+
+		_stoichResolution = *((unsigned char *)config);
+		config = (void*)((unsigned char *)config + 1);
 				
+		_stoichTable = (unsigned short *)config; // value in 1/1024
+		config = (void*)((unsigned short *)config + _stoichResolution);
+
 		_gasMap = (unsigned short *)config; // value in 1/1024
 		config = (void*)((unsigned short *)config + _afrRpmResolution * _afrMapResolution);
 				
@@ -179,6 +185,33 @@ namespace EngineManagement
 			return afr;
 		
 		return minAfr;
+	}
+
+	float AfrService_Map_Ethanol::GetLambda()
+	{
+		unsigned char stoichIndexL = 0;
+		unsigned char stoichIndexH = 0;
+		float stoichMultiplier = 0;
+		if (_stoichResolution > 1)
+		{
+			float ethanol = CurrentEthanolService->EthanolContent;
+			float stoichDivision = 1 / (_stoichResolution - 1);
+			stoichIndexL = ethanol / stoichDivision;
+			stoichIndexH = stoichIndexL + 1;
+			stoichMultiplier = ((float)ethanol) / stoichDivision - stoichIndexL;
+			if (stoichIndexL > _stoichResolution - 1)
+			{
+				stoichIndexL = stoichIndexH = _stoichResolution - 1;
+			}
+			else if (stoichIndexH > _stoichResolution - 1)
+			{
+				stoichIndexH = _stoichResolution - 1;
+			}
+		}
+
+		float stoich = (_stoichTable[stoichIndexL] * (1 - stoichMultiplier) + _stoichTable[stoichIndexH] * stoichMultiplier) * 0.0009765625;
+
+		return GetAfr() / stoich;
 	}
 }
 #endif

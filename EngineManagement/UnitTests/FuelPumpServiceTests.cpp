@@ -25,8 +25,13 @@ namespace UnitTests
 			EngineManagement::CurrentDigitalService = &_digitalService;
 			EngineManagement::CurrentTimerService = &_timerService;
 
-			void *config = malloc(6);
+			void *config = malloc(7);
 			void *buildConfig = config;
+
+			//fuel pump service id
+			*((unsigned char *)buildConfig) = 0;
+			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
+
 			//fuelPin
 			*((unsigned char *)buildConfig) = 1;
 			buildConfig = (void*)((unsigned char *)buildConfig + 1);
@@ -42,7 +47,7 @@ namespace UnitTests
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.Times(1)
 				.WillOnce(Return(5000));
-			EngineManagement::CurrentFuelPumpService = new EngineManagement::FuelPumpService(config, highZ);
+			EngineManagement::CurrentFuelPumpService = EngineManagement::CreateFuelPumpService(config, highZ);
 		}
 
 		TEST_METHOD(WhenUsingFuelPumpThenFuelPumpIsUsed)

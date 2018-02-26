@@ -26,7 +26,7 @@ namespace UnitTests
 
 			void *config = malloc(4);
 			void *buildConfig = config;
-
+			
 			*((unsigned char *)buildConfig) = 4;
 			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
 
@@ -49,9 +49,13 @@ namespace UnitTests
 			EngineManagement::CurrentInjectorServices[2] = new EngineManagement::InjectorService(3, false, false);
 			EngineManagement::CurrentInjectorServices[3] = new EngineManagement::InjectorService(4, false, false);
 
-			config = malloc(4);
+			config = malloc(5);
 			buildConfig = config;
-			
+
+			//fuel prime service id
+			*((unsigned char *)buildConfig) = 0;
+			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
+
 			//Prime Time
 			*((float *)buildConfig) = 1;
 			buildConfig = (void*)((float *)buildConfig + 1);
@@ -59,7 +63,7 @@ namespace UnitTests
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.Times(1)
 				.WillOnce(Return(5000));
-			EngineManagement::CurrentPrimeService = new EngineManagement::PrimeService_StaticPulseWidth(config);
+			EngineManagement::CurrentPrimeService = EngineManagement::CreatePrimeService(config);
 		}
 
 		TEST_METHOD(WhenUsingFuelPrimeThenFuelPrimeIsUsed)

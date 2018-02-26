@@ -24,8 +24,13 @@ namespace UnitTests
 			EngineManagement::CurrentTimerService = &_timerService;
 			EngineManagement::CurrentAnalogService = &_analogService;
 
-			void *config = malloc(19);
+			void *config = malloc(20);
 			void *buildConfig = config;
+
+			//map service id
+			*((unsigned char *)buildConfig) = 1;
+			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
+
 			//adcPin
 			*((unsigned char *)buildConfig) = 1;
 			buildConfig = (void*)((unsigned char *)buildConfig + 1);
@@ -53,7 +58,7 @@ namespace UnitTests
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.WillRepeatedly(Return(5000));
 			EXPECT_CALL(_analogService, InitPin(1)).Times(1);
-			EngineManagement::CurrentMapService = new EngineManagement::MapService_Analog(config);
+			EngineManagement::CurrentMapService = EngineManagement::CreateMapService(config);
 		}
 
 		TEST_METHOD(WhenGettingMapKpaThenCorrectMapKpaIsReturned)

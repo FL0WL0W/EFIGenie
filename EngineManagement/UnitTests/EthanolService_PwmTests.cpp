@@ -24,6 +24,11 @@ namespace UnitTests
 
 			void *config = malloc(19);
 			void *buildConfig = config;
+
+			//ethanol service id
+			*((unsigned char *)buildConfig) = 2;
+			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
+
 			//adcPin
 			*((unsigned char *)buildConfig) = 1;
 			buildConfig = (void*)((unsigned char *)buildConfig + 1);
@@ -48,7 +53,7 @@ namespace UnitTests
 			*((unsigned short *)buildConfig) = 500;
 			buildConfig = (void*)((unsigned short *)buildConfig + 1);
 
-			EngineManagement::CurrentEthanolService = new EngineManagement::EthanolService_Pwm(config);
+			EngineManagement::CurrentEthanolService = EngineManagement::CreateEthanolService(config);
 		}
 
 		TEST_METHOD(WhenGettingEthanolContentThenCorrectEthanolContentIsReturned)

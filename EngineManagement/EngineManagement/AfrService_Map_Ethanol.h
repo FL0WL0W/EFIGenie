@@ -18,15 +18,18 @@ namespace EngineManagement
 		unsigned int _startupAfrTickDelay;
 		unsigned int _startupAfrTickDecay;
 		float *_ectMultiplierTable;
+		unsigned short *_stoichTable;
 		unsigned short *_tpsMinAfrGas;
 		unsigned short *_tpsMinAfrEthanol;
 		unsigned char _afrRpmResolution;
 		unsigned char _afrMapResolution;
 		unsigned char _afrEctResolution;
 		unsigned char _afrTpsResolution;
+		unsigned char _stoichResolution;
 	public:
 		AfrService_Map_Ethanol(void *config);
 		float GetAfr();
+		float GetLambda();
 	};
 }
 #endif

@@ -24,8 +24,13 @@ namespace UnitTests
 			EngineManagement::CurrentTimerService = &_timerService;
 			EngineManagement::CurrentAnalogService = &_analogService;
 
-			void *config = malloc(19);
+			void *config = malloc(20);
 			void *buildConfig = config;
+
+			//voltage service id
+			*((unsigned char *)buildConfig) = 1;
+			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
+
 			//adcPin
 			*((unsigned char *)buildConfig) = 1;
 			buildConfig = (void*)((unsigned char *)buildConfig + 1);
@@ -53,7 +58,7 @@ namespace UnitTests
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.WillRepeatedly(Return(5000));
 			EXPECT_CALL(_analogService, InitPin(1)).Times(1);
-			EngineManagement::CurrentVoltageService = new EngineManagement::VoltageService_Analog(config);
+			EngineManagement::CurrentVoltageService = EngineManagement::CreateVoltageService(config);
 		}
 
 		TEST_METHOD(WhenGettingVoltageThenCorrectVoltageIsReturned)
