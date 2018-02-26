@@ -183,11 +183,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Simple.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h">
       <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.h">
+      <Filter>Header Files\Services</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -296,11 +296,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineConfig.cpp">
       <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Simple.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)ILambdaSensorService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.cpp">
+      <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

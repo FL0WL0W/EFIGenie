@@ -12,11 +12,11 @@
 #include "IVoltageService.h"
 #include "ITpsService.h"
 #include "IDecoder.h"
+#include "ILambdaSensorService.h"
 #include "IFuelTrimService.h"
 #include "IPrimeService.h"
 #include "IFuelPumpService.h"
 #include "IEngineCoolantTemperatureService.h"
-#include "ILambdaSensorService.h"
 #include "IAfrService.h"
 
 namespace EngineManagement

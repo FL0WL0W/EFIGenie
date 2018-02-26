@@ -167,6 +167,9 @@ namespace EngineManagement
 #ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->Tick();
 #endif
+#ifdef ILambdaSensorServiceExists
+		CurrentLambdaSensorService->ReadLambda();
+#endif
 #ifdef IAfrServiceExists
 		CurrentAfrService->CalculateAfr();
 #endif
