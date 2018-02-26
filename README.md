@@ -12,31 +12,43 @@ Features<br>
     <ul>
       <li>Stm32Devboard - 8 cylinder sequential (10, 12, 14, 16 wasted spark/banked injection)</li>
     </ul>
-  <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
-  <li>Build Defines for NOIGNITION (Injection only hardware / I.E. PiggyBack)</li>
-  <li>Individual injector trims</li>
-  <li>Fuel Pump (On/Off)</li>
-  <li>Fuel Prime</li>
-  <li>After Start Enrichment</li>
-  <li>Warm Up Enrichment</li>
-  <li>TPS and MAP acceleration enrichment</li>
-  <li>Temperature Bias between ECT and IAT</li>
-  <li>Voltage and MAP Injector Offset</li>
-  <li>Short Pulse Adder</li>
   <li>Flexible Crank Cam Decoder</li>
     <ul>
       <li>GM 24x (Cam + Crank and Crank Only)</li>
       <li>--More to come</li>
     </ul>
+  <li>Individual injector trims</li>
+  <li>Injector offset voltage and MAP</li>
+  <li>Injector short pulse adder</li>
+  <li>TPS and MAP acceleration enrichment</li>
+  <li>Temperature Bias between ECT and IAT</li>
+  <li>After Start Enrichment</li>
+  <li>Warm Up Enrichment</li>
+  <li>Fuel Prime</li>
+  <li>Fuel Pump (On/Off)</li>
   <li>Deceleration fuel cut off (DFCO)</li>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
-  <li>Unit Tests to ensure everything works</li>
+  <li>Firmware features</li>
+    <ul>
+      <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
+      <li>Build Defines for NOIGNITION Control (Injection only hardware / I.E. PiggyBack)</li>
+      <li>Unit Tests to ensure everything works</li>
+      <li>Service Oriented Architecture</li>
+      <li>Ability to easily remove services in order to conserve space/li>
+    </ul>
 </ul>
 <br>
 TODO LIST<br>
 <ul>
+  <li>*Implement Stm32F10x PWM service</li>
+  <li>*Tach output</li>
+  <li>*Fuel Trim (Wideband and Narrowband)</li>
+  <li>*Idle control (PWM/Stepper - PID control loop)</li>
+  <li>*Alpha-N</li>
+  <li>*Logging</li>
+  <li>*Tuner Studio</li>
   <li>*Create unit tests</li>
     <ul>
       <li>PistonEngineController</li>
@@ -49,16 +61,9 @@ TODO LIST<br>
   <li>*Create integration tests with integration test hardware</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
-  <li>*Implement Stm32F10x PWM service</li>
-  <li>*Fuel Trim (Wideband and Narrowband)</li>
-  <li>*Tach output</li>
   <li>Fuel Pump (PWM)</li>
-  <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
-  <li>*Logging</li>
-  <li>*Tuner Studio</li>
-  <li>Alpha-N</li>
   <li>CAN Bus/OBD2</li>
   <li>Vehicle Speed Sensor</li>
   <li>Variable table axis(I.E. RPM 400, 600, 800, 1200, 2400, 3600, 3800, 4000, 4200, 5400, 6600)</li>
