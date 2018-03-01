@@ -1,4 +1,4 @@
-#if defined(ILambdaSensorServiceExists) && (defined(ITpsServiceExists) || defined(IMapServiceExists))
+#if defined(IFuelTrimServiceExists) && defined(ILambdaSensorServiceExists) && (defined(ITpsServiceExists) || defined(IMapServiceExists))
 #define FuelTrimServiceWrapper_InterpolatedTableExists
 namespace EngineManagement
 {
@@ -6,7 +6,6 @@ namespace EngineManagement
 	{
 	protected:
 		//settings
-		float _lambdaDeltaEnable;
 		unsigned short _cycleDelay;
 		unsigned short _dotRpmSampleRate;
 		unsigned int _rpmDot;

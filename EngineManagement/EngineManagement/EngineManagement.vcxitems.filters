@@ -61,6 +61,12 @@
     <Filter Include="Source Files\PistonEngine\Interface">
       <UniqueIdentifier>{8fdd1737-ac81-4e04-9267-dccb6bb6d278}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Services\FuelTrimService">
+      <UniqueIdentifier>{033e91b9-9d4d-4ad7-b0d3-4d5201d6a74b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services\FuelTrimService">
+      <UniqueIdentifier>{859f74c0-d00e-43fa-9335-5243786b4eb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h">
@@ -187,7 +193,10 @@
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.h">
-      <Filter>Header Files\Services</Filter>
+      <Filter>Header Files\Services\FuelTrimService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.h">
+      <Filter>Header Files\Services\FuelTrimService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -300,7 +309,10 @@
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
-      <Filter>Source Files\Services</Filter>
+      <Filter>Source Files\Services\FuelTrimService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.cpp">
+      <Filter>Source Files\Services\FuelTrimService</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

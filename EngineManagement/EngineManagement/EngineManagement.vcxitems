@@ -17,6 +17,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
@@ -61,6 +62,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IEthanolService.cpp" />
