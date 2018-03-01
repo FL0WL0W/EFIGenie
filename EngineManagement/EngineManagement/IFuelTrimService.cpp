@@ -1,6 +1,7 @@
 #include "Services.h"
 #include "FuelTrimServiceWrapper_InterpolatedTable.h"
 #include "FuelTrimService_Narrow.h"
+#include "FuelTrimService_Pid.h"
 
 #ifdef IFuelTrimServiceExists
 namespace EngineManagement
@@ -24,7 +25,7 @@ namespace EngineManagement
 			return new FuelTrimService_Narrow((void*)((unsigned char*)config + 1));
 #endif
 #ifdef FuelTrimService_PidExists
-		case 2:
+		case 3:
 			return new FuelTrimService_Pid((void*)((unsigned char*)config + 1));
 #endif
 		}

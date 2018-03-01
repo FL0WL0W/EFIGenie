@@ -32,18 +32,19 @@ namespace EngineManagement
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		Voltage = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
+		unsigned int lastReadTick = _lastReadTick;
 		//if ther hasn't been a full tick between reads then return;
-		if(_lastReadTick == readTickOrig)
+		if(lastReadTick == readTickOrig)
 			return;
 		unsigned int readTick = readTickOrig;
-		if (readTick < _lastReadTick)
+		if (readTick < lastReadTick)
 		{
-			_lastReadTick = _lastReadTick + 2147483647;
+			lastReadTick += 2147483647;
 			readTick += 2147483647;
 		}
-		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
+		if (readTick < (lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		VoltageDot = ((Voltage - _lastVoltage) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
+		VoltageDot = ((Voltage - _lastVoltage) / (readTick - lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTick;
 		_lastVoltage = Voltage;
 	}

@@ -31,12 +31,20 @@ namespace EngineManagement
 	void FuelTrimServiceWrapper_InterpolatedTable::TrimTick()
 	{
 		unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();
-		unsigned int tick = CurrentTimerService->GetTick();
-		float rpm = CurrentDecoder->GetRpm();
-		if (tick < (_prevTick + ticksPerSecond / _dotRpmSampleRate))
+		unsigned int origTick = CurrentTimerService->GetTick();
+		unsigned int tick = origTick;
+		unsigned int prevTick = _prevTick;
+		if (tick < prevTick)
 		{
-			_rpmDot = ((rpm - _prevRpm) / (tick - _prevTick)) * ticksPerSecond;
+			prevTick += 2147483647;
+			tick += 2147483647;
+		}
+		float rpm = CurrentDecoder->GetRpm();
+		if (tick < (prevTick + ticksPerSecond / _dotRpmSampleRate))
+		{
+			_rpmDot = ((rpm - _prevRpm) / (tick - prevTick)) * ticksPerSecond;
 			_prevRpm = rpm;
+			_prevTick = origTick;
 		}
 		float delayTime = (60 * _cycleDelay) / rpm;
 

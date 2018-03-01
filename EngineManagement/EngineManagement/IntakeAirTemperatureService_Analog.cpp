@@ -32,18 +32,19 @@ namespace EngineManagement
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
 		IntakeAirTemperature = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
+		unsigned int lastReadTick = _lastReadTick;
 		//if ther hasn't been a full tick between reads then return;
-		if(_lastReadTick == readTickOrig)
+		if(lastReadTick == readTickOrig)
 			return;
 		unsigned int readTick = readTickOrig;
-		if (readTick < _lastReadTick)
+		if (readTick < lastReadTick)
 		{
-			_lastReadTick = _lastReadTick + 2147483647;
+			lastReadTick += 2147483647;
 			readTick += 2147483647;
 		}
-		if (readTick < (_lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
+		if (readTick < (lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		IntakeAirTemperatureDot = ((IntakeAirTemperature - _lastIat) / (readTick - _lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
+		IntakeAirTemperatureDot = ((IntakeAirTemperature - _lastIat) / (readTick - lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
 		_lastIat = IntakeAirTemperature;
 	}
