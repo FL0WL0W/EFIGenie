@@ -192,13 +192,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.h">
-      <Filter>Header Files\Services\FuelTrimService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.h">
-      <Filter>Header Files\Services\FuelTrimService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Pid.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h">
       <Filter>Header Files\Services\FuelTrimService</Filter>
     </ClInclude>
   </ItemGroup>
@@ -312,12 +306,6 @@
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
-      <Filter>Source Files\Services\FuelTrimService</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.cpp">
-      <Filter>Source Files\Services\FuelTrimService</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Pid.cpp">
       <Filter>Source Files\Services\FuelTrimService</Filter>
     </ClCompile>
   </ItemGroup>
