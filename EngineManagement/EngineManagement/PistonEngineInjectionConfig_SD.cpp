@@ -12,10 +12,10 @@ namespace EngineManagement
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
-		_maxMapKpa = *(float *)config;
+		_maxMapBar = *(float *)config;
 		config = (void*)((float *)config + 1);
 				
-		_maxMapKpaDot = *(float *)config;
+		_maxMapBarDot = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
 #ifdef ITpsServiceExists
@@ -73,7 +73,7 @@ namespace EngineManagement
 		_gasConstant = *((unsigned short *)config);  //value in 0.1 units
 		config = (void*)((unsigned short *)config + 1);
 		
-		_temperatureBias = ((unsigned char *)config);   //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapKpa * _pistonEngineConfig->MaxRpm * 120)
+		_temperatureBias = ((unsigned char *)config);   //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapBar * _pistonEngineConfig->MaxRpm * 120)
 		config = (void*)((unsigned char *)config + _temperatureBiasResolution);
 		
 #ifdef ITpsServiceExists
@@ -114,10 +114,10 @@ namespace EngineManagement
 		unsigned char mapIndexL = 0;
 		unsigned char mapIndexH = 0;
 		float mapMultiplier = 0;
-		unsigned short map = CurrentMapService->MapKpa;
+		float map = CurrentMapService->MapBar;
 		if (_veMapResolution > 1)
 		{
-			unsigned short mapDivision = _maxMapKpa / _veMapResolution;
+			float mapDivision = _maxMapBar / _veMapResolution;
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;
 			mapMultiplier = ((float)map) / mapDivision - mapIndexL;
@@ -135,13 +135,12 @@ namespace EngineManagement
 		+			_volumetricEfficiencyMap[rpmIndexH + _veRpmResolution * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
 		+			_volumetricEfficiencyMap[rpmIndexL + _veRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
 		+			_volumetricEfficiencyMap[rpmIndexH + _veRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
-		VE *= 0.0078125f;
-		
+				
 #ifdef IFuelTrimServiceExists
 		if (CurrentFuelTrimService != 0)
 			VE += CurrentFuelTrimService->GetFuelTrim(cylinder);
 #endif
-
+		VE *= 0.0078125f;
 
 		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
@@ -151,7 +150,7 @@ namespace EngineManagement
 		if (_temperatureBiasResolution > 1)
 		{
 			unsigned int temperatureBiasCalc = map * rpm * VE;
-			unsigned int temperatureBiasDivision = (_maxMapKpa * _maxRpm * 120) / _temperatureBiasResolution;
+			unsigned int temperatureBiasDivision = (_maxMapBar * _maxRpm * 120) / _temperatureBiasResolution;
 			temperatureBiasIndexL = temperatureBiasCalc / temperatureBiasDivision;
 			temperatureBiasIndexH = temperatureBiasIndexL + 1;
 			temperatureBiasMultiplier = ((float)temperatureBiasCalc) / temperatureBiasDivision - temperatureBiasIndexL;
@@ -175,7 +174,7 @@ namespace EngineManagement
 		float temperature = CurrentEngineCoolantTemperatureService->EngineCoolantTemperature;
 #endif
 		
-		float airDensity = map / (100.0f * _gasConstant * temperature);
+		float airDensity = map / (_gasConstant * temperature);
 		
 		float airFuelRatio = CurrentAfrService->Afr;
 		
@@ -186,8 +185,8 @@ namespace EngineManagement
 		float mapDotMultiplier = 0;
 		if (_mapDotAdderResolution > 1)
 		{
-			unsigned short mapDot = CurrentMapService->MapKpaDot;
-			unsigned short mapDotDivision = _maxMapKpa / _mapDotAdderResolution;
+			float mapDot = CurrentMapService->MapBarDot;
+			float mapDotDivision = _maxMapBarDot / _mapDotAdderResolution;
 			unsigned char mapDotIndexL = mapDot / mapDotDivision;
 			unsigned char mapDotIndexH = mapDotIndexL + 1;
 			float mapDotMultiplier = ((float)mapDot) / mapDotDivision - mapDotIndexL;
@@ -285,7 +284,7 @@ namespace EngineManagement
 		float mapOffsetMultiplier = 0;
 		if (_offsetMapResolution > 1)
 		{
-			unsigned short mapOffsetDivision = _maxMapKpa / _offsetMapResolution;
+			float mapOffsetDivision = _maxMapBar / _offsetMapResolution;
 			mapOffsetIndexL = map / mapOffsetDivision;
 			mapOffsetIndexH = mapOffsetIndexL + 1;
 			mapOffsetMultiplier = ((float)map) / mapOffsetDivision - mapOffsetIndexL;

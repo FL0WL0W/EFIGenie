@@ -73,8 +73,8 @@ namespace UnitTests
 			*((unsigned short *)buildConfig) = 6000;
 			buildConfig = (void*)((unsigned short *)buildConfig + 1);
 
-			//MaxMapKpa
-			*((float *)buildConfig) = 100;
+			//MaxMapBar
+			*((float *)buildConfig) = 1;
 			buildConfig = (void*)((float *)buildConfig + 1);
 
 			//MinEct
@@ -152,7 +152,7 @@ namespace UnitTests
 			
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(0));
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
-			_mapService.MapKpa = 0;
+			_mapService.MapBar = 0;
 			_ectService.EngineCoolantTemperature = -40;
 			_tpsService.Tps = 0;
 			_ethanolService.EthanolContent = 0;
@@ -179,24 +179,24 @@ namespace UnitTests
 			Assert::AreEqual(0.855f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 			EXPECT_CALL(_timerService, GetTick()).WillRepeatedly(Return(50001));
 
-			_mapService.MapKpa = 33;
+			_mapService.MapBar = 0.33;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
 			EngineManagement::CurrentAfrService->CalculateAfr();
 			Assert::AreEqual(11.76f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 			Assert::AreEqual(0.8f, EngineManagement::CurrentAfrService->Lambda, 0.01f);
 
-			_mapService.MapKpa = 16.5;
+			_mapService.MapBar = 0.165;
 			_ectService.EngineCoolantTemperature = 100;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(1000));
 			EngineManagement::CurrentAfrService->CalculateAfr();
 			Assert::AreEqual(15.14f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
-			_mapService.MapKpa = 16.5;
+			_mapService.MapBar = 0.165;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(2000));
 			EngineManagement::CurrentAfrService->CalculateAfr();
 			Assert::AreEqual(14.9f, EngineManagement::CurrentAfrService->Afr, 0.1f);
 
-			_mapService.MapKpa = 0;
+			_mapService.MapBar = 0;
 			_tpsService.Tps = 1;
 			EXPECT_CALL(_decoder, GetRpm()).Times(1).WillOnce(Return(0));
 			EngineManagement::CurrentAfrService->CalculateAfr();

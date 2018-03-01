@@ -8,7 +8,7 @@ namespace EngineManagement
 		unsigned short *_gasMap;
 		unsigned short *_ethanolMap;
 		unsigned short _maxRpm;
-		float _maxMapKpa;
+		float _maxMapBar;
 		float _minEct;
 		float _maxEct;
 		bool _started = false;

@@ -9,7 +9,7 @@ namespace EngineManagement
 		short *_ignitionAdvanceMapGas;
 		short *_ignitionAdvanceMapEthanol;
 		unsigned short _maxRpm;
-		float _maxMapKpa;
+		float _maxMapBar;
 		unsigned char _ignitionRpmResolution;
 		unsigned char _ignitionMapResolution;
 	public:

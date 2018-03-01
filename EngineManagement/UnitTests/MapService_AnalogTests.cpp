@@ -61,33 +61,33 @@ namespace UnitTests
 			EngineManagement::CurrentMapService = EngineManagement::CreateMapService(config);
 		}
 
-		TEST_METHOD(WhenGettingMapKpaThenCorrectMapKpaIsReturned)
+		TEST_METHOD(WhenGettingMapBarThenCorrectMapBarIsReturned)
 		{
 			CreateServices();
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0));
 			EngineManagement::CurrentMapService->ReadMap();
-			Assert::AreEqual(-10.0f, EngineManagement::CurrentMapService->MapKpa, 0.1f);
-			Assert::AreEqual(0.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
+			Assert::AreEqual(-10.0f, EngineManagement::CurrentMapService->MapBar, 0.1f);
+			Assert::AreEqual(0.0f, EngineManagement::CurrentMapService->MapBarDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(10));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(1));
 			EngineManagement::CurrentMapService->ReadMap();
-			Assert::AreEqual(20.0f, EngineManagement::CurrentMapService->MapKpa, 0.1f);
-			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
+			Assert::AreEqual(20.0f, EngineManagement::CurrentMapService->MapBar, 0.1f);
+			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapBarDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(15));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0.5));
 			EngineManagement::CurrentMapService->ReadMap();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapKpa, 0.001f);
-			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
+			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapBar, 0.001f);
+			Assert::AreEqual(10000.0f, EngineManagement::CurrentMapService->MapBarDot, 0.1f);
 
 			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(20));
 			EXPECT_CALL(_analogService, ReadPin(1)).Times(1).WillOnce(Return(0.5));
 			EngineManagement::CurrentMapService->ReadMap();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapKpa, 0.001f);
-			Assert::AreEqual(-10625.0f, EngineManagement::CurrentMapService->MapKpaDot, 0.1f);
+			Assert::AreEqual(-1.25f, EngineManagement::CurrentMapService->MapBar, 0.001f);
+			Assert::AreEqual(-10625.0f, EngineManagement::CurrentMapService->MapBarDot, 0.1f);
 		}
 	};
 }

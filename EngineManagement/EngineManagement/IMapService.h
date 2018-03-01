@@ -5,8 +5,8 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadMap() = 0;
-		float MapKpa = 0;
-		float MapKpaDot = 0;
+		float MapBar = 0;
+		float MapBarDot = 0;
 	};
 
 	extern IMapService *CurrentMapService;

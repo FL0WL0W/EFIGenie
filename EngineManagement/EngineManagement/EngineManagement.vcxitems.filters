@@ -186,7 +186,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
   </ItemGroup>
@@ -299,7 +299,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ILambdaSensorService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimService_Narrow.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

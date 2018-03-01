@@ -23,8 +23,8 @@ namespace EngineManagement
 		short *_mapDotAdder;
 		unsigned short _injectorOpenPosition64thDegree;
 		unsigned short _maxRpm;
-		float _maxMapKpa;
-		float _maxMapKpaDot;
+		float _maxMapBar;
+		float _maxMapBarDot;
 		float _voltageMax;
 		float _voltageMin;
 		unsigned char _veRpmResolution;

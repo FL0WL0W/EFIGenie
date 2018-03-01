@@ -5,10 +5,8 @@ namespace EngineManagement
 	{
 	public:
 		virtual void ReadLambda() = 0;
-		float Lambda[MAX_CYLINDERS];
+		float Lambda;
 	};
-
-	extern ILambdaSensorService *CurrentLambdaSensorService;
 
 	ILambdaSensorService* CreateLambdaSensorService(void *config);
 }

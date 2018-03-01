@@ -10,7 +10,7 @@ namespace EngineManagement
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
-		_maxMapKpa = *(float *)config;
+		_maxMapBar = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
 		_minEct = *(float *)config;
@@ -91,8 +91,8 @@ namespace EngineManagement
 		float mapMultiplier = 0;
 		if (_afrMapResolution > 1)
 		{
-			unsigned short map = CurrentMapService->MapKpa;
-			unsigned short mapDivision = _maxMapKpa / (_afrMapResolution - 1);
+			float map = CurrentMapService->MapBar;
+			float mapDivision = _maxMapBar / (_afrMapResolution - 1);
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;
 			mapMultiplier = ((float)map) / mapDivision - mapIndexL;

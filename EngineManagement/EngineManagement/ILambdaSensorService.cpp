@@ -3,8 +3,6 @@
 #ifdef ILambdaSensorServiceExists
 namespace EngineManagement
 {
-	ILambdaSensorService *CurrentLambdaSensorService;
-
 	ILambdaSensorService *CreateLambdaSensorService(void *config)
 	{
 		unsigned char lambdaSensorId = *((unsigned char*)config);

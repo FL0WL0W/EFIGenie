@@ -5,6 +5,7 @@ namespace EngineManagement
 	{
 	public:
 		virtual short GetFuelTrim(unsigned char cylinder) = 0;
+		virtual void TrimTick() = 0;
 	};
 
 	extern IFuelTrimService *CurrentFuelTrimService;
