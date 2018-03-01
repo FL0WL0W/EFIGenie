@@ -195,6 +195,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h">
       <Filter>Header Files\Services\FuelTrimService</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h">
+      <Filter>Header Files\Services\FuelTrimService</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -306,6 +309,9 @@
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
+      <Filter>Source Files\Services\FuelTrimService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp">
       <Filter>Source Files\Services\FuelTrimService</Filter>
     </ClCompile>
   </ItemGroup>
