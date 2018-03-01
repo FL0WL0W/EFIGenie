@@ -30,6 +30,7 @@ Features<br>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
+  <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
   <li>Firmware features</li>
     <ul>
       <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
