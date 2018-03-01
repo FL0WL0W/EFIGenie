@@ -53,9 +53,8 @@ TODO LIST<br>
   <li>*Tuner Studio</li>
   <li>*Create unit tests</li>
     <ul>
-      <li>FuelTimeService_Narrow</li>
-      <li>FuelTimeService_Pid</li>
-      <li>FuelTimeServiceWrapper_InterpolatedTable</li>
+      <li>FuelTimeServiceWrapper_MultiChannel</li>
+      <li>FuelTimeService_InterpolatedTable</li>
       <li>PistonEngineController</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
