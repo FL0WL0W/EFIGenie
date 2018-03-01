@@ -30,6 +30,7 @@ Features<br>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
+  <li>Fuel Trim (Wideband/Pid and Narrowband)</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
   <li>Firmware features</li>
     <ul>
@@ -44,8 +45,8 @@ Features<br>
 TODO LIST<br>
 <ul>
   <li>*Implement Stm32F10x PWM service</li>
+  <li>*LambdaSensorService</li>
   <li>*Tach output</li>
-  <li>*Fuel Trim (Wideband and Narrowband)</li>
   <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
