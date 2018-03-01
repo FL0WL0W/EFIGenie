@@ -65,6 +65,7 @@ TODO LIST<br>
   <li>*Create integration tests with integration test hardware</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
+  <li>Electric Fan Control</li>
   <li>Fuel Pump (PWM)</li>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
