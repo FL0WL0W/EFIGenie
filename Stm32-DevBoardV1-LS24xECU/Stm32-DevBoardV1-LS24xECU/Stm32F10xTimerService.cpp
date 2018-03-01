@@ -11,7 +11,7 @@ namespace Stm32
 	Stm32F10xTimerService *MainTimerService;
 	extern "C" 
 	{
-		void TIM2_IRQHandler(void)
+		void TIM4_IRQHandler(void)
 		{
 			MainTimerService->Interrupt();
 		}
@@ -29,13 +29,13 @@ namespace Stm32
 		timeBaseInit.TIM_Period = 65535;
 		timeBaseInit.TIM_ClockDivision = 0;
 		timeBaseInit.TIM_RepetitionCounter = 0;
-		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-		TIM_TimeBaseInit(TIM2, &timeBaseInit);
-		TIM_Cmd(TIM2, ENABLE);
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+		TIM_TimeBaseInit(TIM4, &timeBaseInit);
+		TIM_Cmd(TIM4, ENABLE);
 	
 		/* Enable the timer global Interrupt */
 		NVIC_InitTypeDef   NVIC_InitStructure;
-		NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -46,25 +46,25 @@ namespace Stm32
 	
 		oCInit.TIM_OCMode = TIM_OCMode_Active;
 		oCInit.TIM_Pulse = 0x0000;
-		TIM_OC1Init(TIM2, &oCInit);
+		TIM_OC1Init(TIM4, &oCInit);
 	
-		TIM_ClearITPendingBit(TIM2, TIM_IT_CC1 | TIM_IT_Update);
-		TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-		TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);
+		TIM_ClearITPendingBit(TIM4, TIM_IT_CC4 | TIM_IT_Update);
+		TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+		TIM_ITConfig(TIM4, TIM_IT_CC4, ENABLE);
 		
 		MainTimerService = this;
 	}
 
 	unsigned int Stm32F10xTimerService::GetTick()
 	{
-		return _tick | TIM_GetCounter(TIM2);
+		return _tick | TIM_GetCounter(TIM4);
 	}
 
 	void Stm32F10xTimerService::ScheduleCallBack(unsigned int tick)
 	{
 		//1 tick of overhead
 		tick--;
-		unsigned int counter = _tick | TIM_GetCounter(TIM2);
+		unsigned int counter = _tick | TIM_GetCounter(TIM4);
 		if (_tick == (tick & 0xFFFF0000))
 		{
 			if (tick <= counter)
@@ -75,7 +75,7 @@ namespace Stm32
 			{
 				_futureTock = false;
 				_futureTick = true;
-				TIM_SetCompare1(TIM2, tick & 0xFFFF);
+				TIM_SetCompare4(TIM4, tick & 0xFFFF);
 			}	
 		}
 		else if ((tick < counter && (counter - tick <= 2147483648)) || (tick > counter && (tick - counter > 2147483648)))
@@ -99,20 +99,20 @@ namespace Stm32
 	
 	void Stm32F10xTimerService::Interrupt(void)
 	{
-		if (TIM_GetITStatus(TIM2, TIM_IT_CC1) != RESET) {
+		if (TIM_GetITStatus(TIM4, TIM_IT_CC4) != RESET) {
 			if (_futureTick)
 			{
 				ReturnCallBack();
 			}
-			TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
+			TIM_ClearITPendingBit(TIM4, TIM_IT_CC4);
 		}
-		if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
+		if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) {
 			_tick += 0x00010000;	
 			if (_futureTock)
 			{
 				ScheduleCallBack(_callTick);
 			}
-			TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+			TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 		}
 	}
 
