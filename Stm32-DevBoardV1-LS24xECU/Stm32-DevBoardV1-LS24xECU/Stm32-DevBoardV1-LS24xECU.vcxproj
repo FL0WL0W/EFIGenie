@@ -52,6 +52,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stm32F10xAnalogService.cpp" />
     <ClCompile Include="Stm32F10xDigitalService.cpp" />
+    <ClCompile Include="STM32F10xPwmService.cpp" />
     <ClCompile Include="Stm32F10xTimerService.cpp" />
     <ClCompile Include="system_stm32f10x.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xb.c" />
@@ -115,6 +116,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stm32F10xAnalogService.h" />
     <ClInclude Include="Stm32F10xDigitalService.h" />
+    <ClInclude Include="Stm32F10xPwmService.h" />
     <ClInclude Include="Stm32F10xTimerService.h" />
   </ItemGroup>
   <ItemGroup>

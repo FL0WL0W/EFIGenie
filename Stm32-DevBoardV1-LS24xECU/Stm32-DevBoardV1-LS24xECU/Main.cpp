@@ -7,6 +7,7 @@
 #include "Stm32F10xTimerService.h"
 #include "Stm32F10xDigitalService.h"
 #include "Stm32F10xAnalogService.h"
+#include "Stm32F10xPwmService.h"
 #include "EmbeddedResources.h"
 #include "stm32f10x_tim.h"
 #include <stm32f10x_gpio.h>
@@ -56,8 +57,7 @@ int main()
 	
 	_analogService = new Stm32::Stm32F10xAnalogService();
 	
-	//TODO: Implement PWM service
-	_pwmService = NULL;
+	_pwmService = new Stm32::Stm32F10xPwmService;
 		
 	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, false);
 	
