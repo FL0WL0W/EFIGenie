@@ -44,7 +44,8 @@ Features<br>
 <br>
 TODO LIST<br>
 <ul>
-  <li>*Implement Stm32F10x PWM service</li>
+  <li>*Implement Stm32F10x PWM service (reading)</li>
+  <li>*Test Stm32F10x Services</li>
   <li>*LambdaSensorService</li>
   <li>*Tach output</li>
   <li>*Idle control (PWM/Stepper - PID control loop)</li>
