@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "PinDirection.h"
 #include "IDigitalService.h"
-#include "Stm32F10xDigitalService.h"
+#include "Stm32F103DigitalService.h"
 
 unsigned short PinToGPIO_Pin(uint8_t pin)
 {
@@ -46,7 +46,7 @@ unsigned short PinToGPIO_Pin(uint8_t pin)
 
 namespace Stm32
 {
-	void Stm32F10xDigitalService::InitPin(uint8_t pin, HardwareAbstraction::PinDirection direction)
+	void Stm32F103DigitalService::InitPin(uint8_t pin, HardwareAbstraction::PinDirection direction)
 	{		
 		if (pin == 0)
 			return;
@@ -79,7 +79,7 @@ namespace Stm32
 		}
 	}
 	
-	bool Stm32F10xDigitalService::ReadPin(uint8_t pin)
+	bool Stm32F103DigitalService::ReadPin(uint8_t pin)
 	{
 		if (pin == 0)
 			return false;
@@ -96,7 +96,7 @@ namespace Stm32
 		}
 	}
 	
-	void Stm32F10xDigitalService::WritePin(uint8_t pin, bool value)
+	void Stm32F103DigitalService::WritePin(uint8_t pin, bool value)
 	{
 		if (pin == 0)
 			return;

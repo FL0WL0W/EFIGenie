@@ -21,15 +21,17 @@ namespace EngineManagement
 		A3 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
-		CurrentPwmService->InitPin(_pwmPin, HardwareAbstraction::In);
+		unsigned short minFrequency = *((unsigned short *)config);
+		config = (void*)((unsigned short *)config + 1);
+		
+		CurrentPwmService->InitPin(_pwmPin, HardwareAbstraction::In, minFrequency);
 	}
 	
 	void EthanolService_Pwm::ReadEthanolContent()
 	{
 		float prevEc = EthanolContent;
 		HardwareAbstraction::PwmValue pwmValue = CurrentPwmService->ReadPin(_pwmPin);
-		float pulseWidth = pwmValue.PulseWidth / pwmValue.Period;
-		EthanolContent = A3 * pulseWidth * pulseWidth * pulseWidth + A2 * pulseWidth * pulseWidth + A1 * pulseWidth + A0;
+		EthanolContent = A3 * pwmValue.Period * pwmValue.Period * pwmValue.Period + A2 * pwmValue.Period * pwmValue.Period + A1 * pwmValue.Period + A0;
 	}
 }
 #endif

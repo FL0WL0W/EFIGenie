@@ -1,6 +1,6 @@
 namespace Stm32
 {
-	class Stm32F10xDigitalService : public HardwareAbstraction::IDigitalService
+	class Stm32F103DigitalService : public HardwareAbstraction::IDigitalService
 	{
 	public:
 		void InitPin(uint8_t pin, HardwareAbstraction::PinDirection direction);

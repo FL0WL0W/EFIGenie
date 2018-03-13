@@ -40,20 +40,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Stm32F10xTimerService.cpp">
-      <Filter>Source files\Stm32</Filter>
-    </ClCompile>
     <ClCompile Include="system_stm32f10x.c">
       <Filter>Source files\Stm32</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source files</Filter>
-    </ClCompile>
-    <ClCompile Include="Stm32F10xAnalogService.cpp">
-      <Filter>Source files\Stm32</Filter>
-    </ClCompile>
-    <ClCompile Include="Stm32F10xDigitalService.cpp">
-      <Filter>Source files\Stm32</Filter>
     </ClCompile>
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xb.c">
       <Filter>Source files\Device-specific files</Filter>
@@ -208,7 +199,19 @@
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\CMSIS_StdPeriph\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h">
       <Filter>Header files\Device-specific files\StdPeriph</Filter>
     </ClInclude>
-    <ClCompile Include="STM32F10xPwmService.cpp">
+    <ClCompile Include="Stm32F103AnalogService.cpp">
+      <Filter>Source files\Stm32</Filter>
+    </ClCompile>
+    <ClCompile Include="Stm32F103DigitalService.cpp">
+      <Filter>Source files\Stm32</Filter>
+    </ClCompile>
+    <ClCompile Include="STM32F103PwmService.cpp">
+      <Filter>Source files\Stm32</Filter>
+    </ClCompile>
+    <ClCompile Include="Stm32F103TimerService.cpp">
+      <Filter>Source files\Stm32</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerLocks.cpp">
       <Filter>Source files\Stm32</Filter>
     </ClCompile>
   </ItemGroup>
@@ -227,16 +230,19 @@
     <ClInclude Include="resource.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="Stm32F10xTimerService.h">
+    <ClInclude Include="Stm32F103AnalogService.h">
       <Filter>Header files\Stm32</Filter>
     </ClInclude>
-    <ClInclude Include="Stm32F10xAnalogService.h">
+    <ClInclude Include="Stm32F103DigitalService.h">
       <Filter>Header files\Stm32</Filter>
     </ClInclude>
-    <ClInclude Include="Stm32F10xDigitalService.h">
+    <ClInclude Include="Stm32F103PwmService.h">
       <Filter>Header files\Stm32</Filter>
     </ClInclude>
-    <ClInclude Include="Stm32F10xPwmService.h">
+    <ClInclude Include="Stm32F103TimerService.h">
+      <Filter>Header files\Stm32</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerLocks.h">
       <Filter>Header files\Stm32</Filter>
     </ClInclude>
   </ItemGroup>

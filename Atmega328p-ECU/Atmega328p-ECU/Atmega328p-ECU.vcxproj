@@ -58,6 +58,11 @@
       <AdditionalOptions />
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ClCompile>
+      <PreprocessorDefinitions>MAX_CYLINDERS=8;NOINJECTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Atmega328pTimerService.cpp" />
     <ClCompile Include="LEDBlink.cpp" />

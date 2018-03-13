@@ -3,11 +3,11 @@
 #include <stm32f10x_adc.h>
 #include <stdint.h>
 #include "IAnalogService.h"
-#include "Stm32F10xAnalogService.h"
+#include "Stm32F103AnalogService.h"
 
 namespace Stm32
 {
-	Stm32F10xAnalogService::Stm32F10xAnalogService()
+	Stm32F103AnalogService::Stm32F103AnalogService()
 	{
 	//set ADC back to defaults
 		ADC_DeInit(ADC1);
@@ -50,7 +50,7 @@ namespace Stm32
 			;
 	}
 
-	void Stm32F10xAnalogService::InitPin(uint8_t pin)
+	void Stm32F103AnalogService::InitPin(uint8_t pin)
 	{
 		if (pin == 0)
 			return;
@@ -104,7 +104,7 @@ namespace Stm32
 		}
 	}
 	
-	float Stm32F10xAnalogService::ReadPin(uint8_t pin)
+	float Stm32F103AnalogService::ReadPin(uint8_t pin)
 	{
 		if (pin == 0)
 			return 0;
@@ -119,6 +119,6 @@ namespace Stm32
 		while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
 			;
 		//return the value
-		return ADC_GetConversionValue(ADC1) * 0.000244140625f;  //convert from 12 bit to 16 bit
+		return ADC_GetConversionValue(ADC1) * 0.000244140625f * 3.3;  //convert from 12 bit to float and convert to voltage
 	}
 }

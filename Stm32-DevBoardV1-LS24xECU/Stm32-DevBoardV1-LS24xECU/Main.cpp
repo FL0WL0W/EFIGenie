@@ -4,10 +4,10 @@
 #include "Services.h"
 #include "PistonEngineFactory.h"
 #include <functional>
-#include "Stm32F10xTimerService.h"
-#include "Stm32F10xDigitalService.h"
-#include "Stm32F10xAnalogService.h"
-#include "Stm32F10xPwmService.h"
+#include "Stm32F103TimerService.h"
+#include "Stm32F103DigitalService.h"
+#include "Stm32F103AnalogService.h"
+#include "Stm32F103PwmService.h"
 #include "EmbeddedResources.h"
 #include "stm32f10x_tim.h"
 #include <stm32f10x_gpio.h>
@@ -51,13 +51,13 @@ int main()
 {
 	clock_init();
 		
-	_timerService = new Stm32::Stm32F10xTimerService();
+	_timerService = new Stm32::Stm32F103TimerService(4,4,100000);
 		
-	_digitalService = new Stm32::Stm32F10xDigitalService();
+	_digitalService = new Stm32::Stm32F103DigitalService();
 	
-	_analogService = new Stm32::Stm32F10xAnalogService();
+	_analogService = new Stm32::Stm32F103AnalogService();
 	
-	_pwmService = new Stm32::Stm32F10xPwmService;
+	_pwmService = new Stm32::Stm32F103PwmService;
 		
 	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, false);
 	
