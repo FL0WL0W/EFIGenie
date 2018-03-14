@@ -150,6 +150,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SensorService_Frequency.h">
       <Filter>Header Files\Services\SensorService</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)TachometerService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -232,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)SensorService_Analog.cpp">
       <Filter>Source Files\Services\SensorService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)TachometerService.cpp">
+      <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

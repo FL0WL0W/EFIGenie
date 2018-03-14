@@ -20,15 +20,18 @@ namespace EngineManagement
 		HardwareAbstraction::IDigitalService *digitalService,
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
-		void *pistonEngineConfigFile,
+		void *pistonEngineConfigFile
 #ifdef IIgnitorServiceExists
-		bool ignitionHighZ,
+		, bool ignitionHighZ
 #endif
 #ifdef IInjectorServiceExists
-		bool injectorHighZ,
+		, bool injectorHighZ
 #endif
 #ifdef IFuelPumpServiceExists
-		bool fuelPumpHighZ
+		, bool fuelPumpHighZ
+#endif
+#ifdef TachometerServiceExists
+		, bool tachometerHighZ
 #endif
 		);
 	

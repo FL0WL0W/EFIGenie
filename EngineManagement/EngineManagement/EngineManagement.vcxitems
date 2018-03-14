@@ -43,6 +43,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TachometerService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
@@ -72,5 +73,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TachometerService.cpp" />
   </ItemGroup>
 </Project>

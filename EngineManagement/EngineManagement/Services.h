@@ -12,6 +12,7 @@
 #include "IPrimeService.h"
 #include "IFuelPumpService.h"
 #include "IAfrService.h"
+#include "TachometerService.h"
 
 namespace EngineManagement
 {

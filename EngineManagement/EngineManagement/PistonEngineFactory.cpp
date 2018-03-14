@@ -8,15 +8,18 @@ namespace EngineManagement
 		HardwareAbstraction::IDigitalService *digitalService,
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
-		void *pistonEngineConfigFile,
+		void *pistonEngineConfigFile
 #ifdef IIgnitorServiceExists
-		bool ignitionHighZ,
+		, bool ignitionHighZ
 #endif
 #ifdef IInjectorServiceExists
-		bool injectorHighZ,
+		, bool injectorHighZ
 #endif
 #ifdef IFuelPumpServiceExists
-		bool fuelPumpHighZ
+		, bool fuelPumpHighZ
+#endif
+#ifdef TachometerServiceExists
+		, bool tachometerHighZ
 #endif
 		)
 	{
@@ -126,6 +129,12 @@ namespace EngineManagement
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
 
+		//create tachometer service to start after the cam is synced
+#ifdef TachometerServiceExists
+		CurrentTachometerService = new TachometerService((void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++)), tachometerHighZ);		  
+#endif 
+
+		
 #ifdef IPrimeServiceExists
 		CurrentPrimeService->Prime();
 #endif
