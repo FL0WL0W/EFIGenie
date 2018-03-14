@@ -38,7 +38,8 @@ Features<br>
       <li>Build Defines for NOIGNITION Control (Injection only hardware / I.E. PiggyBack)</li>
       <li>Unit Tests to ensure everything works</li>
       <li>Service Oriented Architecture</li>
-      <li>Ability to easily remove services in order to conserve space/li>
+      <li>Ability to easily remove services in order to conserve space</li>
+      <li>Easily add new sensors</li>
     </ul>
 </ul>
 <br>
