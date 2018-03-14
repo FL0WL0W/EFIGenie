@@ -45,7 +45,6 @@ Features<br>
 TODO LIST<br>
 <ul>
   <li>*Test Stm32F10x Services</li>
-  <li>*LambdaSensorService</li>
   <li>*Tach output</li>
   <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>*Alpha-N</li>
