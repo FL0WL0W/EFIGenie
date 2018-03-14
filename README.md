@@ -32,6 +32,7 @@ Features<br>
   <li>Launch control (Hard and Soft Spark)</li>
   <li>Fuel Trim (Wideband/Pid and Narrowband)</li>
   <li>Tach Output</li>
+  <li>Vehicle Speed Sensor</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
   <li>Firmware features</li>
     <ul>
@@ -71,7 +72,6 @@ TODO LIST<br>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
   <li>CAN Bus/OBD2</li>
-  <li>Vehicle Speed Sensor</li>
   <li>Variable table axis(I.E. RPM 400, 600, 800, 1200, 2400, 3600, 3800, 4000, 4200, 5400, 6600)</li>
 </ul><br>
   *High Priority
