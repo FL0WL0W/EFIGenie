@@ -31,6 +31,7 @@ Features<br>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
   <li>Fuel Trim (Wideband/Pid and Narrowband)</li>
+  <li>Tach Output</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
   <li>Firmware features</li>
     <ul>
