@@ -39,8 +39,9 @@ namespace EngineManagement
 			break;
 		}
 		
+		fileSystemPointer++;
 #ifdef IIgnitorServiceExists
-		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		if(CurrentPistonEngineConfig->IsDistributor)
 		{
 			//set all to the same pin for distributor
@@ -57,8 +58,9 @@ namespace EngineManagement
 			}
 		}
 #endif
+		fileSystemPointer++;
 #ifdef IInjectorServiceExists
-		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{
 			CurrentInjectorServices[cylinder] = new EngineManagement::InjectorService(*((unsigned char*)injectorConfigFile + cylinder), (bool)((unsigned char*)injectorConfigFile + CurrentPistonEngineConfig->Cylinders), injectorHighZ);
@@ -82,33 +84,42 @@ namespace EngineManagement
 		
 		void *ethanolConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentEthanolContentService = CreateSensorService(ethanolConfigFile);
+		
+		void *vssConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		CurrentVehicleSpeedSensorService = CreateSensorService(vssConfigFile);
 
+		fileSystemPointer++;
 #ifdef IFuelTrimServiceExists
-		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentFuelTrimService = CreateFuelTrimService(fuelTrimConfigFile);
 #endif
 		
+		fileSystemPointer++;
 #ifdef IAfrServiceExists
-		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentAfrService = CreateAfrService(afrConfigFile);
 #endif
 		
+		fileSystemPointer++;
 #ifdef IFuelPumpServiceExists
-		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *fuelPumpConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentFuelPumpService = CreateFuelPumpService(fuelPumpConfigFile, fuelPumpHighZ);
 #endif
 		
+		fileSystemPointer++;
 #ifdef IPrimeServiceExists
-		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 #endif
 
+		fileSystemPointer++;
 #ifdef IPistonEngineInjectionConfigExists
-		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
 #endif
 
+		fileSystemPointer++;
 #ifdef IPistonEngineIgnitionConfigExists
-		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
+		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
 #endif
 
@@ -127,8 +138,9 @@ namespace EngineManagement
 		while(!CurrentDecoder->IsSynced());
 
 		//create tachometer service to start after the cam is synced
+		fileSystemPointer++;
 #ifdef TachometerServiceExists
-		CurrentTachometerService = new TachometerService((void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++)), tachometerHighZ);		  
+		CurrentTachometerService = new TachometerService((void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer)), tachometerHighZ);		  
 #endif 
 
 		

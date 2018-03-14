@@ -28,4 +28,5 @@ namespace EngineManagement
 	extern ISensorService *CurrentVoltageService;
 	extern ISensorService *CurrentThrottlePositionService;
 	extern ISensorService *CurrentEthanolContentService;
+	extern ISensorService *CurrentVehicleSpeedSensorService;
 }
