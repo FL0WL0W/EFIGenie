@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "Services.h"
 #include "FuelTrimService_InterpolatedTable.h"
 
@@ -8,8 +9,53 @@ namespace EngineManagement
 	{
 		if (CurrentManifoldAirPressureService == 0)
 			return; //TODO: figure out error handling
-		//lambda service stuff
-		//TODO: CONFIG
+		
+		unsigned int _updateRate = *(unsigned int *)config;
+		config = (void*)((unsigned int *)config + 1);
+		
+		unsigned short _cycleDelay = *(unsigned short *)config;
+		config = (void*)((unsigned short *)config + 1);
+		
+		float _kP = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		float _kI = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		float _kD = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		unsigned char _rpmResolution = *(unsigned char *)config;
+		config = (void*)((unsigned char *)config + 1);
+		
+		unsigned short *_rpmDivisions = (unsigned short *)config;
+		config = (void*)((unsigned short *)config + _rpmResolution);
+		
+		unsigned short _rpmInterpolationDistance = *(unsigned short *)config;
+		config = (void*)((unsigned short *)config + 1);
+		
+		unsigned char _yResolution = *(unsigned char *)config;
+		config = (void*)((unsigned char *)config + 1);
+		
+		float *_yDivisions = (float *)config;
+		config = (void*)((float *)config + _yResolution);
+		
+		float _yInterpolationDistance = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		unsigned char flags = *(unsigned char *)config;
+		config = (void*)((unsigned char *)config + 1);
+		bool _isPid = flags & 0x01;
+		bool _useTps = flags & 0x02;
+		
+		float _lambdaDeltaEnable = *(float *)config;
+		config = (void*)((float *)config + 1);
+		
+		ISensorService *_lambdaSensorService = CreateSensorService(config);
+		if (_lambdaSensorService == 0)
+			return; //TODO: figure out error handling
+		
+		_fuelTrimIntegralTable = (short *)malloc(sizeof(short) * (_rpmResolution+1) * (_yResolution+1));
 	}
 
 	short FuelTrimService_InterpolatedTable::GetFuelTrim(unsigned char cylinder)
@@ -56,57 +102,9 @@ namespace EngineManagement
 			unsigned char yPredictIndexL = 0;
 			unsigned char yPredictIndexH = 0;
 			float yDist = 0;
-			for (int i = _yResolution - 1; i >= 0; i--)
+			for (int i = _yResolution; i >= 0; i--)
 			{
-				if (yPredict > _yDivisions[i])
-				{
-					if (i == _yResolution - 1)
-					{
-						yDist = yPredict - _yDivisions[i];
-						if (yDist > _yInterpolationDistance)
-						{
-							yPredictIndexH = i;
-							yPredictIndexL = i;
-						}
-						else
-						{
-							yPredictIndexH = i;
-							yPredictIndexL = yPredictIndexH - 1;
-						}
-					}
-					else
-					{
-						if (yPredict - _yDivisions[i] < _yDivisions[i + 1] - yPredict)
-						{
-							yDist = yPredict - _yDivisions[i];
-							if (yDist > _yInterpolationDistance)
-							{
-								yPredictIndexH = i;
-								yPredictIndexL = i;
-							}
-							else
-							{
-								yPredictIndexH = i;
-								yPredictIndexL = yPredictIndexH - 1;
-							}
-						}
-						else
-						{
-							yDist = _yDivisions[i + 1] - yPredict;
-							if (yDist > _yInterpolationDistance)
-							{
-								yPredictIndexH = i;
-								yPredictIndexL = i;
-							}
-							else
-							{
-								yPredictIndexL = i;
-								yPredictIndexH = i + 1;
-							}
-						}
-					}
-				}
-				else if (i == 0)
+				if (i == 0)
 				{
 					yDist = _yDivisions[0] - yPredict;
 					if (yDist > _yInterpolationDistance)
@@ -120,63 +118,62 @@ namespace EngineManagement
 						yPredictIndexH = 1;
 					}
 				}
+				else if (yPredict > _yDivisions[i - 1])
+				{
+					if (i == _yResolution)
+					{
+						yDist = yPredict - _yDivisions[i - 1];
+						if (yDist > _yInterpolationDistance)
+						{
+							yPredictIndexH = i;
+							yPredictIndexL = i;
+						}
+						else
+						{
+							yPredictIndexH = i;
+							yPredictIndexL = i - 1;
+						}
+					}
+					else
+					{
+						if ((yDist = yPredict - _yDivisions[i - 1]) < _yDivisions[i] - yPredict)
+						{
+							if (yDist > _yInterpolationDistance)
+							{
+								yPredictIndexH = i;
+								yPredictIndexL = i;
+							}
+							else
+							{
+								yPredictIndexH = i;
+								yPredictIndexL = i - 1;
+							}
+						}
+						else
+						{
+							yDist = _yDivisions[i] - yPredict;
+							if (yDist > _yInterpolationDistance)
+							{
+								yPredictIndexH = i;
+								yPredictIndexL = i;
+							}
+							else
+							{
+								yPredictIndexH = i + 1;
+								yPredictIndexL = i;
+							}
+						}
+					}
+				}
 			}
 			float yPredictMultiplier = yDist / _yInterpolationDistance;
 
 			unsigned char rpmPredictIndexL = 0;
 			unsigned char rpmPredictIndexH = 0;
 			unsigned short rpmDist = 0;
-			for (int i = _rpmResolution - 1; i >= 0; i--)
+			for (int i = _rpmResolution; i >= 0; i--)
 			{
-				if (rpmPredict > _rpmDivisions[i])
-				{
-					if (i == _rpmResolution - 1)
-					{
-						rpmDist = rpmPredict - _rpmDivisions[i];
-						if (rpmDist > _rpmInterpolationDistance)
-						{
-							rpmPredictIndexH = i;
-							rpmPredictIndexL = i;
-						}
-						else
-						{
-							rpmPredictIndexH = i;
-							rpmPredictIndexL = rpmPredictIndexH - 1;
-						}
-					}
-					else
-					{
-						if (rpmPredict - _rpmDivisions[i] < _rpmDivisions[i + 1] - rpmPredict)
-						{
-							rpmDist = rpmPredict - _rpmDivisions[i];
-							if (rpmDist > _rpmInterpolationDistance)
-							{
-								rpmPredictIndexH = i;
-								rpmPredictIndexL = i;
-							}
-							else
-							{
-								rpmPredictIndexH = i;
-								rpmPredictIndexL = rpmPredictIndexH - 1;
-							}
-						}
-						else
-						{
-							rpmDist = _rpmDivisions[i + 1] - rpmPredict;
-							if (rpmDist > _rpmInterpolationDistance)
-							{
-								rpmPredictIndexH = i;
-								rpmPredictIndexL = i;
-							}
-							else
-							{
-								rpmPredictIndexL = i;
-								rpmPredictIndexH = i + 1;
-							}
-						}
-					}
-				}
-				else if (i == 0)
+				if (i == 0)
 				{
 					rpmDist = _rpmDivisions[0] - rpmPredict;
 					if (rpmDist > _rpmInterpolationDistance)
@@ -188,6 +185,53 @@ namespace EngineManagement
 					{
 						rpmPredictIndexL = 0;
 						rpmPredictIndexH = 1;
+					}
+				}
+				else if (rpmPredict > _rpmDivisions[i - 1])
+				{
+					if (i == _rpmResolution)
+					{
+						rpmDist = rpmPredict - _rpmDivisions[i - 1];
+						if (rpmDist > _rpmInterpolationDistance)
+						{
+							rpmPredictIndexH = i;
+							rpmPredictIndexL = i;
+						}
+						else
+						{
+							rpmPredictIndexH = i;
+							rpmPredictIndexL = i - 1;
+						}
+					}
+					else
+					{
+						if ((rpmDist = rpmPredict - _rpmDivisions[i - 1]) < _rpmDivisions[i] - rpmPredict)
+						{
+							if (rpmDist > _rpmInterpolationDistance)
+							{
+								rpmPredictIndexH = i;
+								rpmPredictIndexL = i;
+							}
+							else
+							{
+								rpmPredictIndexH = i;
+								rpmPredictIndexL = i - 1;
+							}
+						}
+						else
+						{
+							rpmDist = _rpmDivisions[i] - rpmPredict;
+							if (rpmDist > _rpmInterpolationDistance)
+							{
+								rpmPredictIndexH = i;
+								rpmPredictIndexL = i;
+							}
+							else
+							{
+								rpmPredictIndexH = i + 1;
+								rpmPredictIndexL = i;
+							}
+						}
 					}
 				}
 			}

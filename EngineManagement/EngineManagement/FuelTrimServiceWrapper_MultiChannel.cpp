@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "Services.h"
 #include "FuelTrimServiceWrapper_MultiChannel.h"
 
@@ -6,7 +7,24 @@ namespace EngineManagement
 {
 	FuelTrimServiceWrapper_MultiChannel::FuelTrimServiceWrapper_MultiChannel(void *config)
 	{
-		//TODO: config
+		void *origConfig = config;
+		unsigned char _numberOfFuelTrimChannels = *(unsigned char *)config;
+		config = (void*)((unsigned char *)config + 1);
+		
+#if MAX_CYLINDERS <= 8
+		unsigned char *_fuelTrimChannelMask = (unsigned char *)config;
+		config = (void*)((unsigned char *)config + _numberOfFuelTrimChannels);
+#elif MAX_CYLINDERS <= 16
+		unsigned short *_fuelTrimChannelMask = (unsigned short *)config;
+		config = (void*)((unsigned short *)config + _numberOfFuelTrimChannels);
+#endif
+		_fuelTrimChannels = (IFuelTrimService **)malloc(sizeof(IFuelTrimService **) * _numberOfFuelTrimChannels);
+		for (unsigned char i; i < _numberOfFuelTrimChannels; i++)
+		{
+			_fuelTrimChannels[i] = CreateFuelTrimService((void*)((unsigned int *)origConfig + *((unsigned int *)config)));
+			config = (void*)((unsigned int *)config + _numberOfFuelTrimChannels);
+		}
+		IFuelTrimService **_fuelTrimChannels;
 	}
 	
 	short FuelTrimServiceWrapper_MultiChannel::GetFuelTrim(unsigned char cylinder)

@@ -84,7 +84,6 @@ namespace EngineManagement
 		CurrentEthanolContentService = CreateSensorService(ethanolConfigFile);
 
 #ifdef IFuelTrimServiceExists
-		//TODO: Fuel Trim Service
 		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentFuelTrimService = CreateFuelTrimService(fuelTrimConfigFile);
 #endif
@@ -104,19 +103,17 @@ namespace EngineManagement
 #endif
 
 #ifdef IPistonEngineInjectionConfigExists
-		//TODO: create unit tests
 		void *pistonEngineInjectionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentPistonEngineInjectionConfig = CreatePistonEngineInjectionConfig(pistonEngineInjectionConfigFile);
 #endif
 
 #ifdef IPistonEngineIgnitionConfigExists
-		//TODO: create unit tests
 		void *pistonEngineIgnitionConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentPistonEngineIgnitionConfig = CreatePistonEngineIgnitionConfig(pistonEngineIgnitionConfigFile);
 #endif
 
 #ifdef PistonEngineControllerExists
-		//TODO: create unit tests
+		//TODO:
 		//finish odd cylinder banks
 		//finish Throttle Body Injection
 		CurrentPistonEngineController = new EngineManagement::PistonEngineController();

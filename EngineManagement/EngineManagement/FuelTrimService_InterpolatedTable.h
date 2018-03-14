@@ -11,15 +11,16 @@ namespace EngineManagement
 		float _kP;
 		float _kI;
 		float _kD;
-		ISensorService *_lambdaSensorService;
-		bool _isPid;
 		unsigned char _rpmResolution;
 		unsigned short *_rpmDivisions;
 		unsigned short _rpmInterpolationDistance;
 		unsigned char _yResolution;
 		float *_yDivisions;
 		float _yInterpolationDistance;
+		bool _isPid;
+		bool _useTps;
 		float _lambdaDeltaEnable;
+		ISensorService *_lambdaSensorService;
 
 		float _lastError;
 		short *_fuelTrimIntegralTable;
@@ -27,7 +28,6 @@ namespace EngineManagement
 		unsigned int _rpmDot;
 		unsigned short _prevRpm;
 		unsigned int _prevTick;
-		bool _useTps;
 	public:
 		FuelTrimService_InterpolatedTable(void *config);
 		short GetFuelTrim(unsigned char cylinder);
