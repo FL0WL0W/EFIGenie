@@ -38,14 +38,14 @@ Features<br>
       <li>Build Defines for NOIGNITION Control (Injection only hardware / I.E. PiggyBack)</li>
       <li>Unit Tests to ensure everything works</li>
       <li>Service Oriented Architecture</li>
-      <li>Ability to easily remove services in order to conserve space/li>
+      <li>Ability to easily remove services in order to conserve space</li>
+      <li>Easily add new sensors</li>
     </ul>
 </ul>
 <br>
 TODO LIST<br>
 <ul>
-  <li>*Test Stm32F10x Services</li>
-  <li>*LambdaSensorService</li>
+  <li>*Test Stm32F103 Services</li>
   <li>*Tach output</li>
   <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>*Alpha-N</li>
