@@ -46,13 +46,13 @@ Features<br>
 TODO LIST<br>
 <ul>
   <li>*Test Stm32F103 Services</li>
-  <li>*Tach output</li>
   <li>*Idle control (PWM/Stepper - PID control loop)</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
   <li>*Tuner Studio</li>
   <li>*Create unit tests</li>
     <ul>
+      <li>TachometerService</li>
       <li>FuelTimeServiceWrapper_MultiChannel</li>
       <li>FuelTimeService_InterpolatedTable</li>
       <li>PistonEngineController</li>
