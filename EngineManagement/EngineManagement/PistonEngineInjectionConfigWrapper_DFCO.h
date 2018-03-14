@@ -1,4 +1,4 @@
-#if defined(IPistonEngineInjectionConfigExists) && defined(ITpsServiceExists)
+#if defined(IPistonEngineInjectionConfigExists)
 #define PistonEngineInjectionConfigWrapper_DFCOExists
 namespace EngineManagement
 {

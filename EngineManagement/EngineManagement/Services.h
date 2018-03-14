@@ -6,17 +6,11 @@
 
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
-#include "IMapService.h"
-#include "IEthanolService.h"
-#include "IIntakeAirTemperatureService.h"
-#include "IVoltageService.h"
-#include "ITpsService.h"
+#include "ISensorService.h"
 #include "IDecoder.h"
-#include "ILambdaSensorService.h"
 #include "IFuelTrimService.h"
 #include "IPrimeService.h"
 #include "IFuelPumpService.h"
-#include "IEngineCoolantTemperatureService.h"
 #include "IAfrService.h"
 
 namespace EngineManagement
@@ -26,4 +20,11 @@ namespace EngineManagement
 	extern HardwareAbstraction::IAnalogService *CurrentAnalogService;
 	extern HardwareAbstraction::IPwmService *CurrentPwmService;
 	extern Decoder::IDecoder *CurrentDecoder;
+	
+	extern ISensorService *CurrentIntakeAirTemperatureService;
+	extern ISensorService *CurrentEngineCoolantTemperatureService;
+	extern ISensorService *CurrentManifoldAirPressureService;
+	extern ISensorService *CurrentVoltageService;
+	extern ISensorService *CurrentThrottlePositionService;
+	extern ISensorService *CurrentEthanolContentService;
 }

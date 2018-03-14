@@ -7,4 +7,11 @@ namespace EngineManagement
 	HardwareAbstraction::IAnalogService *CurrentAnalogService;
 	HardwareAbstraction::IPwmService *CurrentPwmService;
 	Decoder::IDecoder *CurrentDecoder;
+	
+	ISensorService *CurrentIntakeAirTemperatureService;
+	ISensorService *CurrentEngineCoolantTemperatureService;
+	ISensorService *CurrentManifoldAirPressureService;
+	ISensorService *CurrentVoltageService;
+	ISensorService *CurrentThrottlePositionService;
+	ISensorService *CurrentEthanolContentService;
 }

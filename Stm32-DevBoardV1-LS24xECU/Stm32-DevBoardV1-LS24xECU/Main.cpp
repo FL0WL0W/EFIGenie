@@ -57,7 +57,7 @@ int main()
 	
 	_analogService = new Stm32::Stm32F103AnalogService();
 	
-	_pwmService = new Stm32::Stm32F103PwmService;
+	_pwmService = new Stm32::Stm32F103PwmService();
 		
 	EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, false);
 	

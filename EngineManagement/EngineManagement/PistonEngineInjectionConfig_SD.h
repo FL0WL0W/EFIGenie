@@ -1,4 +1,4 @@
-#if defined(IPistonEngineInjectionConfigExists) && defined(IAfrServiceExists) && defined(IMapServiceExists)
+#if defined(IPistonEngineInjectionConfigExists) && defined(IAfrServiceExists)
 #define PistonEngineInjectionConfig_SDExists
 namespace EngineManagement
 {	
@@ -13,13 +13,9 @@ namespace EngineManagement
 		float _shortPulseLimit;
 		unsigned short _gasConstant;
 		unsigned char *_temperatureBias;
-		
-#ifdef ITpsServiceExists
 		float _maxTpsDot;
 		unsigned char _tpsDotAdderResolution;
-		short *_tpsDotAdder;
-#endif
-		
+		short *_tpsDotAdder;		
 		short *_mapDotAdder;
 		unsigned short _injectorOpenPosition64thDegree;
 		unsigned short _maxRpm;

@@ -1,4 +1,4 @@
-#if defined(IFuelTrimServiceExists) && defined(ILambdaSensorServiceExists) && (defined(ITpsServiceExists) || defined(IMapServiceExists))
+#if defined(IFuelTrimServiceExists)
 #define FuelTrimService_InterpolatedTableExists
 namespace EngineManagement
 {
@@ -11,7 +11,7 @@ namespace EngineManagement
 		float _kP;
 		float _kI;
 		float _kD;
-		ILambdaSensorService *_lambdaSensorService;
+		ISensorService *_lambdaSensorService;
 		bool _isPid;
 		unsigned char _rpmResolution;
 		unsigned short *_rpmDivisions;
@@ -27,9 +27,7 @@ namespace EngineManagement
 		unsigned int _rpmDot;
 		unsigned short _prevRpm;
 		unsigned int _prevTick;
-#if defined(ITpsServiceExists) && defined(IMapServiceExists)
 		bool _useTps;
-#endif
 	public:
 		FuelTrimService_InterpolatedTable(void *config);
 		short GetFuelTrim(unsigned char cylinder);

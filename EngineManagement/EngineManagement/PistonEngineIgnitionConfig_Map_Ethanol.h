@@ -1,4 +1,4 @@
-#if defined(IPistonEngineIgnitionConfigExists) && defined(IMapServiceExists) && defined(IEthanolServiceExists)
+#if defined(IPistonEngineIgnitionConfigExists)
 #define PistonEngineIgnitionConfig_Map_EthanolExists
 namespace EngineManagement
 {

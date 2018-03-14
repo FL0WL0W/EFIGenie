@@ -1,4 +1,4 @@
-#if defined(IAfrServiceExists) && defined(IMapServiceExists) && defined(ITpsServiceExists) && defined(IEthanolServiceExists)
+#if defined(IAfrServiceExists)
 #define AfrService_Map_EthanolExists
 namespace EngineManagement
 {

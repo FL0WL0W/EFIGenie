@@ -9,6 +9,9 @@ namespace EngineManagement
 	PistonEngineInjectionConfig_SD::PistonEngineInjectionConfig_SD(
 		void *config)
 	{		
+		if (CurrentManifoldAirPressureService == 0)
+			return; //TODO: figure out error handling
+			
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -18,10 +21,8 @@ namespace EngineManagement
 		_maxMapBarDot = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
-#ifdef ITpsServiceExists
 		_maxTpsDot = *(float *)config;
 		config = (void*)((float *)config + 1);
-#endif
 		
 		_voltageMax = *((float *)config);
 		config = (void*)((float *)config + 1);
@@ -44,10 +45,8 @@ namespace EngineManagement
 		_temperatureBiasResolution = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
 		
-#ifdef ITpsServiceExists
 		_tpsDotAdderResolution = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
-#endif
 		
 		_mapDotAdderResolution = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
@@ -76,10 +75,8 @@ namespace EngineManagement
 		_temperatureBias = ((unsigned char *)config);   //value in 1/256 units (1 to 0 == IAT to ECT), incremented by (map * rpm * VE) from (0 to _mapService->MaxMapBar * _pistonEngineConfig->MaxRpm * 120)
 		config = (void*)((unsigned char *)config + _temperatureBiasResolution);
 		
-#ifdef ITpsServiceExists
 		_tpsDotAdder = ((short *)config);  //(value in us)
 		config = (void*)((short *)config + _tpsDotAdderResolution);
-#endif		
 		
 		_mapDotAdder = ((short *)config);  //(value in us)
 		config = (void*)((short *)config + _mapDotAdderResolution);
@@ -114,7 +111,7 @@ namespace EngineManagement
 		unsigned char mapIndexL = 0;
 		unsigned char mapIndexH = 0;
 		float mapMultiplier = 0;
-		float map = CurrentMapService->MapBar;
+		float map = CurrentManifoldAirPressureService->Value;
 		if (_veMapResolution > 1)
 		{
 			float mapDivision = _maxMapBar / _veMapResolution;
@@ -166,13 +163,16 @@ namespace EngineManagement
 		
 		unsigned char temperatureBias = _temperatureBias[temperatureBiasIndexL] * (1 - temperatureBiasMultiplier) + _temperatureBias[temperatureBiasIndexH] * temperatureBiasMultiplier;
 		
-#if defined(IIntakeAirTemperatureServiceExists) && defined(IEngineCoolantTemperatureServiceExists)
-		float temperature = (CurrentIntakeAirTemperatureService->IntakeAirTemperature * temperatureBias + CurrentEngineCoolantTemperatureService->EngineCoolantTemperature * (255 - temperatureBias))/255;
-#elif defined(IIntakeAirTemperatureServiceExists)
-		float temperature = CurrentIntakeAirTemperatureService->IntakeAirTemperature;
-#elif defined(IEngineCoolantTemperatureServiceExists)
-		float temperature = CurrentEngineCoolantTemperatureService->EngineCoolantTemperature;
-#endif
+		float temperature = 30;
+		if (CurrentIntakeAirTemperatureService != 0)
+		{
+			if (CurrentEngineCoolantTemperatureService != 0)
+				float temperature = (CurrentIntakeAirTemperatureService->Value * temperatureBias + CurrentEngineCoolantTemperatureService->Value * (255 - temperatureBias)) / 255;
+			else
+				float temperature = CurrentIntakeAirTemperatureService->Value;
+		}
+		else if (CurrentEngineCoolantTemperatureService != 0)
+			float temperature = CurrentEngineCoolantTemperatureService->Value;
 		
 		float airDensity = map / (_gasConstant * temperature);
 		
@@ -185,7 +185,7 @@ namespace EngineManagement
 		float mapDotMultiplier = 0;
 		if (_mapDotAdderResolution > 1)
 		{
-			float mapDot = CurrentMapService->MapBarDot;
+			float mapDot = CurrentManifoldAirPressureService->ValueDot;
 			float mapDotDivision = _maxMapBarDot / _mapDotAdderResolution;
 			unsigned char mapDotIndexL = mapDot / mapDotDivision;
 			unsigned char mapDotIndexH = mapDotIndexL + 1;
@@ -202,29 +202,30 @@ namespace EngineManagement
 		
 		injectorDuration += (_mapDotAdder[mapDotIndexL] * (1 - mapDotMultiplier) + _mapDotAdder[mapDotIndexH] * mapDotMultiplier) * 0.000001f;
 		
-#ifdef ITpsServiceExists
-		unsigned char tpsDotIndexL = 0;
-		unsigned char tpsDotIndexH = 0;
-		float tpsDotMultiplier = 0;
-		if (_tpsDotAdderResolution > 1)
+		if (CurrentThrottlePositionService != 0)
 		{
-			unsigned short tpsDot = CurrentThrottlePositionService->TpsDot;
-			unsigned short tpsDotDivision = 1 / _tpsDotAdderResolution;
-			tpsDotIndexL = tpsDot / tpsDotDivision;
-			tpsDotIndexH = tpsDotIndexL + 1;
-			tpsDotMultiplier = ((float)tpsDot) / tpsDotDivision - tpsDotIndexL;
-			if (tpsDotIndexL > _tpsDotAdderResolution - 1)
+			unsigned char tpsDotIndexL = 0;
+			unsigned char tpsDotIndexH = 0;
+			float tpsDotMultiplier = 0;
+			if (_tpsDotAdderResolution > 1)
 			{
-				tpsDotIndexL = tpsDotIndexH = _tpsDotAdderResolution - 1;
+				unsigned short tpsDot = CurrentThrottlePositionService->ValueDot;
+				unsigned short tpsDotDivision = 1 / _tpsDotAdderResolution;
+				tpsDotIndexL = tpsDot / tpsDotDivision;
+				tpsDotIndexH = tpsDotIndexL + 1;
+				tpsDotMultiplier = ((float)tpsDot) / tpsDotDivision - tpsDotIndexL;
+				if (tpsDotIndexL > _tpsDotAdderResolution - 1)
+				{
+					tpsDotIndexL = tpsDotIndexH = _tpsDotAdderResolution - 1;
+				}
+				else if (tpsDotIndexH > _tpsDotAdderResolution - 1)
+				{
+					tpsDotIndexH = _tpsDotAdderResolution - 1;
+				}
 			}
-			else if (tpsDotIndexH > _tpsDotAdderResolution - 1)
-			{
-				tpsDotIndexH = _tpsDotAdderResolution - 1;
-			}
-		}
 		
-		injectorDuration += (_tpsDotAdder[tpsDotIndexL] * (1 - tpsDotMultiplier) + _tpsDotAdder[tpsDotIndexH] * tpsDotMultiplier) * 0.000001f;
-#endif
+			injectorDuration += (_tpsDotAdder[tpsDotIndexL] * (1 - tpsDotMultiplier) + _tpsDotAdder[tpsDotIndexH] * tpsDotMultiplier) * 0.000001f;
+		}
 		
 		if (injectorDuration <= 0) 
 			return timing;
@@ -254,11 +255,9 @@ namespace EngineManagement
 			injectorDuration += (_shortPulseAdder[injectorDurationIndexL] * (1 - injectorDurationMultiplier) + _shortPulseAdder[injectorDurationIndexH] * injectorDurationMultiplier) * 0.000001f;
 		}
 		
-#ifdef IVoltageServiceExists
-		float voltage = CurrentVoltageService->Voltage;
-#else
 		float voltage = 14;
-#endif
+		if (CurrentVoltageService != 0)
+			voltage = CurrentVoltageService->Value;
 		
 		unsigned char voltageIndexL = 0;
 		unsigned char voltageIndexH = 0;

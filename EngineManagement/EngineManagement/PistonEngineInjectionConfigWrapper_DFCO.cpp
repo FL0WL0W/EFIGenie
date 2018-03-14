@@ -6,6 +6,9 @@ namespace EngineManagement
 {
 	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)
 	{
+		if (CurrentThrottlePositionService == 0)
+			return; //TODO: figure out error handling
+		
 		_tpsEnable = *(float *)config;
 		config = (void*)((float *)config + 1);
 		
@@ -20,7 +23,7 @@ namespace EngineManagement
 	
 	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char cylinder)
 	{
-		float tps = CurrentThrottlePositionService->Tps;
+		float tps = CurrentThrottlePositionService->Value;
 		unsigned short rpm = CurrentDecoder->GetRpm();
 		
 		if (tps < _tpsEnable && rpm > _rpmEnable)

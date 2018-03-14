@@ -62,35 +62,23 @@ namespace EngineManagement
 		}
 #endif
 
-#ifdef IMapServiceExists
 		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentMapService = CreateMapService(mapConfigFile);
-#endif
+		CurrentManifoldAirPressureService = CreateSensorService(mapConfigFile);
 		
-#ifdef IEngineCoolantTemperatureServiceExists
 		void *ectConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentEngineCoolantTemperatureService = CreateEngineCoolantTemperatureService(ectConfigFile);
-#endif
+		CurrentEngineCoolantTemperatureService = CreateSensorService(ectConfigFile);
 
-#ifdef IIntakeAirTemperatureServiceExists
 		void *iatConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentIntakeAirTemperatureService = CreateIntakeAirTemperatureService(iatConfigFile);
-#endif
+		CurrentIntakeAirTemperatureService = CreateSensorService(iatConfigFile);
 		
-#ifdef ITpsServiceExists
 		void *tpsConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentThrottlePositionService = CreateThrottlePositionService(tpsConfigFile);
-#endif
+		CurrentThrottlePositionService = CreateSensorService(tpsConfigFile);
 		
-#ifdef IVoltageServiceExists
 		void *voltageConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentVoltageService = CreateVoltageService(voltageConfigFile);
-#endif
+		CurrentVoltageService = CreateSensorService(voltageConfigFile);
 		
-#ifdef IEthanolServiceExists
 		void *ethanolConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentEthanolService = CreateEthanolService(ethanolConfigFile);
-#endif
+		CurrentEthanolContentService = CreateSensorService(ethanolConfigFile);
 
 #ifdef IFuelTrimServiceExists
 		//TODO: Fuel Trim Service
@@ -149,21 +137,21 @@ namespace EngineManagement
 
 	void ScheduleEvents()
 	{
-#ifdef IMapServiceExists
-		CurrentMapService->ReadMap();
-#endif
-#ifdef IEngineCoolantTemperatureServiceExists
-		CurrentEngineCoolantTemperatureService->ReadEct();
-#endif
-#ifdef IIntakeAirTemperatureServiceExists
-		CurrentIntakeAirTemperatureService->ReadIat();
-#endif
-#ifdef IVoltageServiceExists
-		CurrentVoltageService->ReadVoltage();
-#endif
-#ifdef IEthanolServiceExists
-		CurrentEthanolService->ReadEthanolContent();
-#endif
+		if (CurrentManifoldAirPressureService != 0)
+			CurrentManifoldAirPressureService->ReadValue();
+		
+		if (CurrentEngineCoolantTemperatureService != 0)
+			CurrentEngineCoolantTemperatureService->ReadValue();
+		
+		if (CurrentIntakeAirTemperatureService != 0)
+			CurrentIntakeAirTemperatureService->ReadValue();
+
+		if (CurrentVoltageService != 0)
+		CurrentVoltageService->ReadValue();
+		
+		if (CurrentEthanolContentService != 0)
+			CurrentEthanolContentService->ReadValue();
+
 #ifdef IFuelPumpServiceExists
 		CurrentFuelPumpService->Tick();
 #endif

@@ -25,12 +25,6 @@
     <Filter Include="Header Files\Services\VoltageService">
       <UniqueIdentifier>{013cd98d-a4ad-4998-8458-2a53d1a1442f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Services\IntakeAirTemperatureService">
-      <UniqueIdentifier>{c8c0f3ff-79eb-4faa-9712-a207c4ee340a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Services\EngineCoolantTemperatureService">
-      <UniqueIdentifier>{4a6751a8-4481-44ee-bd04-89ffd3c19bb1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Services\AfrService">
       <UniqueIdentifier>{b39aa646-ecd0-4aef-87dc-628bfe712b00}</UniqueIdentifier>
     </Filter>
@@ -49,14 +43,8 @@
     <Filter Include="Source Files\Services">
       <UniqueIdentifier>{c486498b-cc6c-4c8a-bf5d-cf08800d395c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Services\EthanolService">
-      <UniqueIdentifier>{1e4d92e0-61e9-4ed0-9be6-ab6a88e94ddc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Services\Interface">
       <UniqueIdentifier>{782ddfbb-7fda-4085-9b30-0add44e20fa3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Services\EthanolService">
-      <UniqueIdentifier>{912035ef-7564-4f03-9e24-144cbb9a9608}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\PistonEngine\Interface">
       <UniqueIdentifier>{8fdd1737-ac81-4e04-9267-dccb6bb6d278}</UniqueIdentifier>
@@ -66,6 +54,12 @@
     </Filter>
     <Filter Include="Source Files\Services\FuelTrimService">
       <UniqueIdentifier>{859f74c0-d00e-43fa-9335-5243786b4eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Services\SensorService">
+      <UniqueIdentifier>{c8c0f3ff-79eb-4faa-9712-a207c4ee340a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services\SensorService">
+      <UniqueIdentifier>{1e4d92e0-61e9-4ed0-9be6-ab6a88e94ddc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,33 +74,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.h">
       <Filter>Header Files\PistonEngine\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.h">
-      <Filter>Header Files\Services\EngineCoolantTemperatureService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Static.h">
-      <Filter>Header Files\Services\EngineCoolantTemperatureService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Static.h">
-      <Filter>Header Files\Services\EthanolService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Analog.h">
-      <Filter>Header Files\Services\EthanolService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.h">
-      <Filter>Header Files\Services\EthanolService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.h">
-      <Filter>Header Files\Services\IntakeAirTemperatureService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Static.h">
-      <Filter>Header Files\Services\IntakeAirTemperatureService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Analog.h">
-      <Filter>Header Files\Services\VoltageService</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)VoltageService_Static.h">
-      <Filter>Header Files\Services\VoltageService</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h">
       <Filter>Header Files\PistonEngine</Filter>
@@ -123,12 +90,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineConfig.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)TpsService_Analog.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MapService_Analog.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectorService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
@@ -138,12 +99,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IAfrService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IEthanolService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelTrimService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
@@ -151,18 +106,6 @@
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IInjectorService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IMapService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ITpsService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IVoltageService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h">
@@ -189,25 +132,28 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ILambdaSensorService.h">
-      <Filter>Header Files\Services\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h">
       <Filter>Header Files\Services\FuelTrimService</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h">
       <Filter>Header Files\Services\FuelTrimService</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ISensorService.h">
+      <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)SensorService_Static.h">
+      <Filter>Header Files\Services\SensorService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)SensorService_Analog.h">
+      <Filter>Header Files\Services\SensorService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)SensorService_Frequency.h">
+      <Filter>Header Files\Services\SensorService</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
       <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Pwm.cpp">
-      <Filter>Source Files\Services\EthanolService</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EthanolService_Analog.cpp">
-      <Filter>Source Files\Services\EthanolService</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">
       <Filter>Source Files\PistonEngine\InjectionConfig</Filter>
@@ -233,22 +179,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Services.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EngineCoolantTemperatureService_Analog.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)InjectorService.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IntakeAirTemperatureService_Analog.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MapService_Analog.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)TpsService_Analog.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)VoltageService_Analog.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IInjectorService.cpp">
@@ -272,16 +203,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.cpp">
       <Filter>Source Files\PistonEngine\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IVoltageService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IEngineCoolantTemperatureService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IEthanolService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp">
@@ -290,29 +212,26 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IIntakeAirTemperatureService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IMapService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IPrimeService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ITpsService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineConfig.cpp">
       <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ILambdaSensorService.cpp">
-      <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
       <Filter>Source Files\Services\FuelTrimService</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp">
       <Filter>Source Files\Services\FuelTrimService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ISensorService.cpp">
+      <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SensorService_Frequency.cpp">
+      <Filter>Source Files\Services\SensorService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SensorService_Analog.cpp">
+      <Filter>Source Files\Services\SensorService</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

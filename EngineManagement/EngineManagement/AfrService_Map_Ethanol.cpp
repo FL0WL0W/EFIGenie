@@ -7,6 +7,9 @@ namespace EngineManagement
 {
 	AfrService_Map_Ethanol::AfrService_Map_Ethanol(void *config)
 	{
+		if (CurrentThrottlePositionService == 0)
+			return; //TODO: figure out error handling
+		
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -91,7 +94,7 @@ namespace EngineManagement
 		float mapMultiplier = 0;
 		if (_afrMapResolution > 1)
 		{
-			float map = CurrentMapService->MapBar;
+			float map = CurrentManifoldAirPressureService->Value;
 			float mapDivision = _maxMapBar / (_afrMapResolution - 1);
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;
@@ -111,43 +114,46 @@ namespace EngineManagement
 		+				_gasMap[rpmIndexL + _afrRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
 		+				_gasMap[rpmIndexH + _afrRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
 		
-		float ethanolAfr =	_ethanolMap[rpmIndexL + _afrRpmResolution * mapIndexL] * (1 - rpmMultiplier) * (1 - mapMultiplier)
-		+					_ethanolMap[rpmIndexH + _afrRpmResolution * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
-		+					_ethanolMap[rpmIndexL + _afrRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
-		+					_ethanolMap[rpmIndexH + _afrRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
-		
-#ifdef IEngineCoolantTemperatureServiceExists
-		unsigned char ectIndexL = 0;
-		unsigned char ectIndexH = 0;
-		float ectMultiplier = 0;
-		if (_afrEctResolution > 1)
+		float ethanolAfr = gasAfr;
+		if (CurrentEthanolContentService != 0)
 		{
-			float ect = CurrentEngineCoolantTemperatureService->EngineCoolantTemperature;
-			float ectDivision = (_maxEct - _minEct) / (_afrEctResolution - 1);
-			ectIndexL = (ect - _minEct) / ectDivision;
-			ectIndexH = ectIndexL + 1;
-			ectMultiplier = (ect - _minEct) / ectDivision - ectIndexL;
-			if (ectIndexL > _afrEctResolution - 1)
-			{
-				ectIndexL = ectIndexH = _afrEctResolution - 1;
-			}
-			else if (ectIndexH > _afrEctResolution - 1)
-			{
-				ectIndexH = _afrEctResolution - 1;
-			}
+			ethanolAfr =	_ethanolMap[rpmIndexL + _afrRpmResolution * mapIndexL] * (1 - rpmMultiplier) * (1 - mapMultiplier)
+			+					_ethanolMap[rpmIndexH + _afrRpmResolution * mapIndexL] * rpmMultiplier * (1 - mapMultiplier)
+			+					_ethanolMap[rpmIndexL + _afrRpmResolution * mapIndexH] * (1 - rpmMultiplier) * mapMultiplier
+			+					_ethanolMap[rpmIndexH + _afrRpmResolution * mapIndexH] * rpmMultiplier * mapMultiplier;
 		}
-				
-		float ectAfrMultiplier = _ectMultiplierTable[ectIndexL] * (1 - ectMultiplier) + _ectMultiplierTable[ectIndexH] * ectMultiplier;
-#else
-		float ectAfrMultiplier = 1l;
-#endif
+		
+		float ectAfrMultiplier = 1;
+		if (CurrentEngineCoolantTemperatureService != 0)
+		{
+			unsigned char ectIndexL = 0;
+			unsigned char ectIndexH = 0;
+			float ectMultiplier = 0;
+			if (_afrEctResolution > 1)
+			{
+				float ect = CurrentEngineCoolantTemperatureService->Value;
+				float ectDivision = (_maxEct - _minEct) / (_afrEctResolution - 1);
+				ectIndexL = (ect - _minEct) / ectDivision;
+				ectIndexH = ectIndexL + 1;
+				ectMultiplier = (ect - _minEct) / ectDivision - ectIndexL;
+				if (ectIndexL > _afrEctResolution - 1)
+				{
+					ectIndexL = ectIndexH = _afrEctResolution - 1;
+				}
+				else if (ectIndexH > _afrEctResolution - 1)
+				{
+					ectIndexH = _afrEctResolution - 1;
+				}
+			}
+			ectAfrMultiplier = _ectMultiplierTable[ectIndexL] * (1 - ectMultiplier) + _ectMultiplierTable[ectIndexH] * ectMultiplier;
+		}
 
 		unsigned char tpsIndexL = 0;
 		unsigned char tpsIndexH = 0;
 		float tpsMultiplier = 0;
 		if (_afrTpsResolution > 1)
 		{
-			float tps = CurrentThrottlePositionService->Tps;
+			float tps = CurrentThrottlePositionService->Value;
 			float tpsDivision = 1 / (_afrTpsResolution - 1.0);
 			tpsIndexL = tps / tpsDivision;
 			tpsIndexH = tpsIndexL + 1;
@@ -162,9 +168,16 @@ namespace EngineManagement
 			}
 		}
 		
-		float minAfr = ((_tpsMinAfrEthanol[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfrEthanol[tpsIndexH] * tpsMultiplier) * CurrentEthanolService->EthanolContent + (_tpsMinAfrGas[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfrGas[tpsIndexH] * tpsMultiplier) * (1 - CurrentEthanolService->EthanolContent))/1024.0f;
+		float afr = gasAfr;
+		float minAfrGas = (_tpsMinAfrGas[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfrGas[tpsIndexH] * tpsMultiplier) / 1024.0f;
+		float minAfr = minAfrGas;
 		
-		float afr = ((ethanolAfr * CurrentEthanolService->EthanolContent + gasAfr * (1 - CurrentEthanolService->EthanolContent)) * 0.0009765625) * ectAfrMultiplier;
+		if (CurrentEthanolContentService != 0)
+		{
+			float minAfrEthanol = (_tpsMinAfrEthanol[tpsIndexL] * (1 - tpsMultiplier) + _tpsMinAfrEthanol[tpsIndexH] * tpsMultiplier) / 1024.0f;
+			minAfr = minAfrEthanol * CurrentEthanolContentService->Value + minAfrGas * (1 - CurrentEthanolContentService->Value);
+			afr = ((ethanolAfr * CurrentEthanolContentService->Value + gasAfr * (1 - CurrentEthanolContentService->Value)) * 0.0009765625) * ectAfrMultiplier;
+		}
 		
 		unsigned int currentTick =  CurrentTimerService->GetTick();
 		if (!_started)
@@ -191,7 +204,7 @@ namespace EngineManagement
 		float stoichMultiplier = 0;
 		if (_stoichResolution > 1)
 		{
-			float ethanol = CurrentEthanolService->EthanolContent;
+			float ethanol = CurrentEthanolContentService->Value;
 			float stoichDivision = 1 / (_stoichResolution - 1);
 			stoichIndexL = ethanol / stoichDivision;
 			stoichIndexH = stoichIndexL + 1;

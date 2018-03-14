@@ -157,34 +157,26 @@
     <ClInclude Include="MockAnalogService.h" />
     <ClInclude Include="MockDecoder.h" />
     <ClInclude Include="MockDigitalService.h" />
-    <ClInclude Include="MockEngineCoolantTemperatureService.h" />
-    <ClInclude Include="MockEthanolService.h" />
     <ClInclude Include="MockFuelPumpService.h" />
     <ClInclude Include="MockFuelTrimService.h" />
     <ClInclude Include="MockIgnitorService.h" />
     <ClInclude Include="MockInjectorService.h" />
-    <ClInclude Include="MockIntakeAirTemperatureService.h" />
-    <ClInclude Include="MockMapService.h" />
     <ClInclude Include="MockPistonEngineIgnitionConfig.h" />
     <ClInclude Include="MockPistonEngineInjectionConfig.h" />
     <ClInclude Include="MockPrimeService.h" />
     <ClInclude Include="MockPwmService.h" />
     <ClInclude Include="MockTimerService.h" />
-    <ClInclude Include="MockTpsService.h" />
-    <ClInclude Include="MockVoltageService.h" />
+    <ClInclude Include="MockSensorService.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp" />
-    <ClCompile Include="EthanolService_AnalogTests.cpp" />
     <ClCompile Include="EthanolService_PwmTests.cpp" />
     <ClCompile Include="FuelPumpServiceTests.cpp" />
     <ClCompile Include="gmock_initialize.cpp" />
     <ClCompile Include="IgnitorServiceTests.cpp" />
     <ClCompile Include="InjectorServiceTests.cpp" />
-    <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp" />
-    <ClCompile Include="MapService_AnalogTests.cpp" />
     <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -193,8 +185,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="AfrService_Map_EthanolTests.cpp" />
-    <ClCompile Include="TpsService_AnalogTests.cpp" />
-    <ClCompile Include="VoltageService_AnalogTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

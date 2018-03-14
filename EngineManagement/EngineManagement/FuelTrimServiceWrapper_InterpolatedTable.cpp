@@ -6,6 +6,9 @@ namespace EngineManagement
 {
 	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(void *config)
 	{
+		if (CurrentManifoldAirPressureService == 0)
+			return; //TODO: figure out error handling
+		//lambda service stuff
 		//TODO: CONFIG
 	}
 
@@ -38,26 +41,16 @@ namespace EngineManagement
 
 			float y = 0;
 			float yPredict = 0;
-			#ifdef ITpsServiceExists
-			#ifdef IMapServiceExists
-			if (_useTps)
+			if (_useTps && CurrentThrottlePositionService != 0)
 			{
-			#endif
-				y = CurrentThrottlePositionService->Tps;
-				yPredict = CurrentThrottlePositionService->Tps - delayTime * CurrentThrottlePositionService->TpsDot;
-				#ifdef IMapServiceExists
+				y = CurrentThrottlePositionService->Value;
+				yPredict = y - delayTime * CurrentThrottlePositionService->Value;
 			}
-			else
+			else if(CurrentManifoldAirPressureService != 0)
 			{
-			#endif
-			#endif
-			#ifdef IMapServiceExists
-				y = CurrentMapService->MapBar;
-				yPredict = CurrentMapService->MapBar - delayTime * CurrentMapService->MapBarDot;
-				#ifdef ITpsServiceExists
+				y = CurrentManifoldAirPressureService->Value;
+				yPredict = y - delayTime * CurrentManifoldAirPressureService->ValueDot;
 			}
-			#endif
-			#endif
 			unsigned short rpmPredict = rpm - delayTime * _rpmDot;
 
 			unsigned char yPredictIndexL = 0;
@@ -340,9 +333,9 @@ namespace EngineManagement
 			}
 			unsigned char rpmMultiplier = rpmDist / _rpmInterpolationDistance;
 		
-			_lambdaSensorService->ReadLambda();
+			_lambdaSensorService->ReadValue();
 			
-			float error = CurrentAfrService->Lambda - _lambdaSensorService->Lambda;
+			float error = CurrentAfrService->Lambda - _lambdaSensorService->Value;
 			float fuelTrimIntegral;
 		
 			if (_isPid)

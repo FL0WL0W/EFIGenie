@@ -7,6 +7,9 @@ namespace EngineManagement
 {
 	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(void *config)
 	{		
+		if (CurrentManifoldAirPressureService == 0)
+			return; //TODO: figure out error handling
+		
 		_maxRpm = *(unsigned short *)config;
 		config = (void*)((unsigned short *)config + 1);
 		
@@ -56,7 +59,7 @@ namespace EngineManagement
 		float mapMultiplier = 0;
 		if (_ignitionMapResolution > 1)
 		{
-			unsigned short map = CurrentMapService->MapBar;
+			unsigned short map = CurrentManifoldAirPressureService->Value;
 			unsigned short mapDivision = _maxMapBar / _ignitionMapResolution;
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;
@@ -76,14 +79,20 @@ namespace EngineManagement
 		+					_ignitionAdvanceMapGas[rpmIndexL + _ignitionRpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
 		+					_ignitionAdvanceMapGas[rpmIndexH + _ignitionRpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
 			
-		short ignitionEthanol = _ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier
-		+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-		+						_ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-		+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		short ignitionEthanol = ignitionGas;
+		if (CurrentEthanolContentService != 0)
+		{
+			ignitionEthanol = _ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier
+			+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
+			+						_ignitionAdvanceMapEthanol[rpmIndexL + _ignitionRpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
+			+						_ignitionAdvanceMapEthanol[rpmIndexH + _ignitionRpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		}
 			
 		IgnitionTiming timing = IgnitionTiming();
 		timing.IgnitionDwellTime = true;
-		timing.IgnitionAdvance64thDegree = ignitionEthanol * CurrentEthanolService->EthanolContent + ignitionGas * (1 - CurrentEthanolService->EthanolContent);
+		timing.IgnitionAdvance64thDegree = ignitionGas;
+		if (CurrentEthanolContentService != 0)
+			timing.IgnitionAdvance64thDegree = ignitionEthanol * CurrentEthanolContentService->Value + ignitionGas * (1 - CurrentEthanolContentService->Value);
 		timing.IgnitionDwellTime = _ignitionDwellTime;
 		return timing;
 	}

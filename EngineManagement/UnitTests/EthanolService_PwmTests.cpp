@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "Services.h"
-#include "EthanolService_Pwm.h"
+#include "SensorService_Frequency.h"
 #include "MockTimerService.h"
 #include "MockPwmService.h"
 using ::testing::AtLeast;
@@ -16,20 +16,22 @@ namespace UnitTests
 	TEST_CLASS(EthanolService_PwmTests)
 	{
 	public:
+		HardwareAbstraction::MockTimerService _timerService;
 		HardwareAbstraction::MockPwmService _pwmService;
 
 		void CreateServices()
 		{
+			EngineManagement::CurrentTimerService = &_timerService;
 			EngineManagement::CurrentPwmService = &_pwmService;
 
-			void *config = malloc(19);
+			void *config = malloc(30);
 			void *buildConfig = config;
 
 			//ethanol service id
-			*((unsigned char *)buildConfig) = 2;
+			*((unsigned char *)buildConfig) = 3;
 			buildConfig = (void *)(((unsigned char *)buildConfig) + 1);
 
-			//adcPin
+			//pwmPin
 			*((unsigned char *)buildConfig) = 1;
 			buildConfig = (void*)((unsigned char *)buildConfig + 1);
 
@@ -53,30 +55,52 @@ namespace UnitTests
 			*((unsigned short *)buildConfig) = 500;
 			buildConfig = (void*)((unsigned short *)buildConfig + 1);
 
-			EngineManagement::CurrentEthanolService = EngineManagement::CreateEthanolService(config);
+			//MaxValue
+			*((float *)buildConfig) = 150;
+			buildConfig = (void*)((float *)buildConfig + 1);
+
+			//MinValue
+			*((float *)buildConfig) = 30;
+			buildConfig = (void*)((float *)buildConfig + 1);
+
+			//MinFrequency
+			*((unsigned short *)buildConfig) = 40;
+			buildConfig = (void*)((unsigned short *)buildConfig + 1);
+
+			EXPECT_CALL(_timerService, GetTicksPerSecond())
+				.WillRepeatedly(Return(5000));
+			EngineManagement::CurrentEthanolContentService = EngineManagement::CreateSensorService(config);
 		}
 
-		TEST_METHOD(WhenGettingEthanolContentThenCorrectEthanolContentIsReturned)
+		TEST_METHOD(WhenGettingValueThenCorrectValueIsReturned)
 		{
 			CreateServices();
-			HardwareAbstraction::PwmValue pwmValue = { 0.01f, 0.00f };
+			HardwareAbstraction::PwmValue pwmValue = { 1.0f, 0.5f };
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5));
 			EXPECT_CALL(_pwmService, ReadPin(1)).Times(1).WillOnce(Return(pwmValue));
-			EngineManagement::CurrentEthanolService->ReadEthanolContent();
-			Assert::AreEqual(-10.0f, EngineManagement::CurrentEthanolService->EthanolContent, 0.1f);
+			EngineManagement::CurrentEthanolContentService->ReadValue();
+			Assert::AreEqual(30.0f, EngineManagement::CurrentEthanolContentService->Value, 0.1f);
+			Assert::AreEqual(0.0f, EngineManagement::CurrentEthanolContentService->ValueDot, 0.1f);
 
-			pwmValue = { 0.01f, 0.01f };
+			pwmValue = { 0.5f, 0.4f };
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(10));
 			EXPECT_CALL(_pwmService, ReadPin(1)).Times(1).WillOnce(Return(pwmValue));
-			EngineManagement::CurrentEthanolService->ReadEthanolContent();
-			Assert::AreEqual(20.0f, EngineManagement::CurrentEthanolService->EthanolContent, 0.1f);
+			EngineManagement::CurrentEthanolContentService->ReadValue();
+			Assert::AreEqual(130.0f, EngineManagement::CurrentEthanolContentService->Value, 0.1f);
+			Assert::AreEqual(65000.0f, EngineManagement::CurrentEthanolContentService->ValueDot, 0.1f);
 
-			pwmValue = { 0.01f, 0.005f };
+			pwmValue = { 0.25f, 0.2f };
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(15));
 			EXPECT_CALL(_pwmService, ReadPin(1)).Times(1).WillOnce(Return(pwmValue));
-			EngineManagement::CurrentEthanolService->ReadEthanolContent();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentEthanolService->EthanolContent, 0.001f);
+			EngineManagement::CurrentEthanolContentService->ReadValue();
+			Assert::AreEqual(150.0f, EngineManagement::CurrentEthanolContentService->Value, 0.001f);
+			Assert::AreEqual(65000.0f, EngineManagement::CurrentEthanolContentService->ValueDot, 0.1f);
 
+			EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(20));
 			EXPECT_CALL(_pwmService, ReadPin(1)).Times(1).WillOnce(Return(pwmValue));
-			EngineManagement::CurrentEthanolService->ReadEthanolContent();
-			Assert::AreEqual(-1.25f, EngineManagement::CurrentEthanolService->EthanolContent, 0.001f);
+			EngineManagement::CurrentEthanolContentService->ReadValue();
+			Assert::AreEqual(150.0f, EngineManagement::CurrentEthanolContentService->Value, 0.001f);
+			Assert::AreEqual(10000.0f, EngineManagement::CurrentEthanolContentService->ValueDot, 0.1f);
 		}
 	};
 }

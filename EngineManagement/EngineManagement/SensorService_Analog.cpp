@@ -1,14 +1,14 @@
 #include "Services.h"
-#include "VoltageService_Analog.h"
+#include "SensorService_Analog.h"
 
-#ifdef VoltageService_AnalogExists
+#ifdef SensorService_AnalogExists
 namespace EngineManagement
 {	
-	VoltageService_Analog::VoltageService_Analog(void *config)
-	{		
+	SensorService_Analog::SensorService_Analog(void *config)
+	{
 		_adcPin = *((unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
-				
+		
 		A0 = *((float *)config);
 		config = (void*)((float *)config + 1);
 		
@@ -24,13 +24,24 @@ namespace EngineManagement
 		_dotSampleRate = *((unsigned short *)config);
 		config = (void*)((unsigned short *)config + 1);
 		
+		MaxValue = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
+		MinValue = *((float *)config);
+		config = (void*)((float *)config + 1);
+		
 		CurrentAnalogService->InitPin(_adcPin);
 	}
 	
-	void VoltageService_Analog::ReadVoltage()
+	void SensorService_Analog::ReadValue()
 	{
 		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
-		Voltage = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
+		float value = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
+		if (value < MinValue)
+			value = MinValue;
+		else if (value > MaxValue)
+			value = MaxValue;
+		Value = value;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
 		unsigned int lastReadTick = _lastReadTick;
 		//if ther hasn't been a full tick between reads then return;
@@ -44,9 +55,9 @@ namespace EngineManagement
 		}
 		if (readTick < (lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
 			return;
-		VoltageDot = ((Voltage - _lastVoltage) / (readTick - lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
-		_lastReadTick = readTick;
-		_lastVoltage = Voltage;
+		ValueDot = ((Value - _lastValue) / (readTick - lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
+		_lastReadTick = readTickOrig;
+		_lastValue = Value;
 	}
 }
 #endif

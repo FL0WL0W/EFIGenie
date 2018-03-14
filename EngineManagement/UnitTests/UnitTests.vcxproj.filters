@@ -39,13 +39,7 @@
     <ClInclude Include="MockPistonEngineInjectionConfig.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
-    <ClInclude Include="MockEngineCoolantTemperatureService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="MockAfrService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="MockEthanolService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="MockFuelPumpService.h">
@@ -60,19 +54,7 @@
     <ClInclude Include="MockInjectorService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
-    <ClInclude Include="MockIntakeAirTemperatureService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="MockMapService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="MockPrimeService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="MockTpsService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="MockVoltageService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="MockTimerService.h">
@@ -90,6 +72,9 @@
     <ClInclude Include="MockDigitalService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MockSensorService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -99,21 +84,6 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="IntakeAirTemperatureService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="VoltageService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="MapService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="TpsService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="EthanolService_AnalogTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="EthanolService_PwmTests.cpp">
