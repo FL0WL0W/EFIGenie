@@ -12,8 +12,11 @@ namespace EngineManagement
 		_primeTime = *(float *)config * CurrentTimerService->GetTicksPerSecond();
 		config = (void*)((float *)config + 1);
 		
-		_normalOn = (bool)(*(unsigned char *)config);
+		unsigned char flags = (bool)(*(unsigned char *)config);
 		config = (void*)((unsigned char *)config + 1);
+		
+		_normalOn = flags & 0x01;
+		_useTps = flags & (0x01 << 1);
 		
 		_period = 1 / *(float *)config; //frequency in config
 		config = (void*)((float *)config + 1);
@@ -24,17 +27,17 @@ namespace EngineManagement
 		_maxRpm = 1 / *(unsigned short *)config; 
 		config = (void*)((unsigned short *)config + 1);
 		
-		_maxMap = 1 / *(float *)config; 
+		_maxy = 1 / *(float *)config; 
 		config = (void*)((float *)config + 1);
 		
 		_rpmResolution = *(unsigned char *)config;
 		config = (void*)((unsigned char *)config + 1);
 		
-		_mapResolution = *(unsigned char *)config;
+		_yResolution = *(unsigned char *)config;
 		config = (void*)((unsigned char *)config + 1);
 		
 		_pwmTable = (unsigned char *)config;
-		config = (void*)((unsigned char *)config + _rpmResolution * _mapResolution);
+		config = (void*)((unsigned char *)config + _rpmResolution * _yResolution);
 
 		CurrentPwmService->InitPin(_pin, HardwareAbstraction::Out, 1 / _period);
 		
@@ -98,7 +101,7 @@ namespace EngineManagement
 		unsigned char rpmIndexL = 0;
 		unsigned char rpmIndexH = 0;
 		float rpmMultiplier = 0;
-		if (_mapResolution > 1)
+		if (_yResolution > 1)
 		{
 			unsigned short rpm = CurrentDecoder->GetRpm();
 			unsigned short rpmDivision = _maxRpm / _rpmResolution;
@@ -115,30 +118,38 @@ namespace EngineManagement
 			}
 		}
 			
-		unsigned char mapIndexL = 0;
-		unsigned char mapIndexH = 0;
-		float mapMultiplier = 0;
-		if (_mapResolution > 1)
+		unsigned char yIndexL = 0;
+		unsigned char yIndexH = 0;
+		float yMultiplier = 0;
+		if (_yResolution > 1 && CurrentThrottlePositionService != 0 && CurrentManifoldAbsolutePressureService != 0)
 		{
-			unsigned short map = CurrentManifoldAbsolutePressureService->Value;
-			unsigned short mapDivision = _maxMap / _mapResolution;
-			mapIndexL = map / mapDivision;
-			mapIndexH = mapIndexL + 1;
-			mapMultiplier = (map + 0.0f) / mapDivision - mapIndexL;
-			if (mapIndexL > _mapResolution - 1)
+			float y = 0;
+			if (_useTps && CurrentThrottlePositionService != 0)
 			{
-				mapIndexL = mapIndexH = _mapResolution - 1;
+				y = CurrentThrottlePositionService->Value;
 			}
-			else if (mapIndexH > _mapResolution - 1)
+			else if (CurrentManifoldAbsolutePressureService != 0)
 			{
-				mapIndexH = _mapResolution - 1;
+				y = CurrentManifoldAbsolutePressureService->Value;
+			}
+			float yDivision = _maxy / _yResolution;
+			yIndexL = y / yDivision;
+			yIndexH = yIndexL + 1;
+			yMultiplier = (y + 0.0f) / yDivision - yIndexL;
+			if (yIndexL > _yResolution - 1)
+			{
+				yIndexL = yIndexH = _yResolution - 1;
+			}
+			else if (yIndexH > _yResolution - 1)
+			{
+				yIndexH = _yResolution - 1;
 			}
 		}
 		
-		short _currentPwm = _pwmTable[rpmIndexL + _rpmResolution * mapIndexL] * rpmMultiplier * mapMultiplier
-		+					_pwmTable[rpmIndexH + _rpmResolution * mapIndexL] * (1 - rpmMultiplier) * mapMultiplier
-		+					_pwmTable[rpmIndexL + _rpmResolution * mapIndexH] * rpmMultiplier * (1 - mapMultiplier)
-		+					_pwmTable[rpmIndexH + _rpmResolution * mapIndexH] * (1 - rpmMultiplier) * (1 - mapMultiplier);
+		short _currentPwm = _pwmTable[rpmIndexL + _rpmResolution * yIndexL] * rpmMultiplier * yMultiplier
+		+					_pwmTable[rpmIndexH + _rpmResolution * yIndexL] * (1 - rpmMultiplier) * yMultiplier
+		+					_pwmTable[rpmIndexL + _rpmResolution * yIndexH] * rpmMultiplier * (1 - yMultiplier)
+		+					_pwmTable[rpmIndexH + _rpmResolution * yIndexH] * (1 - rpmMultiplier) * (1 - yMultiplier);
 		
 		On();
 	}

@@ -94,7 +94,9 @@ namespace EngineManagement
 		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / ((_gasConstant / 10.0f) * (temperature + 273.15));   // kg/m^3
 		airDensity *= 1000000; //g/mm^3
 		
-		float pressure = CurrentManifoldAbsolutePressureService->Value * 1000000; //g/mm^3
+		float pressure = 500000; // default to 50 kpa
+		if (CurrentManifoldAbsolutePressureService != 0)
+			pressure = CurrentManifoldAbsolutePressureService->Value * 1000000;  //g/mm^3
 		
 		float idleAirArea = idleAirmass / sqrt(2*pressure*airDensity);
 		

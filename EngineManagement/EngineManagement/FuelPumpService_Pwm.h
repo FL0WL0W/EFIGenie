@@ -6,16 +6,17 @@ namespace EngineManagement
 	{
 		unsigned char _pin;
 		float _period;
-		float _maxMap;
+		float _maxy;
 		unsigned short _maxRpm;
 		unsigned char _rpmResolution;
-		unsigned char _mapResolution;
+		unsigned char _yResolution;
 		unsigned char *_pwmTable;
 		unsigned char _primePwm;
 		unsigned int _primeTime;
 		unsigned char _currentPwm;
 		bool _isOn;
 		bool _normalOn;
+		bool _useTps;
 	public:
 		bool Started = false;
 		FuelPumpService_Pwm(void *config);
