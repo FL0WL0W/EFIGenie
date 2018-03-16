@@ -10,7 +10,7 @@ namespace EngineManagement
 	
 	ISensorService *CurrentIntakeAirTemperatureService;
 	ISensorService *CurrentEngineCoolantTemperatureService;
-	ISensorService *CurrentManifoldAirPressureService;
+	ISensorService *CurrentManifoldAbsolutePressureService;
 	ISensorService *CurrentVoltageService;
 	ISensorService *CurrentThrottlePositionService;
 	ISensorService *CurrentEthanolContentService;

@@ -94,7 +94,7 @@ namespace EngineManagement
 		float mapMultiplier = 0;
 		if (_afrMapResolution > 1)
 		{
-			float map = CurrentManifoldAirPressureService->Value;
+			float map = CurrentManifoldAbsolutePressureService->Value;
 			float mapDivision = _maxMapBar / (_afrMapResolution - 1);
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;

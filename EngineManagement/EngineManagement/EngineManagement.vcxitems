@@ -18,7 +18,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleControlService_Pd.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIdleControlService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h" />
@@ -51,8 +55,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pd.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleControlService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ISensorService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.cpp" />

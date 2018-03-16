@@ -9,7 +9,7 @@ namespace EngineManagement
 	PistonEngineInjectionConfig_SD::PistonEngineInjectionConfig_SD(
 		void *config)
 	{		
-		if (CurrentManifoldAirPressureService == 0)
+		if (CurrentManifoldAbsolutePressureService == 0 || CurrentAfrService == 0)
 			return; //TODO: figure out error handling
 			
 		_maxRpm = *(unsigned short *)config;
@@ -111,7 +111,7 @@ namespace EngineManagement
 		unsigned char mapIndexL = 0;
 		unsigned char mapIndexH = 0;
 		float mapMultiplier = 0;
-		float map = CurrentManifoldAirPressureService->Value;
+		float map = CurrentManifoldAbsolutePressureService->Value;
 		if (_veMapResolution > 1)
 		{
 			float mapDivision = _maxMapBar / _veMapResolution;
@@ -138,8 +138,6 @@ namespace EngineManagement
 			VE += CurrentFuelTrimService->GetFuelTrim(cylinder);
 #endif
 		VE *= 0.0078125f;
-
-		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * VE * 0.00125f;
 		
 		unsigned char temperatureBiasIndexL = 0;
 		unsigned char temperatureBiasIndexH = 0;
@@ -174,18 +172,23 @@ namespace EngineManagement
 		else if (CurrentEngineCoolantTemperatureService != 0)
 			float temperature = CurrentEngineCoolantTemperatureService->Value;
 		
-		float airDensity = map / (_gasConstant * temperature);
+		float airDensity = (map * 100 * 1000) / ((_gasConstant / 10.0f) * (temperature + 273.15)); // kg/m^3
+		airDensity *= 0.001; // g/ml
 		
 		float airFuelRatio = CurrentAfrService->Afr;
 		
-		float injectorDuration = (cylinderVolume * airDensity) / (airFuelRatio + 0.78f/*density of fuel*/) * 60.0f / _injectorGramsPerMinute[cylinder];
+		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * 0.125f * VE * 0.01f; //ml
+		
+		float injectorGrams = (cylinderVolume * airDensity) / (airFuelRatio + airDensity/0.7197f);
+		
+		float injectorDuration =  injectorGrams * 60.0f / _injectorGramsPerMinute[cylinder];
 		
 		unsigned char mapDotIndexL = 0;
 		unsigned char mapDotIndexH = 0;
 		float mapDotMultiplier = 0;
 		if (_mapDotAdderResolution > 1)
 		{
-			float mapDot = CurrentManifoldAirPressureService->ValueDot;
+			float mapDot = CurrentManifoldAbsolutePressureService->ValueDot;
 			float mapDotDivision = _maxMapBarDot / _mapDotAdderResolution;
 			unsigned char mapDotIndexL = mapDot / mapDotDivision;
 			unsigned char mapDotIndexH = mapDotIndexL + 1;

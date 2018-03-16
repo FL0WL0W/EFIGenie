@@ -4,6 +4,7 @@
 #include "IAnalogService.h"
 #include "IPwmService.h"
 
+#include "IIdleControlService.h"
 #include "IIgnitorService.h"
 #include "IInjectorService.h"
 #include "ISensorService.h"
@@ -13,6 +14,7 @@
 #include "IFuelPumpService.h"
 #include "IAfrService.h"
 #include "TachometerService.h"
+#include "IIdleAirControlValveService.h"
 
 namespace EngineManagement
 {
@@ -22,11 +24,11 @@ namespace EngineManagement
 	extern HardwareAbstraction::IPwmService *CurrentPwmService;
 	extern Decoder::IDecoder *CurrentDecoder;
 	
-	extern ISensorService *CurrentIntakeAirTemperatureService;
-	extern ISensorService *CurrentEngineCoolantTemperatureService;
-	extern ISensorService *CurrentManifoldAirPressureService;
-	extern ISensorService *CurrentVoltageService;
-	extern ISensorService *CurrentThrottlePositionService;
-	extern ISensorService *CurrentEthanolContentService;
-	extern ISensorService *CurrentVehicleSpeedSensorService;
+	extern ISensorService *CurrentIntakeAirTemperatureService;//degrees C
+	extern ISensorService *CurrentEngineCoolantTemperatureService;// degrees C
+	extern ISensorService *CurrentManifoldAbsolutePressureService;// Bar
+	extern ISensorService *CurrentVoltageService;// Volts
+	extern ISensorService *CurrentThrottlePositionService;// TPS 0.0-1.0
+	extern ISensorService *CurrentEthanolContentService;// Content 0.0-1.0
+	extern ISensorService *CurrentVehicleSpeedSensorService;// MPH cause thats what people care about
 }

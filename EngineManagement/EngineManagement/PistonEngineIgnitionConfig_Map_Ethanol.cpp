@@ -7,7 +7,7 @@ namespace EngineManagement
 {
 	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(void *config)
 	{		
-		if (CurrentManifoldAirPressureService == 0)
+		if (CurrentManifoldAbsolutePressureService == 0)
 			return; //TODO: figure out error handling
 		
 		_maxRpm = *(unsigned short *)config;
@@ -59,7 +59,7 @@ namespace EngineManagement
 		float mapMultiplier = 0;
 		if (_ignitionMapResolution > 1)
 		{
-			unsigned short map = CurrentManifoldAirPressureService->Value;
+			unsigned short map = CurrentManifoldAbsolutePressureService->Value;
 			unsigned short mapDivision = _maxMapBar / _ignitionMapResolution;
 			mapIndexL = map / mapDivision;
 			mapIndexH = mapIndexL + 1;

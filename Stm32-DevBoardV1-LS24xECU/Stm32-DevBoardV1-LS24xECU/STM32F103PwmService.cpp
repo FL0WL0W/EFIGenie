@@ -591,7 +591,7 @@ namespace Stm32
 		TIM_OCInitTypeDef outputChannelInit;
 		TIM_OCStructInit(&outputChannelInit);
 		outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
-		outputChannelInit.TIM_Pulse = value.PulseWidth * ((72 * 1000 * 1000.0) / TIM_GetPrescaler(TIM));
+		outputChannelInit.TIM_Pulse = TIM->ARR * (value.PulseWidth / value.Period);
 		outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 		outputChannelInit.TIM_OutputNState = TIM_OutputState_Disable;
 		outputChannelInit.TIM_OCIdleState = TIM_OCIdleState_Set;

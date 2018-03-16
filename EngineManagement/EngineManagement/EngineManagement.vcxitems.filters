@@ -153,6 +153,18 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)TachometerService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIdleControlService.h">
+      <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleControlService_Pd.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.h">
+      <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -237,6 +249,18 @@
       <Filter>Source Files\Services\SensorService</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)TachometerService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleControlService.cpp">
+      <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pd.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.cpp">
+      <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

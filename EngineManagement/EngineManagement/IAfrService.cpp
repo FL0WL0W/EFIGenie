@@ -11,12 +11,13 @@ namespace EngineManagement
 		unsigned char afrServiceId = *((unsigned char*)config);
 		switch (afrServiceId)
 		{
+			return 0;
 #ifdef AfrService_StaticExists
-		case 0:
+		case 1:
 			return new EngineManagement::AfrService_Static(*((float*)((unsigned char*)config + 1)));
 #endif
 #ifdef AfrService_Map_EthanolExists
-		case 1:
+		case 2:
 			return new EngineManagement::AfrService_Map_Ethanol((void*)((unsigned char*)config + 1));;
 #endif
 		}

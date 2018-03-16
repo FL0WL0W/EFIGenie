@@ -7,7 +7,7 @@ namespace EngineManagement
 {
 	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(void *config)
 	{
-		if (CurrentManifoldAirPressureService == 0)
+		if (CurrentManifoldAbsolutePressureService == 0 || CurrentAfrService == 0)
 			return; //TODO: figure out error handling
 		
 		unsigned int _updateRate = *(unsigned int *)config;
@@ -92,10 +92,10 @@ namespace EngineManagement
 				y = CurrentThrottlePositionService->Value;
 				yPredict = y - delayTime * CurrentThrottlePositionService->Value;
 			}
-			else if(CurrentManifoldAirPressureService != 0)
+			else if(CurrentManifoldAbsolutePressureService != 0)
 			{
-				y = CurrentManifoldAirPressureService->Value;
-				yPredict = y - delayTime * CurrentManifoldAirPressureService->ValueDot;
+				y = CurrentManifoldAbsolutePressureService->Value;
+				yPredict = y - delayTime * CurrentManifoldAbsolutePressureService->ValueDot;
 			}
 			unsigned short rpmPredict = rpm - delayTime * _rpmDot;
 

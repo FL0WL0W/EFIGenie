@@ -68,7 +68,7 @@ namespace EngineManagement
 #endif
 
 		void *mapConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
-		CurrentManifoldAirPressureService = CreateSensorService(mapConfigFile);
+		CurrentManifoldAbsolutePressureService = CreateSensorService(mapConfigFile);
 		
 		void *ectConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer++));
 		CurrentEngineCoolantTemperatureService = CreateSensorService(ectConfigFile);
@@ -89,15 +89,15 @@ namespace EngineManagement
 		CurrentVehicleSpeedSensorService = CreateSensorService(vssConfigFile);
 
 		fileSystemPointer++;
-#ifdef IFuelTrimServiceExists
-		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
-		CurrentFuelTrimService = CreateFuelTrimService(fuelTrimConfigFile);
-#endif
-		
-		fileSystemPointer++;
 #ifdef IAfrServiceExists
 		void *afrConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		CurrentAfrService = CreateAfrService(afrConfigFile);
+#endif
+		
+		fileSystemPointer++;
+#ifdef IFuelTrimServiceExists
+		void *fuelTrimConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
+		CurrentFuelTrimService = CreateFuelTrimService(fuelTrimConfigFile);
 #endif
 		
 		fileSystemPointer++;
@@ -109,7 +109,20 @@ namespace EngineManagement
 		fileSystemPointer++;
 #ifdef IPrimeServiceExists
 		void *primeConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
+		CurrentPrimeService = CreatePrimeService(primeConfigFile);
 #endif
+		
+		fileSystemPointer++;
+#ifdef IIdleAirControlValveServiceExists
+		void *idleAirValveConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
+		CurrentIdleAirControlValveService = CreateIdleAirControlValveService(idleAirValveConfigFile);
+#endif 
+		
+		fileSystemPointer++;
+#ifdef IIdleControlServiceExists
+		void *idleConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
+		CurrentIdleControlService = CreateIdleControlService(idleConfigFile);
+#endif 
 
 		fileSystemPointer++;
 #ifdef IPistonEngineInjectionConfigExists
@@ -131,32 +144,33 @@ namespace EngineManagement
 #endif
 
 #ifdef IFuelPumpServiceExists
-		CurrentFuelPumpService->Prime();
+		if (CurrentFuelPumpService != 0)
+			CurrentFuelPumpService->Prime();
 #endif
 		
 		//wait until the decoder is synced before any scheduling
 		while(!CurrentDecoder->IsSynced());
-
+		
 		//create tachometer service to start after the cam is synced
 		fileSystemPointer++;
 #ifdef TachometerServiceExists
 		CurrentTachometerService = new TachometerService((void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer)), tachometerHighZ);		  
 #endif 
-
 		
 #ifdef IPrimeServiceExists
 		CurrentPrimeService->Prime();
 #endif
 		
 #ifdef IFuelPumpServiceExists
-		CurrentFuelPumpService->On();
+		if (CurrentFuelPumpService != 0)
+			CurrentFuelPumpService->On();
 #endif
 	}
 
 	void ScheduleEvents()
 	{
-		if (CurrentManifoldAirPressureService != 0)
-			CurrentManifoldAirPressureService->ReadValue();
+		if (CurrentManifoldAbsolutePressureService != 0)
+			CurrentManifoldAbsolutePressureService->ReadValue();
 		
 		if (CurrentEngineCoolantTemperatureService != 0)
 			CurrentEngineCoolantTemperatureService->ReadValue();
@@ -170,15 +184,26 @@ namespace EngineManagement
 		if (CurrentEthanolContentService != 0)
 			CurrentEthanolContentService->ReadValue();
 
-#ifdef IFuelPumpServiceExists
-		CurrentFuelPumpService->Tick();
-#endif
 #ifdef IAfrServiceExists
-		CurrentAfrService->CalculateAfr();
+		if (CurrentAfrService != 0)
+			CurrentAfrService->CalculateAfr();
 #endif
+		
+#ifdef IFuelPumpServiceExists
+		if (CurrentFuelPumpService != 0)
+			CurrentFuelPumpService->Tick();
+#endif
+		
 #ifdef IPrimeServiceExists
-		CurrentPrimeService->Tick();
+		if (CurrentPrimeService != 0)
+			CurrentPrimeService->Tick();
 #endif
+		
+#ifdef IIdleControlServiceExists
+		if (CurrentIdleControlService != 0)
+			CurrentIdleControlService->Tick();
+#endif 
+		
 #ifdef PistonEngineControllerExists
 		CurrentPistonEngineController->ScheduleEvents();
 #endif
