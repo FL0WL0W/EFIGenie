@@ -26,6 +26,7 @@ Features<br>
   <li>Warm Up Enrichment</li>
   <li>Fuel Prime</li>
   <li>Fuel Pump (On/Off)</li>
+  <li>Fuel Pump (PWM Open Loop)</li>
   <li>Deceleration fuel cut off (DFCO)</li>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
@@ -56,6 +57,7 @@ TODO LIST<br>
   <li>*Tuner Studio</li>
   <li>*Create unit tests</li>
     <ul>
+      <li>FuelPumpService_Pwm</li>
       <li>IdleAirControlValveService_Pwm</li>
       <li>IdleControlService_Pd</li>
       <li>TachometerService</li>
@@ -72,7 +74,7 @@ TODO LIST<br>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
   <li>Electric Fan Control</li>
-  <li>Fuel Pump (PWM)</li>
+  <li>Fuel Pump (PWM PID Control Loop)</li>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
   <li>CAN Bus/OBD2</li>
