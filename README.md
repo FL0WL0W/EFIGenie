@@ -26,12 +26,12 @@ Features<br>
   <li>Warm Up Enrichment</li>
   <li>Fuel Prime</li>
   <li>Fuel Pump (On/Off)</li>
-  <li>Fuel Pump (PWM Open Loop)</li>
+  <li>Fuel Pump (PWM Open Loop TPS or Map tables)</li>
   <li>Deceleration fuel cut off (DFCO)</li>
   <li>Flex fuel</li>
   <li>Rev Limiting (Hard and Soft Spark)</li>
   <li>Launch control (Hard and Soft Spark)</li>
-  <li>Fuel Trim (Wideband/Pid and Narrowband)</li>
+  <li>Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)</li>
   <li>Tach Output</li>
   <li>Vehicle Speed Sensor</li>
   <li>Idle control (PWM - PD control loop)</li>
