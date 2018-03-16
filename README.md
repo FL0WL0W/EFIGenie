@@ -57,6 +57,7 @@ TODO LIST<br>
   <li>*Tuner Studio</li>
   <li>*Create unit tests</li>
     <ul>
+      <li>FuelPumpService_Pwm</li>
       <li>IdleAirControlValveService_Pwm</li>
       <li>IdleControlService_Pd</li>
       <li>TachometerService</li>
