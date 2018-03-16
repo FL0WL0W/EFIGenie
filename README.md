@@ -33,6 +33,7 @@ Features<br>
   <li>Fuel Trim (Wideband/Pid and Narrowband)</li>
   <li>Tach Output</li>
   <li>Vehicle Speed Sensor</li>
+  <li>Idle control (PWM - PID control loop)</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
   <li>Firmware features</li>
     <ul>
@@ -48,7 +49,7 @@ Features<br>
 TODO LIST<br>
 <ul>
   <li>*Test Stm32F103 Services</li>
-  <li>*Idle control (PWM/Stepper - PID control loop)</li>
+  <li>*Idle Air Control Valve Stepper</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
   <li>*Tuner Studio</li>
