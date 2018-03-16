@@ -61,6 +61,12 @@
     <Filter Include="Source Files\Services\SensorService">
       <UniqueIdentifier>{1e4d92e0-61e9-4ed0-9be6-ab6a88e94ddc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Services\FuelPumpService">
+      <UniqueIdentifier>{ef8efa53-fbd7-4f50-8c4b-68a683c02b25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services\FuelPumpService">
+      <UniqueIdentifier>{7d0443db-a147-4e11-8b44-b789d204a625}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h">
@@ -126,9 +132,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
@@ -164,6 +167,12 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h">
       <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h">
+      <Filter>Header Files\Services\FuelPumpService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h">
+      <Filter>Header Files\Services\FuelPumpService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +213,6 @@
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitiorService.cpp">
@@ -262,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp">
       <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp">
+      <Filter>Source Files\Services\FuelPumpService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp">
+      <Filter>Source Files\Services\FuelPumpService</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

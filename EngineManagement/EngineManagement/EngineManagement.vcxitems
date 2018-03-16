@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h" />
@@ -52,6 +53,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AfrService_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
