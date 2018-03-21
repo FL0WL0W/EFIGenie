@@ -13,10 +13,18 @@ namespace EngineManagement
 	void IdleControlService_Pd::Tick()
 	{
 		if (CurrentThrottlePositionService != 0 && CurrentThrottlePositionService->Value > _tpsThreshold)
+		{
+			//no longer have error since we are out of the threshold
+			RpmError = 0;
 			return;
+		}
 		
 		if (CurrentVehicleSpeedSensorService != 0 && CurrentVehicleSpeedSensorService->Value > _speedThreshold)
+		{
+			//no longer have error since we are out of the threshold
+			RpmError = 0;
 			return;
+		}
 		
 		unsigned short rpm = CurrentDecoder->GetRpm();
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
@@ -83,7 +91,7 @@ namespace EngineManagement
 		}
 		
 		short thisRpmError = idleTargetRpm - rpm;
-		unsigned int rpmErrorDot = (thisRpmError - RpmError) / dt;
+		int rpmErrorDot = (thisRpmError - RpmError) / dt;
 		RpmError = thisRpmError;
 		
 		idleAirmass += _kP * thisRpmError + _kD * rpmErrorDot;

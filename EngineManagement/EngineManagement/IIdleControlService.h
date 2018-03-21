@@ -4,7 +4,7 @@ namespace EngineManagement
 	class IIdleControlService
 	{
 	public:
-		unsigned short RpmError;
+		short RpmError;
 		virtual void Tick() = 0;
 	};
 
