@@ -1,5 +1,6 @@
 #include "Services.h"
 #include "IdleAirControlValveService_Pwm.h"
+#include "IdleAirControlValveService_Stepper.h"
 
 #ifdef IIdleAirControlValveServiceExists
 namespace EngineManagement
@@ -12,9 +13,13 @@ namespace EngineManagement
 		{
 		case 0:
 			return 0;
-#ifdef IdleAirControlValveService_PidExists
+#ifdef IdleAirControlValveService_PwmExists
 		case 1:
 			return new IdleAirControlValveService_Pwm((void*)((unsigned char*)config + 1));
+#endif
+#ifdef IdleAirControlValveService_StepperExists
+		case 2:
+			return new IdleAirControlValveService_Stepper((void*)((unsigned char*)config + 1));
 #endif
 		}
 	}

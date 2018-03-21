@@ -4,6 +4,8 @@
 #include "IAnalogService.h"
 #include "IPwmService.h"
 
+#include "IStepperService.h"
+
 #include "IIdleControlService.h"
 #include "IIgnitorService.h"
 #include "IInjectorService.h"

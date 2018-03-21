@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Services\FuelPumpService">
       <UniqueIdentifier>{7d0443db-a147-4e11-8b44-b789d204a625}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Services\IdleAirControlValveService">
+      <UniqueIdentifier>{a4cf768f-7328-411c-9dd8-af8aa55327d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services\IdleAirControlValveService">
+      <UniqueIdentifier>{00bd848a-c6c7-48d3-a03d-b90747d60088}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h">
@@ -165,14 +171,20 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.h">
       <Filter>Header Files\Services\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h">
       <Filter>Header Files\Services\FuelPumpService</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h">
       <Filter>Header Files\Services\FuelPumpService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IStepperService.h">
+      <Filter>Header Files\Services\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Stepper.h">
+      <Filter>Header Files\Services\IdleAirControlValveService</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h">
+      <Filter>Header Files\Services\IdleAirControlValveService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -266,14 +278,20 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IIdleAirControlValveService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp">
       <Filter>Source Files\Services\FuelPumpService</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp">
       <Filter>Source Files\Services\FuelPumpService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp">
+      <Filter>Source Files\Services\IdleAirControlValveService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Stepper.cpp">
+      <Filter>Source Files\Services\IdleAirControlValveService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IStepperService.cpp">
+      <Filter>Source Files\Services\Interface</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
