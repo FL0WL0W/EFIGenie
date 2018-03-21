@@ -30,6 +30,7 @@
     <Import Project="..\..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems" Label="Shared" />
     <Import Project="..\..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems" Label="Shared" />
     <Import Project="..\..\EngineManagement\EngineManagement\EngineManagement.vcxitems" Label="Shared" />
+    <Import Project="..\..\Stm32F103Services\Stm32F103Services\Stm32F103Services.vcxitems" Label="Shared" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
@@ -57,10 +58,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Stm32F103AnalogService.cpp" />
-    <ClCompile Include="Stm32F103DigitalService.cpp" />
-    <ClCompile Include="STM32F103PwmService.cpp" />
-    <ClCompile Include="Stm32F103TimerService.cpp" />
     <ClCompile Include="system_stm32f10x.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xb.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\src\misc.c" />
@@ -87,7 +84,6 @@
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\src\stm32f10x_wwdg.c" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\CMSIS_StdPeriph\CM3\CoreSupport\core_cm3.c" />
-    <ClCompile Include="TimerLocks.cpp" />
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\inc\misc.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\STM32F10x_StdPeriph_Driver\inc\stm32f10x_bkp.h" />
@@ -114,7 +110,6 @@
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\CMSIS_StdPeriph\CM3\CoreSupport\core_cm3.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\CMSIS_StdPeriph\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h" />
     <ClInclude Include="$(BSP_ROOT)\STM32F1xxxx\CMSIS_StdPeriph\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h" />
-    <ClInclude Include="TimerLocks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Stm32-DevBoardV1-LS24xECU-Debug.vgdbsettings" />
@@ -123,10 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Stm32F103AnalogService.h" />
-    <ClInclude Include="Stm32F103DigitalService.h" />
-    <ClInclude Include="Stm32F103PwmService.h" />
-    <ClInclude Include="Stm32F103TimerService.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="stm32.xml" />
