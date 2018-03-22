@@ -29,7 +29,7 @@ namespace Stm32
 			NVIC->ISER[TIM1_CC_IRQn >> 0x05] = 0x01 << (TIM1_CC_IRQn & 0x1F);
 			TIM1_Freq_Locked = true;
 			TimerService1 = this;
-			RCC->APB2ENR &= ~RCC_APB2Periph_TIM1;
+			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
 			TIM = TIM1;
 		case 2:
 			NVIC->IP[TIM2_IRQn] = 0;
@@ -38,7 +38,7 @@ namespace Stm32
 				return;
 			TIM2_Freq_Locked = true;
 			TimerService2 = this;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM2;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
 			TIM = TIM2;
 		case 3:
 			NVIC->IP[TIM3_IRQn] = 0;
@@ -47,7 +47,7 @@ namespace Stm32
 				return;
 			TIM3_Freq_Locked = true;
 			TimerService3 = this;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM3;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
 			TIM = TIM3;
 		case 4:
 			NVIC->IP[TIM4_IRQn] = 0;
@@ -56,7 +56,7 @@ namespace Stm32
 				return;
 			TIM4_Freq_Locked = true;
 			TimerService4 = this;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM4;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
 			TIM = TIM4;
 		}
 		
@@ -73,10 +73,13 @@ namespace Stm32
 		//enable timer
 		TIM->CR1 |= TIM_CR1_CEN;
 	
+		unsigned short TIM_IT;
+		
 		/* Enable the timer global Interrupt */
 		switch (compareRegister)
 		{
 		case 1:
+			TIM_IT = TIM_IT_CC1;
 			TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC1E);
 			TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_OC1M | TIM_CCMR1_CC1S)) | TIM_OCMode_Active;
 			if (TIM == TIM1)
@@ -86,6 +89,7 @@ namespace Stm32
 			TimerService1 = this;
 			break;
 		case 2:
+			TIM_IT = TIM_IT_CC2;
 			TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC2E);
 			TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_OC2M | TIM_CCMR1_CC2S)) | (TIM_OCMode_Active << 8);
 			if (TIM == TIM1)
@@ -95,8 +99,9 @@ namespace Stm32
 			TimerService2 = this;
 			break;
 		case 3:
+			TIM_IT = TIM_IT_CC3;
 			TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC3E);
-			TIM->CCMR2 = (TIM->CCMR1 & ~(TIM_CCMR2_OC3M | TIM_CCMR2_CC3S)) | (TIM_OCMode_Active);
+			TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC3M | TIM_CCMR2_CC3S)) | (TIM_OCMode_Active);
 			if (TIM == TIM1)
 				TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS3)) | (TIM_OCIdleState_Reset << 4);
 			TIM->CCR3 = 0;
@@ -104,8 +109,9 @@ namespace Stm32
 			TimerService3 = this;
 			break;
 		case 4:
+			TIM_IT = TIM_IT_CC4;
 			TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC4E);
-			TIM->CCMR2 = (TIM->CCMR1 & ~(TIM_CCMR2_OC4M | TIM_CCMR2_CC4S)) | (TIM_OCMode_Active << 8);
+			TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC4M | TIM_CCMR2_CC4S)) | (TIM_OCMode_Active << 8);
 			if (TIM == TIM1)
 				TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS4)) | (TIM_OCIdleState_Reset << 6);
 			TIM->CCR4 = 0;
@@ -114,8 +120,8 @@ namespace Stm32
 			break;
 		}
 	
-		TIM->SR = ~(TIM_IT_CC | TIM_IT_Update);
-		TIM->DIER |= TIM_IT_Update | TIM_IT_CC;
+		TIM->SR = ~(TIM_IT | TIM_IT_Update);
+		TIM->DIER |= TIM_IT_Update | TIM_IT;
 	}
 
 	unsigned int Stm32F103TimerService::GetTick()

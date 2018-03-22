@@ -37,112 +37,112 @@ namespace Stm32
 			TIM = TIM2;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM2;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
 			break;
 		case 2:
 			TIM_Channel = TIM_Channel_2;
 			TIM = TIM2;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM2;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
 			break;
 		case 3:
 			TIM_Channel = TIM_Channel_3;
 			TIM = TIM2;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM2;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
 			break;
 		case 4:
 			TIM_Channel = TIM_Channel_4;
 			TIM = TIM2;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM2;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
 			break;
 		case 7:
 			TIM_Channel = TIM_Channel_1;
 			TIM = TIM3;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM3;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
 			break;
 		case 8:
 			TIM_Channel = TIM_Channel_2;
 			TIM = TIM3;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM3;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
 			break;
 		case 9:
 			TIM_Channel = TIM_Channel_1;
 			TIM = TIM1;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-			RCC->APB2ENR &= ~RCC_APB2Periph_TIM1;
+			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
 			break;
 		case 10:
 			TIM_Channel = TIM_Channel_2;
 			TIM = TIM1;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-			RCC->APB2ENR &= ~RCC_APB2Periph_TIM1;
+			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
 			break;
 		case 11:
 			TIM_Channel = TIM_Channel_3;
 			TIM = TIM1;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-			RCC->APB2ENR &= ~RCC_APB2Periph_TIM1;
+			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
 			break;
 		case 12:
 			TIM_Channel = TIM_Channel_4;
 			TIM = TIM1;
 			GPIO = GPIOA;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11;
-			RCC->APB2ENR &= ~RCC_APB2Periph_TIM1;
+			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
 			break;
 		case 17:
 			TIM_Channel = TIM_Channel_3;
 			TIM = TIM3;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM3;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
 			break;
 		case 18:
 			TIM_Channel = TIM_Channel_4;
 			TIM = TIM3;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM3;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
 			break;
 		case 23:
 			TIM_Channel = TIM_Channel_1;
 			TIM = TIM4;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM4;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
 			break;
 		case 24:
 			TIM_Channel = TIM_Channel_2;
 			TIM = TIM4;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM4;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
 			break;
 		case 25:
 			TIM_Channel = TIM_Channel_3;
 			TIM = TIM4;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM4;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
 			break;
 		case 26:
 			TIM_Channel = TIM_Channel_4;
 			TIM = TIM4;
 			GPIO = GPIOB;
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-			RCC->APB1ENR &= ~RCC_APB1Periph_TIM4;
+			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
 			break;
 		}
 				
@@ -184,7 +184,7 @@ namespace Stm32
 				break;
 			case TIM_Channel_3:
 				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC3E);
-				TIM->CCMR2 = (TIM->CCMR1 & ~(TIM_CCMR2_OC3M | TIM_CCMR2_CC3S)) | (TIM_OCMode_PWM1);
+				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC3M | TIM_CCMR2_CC3S)) | (TIM_OCMode_PWM1);
 				if (TIM == TIM1)
 					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS3)) | (TIM_OCIdleState_Set << 4);
 				TIM->CCR3 = 0;
@@ -192,7 +192,7 @@ namespace Stm32
 				break;
 			case TIM_Channel_4:
 				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC4E);
-				TIM->CCMR2 = (TIM->CCMR1 & ~(TIM_CCMR2_OC4M | TIM_CCMR2_CC4S)) | (TIM_OCMode_PWM1 << 8);
+				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC4M | TIM_CCMR2_CC4S)) | (TIM_OCMode_PWM1 << 8);
 				if (TIM == TIM1)
 					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS4)) | (TIM_OCIdleState_Set << 6);
 				TIM->CCR4 = 0;
@@ -251,18 +251,26 @@ namespace Stm32
 			switch (TIM_Channel)
 			{
 			case TIM_Channel_1:
+				TIM->SR = ~(TIM_IT_CC1 | TIM_IT_CC2);
+				TIM->DIER |= TIM_IT_CC1 | TIM_IT_CC2;
 				TIM->CCER &= ~(TIM_CCER_CC1E | TIM_CCER_CC2E);
 				TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_CC1S | TIM_CCMR1_IC1F | TIM_CCMR1_CC2S | TIM_CCMR1_IC2F | TIM_CCMR1_IC1PSC | TIM_CCMR1_IC2PSC)) | TIM_ICSelection_DirectTI | (TIM_ICSelection_IndirectTI << 8) | TIM_ICPSC_DIV1 | (TIM_ICPSC_DIV1 << 8);
 				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC1P | TIM_CCER_CC2P)) | TIM_ICPolarity_Rising | TIM_CCER_CC1E | (TIM_ICPolarity_Falling << 4) | TIM_CCER_CC2E;
 			case TIM_Channel_2:
+				TIM->SR = ~(TIM_IT_CC1 | TIM_IT_CC2);
+				TIM->DIER |= TIM_IT_CC1 | TIM_IT_CC2;
 				TIM->CCER &= ~(TIM_CCER_CC1E | TIM_CCER_CC2E);
 				TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_CC1S | TIM_CCMR1_IC1F | TIM_CCMR1_CC2S | TIM_CCMR1_IC2F | TIM_CCMR1_IC1PSC | TIM_CCMR1_IC2PSC)) | TIM_ICSelection_IndirectTI | (TIM_ICSelection_DirectTI << 8) | TIM_ICPSC_DIV1 | (TIM_ICPSC_DIV1 << 8);
 				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC1P | TIM_CCER_CC2P)) | TIM_ICPolarity_Rising | TIM_CCER_CC1E | (TIM_ICPolarity_Falling << 4) | TIM_CCER_CC2E;
 			case TIM_Channel_3:
+				TIM->SR = ~(TIM_IT_CC3 | TIM_IT_CC4);
+				TIM->DIER |= TIM_IT_CC3 | TIM_IT_CC4;
 				TIM->CCER &= ~(TIM_CCER_CC3E | TIM_CCER_CC4E);
 				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_CC3S | TIM_CCMR2_IC3F | TIM_CCMR2_CC3S | TIM_CCMR2_IC3F | TIM_CCMR2_IC3PSC | TIM_CCMR2_IC3PSC)) | TIM_ICSelection_DirectTI | (TIM_ICSelection_IndirectTI << 8) | TIM_ICPSC_DIV1 | (TIM_ICPSC_DIV1 << 8);
 				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC3P | TIM_CCER_CC4P)) | (TIM_ICPolarity_Falling << 8) | TIM_CCER_CC3E | (TIM_ICPolarity_Falling << 12) | TIM_CCER_CC4E;
 			case TIM_Channel_4:
+				TIM->SR = ~(TIM_IT_CC3 | TIM_IT_CC4);
+				TIM->DIER |= TIM_IT_CC3 | TIM_IT_CC4;
 				TIM->CCER &= ~(TIM_CCER_CC3E | TIM_CCER_CC4E);
 				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_CC3S | TIM_CCMR2_IC3F | TIM_CCMR2_CC3S | TIM_CCMR2_IC3F | TIM_CCMR2_IC3PSC | TIM_CCMR2_IC3PSC)) | TIM_ICSelection_IndirectTI | (TIM_ICSelection_DirectTI << 8) | TIM_ICPSC_DIV1 | (TIM_ICPSC_DIV1 << 8);
 				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC3P | TIM_CCER_CC4P)) | (TIM_ICPolarity_Falling << 8) | TIM_CCER_CC3E | (TIM_ICPolarity_Falling << 12) | TIM_CCER_CC4E;
