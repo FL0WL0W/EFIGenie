@@ -30,7 +30,7 @@
     <Import Project="..\..\ReluctorDecoders\ReluctorDecoders\ReluctorDecoders.vcxitems" Label="Shared" />
     <Import Project="..\..\HardwareAbstraction\HardwareAbstraction\HardwareAbstraction.vcxitems" Label="Shared" />
     <Import Project="..\..\EngineManagement\EngineManagement\EngineManagement.vcxitems" Label="Shared" />
-    <Import Project="..\..\Stm32F103Services\Stm32F103Services\Stm32F103Services.vcxitems" Label="Shared" />
+    <Import Project="..\..\Stm32F103ServicesStdPeriph\Stm32F103ServicesStdPeriph\Stm32F103ServicesStdPeriph.vcxitems" Label="Shared" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
