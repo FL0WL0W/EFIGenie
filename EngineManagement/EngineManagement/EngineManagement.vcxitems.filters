@@ -22,9 +22,6 @@
     <Filter Include="Header Files\Services">
       <UniqueIdentifier>{8fa050a8-1b03-444d-967b-087e37b5f437}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Services\VoltageService">
-      <UniqueIdentifier>{013cd98d-a4ad-4998-8458-2a53d1a1442f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Services\AfrService">
       <UniqueIdentifier>{b39aa646-ecd0-4aef-87dc-628bfe712b00}</UniqueIdentifier>
     </Filter>

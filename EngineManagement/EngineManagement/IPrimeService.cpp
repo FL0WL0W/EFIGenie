@@ -13,7 +13,7 @@ namespace EngineManagement
 		{
 #ifdef PrimeService_StaticPulseWidthExists
 		case 0:
-			return new PrimeService_StaticPulseWidth((void*)((unsigned char*)config + 1));
+			return new PrimeService_StaticPulseWidth(PrimeService_StaticPulseWidthConfig::Cast((unsigned char*)config + 1));
 #endif
 		}
 	}

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <functional>
+#include <stm32f1xx_hal_dma.h>
 #include "stm32f1xx_hal_tim.h"
 #include "stm32f1xx_hal_rcc.h"
 #include "stm32f103xb.h"
@@ -32,28 +33,28 @@ namespace Stm32
 			RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
 			TIM = TIM1;
 		case 2:
-			NVIC->IP[TIM2_IRQn] = 0;
-			NVIC->ISER[TIM2_IRQn >> 0x05] = 0x01 << (TIM2_IRQn & 0x1F);
 			if (TIM2_Freq_Locked)
 				return;
+			NVIC->IP[TIM2_IRQn] = 0;
+			NVIC->ISER[TIM2_IRQn >> 0x05] = 0x01 << (TIM2_IRQn & 0x1F);
 			TIM2_Freq_Locked = true;
 			TimerService2 = this;
 			RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 			TIM = TIM2;
 		case 3:
-			NVIC->IP[TIM3_IRQn] = 0;
-			NVIC->ISER[TIM3_IRQn >> 0x05] = 0x01 << (TIM3_IRQn & 0x1F);
 			if (TIM3_Freq_Locked)
 				return;
+			NVIC->IP[TIM3_IRQn] = 0;
+			NVIC->ISER[TIM3_IRQn >> 0x05] = 0x01 << (TIM3_IRQn & 0x1F);
 			TIM3_Freq_Locked = true;
 			TimerService3 = this;
 			RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 			TIM = TIM3;
 		case 4:
-			NVIC->IP[TIM4_IRQn] = 0;
-			NVIC->ISER[TIM4_IRQn >> 0x05] = 0x01 << (TIM4_IRQn & 0x1F);
 			if (TIM4_Freq_Locked)
 				return;
+			NVIC->IP[TIM4_IRQn] = 0;
+			NVIC->ISER[TIM4_IRQn >> 0x05] = 0x01 << (TIM4_IRQn & 0x1F);
 			TIM4_Freq_Locked = true;
 			TimerService4 = this;
 			RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;

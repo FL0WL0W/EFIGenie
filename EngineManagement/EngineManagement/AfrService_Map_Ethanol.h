@@ -2,32 +2,52 @@
 #define AfrService_Map_EthanolExists
 namespace EngineManagement
 {
-	class AfrService_Map_Ethanol : public IAfrService
+	struct __attribute__((__packed__)) AfrService_Map_EthanolConfig
+	{
+	private:
+		AfrService_Map_EthanolConfig()
+		{
+			
+		}
+	public:
+		static AfrService_Map_EthanolConfig* Cast(void *p)
+		{
+			return (AfrService_Map_EthanolConfig *)p;
+		}
+		
+		float StartupAfrMultiplier;
+		float StartupAfrDelay;
+		float StartupAfrDecay;
+		
+		unsigned short MaxRpm;
+		float MaxMapBar;
+		unsigned char AfrRpmResolution;
+		unsigned char AfrMapResolution;
+		unsigned short *GasMap;
+		unsigned short *EthanolMap;
+		
+		short MaxEct;
+		short MinEct;
+		unsigned char AfrEctResolution;
+		float *EctMultiplierTable;
+		
+		unsigned char StoichResolution;
+		unsigned short *StoichTable;
+		
+		unsigned char AfrTpsResolution;
+		unsigned short *TpsMinAfrGas;
+		unsigned short *TpsMinAfrEthanol;
+	};
+	
+class AfrService_Map_Ethanol : public IAfrService
 	{
 	protected:
-		unsigned short *_gasMap;
-		unsigned short *_ethanolMap;
-		unsigned short _maxRpm;
-		float _maxMapBar;
-		float _minEct;
-		float _maxEct;
+		const AfrService_Map_EthanolConfig* _config;
+		unsigned int _startupTick;
 		bool _started = false;
 		bool _aeDone = false;
-		unsigned int _startupTick;
-		float _startupAfrMultiplier;
-		unsigned int _startupAfrTickDelay;
-		unsigned int _startupAfrTickDecay;
-		float *_ectMultiplierTable;
-		unsigned short *_stoichTable;
-		unsigned short *_tpsMinAfrGas;
-		unsigned short *_tpsMinAfrEthanol;
-		unsigned char _afrRpmResolution;
-		unsigned char _afrMapResolution;
-		unsigned char _afrEctResolution;
-		unsigned char _afrTpsResolution;
-		unsigned char _stoichResolution;
 	public:
-		AfrService_Map_Ethanol(void *config);
+		AfrService_Map_Ethanol(const AfrService_Map_EthanolConfig *config);
 		void CalculateAfr();
 	};
 }

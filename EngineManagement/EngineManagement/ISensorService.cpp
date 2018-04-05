@@ -19,11 +19,11 @@ namespace EngineManagement
 #endif
 #ifdef SensorService_AnalogExists
 		case 2:
-			return new EngineManagement::SensorService_Analog((void *)((unsigned char*)config + 1));
+			return new EngineManagement::SensorService_Analog(SensorService_AnalogConfig::Cast((unsigned char*)config + 1));
 #endif
 #ifdef SensorService_FrequencyExists
 		case 3:
-			return new EngineManagement::SensorService_Frequency((void *)((unsigned char*)config + 1));
+			return new EngineManagement::SensorService_Frequency(SensorService_FrequencyConfig::Cast((unsigned char*)config + 1));
 #endif
 		}
 	}

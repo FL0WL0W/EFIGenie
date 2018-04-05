@@ -18,7 +18,7 @@ namespace EngineManagement
 #endif
 #ifdef AfrService_Map_EthanolExists
 		case 2:
-			return new EngineManagement::AfrService_Map_Ethanol((void*)((unsigned char*)config + 1));;
+			return new EngineManagement::AfrService_Map_Ethanol(AfrService_Map_EthanolConfig::Cast((unsigned char*)config + 1));;
 #endif
 		}
 	}

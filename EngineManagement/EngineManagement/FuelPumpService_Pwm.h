@@ -1,25 +1,48 @@
 #if defined(IFuelPumpServiceExists)
 #define FuelPumpService_PwmExists
 namespace EngineManagement
-{
+{	
+	struct __attribute__((__packed__)) FuelPumpService_PwmConfig
+	{
+	private:
+		FuelPumpService_PwmConfig()
+		{
+		}
+	public:
+		static FuelPumpService_PwmConfig* Cast(void *p)
+		{
+			FuelPumpService_PwmConfig* ret = (FuelPumpService_PwmConfig*)p;
+			
+			ret->PwmTable = (unsigned char *)(ret + 1);
+			
+			return ret;
+		}
+		
+		unsigned char Pin;
+		bool NormalOn;
+		
+		unsigned char PrimePwm;
+		unsigned int PrimeTime;
+			
+		unsigned short Frequency;
+			
+		bool UseTps;
+		
+		unsigned short MaxRpm;
+		float MaxY;
+		unsigned char RpmRes;
+		unsigned char YRes;
+		unsigned char *PwmTable;
+	};
+	
 	class FuelPumpService_Pwm : public IFuelPumpService
 	{
-		unsigned char _pin;
-		float _period;
-		float _maxy;
-		unsigned short _maxRpm;
-		unsigned char _rpmResolution;
-		unsigned char _yResolution;
-		unsigned char *_pwmTable;
-		unsigned char _primePwm;
-		unsigned int _primeTime;
+		const FuelPumpService_PwmConfig *_config;
 		unsigned char _currentPwm;
 		bool _isOn;
-		bool _normalOn;
-		bool _useTps;
 	public:
 		bool Started = false;
-		FuelPumpService_Pwm(void *config);
+		FuelPumpService_Pwm(const FuelPumpService_PwmConfig *config);
 		void Prime();
 		void On();
 		void Off();

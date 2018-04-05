@@ -4,10 +4,9 @@
 #ifdef PrimeService_StaticPulseWidthExists
 namespace EngineManagement
 {
-	PrimeService_StaticPulseWidth::PrimeService_StaticPulseWidth(void *config)
+	PrimeService_StaticPulseWidth::PrimeService_StaticPulseWidth(const PrimeService_StaticPulseWidthConfig *config)
 	{
-		_pulseWidth = *(float *)config * CurrentTimerService->GetTicksPerSecond();
-		config = (void*)((float *)config + 1);
+		_pulseWidth = config->PulseWidth * CurrentTimerService->GetTicksPerSecond();
 	}
 
 	void PrimeService_StaticPulseWidth::Prime()

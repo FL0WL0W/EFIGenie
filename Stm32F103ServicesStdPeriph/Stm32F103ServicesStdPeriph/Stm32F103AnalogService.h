@@ -4,7 +4,7 @@ namespace Stm32
 	{
 	public:
 		Stm32F103AnalogService();
-		void InitPin(uint8_t pin);
-		float ReadPin(uint8_t pin);
+		void InitPin(unsigned char pin);
+		float ReadPin(unsigned char pin);
 	};
 }

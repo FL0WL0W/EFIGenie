@@ -4,43 +4,21 @@
 #ifdef SensorService_AnalogExists
 namespace EngineManagement
 {	
-	SensorService_Analog::SensorService_Analog(void *config)
+	SensorService_Analog::SensorService_Analog(const SensorService_AnalogConfig *config)
 	{
-		_adcPin = *((unsigned char *)config);
-		config = (void*)((unsigned char *)config + 1);
+		_config = config;
 		
-		A0 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A1 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A2 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A3 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		_dotSampleRate = *((unsigned short *)config);
-		config = (void*)((unsigned short *)config + 1);
-		
-		MaxValue = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		MinValue = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		CurrentAnalogService->InitPin(_adcPin);
+		CurrentAnalogService->InitPin(_config->AdcPin);
 	}
 	
 	void SensorService_Analog::ReadValue()
 	{
-		float adcValue = CurrentAnalogService->ReadPin(_adcPin);
-		float value = A3 * adcValue * adcValue * adcValue + A2 * adcValue * adcValue + A1 * adcValue + A0;
-		if (value < MinValue)
-			value = MinValue;
-		else if (value > MaxValue)
-			value = MaxValue;
+		float adcValue = CurrentAnalogService->ReadPin(_config->AdcPin);
+		float value = _config->A3 * adcValue * adcValue * adcValue + _config->A2 * adcValue * adcValue + _config->A1 * adcValue + _config->A0;
+		if (value < _config->MinValue)
+			value = _config->MinValue;
+		else if (value > _config->MaxValue)
+			value = _config->MaxValue;
 		Value = value;
 		unsigned int readTickOrig = CurrentTimerService->GetTick();
 		unsigned int lastReadTick = _lastReadTick;
@@ -53,7 +31,7 @@ namespace EngineManagement
 			lastReadTick += 2147483647;
 			readTick += 2147483647;
 		}
-		if (readTick < (lastReadTick + CurrentTimerService->GetTicksPerSecond() / _dotSampleRate))
+		if (readTick < (lastReadTick + CurrentTimerService->GetTicksPerSecond() / _config->DotSampleRate))
 			return;
 		ValueDot = ((Value - _lastValue) / (readTick - lastReadTick)) * CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;

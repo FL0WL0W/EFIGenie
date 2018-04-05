@@ -2,15 +2,30 @@
 #define FuelPumpServiceExists
 namespace EngineManagement
 {
+	struct __attribute__((__packed__)) FuelPumpServiceConfig
+	{
+	private:
+		FuelPumpServiceConfig()
+		{
+			
+		}
+	public:
+		static FuelPumpServiceConfig* Cast(void *p)
+		{
+			return (FuelPumpServiceConfig*)p;
+		}
+		unsigned char Pin;
+		unsigned int PrimeTime;
+		bool NormalOn;
+	};
+	
 	class FuelPumpService : public IFuelPumpService
 	{
-		unsigned char _pin;
-		unsigned int _primeTime;
-		bool _normalOn;
+		const FuelPumpServiceConfig *_config;
 		bool _highZ;
 	public:
 		bool Started = false;
-		FuelPumpService(void *config, bool highZ);
+		FuelPumpService(const FuelPumpServiceConfig *config, bool highZ);
 		void Prime();
 		void On();
 		void Off();

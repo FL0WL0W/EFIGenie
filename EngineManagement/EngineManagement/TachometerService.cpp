@@ -3,20 +3,16 @@
 #ifdef TachometerServiceExists
 namespace EngineManagement
 {
-	TachometerService::TachometerService(void *config, bool highZ)
+	TachometerService::TachometerService(const TachometerServiceConfig *config, bool highZ)
 	{
-		DigitalPin = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
+		_config = config;
+				
+		_ticksPerRpm = (15 * CurrentTimerService->GetTicksPerSecond()) / _config->PulsesPer2Rpm;
 		
-		unsigned char pulsesPer2Rpm = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		
-		TicksPerRpm = (15 * CurrentTimerService->GetTicksPerSecond()) / pulsesPer2Rpm;
-		
-		PinHighZ = highZ;
+		_pinHighZ = highZ;
 
-		CurrentDigitalService->InitPin(DigitalPin, HardwareAbstraction::Out);
-		CurrentDigitalService->WritePin(DigitalPin, false);
+		CurrentDigitalService->InitPin(_config->DigitalPin, HardwareAbstraction::Out);
+		CurrentDigitalService->WritePin(_config->DigitalPin, false);
 		
 		TachometerTask = new HardwareAbstraction::Task(TachometerService::TogglePinTask, this, false);
 		CurrentTimerService->ScheduleTask(TachometerTask, CurrentTimerService->GetTicksPerSecond() * 2);
@@ -25,12 +21,12 @@ namespace EngineManagement
 	void TachometerService::TogglePinTask(void *parameters)
 	{
 		TachometerService *service = ((TachometerService *) parameters);
-		service->PinStatus = !service->PinStatus;
-		CurrentDigitalService->WritePin(service->DigitalPin, service->PinStatus);
+		service->_pinStatus = !service->_pinStatus;
+		CurrentDigitalService->WritePin(service->_config->DigitalPin, service -> _pinStatus);
 		if (CurrentDecoder->GetRpm() < 1)
-			CurrentTimerService->ScheduleTask(service->TachometerTask, service->TicksPerRpm / CurrentDecoder->GetRpm());
+			CurrentTimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / CurrentDecoder->GetRpm());
 		else
-			CurrentTimerService->ScheduleTask(service->TachometerTask, service->TicksPerRpm);
+			CurrentTimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm);
 	}
 	
 	TachometerService *CurrentTachometerService;

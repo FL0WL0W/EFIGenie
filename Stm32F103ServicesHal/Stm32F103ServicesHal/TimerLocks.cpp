@@ -12,7 +12,8 @@ bool TIM4_Input = false;
 #include "PinDirection.h"
 #include "IPwmService.h"
 #include "Stm32F103PwmService.h"
-#include "stm32f10x_tim.h"
+#include <stm32f1xx_hal_dma.h>
+#include "stm32f1xx_hal_tim.h"
 #include "ITimerService.h"
 #include "Stm32F103TimerService.h"
 

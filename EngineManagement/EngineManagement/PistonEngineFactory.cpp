@@ -47,7 +47,7 @@ namespace EngineManagement
 			//set all to the same pin for distributor
 			for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 			{
-				CurrentIgnitorServices[cylinder] = new EngineManagement::IgnitorService(*((unsigned char*)ignitorConfigFile + cylinder), (bool)((unsigned char*)ignitorConfigFile + CurrentPistonEngineConfig->Cylinders), ignitionHighZ);
+				CurrentIgnitorServices[cylinder] = new EngineManagement::IgnitorService(*((unsigned char*)ignitorConfigFile), (bool)((unsigned char*)ignitorConfigFile + 1), ignitionHighZ);
 			}
 		}
 		else
@@ -154,7 +154,7 @@ namespace EngineManagement
 		//create tachometer service to start after the cam is synced
 		fileSystemPointer++;
 #ifdef TachometerServiceExists
-		CurrentTachometerService = new TachometerService((void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer)), tachometerHighZ);		  
+		CurrentTachometerService = new TachometerService((TachometerServiceConfig *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer)), tachometerHighZ);		  
 #endif 
 		
 #ifdef IPrimeServiceExists

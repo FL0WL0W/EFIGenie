@@ -4,37 +4,21 @@
 #ifdef IdleAirControlValveService_StepperExists
 namespace EngineManagement
 {
-	IdleAirControlValveService_Stepper::IdleAirControlValveService_Stepper(void *config)
+	IdleAirControlValveService_Stepper::IdleAirControlValveService_Stepper(const IdleAirControlValveService_StepperConfig *config)
 	{
-		A0 = *((float *)config);
-		config = (void*)((float *)config + 1);
+		_config = config;
 		
-		A1 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A2 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A3 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		_maxStepPosition = *((int *)config);
-		config = (void*)((float *)config + 1);
-		
-		_minStepPosition = *((int *)config);
-		config = (void*)((float *)config + 1);
-		
-		_stepperService = CreateStepperService(config);
+		_stepperService = CreateStepperService((void*)(config + 1));
 	}
 	
 	void IdleAirControlValveService_Stepper::SetArea(float area)
 	{
-		int newStepPosition = area * area * area * A3 + area * area * A2 + area * A1 + A0;
+		int newStepPosition = area * area * area * _config->A3 + area * area * _config->A2 + area * _config->A1 + _config->A0;
 		
-		if (newStepPosition > _maxStepPosition)
-			newStepPosition = _maxStepPosition;
-		else if (newStepPosition < _minStepPosition)
-			newStepPosition = _minStepPosition;
+		if (newStepPosition > _config->MaxStepPosition)
+			newStepPosition = _config->MaxStepPosition;
+		else if (newStepPosition < _config->MinStepPosition)
+			newStepPosition = _config->MinStepPosition;
 		
 		_stepperService->Step(newStepPosition - _currentStepPosition);
 		

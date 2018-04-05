@@ -4,47 +4,25 @@
 #ifdef IdleAirControlValveService_PwmExists
 namespace EngineManagement
 {
-	IdleAirControlValveService_Pwm::IdleAirControlValveService_Pwm(void *config)
+	IdleAirControlValveService_Pwm::IdleAirControlValveService_Pwm(const IdleAirControlValveService_PwmConfig *config)
 	{
-		_pwmPin = *((unsigned char *)config);
-		config = (void*)((unsigned char *)config + 1);
+		_config = config;
 		
-		A0 = *((float *)config);
-		config = (void*)((float *)config + 1);
+		_period = 1.0f / _config->Frequency;
 		
-		A1 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A2 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		A3 = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		MaxPwm = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		MinPwm = *((float *)config);
-		config = (void*)((float *)config + 1);
-		
-		unsigned short frequency = *((unsigned short *)config);
-		config = (void*)((unsigned short *)config + 1);
-		
-		_period = 1.0f / frequency;
-		
-		CurrentPwmService->InitPin(_pwmPin, HardwareAbstraction::Out, frequency);
+		CurrentPwmService->InitPin(_config->PwmPin, HardwareAbstraction::Out, _config->Frequency);
 	}
 	
 	void IdleAirControlValveService_Pwm::SetArea(float area)
 	{
-		float pwmValue = area * area * area * A3 + area * area * A2 + area * A1 + A0;
+		float pwmValue = area * area * area * _config->A3 + area * area * _config->A2 + area * _config->A1 + _config->A0;
 		
-		if (pwmValue > MaxPwm)
-			pwmValue = MaxPwm;
-		else if (pwmValue < MinPwm)
-			pwmValue = MinPwm;
+		if (pwmValue > _config->MaxPulseWidth)
+			pwmValue = _config->MaxPulseWidth;
+		else if (pwmValue < _config->MinPulseWidth)
+			pwmValue = _config->MinPulseWidth;
 		
-		CurrentPwmService->WritePin(_pwmPin, { _period, _period * pwmValue });
+		CurrentPwmService->WritePin(_config->PwmPin, { _period, _period * pwmValue });
 	}
 }
 #endif

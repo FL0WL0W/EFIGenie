@@ -4,83 +4,76 @@
 #ifdef FuelPumpServiceExists
 namespace EngineManagement
 {
-	FuelPumpService::FuelPumpService(void *config, bool highZ)
+	FuelPumpService::FuelPumpService(const FuelPumpServiceConfig *config, bool highZ)
 	{
-		_pin = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		
-		_primeTime = *(float *)config * CurrentTimerService->GetTicksPerSecond();
-		config = (void*)((float *)config + 1);
-		
-		_normalOn = (bool)(*(unsigned char *)config);
-		config = (void*)((unsigned char *)config + 1);
+		_config = config;
 		
 		_highZ = highZ;
 
-		if (_highZ && _normalOn)
+		if (_highZ && _config->NormalOn)
 		{
-			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
+			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
 		}
 		else
 		{
-			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
+			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
 			
-			CurrentDigitalService->WritePin(_pin, _normalOn);
+			CurrentDigitalService->WritePin(_config->Pin, _config->NormalOn);
 		}
 	}
 	
 	void FuelPumpService::Off()
 	{
-		if (_highZ && _normalOn)
+		if (_highZ && _config->NormalOn)
 		{
-			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
+			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
 		}
 		else
 		{
 			if (_highZ)
 			{
-				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
+				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
 			}
 
-			CurrentDigitalService->WritePin(_pin, _normalOn);
+			CurrentDigitalService->WritePin(_config->Pin, _config->NormalOn);
 		}
 	}
 	
 	void FuelPumpService::On()
 	{
 		Started = true;
-		if (_highZ && !_normalOn)
+		if (_highZ && !_config->NormalOn)
 		{
-			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
+			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
 		}
 		else
 		{
 			if (_highZ)
 			{
-				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
+				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
 			}
 
-			CurrentDigitalService->WritePin(_pin, !_normalOn);
+			CurrentDigitalService->WritePin(_config->Pin, !_config->NormalOn);
 		}
 	}
 	
 	void FuelPumpService::Prime()
 	{
-		if (_highZ && !_normalOn)
+		if (_highZ && !_config->NormalOn)
 		{
-			CurrentDigitalService->InitPin(_pin, HardwareAbstraction::In);
+			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
 		}
 		else
 		{
 			if (_highZ)
 			{
-				CurrentDigitalService->InitPin(_pin, HardwareAbstraction::Out);
+				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
 			}
 
-			CurrentDigitalService->WritePin(_pin, !_normalOn);
+			CurrentDigitalService->WritePin(_config->Pin, !_config->NormalOn);
 		}
 		
-		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _primeTime + CurrentTimerService->GetTick(), true);
+		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _config->PrimeTime + CurrentTimerService->GetTick(), true);
 	}
 	
 	void FuelPumpService::PrimeTaskOff(void *parameter)

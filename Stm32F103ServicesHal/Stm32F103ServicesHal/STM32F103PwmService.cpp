@@ -1,7 +1,7 @@
 #include "PinDirection.h"
 #include "IPwmService.h"
-#include "misc.h"
 #include "Stm32F103PwmService.h"
+#include <stm32f1xx_hal_dma.h>
 #include <stm32f1xx_hal_gpio.h>
 #include <stm32f1xx_hal_tim.h>
 #include <stm32f1xx_hal_rcc.h>
@@ -23,136 +23,150 @@ namespace Stm32
 		if (pin == 0)
 			return;
 		
-		uint16_t TIM_CHANNEL;
+		
+		uint16_t TIM_Channel;
 		TIM_TypeDef *TIM;
 		GPIO_TypeDef *GPIO;
-		
-		GPIO = GPIO;		
-		GPIO_InitTypeDef GPIO_InitStruct;
 		
 		switch (pin)
 		{
 		case 1:
-			TIM_CHANNEL = TIM_CHANNEL_1;
+			TIM_Channel = TIM_CHANNEL_1;
 			TIM = TIM2;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+			pin = 0;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 2:
-			TIM_CHANNEL = TIM_CHANNEL_2;
+			TIM_Channel = TIM_CHANNEL_2;
 			TIM = TIM2;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+			pin = 1;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 3:
-			TIM_CHANNEL = TIM_CHANNEL_3;
+			TIM_Channel = TIM_CHANNEL_3;
 			TIM = TIM2;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+			pin = 2;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 4:
-			TIM_CHANNEL = TIM_CHANNEL_4;
+			TIM_Channel = TIM_CHANNEL_4;
 			TIM = TIM2;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM2;
+			pin = 3;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 7:
-			TIM_CHANNEL = TIM_CHANNEL_1;
+			TIM_Channel = TIM_CHANNEL_1;
 			TIM = TIM3;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+			pin = 6;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 8:
-			TIM_CHANNEL = TIM_CHANNEL_2;
+			TIM_Channel = TIM_CHANNEL_2;
 			TIM = TIM3;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+			pin = 7;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 9:
-			TIM_CHANNEL = TIM_CHANNEL_1;
+			TIM_Channel = TIM_CHANNEL_1;
 			TIM = TIM1;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
+			pin = 8;
+			RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 10:
-			TIM_CHANNEL = TIM_CHANNEL_2;
+			TIM_Channel = TIM_CHANNEL_2;
 			TIM = TIM1;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
+			pin = 9;
+			RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 11:
-			TIM_CHANNEL = TIM_CHANNEL_3;
+			TIM_Channel = TIM_CHANNEL_3;
 			TIM = TIM1;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
+			pin = 10;
+			RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 12:
-			TIM_CHANNEL = TIM_CHANNEL_4;
+			TIM_Channel = TIM_CHANNEL_4;
 			TIM = TIM1;
 			GPIO = GPIOA;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11;
-			RCC->APB2ENR |= RCC_APB2Periph_TIM1;
+			pin = 11;
+			RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 			break;
 		case 17:
-			TIM_CHANNEL = TIM_CHANNEL_3;
+			TIM_Channel = TIM_CHANNEL_3;
 			TIM = TIM3;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+			pin = 0;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		case 18:
-			TIM_CHANNEL = TIM_CHANNEL_4;
+			TIM_Channel = TIM_CHANNEL_4;
 			TIM = TIM3;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM3;
+			pin = 1;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		case 23:
-			TIM_CHANNEL = TIM_CHANNEL_1;
+			TIM_Channel = TIM_CHANNEL_1;
 			TIM = TIM4;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
+			pin = 6;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		case 24:
-			TIM_CHANNEL = TIM_CHANNEL_2;
+			TIM_Channel = TIM_CHANNEL_2;
 			TIM = TIM4;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
+			pin = 7;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		case 25:
-			TIM_CHANNEL = TIM_CHANNEL_3;
+			TIM_Channel = TIM_CHANNEL_3;
 			TIM = TIM4;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
+			pin = 8;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		case 26:
-			TIM_CHANNEL = TIM_CHANNEL_4;
+			TIM_Channel = TIM_CHANNEL_4;
 			TIM = TIM4;
 			GPIO = GPIOB;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-			RCC->APB1ENR |= RCC_APB1Periph_TIM4;
+			pin = 9;
+			RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+			RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 			break;
 		}
 				
 		if (direction == HardwareAbstraction::Out)
 		{
-			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-
-			GPIO_Init(GPIO, &GPIO_InitStruct);
-						
+			if (pin > 7)
+				GPIO->CRH = (GPIO->CRH & ~(0x0F << ((pin - 8) << 2))) | (((0x18 & 0x0F) | GPIO_SPEED_FREQ_HIGH) << ((pin - 8) << 2));
+			else
+				GPIO->CRL = (GPIO->CRL & ~(0x0F << (pin << 2))) | (((0x18 & 0x0F) | GPIO_SPEED_FREQ_HIGH) << (pin << 2));
+								
 			if (!((TIM == TIM1 && (TIM1_Freq_Locked || TIM1_Input)) || (TIM == TIM2 && (TIM2_Freq_Locked || TIM2_Input)) || (TIM == TIM3 && (TIM3_Freq_Locked || TIM1_Input)) || (TIM == TIM4 && (TIM4_Freq_Locked || TIM4_Input))))
 			{
 				//set the frequency and mode
@@ -164,39 +178,39 @@ namespace Stm32
 			else if(TIM->CR1 & (~(TIM_CR1_DIR | TIM_CR1_CMS | TIM_CR1_CKD) | TIM_COUNTERMODE_UP))
 				return;  //TODO: figure out errors
 
-			switch (TIM_CHANNEL)
+			switch (TIM_Channel)
 			{
 			case TIM_CHANNEL_1:
-				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC1E);
+				TIM->CCER &= ~TIM_CCER_CC1E;
 				TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_OC1M | TIM_CCMR1_CC1S)) | TIM_OCMODE_PWM1;
 				if (TIM == TIM1)
-					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS1)) | TIM_OCIDLESTATE_SET;
+					TIM->CR2 |= TIM_CR2_OIS1;
 				TIM->CCR1 = 0;
-				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC1P)) | TIM_OUTPUTSTATE_ENABLE | TIM_OCPOLARITY_HIGH;
+				TIM->CCER |= TIM_CCER_CC1E;
 				break;
 			case TIM_CHANNEL_2:
-				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC2E);
+				TIM->CCER &= ~TIM_CCER_CC2E;
 				TIM->CCMR1 = (TIM->CCMR1 & ~(TIM_CCMR1_OC2M | TIM_CCMR1_CC2S)) | (TIM_OCMODE_PWM1 << 8);
 				if (TIM == TIM1)
-					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS2)) | (TIM_OCIDLESTATE_SET << 2);
+					TIM->CR2 |= TIM_CR2_OIS2;
 				TIM->CCR2 = 0;
-				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC2P)) | ((TIM_OUTPUTSTATE_ENABLE | TIM_OCPOLARITY_HIGH) << 4);
+				TIM->CCER |= TIM_CCER_CC2E;
 				break;
 			case TIM_CHANNEL_3:
-				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC3E);
+				TIM->CCER &= ~TIM_CCER_CC3E;
 				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC3M | TIM_CCMR2_CC3S)) | (TIM_OCMODE_PWM1);
 				if (TIM == TIM1)
-					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS3)) | (TIM_OCIDLESTATE_SET << 4);
+					TIM->CR2 |= TIM_CR2_OIS3;
 				TIM->CCR3 = 0;
-				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC3P)) | ((TIM_OUTPUTSTATE_ENABLE | TIM_OCPOLARITY_HIGH) << 8);
+				TIM->CCER |= TIM_CCER_CC3E;
 				break;
 			case TIM_CHANNEL_4:
-				TIM->CCER &= (uint16_t)(~(uint16_t)TIM_CCER_CC4E);
+				TIM->CCER &= ~TIM_CCER_CC4E;
 				TIM->CCMR2 = (TIM->CCMR2 & ~(TIM_CCMR2_OC4M | TIM_CCMR2_CC4S)) | (TIM_OCMODE_PWM1 << 8);
 				if (TIM == TIM1)
-					TIM->CR2 = (TIM->CR2 & ~(TIM_CR2_OIS4)) | (TIM_OCIDLESTATE_SET << 6);
+					TIM->CR2 |= TIM_CR2_OIS4;
 				TIM->CCR4 = 0;
-				TIM->CCER = (TIM->CCER & ~(TIM_CCER_CC4P)) | ((TIM_OUTPUTSTATE_ENABLE | TIM_OCPOLARITY_HIGH) << 12);
+				TIM->CCER |= TIM_CCER_CC4E;
 				break;
 			}
 
@@ -208,16 +222,16 @@ namespace Stm32
 		}
 		else
 		{
-			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-
-			GPIO_Init(GPIO, &GPIO_InitStruct);
+			if (pin > 7)
+				GPIO->CRH = (GPIO->CRH & ~(0x0F << ((pin - 8) << 2))) | ((0x04 & 0x0F) << ((pin - 8) << 2));
+			else
+				GPIO->CRL = (GPIO->CRL & ~(0x0F << (pin << 2))) | ((0x04 & 0x0F) << (pin << 2));
 			
 			if (!((TIM == TIM1 && (TIM1_Freq_Locked)) || (TIM == TIM2 && (TIM2_Freq_Locked)) || (TIM == TIM3 && (TIM3_Freq_Locked)) || (TIM == TIM4 && (TIM4_Freq_Locked))))
 			{
 				//set the frequency and mode
 				TIM->CR1 = (TIM->CR1 & ~(TIM_CR1_DIR | TIM_CR1_CMS | TIM_CR1_CKD)) | TIM_COUNTERMODE_UP;
-				TIM->PSC = std::max(TIM->PSC, (unsigned short)ceil(((72 * 1000 * 1000.0) / 65535) / minFrequency));
+				TIM->PSC = std::max((unsigned short)TIM->PSC, (unsigned short)ceil(((72 * 1000 * 1000.0) / 65535) / minFrequency));
 				TIM->ARR = 0xFFFF;
 			}
 			//make sure we are in the right mode
@@ -248,7 +262,7 @@ namespace Stm32
 				NVIC->ISER[TIM4_IRQn >> 0x05] = 0x01 << (TIM4_IRQn & 0x1F);
 			}
 												
-			switch (TIM_CHANNEL)
+			switch (TIM_Channel)
 			{
 			case TIM_CHANNEL_1:
 				TIM->SR = ~(TIM_IT_CC1 | TIM_IT_CC2);
