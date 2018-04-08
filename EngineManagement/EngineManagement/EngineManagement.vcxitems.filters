@@ -183,6 +183,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h">
       <Filter>Header Files\Services\IdleAirControlValveService</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IStepperService.cpp">
       <Filter>Source Files\Services\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Functions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

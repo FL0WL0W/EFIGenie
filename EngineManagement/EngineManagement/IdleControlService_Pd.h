@@ -17,7 +17,7 @@ namespace EngineManagement
 		float *_idleAirmass;
 		unsigned short *_idleTargetRpm;
 		float *_idleAirmassSpeedAdder;
-		unsigned short *_idleTargetRpmSpeedAdder;
+		short *_idleTargetRpmSpeedAdder;
 		unsigned short _dotSampleRate;
 		unsigned short _gasConstant;//values in 0.1 units
 

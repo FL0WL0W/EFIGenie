@@ -12,7 +12,19 @@ namespace EngineManagement
 	public:
 		static AfrService_Map_EthanolConfig* Cast(void *p)
 		{
-			return (AfrService_Map_EthanolConfig *)p;
+			AfrService_Map_EthanolConfig *ret = (AfrService_Map_EthanolConfig *)p;
+			
+			ret->GasMap = (unsigned short *)(ret + 1);
+			ret->EthanolMap = ret->GasMap + ret->AfrRpmResolution * ret->AfrMapResolution;
+			
+			ret->EctMultiplierTable = (unsigned char *)(ret->EthanolMap + ret->AfrRpmResolution * ret->AfrMapResolution);
+			
+			ret->StoichTable = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
+			
+			ret->TpsMinAfrGas = ret->StoichTable + ret->AfrTpsResolution;
+			ret->TpsMinAfrEthanol = ret->TpsMinAfrGas + ret->AfrTpsResolution;
+				
+			return ret;
 		}
 		
 		float StartupAfrMultiplier;
@@ -23,13 +35,13 @@ namespace EngineManagement
 		float MaxMapBar;
 		unsigned char AfrRpmResolution;
 		unsigned char AfrMapResolution;
-		unsigned short *GasMap;
-		unsigned short *EthanolMap;
+		unsigned short *GasMap; // value in 1/1024
+		unsigned short *EthanolMap; // value in 1/1024
 		
 		short MaxEct;
 		short MinEct;
 		unsigned char AfrEctResolution;
-		float *EctMultiplierTable;
+		unsigned char *EctMultiplierTable; // values in 1/255
 		
 		unsigned char StoichResolution;
 		unsigned short *StoichTable;

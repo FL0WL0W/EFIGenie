@@ -1,4 +1,5 @@
 #include "Services.h"
+#include "Functions.h"
 #include "IdleControlService_Pd.h"
 #include "math.h"
 
@@ -43,51 +44,15 @@ namespace EngineManagement
 		float dt = (readTick - lastReadTick) / (float)CurrentTimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
 		
-		unsigned char ectIndexL = 0;
-		unsigned char ectIndexH = 0;
-		float ectMultiplier = 0;
-		if (_ectResolution > 1)
-		{
-			float ect = CurrentEngineCoolantTemperatureService->Value;
-			float ectDivision = (_maxEct - _minEct) / (_ectResolution - 1);
-			ectIndexL = (ect - _minEct) / ectDivision;
-			ectIndexH = ectIndexL + 1;
-			ectMultiplier = (ect - _minEct) / ectDivision - ectIndexL;
-			if (ectIndexL > _ectResolution - 1)
-			{
-				ectIndexL = ectIndexH = _ectResolution - 1;
-			}
-			else if (ectIndexH > _ectResolution - 1)
-			{
-				ectIndexH = _ectResolution - 1;
-			}
-		}
-		float idleAirmass = _idleAirmass[ectIndexL] * (1 - ectMultiplier) + _idleAirmass[ectIndexH] * ectMultiplier;
-		unsigned short idleTargetRpm = _idleTargetRpm[ectIndexL] * (1 - ectMultiplier) + _idleTargetRpm[ectIndexH] * ectMultiplier;
+		InterpolationResponse ectInterpolation = Interpolate(CurrentEngineCoolantTemperatureService->Value, _maxEct, _minEct, _ectResolution);
+		float idleAirmass = _idleAirmass[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _idleAirmass[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
+		unsigned short idleTargetRpm = _idleTargetRpm[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _idleTargetRpm[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
 		
 		if (CurrentVehicleSpeedSensorService != 0)
 		{
-			unsigned char speedIndexL = 0;
-			unsigned char speedIndexH = 0;
-			float speedMultiplier = 0;
-			if (_speedResolution > 1)
-			{
-				float speed = CurrentVehicleSpeedSensorService->Value;
-				float speedDivision = _speedThreshold / (_speedResolution - 1);
-				speedIndexL = speed / speedDivision;
-				speedIndexH = speedIndexL + 1;
-				ectMultiplier =  speed / speedDivision - speedIndexL;
-				if (speedIndexL > _speedResolution - 1)
-				{
-					speedIndexL = speedIndexH = _speedResolution - 1;
-				}
-				else if (speedIndexH > _speedResolution - 1)
-				{
-					speedIndexH = _speedResolution - 1;
-				}
-			}
-			idleAirmass += _idleAirmass[ectIndexL] * (1 - ectMultiplier) + _idleAirmass[ectIndexH] * ectMultiplier;
-			idleTargetRpm += _idleTargetRpm[ectIndexL] * (1 - ectMultiplier) + _idleTargetRpm[ectIndexH] * ectMultiplier;
+			InterpolationResponse speedtInterpolation = Interpolate(CurrentVehicleSpeedSensorService->Value, _speedThreshold, 0, _speedResolution);
+			idleAirmass += _idleAirmassSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _idleAirmassSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
+			idleTargetRpm += _idleTargetRpmSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _idleTargetRpmSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
 		}
 		
 		short thisRpmError = idleTargetRpm - rpm;

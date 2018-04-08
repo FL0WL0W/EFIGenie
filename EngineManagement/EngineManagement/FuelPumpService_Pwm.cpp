@@ -1,4 +1,5 @@
 #include "Services.h"
+#include "Functions.h"
 #include "stdlib.h"
 #include "FuelPumpService_Pwm.h"
 
@@ -68,33 +69,10 @@ namespace EngineManagement
 		if (!_isOn)
 			return;
 		
-		unsigned char rpmIndexL = 0;
-		unsigned char rpmIndexH = 0;
-		float rpmMultiplier = 0;
-		if (_config->RpmRes > 1)
+		float y = 0;
+		if (CurrentThrottlePositionService != 0 && CurrentManifoldAbsolutePressureService != 0)
 		{
-			unsigned short rpm = CurrentDecoder->GetRpm();
-			unsigned short rpmDivision = _config->MaxRpm / _config->RpmRes;
-			unsigned char rpmIndexL = rpm / rpmDivision;
-			unsigned char rpmIndexH = rpmIndexL + 1;
-			float rpmMultiplier = (rpm + 0.0f) / rpmDivision - rpmIndexL;
-			if (rpmIndexL > _config->RpmRes - 1)
-			{
-				rpmIndexL = rpmIndexH = _config->RpmRes - 1;
-			}
-			else if (rpmIndexH > _config->RpmRes - 1)
-			{
-				rpmIndexH = _config->RpmRes - 1;
-			}
-		}
-			
-		unsigned char yIndexL = 0;
-		unsigned char yIndexH = 0;
-		float yMultiplier = 0;
-		if (_config->YRes > 1 && CurrentThrottlePositionService != 0 && CurrentManifoldAbsolutePressureService != 0)
-		{
-			float y = 0;
-			if (_config->UseTps && CurrentThrottlePositionService != 0)
+			if ((_config->UseTps && CurrentThrottlePositionService != 0) || CurrentManifoldAbsolutePressureService == 0)
 			{
 				y = CurrentThrottlePositionService->Value;
 			}
@@ -102,24 +80,9 @@ namespace EngineManagement
 			{
 				y = CurrentManifoldAbsolutePressureService->Value;
 			}
-			float yDivision = _config->MaxY / _config->YRes;
-			yIndexL = y / yDivision;
-			yIndexH = yIndexL + 1;
-			yMultiplier = (y + 0.0f) / yDivision - yIndexL;
-			if (yIndexL > _config->YRes - 1)
-			{
-				yIndexL = yIndexH = _config->YRes - 1;
-			}
-			else if (yIndexH > _config->YRes - 1)
-			{
-				yIndexH = _config->YRes - 1;
-			}
 		}
 		
-		short _currentPwm = _config->PwmTable[rpmIndexL + _config->RpmRes * yIndexL] * rpmMultiplier * yMultiplier
-		+					_config->PwmTable[rpmIndexH + _config->RpmRes * yIndexL] * (1 - rpmMultiplier) * yMultiplier
-		+					_config->PwmTable[rpmIndexL + _config->RpmRes * yIndexH] * rpmMultiplier * (1 - yMultiplier)
-		+					_config->PwmTable[rpmIndexH + _config->RpmRes * yIndexH] * (1 - rpmMultiplier) * (1 - yMultiplier);
+		_currentPwm = InterpolateTable2<unsigned char>(CurrentDecoder->GetRpm(), _config->MaxRpm, 0, _config->RpmRes, y, _config->MaxY, 0, _config->YRes, _config->PwmTable);
 		
 		On();
 	}

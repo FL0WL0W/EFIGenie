@@ -19,6 +19,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Functions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Stepper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IdleControlService_Pd.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Functions.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Pwm.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleAirControlValveService_Stepper.cpp" />
