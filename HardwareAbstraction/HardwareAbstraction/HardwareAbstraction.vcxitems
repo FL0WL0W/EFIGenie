@@ -14,6 +14,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)HardwareAbstractionCollection.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IAnalogService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IDigitalService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPwmService.h" />

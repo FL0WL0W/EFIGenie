@@ -103,4 +103,20 @@ namespace HardwareAbstraction
 		}
 		return true;
 	}
+	
+	unsigned int ITimerService::GetElapsedTick(unsigned int lastTick)
+	{
+		unsigned int tick = GetTick();
+		if (tick < lastTick)
+		{
+			lastTick += 2147483647;
+			tick += 2147483647;
+		}
+		return tick - lastTick;
+	}
+	
+	float ITimerService::GetElapsedTime(unsigned int lastTick)
+	{
+		return (GetElapsedTick(lastTick) / (float)GetTicksPerSecond());
+	}
 }

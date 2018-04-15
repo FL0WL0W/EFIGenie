@@ -1,6 +1,6 @@
-#include "Services.h"
 #include "PistonEngineFactory.h"
 
+#ifdef PISTONENGINEFACTORY_H
 namespace EngineManagement
 {		
 	void CreateServices(
@@ -22,12 +22,7 @@ namespace EngineManagement
 		, bool tachometerHighZ
 #endif
 		)
-	{
-		CurrentTimerService = timerService;
-		CurrentDigitalService = digitalService;
-		CurrentAnalogService = analogService;
-		CurrentPwmService = pwmService;
-		
+	{		
 		unsigned char fileSystemPointer = 0;
 
 		CurrentPistonEngineConfig = new EngineManagement::PistonEngineConfig((void *)((unsigned int*)pistonEngineConfigFile + *((unsigned char*)pistonEngineConfigFile)));
@@ -209,3 +204,4 @@ namespace EngineManagement
 #endif
 	}
 }
+#endif

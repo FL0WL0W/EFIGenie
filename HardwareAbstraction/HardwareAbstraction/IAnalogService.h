@@ -1,3 +1,5 @@
+#ifndef IANALOGSERVICE_H
+#define IANALOGSERVICE_H
 namespace HardwareAbstraction
 {
 	class IAnalogService
@@ -7,3 +9,4 @@ namespace HardwareAbstraction
 		virtual float ReadPin(unsigned char pin) = 0; //pin 0 should be for "null". returns voltage
 	};
 }
+#endif

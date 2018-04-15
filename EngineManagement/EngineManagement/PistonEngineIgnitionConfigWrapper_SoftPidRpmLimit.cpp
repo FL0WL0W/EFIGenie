@@ -1,6 +1,6 @@
-#include "Services.h"
 #include "PistonEngineFactory.h"
 
+#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 namespace EngineManagement
 {
 	PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit::PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(void *config)
@@ -72,3 +72,4 @@ namespace EngineManagement
 		return _child->GetIgnitionTiming();
 	}
 }
+#endif

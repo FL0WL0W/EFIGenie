@@ -1,3 +1,5 @@
+#ifndef IDECODER_H
+#define IDECODER_H
 namespace Decoder
 {
 	enum EdgeTrigger
@@ -19,3 +21,4 @@ namespace Decoder
 		virtual bool HasCamPosition() = 0;
 	};
 }
+#endif

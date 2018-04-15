@@ -1,7 +1,7 @@
-#include "Services.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 
+#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 namespace EngineManagement
 {
 	PistonEngineIgnitionConfigWrapper_HardRpmLimit::PistonEngineIgnitionConfigWrapper_HardRpmLimit(void *config)
@@ -40,3 +40,4 @@ namespace EngineManagement
 		return _child->GetIgnitionTiming();
 	}
 }
+#endif

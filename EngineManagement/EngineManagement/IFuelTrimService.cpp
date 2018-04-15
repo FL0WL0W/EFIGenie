@@ -1,4 +1,3 @@
-#include "Services.h"
 #include "FuelTrimService_InterpolatedTable.h"
 #include "FuelTrimServiceWrapper_MultiChannel.h"
 
@@ -17,7 +16,7 @@ namespace EngineManagement
 			return 0;
 #ifdef FuelTrimService_InterpolatedTableExists
 		case 1:
-			return new FuelTrimService_InterpolatedTable((void*)((unsigned char*)config + 1));
+			return new FuelTrimService_InterpolatedTable(FuelTrimService_InterpolatedTableConfig::Cast((unsigned char*)config + 1));
 #endif
 #ifdef FuelTrimServiceWrapper_MultiChannelExists
 		case 2:

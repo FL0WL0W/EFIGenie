@@ -1,7 +1,6 @@
-#include "Services.h"
 #include "PistonEngineFactory.h"
 
-#ifdef PistonEngineInjectionConfigWrapper_DFCOExists
+#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
 	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)

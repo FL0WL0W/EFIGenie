@@ -1,3 +1,6 @@
+#ifndef ITIMERSERVICE_H
+#define ITIMERSERVICE_H
+
 #define TIMERSERVICE_MAX_STACK_SIZE 256
 
 namespace HardwareAbstraction
@@ -39,9 +42,13 @@ namespace HardwareAbstraction
 		virtual unsigned int GetTicksPerSecond() = 0;
 
 		void ReturnCallBack(void);
-		Task *ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, bool deleteOnExecution);
-		bool ScheduleTask(Task *task, unsigned int tick);
-		bool ReScheduleTask(Task *task, unsigned int tick);
-		bool UnScheduleTask(Task *task);
+		Task *ScheduleTask(void(*)(void *), void *, unsigned int, bool);
+		bool ScheduleTask(Task *, unsigned int);
+		bool ReScheduleTask(Task *, unsigned int);
+		bool UnScheduleTask(Task *);
+		
+		unsigned int GetElapsedTick(unsigned int);
+		float GetElapsedTime(unsigned int);
 	};
 }
+#endif

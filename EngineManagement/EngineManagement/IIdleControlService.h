@@ -1,4 +1,7 @@
-#define IIdleControlServiceExists
+#include "IOServiceCollection.h"
+
+#ifndef IIDLECONTROLSERVICE_H
+#define IIDLECONTROLSERVICE_H
 namespace EngineManagement
 {
 	class IIdleControlService
@@ -6,9 +9,8 @@ namespace EngineManagement
 	public:
 		short RpmError;
 		virtual void Tick() = 0;
+		
+		static IIdleControlService* CreateIdleControlService(const IOServiceLayer::IOServiceCollection *iOServiceCollection, void *config);
 	};
-
-	extern IIdleControlService *CurrentIdleControlService;
-
-	IIdleControlService* CreateIdleControlService(void *config);
 }
+#endif

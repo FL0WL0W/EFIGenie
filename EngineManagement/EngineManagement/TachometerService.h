@@ -1,5 +1,9 @@
-#define TachometerServiceExists
-namespace EngineManagement
+#include "IOServiceCollection.h"
+
+#if !defined(TACHOMETERSERVICE_H) && defined(IDECODER_H)
+#define TACHOMETERSERVICE_H
+
+namespace ApplicationServiceLayer
 {
 	struct __attribute__((__packed__)) TachometerServiceConfig
 	{
@@ -21,14 +25,16 @@ namespace EngineManagement
 	{
 	protected:
 		HardwareAbstraction::Task *TachometerTask;
+		
+		const IOServiceLayer::IOServiceCollection *_IOServiceCollection;
 		const TachometerServiceConfig *_config;
+		bool _pinHighZ;
+		
 		unsigned short _ticksPerRpm;
 		bool _pinStatus;
-		bool _pinHighZ;
 	public:
-		TachometerService(const TachometerServiceConfig *config, bool highZ);
+		TachometerService(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const TachometerServiceConfig *config, const bool highZ);
 		static void TogglePinTask(void *parameters);
 	};
-
-	extern TachometerService *CurrentTachometerService;
 }
+#endif

@@ -1,6 +1,9 @@
-#if defined(IPrimeServiceExists) && defined(IInjectorServiceExists)
-#define PrimeService_StaticPulseWidthExists
-namespace EngineManagement
+#include "IOServiceCollection.h"
+#include "IPrimeService.h"
+
+#if !defined(PRIMESERVICE_STATICPULSEWIDTH_H) && defined(IPRIMESERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)// && defined(IOServiceCollection::InjectorService)
+#define PRIMESERVICE_STATICPULSEWIDTH_H
+namespace ApplicationServiceLayer
 {
 	struct __attribute__((__packed__)) PrimeService_StaticPulseWidthConfig
 	{
@@ -19,10 +22,12 @@ namespace EngineManagement
 	
 	class PrimeService_StaticPulseWidth : public IPrimeService
 	{
-		unsigned int _pulseWidth;
+		const IOServiceLayer::IOServiceCollection *_IOServiceCollection;
+		const PrimeService_StaticPulseWidthConfig *_config;
+			
 		bool _started = false;
 	public:
-		PrimeService_StaticPulseWidth(const PrimeService_StaticPulseWidthConfig *config);
+		PrimeService_StaticPulseWidth(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const PrimeService_StaticPulseWidthConfig *config);
 		void Prime();
 		void Tick();
 	};

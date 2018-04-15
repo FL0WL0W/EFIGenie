@@ -1,6 +1,4 @@
 #include <stdint.h>
-#include "ITimerService.h"
-#include "IDecoder.h"
 #include "Gm24xDecoder.h"
 
 namespace Decoder

@@ -24,6 +24,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PinDirection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)HardwareAbstractionCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)TimerService.cpp">

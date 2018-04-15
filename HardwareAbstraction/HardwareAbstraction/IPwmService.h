@@ -1,3 +1,5 @@
+#ifndef IPWMSERVICE_H
+#define IPWMSERVICE_H
 namespace HardwareAbstraction
 {
 	struct PwmValue
@@ -14,3 +16,4 @@ namespace HardwareAbstraction
 		virtual void WritePin(unsigned char pin, PwmValue value) = 0; //pin 0 should be for "null"
 	};
 }
+#endif

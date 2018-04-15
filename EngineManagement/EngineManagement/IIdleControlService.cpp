@@ -1,5 +1,4 @@
-#include "Services.h"
-#include "IdleControlService_Pd.h"
+#include "IdleControlService_Pid.h"
 
 #ifdef IIdleControlServiceExists
 namespace EngineManagement
@@ -12,9 +11,9 @@ namespace EngineManagement
 		{
 		case 0:
 			return 0;
-#ifdef	IdleControlService_PdExists
+#ifdef	IdleControlService_PidExists
 		case 1:
-			return new IdleControlService_Pd((void*)((unsigned char*)config + 1));
+			return new IdleControlService_Pid(IdleControlService_PidConfig::Cast((unsigned char*)config + 1));
 #endif
 		}
 	}

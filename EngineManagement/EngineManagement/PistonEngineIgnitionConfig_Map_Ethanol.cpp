@@ -1,8 +1,7 @@
-#include "Services.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 
-#ifdef PistonEngineIgnitionConfig_Map_EthanolExists
+#ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 namespace EngineManagement
 {
 	PistonEngineIgnitionConfig_Map_Ethanol::PistonEngineIgnitionConfig_Map_Ethanol(void *config)

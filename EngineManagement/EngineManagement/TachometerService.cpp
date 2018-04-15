@@ -1,34 +1,33 @@
-#include "Services.h"
+#include "TachometerService.h"
 
-#ifdef TachometerServiceExists
-namespace EngineManagement
+#ifdef TACHOMETERSERVICE_H
+namespace ApplicationServiceLayer
 {
-	TachometerService::TachometerService(const TachometerServiceConfig *config, bool highZ)
+	TachometerService::TachometerService(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const TachometerServiceConfig *config, const bool highZ)
 	{
+		_IOServiceCollection = iOServiceCollection;
 		_config = config;
 				
-		_ticksPerRpm = (15 * CurrentTimerService->GetTicksPerSecond()) / _config->PulsesPer2Rpm;
+		_ticksPerRpm = (15 * _IOServiceCollection->HardwareAbstractionCollection->TimerService->GetTicksPerSecond()) / _config->PulsesPer2Rpm;
 		
 		_pinHighZ = highZ;
 
-		CurrentDigitalService->InitPin(_config->DigitalPin, HardwareAbstraction::Out);
-		CurrentDigitalService->WritePin(_config->DigitalPin, false);
+		_IOServiceCollection->HardwareAbstractionCollection->DigitalService->InitPin(_config->DigitalPin, HardwareAbstraction::Out);
+		_IOServiceCollection->HardwareAbstractionCollection->DigitalService->WritePin(_config->DigitalPin, false);
 		
 		TachometerTask = new HardwareAbstraction::Task(TachometerService::TogglePinTask, this, false);
-		CurrentTimerService->ScheduleTask(TachometerTask, CurrentTimerService->GetTicksPerSecond() * 2);
+		_IOServiceCollection->HardwareAbstractionCollection->TimerService->ScheduleTask(TachometerTask, _IOServiceCollection->HardwareAbstractionCollection->TimerService->GetTicksPerSecond() * 2);
 	}
 	
 	void TachometerService::TogglePinTask(void *parameters)
 	{
 		TachometerService *service = ((TachometerService *) parameters);
 		service->_pinStatus = !service->_pinStatus;
-		CurrentDigitalService->WritePin(service->_config->DigitalPin, service -> _pinStatus);
-		if (CurrentDecoder->GetRpm() < 1)
-			CurrentTimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / CurrentDecoder->GetRpm());
+		service->_IOServiceCollection->HardwareAbstractionCollection->DigitalService->WritePin(service->_config->DigitalPin, service->_pinStatus);
+		if (service->_IOServiceCollection->Decoder->GetRpm() < 1)
+			service->_IOServiceCollection->HardwareAbstractionCollection->TimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / service->_IOServiceCollection->Decoder->GetRpm());
 		else
-			CurrentTimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm);
+			service->_IOServiceCollection->HardwareAbstractionCollection->TimerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm);
 	}
-	
-	TachometerService *CurrentTachometerService;
 }
 #endif

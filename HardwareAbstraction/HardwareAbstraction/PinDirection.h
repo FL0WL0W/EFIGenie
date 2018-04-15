@@ -1,3 +1,5 @@
+#ifndef PINDIRECTION_H
+#define PINDIRECTION_H
 namespace HardwareAbstraction
 {
 	enum PinDirection
@@ -6,3 +8,4 @@ namespace HardwareAbstraction
 		Out = 1
 	};
 }
+#endif

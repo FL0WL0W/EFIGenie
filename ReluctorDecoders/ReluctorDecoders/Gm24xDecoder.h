@@ -1,3 +1,8 @@
+#include "IDecoder.h"
+#include "ITimerService.h"
+
+#ifndef GM24XDECODER_H
+#define GM24XDECODER_H
 namespace Decoder
 {
 	class Gm24xDecoder : public IDecoder
@@ -25,3 +30,4 @@ namespace Decoder
 		bool HasCamPosition();
 	};
 }
+#endif

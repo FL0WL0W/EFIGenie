@@ -1,61 +1,21 @@
 #include "stdlib.h"
-#include "Services.h"
 #include "FuelTrimService_InterpolatedTable.h"
 
 #ifdef FuelTrimService_InterpolatedTableExists
 namespace EngineManagement
 {
-	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(void *config)
+	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(const FuelTrimService_InterpolatedTableConfig *config)
 	{
 		if (CurrentManifoldAbsolutePressureService == 0 || CurrentAfrService == 0)
 			return; //TODO: figure out error handling
+				
+		_config = config;
 		
-		unsigned int _updateRate = *(unsigned int *)config;
-		config = (void*)((unsigned int *)config + 1);
-		
-		unsigned short _cycleDelay = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		float _kP = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		float _kI = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		float _kD = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		unsigned char _rpmResolution = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		
-		unsigned short *_rpmDivisions = (unsigned short *)config;
-		config = (void*)((unsigned short *)config + _rpmResolution);
-		
-		unsigned short _rpmInterpolationDistance = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		unsigned char _yResolution = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		
-		float *_yDivisions = (float *)config;
-		config = (void*)((float *)config + _yResolution);
-		
-		float _yInterpolationDistance = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		unsigned char flags = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		bool _isPid = flags & 0x01;
-		bool _useTps = flags & 0x02;
-		
-		float _lambdaDeltaEnable = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		ISensorService *_lambdaSensorService = CreateSensorService(config);
+		IFloatInputService *_lambdaSensorService = CreateSensorService(_config->YDivisions + _config->YResolution);
 		if (_lambdaSensorService == 0)
 			return; //TODO: figure out error handling
 		
-		_fuelTrimIntegralTable = (short *)malloc(sizeof(short) * (_rpmResolution+1) * (_yResolution+1));
+		_fuelTrimIntegralTable = (short *)malloc(sizeof(short) * (_config->RpmResolution+1) * (_config->YResolution+1));
 	}
 
 	short FuelTrimService_InterpolatedTable::GetFuelTrim(unsigned char cylinder)
@@ -65,7 +25,7 @@ namespace EngineManagement
 
 	void FuelTrimService_InterpolatedTable::TrimTick()
 	{
-		if (CurrentAfrService->Lambda < 1 + _lambdaDeltaEnable || CurrentAfrService->Lambda > 1 - _lambdaDeltaEnable)
+		if (CurrentAfrService->Lambda < 1 + _config->LambdaDeltaEnable || CurrentAfrService->Lambda > 1 - _config->LambdaDeltaEnable)
 		{
 			unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();
 			unsigned int origTick = CurrentTimerService->GetTick();
@@ -77,17 +37,17 @@ namespace EngineManagement
 				tick += 2147483647;
 			}
 			float elapsedTime = (tick - prevTick) / ticksPerSecond;
-			if (elapsedTime * _updateRate < 1)
+			if (elapsedTime * _config->UpdateRate < 1)
 				return;
 			float rpm = CurrentDecoder->GetRpm();
 			_rpmDot = (rpm - _prevRpm) / elapsedTime;
 			_prevRpm = rpm;
 			_prevTick = origTick;
-			float delayTime = (60 * _cycleDelay) / rpm;
+			float delayTime = (60 * _config->CycleDelay) / rpm;
 
 			float y = 0;
 			float yPredict = 0;
-			if (_useTps && CurrentThrottlePositionService != 0)
+			if (_config->UseTps && CurrentThrottlePositionService != 0)
 			{
 				y = CurrentThrottlePositionService->Value;
 				yPredict = y - delayTime * CurrentThrottlePositionService->Value;
@@ -102,12 +62,12 @@ namespace EngineManagement
 			unsigned char yPredictIndexL = 0;
 			unsigned char yPredictIndexH = 0;
 			float yDist = 0;
-			for (int i = _yResolution; i >= 0; i--)
+			for (int i = _config->YResolution; i >= 0; i--)
 			{
 				if (i == 0)
 				{
-					yDist = _yDivisions[0] - yPredict;
-					if (yDist > _yInterpolationDistance)
+					yDist = _config->YDivisions[0] - yPredict;
+					if (yDist > _config->YInterpolationDistance)
 					{
 						yPredictIndexH = 0;
 						yPredictIndexL = 0;
@@ -118,12 +78,12 @@ namespace EngineManagement
 						yPredictIndexH = 1;
 					}
 				}
-				else if (yPredict > _yDivisions[i - 1])
+				else if (yPredict > _config->YDivisions[i - 1])
 				{
-					if (i == _yResolution)
+					if (i == _config->YResolution)
 					{
-						yDist = yPredict - _yDivisions[i - 1];
-						if (yDist > _yInterpolationDistance)
+						yDist = yPredict - _config->YDivisions[i - 1];
+						if (yDist > _config->YInterpolationDistance)
 						{
 							yPredictIndexH = i;
 							yPredictIndexL = i;
@@ -136,9 +96,9 @@ namespace EngineManagement
 					}
 					else
 					{
-						if ((yDist = yPredict - _yDivisions[i - 1]) < _yDivisions[i] - yPredict)
+						if ((yDist = yPredict - _config->YDivisions[i - 1]) < _config->YDivisions[i] - yPredict)
 						{
-							if (yDist > _yInterpolationDistance)
+							if (yDist > _config->YInterpolationDistance)
 							{
 								yPredictIndexH = i;
 								yPredictIndexL = i;
@@ -151,8 +111,8 @@ namespace EngineManagement
 						}
 						else
 						{
-							yDist = _yDivisions[i] - yPredict;
-							if (yDist > _yInterpolationDistance)
+							yDist = _config->YDivisions[i] - yPredict;
+							if (yDist > _config->YInterpolationDistance)
 							{
 								yPredictIndexH = i;
 								yPredictIndexL = i;
@@ -166,17 +126,17 @@ namespace EngineManagement
 					}
 				}
 			}
-			float yPredictMultiplier = yDist / _yInterpolationDistance;
+			float yPredictMultiplier = yDist / _config->YInterpolationDistance;
 
 			unsigned char rpmPredictIndexL = 0;
 			unsigned char rpmPredictIndexH = 0;
 			unsigned short rpmDist = 0;
-			for (int i = _rpmResolution; i >= 0; i--)
+			for (int i = _config->RpmResolution; i >= 0; i--)
 			{
 				if (i == 0)
 				{
-					rpmDist = _rpmDivisions[0] - rpmPredict;
-					if (rpmDist > _rpmInterpolationDistance)
+					rpmDist = _config->RpmDivisions[0] - rpmPredict;
+					if (rpmDist > _config->RpmInterpolationDistance)
 					{
 						rpmPredictIndexH = 0;
 						rpmPredictIndexL = 0;
@@ -187,12 +147,12 @@ namespace EngineManagement
 						rpmPredictIndexH = 1;
 					}
 				}
-				else if (rpmPredict > _rpmDivisions[i - 1])
+				else if (rpmPredict > _config->RpmDivisions[i - 1])
 				{
-					if (i == _rpmResolution)
+					if (i == _config->RpmResolution)
 					{
-						rpmDist = rpmPredict - _rpmDivisions[i - 1];
-						if (rpmDist > _rpmInterpolationDistance)
+						rpmDist = rpmPredict - _config->RpmDivisions[i - 1];
+						if (rpmDist > _config->RpmInterpolationDistance)
 						{
 							rpmPredictIndexH = i;
 							rpmPredictIndexL = i;
@@ -205,9 +165,9 @@ namespace EngineManagement
 					}
 					else
 					{
-						if ((rpmDist = rpmPredict - _rpmDivisions[i - 1]) < _rpmDivisions[i] - rpmPredict)
+						if ((rpmDist = rpmPredict - _config->RpmDivisions[i - 1]) < _config->RpmDivisions[i] - rpmPredict)
 						{
-							if (rpmDist > _rpmInterpolationDistance)
+							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmPredictIndexH = i;
 								rpmPredictIndexL = i;
@@ -220,8 +180,8 @@ namespace EngineManagement
 						}
 						else
 						{
-							rpmDist = _rpmDivisions[i] - rpmPredict;
-							if (rpmDist > _rpmInterpolationDistance)
+							rpmDist = _config->RpmDivisions[i] - rpmPredict;
+							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmPredictIndexH = i;
 								rpmPredictIndexL = i;
@@ -235,19 +195,19 @@ namespace EngineManagement
 					}
 				}
 			}
-			float rpmPredictMultiplier = rpmDist / _rpmInterpolationDistance;
+			float rpmPredictMultiplier = rpmDist / _config->RpmInterpolationDistance;
 			
 			unsigned char yIndexL = 0;
 			unsigned char yIndexH = 0;
 			yDist = 0;
-			for (int i = _yResolution - 1; i >= 0; i--)
+			for (int i = _config->YResolution - 1; i >= 0; i--)
 			{
-				if (y > _yDivisions[i])
+				if (y > _config->YDivisions[i])
 				{
-					if (i == _yResolution - 1)
+					if (i == _config->YResolution - 1)
 					{
-						yDist = y - _yDivisions[i];
-						if (yDist > _yInterpolationDistance)
+						yDist = y - _config->YDivisions[i];
+						if (yDist > _config->YInterpolationDistance)
 						{
 							yIndexH = i;
 							yIndexL = i;
@@ -260,10 +220,10 @@ namespace EngineManagement
 					}
 					else
 					{
-						if (y - _yDivisions[i] < _yDivisions[i + 1] - y)
+						if (y - _config->YDivisions[i] < _config->YDivisions[i + 1] - y)
 						{
-							yDist = y - _yDivisions[i];
-							if (yDist > _yInterpolationDistance)
+							yDist = y - _config->YDivisions[i];
+							if (yDist > _config->YInterpolationDistance)
 							{
 								yIndexH = i;
 								yIndexL = i;
@@ -276,8 +236,8 @@ namespace EngineManagement
 						}
 						else
 						{
-							yDist = _yDivisions[i + 1] - y;
-							if (yDist > _yInterpolationDistance)
+							yDist = _config->YDivisions[i + 1] - y;
+							if (yDist > _config->YInterpolationDistance)
 							{
 								yIndexH = i;
 								yIndexL = i;
@@ -292,8 +252,8 @@ namespace EngineManagement
 				}
 				else if (i == 0)
 				{
-					yDist = _yDivisions[0] - y;
-					if (yDist > _yInterpolationDistance)
+					yDist = _config->YDivisions[0] - y;
+					if (yDist > _config->YInterpolationDistance)
 					{
 						yIndexH = 0;
 						yIndexL = 0;
@@ -305,19 +265,19 @@ namespace EngineManagement
 					}
 				}
 			}
-			unsigned char yMultiplier = yDist / _yInterpolationDistance;
+			unsigned char yMultiplier = yDist / _config->YInterpolationDistance;
 
 			unsigned char rpmIndexL = 0;
 			unsigned char rpmIndexH = 0;
 			rpmDist = 0;
-			for (int i = _rpmResolution - 1; i >= 0; i--)
+			for (int i = _config->RpmResolution - 1; i >= 0; i--)
 			{
-				if (rpm > _rpmDivisions[i])
+				if (rpm > _config->RpmDivisions[i])
 				{
-					if (i == _rpmResolution - 1)
+					if (i == _config->RpmResolution - 1)
 					{
-						rpmDist = rpm - _rpmDivisions[i];
-						if (rpmDist > _rpmInterpolationDistance)
+						rpmDist = rpm - _config->RpmDivisions[i];
+						if (rpmDist > _config->RpmInterpolationDistance)
 						{
 							rpmIndexH = i;
 							rpmIndexL = i;
@@ -330,10 +290,10 @@ namespace EngineManagement
 					}
 					else
 					{
-						if (rpm - _rpmDivisions[i] < _rpmDivisions[i + 1] - rpm)
+						if (rpm - _config->RpmDivisions[i] < _config->RpmDivisions[i + 1] - rpm)
 						{
-							rpmDist = rpm - _rpmDivisions[i];
-							if (rpmDist > _rpmInterpolationDistance)
+							rpmDist = rpm - _config->RpmDivisions[i];
+							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmIndexH = i;
 								rpmIndexL = i;
@@ -346,8 +306,8 @@ namespace EngineManagement
 						}
 						else
 						{
-							rpmDist = _rpmDivisions[i + 1] - rpm;
-							if (rpmDist > _rpmInterpolationDistance)
+							rpmDist = _config->RpmDivisions[i + 1] - rpm;
+							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmIndexH = i;
 								rpmIndexL = i;
@@ -362,8 +322,8 @@ namespace EngineManagement
 				}
 				else if (i == 0)
 				{
-					rpmDist = _rpmDivisions[0] - rpm;
-					if (rpmDist > _rpmInterpolationDistance)
+					rpmDist = _config->RpmDivisions[0] - rpm;
+					if (rpmDist > _config->RpmInterpolationDistance)
 					{
 						rpmIndexH = 0;
 						rpmIndexL = 0;
@@ -375,39 +335,39 @@ namespace EngineManagement
 					}
 				}
 			}
-			unsigned char rpmMultiplier = rpmDist / _rpmInterpolationDistance;
+			unsigned char rpmMultiplier = rpmDist / _config->RpmInterpolationDistance;
 		
 			_lambdaSensorService->ReadValue();
 			
 			float error = CurrentAfrService->Lambda - _lambdaSensorService->Value;
 			float fuelTrimIntegral;
 		
-			if (_isPid)
+			if (_config->IsPid)
 			{
-				fuelTrimIntegral = error * elapsedTime;
+				fuelTrimIntegral = error * elapsedTime * _config->I;
 			}
 			else
 			{
 				if (error != 0)
 				{
-					fuelTrimIntegral = _kI * (tick - prevTick) / ticksPerSecond;
+					fuelTrimIntegral = _config->I * elapsedTime;
 					if(error < 0)
 						fuelTrimIntegral = -fuelTrimIntegral;
 				}
 			}
 				
-			_fuelTrimIntegralTable[yPredictIndexL * _rpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * (1 - rpmPredictMultiplier);
-			_fuelTrimIntegralTable[yPredictIndexL * _rpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * rpmPredictMultiplier;
-			_fuelTrimIntegralTable[yPredictIndexH * _rpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * yPredictMultiplier * (1 - rpmPredictMultiplier);
-			_fuelTrimIntegralTable[yPredictIndexH * _rpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * yPredictMultiplier * rpmPredictMultiplier;
+			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * (1 - rpmPredictMultiplier);
+			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * rpmPredictMultiplier;
+			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * yPredictMultiplier * (1 - rpmPredictMultiplier);
+			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * yPredictMultiplier * rpmPredictMultiplier;
 
-			fuelTrimIntegral = (_fuelTrimIntegralTable[yIndexL * _rpmResolution + rpmIndexL] * (1 - yMultiplier) * (1 - rpmMultiplier)
-					  + _fuelTrimIntegralTable[yIndexL * _rpmResolution + rpmIndexH] * (1 - yMultiplier) * rpmMultiplier
-					  + _fuelTrimIntegralTable[yIndexH * _rpmResolution + rpmIndexL] * yMultiplier * (1 - rpmMultiplier)
-					  + _fuelTrimIntegralTable[yIndexH * _rpmResolution + rpmIndexH] * yMultiplier * rpmMultiplier);
+			fuelTrimIntegral =	 (_fuelTrimIntegralTable[yIndexL * _config->RpmResolution + rpmIndexL] * (1 - yMultiplier) * (1 - rpmMultiplier)
+								+ _fuelTrimIntegralTable[yIndexL * _config->RpmResolution + rpmIndexH] * (1 - yMultiplier) * rpmMultiplier
+								+ _fuelTrimIntegralTable[yIndexH * _config->RpmResolution + rpmIndexL] * yMultiplier * (1 - rpmMultiplier)
+								+ _fuelTrimIntegralTable[yIndexH * _config->RpmResolution + rpmIndexH] * yMultiplier * rpmMultiplier);
 		
 			_fuelTrim = fuelTrimIntegral;
-			if (_isPid)
+			if (_config->IsPid)
 			{
 				fuelTrimIntegral *= 0.0078125;
 				
@@ -415,7 +375,7 @@ namespace EngineManagement
 				
 				_lastError = error;
 				
-				_fuelTrim = _kP * error + _kI * fuelTrimIntegral + _kD * derivative;
+				_fuelTrim = _config->P * error + fuelTrimIntegral - _config->D * derivative;
 			}
 		}
 		else

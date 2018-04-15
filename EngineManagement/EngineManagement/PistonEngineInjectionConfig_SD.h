@@ -2,33 +2,44 @@
 #define PistonEngineInjectionConfig_SDExists
 namespace EngineManagement
 {	
-	class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
+	struct PistonEngineInjectionConfig_SDConfig
+	{
+		unsigned short GasConstant;
+		unsigned short InjectorOpenPosition64thDegree;
+		
+		unsigned short MaxRpm;
+		float MaxMapBar;
+		unsigned char VeRpmResolution;
+		unsigned char VeMapResolution;
+		unsigned short *VolumetricEfficiencyMap;
+		
+		unsigned short *InjectorGramsPerMinute;
+		
+		float ShortPulseLimit;
+		short *ShortPulseAdder;
+		
+		float VoltageMax;
+		float VoltageMin;
+		unsigned char OffsetMapResolution;
+		unsigned char OffsetVoltageResolution;
+		short *Offset;
+		
+		unsigned char TemperatureBiasResolution;
+		unsigned char *TemperatureBias;
+		
+		float MaxTpsDot;
+		unsigned char TpsDotAdderResolution;
+		short *TpsDotAdder;		
+		
+		float MaxMapBarDot;
+		unsigned char MapDotAdderResolution;
+		short *MapDotAdder;
+	};
+	
+class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	{
 	protected:
 		PistonEngineConfig *_pistonEngineConfig;
-		unsigned short *_volumetricEfficiencyMap;
-		unsigned short *_injectorGramsPerMinute;
-		short *_shortPulseAdder;
-		short *_offset;
-		float _shortPulseLimit;
-		unsigned short _gasConstant;
-		unsigned char *_temperatureBias;
-		float _maxTpsDot;
-		unsigned char _tpsDotAdderResolution;
-		short *_tpsDotAdder;		
-		short *_mapDotAdder;
-		unsigned short _injectorOpenPosition64thDegree;
-		unsigned short _maxRpm;
-		float _maxMapBar;
-		float _maxMapBarDot;
-		float _voltageMax;
-		float _voltageMin;
-		unsigned char _veRpmResolution;
-		unsigned char _veMapResolution;
-		unsigned char _offsetMapResolution;
-		unsigned char _offsetVoltageResolution;
-		unsigned char _temperatureBiasResolution;
-		unsigned char _mapDotAdderResolution;
 		
 	public:
 		PistonEngineInjectionConfig_SD(void *config);

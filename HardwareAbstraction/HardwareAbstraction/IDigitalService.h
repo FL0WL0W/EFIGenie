@@ -1,3 +1,5 @@
+#ifndef IDIGITALSERVICE_H
+#define IDIGITALSERVICE_H
 namespace HardwareAbstraction
 {
 	class IDigitalService
@@ -8,3 +10,4 @@ namespace HardwareAbstraction
 		virtual void WritePin(unsigned char pin, bool value) = 0; //pin 0 should be for "null"
 	};
 }
+#endif
