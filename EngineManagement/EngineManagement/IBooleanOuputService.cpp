@@ -2,7 +2,7 @@
 #include "BooleanOutputService.h"
 
 #ifdef IBOOLEANOUTPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	void IBooleanOutputService::OutputSetTask(void *parameters)
 	{

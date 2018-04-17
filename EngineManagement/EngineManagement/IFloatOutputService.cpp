@@ -4,7 +4,7 @@
 #include "FloatOutputService_StepperPolynomial.h"
 
 #ifdef IFLOATOUTPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config)
 	{

@@ -1,7 +1,7 @@
 #include "BooleanInputService.h"
 
 #ifdef BOOLEANINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	BooleanInputService::BooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, BooleanInputServiceConfig *config)
 	{

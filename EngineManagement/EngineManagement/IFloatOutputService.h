@@ -2,7 +2,7 @@
 
 #ifndef IFLOATOUTPUTSERVICE_H
 #define IFLOATOUTPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class IFloatOutputService
 	{

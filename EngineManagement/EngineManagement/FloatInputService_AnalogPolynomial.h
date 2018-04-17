@@ -4,7 +4,7 @@
 
 #if !defined(FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H) && defined(IFLOATINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H
-namespace IOServiceLayer
+namespace IOService
 {
 	template<unsigned char Degree>
 	struct __attribute__((__packed__)) FloatInputService_AnalogPolynomialConfig

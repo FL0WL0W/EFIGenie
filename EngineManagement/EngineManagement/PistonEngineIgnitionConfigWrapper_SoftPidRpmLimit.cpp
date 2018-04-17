@@ -1,5 +1,3 @@
-#include "PistonEngineFactory.h"
-
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 namespace EngineManagement
 {

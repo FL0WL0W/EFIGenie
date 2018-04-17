@@ -4,7 +4,7 @@
 
 #if !defined(FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H) && defined(IFLOATINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H) 
 #define FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H
-namespace IOServiceLayer
+namespace IOService
 {
 	template<unsigned char Degree>
 	struct __attribute__((__packed__)) FloatInputService_FrequencyPolynomialConfig

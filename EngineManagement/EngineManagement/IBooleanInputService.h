@@ -2,7 +2,7 @@
 
 #ifndef IBOOLEANINPUTSERVICE_H
 #define IBOOLEANINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class IBooleanInputService
 	{

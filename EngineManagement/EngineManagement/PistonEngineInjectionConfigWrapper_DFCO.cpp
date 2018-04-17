@@ -1,5 +1,3 @@
-#include "PistonEngineFactory.h"
-
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {

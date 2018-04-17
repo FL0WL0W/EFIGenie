@@ -1,4 +1,9 @@
-#define IFuelPumpServiceExists
+#include "ServiceLocator.h"
+
+using namespace Service;
+
+#ifndef IFUELPUMPSERVICE_H
+#define IFUELPUMPSERVICE_H
 namespace EngineManagement
 {
 	class IFuelPumpService
@@ -8,9 +13,8 @@ namespace EngineManagement
 		virtual void On() = 0;
 		virtual void Off() = 0;
 		virtual void Tick() = 0;
+		
+		static IFuelPumpService* CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
-
-	extern IFuelPumpService *CurrentFuelPumpService;
-
-	IFuelPumpService* CreateFuelPumpService(void *config, bool fuelPumpHighZ);
 }
+#endif

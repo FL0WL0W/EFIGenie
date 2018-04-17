@@ -1,4 +1,4 @@
-namespace EngineManagement
+namespace Interpolation
 {
 	struct InterpolationResponse
 	{

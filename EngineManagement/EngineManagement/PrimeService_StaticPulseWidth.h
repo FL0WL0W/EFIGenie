@@ -1,4 +1,4 @@
-#include "IOServiceCollection.h"
+#include "ServiceLocator.h"
 #include "IPrimeService.h"
 
 #if !defined(PRIMESERVICE_STATICPULSEWIDTH_H) && defined(IPRIMESERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)// && defined(IOServiceCollection::InjectorService)
@@ -22,12 +22,11 @@ namespace ApplicationServiceLayer
 	
 	class PrimeService_StaticPulseWidth : public IPrimeService
 	{
-		const IOServiceLayer::IOServiceCollection *_IOServiceCollection;
 		const PrimeService_StaticPulseWidthConfig *_config;
 			
 		bool _started = false;
 	public:
-		PrimeService_StaticPulseWidth(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const PrimeService_StaticPulseWidthConfig *config);
+		PrimeService_StaticPulseWidth(const PrimeService_StaticPulseWidthConfig *config);
 		void Prime();
 		void Tick();
 	};

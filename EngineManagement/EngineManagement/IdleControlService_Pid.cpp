@@ -1,36 +1,53 @@
 #include "IdleControlService_Pid.h"
 #include "math.h"
-#include "Functions.h"
+#include "Interpolation.h"
+
+using namespace Interpolation;
 
 #ifdef IDLECONTROLSERVICE_PID_H
-namespace EngineManagement
+namespace ApplicationService
 {
-	IdleControlService_Pid::IdleControlService_Pid(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const IdleControlService_PidConfig *config)
+	IdleControlService_Pid::IdleControlService_Pid(
+		const IdleControlService_PidConfig *config, 
+		const HardwareAbstractionCollection *hardwareAbstractionCollection, 
+		IDecoder *decoder, 
+		IFloatInputService *throttlePositionService, 
+		IFloatInputService *engineCoolantTemperatureService, 
+		IFloatInputService *vehicleSpeedService,
+		IFloatInputService *intakeAirTemperatureService, 
+		IFloatInputService *manifoldAbsolutePressureService,
+		IFloatOutputService *idleAirControlValveService)
 	{
-		_IOServiceCollection = iOServiceCollection;
 		_config = config;
+		_hardwareAbstractionCollection = hardwareAbstractionCollection;
+		_decoder = decoder;
+		_engineCoolantTemperatureService = engineCoolantTemperatureService;
+		_vehicleSpeedService = vehicleSpeedService;
+		_intakeAirTemperatureService = intakeAirTemperatureService;
+		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
+		_idleAirControlValveService = idleAirControlValveService;
 	}
 	
 	void IdleControlService_Pid::Tick()
 	{
-		if (_IOServiceCollection->ThrottlePositionService != 0 && _IOServiceCollection->ThrottlePositionService->Value > _config->TpsThreshold)
+		if (_throttlePositionService != 0 && _throttlePositionService->Value > _config->TpsThreshold)
 		{
 			//no longer have error since we are out of the threshold
 			RpmError = 0;
 			return;
 		}
 		
-		if (_IOServiceCollection->VehicleSpeedService != 0 && _IOServiceCollection->VehicleSpeedService->Value > _config->SpeedThreshold)
+		if (_vehicleSpeedService != 0 && _vehicleSpeedService->Value > _config->SpeedThreshold)
 		{
 			//no longer have error since we are out of the threshold
 			RpmError = 0;
 			return;
 		}
 		
-		unsigned short rpm = _IOServiceCollection->Decoder->GetRpm();
+		unsigned short rpm = _decoder->GetRpm();
 		
 		//TODO REPLACE THIS WITH FUNCTION
-		unsigned int readTickOrig = _IOServiceCollection->HardwareAbstractionCollection->TimerService->GetTick();
+		unsigned int readTickOrig = _hardwareAbstractionCollection->TimerService->GetTick();
 		unsigned int lastReadTick = _lastReadTick;
 		//if ther hasn't been a full tick between reads then return;
 		if(lastReadTick == readTickOrig)
@@ -41,18 +58,18 @@ namespace EngineManagement
 			lastReadTick += 2147483647;
 			readTick += 2147483647;
 		}
-		if (readTick < (lastReadTick + _IOServiceCollection->HardwareAbstractionCollection->TimerService->GetTicksPerSecond() / _config->DotSampleRate))
+		if (readTick < (lastReadTick + _hardwareAbstractionCollection->TimerService->GetTicksPerSecond() / _config->DotSampleRate))
 			return;
-		float dt = (readTick - lastReadTick) / (float)_IOServiceCollection->HardwareAbstractionCollection->TimerService->GetTicksPerSecond();
+		float dt = (readTick - lastReadTick) / (float)_hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
 		_lastReadTick = readTickOrig;
 		
-		InterpolationResponse ectInterpolation = Interpolate(_IOServiceCollection->EngineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->EctResolution);
+		InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->EctResolution);
 		float idleAirmass = _config->IdleAirmass[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _config->IdleAirmass[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
 		unsigned short idleTargetRpm = _config->IdleTargetRpm[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _config->IdleTargetRpm[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
 		
-		if (_IOServiceCollection->VehicleSpeedService != 0)
+		if (_vehicleSpeedService != 0)
 		{
-			InterpolationResponse speedtInterpolation = Interpolate(_IOServiceCollection->VehicleSpeedService->Value, _config->SpeedThreshold, 0, _config->SpeedResolution);
+			InterpolationResponse speedtInterpolation = Interpolate(_vehicleSpeedService->Value, _config->SpeedThreshold, 0, _config->SpeedResolution);
 			idleAirmass += _config->IdleAirmassSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _config->IdleAirmassSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
 			idleTargetRpm += _config->IdleTargetRpmSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _config->IdleTargetRpmSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
 		}
@@ -70,18 +87,18 @@ namespace EngineManagement
 		idleAirmass += _config->P * RpmError - _config->D * rpmErrorDot + _integral;
 		
 		float temperature = 30;
-		if (_IOServiceCollection->IntakeAirTemperatureService != 0)
-			temperature = _IOServiceCollection->IntakeAirTemperatureService->Value;
+		if (_intakeAirTemperatureService != 0)
+			temperature = _intakeAirTemperatureService->Value;
 		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / ((_config->GasConstant / 10.0f) * (temperature + 273.15));   // kg/m^3
 		airDensity *= 1000000; //g/mm^3
 		
 		float pressure = 500000; // default to 50 kpa
-		if (_IOServiceCollection->ManifoldAbsolutePressureService != 0)
-			pressure = _IOServiceCollection->ManifoldAbsolutePressureService->Value * 1000000;  //g/mm^3
+		if (_manifoldAbsolutePressureService != 0)
+			pressure = _manifoldAbsolutePressureService->Value * 1000000;  //g/mm^3
 		
 		float idleAirArea = idleAirmass / sqrt(2*pressure*airDensity);
 		
-		_IOServiceCollection->IdleAirControlValveService->SetOutput(idleAirArea);
+		_idleAirControlValveService->SetOutput(idleAirArea);
 	}
 }
 #endif 

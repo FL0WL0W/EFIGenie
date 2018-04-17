@@ -1,7 +1,7 @@
 #include "BooleanOutputService.h"
 
 #ifdef BOOLEANOUTPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	BooleanOutputService::BooleanOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const BooleanOutputServiceConfig *config, bool highZ)
 	{

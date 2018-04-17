@@ -5,7 +5,7 @@
 
 #if !defined(FLOATOUTPUTSERVICE_STEPPERPOLYNOMIALCONFIG_H) && defined(IFLOATOUTPUTSERVICE_H)
 #define FLOATOUTPUTSERVICE_STEPPERPOLYNOMIALCONFIG_H
-namespace IOServiceLayer
+namespace IOService
 {
 	template<unsigned char Degree>
 		struct __attribute__((__packed__)) FloatOutputService_StepperPolynomialConfig

@@ -2,7 +2,7 @@
 
 #ifndef IFLOATINPUTSERVICE_H
 #define IFLOATINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class IFloatInputService
 	{

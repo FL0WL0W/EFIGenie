@@ -3,7 +3,7 @@
 
 #if !defined(BOOLEANINPUTSERVICE_H) && defined(IBOOLEANINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define BOOLEANINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	struct __attribute__((__packed__)) BooleanInputServiceConfig
 	{

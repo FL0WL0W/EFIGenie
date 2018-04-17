@@ -2,7 +2,7 @@
 
 #if !defined(BOOLEANINPUTSERVICE_STATIC_H) && defined(IBOOLEANINPUTSERVICE_H)
 #define BOOLEANINPUTSERVICE_STATIC_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class BooleanInputService_Static : public IBooleanInputService
 	{

@@ -1,5 +1,3 @@
-#include "PistonEngineFactory.h"
-
 #ifdef PrimeService_StaticPulseWidthExists
 namespace ApplicationServiceLayer
 {

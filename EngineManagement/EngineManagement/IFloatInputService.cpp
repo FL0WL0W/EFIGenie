@@ -4,7 +4,7 @@
 #include "FloatInputService_FrequencyPolynomial.h"
 
 #ifdef IFLOATINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
 	{

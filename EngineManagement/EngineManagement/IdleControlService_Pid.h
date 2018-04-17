@@ -1,8 +1,16 @@
 #include "IIdleControlService.h"
+#include "HardwareAbstractionCollection.h"
+#include "IDecoder.h"
+#include "IFloatInputService.h"
+#include "IFloatOutputService.h"
+
+using namespace HardwareAbstraction;
+using namespace Decoder;
+using namespace IOService;
 
 #if !defined(IDLECONTROLSERVICE_PID_H) && defined(IIDLECONTROLSERVICE_H)
 #define IDLECONTROLSERVICE_PID_H
-namespace EngineManagement
+namespace ApplicationService
 {
 	struct __attribute__((__packed__)) IdleControlService_PidConfig
 	{
@@ -46,13 +54,29 @@ namespace EngineManagement
 	class IdleControlService_Pid : public IIdleControlService
 	{
 	protected:
-		const IOServiceLayer::IOServiceCollection *_IOServiceCollection;
 		const IdleControlService_PidConfig *_config;
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
+		IDecoder *_decoder;
+		IFloatInputService *_throttlePositionService;
+		IFloatInputService *_engineCoolantTemperatureService;
+		IFloatInputService *_vehicleSpeedService;
+		IFloatInputService *_intakeAirTemperatureService;
+		IFloatInputService *_manifoldAbsolutePressureService;
+		IFloatOutputService *_idleAirControlValveService;
 
 		float _integral;
 		unsigned int _lastReadTick = 0;
 	public:
-		IdleControlService_Pid(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const IdleControlService_PidConfig *config);
+		IdleControlService_Pid(
+			const IdleControlService_PidConfig *config, 
+			const HardwareAbstractionCollection *hardwareAbstractionCollection, 
+			IDecoder *decoder, 
+			IFloatInputService *throttlePositionService, 
+			IFloatInputService *engineCoolantTemperatureService, 
+			IFloatInputService *vehicleSpeedService,
+			IFloatInputService *intakeAirTemperatureService, 
+			IFloatInputService *manifoldAbsolutePressureService,
+			IFloatOutputService *idleAirControlValveService);
 		void Tick();
 	};
 }

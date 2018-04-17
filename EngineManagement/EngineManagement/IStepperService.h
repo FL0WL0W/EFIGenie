@@ -2,7 +2,7 @@
 
 #ifndef ISTEPPERSERVICE_H
 #define ISTEPPERSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class IStepperService
 	{

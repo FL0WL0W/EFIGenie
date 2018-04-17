@@ -3,7 +3,7 @@
 //#include "StepperService_CoilControl.h"
 
 #ifdef ISTEPPERSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	IStepperService* IStepperService::CreateStepperService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config)
 	{

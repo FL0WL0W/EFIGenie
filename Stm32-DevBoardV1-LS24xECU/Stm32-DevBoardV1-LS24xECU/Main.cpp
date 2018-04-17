@@ -1,8 +1,9 @@
 #include <stm32f10x_rcc.h>
 #include <stm32f10x_flash.h>
 #include <map>
-#include "PistonEngineFactory.h"
 #include <functional>
+#include "HardwareAbstractionCollection.h"
+#include "IDecoder.h"
 #include "Stm32F103TimerService.h"
 #include "Stm32F103DigitalService.h"
 #include "Stm32F103AnalogService.h"
@@ -11,6 +12,8 @@
 #include "stm32f10x_tim.h"
 #include <stm32f10x_gpio.h>
 #include "stm32f10x_exti.h"
+#include "ServiceLocator.h"
+#include "ServiceBuilder.h"
 
 void clock_init() {
   /*Configure all clocks to max for best performance.
@@ -42,13 +45,12 @@ void clock_init() {
 }
 
 HardwareAbstraction::HardwareAbstractionCollection _hardwareAbstractionCollection;
-IOServiceLayer::IOServiceCollection *_iOServiceCollection;
+//IOService::IOServiceCollection *_iOServiceCollection;
 
 int main()
 {
 	clock_init();
 		
-	
 	_hardwareAbstractionCollection.TimerService = new Stm32::Stm32F103TimerService(4, 4, 100000);
 		
 	_hardwareAbstractionCollection.DigitalService = new Stm32::Stm32F103DigitalService();
@@ -59,14 +61,15 @@ int main()
 		
 	void *config = EmbeddedResources::ConfigFile_dat.data();
 	unsigned int size;
-	_iOServiceCollection = IOServiceLayer::IOServiceCollection::CreateIOServiceCollection(&_hardwareAbstractionCollection, config, &size);
-	config = (void *)((unsigned char *)config + size);
 	
+	ServiceBuilder::CreateServices(&_hardwareAbstractionCollection, config, &size);
+	config = (void *)((unsigned char *)config + size);
+		
 	//EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, true, true);
 	
 	for (;;)
 	{
-		_iOServiceCollection->Tick();
+		//_iOServiceCollection->Tick();
 		//EngineManagement::ScheduleEvents();
 	}
 }
@@ -105,7 +108,7 @@ extern "C"
 			else
 				edgeTrigger = Decoder::EdgeTrigger::Down;
 			
-			_iOServiceCollection->Decoder->CrankEdgeTrigger(edgeTrigger);
+			//_iOServiceCollection->Decoder->CrankEdgeTrigger(edgeTrigger);
 			
 			EXTI_ClearITPendingBit(EXTI_Line15);
 		}
@@ -122,7 +125,7 @@ extern "C"
 			else
 				edgeTrigger = Decoder::EdgeTrigger::Down;
 			
-			_iOServiceCollection->Decoder->CamEdgeTrigger(edgeTrigger);
+			//_iOServiceCollection->Decoder->CamEdgeTrigger(edgeTrigger);
 			
 			EXTI_ClearITPendingBit(EXTI_Line14);
 		}

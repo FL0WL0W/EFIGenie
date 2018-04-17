@@ -4,7 +4,7 @@
 
 #if !defined(FLOATOUTPUTSERVICE_PWMPOLYNOMIALCONFIG_H) && defined(IFLOATOUTPUTSERVICE_H)
 #define FLOATOUTPUTSERVICE_PWMPOLYNOMIALCONFIG_H
-namespace IOServiceLayer
+namespace IOService
 {
 	template<unsigned char Degree>
 	struct __attribute__((__packed__)) FloatOutputService_PwmPolynomialConfig

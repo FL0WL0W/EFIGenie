@@ -3,7 +3,7 @@
 #include "BooleanInputService.h"
 
 #ifdef IBOOLEANINPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	IBooleanInputService* IBooleanInputService::CreateBooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
 	{

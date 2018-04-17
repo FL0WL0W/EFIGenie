@@ -1,4 +1,6 @@
-#include "IOServiceCollection.h"
+#include "ServiceLocator.h"
+
+using namespace Service;
 
 #ifndef IPRIMESERVICE_H
 #define IPRIMESERVICE_H
@@ -10,7 +12,7 @@ namespace ApplicationServiceLayer
 		virtual void Prime() = 0;
 		virtual void Tick() = 0;
 		
-		static IPrimeService* CreatePrimeService(IOServiceLayer::IOServiceCollection *iOServiceLayerCollection, void *config);
+		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif

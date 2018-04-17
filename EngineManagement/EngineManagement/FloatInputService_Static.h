@@ -2,7 +2,7 @@
 
 #if !defined(FLOATINPUTSERVICE_STATIC_H) && defined(IFLOATINPUTSERVICE_H)
 #define FLOATINPUTSERVICE_STATIC_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class FloatInputService_Static : public IFloatInputService
 	{

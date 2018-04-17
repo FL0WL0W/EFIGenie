@@ -2,7 +2,7 @@
 
 #ifndef IBOOLEANOUTPUTSERVICE_H
 #define IBOOLEANOUTPUTSERVICE_H
-namespace IOServiceLayer
+namespace IOService
 {
 	class IBooleanOutputService
 	{

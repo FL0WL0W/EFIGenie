@@ -22,7 +22,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Functions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Interpolation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IBooleanInputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IBooleanOutputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FloatOutputService_PwmPolynomial.h" />
@@ -31,14 +31,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFloatOutputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IIdleControlService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)IOServiceCollection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ServiceBuilder.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ServiceLocator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IStepperService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FloatInputService_FrequencyPolynomial.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FloatInputService_AnalogPolynomial.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)AfrService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IAfrService.h" />
@@ -62,7 +62,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Functions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Interpolation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IAfrService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pid.cpp" />
@@ -85,6 +85,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ServiceBuilder.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ServiceLocator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)TachometerService.cpp" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,10 @@
-#include "IOServiceCollection.h"
+#include "ServiceLocator.h"
+
+using namespace Service;
 
 #ifndef IIDLECONTROLSERVICE_H
 #define IIDLECONTROLSERVICE_H
-namespace EngineManagement
+namespace ApplicationService
 {
 	class IIdleControlService
 	{
@@ -10,7 +12,7 @@ namespace EngineManagement
 		short RpmError;
 		virtual void Tick() = 0;
 		
-		static IIdleControlService* CreateIdleControlService(const IOServiceLayer::IOServiceCollection *iOServiceCollection, void *config);
+		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif

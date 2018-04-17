@@ -1,6 +1,6 @@
-#include "Functions.h"
+#include "Interpolation.h"
 
-namespace EngineManagement
+namespace Interpolation
 {
 	InterpolationResponse Interpolate(float value, float maxValue, float minValue, unsigned char resolution)
 	{

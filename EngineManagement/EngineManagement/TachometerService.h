@@ -1,9 +1,16 @@
-#include "IOServiceCollection.h"
+#include "HardwareAbstractionCollection.h"
+#include "ServiceLocator.h"
+#include "IDecoder.h"
+#include "IBooleanOutputService.h"
+
+using namespace HardwareAbstraction;
+using namespace Service;
+using namespace IOService;
+using namespace Decoder;
 
 #if !defined(TACHOMETERSERVICE_H) && defined(IDECODER_H)
 #define TACHOMETERSERVICE_H
-
-namespace ApplicationServiceLayer
+namespace ApplicationService
 {
 	struct __attribute__((__packed__)) TachometerServiceConfig
 	{
@@ -13,28 +20,33 @@ namespace ApplicationServiceLayer
 			
 		}
 	public:
-		TachometerServiceConfig* Cast(void *p)
+		static TachometerServiceConfig* Cast(void *p)
 		{
 			return (TachometerServiceConfig *)p;
 		}
-		unsigned char DigitalPin;
+		unsigned int Size()
+		{
+			return sizeof(TachometerServiceConfig);
+		}
 		unsigned char PulsesPer2Rpm;
 	};
 	
 	class TachometerService
 	{
 	protected:
-		HardwareAbstraction::Task *TachometerTask;
+		Task *TachometerTask;
 		
-		const IOServiceLayer::IOServiceCollection *_IOServiceCollection;
 		const TachometerServiceConfig *_config;
-		bool _pinHighZ;
+		IBooleanOutputService *_booleanOutputService;
+		ITimerService *_timerService;
+		IDecoder *_decoder;
 		
 		unsigned short _ticksPerRpm;
 		bool _pinStatus;
 	public:
-		TachometerService(const IOServiceLayer::IOServiceCollection *iOServiceCollection, const TachometerServiceConfig *config, const bool highZ);
+		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, IDecoder *decoder);
 		static void TogglePinTask(void *parameters);
+		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif
