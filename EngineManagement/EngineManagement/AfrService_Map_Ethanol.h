@@ -1,6 +1,18 @@
-#if defined(IAfrServiceExists)
-#define AfrService_Map_EthanolExists
-namespace EngineManagement
+#include "ITimerService.h"
+#include "IDecoder.h"
+#include "IFloatInputService.h"
+#include "Interpolation.h"
+
+using namespace HardwareAbstraction;
+using namespace Decoder;
+using namespace IOService;
+using namespace Interpolation;
+
+#include "IAfrService.h"
+
+#if !defined(AFRSERVICE_MAP_ETHANOL_H) && defined(IAFRSERVICE_H)
+#define AFRSERVICE_MAP_ETHANOL_H
+namespace ApplicationService
 {
 	struct __attribute__((__packed__)) AfrService_Map_EthanolConfig
 	{
@@ -21,10 +33,21 @@ namespace EngineManagement
 			
 			ret->StoichTable = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
 			
-			ret->TpsMinAfrGas = ret->StoichTable + ret->AfrTpsResolution;
+			ret->TpsMinAfrGas = ret->StoichTable + ret->StoichResolution;
 			ret->TpsMinAfrEthanol = ret->TpsMinAfrGas + ret->AfrTpsResolution;
 				
 			return ret;
+		}
+		
+		unsigned int Size()
+		{
+			return sizeof(AfrService_Map_EthanolConfig) +
+				sizeof(unsigned short) * AfrRpmResolution * AfrMapResolution +
+				sizeof(unsigned short) * AfrRpmResolution * AfrMapResolution +
+				sizeof(unsigned char) * AfrEctResolution +
+				sizeof(unsigned short) * StoichResolution +
+				sizeof(unsigned short) * AfrTpsResolution +
+				sizeof(unsigned short) * AfrTpsResolution;
 		}
 		
 		float StartupAfrMultiplier;
@@ -55,11 +78,25 @@ class AfrService_Map_Ethanol : public IAfrService
 	{
 	protected:
 		const AfrService_Map_EthanolConfig* _config;
+		ITimerService *_timerService;
+		IDecoder *_decoder;
+		IFloatInputService *_manifoldAbsolutePressureService;
+		IFloatInputService *_engineCoolantTemperatureService;  
+		IFloatInputService *_ethanolContentService;
+		IFloatInputService *_throttlePositionService;
+		
 		unsigned int _startupTick;
 		bool _started = false;
 		bool _aeDone = false;
 	public:
-		AfrService_Map_Ethanol(const AfrService_Map_EthanolConfig *config);
+		AfrService_Map_Ethanol(
+		const AfrService_Map_EthanolConfig *config,
+			ITimerService *timerService, 
+			IDecoder *decoder,
+			IFloatInputService *manifoldAbsolutePressureService,
+			IFloatInputService *engineCoolantTemperatureService,  
+			IFloatInputService *ethanolContentService, 
+			IFloatInputService *throttlePositionService);
 		void CalculateAfr();
 	};
 }

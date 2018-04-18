@@ -1,20 +1,25 @@
-#ifdef PrimeService_StaticPulseWidthExists
-namespace ApplicationServiceLayer
+#include "PrimeService_StaticPulseWidth.h"
+
+#ifdef PRIMESERVICE_STATICPULSEWIDTH_H
+namespace ApplicationService
 {
-	PrimeService_StaticPulseWidth::PrimeService_StaticPulseWidth(const PrimeService_StaticPulseWidthConfig *config)
+	PrimeService_StaticPulseWidth::PrimeService_StaticPulseWidth(const PrimeService_StaticPulseWidthConfig *config, ITimerService *timerService, IBooleanOutputService **injectorServices)
 	{
-		_pulseWidth = config->PulseWidth * CurrentTimerService->GetTicksPerSecond();
+		_timerService = timerService;
+		_injectorServices = injectorServices;
+		
+		_pulseTick = config->PulseWidth * _timerService->GetTicksPerSecond();
 	}
 
 	void PrimeService_StaticPulseWidth::Prime()
 	{
 		if (!_started)
 		{
-			unsigned int currentTick = CurrentTimerService->GetTick();
-			for (unsigned char cylinder = 0; cylinder < CurrentPistonEngineConfig->Cylinders; cylinder++)
+			unsigned int currentTick = _timerService->GetTick();
+			for (unsigned char injector = 0; _injectorServices[injector] != 0; injector++)
 			{
-				CurrentInjectorServices[cylinder]->InjectorOpen();
-				CurrentTimerService->ScheduleTask(&IInjectorService::InjectorCloseTask, CurrentInjectorServices[cylinder], currentTick + _pulseWidth, true);
+				_injectorServices[injector]->OutputSet();
+				_timerService->ScheduleTask(&IBooleanOutputService::OutputResetTask, _injectorServices[injector], currentTick + _pulseTick, true);
 			}
 		}
 	}

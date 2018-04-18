@@ -30,6 +30,14 @@ namespace ApplicationService
 			ret->IdleTargetRpmSpeedAdder = (short *)(ret->IdleAirmassSpeedAdder + ret->SpeedResolution);
 			return ret;
 		}
+		unsigned int Size()
+		{
+			return sizeof(IdleControlService_PidConfig) + 
+				(sizeof(float) * EctResolution) + 
+				(sizeof(unsigned short) * SpeedResolution) +
+				(sizeof(float)) * SpeedResolution +
+				(sizeof(short)) * SpeedResolution;
+		}
 		float TpsThreshold;
 		float SpeedThreshold;
 		float P;

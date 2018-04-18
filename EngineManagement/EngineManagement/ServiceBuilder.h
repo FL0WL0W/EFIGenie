@@ -1,31 +1,60 @@
-//inputs 1-100
-#define DECODER_SERVICE_ID						1			// IDecoderService
-#define INTAKE_AIR_TEMPERATURE_SERVICE_ID		1			// IFloatInputService		degrees C
-#define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2			// IFloatInputService		degrees C
-#define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	3			// IFloatInputService		Bar
-#define VOLTAGE_SERVICE_ID						4			// IFloatInputService		Volts
-#define THROTTLE_POSITION_SERVICE_ID			5			// IFloatInputService		TPS 0.0-1.0
-#define ETHANOL_CONTENT_SERVICE_ID				6			// IFloatInputService		Content 0.0-1.0
-#define VEHICLE_SPEED_SERVICE_ID				7			// IFloatInputService		MPH cause thats what people care about
+//hardware abstraction 1-1000
+#define HARDWARE_ABSTRACTION_COLLECTION_ID		1
+#define ANALOG_SERVICE_ID						2				// IAnalogService			voltage
+#define DIGITAL_SERVICE_ID						3				// IDigitalService
+#define PWM_SERVICE_ID							4				// IPwmService
+#define TIMER_SERVICE_ID						5				// ITimerService
 
-//outputs 101-200
-#define IGNITOR_SERVICES_ID						101			// IBooleanOutputService[]
-#define INJECTOR_SERVICES_ID					102			// IBooleanOutputService[]
-#define IDLE_AIR_CONTROL_VALVE_ID				103			// IFloatOutputService		sq mm
+//config 1001-2000
 
-//application services 201-255
-#define HARDWARE_ABSTRACTION_COLLECTION_ID		201
-#define TACHOMETER_SERVICE_ID					202
+//inputs 2001-3000
+#define DECODER_SERVICE_ID						2001			// IDecoderService
+#define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2001			// IFloatInputService		degrees C
+#define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2002			// IFloatInputService		degrees C
+#define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2003			// IFloatInputService		Bar
+#define VOLTAGE_SERVICE_ID						2004			// IFloatInputService		Volts
+#define THROTTLE_POSITION_SERVICE_ID			2005			// IFloatInputService		TPS 0.0-1.0
+#define ETHANOL_CONTENT_SERVICE_ID				2006			// IFloatInputService		Content 0.0-1.0
+#define VEHICLE_SPEED_SERVICE_ID				2007			// IFloatInputService		MPH cause thats what people care about
 
-#define BOOLEANOUTPUTSERVICE_HIGHZ				false
+//outputs 3001-4000
+#define IGNITOR_SERVICES_ID						3001			// IBooleanOutputService[]
+#define INJECTOR_SERVICES_ID					3002			// IBooleanOutputService[]
+#define IDLE_AIR_CONTROL_VALVE_SERVICE_ID				3003			// IFloatOutputService		sq mm
 
+//application services 4001-5000
+#define TACHOMETER_SERVICE_ID					4001			// TachometerService
+#define PRIME_SERVICE_ID						4002			// IPrimeService
+#define IDLE_CONTROL_SERVICE_ID					4003			// IIdleControlService
+#define FUEL_TRIM_SERVICE_ID					4004			// IFuelTrimService
+#define AFR_SERVICE_ID							4005			// IAfrService
+
+#define BOOLEAN_OUTPUT_SERVICE_HIGHZ			false
+
+#include "ServiceLocator.h"
+
+//hardwareabstraction includes
 #include "HardwareAbstractionCollection.h"
+
+//IOService Inlcudes
 #include "IFloatInputService.h"
 #include "IBooleanInputService.h"
 #include "IFloatOutputService.h"
 #include "IBooleanOutputService.h"
-#include "ServiceLocator.h"
+#include "IStepperOutputService.h"
+
+//ApplicationService Includes
 #include "TachometerService.h"
+#include "IPrimeService.h"
+#include "PrimeService_StaticPulseWidth.h"
+#include "IIdleControlService.h"
+#include "IdleControlService_Pid.h"
+#include "IAfrService.h"
+#include "AfrService_Static.h"
+#include "AfrService_Map_Ethanol.h"
+#include "IFuelTrimService.h"
+#include "FuelTrimService_InterpolatedTable.h"
+#include "FuelTrimServiceWrapper_MultiChannel.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
@@ -38,5 +67,11 @@ namespace Service
 	{
 	public:
 		static ServiceLocator *CreateServices(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *totalSize);
+		
+		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }

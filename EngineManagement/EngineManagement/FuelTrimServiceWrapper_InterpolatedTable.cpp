@@ -1,20 +1,26 @@
 #include "stdlib.h"
 #include "FuelTrimService_InterpolatedTable.h"
 
-#ifdef FuelTrimService_InterpolatedTableExists
-namespace EngineManagement
+#ifdef FUELTRIMSERVICE_INTERPOLATEDTABLE_H
+namespace ApplicationService
 {
-	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(const FuelTrimService_InterpolatedTableConfig *config)
-	{
-		if (CurrentManifoldAbsolutePressureService == 0 || CurrentAfrService == 0)
-			return; //TODO: figure out error handling
-				
+	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(
+		const FuelTrimService_InterpolatedTableConfig *config, 
+		ITimerService *timerService, 
+		IDecoder *decoder,
+		IFloatInputService *throttlePositionService, 
+		IFloatInputService *manifoldAbsolutePressureService, 
+		IFloatInputService *lambdaSensorService,
+		IAfrService *afrService)
+	{				
 		_config = config;
-		
-		IFloatInputService *_lambdaSensorService = CreateSensorService(_config->YDivisions + _config->YResolution);
-		if (_lambdaSensorService == 0)
-			return; //TODO: figure out error handling
-		
+		_timerService = timerService;
+		_decoder = decoder;
+		_throttlePositionService = throttlePositionService;
+		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
+		_lambdaSensorService = lambdaSensorService;
+		_afrService = afrService;
+				
 		_fuelTrimIntegralTable = (short *)malloc(sizeof(short) * (_config->RpmResolution+1) * (_config->YResolution+1));
 	}
 
@@ -23,39 +29,31 @@ namespace EngineManagement
 		return _fuelTrim;
 	}
 
-	void FuelTrimService_InterpolatedTable::TrimTick()
+	void FuelTrimService_InterpolatedTable::Tick()
 	{
-		if (CurrentAfrService->Lambda < 1 + _config->LambdaDeltaEnable || CurrentAfrService->Lambda > 1 - _config->LambdaDeltaEnable)
+		if (_afrService->Lambda < 1 + _config->LambdaDeltaEnable || _afrService->Lambda > 1 - _config->LambdaDeltaEnable)
 		{
-			unsigned int ticksPerSecond = CurrentTimerService->GetTicksPerSecond();
-			unsigned int origTick = CurrentTimerService->GetTick();
-			unsigned int tick = origTick;
-			unsigned int prevTick = _prevTick;
-			if (tick < prevTick)
-			{
-				prevTick += 2147483647;
-				tick += 2147483647;
-			}
-			float elapsedTime = (tick - prevTick) / ticksPerSecond;
+			unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();
+			float elapsedTime = _timerService->GetElapsedTime(_prevTick);
+			_prevTick = _timerService->GetTick();
 			if (elapsedTime * _config->UpdateRate < 1)
 				return;
-			float rpm = CurrentDecoder->GetRpm();
+			float rpm = _decoder->GetRpm();
 			_rpmDot = (rpm - _prevRpm) / elapsedTime;
 			_prevRpm = rpm;
-			_prevTick = origTick;
 			float delayTime = (60 * _config->CycleDelay) / rpm;
 
 			float y = 0;
 			float yPredict = 0;
-			if (_config->UseTps && CurrentThrottlePositionService != 0)
+			if (_config->UseTps && _throttlePositionService != 0)
 			{
-				y = CurrentThrottlePositionService->Value;
-				yPredict = y - delayTime * CurrentThrottlePositionService->Value;
+				y = _throttlePositionService->Value;
+				yPredict = y - delayTime * _throttlePositionService->Value;
 			}
-			else if(CurrentManifoldAbsolutePressureService != 0)
+			else if(_manifoldAbsolutePressureService != 0)
 			{
-				y = CurrentManifoldAbsolutePressureService->Value;
-				yPredict = y - delayTime * CurrentManifoldAbsolutePressureService->ValueDot;
+				y = _manifoldAbsolutePressureService->Value;
+				yPredict = y - delayTime * _manifoldAbsolutePressureService->ValueDot;
 			}
 			unsigned short rpmPredict = rpm - delayTime * _rpmDot;
 
@@ -339,7 +337,7 @@ namespace EngineManagement
 		
 			_lambdaSensorService->ReadValue();
 			
-			float error = CurrentAfrService->Lambda - _lambdaSensorService->Value;
+			float error = _afrService->Lambda - _lambdaSensorService->Value;
 			float fuelTrimIntegral;
 		
 			if (_config->IsPid)

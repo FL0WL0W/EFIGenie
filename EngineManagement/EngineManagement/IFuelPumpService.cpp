@@ -5,8 +5,6 @@
 #ifdef IFuelPumpServiceExists
 namespace EngineManagement
 {
-	IFuelPumpService *CurrentFuelPumpService;
-
 	IFuelPumpService* CreateFuelPumpService(void *config, bool fuelPumpHighZ)
 	{
 		unsigned char fuelpumpServiceId = *((unsigned char*)config);

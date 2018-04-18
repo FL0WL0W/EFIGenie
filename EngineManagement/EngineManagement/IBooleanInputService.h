@@ -9,7 +9,7 @@ namespace IOService
 	public:
 		virtual void ReadValue() = 0;
 		bool Value = false;
-
+		
 		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *, void *, unsigned int *);
 	};
 }

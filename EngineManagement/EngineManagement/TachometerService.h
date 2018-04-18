@@ -1,3 +1,4 @@
+#include "ITimerService.h"
 #include "HardwareAbstractionCollection.h"
 #include "ServiceLocator.h"
 #include "IDecoder.h"
@@ -8,7 +9,7 @@ using namespace Service;
 using namespace IOService;
 using namespace Decoder;
 
-#if !defined(TACHOMETERSERVICE_H) && defined(IDECODER_H)
+#if !defined(TACHOMETERSERVICE_H) && defined(IDECODER_H) && defined(ITIMERSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)
 #define TACHOMETERSERVICE_H
 namespace ApplicationService
 {
@@ -46,7 +47,6 @@ namespace ApplicationService
 	public:
 		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, IDecoder *decoder);
 		static void TogglePinTask(void *parameters);
-		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif

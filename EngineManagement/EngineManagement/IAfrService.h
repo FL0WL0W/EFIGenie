@@ -4,7 +4,7 @@ using namespace Service;
 
 #ifndef IAFRSERVICE_H
 #define IAFRSERVICE_H
-namespace EngineManagement
+namespace ApplicationService
 {
 	class IAfrService
 	{

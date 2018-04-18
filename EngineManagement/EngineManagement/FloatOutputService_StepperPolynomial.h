@@ -1,5 +1,5 @@
 #include "HardwareAbstractionCollection.h"
-#include "IStepperService.h"
+#include "IStepperOutputService.h"
 #include "IFloatOutputService.h"
 #include "math.h"
 
@@ -33,7 +33,7 @@ namespace IOService
 			const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
 			const FloatOutputService_StepperPolynomialConfig<Degree> *_config;
 
-			IStepperService *_stepperService;
+			IStepperOutputService *_stepperService;
 			int _currentStepPosition;
 		public:
 			FloatOutputService_StepperPolynomial(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperPolynomialConfig<Degree> *config)
@@ -41,7 +41,7 @@ namespace IOService
 				_hardwareAbstractionCollection = hardwareAbstractionCollection;
 				_config = config;
 
-				_stepperService = IStepperService::CreateStepperService(_hardwareAbstractionCollection, ((void *)(_config + 1)));
+				_stepperService = IStepperOutputService::CreateStepperOutputService(_hardwareAbstractionCollection, ((void *)(_config + 1)), 0);
 			}
 			void SetOutput(float value)
 			{

@@ -10,7 +10,7 @@ namespace IOService
 		virtual void ReadValue() = 0;
 		float Value = 0;
 		float ValueDot = 0;
-
+		
 		static IFloatInputService* CreateFloatInputService(const HardwareAbstraction::HardwareAbstractionCollection *, void *, unsigned int *);
 	};
 }

@@ -11,8 +11,6 @@ namespace ApplicationService
 	public:
 		short RpmError;
 		virtual void Tick() = 0;
-		
-		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif

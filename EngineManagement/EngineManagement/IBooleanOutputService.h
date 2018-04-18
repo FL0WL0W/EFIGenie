@@ -13,7 +13,7 @@ namespace IOService
 
 		static void OutputSetTask(void *);
 		static void OutputResetTask(void *);
-
+		
 		static IBooleanOutputService *CreateBooleanOutputService(const HardwareAbstraction::HardwareAbstractionCollection *, void *, unsigned int *, bool);
 	};
 }

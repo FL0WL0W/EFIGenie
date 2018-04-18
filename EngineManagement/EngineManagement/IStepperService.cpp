@@ -1,11 +1,11 @@
-#include "IStepperService.h"
+#include "IStepperOutputService.h"
 //#include "StepperService_StepDirectionControl.h"
 //#include "StepperService_CoilControl.h"
 
-#ifdef ISTEPPERSERVICE_H
+#ifdef ISTEPPEROUTPUTSERVICE_H
 namespace IOService
 {
-	IStepperService* IStepperService::CreateStepperService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config)
+	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
 	{
 		unsigned char stepperServiceId = *((unsigned char*)config);
 		switch (stepperServiceId)

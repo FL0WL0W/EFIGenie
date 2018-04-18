@@ -1,8 +1,16 @@
-#if defined(IFuelTrimServiceExists)
-#define FuelTrimService_InterpolatedTableExists
-namespace EngineManagement
-{
+#include "IFuelTrimService.h"
+#include "IFloatInputService.h"
+#include "IDecoder.h"
+#include "IAfrService.h"
 
+using namespace HardwareAbstraction;
+using namespace IOService;
+using namespace Decoder;
+
+#if !defined(FUELTRIMSERVICE_INTERPOLATEDTABLE_H) && defined(IFUELTRIMSERVICE_H)
+#define FUELTRIMSERVICE_INTERPOLATEDTABLE_H
+namespace ApplicationService
+{
 	struct __attribute__((__packed__)) FuelTrimService_InterpolatedTableConfig
 	{
 	private:
@@ -19,6 +27,12 @@ namespace EngineManagement
 			ret->YDivisions = (float *)(ret->RpmDivisions + ret->RpmResolution);
 
 			return ret;
+		}
+		unsigned int Size()
+		{
+			return sizeof(FuelTrimService_InterpolatedTableConfig) +
+				sizeof(unsigned short) * RpmResolution +
+				sizeof(float) * YResolution;
 		}
 		unsigned int UpdateRate;
 		unsigned short CycleDelay;
@@ -40,8 +54,13 @@ namespace EngineManagement
 	{
 	protected:
 		const FuelTrimService_InterpolatedTableConfig *_config;
-
+		ITimerService *_timerService;
+		IDecoder *_decoder;
+		IFloatInputService *_throttlePositionService;
+		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_lambdaSensorService;
+		IAfrService *_afrService;
+
 		float _lastError;
 		short *_fuelTrimIntegralTable;
 		short _fuelTrim;
@@ -49,9 +68,16 @@ namespace EngineManagement
 		unsigned short _prevRpm;
 		unsigned int _prevTick;
 	public:
-		FuelTrimService_InterpolatedTable(const FuelTrimService_InterpolatedTableConfig *config);
+		FuelTrimService_InterpolatedTable(
+			const FuelTrimService_InterpolatedTableConfig *config, 
+			ITimerService *timerService, 
+			IDecoder *decoder,
+			IFloatInputService *throttlePositionService, 
+			IFloatInputService *manifoldAbsolutePressureService, 
+			IFloatInputService *lambdaSensorService,
+			IAfrService *afrService);
 		short GetFuelTrim(unsigned char cylinder);
-		void TrimTick();
+		void Tick();
 	};
 }
 #endif
