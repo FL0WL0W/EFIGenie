@@ -26,8 +26,9 @@
 #define TACHOMETER_SERVICE_ID					4001			// TachometerService
 #define PRIME_SERVICE_ID						4002			// IPrimeService
 #define IDLE_CONTROL_SERVICE_ID					4003			// IIdleControlService
-#define FUEL_TRIM_SERVICE_ID					4004			// IFuelTrimService
-#define AFR_SERVICE_ID							4005			// IAfrService
+#define AFR_SERVICE_ID							4004			// IAfrService
+#define FUEL_TRIM_SERVICE_ID					4005			// IFuelTrimService
+#define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
 
 #define BOOLEAN_OUTPUT_SERVICE_HIGHZ			false
 
@@ -55,6 +56,9 @@
 #include "IFuelTrimService.h"
 #include "FuelTrimService_InterpolatedTable.h"
 #include "FuelTrimServiceWrapper_MultiChannel.h"
+#include "IFuelPumpService.h"
+#include "FuelPumpService.h"
+#include "FuelPumpService_Analog.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
@@ -73,5 +77,6 @@ namespace Service
 		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }

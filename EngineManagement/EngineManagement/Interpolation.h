@@ -1,3 +1,5 @@
+#ifndef INTERPOLATION_H
+#define INTERPOLATION_H
 namespace Interpolation
 {
 	struct InterpolationResponse
@@ -36,3 +38,4 @@ namespace Interpolation
 			+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexH] * (1 - interpolationX.Multiplier) * (1 - interpolationY.Multiplier);
 		}
 }
+#endif

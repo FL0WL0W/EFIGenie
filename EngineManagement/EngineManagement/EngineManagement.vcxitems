@@ -19,7 +19,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)BooleanInputService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)BooleanOutputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Interpolation.h" />
@@ -59,13 +59,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)BooleanInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)BooleanOutputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Interpolation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pid.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatOutputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.cpp" />

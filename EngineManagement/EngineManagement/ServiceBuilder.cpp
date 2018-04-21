@@ -126,6 +126,15 @@ namespace Service
 					break;
 				}
 #endif
+#ifdef FUEL_PUMP_SERVICE_ID
+			case FUEL_PUMP_SERVICE_ID:
+				{
+					serviceLocator->Register(serviceId, CreateFuelPumpService(serviceLocator, config, &size));
+					config = (void *)((unsigned char *)config + size);
+					*totalSize += size;
+					break;
+				}
+#endif
 			}
 		}
 
@@ -185,7 +194,7 @@ namespace Service
 		case 1:
 			{
 				PrimeService_StaticPulseWidthConfig *primeConfig = PrimeService_StaticPulseWidthConfig::Cast((unsigned char*)config + 1);
-				*totalSize = primeConfig->Size() + 1;
+				*totalSize += primeConfig->Size();
 				
 				if (hardwareAbstractionCollection == 0 || injectorServices == 0)
 					return 0;
@@ -247,7 +256,7 @@ namespace Service
 		case 1:
 			{
 				IdleControlService_PidConfig *idleConfig = IdleControlService_PidConfig::Cast((unsigned char*)config + 1);
-				*totalSize = idleConfig->Size() + 1;
+				*totalSize += idleConfig->Size();
 				
 				if (engineCoolantTemperatureService == 0 || idleAirControlValveService == 0 || decoder == 0 || idleAirControlValveService == 0 || hardwareAbstractionCollection == 0)
 					return 0;
@@ -322,14 +331,14 @@ namespace Service
 			return 0;
 #ifdef AFRSERVICE_STATIC_H
 		case 1:
-			*totalSize = 2;
+			*totalSize += 1;
 			return new AfrService_Static(*((float*)((unsigned char*)config + 1)));
 #endif
 #ifdef AFRSERVICE_MAP_ETHANOL_H
 		case 2:
 			{
 				AfrService_Map_EthanolConfig *afrConfig = AfrService_Map_EthanolConfig::Cast((unsigned char*)config + 1);
-				*totalSize = afrConfig->Size() + 1;
+				*totalSize += afrConfig->Size();
 				
 				if (hardwareAbstractionCollection->TimerService == 0 || manifoldAbsolutePressureService == 0 || throttlePositionService == 0)
 					return 0;
@@ -382,7 +391,7 @@ namespace Service
 		case 1:
 			{
 				FuelTrimService_InterpolatedTableConfig *fuelTrimConfig = FuelTrimService_InterpolatedTableConfig::Cast((unsigned char*)config + 1);
-				*totalSize = fuelTrimConfig->Size() + 1;
+				*totalSize += fuelTrimConfig->Size();
 				
 				unsigned int size;
 				IFloatInputService *lambdaService = IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size);
@@ -418,6 +427,84 @@ namespace Service
 				}
 			
 				return new FuelTrimServiceWrapper_MultiChannel(fuelTrimConfig, fuelTrimServices);
+			}
+#endif
+		}
+	}
+	
+	IFuelPumpService *ServiceBuilder::CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
+	{
+		HardwareAbstractionCollection *hardwareAbstractionCollection = 0;
+#ifdef HARDWARE_ABSTRACTION_COLLECTION_ID
+		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
+#endif
+		
+		IDecoder *decoder = 0;
+#ifdef DECODER_SERVICE_ID
+		decoder = (IDecoder *)serviceLocator->Locate(DECODER_SERVICE_ID);
+#endif
+		
+		IFloatInputService *throttlePositionService = 0;
+#ifdef THROTTLE_POSITION_SERVICE_ID
+		throttlePositionService = (IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID);
+#endif 
+		
+		IFloatInputService *manifoldAbsolutePressureService = 0;
+#ifdef MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
+		manifoldAbsolutePressureService = (IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID);
+#endif  
+		
+		unsigned char fuelPumpServiceId = *((unsigned char*)config);
+		*totalSize = 1;
+		switch (fuelPumpServiceId)
+		{
+			return 0;
+#ifdef FUELPUMPSERVICE_H
+		case 1:
+			{
+				FuelPumpServiceConfig *fuelPumpConfig = FuelPumpServiceConfig::Cast(config);
+				config = (void *)((unsigned char *)config + fuelPumpConfig->Size());
+				*totalSize += fuelPumpConfig->Size();
+		
+				unsigned int size;
+				IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+		
+				if (booleanOutputService == 0)
+					return 0;
+		
+				if (hardwareAbstractionCollection == 0)
+				{
+					delete booleanOutputService;
+					return 0;
+				}
+				
+				return new FuelPumpService(fuelPumpConfig, hardwareAbstractionCollection->TimerService, booleanOutputService);
+			}
+#endif
+#ifdef FUELPUMPSERVICE_ANALOG_H
+		case 2:
+			{
+				FuelPumpService_AnalogConfig *fuelPumpConfig = FuelPumpService_AnalogConfig::Cast(config);
+				config = (void *)((unsigned char *)config + fuelPumpConfig->Size());
+				*totalSize += fuelPumpConfig->Size();
+		
+				unsigned int size;
+				IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+		
+				if (floatOutputService == 0)
+					return 0;
+		
+				if (hardwareAbstractionCollection == 0 || decoder == 0 || (throttlePositionService == 0 && manifoldAbsolutePressureService == 0))
+				{
+					delete floatOutputService;
+					return 0;
+				}
+				
+				return new FuelPumpService_Analog(fuelPumpConfig, hardwareAbstractionCollection->TimerService, floatOutputService, decoder, manifoldAbsolutePressureService, throttlePositionService);
 			}
 #endif
 		}

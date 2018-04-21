@@ -1,78 +1,31 @@
 #include "FuelPumpService.h"
 
-#ifdef FuelPumpServiceExists
-namespace EngineManagement
+#ifdef FUELPUMPSERVICE_H
+namespace ApplicationService
 {
-	FuelPumpService::FuelPumpService(const FuelPumpServiceConfig *config, bool highZ)
+	FuelPumpService::FuelPumpService(const FuelPumpServiceConfig *config, ITimerService *timerService, IBooleanOutputService *outputService)
 	{
 		_config = config;
-		
-		_highZ = highZ;
-
-		if (_highZ && _config->NormalOn)
-		{
-			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
-		}
-		else
-		{
-			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
-			
-			CurrentDigitalService->WritePin(_config->Pin, _config->NormalOn);
-		}
+		_timerService = timerService;
+		_outputService = outputService;
 	}
 	
 	void FuelPumpService::Off()
 	{
-		if (_highZ && _config->NormalOn)
-		{
-			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
-		}
-		else
-		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
-			}
-
-			CurrentDigitalService->WritePin(_config->Pin, _config->NormalOn);
-		}
+		_outputService->OutputReset();
 	}
 	
 	void FuelPumpService::On()
 	{
 		Started = true;
-		if (_highZ && !_config->NormalOn)
-		{
-			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
-		}
-		else
-		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
-			}
-
-			CurrentDigitalService->WritePin(_config->Pin, !_config->NormalOn);
-		}
+		_outputService->OutputSet();
 	}
 	
 	void FuelPumpService::Prime()
 	{
-		if (_highZ && !_config->NormalOn)
-		{
-			CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
-		}
-		else
-		{
-			if (_highZ)
-			{
-				CurrentDigitalService->InitPin(_config->Pin, HardwareAbstraction::Out);
-			}
-
-			CurrentDigitalService->WritePin(_config->Pin, !_config->NormalOn);
-		}
+		_outputService->OutputSet();
 		
-		CurrentTimerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _config->PrimeTime + CurrentTimerService->GetTick(), true);
+		_timerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _config->PrimeTime * _timerService->GetTicksPerSecond() + _timerService->GetTick(), true);
 	}
 	
 	void FuelPumpService::PrimeTaskOff(void *parameter)

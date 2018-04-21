@@ -9,7 +9,7 @@ namespace IOService
 	public:
 		virtual void SetOutput(float output) = 0;
 		
-		static IFloatOutputService* CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config);
+		static IFloatOutputService* CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *Size);
 	};
 }
 #endif

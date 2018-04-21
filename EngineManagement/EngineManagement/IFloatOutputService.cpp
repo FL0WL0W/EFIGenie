@@ -6,7 +6,7 @@
 #ifdef IFLOATOUTPUTSERVICE_H
 namespace IOService
 {
-	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config)
+	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *)
 	{
 		unsigned char idleAirControlValveServiceId = *((unsigned char*)config);
 		switch (idleAirControlValveServiceId)

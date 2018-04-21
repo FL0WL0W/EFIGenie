@@ -126,9 +126,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h">
       <Filter>Header Files\ApplicationService\FuelTrimService</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.h">
-      <Filter>Header Files\ApplicationService\FuelPumpService</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h">
       <Filter>Header Files\ApplicationService\FuelPumpService</Filter>
     </ClInclude>
@@ -204,6 +201,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IStepperOutputService.h">
       <Filter>Header Files\IOService\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h">
+      <Filter>Header Files\ApplicationService\FuelPumpService</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
@@ -245,9 +245,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService.cpp">
       <Filter>Source Files\ApplicationService\FuelPumpService</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Pwm.cpp">
-      <Filter>Source Files\ApplicationService\FuelPumpService</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IStepperService.cpp">
       <Filter>Source Files\IOService\Interface</Filter>
     </ClCompile>
@@ -256,9 +253,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp">
       <Filter>Source Files\ApplicationService</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp">
-      <Filter>Source Files\ApplicationService\Interface</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatInputService.cpp">
       <Filter>Source Files\IOService\Interface</Filter>
@@ -292,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pid.cpp">
       <Filter>Source Files\ApplicationService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp">
+      <Filter>Source Files\ApplicationService\FuelPumpService</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

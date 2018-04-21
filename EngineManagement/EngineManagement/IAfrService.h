@@ -12,8 +12,6 @@ namespace ApplicationService
 		float Afr;
 		float Lambda;
 		virtual void CalculateAfr() = 0;
-		
-		static IAfrService* CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
 #endif
