@@ -1,5 +1,5 @@
-#if !defined(NOINJECTION)
-#define IPistonEngineInjectionConfigExists
+#ifndef IPISTONENGINEINJECTIONCONFIG_H
+#define IPISTONENGINEINJECTIONCONFIG_H
 namespace EngineManagement
 {		
 	struct InjectorTiming
@@ -13,9 +13,5 @@ namespace EngineManagement
 	public:
 		virtual InjectorTiming GetInjectorTiming(unsigned char cylinder) = 0;
 	};
-
-	extern IPistonEngineInjectionConfig *CurrentPistonEngineInjectionConfig;
-
-	IPistonEngineInjectionConfig* CreatePistonEngineInjectionConfig(void *config);
 }
 #endif

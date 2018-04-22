@@ -32,7 +32,7 @@ namespace Interpolation
 	template<typename K>
 		K InterpolateTable2(InterpolationResponse interpolationX, unsigned char resolutionX, InterpolationResponse interpolationY, K* table)
 		{
-			short _currentPwm = table[interpolationX.IndexL + resolutionX * interpolationY.IndexL] * interpolationX.Multiplier * interpolationY.Multiplier
+			return				table[interpolationX.IndexL + resolutionX * interpolationY.IndexL] * interpolationX.Multiplier * interpolationY.Multiplier
 			+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexL] * (1 - interpolationX.Multiplier) * interpolationY.Multiplier
 			+					table[interpolationX.IndexL + resolutionX * interpolationY.IndexH] * interpolationX.Multiplier * (1 - interpolationY.Multiplier)
 			+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexH] * (1 - interpolationX.Multiplier) * (1 - interpolationY.Multiplier);

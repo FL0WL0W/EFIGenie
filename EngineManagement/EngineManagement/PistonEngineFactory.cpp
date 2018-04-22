@@ -7,10 +7,10 @@ namespace EngineManagement
 		HardwareAbstraction::IAnalogService *analogService,
 		HardwareAbstraction::IPwmService *pwmService,
 		void *pistonEngineConfigFile
-#ifdef IIgnitorServiceExists
+#ifdef IPISTONENGINEIGNITIONCONFIG_H
 		, bool ignitionHighZ
 #endif
-#ifdef IInjectorServiceExists
+#ifdef IPISTONENGINEINJECTIONCONFIG_H
 		, bool injectorHighZ
 #endif
 #ifdef IFuelPumpServiceExists
@@ -33,7 +33,7 @@ namespace EngineManagement
 		}
 		
 		fileSystemPointer++;
-#ifdef IIgnitorServiceExists
+#ifdef IPISTONENGINEIGNITIONCONFIG_H
 		void *ignitorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		if(CurrentPistonEngineConfig->IsDistributor)
 		{
@@ -52,7 +52,7 @@ namespace EngineManagement
 		}
 #endif
 		fileSystemPointer++;
-#ifdef IInjectorServiceExists
+#ifdef IPISTONENGINEINJECTIONCONFIG_H
 		void *injectorConfigFile = (void *)((unsigned char*)pistonEngineConfigFile + *((unsigned int*)pistonEngineConfigFile + fileSystemPointer));
 		for(unsigned char cylinder = 0 ; cylinder < CurrentPistonEngineConfig->Cylinders ; cylinder++)
 		{

@@ -1,5 +1,7 @@
-#if defined(IPistonEngineInjectionConfigExists)
-#define PistonEngineInjectionConfigWrapper_DFCOExists
+#include "IPistonEngineInjectionConfig.h"
+
+#if !defined(IPISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H) && defined(IPISTONENGINEINJECTIONCONFIG_H)
+#define IPISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
 	class PistonEngineInjectionConfigWrapper_DFCO : public IPistonEngineInjectionConfig

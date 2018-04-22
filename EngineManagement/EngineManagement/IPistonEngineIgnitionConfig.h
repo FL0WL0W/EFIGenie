@@ -1,5 +1,5 @@
-#if !defined(NOIGNITION)
-#define IPistonEngineIgnitionConfigExists
+#ifndef IPISTONENGINEIGNITIONCONFIG_H
+#define IPISTONENGINEIGNITIONCONFIG_H
 namespace EngineManagement
 {
 	struct IgnitionTiming
@@ -14,9 +14,5 @@ namespace EngineManagement
 	public:
 		virtual IgnitionTiming GetIgnitionTiming() = 0;
 	};
-
-	extern IPistonEngineIgnitionConfig *CurrentPistonEngineIgnitionConfig;
-
-	IPistonEngineIgnitionConfig* CreatePistonEngineIgnitionConfig(void *config);
 }
 #endif

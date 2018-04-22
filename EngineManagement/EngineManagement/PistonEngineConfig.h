@@ -1,32 +1,29 @@
-#define PistonEngineConfigExists
+#ifndef PISTONENGINECONFIG_H
+#define PISTONENGINECONFIG_H
 namespace EngineManagement
 {
-	class PistonEngineConfig
+	struct __attribute__((__packed__)) PistonEngineConfig
 	{
-	public:
-		PistonEngineConfig(void *config)
+	private:
+		PistonEngineConfig()
 		{
-			Cylinders = *((unsigned char *)config);
-			config = (void *)(((unsigned char *)config) + 1);
 			
-			Ml8thPerCylinder = *((unsigned short *)config); //1/8 ml
-			config = (void *)(((unsigned short *)config) + 1);
-						
-			IsThrottleBodyInjection = *((bool *)config);
-			config = (void *)(((bool *)config) + 1);
-			
-			IsDistributor = *((bool *)config);
-			config = (void *)(((bool *)config) + 1);
-			
-			DecoderId = *((unsigned char *)config);
-			config = (void *)(((unsigned char *)config) + 1);
 		}
+	public:
+		static PistonEngineConfig* Cast(void *p)
+		{
+			return (PistonEngineConfig *)p;
+		}
+		unsigned int Size()
+		{
+			return sizeof(PistonEngineConfig);
+		}
+		
 		unsigned char Cylinders;
 		unsigned short Ml8thPerCylinder;
 		bool IsThrottleBodyInjection;
 		bool IsDistributor;
 		unsigned char DecoderId;
 	};
-
-	extern PistonEngineConfig *CurrentPistonEngineConfig;
 }
+#endif

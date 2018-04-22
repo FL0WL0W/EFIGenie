@@ -28,9 +28,6 @@
     <Filter Include="Header Files\PistonEngine\IgnitionConfig">
       <UniqueIdentifier>{4634e4bc-4c69-4f61-af62-d19b261a094e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\PistonEngine\Interface">
-      <UniqueIdentifier>{8fdd1737-ac81-4e04-9267-dccb6bb6d278}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\IOService">
       <UniqueIdentifier>{8fa050a8-1b03-444d-967b-087e37b5f437}</UniqueIdentifier>
     </Filter>
@@ -98,9 +95,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.h">
       <Filter>Header Files\PistonEngine\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineController.h">
-      <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h">
       <Filter>Header Files\PistonEngine\InjectionConfig</Filter>
@@ -204,11 +198,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h">
       <Filter>Header Files\ApplicationService\FuelPumpService</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineService.h">
+      <Filter>Header Files\PistonEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineController.cpp">
-      <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">
       <Filter>Source Files\PistonEngine\InjectionConfig</Filter>
     </ClCompile>
@@ -226,15 +220,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.cpp">
       <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.cpp">
-      <Filter>Source Files\PistonEngine\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.cpp">
-      <Filter>Source Files\PistonEngine\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineConfig.cpp">
-      <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp">
       <Filter>Source Files\ApplicationService\FuelTrimService</Filter>
@@ -289,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp">
       <Filter>Source Files\ApplicationService\FuelPumpService</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineService.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

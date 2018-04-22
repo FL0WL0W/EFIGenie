@@ -29,6 +29,7 @@
 #define AFR_SERVICE_ID							4004			// IAfrService
 #define FUEL_TRIM_SERVICE_ID					4005			// IFuelTrimService
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
+#define PISTON_ENGINE_SERVICE_ID				4007			// IFuelPumpService
 
 #define BOOLEAN_OUTPUT_SERVICE_HIGHZ			false
 
@@ -59,11 +60,16 @@
 #include "IFuelPumpService.h"
 #include "FuelPumpService.h"
 #include "FuelPumpService_Analog.h"
+#include "IPistonEngineInjectionConfig.h"
+#include "PistonEngineInjectionConfig_SD.h"
+#include "IPistonEngineIgnitionConfig.h"
+#include "PistonEngineService.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
 using namespace Service;
 using namespace ApplicationService;
+using namespace EngineManagement;
 
 namespace Service
 {
@@ -78,5 +84,8 @@ namespace Service
 		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IPistonEngineInjectionConfig *CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
+		static IPistonEngineIgnitionConfig *CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
+		static PistonEngineService *CreatePistonEngineService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }
