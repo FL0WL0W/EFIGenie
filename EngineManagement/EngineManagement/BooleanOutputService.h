@@ -1,6 +1,8 @@
 #include "HardwareAbstractionCollection.h"
 #include "IBooleanOutputService.h"
 
+using namespace HardwareAbstraction;
+
 #if !defined(BOOLEANOUTPUTSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define BOOLEANOUTPUTSERVICE_H
 namespace IOService
@@ -12,11 +14,13 @@ namespace IOService
 		{
 
 		}
+		
 	public:
 		static BooleanOutputServiceConfig* Cast(void *p)
 		{
 			return (BooleanOutputServiceConfig *)p;
 		}
+		
 		unsigned int Size()
 		{
 			return sizeof(BooleanOutputServiceConfig);
@@ -28,15 +32,17 @@ namespace IOService
 
 	class BooleanOutputService : public IBooleanOutputService
 	{
-		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
+	protected:
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const BooleanOutputServiceConfig *_config;
 		bool _highZ;
+		
 	public:
-		BooleanOutputService(const HardwareAbstraction::HardwareAbstractionCollection *, const BooleanOutputServiceConfig *, bool );
+		BooleanOutputService(const HardwareAbstractionCollection *, const BooleanOutputServiceConfig *, bool highZ);
 
 		void OutputSet();
 		void OutputReset();
-		void OutputWrite(bool);
+		void OutputWrite(bool value);
 	};
 }
 #endif

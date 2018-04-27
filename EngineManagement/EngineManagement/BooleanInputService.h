@@ -12,11 +12,13 @@ namespace IOService
 		{
 
 		}
+		
 	public:
 		static BooleanInputServiceConfig* Cast(void *p)
 		{
 			return (BooleanInputServiceConfig *)p;
 		}
+		
 		unsigned int Size()
 		{
 			return sizeof(BooleanInputServiceConfig);
@@ -28,8 +30,10 @@ namespace IOService
 
 	class BooleanInputService : public IBooleanInputService
 	{
+	protected:
 		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		BooleanInputServiceConfig *_config;
+		
 	public:
 		BooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *, BooleanInputServiceConfig *);
 		void ReadValue();

@@ -1,5 +1,7 @@
 #include "HardwareAbstractionCollection.h"
 
+using namespace HardwareAbstraction;
+
 #ifndef IFLOATINPUTSERVICE_H
 #define IFLOATINPUTSERVICE_H
 namespace IOService
@@ -11,7 +13,7 @@ namespace IOService
 		float Value = 0;
 		float ValueDot = 0;
 		
-		static IFloatInputService* CreateFloatInputService(const HardwareAbstraction::HardwareAbstractionCollection *, void *, unsigned int *);
+		static IFloatInputService* CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
 	};
 }
 #endif

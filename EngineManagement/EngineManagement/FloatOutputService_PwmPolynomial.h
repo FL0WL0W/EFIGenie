@@ -2,8 +2,10 @@
 #include "IFloatOutputService.h"
 #include "math.h"
 
-#if !defined(FLOATOUTPUTSERVICE_PWMPOLYNOMIALCONFIG_H) && defined(IFLOATOUTPUTSERVICE_H)
-#define FLOATOUTPUTSERVICE_PWMPOLYNOMIALCONFIG_H
+using namespace HardwareAbstraction;
+
+#if !defined(FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H) && defined(IFLOATOUTPUTSERVICE_H)
+#define FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H
 namespace IOService
 {
 	template<unsigned char Degree>
@@ -14,11 +16,18 @@ namespace IOService
 		{
 			
 		}
+		
 	public:
 		static FloatOutputService_PwmPolynomialConfig* Cast(void *p)
 		{
 			return (FloatOutputService_PwmPolynomialConfig *)p;
 		}
+			
+		unsigned int Size()
+		{
+			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
+		}
+		
 		unsigned char PwmPin;
 		float A[Degree + 1];
 		float MinPulseWidth;
@@ -29,17 +38,19 @@ namespace IOService
 	template<unsigned char Degree>
 	class FloatOutputService_PwmPolynomial : public IFloatOutputService
 	{
-		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
+	protected:
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatOutputService_PwmPolynomialConfig<Degree> *_config;
 
 	public:
-		FloatOutputService_PwmPolynomial(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_PwmPolynomialConfig<Degree> *config)
+		FloatOutputService_PwmPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_PwmPolynomialConfig<Degree> *config)
 		{
 			_hardwareAbstractionCollection = hardwareAbstractionCollection;
 			_config = config;
 
 			_hardwareAbstractionCollection->PwmService->InitPin(_config->PwmPin, HardwareAbstraction::Out, _config->Frequency);
 		}
+		
 		void SetOutput(float value)
 		{
 			float pwmValue = _config->A[0];

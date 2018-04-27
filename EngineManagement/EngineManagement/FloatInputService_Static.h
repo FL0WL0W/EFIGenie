@@ -8,6 +8,7 @@ namespace IOService
 	{
 	public:
 		FloatInputService_Static(float value, float valueDot) { Value = value; ValueDot = valueDot; }
+		
 		void ReadValue() { };
 	};
 }

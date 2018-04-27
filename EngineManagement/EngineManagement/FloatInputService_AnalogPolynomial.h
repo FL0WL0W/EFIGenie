@@ -2,6 +2,8 @@
 #include "IFloatInputService.h"
 #include "math.h"
 
+using namespace HardwareAbstraction;
+
 #if !defined(FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H) && defined(IFLOATINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H
 namespace IOService
@@ -14,15 +16,18 @@ namespace IOService
 		{
 			
 		}
+		
 	public:
 		static FloatInputService_AnalogPolynomialConfig<Degree>* Cast(void *p)
 		{
 			return (FloatInputService_AnalogPolynomialConfig<Degree> *)p;
 		}
+		
 		unsigned int Size()
 		{
 			return sizeof(FloatInputService_AnalogPolynomialConfig<Degree>);
 		}
+		
 		unsigned char AdcPin;
 		float A[Degree+1];
 		float MinValue;
@@ -33,13 +38,15 @@ namespace IOService
 	template<unsigned char Degree>
 	class FloatInputService_AnalogPolynomial : public IFloatInputService
 	{
-		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
+	protected:
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatInputService_AnalogPolynomialConfig<Degree> *_config;
 		
 		unsigned int _lastReadTick = 0;
 		float _lastValue = 0;
+		
 	public:
-		FloatInputService_AnalogPolynomial(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatInputService_AnalogPolynomialConfig<Degree> *config)
+		FloatInputService_AnalogPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatInputService_AnalogPolynomialConfig<Degree> *config)
 		{
 			_hardwareAbstractionCollection = hardwareAbstractionCollection;
 			_config = config;

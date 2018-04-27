@@ -3,12 +3,12 @@
 #ifdef BOOLEANINPUTSERVICE_H
 namespace IOService
 {
-	BooleanInputService::BooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, BooleanInputServiceConfig *config)
+	BooleanInputService::BooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, BooleanInputServiceConfig *config)
 	{
 		_hardwareAbstractionCollection = hardwareAbstractionCollection;
 		_config = config;
 		
-		_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, HardwareAbstraction::In);
+		_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, In);
 	}
 	
 	void BooleanInputService::ReadValue()

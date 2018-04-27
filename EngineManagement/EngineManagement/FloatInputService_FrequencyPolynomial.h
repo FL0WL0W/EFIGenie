@@ -2,6 +2,8 @@
 #include "IFloatInputService.h"
 #include "math.h"
 
+using namespace HardwareAbstraction;
+
 #if !defined(FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H) && defined(IFLOATINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H) 
 #define FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H
 namespace IOService
@@ -14,15 +16,18 @@ namespace IOService
 		{
 			
 		}
+		
 	public:
 		static FloatInputService_FrequencyPolynomialConfig<Degree>* Cast(void *p)
 		{
 			return (FloatInputService_FrequencyPolynomialConfig<Degree> *)p;
 		}
+		
 		unsigned int Size()
 		{
 			return sizeof(FloatInputService_FrequencyPolynomialConfig<Degree>);
 		}
+		
 		unsigned char PwmPin;
 		unsigned short MinFrequency;
 		float A[Degree + 1];
@@ -34,13 +39,15 @@ namespace IOService
 	template<unsigned char Degree>
 	class FloatInputService_FrequencyPolynomial : public IFloatInputService
 	{
-		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
+	protected:
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatInputService_FrequencyPolynomialConfig<Degree> *_config;
 
 		unsigned int _lastReadTick = 0;
 		float _lastValue = 0;
+		
 	public:
-		FloatInputService_FrequencyPolynomial(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatInputService_FrequencyPolynomialConfig<Degree> *config)
+		FloatInputService_FrequencyPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatInputService_FrequencyPolynomialConfig<Degree> *config)
 		{
 			_hardwareAbstractionCollection = hardwareAbstractionCollection;
 			_config = config;

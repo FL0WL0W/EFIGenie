@@ -8,6 +8,7 @@ namespace IOService
 	{
 	public:
 		BooleanInputService_Static(bool value) { Value = value; }
+		
 		void ReadValue() { };
 	};
 }

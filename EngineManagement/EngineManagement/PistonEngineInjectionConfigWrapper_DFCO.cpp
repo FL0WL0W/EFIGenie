@@ -1,4 +1,6 @@
-#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_DFCO_H
+#include "PistonEngineInjectionConfigWrapper_DFCO.h"
+
+#ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
 	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)

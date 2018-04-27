@@ -1,7 +1,7 @@
 #include "IPistonEngineInjectionConfig.h"
 
-#if !defined(IPISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H) && defined(IPISTONENGINEINJECTIONCONFIG_H)
-#define IPISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
+#if !defined(PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H) && defined(IPISTONENGINEINJECTIONCONFIG_H)
+#define PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
 	class PistonEngineInjectionConfigWrapper_DFCO : public IPistonEngineInjectionConfig

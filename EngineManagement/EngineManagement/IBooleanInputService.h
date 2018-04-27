@@ -1,5 +1,7 @@
 #include "HardwareAbstractionCollection.h"
 
+using namespace HardwareAbstraction;
+
 #ifndef IBOOLEANINPUTSERVICE_H
 #define IBOOLEANINPUTSERVICE_H
 namespace IOService
@@ -10,7 +12,7 @@ namespace IOService
 		virtual void ReadValue() = 0;
 		bool Value = false;
 		
-		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *, void *, unsigned int *);
+		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
 	};
 }
 #endif

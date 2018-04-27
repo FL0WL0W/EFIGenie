@@ -157,11 +157,6 @@ namespace Service
 		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
 #endif
 		
-		IDecoder *decoder = 0;
-#ifdef DECODER_SERVICE_ID
-		decoder = (IDecoder *)serviceLocator->Locate(DECODER_SERVICE_ID);
-#endif
-		
 		TachometerServiceConfig *tachometerConfig = TachometerServiceConfig::Cast(config);
 		config = (void *)((unsigned char *)config + tachometerConfig->Size());
 		*totalSize = tachometerConfig->Size();
@@ -170,17 +165,9 @@ namespace Service
 		IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
-		
-		if (booleanOutputService == 0)
-			return 0;
-		
-		if (hardwareAbstractionCollection == 0 || decoder == 0)
-		{
-			delete booleanOutputService;
-			return 0;
-		}
-		
-		return new TachometerService(tachometerConfig, booleanOutputService, hardwareAbstractionCollection->TimerService, decoder);
+				
+		//TODO build things like this
+		return Construct<TachometerService, TachometerServiceConfig*, IBooleanOutputService*, ITimerService*, IDecoder*>(serviceLocator, tachometerConfig, booleanOutputService, TIMER_SERVICE_ID, DECODER_SERVICE_ID);
 	}
 	
 	IPrimeService* ServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)

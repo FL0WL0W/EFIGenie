@@ -75,6 +75,12 @@ namespace Service
 {
 	class ServiceBuilder
 	{
+		template<typename Constructed, typename Type1, typename Type2, typename Type3, typename Type4>
+			static Constructed * Construct(ServiceLocator *serviceLocator, Type1 type1, Type2 type2, unsigned int type3, unsigned int type4)
+			{
+				return new Constructed(type1, type2, (Type3)serviceLocator->Locate(type3), (Type4)serviceLocator->Locate(type4));
+			}
+		
 	public:
 		static ServiceLocator *CreateServices(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *totalSize);
 		
