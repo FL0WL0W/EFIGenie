@@ -3,31 +3,22 @@
 #ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
-	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(void *config)
+	PistonEngineInjectionConfigWrapper_DFCO::PistonEngineInjectionConfigWrapper_DFCO(PistonEngineInjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IDecoder *decoder, IPistonEngineInjectionConfig *child)
 	{
-		if (CurrentThrottlePositionService == 0)
-			return; //TODO: figure out error handling
-		
-		_tpsEnable = *(float *)config;
-		config = (void*)((float *)config + 1);
-		
-		_rpmEnable = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		_rpmDisable = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		_child = CreatePistonEngineInjectionConfig(config);
+		_config = config;
+		_throttlePositionService = throttlePositionService;
+		_decoder = decoder;
+		_child = child;
 	}
 	
 	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char cylinder)
 	{
-		float tps = CurrentThrottlePositionService->Value;
-		unsigned short rpm = CurrentDecoder->GetRpm();
+		float tps = _throttlePositionService->Value;
+		unsigned short rpm = _decoder->GetRpm();
 		
-		if (tps < _tpsEnable && rpm > _rpmEnable)
+		if (tps < _config->TpsThreshold && rpm > _config->RpmEnable)
 			_dfcoEnabled = true;
-		if (rpm < _rpmDisable)
+		if (rpm < _config->RpmDisable)
 			_dfcoEnabled = false;
 		
 		if (_dfcoEnabled)

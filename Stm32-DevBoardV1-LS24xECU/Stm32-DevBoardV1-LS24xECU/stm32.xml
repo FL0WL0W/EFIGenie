@@ -4,10 +4,10 @@
   <ToolchainVersion>
     <GCC>7.2.0</GCC>
     <GDB>8.0.1</GDB>
-    <Revision>2</Revision>
+    <Revision>3</Revision>
   </ToolchainVersion>
   <BspID>com.sysprogs.arm.stm32</BspID>
-  <BspVersion>4.6R3</BspVersion>
+  <BspVersion>4.6R4</BspVersion>
   <McuID>STM32F103C8</McuID>
   <MCUDefinitionFile>STM32F1xxxx/DeviceDefinitions/stm32f103xb.xml</MCUDefinitionFile>
   <MCUProperties>

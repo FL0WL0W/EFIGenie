@@ -25,14 +25,27 @@ namespace EngineManagement
 	public:
 		static PistonEngineInjectionConfig_SDConfig * Cast(void *p)
 		{
-			//TODO
-		//_shortPulseAdder = (short *)config;  //60us increments (value in us)
-		//config = (void*)((short *)config + (int)(_shortPulseLimit / 0.00006f) + 1);
+			PistonEngineInjectionConfig_SDConfig *ret = (PistonEngineInjectionConfig_SDConfig *)p;
+
+			ret->VolumetricEfficiencyMap = (unsigned short *)(ret + 1);
+			ret->ShortPulseAdder = (short *)(ret->VolumetricEfficiencyMap + ret->VeRpmResolution * ret->VeMapResolution);
+			ret->Offset = (ret->ShortPulseAdder + (int)(ret->ShortPulseLimit / 0.00006f) + 1);
+			ret->TemperatureBias = (unsigned char *)(ret->Offset + ret->OffsetMapResolution *ret->OffsetVoltageResolution);
+			ret->TpsDotAdder = (short *)(ret->TemperatureBias + ret->TemperatureBiasResolution);
+			ret->MapDotAdder = ret->TpsDotAdder + ret->TpsDotAdderResolution;
+
+			return ret;
 		}
 		
 		unsigned int Size()
 		{
-			//TODO
+			return sizeof(PistonEngineInjectionConfig_SDConfig) +
+				sizeof(unsigned short) * VeRpmResolution * VeMapResolution +
+				sizeof(short) * ((int)(ShortPulseLimit / 0.00006f) + 1) +
+				sizeof(short) * OffsetMapResolution * OffsetVoltageResolution +
+				sizeof(unsigned char) * TemperatureBiasResolution +
+				sizeof(short) * TpsDotAdderResolution +
+				sizeof(short) * MapDotAdderResolution;
 		}
 		
 		unsigned short GasConstant;
@@ -44,7 +57,7 @@ namespace EngineManagement
 		unsigned char VeMapResolution;
 		unsigned short *VolumetricEfficiencyMap;
 		
-		unsigned short *InjectorGramsPerMinute;
+		unsigned short InjectorGramsPerMinute[MAX_CYLINDERS];
 		
 		float ShortPulseLimit;
 		short *ShortPulseAdder;

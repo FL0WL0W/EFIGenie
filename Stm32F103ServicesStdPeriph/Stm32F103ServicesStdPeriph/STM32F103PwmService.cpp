@@ -159,7 +159,7 @@ namespace Stm32
 			}
 			//make sure we are in the right mode
 			else if(TIM->CR1 & (~(TIM_CR1_DIR | TIM_CR1_CMS | TIM_CR1_CKD) | TIM_CounterMode_Up))
-				return;  //TODO: figure out errors
+				return; 
 
 			switch (TIM_Channel)
 			{
@@ -219,7 +219,7 @@ namespace Stm32
 			}
 			//make sure we are in the right mode
 			else if(TIM->CR1 & (~(TIM_CR1_DIR | TIM_CR1_CMS | TIM_CR1_CKD) | TIM_CounterMode_Up))
-				return;   //TODO: figure out errors
+				return;   
 			
 			//enable intterupt
 			if (TIM == TIM1)

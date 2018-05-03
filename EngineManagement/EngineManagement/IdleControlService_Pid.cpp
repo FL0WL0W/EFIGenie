@@ -46,22 +46,10 @@ namespace ApplicationService
 		
 		unsigned short rpm = _decoder->GetRpm();
 		
-		//TODO REPLACE THIS WITH FUNCTION
-		unsigned int readTickOrig = _hardwareAbstractionCollection->TimerService->GetTick();
-		unsigned int lastReadTick = _lastReadTick;
-		//if ther hasn't been a full tick between reads then return;
-		if(lastReadTick == readTickOrig)
+		float dt = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
+		if (dt * _config->DotSampleRate < 1)
 			return;
-		unsigned int readTick = readTickOrig;
-		if (readTick < lastReadTick)
-		{
-			lastReadTick += 2147483647;
-			readTick += 2147483647;
-		}
-		if (readTick < (lastReadTick + _hardwareAbstractionCollection->TimerService->GetTicksPerSecond() / _config->DotSampleRate))
-			return;
-		float dt = (readTick - lastReadTick) / (float)_hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
-		_lastReadTick = readTickOrig;
+		_lastReadTick = _hardwareAbstractionCollection->TimerService->GetTick();
 		
 		InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->EctResolution);
 		float idleAirmass = _config->IdleAirmass[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _config->IdleAirmass[ectInterpolation.IndexH] * ectInterpolation.Multiplier;

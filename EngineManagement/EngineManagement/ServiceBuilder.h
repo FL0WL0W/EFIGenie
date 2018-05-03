@@ -62,7 +62,9 @@
 #include "FuelPumpService_Analog.h"
 #include "IPistonEngineInjectionConfig.h"
 #include "PistonEngineInjectionConfig_SD.h"
+#include "PistonEngineInjectionConfigWrapper_DFCO.h"
 #include "IPistonEngineIgnitionConfig.h"
+#include "PistonEngineIgnitionConfig_Map_Ethanol.h"
 #include "PistonEngineService.h"
 
 using namespace HardwareAbstraction;

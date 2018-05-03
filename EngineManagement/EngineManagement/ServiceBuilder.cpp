@@ -568,16 +568,37 @@ namespace Service
 			{
 				PistonEngineInjectionConfig_SDConfig *pistonEngineIgnitionConfig = PistonEngineInjectionConfig_SDConfig::Cast(config);
 				*totalSize += pistonEngineIgnitionConfig->Size();
-			
-				if(manifoldAbsolutePressureService == 0 || afrService == 0 || decoder == 0)
+
+				if (manifoldAbsolutePressureService == 0 || afrService == 0 || decoder == 0)
 					return 0;
-				
+
 				return new PistonEngineInjectionConfig_SD(pistonEngineIgnitionConfig, pistonEngineConfig, decoder, manifoldAbsolutePressureService, afrService, fuelTrimService, intakeAirTemperatureService, engineCoolantTemperatureService, throttlePositionService, voltageService);
 			}
 #endif
-#ifdef PistonEngineInjectionConfigWrapper_DFCOExists
+#ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 		case 2:
-			return new EngineManagement::PistonEngineInjectionConfigWrapper_DFCO((void*)((unsigned char*)config + 1));
+			{
+				PistonEngineInjectionConfigWrapper_DFCOConfig *pistonEngineIgnitionConfig = PistonEngineInjectionConfigWrapper_DFCOConfig::Cast(config);
+				*totalSize += pistonEngineIgnitionConfig->Size();
+
+
+				if (throttlePositionService == 0 || decoder == 0)
+					return 0;
+
+				config = (void *)(pistonEngineIgnitionConfig + 1);
+				unsigned int size;
+				IPistonEngineInjectionConfig *child = CreatePistonEngineInjetionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+
+				if (child == 0)
+				{
+					delete child;
+					return 0;
+				}
+
+				return new PistonEngineInjectionConfigWrapper_DFCO(pistonEngineIgnitionConfig, throttlePositionService, decoder, child);
+			}
 #endif
 		}
 		return 0;
@@ -585,6 +606,51 @@ namespace Service
 	
 	IPistonEngineIgnitionConfig *ServiceBuilder::CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *totalSize)
 	{
+		HardwareAbstractionCollection *hardwareAbstractionCollection = 0;
+#ifdef HARDWARE_ABSTRACTION_COLLECTION_ID
+		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
+#endif
+		
+		IFloatOutputService *idleAirControlValveService = 0;
+#if defined(IDLE_AIR_CONTROL_VALVE_SERVICE_ID)
+		idleAirControlValveService = (IFloatOutputService*)serviceLocator->Locate(IDLE_AIR_CONTROL_VALVE_SERVICE_ID);
+#endif
+		
+		IDecoder *decoder = 0;
+#ifdef DECODER_SERVICE_ID
+		decoder = (IDecoder *)serviceLocator->Locate(DECODER_SERVICE_ID);
+#endif
+		
+		IFloatInputService *engineCoolantTemperatureService = 0;
+#ifdef ENGINE_COOLANT_TEMPERATURE_SERVICE_ID
+		engineCoolantTemperatureService = (IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID);
+#endif
+		
+		IFloatInputService *throttlePositionService = 0;
+#ifdef THROTTLE_POSITION_SERVICE_ID
+		throttlePositionService = (IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID);
+#endif  		
+		
+		IFloatInputService *vehicleSpeedService = 0;
+#ifdef VEHICLE_SPEED_SERVICE_ID
+		vehicleSpeedService = (IFloatInputService*)serviceLocator->Locate(VEHICLE_SPEED_SERVICE_ID);
+#endif  
+		
+		IFloatInputService *intakeAirTemperatureService = 0;
+#ifdef INTAKE_AIR_TEMPERATURE_SERVICE_ID
+		intakeAirTemperatureService = (IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID);
+#endif  
+		
+		IFloatInputService *manifoldAbsolutePressureService = 0;
+#ifdef MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
+		manifoldAbsolutePressureService = (IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID);
+#endif  
+		
+		IFloatInputService *ethanolContentService = 0;
+#ifdef ETHANOL_CONTENT_SERVICE_ID
+		ethanolContentService = (IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID);
+#endif  
+		
 		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)config);
 		config = (void *)((unsigned char*)config + 1);
 		*totalSize = 1;
@@ -592,7 +658,15 @@ namespace Service
 		{
 #ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 		case 1:
-			return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol((void*)((unsigned char*)config + 1));
+			{
+				PistonEngineIgnitionConfig_Map_EthanolConfig *pistonEngineInjectionConfig = PistonEngineIgnitionConfig_Map_EthanolConfig::Cast(config);
+				*totalSize += pistonEngineInjectionConfig->Size();
+
+				if (manifoldAbsolutePressureService == 0 || decoder == 0)
+					return 0;
+
+				return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(pistonEngineInjectionConfig, decoder, ethanolContentService, manifoldAbsolutePressureService);
+			}
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 2:

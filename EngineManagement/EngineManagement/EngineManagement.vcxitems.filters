@@ -209,9 +209,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.cpp">
       <Filter>Source Files\PistonEngine\InjectionConfig</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineFactory.cpp">
-      <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp">
       <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
     </ClCompile>

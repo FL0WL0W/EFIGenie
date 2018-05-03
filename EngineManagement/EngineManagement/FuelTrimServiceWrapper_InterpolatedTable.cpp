@@ -33,11 +33,10 @@ namespace ApplicationService
 	{
 		if (_afrService->Lambda < 1 + _config->LambdaDeltaEnable || _afrService->Lambda > 1 - _config->LambdaDeltaEnable)
 		{
-			unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();
 			float elapsedTime = _timerService->GetElapsedTime(_prevTick);
-			_prevTick = _timerService->GetTick();
 			if (elapsedTime * _config->UpdateRate < 1)
 				return;
+			_prevTick = _timerService->GetTick();
 			float rpm = _decoder->GetRpm();
 			_rpmDot = (rpm - _prevRpm) / elapsedTime;
 			_prevRpm = rpm;

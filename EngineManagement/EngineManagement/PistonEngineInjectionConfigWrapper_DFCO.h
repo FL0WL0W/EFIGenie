@@ -1,20 +1,47 @@
 #include "IPistonEngineInjectionConfig.h"
+#include "IFloatInputService.h"
+#include "IDecoder.h"
+
+using namespace Decoder;
+using namespace IOService;
 
 #if !defined(PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H) && defined(IPISTONENGINEINJECTIONCONFIG_H)
 #define PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
+	struct __attribute__((__packed__)) PistonEngineInjectionConfigWrapper_DFCOConfig
+	{
+	private:
+		PistonEngineInjectionConfigWrapper_DFCOConfig()
+		{
+
+		}
+	public:
+		static PistonEngineInjectionConfigWrapper_DFCOConfig * Cast(void *p)
+		{
+			return (PistonEngineInjectionConfigWrapper_DFCOConfig *)p;
+		}
+
+		unsigned int Size()
+		{
+			return sizeof(PistonEngineInjectionConfigWrapper_DFCOConfig);
+		}
+
+		float TpsThreshold;
+		unsigned short RpmEnable;
+		unsigned short RpmDisable;
+	};
+
 	class PistonEngineInjectionConfigWrapper_DFCO : public IPistonEngineInjectionConfig
 	{
 	protected:
+		PistonEngineInjectionConfigWrapper_DFCOConfig *_config;
+		IFloatInputService *_throttlePositionService;
+		IDecoder *_decoder;
 		IPistonEngineInjectionConfig *_child;
-		float _tpsEnable;
-		unsigned short _rpmEnable;
-		unsigned short _rpmDisable;
 		bool _dfcoEnabled;
 	public:
-		PistonEngineInjectionConfigWrapper_DFCO(
-			void *config);
+		PistonEngineInjectionConfigWrapper_DFCO(PistonEngineInjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IDecoder *decoder, IPistonEngineInjectionConfig *child);
 		InjectorTiming GetInjectorTiming(unsigned char cylinder);
 	};
 }
