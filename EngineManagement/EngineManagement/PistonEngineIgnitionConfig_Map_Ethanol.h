@@ -11,7 +11,7 @@ using namespace Interpolation;
 #define PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 namespace EngineManagement
 {
-	struct PistonEngineIgnitionConfig_Map_EthanolConfig
+	struct __attribute__((__packed__)) PistonEngineIgnitionConfig_Map_EthanolConfig
 	{
 	private:
 		PistonEngineIgnitionConfig_Map_EthanolConfig()

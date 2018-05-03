@@ -566,38 +566,34 @@ namespace Service
 #ifdef PISTONENGINEINJECTIONCONFIG_SD_H
 		case 1:
 			{
-				PistonEngineInjectionConfig_SDConfig *pistonEngineIgnitionConfig = PistonEngineInjectionConfig_SDConfig::Cast(config);
-				*totalSize += pistonEngineIgnitionConfig->Size();
+				PistonEngineInjectionConfig_SDConfig *pistonEngineInjectionConfig = PistonEngineInjectionConfig_SDConfig::Cast(config);
+				*totalSize += pistonEngineInjectionConfig->Size();
 
 				if (manifoldAbsolutePressureService == 0 || afrService == 0 || decoder == 0)
 					return 0;
 
-				return new PistonEngineInjectionConfig_SD(pistonEngineIgnitionConfig, pistonEngineConfig, decoder, manifoldAbsolutePressureService, afrService, fuelTrimService, intakeAirTemperatureService, engineCoolantTemperatureService, throttlePositionService, voltageService);
+				return new PistonEngineInjectionConfig_SD(pistonEngineInjectionConfig, pistonEngineConfig, decoder, manifoldAbsolutePressureService, afrService, fuelTrimService, intakeAirTemperatureService, engineCoolantTemperatureService, throttlePositionService, voltageService);
 			}
 #endif
 #ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 		case 2:
 			{
-				PistonEngineInjectionConfigWrapper_DFCOConfig *pistonEngineIgnitionConfig = PistonEngineInjectionConfigWrapper_DFCOConfig::Cast(config);
-				*totalSize += pistonEngineIgnitionConfig->Size();
-
+				PistonEngineInjectionConfigWrapper_DFCOConfig *pistonEngineInjectionConfig = PistonEngineInjectionConfigWrapper_DFCOConfig::Cast(config);
+				*totalSize += pistonEngineInjectionConfig->Size();
 
 				if (throttlePositionService == 0 || decoder == 0)
 					return 0;
 
-				config = (void *)(pistonEngineIgnitionConfig + 1);
+				config = (void *)(pistonEngineInjectionConfig + 1);
 				unsigned int size;
 				IPistonEngineInjectionConfig *child = CreatePistonEngineInjetionConfig(serviceLocator, pistonEngineConfig, config, &size);
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 
 				if (child == 0)
-				{
-					delete child;
 					return 0;
-				}
 
-				return new PistonEngineInjectionConfigWrapper_DFCO(pistonEngineIgnitionConfig, throttlePositionService, decoder, child);
+				return new PistonEngineInjectionConfigWrapper_DFCO(pistonEngineInjectionConfig, throttlePositionService, decoder, child);
 			}
 #endif
 		}
@@ -659,22 +655,63 @@ namespace Service
 #ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 		case 1:
 			{
-				PistonEngineIgnitionConfig_Map_EthanolConfig *pistonEngineInjectionConfig = PistonEngineIgnitionConfig_Map_EthanolConfig::Cast(config);
-				*totalSize += pistonEngineInjectionConfig->Size();
+				PistonEngineIgnitionConfig_Map_EthanolConfig *pistonEngineIgnitionConfig = PistonEngineIgnitionConfig_Map_EthanolConfig::Cast(config);
+				*totalSize += pistonEngineIgnitionConfig->Size();
 
 				if (manifoldAbsolutePressureService == 0 || decoder == 0)
 					return 0;
 
-				return new EngineManagement::PistonEngineIgnitionConfig_Map_Ethanol(pistonEngineInjectionConfig, decoder, ethanolContentService, manifoldAbsolutePressureService);
+				return new PistonEngineIgnitionConfig_Map_Ethanol(pistonEngineIgnitionConfig, decoder, ethanolContentService, manifoldAbsolutePressureService);
 			}
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 2:
-			return new EngineManagement::PistonEngineIgnitionConfigWrapper_HardRpmLimit((void*)((unsigned char*)config + 1));
+			{
+				PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig *pistonEngineIgnitionConfig = PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig::Cast(config);
+				*totalSize += pistonEngineIgnitionConfig->Size();
+
+				if (decoder == 0 || hardwareAbstractionCollection)
+					return 0;
+
+				config = (void *)(pistonEngineIgnitionConfig + 1);
+				unsigned int size;
+				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+
+				if (child == 0)
+					return 0;
+				
+				IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService(hardwareAbstractionCollection, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+				
+				return new PistonEngineIgnitionConfigWrapper_HardRpmLimit(pistonEngineIgnitionConfig, decoder, booleanInputService, child);
+			}
 #endif
-#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTRPMLIMIT_H
+#ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 		case 3:
-			return new EngineManagement::PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit((void*)((unsigned char*)config + 1));
+			{
+				PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig *pistonEngineIgnitionConfig = PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig::Cast(config);
+				*totalSize += pistonEngineIgnitionConfig->Size();
+
+				if (decoder == 0 || hardwareAbstractionCollection)
+					return 0;
+
+				config = (void *)(pistonEngineIgnitionConfig + 1);
+				unsigned int size;
+				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+
+				if (child == 0)
+					return 0;
+				
+				IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService(hardwareAbstractionCollection, config, &size);
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+				return new PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(pistonEngineIgnitionConfig, hardwareAbstractionCollection->TimerService, decoder, booleanInputService, child);
+			}
 #endif
 		}
 		return 0;

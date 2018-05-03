@@ -65,6 +65,8 @@
 #include "PistonEngineInjectionConfigWrapper_DFCO.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
+#include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
+#include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
 #include "PistonEngineService.h"
 
 using namespace HardwareAbstraction;

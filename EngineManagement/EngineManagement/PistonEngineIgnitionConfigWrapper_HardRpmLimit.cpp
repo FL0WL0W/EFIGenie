@@ -1,33 +1,24 @@
-#include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 namespace EngineManagement
 {
-	PistonEngineIgnitionConfigWrapper_HardRpmLimit::PistonEngineIgnitionConfigWrapper_HardRpmLimit(void *config)
-	{		
-		_pinEnable = *(unsigned char *)config;
-		config = (void*)((unsigned char *)config + 1);
-		
-		_pinNormalOn = (bool)(*(unsigned char *)config);
-		config = (void*)((unsigned char *)config + 1);
-		
-		_rpmEnable = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		_rpmDisable = *(unsigned short *)config;
-		config = (void*)((unsigned short *)config + 1);
-		
-		_child = CreatePistonEngineIgnitionConfig(config);
+	PistonEngineIgnitionConfigWrapper_HardRpmLimit::PistonEngineIgnitionConfigWrapper_HardRpmLimit(PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig *config, IDecoder *decoder, IBooleanInputService *booleanInputService, IPistonEngineIgnitionConfig *child)
+	{				
+		_config = config;
+		_decoder = decoder;
+		_booleanInputService = booleanInputService;
+		_child = child;
 	}
 	
 	IgnitionTiming PistonEngineIgnitionConfigWrapper_HardRpmLimit::GetIgnitionTiming()
 	{
-		unsigned short rpm = CurrentDecoder->GetRpm();
+		_booleanInputService->ReadValue();
+		unsigned short rpm = _decoder->GetRpm();
 		
-		if (rpm < _rpmDisable)
+		if (rpm < _config->RpmDisable)
 			_limitEnabled = false;
-		else if (rpm > _rpmEnable && (_pinEnable == 0 || CurrentDigitalService->ReadPin(_pinEnable) != _pinNormalOn))
+		else if (rpm > _config->RpmEnable && _booleanInputService != 0 && !_booleanInputService->Value)
 			_limitEnabled = true;
 		
 		if (_limitEnabled)
