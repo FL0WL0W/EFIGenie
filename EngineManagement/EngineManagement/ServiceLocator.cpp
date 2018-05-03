@@ -3,12 +3,12 @@
 #ifdef SERVICELOCATOR_H
 namespace Service
 {
-	void ServiceLocator::Register(unsigned char serviceId, void *service)
+	void ServiceLocator::Register(unsigned short serviceId, void *service)
 	{
 		_services.insert(std::pair<unsigned char, void *>(serviceId, service));
 	}
 
-	void* ServiceLocator::Locate(unsigned char serviceId)
+	void* ServiceLocator::Locate(unsigned short serviceId)
 	{
 		std::map<unsigned char, void *>::iterator it = _services.find(serviceId);
 		if (it != _services.end())
@@ -16,7 +16,7 @@ namespace Service
 		return 0;
 	}
 
-	void* ServiceLocator::Unregister(unsigned char serviceId)
+	void* ServiceLocator::Unregister(unsigned short serviceId)
 	{
 		std::map<unsigned char, void *>::iterator it = _services.find(serviceId);
 		if (it != _services.end())

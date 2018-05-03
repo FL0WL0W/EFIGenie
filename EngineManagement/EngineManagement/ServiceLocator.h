@@ -9,9 +9,9 @@ namespace Service
 	protected:
 		std::map<unsigned char, void *> _services;
 	public:
-		void Register(unsigned char serviceId, void *service);
-		void* Locate(unsigned char serviceId);
-		void* Unregister(unsigned char serviceId);
+		void Register(unsigned short serviceId, void *service);
+		void* Locate(unsigned short serviceId);
+		void* Unregister(unsigned short serviceId);
 	};
 }
 #endif

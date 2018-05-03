@@ -20,7 +20,7 @@
 //outputs 3001-4000
 #define IGNITOR_SERVICES_ID						3001			// IBooleanOutputService[]
 #define INJECTOR_SERVICES_ID					3002			// IBooleanOutputService[]
-#define IDLE_AIR_CONTROL_VALVE_SERVICE_ID				3003			// IFloatOutputService		sq mm
+#define IDLE_AIR_CONTROL_VALVE_SERVICE_ID		3003			// IFloatOutputService		sq mm
 
 //application services 4001-5000
 #define TACHOMETER_SERVICE_ID					4001			// TachometerService

@@ -327,6 +327,7 @@ namespace Service
 		*totalSize = 1;
 		switch (afrServiceId)
 		{
+		case 0:
 			return 0;
 #ifdef AFRSERVICE_STATIC_H
 		case 1:
@@ -459,6 +460,7 @@ namespace Service
 		*totalSize = 1;
 		switch (fuelPumpServiceId)
 		{
+		case 0:
 			return 0;
 #ifdef FUELPUMPSERVICE_H
 		case 1:
