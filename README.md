@@ -72,6 +72,7 @@ TODO LIST<br>
       <li>PistonEngineInjectionConfigWrapper_DFCO</li>
     </ul>
   <li>*Create integration tests with integration test hardware</li>
+  <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
   <li>Electric Fan Control</li>
