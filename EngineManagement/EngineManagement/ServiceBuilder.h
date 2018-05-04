@@ -90,17 +90,41 @@ namespace Service
 			return castedConfig;
 		}
 		
-		template<typename T>
-			static T LocateRequired(ServiceLocator *serviceLocator, unsigned short serviceId)
-			{
-				//TODO throw an error here
-				return (T)serviceLocator->Locate(serviceId);
-			}
-		template<typename T>
-			static T LocateOptional(ServiceLocator *serviceLocator, unsigned short serviceId)
-			{
-				return (T)serviceLocator->Locate(serviceId);
-			}
+		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		{
+			unsigned int size;
+			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
+			*config = (void *)((unsigned char *)*config + size);
+			*totalSize += size;
+			return booleanOutputService;
+		}
+		
+		static IBooleanInputService * CreateBooleanInputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		{
+			unsigned int size;
+			IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			*config = (void *)((unsigned char *)*config + size);
+			*totalSize += size;
+			return booleanInputService;
+		}
+		
+		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		{
+			unsigned int size;
+			IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			*config = (void *)((unsigned char *)*config + size);
+			*totalSize += size;
+			return floatOutputService;
+		}
+		
+		static IFloatInputService * CreateFloatInputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		{
+			unsigned int size;
+			IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			*config = (void *)((unsigned char *)*config + size);
+			*totalSize += size;
+			return floatInputService;
+		}
 		
 		static unsigned char GetServiceId(void **config, unsigned int *size)
 		{
