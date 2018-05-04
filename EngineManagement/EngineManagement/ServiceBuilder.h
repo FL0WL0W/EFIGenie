@@ -79,11 +79,36 @@ namespace Service
 {
 	class ServiceBuilder
 	{
-		template<typename Constructed, typename Type1, typename Type2, typename Type3, typename Type4>
-			static Constructed * Construct(ServiceLocator *serviceLocator, Type1 type1, Type2 type2, unsigned int type3, unsigned int type4)
+		template<typename T>
+		static T* CastConfig(void **config, unsigned int *size)
+		{
+			T *castedConfig = T::Cast(*config);
+			unsigned int confSize = castedConfig->Size();
+			*size += confSize;
+			*config = (void *)((unsigned char *)*config + confSize);
+			
+			return castedConfig;
+		}
+		
+		template<typename T>
+			static T LocateRequired(ServiceLocator *serviceLocator, unsigned short serviceId)
 			{
-				return new Constructed(type1, type2, (Type3)serviceLocator->Locate(type3), (Type4)serviceLocator->Locate(type4));
+				//TODO throw an error here
+				return (T)serviceLocator->Locate(serviceId);
 			}
+		template<typename T>
+			static T LocateOptional(ServiceLocator *serviceLocator, unsigned short serviceId)
+			{
+				return (T)serviceLocator->Locate(serviceId);
+			}
+		
+		static unsigned char GetServiceId(void **config, unsigned int *size)
+		{
+			unsigned char serviceId = *((unsigned char*)*config);
+			*config = (void *)((unsigned char*)*config + 1);
+			*size = 1;
+			return serviceId;
+		}
 		
 	public:
 		static ServiceLocator *CreateServices(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *totalSize);

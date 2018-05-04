@@ -151,53 +151,38 @@ namespace Service
 	}
 	
 	TachometerService *ServiceBuilder::CreateTachometerService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{
-		HardwareAbstractionCollection *hardwareAbstractionCollection = 0;
-#if defined(HARDWARE_ABSTRACTION_COLLECTION_ID)
-		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
-#endif
+	{		
+		*totalSize = 0;
+		TachometerServiceConfig *tachometerConfig = CastConfig < TachometerServiceConfig>(&config, totalSize);
 		
-		TachometerServiceConfig *tachometerConfig = TachometerServiceConfig::Cast(config);
-		config = (void *)((unsigned char *)config + tachometerConfig->Size());
-		*totalSize = tachometerConfig->Size();
-		
+		//TODO put this in a helper function
 		unsigned int size;
-		IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
+		IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(
+			LocateRequired<HardwareAbstractionCollection *>(serviceLocator, HARDWARE_ABSTRACTION_COLLECTION_ID), 
+			config, 
+			&size, 
+			BOOLEAN_OUTPUT_SERVICE_HIGHZ);
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
 				
-		//TODO build things like this
-		return Construct<TachometerService, TachometerServiceConfig*, IBooleanOutputService*, ITimerService*, IDecoder*>(serviceLocator, tachometerConfig, booleanOutputService, TIMER_SERVICE_ID, DECODER_SERVICE_ID);
+		return new TachometerService(tachometerConfig,
+			booleanOutputService,
+			LocateRequired<ITimerService *>(serviceLocator, TIMER_SERVICE_ID),
+			LocateRequired<IDecoder *>(serviceLocator, DECODER_SERVICE_ID));
 	}
 	
 	IPrimeService* ServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
-		HardwareAbstractionCollection *hardwareAbstractionCollection;
-#if defined(HARDWARE_ABSTRACTION_COLLECTION_ID)
-		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
-#endif
-		
-		IBooleanOutputService **injectorServices;
-#ifdef INJECTOR_SERVICES_ID
-		injectorServices = (IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID);
-#endif
-		
-		unsigned char primeServiceId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (primeServiceId)
+		switch (GetServiceId(&config, totalSize))
 		{
+		case 0:
+			return 0;
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:
-			{
-				PrimeService_StaticPulseWidthConfig *primeConfig = PrimeService_StaticPulseWidthConfig::Cast(config);
-				*totalSize += primeConfig->Size();
-				
-				if (hardwareAbstractionCollection == 0 || injectorServices == 0)
-					return 0;
-				
-				return new PrimeService_StaticPulseWidth(primeConfig, hardwareAbstractionCollection->TimerService, injectorServices);
-			}
+			return new PrimeService_StaticPulseWidth(
+				CastConfig < PrimeService_StaticPulseWidthConfig>(&config, totalSize), 
+				LocateRequired<ITimerService *>(serviceLocator, TIMER_SERVICE_ID), 
+				LocateRequired<IBooleanOutputService **>(serviceLocator, INJECTOR_SERVICES_ID));
 #endif
 		}
 		return 0;
@@ -205,70 +190,23 @@ namespace Service
 	
 	IIdleControlService* ServiceBuilder::CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
-		HardwareAbstractionCollection *hardwareAbstractionCollection = 0;
-#ifdef HARDWARE_ABSTRACTION_COLLECTION_ID
-		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
-#endif
-		
-		IFloatOutputService *idleAirControlValveService = 0;
-#if defined(IDLE_AIR_CONTROL_VALVE_SERVICE_ID)
-		idleAirControlValveService = (IFloatOutputService*)serviceLocator->Locate(IDLE_AIR_CONTROL_VALVE_SERVICE_ID);
-#endif
-		
-		IDecoder *decoder = 0;
-#ifdef DECODER_SERVICE_ID
-		decoder = (IDecoder *)serviceLocator->Locate(DECODER_SERVICE_ID);
-#endif
-		
-		IFloatInputService *engineCoolantTemperatureService = 0;
-#ifdef ENGINE_COOLANT_TEMPERATURE_SERVICE_ID
-		engineCoolantTemperatureService = (IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID);
-#endif
-		
-		IFloatInputService *throttlePositionService = 0;
-#ifdef THROTTLE_POSITION_SERVICE_ID
-		throttlePositionService = (IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID);
-#endif  		
-		
-		IFloatInputService *vehicleSpeedService = 0;
-#ifdef VEHICLE_SPEED_SERVICE_ID
-		vehicleSpeedService = (IFloatInputService*)serviceLocator->Locate(VEHICLE_SPEED_SERVICE_ID);
-#endif  
-		
-		IFloatInputService *intakeAirTemperatureService = 0;
-#ifdef INTAKE_AIR_TEMPERATURE_SERVICE_ID
-		intakeAirTemperatureService = (IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID);
-#endif  
-		
-		IFloatInputService *manifoldAbsolutePressureService = 0;
-#ifdef MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
-		manifoldAbsolutePressureService = (IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID);
-#endif  
-		
-		unsigned char primeServiceId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (primeServiceId)
+		switch (GetServiceId(&config, totalSize))
 		{
+		case 0:
+			return 0;
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:
-			{
-				IdleControlService_PidConfig *idleConfig = IdleControlService_PidConfig::Cast(config);
-				*totalSize += idleConfig->Size();
-				
-				if (engineCoolantTemperatureService == 0 || idleAirControlValveService == 0 || decoder == 0 || idleAirControlValveService == 0 || hardwareAbstractionCollection == 0)
-					return 0;
-				
+			{				
 				return new IdleControlService_Pid(
-					idleConfig, 
-					hardwareAbstractionCollection, 
-					decoder, 
-					throttlePositionService, 
-					engineCoolantTemperatureService, 
-					vehicleSpeedService,
-					intakeAirTemperatureService, 
-					manifoldAbsolutePressureService,
-					idleAirControlValveService);
+					CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
+					LocateRequired<HardwareAbstractionCollection *>(serviceLocator, HARDWARE_ABSTRACTION_COLLECTION_ID), 
+					LocateRequired<IDecoder *>(serviceLocator, DECODER_SERVICE_ID), 
+					LocateOptional<IFloatInputService *>(serviceLocator, THROTTLE_POSITION_SERVICE_ID), 
+					LocateRequired<IFloatInputService *>(serviceLocator, ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
+					LocateOptional<IFloatInputService *>(serviceLocator, VEHICLE_SPEED_SERVICE_ID),
+					LocateOptional<IFloatInputService *>(serviceLocator, INTAKE_AIR_TEMPERATURE_SERVICE_ID),
+					LocateOptional<IFloatInputService *>(serviceLocator, MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					LocateRequired<IFloatOutputService *>(serviceLocator, IDLE_AIR_CONTROL_VALVE_SERVICE_ID));
 			}
 #endif
 		}
@@ -276,56 +214,8 @@ namespace Service
 	}
 	
 	IAfrService *ServiceBuilder::CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{
-		HardwareAbstractionCollection *hardwareAbstractionCollection = 0;
-#ifdef HARDWARE_ABSTRACTION_COLLECTION_ID
-		hardwareAbstractionCollection = (HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
-#endif
-		
-		IFloatOutputService *idleAirControlValveService = 0;
-#if defined(IDLE_AIR_CONTROL_VALVE_SERVICE_ID)
-		idleAirControlValveService = (IFloatOutputService*)serviceLocator->Locate(IDLE_AIR_CONTROL_VALVE_SERVICE_ID);
-#endif
-		
-		IDecoder *decoder = 0;
-#ifdef DECODER_SERVICE_ID
-		decoder = (IDecoder *)serviceLocator->Locate(DECODER_SERVICE_ID);
-#endif
-		
-		IFloatInputService *engineCoolantTemperatureService = 0;
-#ifdef ENGINE_COOLANT_TEMPERATURE_SERVICE_ID
-		engineCoolantTemperatureService = (IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID);
-#endif
-		
-		IFloatInputService *throttlePositionService = 0;
-#ifdef THROTTLE_POSITION_SERVICE_ID
-		throttlePositionService = (IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID);
-#endif  		
-		
-		IFloatInputService *vehicleSpeedService = 0;
-#ifdef VEHICLE_SPEED_SERVICE_ID
-		vehicleSpeedService = (IFloatInputService*)serviceLocator->Locate(VEHICLE_SPEED_SERVICE_ID);
-#endif  
-		
-		IFloatInputService *intakeAirTemperatureService = 0;
-#ifdef INTAKE_AIR_TEMPERATURE_SERVICE_ID
-		intakeAirTemperatureService = (IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID);
-#endif  
-		
-		IFloatInputService *manifoldAbsolutePressureService = 0;
-#ifdef MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
-		manifoldAbsolutePressureService = (IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID);
-#endif  
-		
-		IFloatInputService *ethanolContentService = 0;
-#ifdef ETHANOL_CONTENT_SERVICE_ID
-		ethanolContentService = (IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID);
-#endif  
-		
-		unsigned char afrServiceId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (afrServiceId)
+	{		
+		switch (GetServiceId(&config, totalSize))
 		{
 		case 0:
 			return 0;
@@ -337,16 +227,18 @@ namespace Service
 #ifdef AFRSERVICE_MAP_ETHANOL_H
 		case 2:
 			{
-				AfrService_Map_EthanolConfig *afrConfig = AfrService_Map_EthanolConfig::Cast(config);
-				*totalSize += afrConfig->Size();
-				
-				if (hardwareAbstractionCollection->TimerService == 0 || manifoldAbsolutePressureService == 0 || throttlePositionService == 0)
-					return 0;
-				
-				return new AfrService_Map_Ethanol(afrConfig, hardwareAbstractionCollection->TimerService, decoder, manifoldAbsolutePressureService, engineCoolantTemperatureService, ethanolContentService, throttlePositionService);
+				return new AfrService_Map_Ethanol(
+					CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
+					LocateRequired<ITimerService *>(serviceLocator, TIMER_SERVICE_ID),
+					LocateRequired<IDecoder *>(serviceLocator, DECODER_SERVICE_ID),
+					LocateRequired<IFloatInputService *>(serviceLocator, MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					LocateOptional<IFloatInputService *>(serviceLocator, ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
+					LocateOptional<IFloatInputService *>(serviceLocator, ETHANOL_CONTENT_SERVICE_ID),
+					LocateRequired<IFloatInputService *>(serviceLocator, THROTTLE_POSITION_SERVICE_ID));
 			}
 #endif
 		}
+		return 0;
 	}
 	
 	IFuelTrimService *ServiceBuilder::CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
@@ -381,10 +273,7 @@ namespace Service
 		afrService = (IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID);
 #endif
 		
-		unsigned char fuelTrimId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (fuelTrimId)
+		switch (GetServiceId(&config, totalSize))
 		{
 		case 0:
 			return 0;
@@ -455,10 +344,7 @@ namespace Service
 		manifoldAbsolutePressureService = (IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID);
 #endif  
 		
-		unsigned char fuelPumpServiceId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (fuelPumpServiceId)
+		switch (GetServiceId(&config, totalSize))
 		{
 		case 0:
 			return 0;
@@ -560,10 +446,7 @@ namespace Service
 		fuelTrimService = (IFuelTrimService*)serviceLocator->Locate(FUEL_TRIM_SERVICE_ID);
 #endif  
 		
-		unsigned char pistonEngineInjectionConfigId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (pistonEngineInjectionConfigId)
+		switch (GetServiceId(&config, totalSize))
 		{
 #ifdef PISTONENGINEINJECTIONCONFIG_SD_H
 		case 1:
@@ -649,10 +532,7 @@ namespace Service
 		ethanolContentService = (IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID);
 #endif  
 		
-		unsigned char pistonEngineIgnitionConfigId = *((unsigned char*)config);
-		config = (void *)((unsigned char*)config + 1);
-		*totalSize = 1;
-		switch (pistonEngineIgnitionConfigId)
+		switch (GetServiceId(&config, totalSize))
 		{
 #ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 		case 1:
