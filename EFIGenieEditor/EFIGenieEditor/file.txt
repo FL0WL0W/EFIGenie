@@ -3,5 +3,5 @@ uint16 MaxRPM RPM 2000 6000 60000
 float32_2 MaxMAP Bar 0.5 1 10
 uint8 RPMResolution  1 10 100
 uint8 MAPResolution  1 10 100
-uint16[0:RPMResolution:MaxRPM][0:MAPResolution:MaxMAP] IgnitionAdvanceMapGas [RPM][Bar]
-uint16[0:RPMResolution:MaxRPM][0:MAPResolution:MaxMAP] IgnitionAdvanceMapEthanol [RPM][Bar]
+int16*0.015625[0:MAPResolution:MaxMAP][0:RPMResolution:MaxRPM] IgnitionAdvanceMapGas [RPM][Bar]
+int16*0.015625[0:MAPResolution:MaxMAP][0:RPMResolution:MaxRPM] IgnitionAdvanceMapEthanol [RPM][Bar]

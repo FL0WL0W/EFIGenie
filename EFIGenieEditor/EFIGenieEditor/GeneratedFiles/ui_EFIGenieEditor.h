@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMdiArea>
@@ -27,6 +28,7 @@ class Ui_EFIGenieEditorClass
 {
 public:
     QWidget *centralWidget;
+    QGridLayout *gridLayout;
     QMdiArea *mainArea;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
@@ -36,16 +38,27 @@ public:
     {
         if (EFIGenieEditorClass->objectName().isEmpty())
             EFIGenieEditorClass->setObjectName(QStringLiteral("EFIGenieEditorClass"));
-        EFIGenieEditorClass->resize(964, 980);
+        EFIGenieEditorClass->resize(997, 1030);
         centralWidget = new QWidget(EFIGenieEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        gridLayout = new QGridLayout(centralWidget);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         mainArea = new QMdiArea(centralWidget);
         mainArea->setObjectName(QStringLiteral("mainArea"));
-        mainArea->setGeometry(QRect(0, 50, 981, 911));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(mainArea->sizePolicy().hasHeightForWidth());
+        mainArea->setSizePolicy(sizePolicy);
+
+        gridLayout->addWidget(mainArea, 0, 0, 1, 1);
+
         EFIGenieEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(EFIGenieEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 964, 26));
+        menuBar->setGeometry(QRect(0, 0, 997, 26));
         EFIGenieEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(EFIGenieEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));

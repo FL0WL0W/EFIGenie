@@ -2,6 +2,7 @@
 #include <qgridlayout.h>
 #include "EFIGenieEditor.h"
 #include <ConfigWidget.h>
+#include "TableEditWidget.h"
 #include <QMdiSubWindow>
 
 EFIGenieEditor::EFIGenieEditor(QWidget *parent)
@@ -22,11 +23,7 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	std::string definition = std::string(buffer);
 
 	QMdiSubWindow *subwindow = new QMdiSubWindow(ui.mainArea);
-
-	QGridLayout *layout = new QGridLayout;
-
 	ConfigWidget *configWidget = new ConfigWidget(definition);
-
 	subwindow->setWidget(configWidget);
 
 	setWindowTitle("Camera Window");

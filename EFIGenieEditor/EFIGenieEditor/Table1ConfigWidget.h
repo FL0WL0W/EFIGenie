@@ -32,6 +32,8 @@ public:
 		XRes = xRes;
 		XMax = xMax;
 
+		Interpolated();
+
 		QGridLayout *layout = new QGridLayout;
 		layout->setSpacing(5);
 		layout->setMargin(0);
@@ -65,31 +67,42 @@ public:
 		if (LastInterpedXMin == *XMin && LastInterpedXRes == *XRes && LastInterpedXMax == *XMax)
 			return;//if we are up to date then we dont need to interp;
 		//TOD: interpolate the values
+		Interpolated();
 	}
 
 	void * getValue()
+	{
+		throw;
+	}
+
+	void setValue(void *val)
+	{
+		throw;
+	}
+
+	void * getConfigValue()
 	{
 		Interpolate();
 		return &config;
 	}
 
-	void setValue(void *val)
+	void setConfigValue(void *val)
 	{
-		memcpy(config, val, size());
+		memcpy(config, val, configSize());
 		Interpolated(); //setting value so assume we are interpolated
 	}
 
-	unsigned int size()
+	unsigned int configSize()
 	{
 		return SizeOfType(Type) * (*XRes);
 	}
 
-	bool isPointer()
+	bool isConfigPointer()
 	{
 		return true;
 	}
 
-	std::string getType()
+	std::string getConfigType()
 	{
 		return Type;
 	}

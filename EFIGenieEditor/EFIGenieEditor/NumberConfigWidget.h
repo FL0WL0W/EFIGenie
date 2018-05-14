@@ -13,11 +13,15 @@ public:
 	QDoubleSpinBox * SpinBox;
 	QLabel * UnitLabel;
 	double Value;
+	double Multiplier;
+	void *ConfigValue;
 	std::string Type;
 
-	NumberConfigWidget(const char * name, const char * units, double min, double max, double value, int decimals, std::string type)
+	NumberConfigWidget(const char * name, const char * units, double min, double max, double value, int decimals, double multiplier, std::string type)
 	{
 		Type = type;
+		Multiplier = multiplier;
+		ConfigValue = malloc(configSize());
 
 		QGridLayout *layout = new QGridLayout;
 		layout->setSpacing(5);
@@ -47,31 +51,47 @@ public:
 	{
 		return &Value;
 	}
-
+	
 	void setValue(void *val)
 	{
 		SpinBox->setValue(*((double *)val));
 		Value = *((double *)val);
+		double scaledValue = Value / Multiplier;
+		CopyDoubleToLocationType(Type, ConfigValue, &scaledValue);
 	}
 
-	unsigned int size()
+	void * getConfigValue()
+	{
+		return ConfigValue;
+	}
+
+	void setConfigValue(void *val)
+	{
+		double scaledValue = 0;
+		CopyTypeToLocationDouble(Type, &scaledValue, val);
+		double value = scaledValue * Multiplier;
+		setValue(&value);
+	}
+
+	unsigned int configSize()
 	{
 		return SizeOfType(Type);
 	}
 
-	bool isPointer()
+	bool isConfigPointer()
 	{
 		return false;
 	}
 
-	std::string getType()
+	std::string getConfigType()
 	{
 		return Type;
 	}
 
 	bool eventFilter(QObject *watched, QEvent *e)
 	{
-		Value = SpinBox->value();
+		double val = SpinBox->value();
+		setValue(&val);
 		return false;
 	}
 };

@@ -25,36 +25,20 @@ public:
 		for (int i = 0; i < lines.size(); ++i)
 		{
 			std::vector<std::string> params = Split(lines[i], ' ');
-			if (params[0] == "uint8"
-				|| params[0] == "int8"
-				|| params[0] == "uint16"
-				|| params[0] == "int16"
-				|| params[0] == "uint32"
-				|| params[0] == "int32"
-				|| params[0] == "uint64"
-				|| params[0] == "int64")
-			{
-				NumberConfigWidget * widget = new NumberConfigWidget(params[1].c_str(), params[2].c_str(), atof(params[3].c_str()), atof(params[5].c_str()), atof(params[4].c_str()), 0, params[0]);
-
-				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
-
-				layout->addWidget(widget, i, 0);
-			}
-			else if (Split(params[0], '_')[0] == "float32" || Split(params[0], '_')[0] == "float64")
-			{
-				NumberConfigWidget * widget = new NumberConfigWidget(params[1].c_str(), params[2].c_str(), atof(params[3].c_str()), atof(params[5].c_str()), atof(params[4].c_str()), atoi(Split(params[0], '_')[1].c_str()), params[0]);
-
-				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
-
-				layout->addWidget(widget, i, 0);
-			}
-			else if (Split(params[0], '[').size() > 1)
+			std::string baseType = Split(Split(Split(params[0], '*')[0], '_')[0], '[')[0];
+			if (Split(params[0], '[').size() > 1)
 			{
 				std::vector<std::string> xBounds = Split(Split(Split(params[0], '[')[1], ']')[0], ':');
+				double multiplier = 1;
+				if (Split(params[0], '*').size() > 1)
+				{
+					multiplier = atof(Split(Split(Split(params[0], '*')[1], '_')[0], '[')[0].c_str());
+				}
+
 				double *xMin = 0;
 				double *xRes = 0;
 				double *xMax = 0;
-				if (xBounds.size() > 3)
+				if (xBounds.size() >= 3)
 				{
 					for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 					{
@@ -70,29 +54,29 @@ public:
 					{
 						xMin = (double*)malloc(sizeof(double));
 						double buff = atof(xBounds[0].c_str());
-						CopyNumberToLocation<double>((void*)xMin, (void*)&buff);
+						CopyDoubleToLocationType<double>((void*)xMin, (void*)&buff);
 					}
 					if (xRes == 0)
 					{
 						xRes = (double*)malloc(sizeof(double));
 						double buff = atoi(xBounds[1].c_str());
-						CopyNumberToLocation<double>((void*)xRes, (void*)&buff);
+						CopyDoubleToLocationType<double>((void*)xRes, (void*)&buff);
 					}
 					if (xMax == 0)
 					{
 						xMax = (double*)malloc(sizeof(double));
 						double buff = atof(xBounds[3].c_str());
-						CopyNumberToLocation<double>((void*)xMax, (void*)&buff);
+						CopyDoubleToLocationType<double>((void*)xMax, (void*)&buff);
 					}
 				}
 
 				if (Split(params[0], '[').size() == 3)
 				{
-					std::vector<std::string> yBounds = Split(Split(Split(params[0], '[')[1], ']')[0], ':');
+					std::vector<std::string> yBounds = Split(Split(Split(params[0], '[')[2], ']')[0], ':');
 					double *yMin = 0;
 					double *yRes = 0;
 					double *yMax = 0;
-					if (yBounds.size() > 3)
+					if (yBounds.size() >= 3)
 					{
 						for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 						{
@@ -108,24 +92,24 @@ public:
 						{
 							yMin = (double*)malloc(sizeof(double));
 							double buff = atof(yBounds[0].c_str());
-							CopyNumberToLocation<double>((void*)yMin, (void*)&buff);
+							CopyDoubleToLocationType<double>((void*)yMin, (void*)&buff);
 						}
 						if (yRes == 0)
 						{
 							yRes = (double*)malloc(sizeof(double));
 							double buff = atoi(yBounds[1].c_str());
-							CopyNumberToLocation<double>((void*)yRes, (void*)&buff);
+							CopyDoubleToLocationType<double>((void*)yRes, (void*)&buff);
 						}
 						if (yMax == 0)
 						{
 							yMax = (double*)malloc(sizeof(double));
 							double buff = atof(yBounds[3].c_str());
-							CopyNumberToLocation<double>((void*)yMax, (void*)&buff);
+							CopyDoubleToLocationType<double>((void*)yMax, (void*)&buff);
 						}
 
 					}
 
-					Table2ConfigWidget * widget = new Table2ConfigWidget(params[1].c_str(), params[0], xMin, xRes, xMax, yMin, yRes, yMax);
+					Table2ConfigWidget * widget = new Table2ConfigWidget(params[1].c_str(), baseType, multiplier, xMin, xRes, xMax, yMin, yRes, yMax);
 
 					Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
@@ -133,7 +117,7 @@ public:
 				}
 				else
 				{
-					Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), params[0], xMin, xRes, xMax);
+					Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), baseType, xMin, xRes, xMax);
 
 					Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
@@ -141,103 +125,144 @@ public:
 				}
 
 			}
+			else if (baseType == "uint8"
+				|| baseType == "int8"
+				|| baseType == "uint16"
+				|| baseType == "int16"
+				|| baseType == "uint32"
+				|| baseType == "int32"
+				|| baseType == "uint64"
+				|| baseType == "int64")
+			{
+				int decimals = 0;
+				double multiplier = 1;
+				if (Split(params[0], '*').size() > 1)
+				{
+					multiplier = atof(Split(Split(params[0], '*')[1], '_')[0].c_str());
+					if (Split(params[0], '_').size() > 1)
+					{
+						decimals = atoi(Split(params[0], '_')[1].c_str());
+					}
+				}
+
+				NumberConfigWidget * widget = new NumberConfigWidget(params[1].c_str(), params[2].c_str(), atof(params[3].c_str()), atof(params[5].c_str()), atof(params[4].c_str()), decimals, multiplier, baseType);
+
+				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
+
+				layout->addWidget(widget, i, 0);
+			}
+			else if (baseType == "float32" || baseType == "float64")
+			{
+				int decimals = 0;
+				if (Split(params[0], '_').size() > 1)
+				{
+					decimals = atoi(Split(params[0], '_')[1].c_str());
+				}
+				else
+				{
+					decimals = 10;
+				}
+
+				double multiplier = 1;
+				if (Split(params[0], '*').size() > 1)
+				{
+					multiplier = atof(Split(Split(params[0], '*')[1], '_')[0].c_str());
+				}
+
+				NumberConfigWidget * widget = new NumberConfigWidget(params[1].c_str(), params[2].c_str(), atof(params[3].c_str()), atof(params[5].c_str()), atof(params[4].c_str()), decimals, multiplier, baseType);
+
+				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
+
+				layout->addWidget(widget, i, 0);
+			}
 		}
 
 		setLayout(layout);
 	}
-	
+
 	void * getValue()
 	{
-		void * val = malloc(size());
+		throw;
+	}
+
+	void setValue(void *)
+	{
+		throw;
+	}
+	
+	void * getConfigValue()
+	{
+		void * val = malloc(configSize());
 		void * buildVal = val;
 		for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 		{
-			if (widget.second->isPointer())
+			if (widget.second->isConfigPointer())
 				buildVal = (void *)((unsigned int)buildVal + 1);
 			else
 			{
-				if (widget.second->getType() == "uint8")
-					CopyNumberToLocation<unsigned char>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "int8")
-					CopyNumberToLocation<char>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "uint16")
-					CopyNumberToLocation<unsigned short>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "int16")
-					CopyNumberToLocation<short>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "uint32")
-					CopyNumberToLocation<unsigned int>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "int32")
-					CopyNumberToLocation<int>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "uint64")
-					CopyNumberToLocation<unsigned long>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "int64")
-					CopyNumberToLocation<long>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "float32")
-					CopyNumberToLocation<float>(buildVal, widget.second->getValue());
-				if (widget.second->getType() == "float64")
-					CopyNumberToLocation<double>(buildVal, widget.second->getValue());
+				memcpy(buildVal, widget.second->getConfigValue(), widget.second->configSize());
 
-				buildVal = (void *)((unsigned char)buildVal + widget.second->size());
+				buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
 			}
 		}
 		for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 		{
-			if (widget.second->isPointer())
+			if (widget.second->isConfigPointer())
 			{
-				memcpy(buildVal, widget.second->getValue(), widget.second->size());
+				memcpy(buildVal, widget.second->getConfigValue(), widget.second->configSize());
 
-				buildVal = (void *)((unsigned char)buildVal + widget.second->size());
+				buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
 			}
 		}
 
 		return val;
 	}
 
-	void setValue(void *val)
+	void setConfigValue(void *val)
 	{
 		void * buildVal = val;
 		for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 		{
-			if (widget.second->isPointer())
+			if (widget.second->isConfigPointer())
 				buildVal = (void *)((unsigned int)buildVal + 1);
 			else
 			{
-				widget.second->setValue(buildVal);
+				widget.second->setConfigValue(buildVal);
 
-				buildVal = (void *)((unsigned char)buildVal + widget.second->size());
+				buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
 			}
 		}
 		for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 		{
-			if (widget.second->isPointer())
+			if (widget.second->isConfigPointer())
 			{
-				widget.second->setValue(buildVal);
+				widget.second->setConfigValue(buildVal);
 
-				buildVal = (void *)((unsigned char)buildVal + widget.second->size());
+				buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
 			}
 		}
 	}
 
-	unsigned int size()
+	unsigned int configSize()
 	{
 		unsigned int size = 0;
 		for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 		{
-			if(widget.second->isPointer())
+			if(widget.second->isConfigPointer())
 				size += sizeof(unsigned int);
 
-			size += widget.second->size();
+			size += widget.second->configSize();
 		}
 
 		return size;
 	}
 
-	bool isPointer()
+	bool isConfigPointer()
 	{
 		return true;
 	}
 
-	std::string getType()
+	std::string getConfigType()
 	{
 		return "";
 	}
