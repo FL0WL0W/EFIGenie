@@ -5,16 +5,20 @@
 #include <QMouseEvent>
 #include <IConfigWidget.h>
 #include <Functions.h>
+#include "TableEditWidget.h"
+#include <QDialog>
 
 #ifndef Table1ConfigWidget_H
 #define Table1ConfigWidget_H
 class Table1ConfigWidget : public QWidget, public IConfigWidget
 {
+	Q_OBJECT
 public:
 	QLabel * Label;
 	QPushButton * Button;
 	int Decimals;
 	std::string Type;
+	double Multiplier;
 	double *XMin;
 	double *XRes;
 	double *XMax;
@@ -25,102 +29,27 @@ public:
 
 	void *config;
 
-	Table1ConfigWidget(const char * label, std::string type, double *xMin, double *xRes, double *xMax)
-	{
-		Type = type;
-		XMin = xMin;
-		XRes = xRes;
-		XMax = xMax;
+	~Table1ConfigWidget();
+	Table1ConfigWidget(const char * label, std::string type, double *xMin, double *xRes, double *xMax, double multiplier);
 
-		Interpolated();
+	void Interpolated();
 
-		QGridLayout *layout = new QGridLayout;
-		layout->setSpacing(5);
-		layout->setMargin(0);
+	void Interpolate();
 
-		Label = new QLabel(QString(label));
-		Label->setFixedSize(300, 25);
-		layout->addWidget(Label, 0, 0);
+	void * getValue();
 
-		QLabel * padding = new QLabel(QString(""));
-		padding->setFixedSize(100, 25);
-		layout->addWidget(padding, 0, 2);
+	void setValue(void *val);
 
-		Button = new QPushButton();
-		Button->setText("Edit");
-		Button->setFixedSize(100, 25);
-		layout->addWidget(Button, 0, 1);
-		Button->installEventFilter(this);
+	void * getConfigValue();
 
-		setLayout(layout);
-	}
+	void setConfigValue(void *val);
 
-	void Interpolated()
-	{
-		LastInterpedXMin = *XMin;
-		LastInterpedXRes = *XRes;
-		LastInterpedXMax = *XMax;
-	}
+	unsigned int configSize();
 
-	void Interpolate()
-	{
-		if (LastInterpedXMin == *XMin && LastInterpedXRes == *XRes && LastInterpedXMax == *XMax)
-			return;//if we are up to date then we dont need to interp;
-		//TOD: interpolate the values
-		Interpolated();
-	}
+	bool isConfigPointer();
 
-	void * getValue()
-	{
-		throw;
-	}
+	std::string getConfigType();
 
-	void setValue(void *val)
-	{
-		throw;
-	}
-
-	void * getConfigValue()
-	{
-		Interpolate();
-		return &config;
-	}
-
-	void setConfigValue(void *val)
-	{
-		memcpy(config, val, configSize());
-		Interpolated(); //setting value so assume we are interpolated
-	}
-
-	unsigned int configSize()
-	{
-		return SizeOfType(Type) * (*XRes);
-	}
-
-	bool isConfigPointer()
-	{
-		return true;
-	}
-
-	std::string getConfigType()
-	{
-		return Type;
-	}
-
-	bool eventFilter(QObject *watched, QEvent *e)
-	{
-		if (e->type() == QEvent::MouseButtonRelease)
-		{
-			QMouseEvent* ev = (QMouseEvent*)e;
-			if (ev->button() == Qt::LeftButton) {
-				if (watched == Button)
-				{
-					Interpolate();//Interpolate before we open the dialog
-					//TODO: add table dialog
-				}
-			}
-		}
-		return false;
-	}
+	bool eventFilter(QObject *watched, QEvent *e);
 };
 #endif

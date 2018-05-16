@@ -19,4 +19,6 @@ template <typename T>
 void CopyTypeToLocationDouble(void *pos, void *number);
 
 void CopyTypeToLocationDouble(std::string type, void *pos, void *number);
+
+int getAccuracy(double minNum, double maxNum);
 #endif

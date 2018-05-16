@@ -3,11 +3,13 @@
 #include <QDoubleSpinBox>
 #include <QGridLayout>
 #include <IConfigWidget.h>
+#include "Functions.h"
 
 #ifndef NumberConfigWidget_H
 #define NumberConfigWidget_H
 class NumberConfigWidget : public QWidget, public IConfigWidget
 {
+	Q_OBJECT
 public:
 	QLabel * Label;
 	QDoubleSpinBox * SpinBox;
@@ -17,82 +19,24 @@ public:
 	void *ConfigValue;
 	std::string Type;
 
-	NumberConfigWidget(const char * name, const char * units, double min, double max, double value, int decimals, double multiplier, std::string type)
-	{
-		Type = type;
-		Multiplier = multiplier;
-		ConfigValue = malloc(configSize());
+	~NumberConfigWidget();
 
-		QGridLayout *layout = new QGridLayout;
-		layout->setSpacing(5);
-		layout->setMargin(0);
+	NumberConfigWidget(const char * name, const char * units, double min, double max, double value, int decimals, double multiplier, std::string type);
 
-		Label = new QLabel(QString(name));
-		Label->setFixedSize(300, 25);
-		layout->addWidget(Label, 0, 0);
-
-		UnitLabel = new QLabel(QString(units));
-		UnitLabel->setFixedSize(100, 25);
-		layout->addWidget(UnitLabel, 0, 2);
-
-		SpinBox = new QDoubleSpinBox();
-		SpinBox->setMinimum(min);
-		SpinBox->setMaximum(max);
-		SpinBox->setValue(value);
-		SpinBox->setFixedSize(100, 25);
-		SpinBox->setDecimals(decimals);
-		layout->addWidget(SpinBox, 0, 1);
-		SpinBox->installEventFilter(this);
-
-		setLayout(layout);
-	}
-
-	void * getValue()
-	{
-		return &Value;
-	}
+	void * getValue();
 	
-	void setValue(void *val)
-	{
-		SpinBox->setValue(*((double *)val));
-		Value = *((double *)val);
-		double scaledValue = Value / Multiplier;
-		CopyDoubleToLocationType(Type, ConfigValue, &scaledValue);
-	}
+	void setValue(void *val);
 
-	void * getConfigValue()
-	{
-		return ConfigValue;
-	}
+	void * getConfigValue();
 
-	void setConfigValue(void *val)
-	{
-		double scaledValue = 0;
-		CopyTypeToLocationDouble(Type, &scaledValue, val);
-		double value = scaledValue * Multiplier;
-		setValue(&value);
-	}
+	void setConfigValue(void *val);
 
-	unsigned int configSize()
-	{
-		return SizeOfType(Type);
-	}
+	unsigned int configSize();
 
-	bool isConfigPointer()
-	{
-		return false;
-	}
+	bool isConfigPointer();
 
-	std::string getConfigType()
-	{
-		return Type;
-	}
+	std::string getConfigType();
 
-	bool eventFilter(QObject *watched, QEvent *e)
-	{
-		double val = SpinBox->value();
-		setValue(&val);
-		return false;
-	}
+	bool eventFilter(QObject *watched, QEvent *e);
 };
 #endif

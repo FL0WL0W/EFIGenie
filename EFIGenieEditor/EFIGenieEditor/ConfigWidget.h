@@ -13,6 +13,7 @@
 #define ConfigWidget_H
 class ConfigWidget : public QWidget, public IConfigWidget
 {
+	Q_OBJECT
 public:
 	std::vector<std::pair<std::string, IConfigWidget *>> Widgets;
 
@@ -110,6 +111,7 @@ public:
 					}
 
 					Table2ConfigWidget * widget = new Table2ConfigWidget(params[1].c_str(), baseType, multiplier, xMin, xRes, xMax, yMin, yRes, yMax);
+					widget->setParent(this);
 
 					Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
@@ -117,7 +119,8 @@ public:
 				}
 				else
 				{
-					Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), baseType, xMin, xRes, xMax);
+					Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), baseType, xMin, xRes, xMax, multiplier);
+					widget->setParent(this);
 
 					Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 

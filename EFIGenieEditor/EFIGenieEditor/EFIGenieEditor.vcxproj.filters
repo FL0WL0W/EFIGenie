@@ -45,12 +45,33 @@
     <ClCompile Include="Functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Table1ConfigWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Table2ConfigWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberConfigWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="EFIGenieEditor.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="TableEditWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ConfigWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Table1ConfigWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Table2ConfigWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="NumberConfigWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -68,19 +89,7 @@
     <ClInclude Include="IConfigWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NumberConfigWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Table1ConfigWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Table2ConfigWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

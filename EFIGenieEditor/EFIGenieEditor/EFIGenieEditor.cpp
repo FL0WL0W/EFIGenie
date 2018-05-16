@@ -5,10 +5,13 @@
 #include "TableEditWidget.h"
 #include <QMdiSubWindow>
 
+QMdiArea *MainArea;
+
 EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	MainArea = ui.mainArea;
 
 	std::ifstream t;
 	int length;
@@ -21,6 +24,7 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	t.close();                    // close file handle
 
 	std::string definition = std::string(buffer);
+	delete buffer;
 
 	QMdiSubWindow *subwindow = new QMdiSubWindow(ui.mainArea);
 	ConfigWidget *configWidget = new ConfigWidget(definition);

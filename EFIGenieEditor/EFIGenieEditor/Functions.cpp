@@ -90,3 +90,12 @@ void CopyTypeToLocationDouble(std::string type, void *pos, void *number)
 	if (type == "float64")
 		CopyTypeToLocationDouble<double>(pos, number);
 }
+
+int getAccuracy(double minNum, double maxNum)
+{
+	int maxLog = log(maxNum);
+	int l = 3 - maxLog;
+	if (l > 0)
+		return l;
+	return 0;
+}

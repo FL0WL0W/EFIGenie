@@ -1,14 +1,30 @@
 #include "TableEditWidget.h"
 
+TableEditWidget::~TableEditWidget()
+{
+	delete tableWidget;
+}
 
 TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double rowMax, int rowDecimal, double columnMin, double columnMax, int columnDecimal, void *val, double valueMin, double valueMax, int valueDecimal)
 {
 	QGridLayout *layout = new QGridLayout;
+	QGridLayout *menuBarLayout = new QGridLayout;
 	setLayout(layout);
+
+	OkButton = new QPushButton("Ok");
+	menuBarLayout->addWidget(OkButton, 0, 0);
+	ApplyButton = new QPushButton("Apply");
+	menuBarLayout->addWidget(ApplyButton, 0, 1);
+	CancelButton = new QPushButton("Cancel");
+	menuBarLayout->addWidget(CancelButton, 0, 2);
+	layout->addLayout(menuBarLayout, 0, 0);
+	connect(OkButton, SIGNAL(clicked(bool)), this, SLOT(ok()));
+	connect(ApplyButton, SIGNAL(clicked(bool)), this, SLOT(apply()));
+	connect(CancelButton, SIGNAL(clicked(bool)), this, SLOT(cancel()));
 
 	tableWidget = new QTableWidget(rows, columns);
 	//tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	layout->addWidget(tableWidget, 0, 0);
+	layout->addWidget(tableWidget, 1, 0);
 	layout->setMargin(0);
 
 	char * rowFormat = (char *)calloc(20, 20);
@@ -22,6 +38,7 @@ TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double ro
 		delete buff;
 	}
 	tableWidget->setVerticalHeaderLabels(QStringList(rowList));
+	delete rowFormat;
 
 	char * columnFormat = (char *)calloc(20, 20);
 	sprintf(columnFormat, "%%.%df", columnDecimal);
@@ -34,6 +51,7 @@ TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double ro
 		delete buff;
 	}
 	tableWidget->setHorizontalHeaderLabels(QStringList(columnList));
+	delete columnFormat;
 	tableWidget->setColumnCount(columns);
 	tableWidget->setRowCount(rows);
 
@@ -70,7 +88,9 @@ void TableEditWidget::adjustSize()
 	int rows = model->rowCount();
 	int cols = model->columnCount();
 	int x = tableWidget->columnViewportPosition(cols - 1) + (tableWidget->columnViewportPosition(cols - 1) - tableWidget->columnViewportPosition(cols - 2)) - 1 + tableWidget->verticalHeader()->width() - tableWidget->frameWidth() - 1 + 50;
-	int y = tableWidget->rowViewportPosition(rows - 1) + (tableWidget->rowViewportPosition(rows - 1) - tableWidget->rowViewportPosition(rows - 2)) + tableWidget->frameWidth() + 50;
+	if (x < 250)
+		x = 250;
+	int y = tableWidget->rowViewportPosition(rows - 1) + (tableWidget->rowViewportPosition(rows - 1) - tableWidget->rowViewportPosition(rows - 2)) + tableWidget->frameWidth() + 95 + tableWidget->viewport()->y();
 	QPoint p = tableWidget->viewport()->mapToParent(QPoint(x, y));
 	QRect g = geometry();
 	g.setSize(QSize(p.x(), p.y()));
@@ -112,4 +132,21 @@ void TableEditWidget::setValue(void *val)
 			tableWidget->setItem(i, j, item);
 		}
 	}
+}
+void TableEditWidget::apply()
+{
+	void * val = getValue();
+	apply(val);
+	delete val;
+}
+void TableEditWidget::ok()
+{
+	void * val = getValue();
+	apply(val);
+	delete val;
+	quit();
+}
+void TableEditWidget::cancel()
+{
+	quit();
 }
