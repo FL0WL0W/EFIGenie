@@ -9,13 +9,13 @@
 
 //inputs 2001-3000
 #define DECODER_SERVICE_ID						2001			// IDecoderService
-#define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2001			// IFloatInputService		degrees C
-#define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2002			// IFloatInputService		degrees C
-#define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2003			// IFloatInputService		Bar
-#define VOLTAGE_SERVICE_ID						2004			// IFloatInputService		Volts
-#define THROTTLE_POSITION_SERVICE_ID			2005			// IFloatInputService		TPS 0.0-1.0
-#define ETHANOL_CONTENT_SERVICE_ID				2006			// IFloatInputService		Content 0.0-1.0
-#define VEHICLE_SPEED_SERVICE_ID				2007			// IFloatInputService		MPH cause thats what people care about
+#define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2002			// IFloatInputService		degrees C
+#define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2003			// IFloatInputService		degrees C
+#define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2004			// IFloatInputService		Bar
+#define VOLTAGE_SERVICE_ID						2005			// IFloatInputService		Volts
+#define THROTTLE_POSITION_SERVICE_ID			2006			// IFloatInputService		TPS 0.0-1.0
+#define ETHANOL_CONTENT_SERVICE_ID				2007			// IFloatInputService		Content 0.0-1.0
+#define VEHICLE_SPEED_SERVICE_ID				2008			// IFloatInputService		MPH cause thats what people care about
 
 //outputs 3001-4000
 #define IGNITOR_SERVICES_ID						3001			// IBooleanOutputService[]

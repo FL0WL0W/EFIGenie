@@ -2,6 +2,7 @@
 #include <vector>
 #include <Functions.h>
 #include <QGridLayout>
+#include <QLabel>
 #include <IConfigWidget.h>
 #include <vector>
 #include <NumberConfigWidget.h>
@@ -18,7 +19,7 @@ class ConfigWidget : public QWidget, public IConfigWidget
 public:
 	std::vector<std::pair<std::string, IConfigWidget *>> Widgets;
 
-	ConfigWidget(std::string definition, std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigWidget(std::string definition, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
 
 	void * getValue();
 

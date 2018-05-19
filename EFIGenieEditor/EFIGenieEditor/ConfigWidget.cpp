@@ -1,7 +1,8 @@
 #include "ConfigWidget.h"
 #include <ConfigSelectorWidget.h>
+#include <ConfigDialogWidget.h>
 
-ConfigWidget::ConfigWidget(std::string definition, std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
 {
 	std::vector<std::string> lines = Split(definition, '\n');
 
@@ -100,6 +101,7 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<unsigned short, std:
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
 				layout->addWidget(widget, i, 0);
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 			else
 			{
@@ -109,6 +111,7 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<unsigned short, std:
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
 				layout->addWidget(widget, i, 0);
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 
 		}
@@ -136,7 +139,11 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<unsigned short, std:
 
 			Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
-			layout->addWidget(widget, i, 0);
+			if (params[1].c_str()[0] != '.')
+			{
+				layout->addWidget(widget, i, 0);
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
+			}
 		}
 		else if (baseType == "float32" || baseType == "float64")
 		{
@@ -160,17 +167,58 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<unsigned short, std:
 
 			Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
-			layout->addWidget(widget, i, 0);
+			if (params[1].c_str()[0] != '.')
+			{
+				layout->addWidget(widget, i, 0);
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
+			}
 		}
 		else
 		{
 			int serviceId = atoi(baseType.c_str());
 
-			ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, definitions);
+			if (Split(params[0], '_').size() < 2 || Split(params[0], '_')[1] == "D")
+			{
+				ConfigDialogWidget * widget = new ConfigDialogWidget(params[1].c_str(), serviceId, definitions);
 
-			layout->addWidget(widget, i, 0);
+				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
+
+				layout->addWidget(widget, i, 0);
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
+			}
+			else if (Split(params[0], '_')[1] == "E")
+			{
+				QGridLayout *sublayout = new QGridLayout();
+				sublayout->setMargin(0);
+				QLabel * text = new QLabel(QString(params[1].c_str()));
+				text->setFixedSize(550, 25);
+				sublayout->addWidget(text, 0, 0);
+
+				QGridLayout *subsublayout = new QGridLayout();
+				subsublayout->setMargin(0);
+				QLabel * padding = new QLabel(QString(""));
+				padding->setFixedSize(50, 25);
+				subsublayout->addWidget(padding, 0, 0);
+
+				ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, definitions);
+
+				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
+
+				subsublayout->addWidget(widget, 0, 1);
+				subsublayout->setSizeConstraint(QLayout::SetFixedSize);
+
+				sublayout->addLayout(subsublayout, 1, 0);
+				layout->addLayout(sublayout, i, 0);
+				layout->setAlignment(sublayout, Qt::AlignLeft | Qt::AlignTop);
+			}
+
+			//ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, definitions);
+
+			//layout->addWidget(widget, i, 0);
 		}
 	}
+
+	layout->setSizeConstraint(QLayout::SetFixedSize);
 
 	setLayout(layout);
 }

@@ -20,12 +20,12 @@ public slots:
 public:
 	ConfigWidget *configWidget = 0;
 	QComboBox *Selection;
-	std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> Definitions;
+	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> Definitions;
 	std::map<unsigned char, std::pair<std::string, std::string>> TypeDefinitions;
 	QGridLayout *layout = new QGridLayout;
 	unsigned char ServiceId;
 
-	ConfigSelectorWidget(unsigned short serviceId, std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigSelectorWidget(unsigned short serviceId, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
 
 	void setServiceId(unsigned char serviceId);
 

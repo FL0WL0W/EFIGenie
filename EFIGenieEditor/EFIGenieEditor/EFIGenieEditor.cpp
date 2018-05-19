@@ -37,7 +37,7 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	std::string path = "config";
 	std::vector<std::string> files;
 	read_directory(path, files);
-	std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> definitions;
+	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions;
 	std::string mainDefinition;
 	for (std::string file : files)
 	{
@@ -75,12 +75,12 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 
 		if (file != "main.conf")
 		{
-			std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator it = definitions.find(serviceId);
+			std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator it = definitions.find(serviceId);
 			if (it == definitions.end())
 			{
 				std::map<unsigned char, std::pair<std::string, std::string>> typeDefinitions;
 				typeDefinitions.insert(std::pair<unsigned char, std::pair<std::string, std::string>>(typeId, std::pair<std::string, std::string>(serviceName, definition)));
-				definitions.insert(std::pair<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>>(serviceId, typeDefinitions));
+				definitions.insert(std::pair<int, std::map<unsigned char, std::pair<std::string, std::string>>>(serviceId, typeDefinitions));
 			}
 			else
 			{
@@ -93,10 +93,74 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 		}
 	}
 
+	for (std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator itDef = definitions.begin(); itDef != definitions.end(); ++itDef)
+	{
+		for (std::map<unsigned char, std::pair<std::string, std::string>>::iterator itType = itDef->second.begin(); itType != itDef->second.end(); ++itType)
+		{
+			std::vector<std::string> lines = Split(itType->second.second, '\n');
+			if (lines.size() > 0 && lines[0].size() >= 6 && lines[0].substr(0, 6) == "#COPY#")
+			{
+				std::vector<std::string> params = Split(lines[0], ' ');
+				if (params.size() < 2)
+				{
+					continue;
+				}
+				params = Split(params[1], '_');
+				if (params.size() < 2)
+				{
+					continue;
+				}
+
+				std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator it = definitions.find(atoi(params[0].c_str()));
+				if (it == definitions.end())
+				{
+					continue;
+				}
+
+				std::map<unsigned char, std::pair<std::string, std::string>>::iterator it2 = it->second.find(atoi(params[1].c_str()));
+
+				if (it2 == it->second.end())
+				{
+					continue;
+				}
+
+				std::string definition = it2->second.second;
+
+				bool skip = true;
+				for (std::string line : lines)
+				{
+					if (skip)
+					{
+						skip = false;
+						continue;
+					}
+
+					params = Split(line, '|');
+					if (params.size() < 2)
+					{
+						continue;
+					}
+
+					const std::string s = params[0];
+					const std::string t = params[1];
+
+					std::string::size_type n = 0;
+					while ((n = definition.find(s, n)) != std::string::npos)
+					{
+						definition.replace(n, s.size(), t);
+						n += t.size();
+					}
+				}
+
+				itType->second.second = definition;
+			}
+		}
+	}
 
 	QMdiSubWindow *subwindow = new QMdiSubWindow(ui.mainArea);
 	ConfigWidget *configWidget = new ConfigWidget(mainDefinition, definitions);
 	subwindow->setWidget(configWidget);
+	subwindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 	setWindowTitle("Camera Window");
 }

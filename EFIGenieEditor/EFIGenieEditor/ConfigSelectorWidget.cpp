@@ -1,9 +1,9 @@
 #include <ConfigSelectorWidget.h>
 
-ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
 {
 	Definitions = definitions;
-	std::map<unsigned short, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator typeIt = Definitions.find(serviceId);
+	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator typeIt = Definitions.find(serviceId);
 	TypeDefinitions = typeIt->second;
 
 	Selection = new QComboBox();
@@ -15,9 +15,21 @@ ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, std::map<un
 
 	setServiceId(TypeDefinitions.begin()->first);
 
-	layout->addWidget(Selection, 0, 0);
+	QGridLayout *SelectionLayout = new QGridLayout();
+
+	SelectionLayout->addWidget(Selection, 0, 0);
+	
+	SelectionLayout->setMargin(10);
+
+	QLabel * padding = new QLabel(QString(""));
+	padding->setFixedSize(600, 0);
+	layout->addWidget(padding, 0, 0);
+
+	layout->addLayout(SelectionLayout, 1, 0);
+	layout->setMargin(0);
 
 	setLayout(layout);
+	layout->setSizeConstraint(QLayout::SetFixedSize);
 
 	connect(Selection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
 }
@@ -46,7 +58,7 @@ void ConfigSelectorWidget::setServiceId(unsigned char serviceId)
 	std::string definition = it->second.second;
 	configWidget = new ConfigWidget(definition, Definitions);
 
-	layout->addWidget(configWidget, 1, 0);
+	layout->addWidget(configWidget, 2, 0);
 	ServiceId = serviceId;
 }
 
@@ -79,7 +91,7 @@ void * ConfigSelectorWidget::getConfigValue()
 
 void ConfigSelectorWidget::setConfigValue(void *val)
 {
-	unsigned short serviceId = *((unsigned char *)val);
+	unsigned char serviceId = *((unsigned char *)val);
 
 	for (int i = 0; i < Selection->count(); i++)
 	{

@@ -38,7 +38,7 @@ public:
     {
         if (EFIGenieEditorClass->objectName().isEmpty())
             EFIGenieEditorClass->setObjectName(QStringLiteral("EFIGenieEditorClass"));
-        EFIGenieEditorClass->resize(997, 1030);
+        EFIGenieEditorClass->resize(1366, 700);
         centralWidget = new QWidget(EFIGenieEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -58,7 +58,7 @@ public:
         EFIGenieEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(EFIGenieEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 997, 26));
+        menuBar->setGeometry(QRect(0, 0, 1366, 26));
         EFIGenieEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(EFIGenieEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
