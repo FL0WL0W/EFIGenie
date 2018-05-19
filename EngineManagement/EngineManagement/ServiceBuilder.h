@@ -6,6 +6,8 @@
 #define TIMER_SERVICE_ID						5				// ITimerService
 
 //config 1001-2000
+#define IGNITION_CONFIG_ID						1001
+#define INJECTION_CONFIG_ID						1002
 
 //inputs 2001-3000
 #define DECODER_SERVICE_ID						2001			// IDecoderService
@@ -29,7 +31,7 @@
 #define AFR_SERVICE_ID							4004			// IAfrService
 #define FUEL_TRIM_SERVICE_ID					4005			// IFuelTrimService
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
-#define PISTON_ENGINE_SERVICE_ID				4007			// IFuelPumpService
+#define PISTON_ENGINE_SERVICE_ID				4007			// PistonEngineService
 
 #define BOOLEAN_OUTPUT_SERVICE_HIGHZ			false
 

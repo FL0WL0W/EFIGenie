@@ -23,7 +23,7 @@ namespace EngineManagement
 		unsigned short Ml8thPerCylinder;
 		bool IsThrottleBodyInjection;
 		bool IsDistributor;
-		unsigned char DecoderId;
+		unsigned char DecoderId;//TODO MOVE THIS OUT INTO SERVICE BUILDER
 	};
 }
 #endif
