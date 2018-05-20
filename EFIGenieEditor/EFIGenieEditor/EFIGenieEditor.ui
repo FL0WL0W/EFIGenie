@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1366</width>
-    <height>700</height>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,14 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionLoad_Bin"/>
+    <addaction name="actionSave_Bin"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -46,6 +54,16 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLoad_Bin">
+   <property name="text">
+    <string>Load Bin</string>
+   </property>
+  </action>
+  <action name="actionSave_Bin">
+   <property name="text">
+    <string>Save Bin</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

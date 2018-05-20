@@ -1,7 +1,6 @@
 #include <fstream>
 #include <qgridlayout.h>
 #include "EFIGenieEditor.h"
-#include <ConfigWidget.h>
 #include "TableEditWidget.h"
 #include <QMdiSubWindow>
 #include <iostream>
@@ -27,10 +26,41 @@ void read_directory(const std::string& name, std::vector<std::string>& v)
 		FindClose(hFind);
 	}
 }
+char* read_file_bytes(const std::string& file)
+{
+	std::ifstream t;
+	int length;
+	t.open(file);      // open input file
+	t.seekg(0, std::ios::end);    // go to the end
+	length = t.tellg();           // report location (this is the length)
+	t.seekg(0, std::ios::beg);    // go back to the beginning
+	char *buffer = (char*)calloc(length + 1, length + 1);    // allocate memory for a buffer of appropriate dimension
+	t.read(buffer, length);       // read the whole file into the buffer
+	t.close();                    // close file handle
+
+	return buffer;
+}
+std::string read_file(const std::string& file)
+{
+	char *buffer = read_file_bytes(file);
+	std::string fileString = std::string(buffer);
+	delete buffer;
+
+	return fileString;
+}
+
+void write_file(const std::string& file, unsigned char *buffer, int size)
+{
+	FILE * pFile;
+	pFile = fopen(file.c_str(), "wb");
+	fwrite(buffer, sizeof(unsigned char), size, pFile);
+	fclose(pFile);
+}
 
 EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
+	//setWindowState(Qt::WindowMaximized);
 	ui.setupUi(this);
 	MainArea = ui.mainArea;
 
@@ -61,17 +91,7 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 			continue;
 		}
 
-		std::ifstream t;
-		int length;
-		t.open("config/" + file);      // open input file
-		t.seekg(0, std::ios::end);    // go to the end
-		length = t.tellg();           // report location (this is the length)
-		t.seekg(0, std::ios::beg);    // go back to the beginning
-		char *buffer = (char*)calloc(length + 1, length + 1);    // allocate memory for a buffer of appropriate dimension
-		t.read(buffer, length);       // read the whole file into the buffer
-		t.close();                    // close file handle
-		std::string definition = std::string(buffer);
-		delete buffer;
+		std::string definition = read_file("config/" + file);
 
 		if (file != "main.conf")
 		{
@@ -158,9 +178,28 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	}
 
 	QMdiSubWindow *subwindow = new QMdiSubWindow(ui.mainArea);
-	ConfigWidget *configWidget = new ConfigWidget(mainDefinition, definitions);
-	subwindow->setWidget(configWidget);
+	mainConfigWidget = new ConfigWidget(mainDefinition,false, definitions);
+	subwindow->setWidget(mainConfigWidget);
 	subwindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	setWindowTitle("Camera Window");
+	setWindowTitle("EFIGenie Editor");
+
+	connect(ui.menuBar, SIGNAL(triggered(QAction *)), this, SLOT(triggered(QAction *)));
+}
+
+void EFIGenieEditor::triggered(QAction *action)
+{
+	if (action->text() == "Load Bin")
+	{
+		QFileDialog *dialog = new QFileDialog(this);
+		char * val = read_file_bytes(dialog->getOpenFileName().toUtf8().constData());
+		mainConfigWidget->setConfigValue((void *)val);
+	}
+	if (action->text() == "Save Bin")
+	{
+		QFileDialog *dialog = new QFileDialog(this);
+		unsigned char * configBin = (unsigned char *)mainConfigWidget->getConfigValue();
+		write_file(dialog->getSaveFileName().toUtf8().constData(), configBin, mainConfigWidget->configSize());
+		delete configBin;
+	}
 }

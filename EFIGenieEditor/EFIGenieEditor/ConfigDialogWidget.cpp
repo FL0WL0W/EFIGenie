@@ -1,10 +1,14 @@
 #include <ConfigDialogWidget.h>
 
-ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short serviceId, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+extern QMdiArea *MainArea;
+
+ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
 {
+	IsConfigPointer = isConfigPointer;
+
 	dialog = new QMdiSubWindow((QWidget *)MainArea);
 	
-	configSelectorWidget = new ConfigSelectorWidget(serviceId, definitions);
+	configSelectorWidget = new ConfigSelectorWidget(serviceId, isConfigPointer, definitions, 700);
 
 	dialog->layout()->addWidget(configSelectorWidget);
 	dialog->layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -60,7 +64,7 @@ unsigned int ConfigDialogWidget::configSize()
 
 bool ConfigDialogWidget::isConfigPointer()
 {
-	return true;
+	return configSelectorWidget->isConfigPointer();
 }
 
 std::string ConfigDialogWidget::getConfigType()

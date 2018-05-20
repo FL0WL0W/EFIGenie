@@ -2,15 +2,29 @@
 #include <ConfigSelectorWidget.h>
 #include <ConfigDialogWidget.h>
 
-ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight)
 {
+	IsConfigPointer = isConfigPointer;
+
 	std::vector<std::string> lines = Split(definition, '\n');
 
 	QGridLayout *layout = new QGridLayout;
 
+	layout->setSizeConstraint(QLayout::SetFixedSize);
+
+	setLayout(layout);
+
+	int col = 0;
+	int row = 0;
 	for (int i = 0; i < lines.size(); ++i)
 	{
 		std::vector<std::string> params = Split(lines[i], ' ');
+		bool isPointer = false;
+		if (params[0][0] == '*')
+		{
+			params[0] = params[0].substr(1, params[0].size() - 1);
+			isPointer = true;
+		}
 		std::string baseType = Split(Split(Split(params[0], '*')[0], '_')[0], '[')[0];
 		if (Split(params[0], '[').size() > 1)
 		{
@@ -24,35 +38,51 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 			double *xMin = 0;
 			double *xRes = 0;
 			double *xMax = 0;
+			double xMinMult = 1;
+			double xResMult = 1;
+			double xMaxMult = 1;
 			if (xBounds.size() >= 3)
 			{
 				for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 				{
-					if (widget.first == xBounds[0])
+					if (widget.first == Split(xBounds[0], '*')[0])
 						xMin = (double *)widget.second->getValue();
-					if (widget.first == xBounds[1])
+					if (widget.first == Split(xBounds[1], '*')[0])
 						xRes = (double *)widget.second->getValue();
-					if (widget.first == xBounds[2])
+					if (widget.first == Split(xBounds[2], '*')[0])
 						xMax = (double *)widget.second->getValue();
 				}
 
 				if (xMin == 0)
 				{
 					xMin = (double*)malloc(sizeof(double));
-					double buff = atof(xBounds[0].c_str());
+					double buff = atof(Split(xBounds[0], '*')[0].c_str());
 					CopyDoubleToLocationType<double>((void*)xMin, (void*)&buff);
 				}
 				if (xRes == 0)
 				{
 					xRes = (double*)malloc(sizeof(double));
-					double buff = atoi(xBounds[1].c_str());
+					double buff = atoi(Split(xBounds[1], '*')[0].c_str());
 					CopyDoubleToLocationType<double>((void*)xRes, (void*)&buff);
 				}
 				if (xMax == 0)
 				{
 					xMax = (double*)malloc(sizeof(double));
-					double buff = atof(xBounds[3].c_str());
+					double buff = atof(Split(xBounds[2], '*')[0].c_str());
 					CopyDoubleToLocationType<double>((void*)xMax, (void*)&buff);
+				}
+
+				if (Split(xBounds[0], '*').size() > 1)
+				{
+					xMinMult = atof(Split(xBounds[0], '*')[1].c_str());
+				}
+				if (Split(xBounds[1], '*').size() > 1)
+				{
+					xResMult = atof(Split(xBounds[1], '*')[1].c_str());
+				}
+				if (Split(xBounds[2], '*').size() > 1)
+				{
+					xMaxMult = atof(Split(xBounds[2], '*')[1].c_str());
 				}
 			}
 
@@ -62,55 +92,84 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 				double *yMin = 0;
 				double *yRes = 0;
 				double *yMax = 0;
+				double yMinMult = 1;
+				double yResMult = 1;
+				double yMaxMult = 1;
 				if (yBounds.size() >= 3)
 				{
 					for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 					{
-						if (widget.first == yBounds[0])
+						if (widget.first == Split(yBounds[0], '*')[0])
 							yMin = (double *)widget.second->getValue();
-						if (widget.first == yBounds[1])
+						if (widget.first == Split(yBounds[1], '*')[0])
 							yRes = (double *)widget.second->getValue();
-						if (widget.first == yBounds[2])
+						if (widget.first == Split(yBounds[2], '*')[0])
 							yMax = (double *)widget.second->getValue();
 					}
 
 					if (yMin == 0)
 					{
 						yMin = (double*)malloc(sizeof(double));
-						double buff = atof(yBounds[0].c_str());
+						double buff = atof(Split(yBounds[0], '*')[0].c_str());
 						CopyDoubleToLocationType<double>((void*)yMin, (void*)&buff);
 					}
 					if (yRes == 0)
 					{
 						yRes = (double*)malloc(sizeof(double));
-						double buff = atoi(yBounds[1].c_str());
+						double buff = atoi(Split(yBounds[1], '*')[0].c_str());
 						CopyDoubleToLocationType<double>((void*)yRes, (void*)&buff);
 					}
 					if (yMax == 0)
 					{
 						yMax = (double*)malloc(sizeof(double));
-						double buff = atof(yBounds[3].c_str());
+						double buff = atof(Split(yBounds[2], '*')[0].c_str());
 						CopyDoubleToLocationType<double>((void*)yMax, (void*)&buff);
 					}
 
+					if (Split(yBounds[0], '*').size() > 1)
+					{
+						yMinMult = atof(Split(yBounds[0], '*')[1].c_str());
+					}
+					if (Split(yBounds[1], '*').size() > 1)
+					{
+						yResMult = atof(Split(yBounds[1], '*')[1].c_str());
+					}
+					if (Split(yBounds[2], '*').size() > 1)
+					{
+						yMaxMult = atof(Split(yBounds[2], '*')[1].c_str());
+					}
 				}
 
-				Table2ConfigWidget * widget = new Table2ConfigWidget(params[1].c_str(), baseType, multiplier, xMin, xRes, xMax, yMin, yRes, yMax);
+				Table2ConfigWidget * widget = new Table2ConfigWidget(params[1].c_str(), baseType, isPointer, params[2].c_str(), multiplier, xMin, xMinMult, xRes, xResMult, xMax, xMaxMult, yMin, yMinMult, yRes, yResMult, yMax, yMaxMult);
 				widget->setParent(this);
 
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
-
-				layout->addWidget(widget, i, 0);
+				
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					i = 0;
+					layout->addWidget(widget, row++, col);
+				}
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 			else
 			{
-				Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), baseType, xMin, xRes, xMax, multiplier);
+				Table1ConfigWidget * widget = new Table1ConfigWidget(params[1].c_str(), baseType, isPointer, params[2].c_str(), xMin, xMinMult, xRes, xResMult, xMax, xMaxMult, multiplier);
 				widget->setParent(this);
 
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
-				layout->addWidget(widget, i, 0);
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					row = 0;
+					layout->addWidget(widget, row++, col);
+				}
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 
@@ -141,7 +200,14 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 
 			if (params[1].c_str()[0] != '.')
 			{
-				layout->addWidget(widget, i, 0);
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					row = 0;
+					layout->addWidget(widget, row++, col);
+				}
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 		}
@@ -169,7 +235,33 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 
 			if (params[1].c_str()[0] != '.')
 			{
-				layout->addWidget(widget, i, 0);
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					row = 0;
+					layout->addWidget(widget, row++, col);
+				}
+				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
+			}
+		}
+		else if (baseType == "bool")
+		{
+			BoolConfigWidget * widget = new BoolConfigWidget(params[1].c_str(), (bool)atoi(params[2].c_str()));
+
+			Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
+
+			if (params[1].c_str()[0] != '.')
+			{
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					row = 0;
+					layout->addWidget(widget, row++, col);
+				}
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 		}
@@ -179,11 +271,18 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 
 			if (Split(params[0], '_').size() < 2 || Split(params[0], '_')[1] == "D")
 			{
-				ConfigDialogWidget * widget = new ConfigDialogWidget(params[1].c_str(), serviceId, definitions);
+				ConfigDialogWidget * widget = new ConfigDialogWidget(params[1].c_str(), serviceId, isPointer, definitions);
 
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
-				layout->addWidget(widget, i, 0);
+				layout->addWidget(widget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(widget);
+					col++;
+					row = 0;
+					layout->addWidget(widget, row++, col);
+				}
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 			else if (Split(params[0], '_')[1] == "E")
@@ -200,7 +299,7 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 				padding->setFixedSize(50, 25);
 				subsublayout->addWidget(padding, 0, 0);
 
-				ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, definitions);
+				ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, isPointer, definitions);
 
 				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
 
@@ -208,19 +307,21 @@ ConfigWidget::ConfigWidget(std::string definition, std::map<int, std::map<unsign
 				subsublayout->setSizeConstraint(QLayout::SetFixedSize);
 
 				sublayout->addLayout(subsublayout, 1, 0);
-				layout->addLayout(sublayout, i, 0);
+				QWidget *subWidget = new QWidget();
+				subWidget->setLayout(sublayout);
+
+				layout->addWidget(subWidget, row++, col);
+				if (maxHeight < layout->sizeHint().height())
+				{
+					layout->removeWidget(subWidget);
+					col++;
+					row = 0;
+					layout->addWidget(subWidget, row++, col);
+				}
 				layout->setAlignment(sublayout, Qt::AlignLeft | Qt::AlignTop);
 			}
-
-			//ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, definitions);
-
-			//layout->addWidget(widget, i, 0);
 		}
 	}
-
-	layout->setSizeConstraint(QLayout::SetFixedSize);
-
-	setLayout(layout);
 }
 
 void * ConfigWidget::getValue()
@@ -240,12 +341,13 @@ void * ConfigWidget::getConfigValue()
 	for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 	{
 		if (widget.second->isConfigPointer())
-			buildVal = (void *)((unsigned int)buildVal + 1);
+			buildVal = (void *)((unsigned int *)buildVal + 1);
 		else
 		{
+			int cfgSize = widget.second->configSize();
 			memcpy(buildVal, widget.second->getConfigValue(), widget.second->configSize());
 
-			buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
+			buildVal = (void *)((unsigned char *)buildVal + widget.second->configSize());
 		}
 	}
 	for (std::pair<std::string, IConfigWidget *> widget : Widgets)
@@ -254,7 +356,7 @@ void * ConfigWidget::getConfigValue()
 		{
 			memcpy(buildVal, widget.second->getConfigValue(), widget.second->configSize());
 
-			buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
+			buildVal = (void *)((unsigned char *)buildVal + widget.second->configSize());
 		}
 	}
 
@@ -267,12 +369,12 @@ void ConfigWidget::setConfigValue(void *val)
 	for (std::pair<std::string, IConfigWidget *> widget : Widgets)
 	{
 		if (widget.second->isConfigPointer())
-			buildVal = (void *)((unsigned int)buildVal + 1);
+			buildVal = (void *)((unsigned int *)buildVal + 1);
 		else
 		{
 			widget.second->setConfigValue(buildVal);
 
-			buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
+			buildVal = (void *)((unsigned char *)buildVal + widget.second->configSize());
 		}
 	}
 	for (std::pair<std::string, IConfigWidget *> widget : Widgets)
@@ -281,7 +383,7 @@ void ConfigWidget::setConfigValue(void *val)
 		{
 			widget.second->setConfigValue(buildVal);
 
-			buildVal = (void *)((unsigned char)buildVal + widget.second->configSize());
+			buildVal = (void *)((unsigned char*)buildVal + widget.second->configSize());
 		}
 	}
 }
@@ -302,7 +404,7 @@ unsigned int ConfigWidget::configSize()
 
 bool ConfigWidget::isConfigPointer()
 {
-	return true;
+	return IsConfigPointer;
 }
 
 std::string ConfigWidget::getConfigType()

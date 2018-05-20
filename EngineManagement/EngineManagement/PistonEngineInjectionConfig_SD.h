@@ -69,6 +69,7 @@ namespace EngineManagement
 		short *Offset;
 		
 		unsigned char TemperatureBiasResolution;
+		float MaxTemperatureBias;
 		unsigned char *TemperatureBias;
 		
 		float MaxTpsDot;

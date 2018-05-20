@@ -1,9 +1,11 @@
 #include <QWidget>
 #include <QLabel>
+#include <QEventLoop>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QMouseEvent>
 #include <IConfigWidget.h>
+#include <QMdiSubWindow>
 #include <Functions.h>
 #include "TableEditWidget.h"
 #include <QDialog>
@@ -13,6 +15,9 @@
 class Table1ConfigWidget : public QWidget, public IConfigWidget
 {
 	Q_OBJECT
+public slots:
+	void setValue(void *val);
+	void edit();
 public:
 	QLabel * Label;
 	QPushButton * Button;
@@ -22,6 +27,10 @@ public:
 	double *XMin;
 	double *XRes;
 	double *XMax;
+	double XMinMult;
+	double XResMult;
+	double XMaxMult;
+	bool IsConfigPointer;
 
 	double LastInterpedXMin;
 	double LastInterpedXRes;
@@ -29,16 +38,16 @@ public:
 
 	void *config;
 
+	std::string UnitLabel;
+
 	~Table1ConfigWidget();
-	Table1ConfigWidget(const char * label, std::string type, double *xMin, double *xRes, double *xMax, double multiplier);
+	Table1ConfigWidget(const char * label, std::string type, bool isConfigPointer, std::string units, double *xMin, double xMinMult, double *xRes, double xResMult, double *xMax, double xMaxMult, double multiplier);
 
 	void Interpolated();
 
 	void Interpolate();
 
 	void * getValue();
-
-	void setValue(void *val);
 
 	void * getConfigValue();
 
@@ -49,7 +58,5 @@ public:
 	bool isConfigPointer();
 
 	std::string getConfigType();
-
-	bool eventFilter(QObject *watched, QEvent *e);
 };
 #endif

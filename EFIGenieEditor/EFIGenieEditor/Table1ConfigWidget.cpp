@@ -1,5 +1,7 @@
 #include "Table1ConfigWidget.h"
 
+extern QMdiArea *MainArea;
+
 Table1ConfigWidget::~Table1ConfigWidget()
 {
 	delete config;
@@ -7,13 +9,18 @@ Table1ConfigWidget::~Table1ConfigWidget()
 	delete Label;
 }
 
-Table1ConfigWidget::Table1ConfigWidget(const char * label, std::string type, double *xMin, double *xRes, double *xMax, double multiplier)
+Table1ConfigWidget::Table1ConfigWidget(const char * label, std::string type, bool isConfigPointer, std::string units, double *xMin, double xMinMult, double *xRes, double xResMult, double *xMax, double xMaxMult, double multiplier)
 {
+	UnitLabel = units;
+	IsConfigPointer = isConfigPointer;
 	Multiplier = multiplier;
 	Type = type;
 	XMin = xMin;
 	XRes = xRes;
 	XMax = xMax;
+	XMinMult = xMinMult;
+	XResMult = xResMult;
+	XMaxMult = xMaxMult;
 
 	config = calloc(configSize(), configSize());
 
@@ -27,15 +34,16 @@ Table1ConfigWidget::Table1ConfigWidget(const char * label, std::string type, dou
 	Label->setFixedSize(300, 25);
 	layout->addWidget(Label, 0, 0);
 
-	QLabel * padding = new QLabel(QString(""));
-	padding->setFixedSize(100, 25);
-	layout->addWidget(padding, 0, 2);
+	QLabel * unitLabel = new QLabel(QString(units.c_str()));
+	unitLabel->setFixedSize(100, 25);
+	layout->addWidget(unitLabel, 0, 2);
 
 	Button = new QPushButton();
 	Button->setText("Edit");
 	Button->setFixedSize(100, 25);
 	layout->addWidget(Button, 0, 1);
-	Button->installEventFilter(this);
+
+	connect(Button, SIGNAL(clicked(bool)), this, SLOT(edit()));
 
 	setLayout(layout);
 }
@@ -61,10 +69,10 @@ void * Table1ConfigWidget::getValue()
 {
 	Interpolate();
 
-	double * value = (double *)calloc(sizeof(double)* (*XRes), sizeof(double)* (*XRes));
+	double * value = (double *)calloc(sizeof(double)* (*XRes * XResMult), sizeof(double)* (*XRes * XResMult));
 	double * buildVal = value;
 	void *buildConfig = config;
-	for (int i = 0; i < *XRes; i++)
+	for (int i = 0; i < *XRes * XResMult; i++)
 	{
 		CopyTypeToLocationDouble(Type, buildVal, buildConfig);
 		*buildVal *= Multiplier;
@@ -77,7 +85,7 @@ void * Table1ConfigWidget::getValue()
 void Table1ConfigWidget::setValue(void *val)
 {
 	void *buildConfig = config;
-	for (int i = 0; i < *XRes; i++)
+	for (int i = 0; i < *XRes * XResMult; i++)
 	{
 		double num = *(double *)val / Multiplier;
 		CopyDoubleToLocationType(Type, buildConfig, &num);
@@ -91,7 +99,9 @@ void Table1ConfigWidget::setValue(void *val)
 void * Table1ConfigWidget::getConfigValue()
 {
 	Interpolate();
-	return &config;
+	void * val = malloc(configSize());
+	memcpy(val, config, configSize());
+	return val;
 }
 
 void Table1ConfigWidget::setConfigValue(void *val)
@@ -102,12 +112,12 @@ void Table1ConfigWidget::setConfigValue(void *val)
 
 unsigned int Table1ConfigWidget::configSize()
 {
-	return SizeOfType(Type) * (*XRes);
+	return SizeOfType(Type) * (*XRes * XResMult);
 }
 
 bool Table1ConfigWidget::isConfigPointer()
 {
-	return true;
+	return IsConfigPointer;
 }
 
 std::string Table1ConfigWidget::getConfigType()
@@ -115,38 +125,38 @@ std::string Table1ConfigWidget::getConfigType()
 	return Type;
 }
 
-bool Table1ConfigWidget::eventFilter(QObject *watched, QEvent *e)
+void Table1ConfigWidget::edit()
 {
-	if (e->type() == QEvent::MouseButtonRelease)
-	{
-		QMouseEvent* ev = (QMouseEvent*)e;
-		if (ev->button() == Qt::LeftButton) {
-			if (watched == Button)
-			{
-				Interpolate();//Interpolate before we open the dialog
-				QDialog *dialog = new QDialog(this);
-				QGridLayout *layout = new QGridLayout();
+	Interpolate();//Interpolate before we open the dialog
+	QMdiSubWindow *dialog = new QMdiSubWindow((QWidget *)MainArea);
 
-				void * widgetValue = getValue();
+	dialog->setWindowTitle(Label->text());
 
-				TableEditWidget *editWidget = new TableEditWidget(*XRes, 1, *XMin, *XMax, getAccuracy(*XMin, *XMax), 0, 0, 0, widgetValue, 0, 100, 0);
+	void * widgetValue = getValue();
 
-				delete widgetValue;
-				layout->addWidget(editWidget, 0, 0);
-				layout->setMargin(0);
+	TableEditWidget *editWidget = new TableEditWidget(*XRes * XResMult, 1, *XMin * XMinMult, *XMax * XMaxMult, getAccuracy(*XMin * XMinMult, *XMax * XMaxMult), 0, 0, 0, widgetValue, 0, 100, 0, UnitLabel, true);
 
-				dialog->setLayout(layout);
-				dialog->resize(editWidget->width(), editWidget->height());
-				dialog->exec();
+	delete widgetValue;
+	dialog->layout()->addWidget(editWidget);
+	dialog->layout()->setMargin(0);
 
-				widgetValue = editWidget->getValue();
+	if(((QWidget *)MainArea)->height() > editWidget->height())
+		dialog->resize(editWidget->width(), editWidget->height());
+	else
+		dialog->resize(editWidget->width(), ((QWidget *)MainArea)->height());
 
-				setValue(widgetValue);
-				delete widgetValue;
-				delete editWidget;
-				delete dialog;
-			}
-		}
-	}
-	return false;
+	dialog->setWindowFlags(Qt::CustomizeWindowHint);
+	dialog->show();
+
+	((QWidget *)parent())->setDisabled(true);
+	((QWidget *)parent()->parent())->setDisabled(true);
+
+	QEventLoop loop;
+	connect(editWidget, SIGNAL(quit()), &loop, SLOT(quit()));
+	connect(editWidget, SIGNAL(apply(void *)), this, SLOT(setValue(void *)));
+	loop.exec();
+	delete editWidget;
+	delete dialog;
+	((QWidget *)parent())->setDisabled(false);
+	((QWidget *)parent()->parent())->setDisabled(false);
 }

@@ -31,7 +31,7 @@ public:
 	std::string Type;
 	
 	~TableEditWidget();
-	TableEditWidget(int rows, int columns, double rowMin, double rowMax, int rowDecimal, double columnMin, double columnMax, int columnDecimal, void *val, double valueMin, double valueMax, int valueDecimal);
+	TableEditWidget(int rows, int columns, double rowMin, double rowMax, int rowDecimal, double columnMin, double columnMax, int columnDecimal, void *val, double valueMin, double valueMax, int valueDecimal, std::string valueUnits, bool headerIsValueUnits);
 	void * getValue();
 	void setValue(void *val);
 	void adjustSize();

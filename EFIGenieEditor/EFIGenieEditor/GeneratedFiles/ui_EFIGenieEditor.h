@@ -17,6 +17,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMdiArea>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
@@ -27,10 +28,13 @@ QT_BEGIN_NAMESPACE
 class Ui_EFIGenieEditorClass
 {
 public:
+    QAction *actionLoad_Bin;
+    QAction *actionSave_Bin;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QMdiArea *mainArea;
     QMenuBar *menuBar;
+    QMenu *menuFile;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -38,7 +42,11 @@ public:
     {
         if (EFIGenieEditorClass->objectName().isEmpty())
             EFIGenieEditorClass->setObjectName(QStringLiteral("EFIGenieEditorClass"));
-        EFIGenieEditorClass->resize(1366, 700);
+        EFIGenieEditorClass->resize(1366, 454);
+        actionLoad_Bin = new QAction(EFIGenieEditorClass);
+        actionLoad_Bin->setObjectName(QStringLiteral("actionLoad_Bin"));
+        actionSave_Bin = new QAction(EFIGenieEditorClass);
+        actionSave_Bin->setObjectName(QStringLiteral("actionSave_Bin"));
         centralWidget = new QWidget(EFIGenieEditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -59,6 +67,8 @@ public:
         menuBar = new QMenuBar(EFIGenieEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 1366, 26));
+        menuFile = new QMenu(menuBar);
+        menuFile->setObjectName(QStringLiteral("menuFile"));
         EFIGenieEditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(EFIGenieEditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -66,6 +76,10 @@ public:
         statusBar = new QStatusBar(EFIGenieEditorClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         EFIGenieEditorClass->setStatusBar(statusBar);
+
+        menuBar->addAction(menuFile->menuAction());
+        menuFile->addAction(actionLoad_Bin);
+        menuFile->addAction(actionSave_Bin);
 
         retranslateUi(EFIGenieEditorClass);
 
@@ -75,6 +89,9 @@ public:
     void retranslateUi(QMainWindow *EFIGenieEditorClass)
     {
         EFIGenieEditorClass->setWindowTitle(QApplication::translate("EFIGenieEditorClass", "EFIGenieEditor", nullptr));
+        actionLoad_Bin->setText(QApplication::translate("EFIGenieEditorClass", "Load Bin", nullptr));
+        actionSave_Bin->setText(QApplication::translate("EFIGenieEditorClass", "Save Bin", nullptr));
+        menuFile->setTitle(QApplication::translate("EFIGenieEditorClass", "File", nullptr));
     } // retranslateUi
 
 };

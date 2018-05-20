@@ -9,8 +9,10 @@ Table2ConfigWidget::~Table2ConfigWidget()
 	delete Label;
 }
 
-Table2ConfigWidget::Table2ConfigWidget(const char * label, std::string type, double multiplier, double *xMin, double *xRes, double *xMax, double *yMin, double *yRes, double *yMax)
+Table2ConfigWidget::Table2ConfigWidget(const char * label, std::string type, bool isConfigPointer, std::string units, double multiplier, double *xMin, double xMinMult, double *xRes, double xResMult, double *xMax, double xMaxMult, double *yMin, double yMinMult, double *yRes, double yResMult, double *yMax, double yMaxMult)
 {
+	UnitLabel = units;
+	IsConfigPointer = isConfigPointer;
 	Type = type;
 	Multiplier = multiplier;
 	XMin = xMin;
@@ -19,6 +21,12 @@ Table2ConfigWidget::Table2ConfigWidget(const char * label, std::string type, dou
 	YMin = yMin;
 	YRes = yRes;
 	YMax = yMax;
+	XMinMult = xMinMult;
+	XResMult = xResMult;
+	XMaxMult = xMaxMult;
+	YMinMult = yMinMult;
+	YResMult = yResMult;
+	YMaxMult = yMaxMult;
 
 	config = calloc(configSize(), configSize());
 
@@ -32,9 +40,9 @@ Table2ConfigWidget::Table2ConfigWidget(const char * label, std::string type, dou
 	Label->setFixedSize(300, 25);
 	layout->addWidget(Label, 0, 0);
 
-	QLabel * padding = new QLabel(QString(""));
-	padding->setFixedSize(100, 25);
-	layout->addWidget(padding, 0, 2);
+	QLabel * unitLabel = new QLabel(QString(units.c_str()));
+	unitLabel->setFixedSize(100, 25);
+	layout->addWidget(unitLabel, 0, 2);
 
 	Button = new QPushButton();
 	Button->setText("Edit");
@@ -70,12 +78,12 @@ void * Table2ConfigWidget::getValue()
 {
 	Interpolate();
 
-	double * value = (double *)calloc(sizeof(double)* (*XRes) * (*YRes), sizeof(double)* (*XRes) * (*YRes));
+	double * value = (double *)calloc(sizeof(double)* (*XRes * XResMult) * (*YRes * YResMult), sizeof(double)* (*XRes * XResMult) * (*YRes * YResMult));
 	double * buildVal = value;
 	void *buildConfig = config;
-	for (int i = 0; i < *XRes; i++)
+	for (int i = 0; i < *XRes * XResMult; i++)
 	{
-		for (int j = 0; j < *YRes; j++)
+		for (int j = 0; j < *YRes * YResMult; j++)
 		{
 			CopyTypeToLocationDouble(Type, buildVal, buildConfig);
 			*buildVal *= Multiplier;
@@ -89,9 +97,9 @@ void * Table2ConfigWidget::getValue()
 void Table2ConfigWidget::setValue(void *val)
 {
 	void *buildConfig = config;
-	for (int i = 0; i < *XRes; i++)
+	for (int i = 0; i < *XRes * XResMult; i++)
 	{
-		for (int j = 0; j < *YRes; j++)
+		for (int j = 0; j < *YRes * YResMult; j++)
 		{
 			double num = *(double *)val / Multiplier;
 			CopyDoubleToLocationType(Type, buildConfig, &num);
@@ -105,8 +113,10 @@ void Table2ConfigWidget::setValue(void *val)
 
 void * Table2ConfigWidget::getConfigValue()
 {
-	Interpolate();
-	return &config;
+	Interpolate(); 
+	void * val = malloc(configSize());
+	memcpy(val, config, configSize());
+	return val;
 }
 
 void Table2ConfigWidget::setConfigValue(void *val)
@@ -117,12 +127,12 @@ void Table2ConfigWidget::setConfigValue(void *val)
 
 unsigned int Table2ConfigWidget::configSize()
 {
-	return SizeOfType(Type) * (*XRes) * (*YRes);
+	return SizeOfType(Type) * (*XRes * XResMult) * (*YRes * YResMult);
 }
 
 bool Table2ConfigWidget::isConfigPointer()
 {
-	return true;
+	return IsConfigPointer;
 }
 
 std::string Table2ConfigWidget::getConfigType()
@@ -135,19 +145,26 @@ void Table2ConfigWidget::edit()
 	Interpolate();//Interpolate before we open the dialog
 	QMdiSubWindow *dialog = new QMdiSubWindow((QWidget *)MainArea);
 
+	dialog->setWindowTitle(Label->text());
+
 	void * widgetValue = getValue();
 
-	TableEditWidget *editWidget = new TableEditWidget(*XRes, *YRes, *XMin, *XMax, getAccuracy(*XMin, *XMax), *YMin, *YMax, getAccuracy(*YMin, *YMax), widgetValue, 0, 100, 0);
+	TableEditWidget *editWidget = new TableEditWidget(*XRes * XResMult, *YRes * YResMult, *XMin * XMinMult, *XMax * XMaxMult, getAccuracy(*XMin * XMinMult, *XMax * XMaxMult), *YMin * YMinMult, *YMax * YMaxMult, getAccuracy(*YMin * YMinMult, *YMax * YMaxMult), widgetValue, 0, 100, 0, UnitLabel, false);
 
 	delete widgetValue;
 	dialog->layout()->addWidget(editWidget);
 	dialog->layout()->setMargin(0);
 
-	dialog->resize(editWidget->width(), editWidget->height());
+	if (((QWidget *)MainArea)->height() > editWidget->height())
+		dialog->resize(editWidget->width(), editWidget->height());
+	else
+		dialog->resize(editWidget->width(), ((QWidget *)MainArea)->height());
+
 	dialog->setWindowFlags(Qt::CustomizeWindowHint);
 	dialog->show();
 
 	((QWidget *)parent())->setDisabled(true);
+	((QWidget *)parent()->parent())->setDisabled(true);
 
 	QEventLoop loop;
 	connect(editWidget, SIGNAL(quit()), &loop, SLOT(quit()));
@@ -156,4 +173,5 @@ void Table2ConfigWidget::edit()
 	delete editWidget; 
 	delete dialog;
 	((QWidget *)parent())->setDisabled(false);
+	((QWidget *)parent()->parent())->setDisabled(false);
 }

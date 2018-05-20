@@ -1,7 +1,9 @@
 #include <ConfigSelectorWidget.h>
 
-ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight)
 {
+	IsConfigPointer = isConfigPointer;
+	MaxHeight = maxHeight;
 	Definitions = definitions;
 	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator typeIt = Definitions.find(serviceId);
 	TypeDefinitions = typeIt->second;
@@ -56,7 +58,7 @@ void ConfigSelectorWidget::setServiceId(unsigned char serviceId)
 	}
 
 	std::string definition = it->second.second;
-	configWidget = new ConfigWidget(definition, Definitions);
+	configWidget = new ConfigWidget(definition, IsConfigPointer, Definitions, MaxHeight);
 
 	layout->addWidget(configWidget, 2, 0);
 	ServiceId = serviceId;
@@ -97,6 +99,7 @@ void ConfigSelectorWidget::setConfigValue(void *val)
 	{
 		if (Selection->itemData(i).toInt() == serviceId)
 		{
+			Selection->setCurrentIndex(i);
 			setServiceId(serviceId);
 			break;
 		}
@@ -112,7 +115,7 @@ unsigned int ConfigSelectorWidget::configSize()
 
 bool ConfigSelectorWidget::isConfigPointer()
 {
-	return true;
+	return configWidget->isConfigPointer();
 }
 
 std::string ConfigSelectorWidget::getConfigType()

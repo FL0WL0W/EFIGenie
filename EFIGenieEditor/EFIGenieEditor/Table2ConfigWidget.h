@@ -32,6 +32,13 @@ public:
 	double *YMin;
 	double *YRes;
 	double *YMax;
+	double XMinMult;
+	double XResMult;
+	double XMaxMult;
+	double YMinMult;
+	double YResMult;
+	double YMaxMult;
+	bool IsConfigPointer;
 
 	double LastInterpedXMin;
 	double LastInterpedXRes;
@@ -42,15 +49,16 @@ public:
 
 	void *config;
 
+	std::string UnitLabel;
+
 	~Table2ConfigWidget();
-	Table2ConfigWidget(const char * label, std::string type, double multiplier, double *xMin, double *xRes, double *xMax, double *yMin, double *yRes, double *yMax);
+	Table2ConfigWidget(const char * label, std::string type, bool isConfigPointer, std::string units, double multiplier, double *xMin, double xMinMult, double *xRes, double xResMult, double *xMax, double xMaxMult, double *yMin, double yMinMult, double *yRes, double yResMult, double *yMax, double yMaxMult);
 
 	void Interpolated();
 
 	void Interpolate();
 
 	void * getValue();
-
 
 	void * getConfigValue();
 

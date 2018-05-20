@@ -24,8 +24,10 @@ public:
 	std::map<unsigned char, std::pair<std::string, std::string>> TypeDefinitions;
 	QGridLayout *layout = new QGridLayout;
 	unsigned char ServiceId;
+	int MaxHeight;
+	bool IsConfigPointer;
 
-	ConfigSelectorWidget(unsigned short serviceId, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigSelectorWidget(unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight = 4000);
 
 	void setServiceId(unsigned char serviceId);
 

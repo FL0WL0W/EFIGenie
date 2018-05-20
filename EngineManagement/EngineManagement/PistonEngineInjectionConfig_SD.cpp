@@ -42,7 +42,7 @@ namespace EngineManagement
 		
 		VE *= 0.0078125f;
 				
-		unsigned char temperatureBias = InterpolateTable1<unsigned char>(map * rpm * VE, _config->MaxMap * _config->MaxRpm * 120, 0.0f, _config->TemperatureBiasResolution, _config->TemperatureBias);
+		unsigned char temperatureBias = InterpolateTable1<unsigned char>(map * rpm * VE, _config->MaxTemperatureBias, 0.0f, _config->TemperatureBiasResolution, _config->TemperatureBias);
 		
 		float temperature = 30;
 		if (_intakeAirTemperatureService != 0)

@@ -6,6 +6,7 @@
 #include <IConfigWidget.h>
 #include <vector>
 #include <NumberConfigWidget.h>
+#include <BoolConfigWidget.h>
 #include <Table1ConfigWidget.h>
 #include <Table2ConfigWidget.h>
 
@@ -18,8 +19,9 @@ class ConfigWidget : public QWidget, public IConfigWidget
 	Q_OBJECT
 public:
 	std::vector<std::pair<std::string, IConfigWidget *>> Widgets;
+	bool IsConfigPointer;
 
-	ConfigWidget(std::string definition, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigWidget(std::string definition, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight = 4000);
 
 	void * getValue();
 

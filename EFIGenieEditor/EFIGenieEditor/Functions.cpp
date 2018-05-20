@@ -65,7 +65,7 @@ void CopyDoubleToLocationType(std::string type, void *pos, void *number)
 template <typename T>
 void CopyTypeToLocationDouble(void *pos, void *number)
 {
-	*((double*)pos) = (double)(*((T *)number));
+	*((double*)pos) = *((T *)number);
 }
 void CopyTypeToLocationDouble(std::string type, void *pos, void *number)
 {

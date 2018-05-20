@@ -66,6 +66,9 @@
     <ClCompile Include="ConfigDialogWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="BoolConfigWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="EFIGenieEditor.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="ConfigDialogWidget.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="BoolConfigWidget.h">
       <Filter>Header Files\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

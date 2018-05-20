@@ -5,7 +5,7 @@ TableEditWidget::~TableEditWidget()
 	delete tableWidget;
 }
 
-TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double rowMax, int rowDecimal, double columnMin, double columnMax, int columnDecimal, void *val, double valueMin, double valueMax, int valueDecimal)
+TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double rowMax, int rowDecimal, double columnMin, double columnMax, int columnDecimal, void *val, double valueMin, double valueMax, int valueDecimal, std::string valueUnits, bool headerIsValueUnits)
 {
 	QGridLayout *layout = new QGridLayout;
 	QGridLayout *menuBarLayout = new QGridLayout;
@@ -40,18 +40,28 @@ TableEditWidget::TableEditWidget(int rows, int columns, double rowMin, double ro
 	tableWidget->setVerticalHeaderLabels(QStringList(rowList));
 	delete rowFormat;
 
-	char * columnFormat = (char *)calloc(20, 20);
-	sprintf(columnFormat, "%%.%df", columnDecimal);
-	QList<QString> columnList = QList<QString>();
-	for (int i = 0; i < columns; i++)
+	if (!headerIsValueUnits)
 	{
-		char * buff = (char *)calloc(20, 20);
-		sprintf(buff, columnFormat, (((columnMax - columnMin) * i) / (columns - 1) + columnMin));
-		columnList.push_back(buff);
-		delete buff;
+		char * columnFormat = (char *)calloc(20, 20);
+		sprintf(columnFormat, "%%.%df", columnDecimal);
+		QList<QString> columnList = QList<QString>();
+		for (int i = 0; i < columns; i++)
+		{
+			char * buff = (char *)calloc(20, 20);
+			sprintf(buff, columnFormat, (((columnMax - columnMin) * i) / (columns - 1) + columnMin));
+			columnList.push_back(buff);
+			delete buff;
+		}
+		tableWidget->setHorizontalHeaderLabels(QStringList(columnList));
+		delete columnFormat;
 	}
-	tableWidget->setHorizontalHeaderLabels(QStringList(columnList));
-	delete columnFormat;
+	else
+	{
+		QList<QString> columnList = QList<QString>();
+		columnList.push_back(valueUnits.c_str());
+		tableWidget->setHorizontalHeaderLabels(QStringList(columnList));
+	}
+
 	tableWidget->setColumnCount(columns);
 	tableWidget->setRowCount(rows);
 
