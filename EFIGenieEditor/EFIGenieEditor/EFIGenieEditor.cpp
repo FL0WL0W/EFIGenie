@@ -60,7 +60,7 @@ void write_file(const std::string& file, unsigned char *buffer, int size)
 EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
-	//setWindowState(Qt::WindowMaximized);
+	setWindowState(Qt::WindowMaximized);
 	ui.setupUi(this);
 	MainArea = ui.mainArea;
 
