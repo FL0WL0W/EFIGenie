@@ -74,7 +74,7 @@ namespace ApplicationService
 		else
 			Afr = minAfr;
 
-		float stoich = InterpolateTable1<unsigned short>(_ethanolContentService->Value, 1, 0, _config->StoichResolution, _config->StoichTable);
+		float stoich = InterpolateTable1<unsigned short>(_ethanolContentService->Value, 1, 0, _config->StoichResolution, _config->StoichTable) / 1024.0f;
 
 		Lambda = Afr / stoich;
 	}

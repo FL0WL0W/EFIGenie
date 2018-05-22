@@ -11,6 +11,7 @@ ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::ma
 	QGridLayout *layout = new QGridLayout;
 
 	layout->setSizeConstraint(QLayout::SetFixedSize);
+	layout->setMargin(5);
 
 	setLayout(layout);
 
@@ -26,7 +27,16 @@ ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::ma
 			isPointer = true;
 		}
 		std::string baseType = Split(Split(Split(params[0], '*')[0], '_')[0], '[')[0];
-		if (Split(params[0], '[').size() > 1)
+		if (Split(params[0], '[').size() > 1 && (baseType == "uint8"
+			|| baseType == "int8"
+			|| baseType == "uint16"
+			|| baseType == "int16"
+			|| baseType == "uint32"
+			|| baseType == "int32"
+			|| baseType == "uint64"
+			|| baseType == "int64"
+			|| baseType == "float32"
+			|| baseType == "float64"))
 		{
 			std::vector<std::string> xBounds = Split(Split(Split(params[0], '[')[1], ']')[0], ':');
 			double multiplier = 1;
@@ -265,60 +275,99 @@ ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::ma
 				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 			}
 		}
+		else if (baseType == "uint8bool")
+		{
+		}
+		else if (baseType == "uint16bool")
+		{
+		}
 		else
 		{
+			int times = 1;
+			if (Split(params[0], '[').size() > 1)
+			{
+				times = atoi(Split(Split(params[0], ']')[0], '[')[1].c_str());
+			}
 			int serviceId = atoi(baseType.c_str());
 
-			if (Split(params[0], '_').size() < 2 || Split(params[0], '_')[1] == "D")
+			for (int t = 0; t < times; t++)
 			{
-				ConfigDialogWidget * widget = new ConfigDialogWidget(params[1].c_str(), serviceId, isPointer, definitions);
-
-				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
-
-				layout->addWidget(widget, row++, col);
-				if (maxHeight < layout->sizeHint().height())
+				std::string name = params[1];
+				if (times > 1)
 				{
-					layout->removeWidget(widget);
-					col++;
-					row = 0;
+					name += "(%d)";
+					char * nameBuffer = (char *)calloc(name.length() + 10, name.length() + 10);
+					sprintf(nameBuffer, name.c_str(), t);
+					name = std::string(nameBuffer);
+					delete nameBuffer;
+				}
+				if (Split(Split(params[0], '[')[0], '_').size() < 2 || Split(Split(params[0], '[')[0], '_')[1][0] == 'D')
+				{
+					bool isStatic = false;
+
+					if (Split(Split(params[0], '[')[0], '_')[1].length() > 1 && Split(Split(params[0], '[')[0], '_')[1][1] == 'S')
+					{
+						isStatic = true;
+					}
+
+					ConfigDialogWidget * widget = new ConfigDialogWidget(name.c_str(), serviceId, isPointer, isStatic, definitions);
+
+					Widgets.push_back(std::pair<std::string, IConfigWidget *>(name, widget));
+
 					layout->addWidget(widget, row++, col);
+					if (maxHeight < layout->sizeHint().height())
+					{
+						layout->removeWidget(widget);
+						col++;
+						row = 0;
+						layout->addWidget(widget, row++, col);
+					}
+					layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
 				}
-				layout->setAlignment(widget, Qt::AlignLeft | Qt::AlignTop);
-			}
-			else if (Split(params[0], '_')[1] == "E")
-			{
-				QGridLayout *sublayout = new QGridLayout();
-				sublayout->setMargin(0);
-				QLabel * text = new QLabel(QString(params[1].c_str()));
-				text->setFixedSize(550, 25);
-				sublayout->addWidget(text, 0, 0);
-
-				QGridLayout *subsublayout = new QGridLayout();
-				subsublayout->setMargin(0);
-				QLabel * padding = new QLabel(QString(""));
-				padding->setFixedSize(50, 25);
-				subsublayout->addWidget(padding, 0, 0);
-
-				ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, isPointer, definitions);
-
-				Widgets.push_back(std::pair<std::string, IConfigWidget *>(params[1], widget));
-
-				subsublayout->addWidget(widget, 0, 1);
-				subsublayout->setSizeConstraint(QLayout::SetFixedSize);
-
-				sublayout->addLayout(subsublayout, 1, 0);
-				QWidget *subWidget = new QWidget();
-				subWidget->setLayout(sublayout);
-
-				layout->addWidget(subWidget, row++, col);
-				if (maxHeight < layout->sizeHint().height())
+				else if (Split(Split(params[0], '[')[0], '_')[1][0] == 'E')
 				{
-					layout->removeWidget(subWidget);
-					col++;
-					row = 0;
+					bool isStatic = false;
+
+					if (Split(Split(params[0], '[')[0], '_')[1].length() > 1 && Split(Split(params[0], '[')[0], '_')[1][1] == 'S')
+					{
+						isStatic = true;
+					}
+
+					QGridLayout *sublayout = new QGridLayout();
+					sublayout->setMargin(0);
+					sublayout->setSpacing(0);
+					QLabel * text = new QLabel(QString(name.c_str()));
+					text->setFixedSize(550, 25);
+					sublayout->addWidget(text, 0, 0);
+
+					QGridLayout *subsublayout = new QGridLayout();
+					subsublayout->setMargin(0);
+					subsublayout->setSpacing(0);
+					QLabel * padding = new QLabel(QString(""));
+					padding->setFixedSize(50, 25);
+					subsublayout->addWidget(padding, 0, 0);
+
+					ConfigSelectorWidget * widget = new ConfigSelectorWidget(serviceId, isPointer, isStatic, definitions);
+
+					Widgets.push_back(std::pair<std::string, IConfigWidget *>(name, widget));
+
+					subsublayout->addWidget(widget, 0, 1);
+					subsublayout->setSizeConstraint(QLayout::SetFixedSize);
+
+					sublayout->addLayout(subsublayout, 1, 0);
+					QWidget *subWidget = new QWidget();
+					subWidget->setLayout(sublayout);
+
 					layout->addWidget(subWidget, row++, col);
+					if (maxHeight < layout->sizeHint().height())
+					{
+						layout->removeWidget(subWidget);
+						col++;
+						row = 0;
+						layout->addWidget(subWidget, row++, col);
+					}
+					layout->setAlignment(subWidget, Qt::AlignLeft | Qt::AlignTop);
 				}
-				layout->setAlignment(sublayout, Qt::AlignLeft | Qt::AlignTop);
 			}
 		}
 	}

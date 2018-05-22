@@ -2,13 +2,13 @@
 
 extern QMdiArea *MainArea;
 
-ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
 {
 	IsConfigPointer = isConfigPointer;
 
 	dialog = new QMdiSubWindow((QWidget *)MainArea);
 	
-	configSelectorWidget = new ConfigSelectorWidget(serviceId, isConfigPointer, definitions, 700);
+	configSelectorWidget = new ConfigSelectorWidget(serviceId, isConfigPointer, isStatic, definitions, 700);
 
 	dialog->layout()->addWidget(configSelectorWidget);
 	dialog->layout()->setSizeConstraint(QLayout::SetFixedSize);

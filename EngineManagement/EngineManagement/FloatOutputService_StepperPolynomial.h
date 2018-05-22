@@ -29,11 +29,9 @@ namespace IOService
 				return sizeof(FloatOutputService_StepperPolynomialConfig<Degree>);
 			}
 			
-			unsigned char StepperPin;
 			float A[Degree + 1];
-			float MinStepPosition;
-			float MaxStepPosition;
-			unsigned short Frequency;
+			short MinStepPosition;
+			short MaxStepPosition;
 		};
 
 	template<unsigned char Degree>

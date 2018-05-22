@@ -1,7 +1,8 @@
 #include <ConfigSelectorWidget.h>
 
-ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight)
+ConfigSelectorWidget::ConfigSelectorWidget(int serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight)
 {
+	IsStatic = isStatic;
 	IsConfigPointer = isConfigPointer;
 	MaxHeight = maxHeight;
 	Definitions = definitions;
@@ -19,16 +20,25 @@ ConfigSelectorWidget::ConfigSelectorWidget(unsigned short serviceId, bool isConf
 
 	QGridLayout *SelectionLayout = new QGridLayout();
 
-	SelectionLayout->addWidget(Selection, 0, 0);
+	QWidget * padding2 = new QWidget();
+	padding2->setFixedSize(5, 5);
+	SelectionLayout->addWidget(padding2, 0, 0);
+	QWidget * padding = new QWidget();
+	padding->setMinimumSize(510, 5);
+	SelectionLayout->addWidget(padding, 0, 1);
+	QWidget * padding3 = new QWidget();
+	padding3->setFixedSize(5, 5);
+	SelectionLayout->addWidget(padding3, 0, 2);
+	SelectionLayout->setColumnStretch(1, 100);
+
+	SelectionLayout->addWidget(Selection, 1, 1);
+	SelectionLayout->setMargin(0);
+	SelectionLayout->setSpacing(0);
 	
-	SelectionLayout->setMargin(10);
-
-	QLabel * padding = new QLabel(QString(""));
-	padding->setFixedSize(600, 0);
-	layout->addWidget(padding, 0, 0);
-
-	layout->addLayout(SelectionLayout, 1, 0);
+	if(!isStatic)
+		layout->addLayout(SelectionLayout, 1, 0);
 	layout->setMargin(0);
+	layout->setSpacing(0);
 
 	setLayout(layout);
 	layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -41,7 +51,7 @@ void ConfigSelectorWidget::currentIndexChanged(int index)
 	setServiceId(Selection->itemData(index).toInt());
 }
 
-void ConfigSelectorWidget::setServiceId(unsigned char serviceId)
+void ConfigSelectorWidget::setServiceId(int serviceId)
 {
 	std::map<unsigned char, std::pair<std::string, std::string>>::iterator it = TypeDefinitions.find(serviceId);
 	if (it == TypeDefinitions.end())
@@ -76,6 +86,11 @@ void ConfigSelectorWidget::setValue(void *)
 
 void * ConfigSelectorWidget::getConfigValue()
 {
+	if (IsStatic)
+	{
+		return configWidget->getConfigValue();
+	}
+
 	void * val = malloc(configSize());
 	void * buildVal = val;
 	*((unsigned char *)val) = Selection->currentData().toInt();
@@ -93,6 +108,12 @@ void * ConfigSelectorWidget::getConfigValue()
 
 void ConfigSelectorWidget::setConfigValue(void *val)
 {
+	if (IsStatic)
+	{
+		configWidget->setConfigValue(val);
+		return;
+	}
+
 	unsigned char serviceId = *((unsigned char *)val);
 
 	for (int i = 0; i < Selection->count(); i++)
@@ -110,6 +131,9 @@ void ConfigSelectorWidget::setConfigValue(void *val)
 
 unsigned int ConfigSelectorWidget::configSize()
 {
+	if (IsStatic)
+		return configWidget->configSize();
+
 	return configWidget->configSize() + sizeof(unsigned char);
 }
 

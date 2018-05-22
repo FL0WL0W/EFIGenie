@@ -16,7 +16,7 @@ namespace ApplicationService
 		{
 			FuelTrimServiceWrapper_MultiChannelConfig *ret = (FuelTrimServiceWrapper_MultiChannelConfig *)p;
 
-			ret->FuelTrimChannelMask = (unsigned short *)(ret + 1);
+			ret->FuelTrimChannelMask = (unsigned short *)(ret + 1)-1;
 
 			return ret;
 		}

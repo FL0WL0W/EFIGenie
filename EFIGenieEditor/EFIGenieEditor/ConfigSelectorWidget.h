@@ -23,13 +23,14 @@ public:
 	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> Definitions;
 	std::map<unsigned char, std::pair<std::string, std::string>> TypeDefinitions;
 	QGridLayout *layout = new QGridLayout;
-	unsigned char ServiceId;
+	int ServiceId;
 	int MaxHeight;
 	bool IsConfigPointer;
+	bool IsStatic;
 
-	ConfigSelectorWidget(unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight = 4000);
+	ConfigSelectorWidget(int serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions, int maxHeight = 4000);
 
-	void setServiceId(unsigned char serviceId);
+	void setServiceId(int serviceId);
 
 	void * getValue();
 

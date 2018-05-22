@@ -34,7 +34,7 @@ namespace ApplicationService
 				sizeof(unsigned short) * RpmResolution +
 				sizeof(float) * YResolution;
 		}
-		unsigned int UpdateRate;
+		unsigned short UpdateRate;
 		unsigned short CycleDelay;
 		float P;
 		float I;
@@ -42,11 +42,11 @@ namespace ApplicationService
 		unsigned char RpmResolution;
 		unsigned short *RpmDivisions;
 		unsigned short RpmInterpolationDistance;
+		bool UseTps;
 		unsigned char YResolution;
 		float *YDivisions;
 		float YInterpolationDistance;
 		bool IsPid;
-		bool UseTps;
 		float LambdaDeltaEnable;
 	};
 

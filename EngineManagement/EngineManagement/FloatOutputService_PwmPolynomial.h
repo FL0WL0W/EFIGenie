@@ -30,8 +30,8 @@ namespace IOService
 		
 		unsigned char PwmPin;
 		float A[Degree + 1];
-		float MinPulseWidth;
-		float MaxPulseWidth;
+		float MinDutyCycle;
+		float MaxDutyCycle;
 		unsigned short Frequency;
 	};
 
@@ -57,10 +57,10 @@ namespace IOService
 			for (int i = 1; i <= Degree; i++)
 				pwmValue += _config->A[i] * pow(value, i);
 
-			if (pwmValue > _config->MaxPulseWidth)
-				pwmValue = _config->MaxPulseWidth;
-			else if (pwmValue < _config->MinPulseWidth)
-				pwmValue = _config->MinPulseWidth;
+			if (pwmValue > _config->MaxDutyCycle)
+				pwmValue = _config->MaxDutyCycle;
+			else if (pwmValue < _config->MinDutyCycle)
+				pwmValue = _config->MinDutyCycle;
 
 			_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1 / _config->Frequency, pwmValue / _config->Frequency });
 		}

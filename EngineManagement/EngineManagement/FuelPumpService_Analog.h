@@ -35,8 +35,8 @@ namespace ApplicationService
 				sizeof(unsigned char) * RpmRes * YRes;
 		}
 
-		unsigned char PrimeValue;
-		unsigned int PrimeTime;
+		float PrimeValue;
+		float PrimeTime;
 			
 		bool UseTps;
 		
@@ -44,7 +44,7 @@ namespace ApplicationService
 		float MaxY;
 		unsigned char RpmRes;
 		unsigned char YRes;
-		unsigned char *AnalogTable;
+		float *AnalogTable;
 	};
 	
 	class FuelPumpService_Analog : public IFuelPumpService

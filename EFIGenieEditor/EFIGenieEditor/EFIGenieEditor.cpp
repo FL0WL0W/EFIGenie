@@ -68,6 +68,7 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 	std::vector<std::string> files;
 	read_directory(path, files);
 	std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions;
+	std::map<std::string, std::string> GlobalDefinitions;
 	std::string mainDefinition;
 	for (std::string file : files)
 	{
@@ -86,14 +87,26 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 			typeId = atoi(params[1].c_str());
 			serviceName = Split(params[2],'.')[0];
 		}
-		else if(file != "main.conf")
+		else if(file != "main.conf" && file != "definitions.conf")
 		{
 			continue;
 		}
 
 		std::string definition = read_file("config/" + file);
 
-		if (file != "main.conf")
+		if (file == "main.conf")
+		{
+			mainDefinition = definition;
+		}
+		else if (file == "definitions.conf")
+		{
+			std::vector<std::string> lines = Split(definition, '\n');
+			for (std::string line : lines)
+			{
+				GlobalDefinitions.insert(std::pair<std::string, std::string>(Split(line, '|')[0], Split(line, '|')[1]));
+			}
+		}
+		else 
 		{
 			std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>>::iterator it = definitions.find(serviceId);
 			if (it == definitions.end())
@@ -106,10 +119,6 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 			{
 				it->second.insert(std::pair<unsigned char, std::pair<std::string, std::string>>(typeId, std::pair<std::string, std::string>(serviceName, definition)));
 			}
-		}
-		else
-		{
-			mainDefinition = definition;
 		}
 	}
 
@@ -173,6 +182,19 @@ EFIGenieEditor::EFIGenieEditor(QWidget *parent)
 				}
 
 				itType->second.second = definition;
+			}
+
+			for (std::map<std::string, std::string>::iterator itGlobalDef = GlobalDefinitions.begin(); itGlobalDef != GlobalDefinitions.end(); ++itGlobalDef)
+			{
+				const std::string s = itGlobalDef->first;
+				const std::string t = itGlobalDef->second;
+
+				std::string::size_type n = 0;
+				while ((n = itType->second.second.find(s, n)) != std::string::npos)
+				{
+					itType->second.second.replace(n, s.size(), t);
+					n += t.size();
+				}
 			}
 		}
 	}

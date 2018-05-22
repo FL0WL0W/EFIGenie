@@ -34,12 +34,12 @@ namespace ApplicationService
 		{
 			return sizeof(IdleControlService_PidConfig) + 
 				(sizeof(float) * EctResolution) + 
-				(sizeof(unsigned short) * SpeedResolution) +
+				(sizeof(unsigned short) * EctResolution) +
 				(sizeof(float)) * SpeedResolution +
 				(sizeof(short)) * SpeedResolution;
 		}
 		float TpsThreshold;
-		float SpeedThreshold;
+		unsigned char SpeedThreshold;
 		float P;
 		float I;
 		float D;
@@ -49,12 +49,12 @@ namespace ApplicationService
 
 		unsigned short GasConstant;//values in 0.1 units
 
-		float MaxEct;
-		float MinEct;
+		unsigned short MaxEct;
+		unsigned short MinEct;
 		unsigned char EctResolution;
-		unsigned char SpeedResolution;
 		float *IdleAirmass;
 		unsigned short *IdleTargetRpm;
+		unsigned char SpeedResolution;
 		float *IdleAirmassSpeedAdder;
 		short *IdleTargetRpmSpeedAdder;
 	};

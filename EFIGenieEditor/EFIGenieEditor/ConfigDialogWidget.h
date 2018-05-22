@@ -27,7 +27,7 @@ public:
 	unsigned char ServiceId;
 	bool IsConfigPointer;
 
-	ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
 	
 	void * getValue();
 

@@ -48,7 +48,7 @@ namespace EngineManagement
 				sizeof(short) * MapDotAdderResolution;
 		}
 		
-		unsigned short GasConstant;
+		unsigned short GasConstant;//value in 0.1 unit
 		unsigned short InjectorOpenPosition64thDegree;
 		
 		unsigned short MaxRpm;

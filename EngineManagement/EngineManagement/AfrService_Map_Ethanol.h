@@ -67,7 +67,7 @@ namespace ApplicationService
 		unsigned char *EctMultiplierTable; // values in 1/255
 		
 		unsigned char StoichResolution;
-		unsigned short *StoichTable;
+		unsigned short *StoichTable; // value in 1/1024
 		
 		unsigned char AfrTpsResolution;
 		unsigned short *TpsMinAfrGas;

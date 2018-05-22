@@ -19,7 +19,7 @@ namespace IOService
 #ifdef BOOLEANINPUTSERVICE_STATIC_H
 		case 1:
 			*size += sizeof(float);
-			return new BooleanInputService_Static(*((float *)config));
+			return new BooleanInputService_Static(*((bool *)config));
 #endif
 			
 #ifdef BOOLEANINPUTSERVICE_H
