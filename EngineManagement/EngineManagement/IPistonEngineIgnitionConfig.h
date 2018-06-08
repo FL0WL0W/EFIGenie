@@ -4,7 +4,7 @@ namespace EngineManagement
 {
 	struct IgnitionTiming
 	{
-		bool ignitionEnable;
+		bool IgnitionEnable;
 		float IgnitionDwellTime;
 		short IgnitionAdvance64thDegree;
 	};

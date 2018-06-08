@@ -144,6 +144,15 @@ namespace Service
 					break;
 				}
 #endif
+#if DECODER_SERVICE_ID
+			case DECODER_SERVICE_ID:
+				{
+					serviceLocator->Register(serviceId, CreateDecoderService(serviceLocator, config, &size));
+					config = (void *)((unsigned char *)config + size);
+					*totalSize += size;
+					break;
+				}
+#endif
 			}
 		}
 
@@ -300,7 +309,7 @@ namespace Service
 		case 0: 
 			return 0;
 #ifdef PISTONENGINEINJECTIONCONFIG_SD_H
-		case 1:
+		case 2:
 			return new PistonEngineInjectionConfig_SD(
 				CastConfig < PistonEngineInjectionConfig_SDConfig >(&config, totalSize),
 				pistonEngineConfig,
@@ -314,7 +323,7 @@ namespace Service
 				(IFloatInputService*)serviceLocator->Locate(VOLTAGE_SERVICE_ID));
 #endif
 #ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
-		case 2:
+		case 3:
 			{
 				PistonEngineInjectionConfigWrapper_DFCOConfig *pistonEngineInjectionConfig = CastConfig < PistonEngineInjectionConfigWrapper_DFCOConfig >(&config, totalSize);
 
@@ -339,8 +348,13 @@ namespace Service
 		{
 		case 0: 
 			return 0;
-#ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
+#ifdef PISTONENGINEIGNITIONCONFIG_STATIC_H
 		case 1:
+			return new PistonEngineIgnitionConfig_Static(
+				CastConfig < PistonEngineIgnitionConfig_StaticConfig >(&config, totalSize));
+#endif
+#ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
+		case 2:
 			return new PistonEngineIgnitionConfig_Map_Ethanol(
 				CastConfig < PistonEngineIgnitionConfig_Map_EthanolConfig >(&config, totalSize),
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
@@ -348,7 +362,7 @@ namespace Service
 				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
-		case 2:
+		case 3:
 			{
 				PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig *pistonEngineIgnitionConfig = CastConfig < PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig >(&config, totalSize);
 
@@ -367,7 +381,7 @@ namespace Service
 			}
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
-		case 3:
+		case 4:
 			{
 				PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig *pistonEngineIgnitionConfig = CastConfig < PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig >(&config, totalSize);
 
@@ -417,5 +431,19 @@ namespace Service
 			(IBooleanOutputService**)serviceLocator->Locate(IGNITOR_SERVICES_ID),
 			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 			(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+	}
+	
+	IDecoder *ServiceBuilder::CreateDecoderService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
+	{
+		switch (GetServiceId(&config, totalSize))
+		{
+		case 0:
+			return 0;
+#ifdef GM24XDECODER_H
+		case 1:
+			return new Gm24xDecoder((ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID));
+#endif
+		}
+		return 0;
 	}
 }

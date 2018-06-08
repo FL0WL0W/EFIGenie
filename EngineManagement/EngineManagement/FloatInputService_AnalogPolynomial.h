@@ -29,7 +29,7 @@ namespace IOService
 		}
 		
 		unsigned char AdcPin;
-		float A[Degree+1];
+		float A[Degree];
 		float MinValue;
 		float MaxValue;
 		unsigned short DotSampleRate;

@@ -45,7 +45,7 @@ void clock_init() {
 }
 
 HardwareAbstraction::HardwareAbstractionCollection _hardwareAbstractionCollection;
-//IOService::IOServiceCollection *_iOServiceCollection;
+IDecoder *_decoder;
 
 int main()
 {
@@ -62,15 +62,18 @@ int main()
 	void *config = EmbeddedResources::ConfigFile_dat.data();
 	unsigned int size;
 	
-	ServiceBuilder::CreateServices(&_hardwareAbstractionCollection, config, &size);
+	ServiceLocator *serviceLocator = ServiceBuilder::CreateServices(&_hardwareAbstractionCollection, config, &size);
 	config = (void *)((unsigned char *)config + size);
 		
-	//EngineManagement::CreateServices(_timerService, _digitalService, _analogService, _pwmService, EmbeddedResources::ConfigFile_dat.data(), true, false, true, true);
+	_decoder = (IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID);
+	
+	//TODO PreSync PresSyncableServices
+	while(!_decoder->IsSynced());
+	//TODO PostSync ProstSyncableServices
 	
 	for (;;)
 	{
-		//_iOServiceCollection->Tick();
-		//EngineManagement::ScheduleEvents();
+		//TODO Tick Tickable Services
 	}
 }
 
@@ -108,7 +111,7 @@ extern "C"
 			else
 				edgeTrigger = Decoder::EdgeTrigger::Down;
 			
-			//_iOServiceCollection->Decoder->CrankEdgeTrigger(edgeTrigger);
+			_decoder->CrankEdgeTrigger(edgeTrigger);
 			
 			EXTI_ClearITPendingBit(EXTI_Line15);
 		}
@@ -125,7 +128,7 @@ extern "C"
 			else
 				edgeTrigger = Decoder::EdgeTrigger::Down;
 			
-			//_iOServiceCollection->Decoder->CamEdgeTrigger(edgeTrigger);
+			_decoder->CamEdgeTrigger(edgeTrigger);
 			
 			EXTI_ClearITPendingBit(EXTI_Line14);
 		}

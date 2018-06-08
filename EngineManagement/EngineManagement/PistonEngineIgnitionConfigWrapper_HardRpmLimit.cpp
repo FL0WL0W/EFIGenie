@@ -24,7 +24,7 @@ namespace EngineManagement
 		if (_limitEnabled)
 		{
 			IgnitionTiming timing = IgnitionTiming();
-			timing.ignitionEnable = false;
+			timing.IgnitionEnable = false;
 			return timing;
 		}
 		

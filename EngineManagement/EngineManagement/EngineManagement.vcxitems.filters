@@ -201,6 +201,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineService.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Static.h">
+      <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">
@@ -274,6 +277,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineService.cpp">
       <Filter>Source Files\PistonEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistoneEngineIgnitionConfig_Static.cpp">
+      <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

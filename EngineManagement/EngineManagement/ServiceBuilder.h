@@ -47,6 +47,10 @@
 #include "IBooleanOutputService.h"
 #include "IStepperOutputService.h"
 
+//Decoder
+#include "IDecoder.h"
+#include "Gm24xDecoder.h"
+
 //ApplicationService Includes
 #include "TachometerService.h"
 #include "IPrimeService.h"
@@ -67,6 +71,7 @@
 #include "PistonEngineInjectionConfigWrapper_DFCO.h"
 #include "IPistonEngineIgnitionConfig.h"
 #include "PistonEngineIgnitionConfig_Map_Ethanol.h"
+#include "PistonEngineIgnitionConfig_Static.h"
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 #include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
 #include "PistonEngineService.h"
@@ -148,5 +153,6 @@ namespace Service
 		static IPistonEngineInjectionConfig *CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
 		static IPistonEngineIgnitionConfig *CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
 		static PistonEngineService *CreatePistonEngineService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IDecoder *CreateDecoderService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }

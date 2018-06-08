@@ -72,7 +72,7 @@ namespace EngineManagement
 			}
 			if ((currentTickPlusSome < _ignitorDwellTask[cylinder]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[cylinder]->Tick < 1431655765)) && _pistonEngineIgnitionConfig != 0)
 			{
-				if (!ignitionTiming.ignitionEnable)
+				if (!ignitionTiming.IgnitionEnable)
 				{
 					_timerService->UnScheduleTask(_ignitorFireTask[cylinder]);
 					_timerService->UnScheduleTask(_ignitorDwellTask[cylinder]);

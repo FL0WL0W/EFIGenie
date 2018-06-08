@@ -18,16 +18,19 @@ class ConfigDialogWidget : public QWidget, public IConfigWidget
 	Q_OBJECT
 public slots:
 	void edit();
+	void checkedStateChanged(int);
 public:
 	QLabel * Label;
 	QPushButton * Button;
 	ConfigSelectorWidget *configSelectorWidget = 0;
 	QGridLayout *layout = new QGridLayout;
 	QMdiSubWindow *dialog;
-	unsigned char ServiceId;
+	QCheckBox *CheckBox;
+	unsigned short ServiceId;
 	bool IsConfigPointer;
+	bool EnableDisable;
 
-	ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
+	ConfigDialogWidget(const char * label, int serviceId, bool isConfigPointer, bool isStatic, bool enableDisable, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions);
 	
 	void * getValue();
 

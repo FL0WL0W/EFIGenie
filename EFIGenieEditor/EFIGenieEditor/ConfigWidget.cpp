@@ -297,11 +297,11 @@ ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::ma
 				{
 					name += "(%d)";
 					char * nameBuffer = (char *)calloc(name.length() + 10, name.length() + 10);
-					sprintf(nameBuffer, name.c_str(), t);
+					sprintf(nameBuffer, name.c_str(), t+1);
 					name = std::string(nameBuffer);
 					delete nameBuffer;
 				}
-				if (Split(Split(params[0], '[')[0], '_').size() < 2 || Split(Split(params[0], '[')[0], '_')[1][0] == 'D')
+				if (Split(Split(params[0], '[')[0], '_').size() < 2 || Split(Split(params[0], '[')[0], '_')[1][0] == 'D' || Split(Split(params[0], '[')[0], '_')[1][0] == 'S')
 				{
 					bool isStatic = false;
 
@@ -310,7 +310,7 @@ ConfigWidget::ConfigWidget(std::string definition, bool isConfigPointer, std::ma
 						isStatic = true;
 					}
 
-					ConfigDialogWidget * widget = new ConfigDialogWidget(name.c_str(), serviceId, isPointer, isStatic, definitions);
+					ConfigDialogWidget * widget = new ConfigDialogWidget(name.c_str(), serviceId, isPointer, isStatic, Split(Split(params[0], '[')[0], '_')[1][0] == 'S', definitions);
 
 					Widgets.push_back(std::pair<std::string, IConfigWidget *>(name, widget));
 

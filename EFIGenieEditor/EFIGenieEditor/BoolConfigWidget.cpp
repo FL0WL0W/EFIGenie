@@ -25,18 +25,21 @@ void * BoolConfigWidget::getValue()
 
 void BoolConfigWidget::setValue(void *val)
 {
-	CheckBox->setChecked((bool)val);
+	CheckBox->setChecked(*((bool *)val));
 }
 
 void * BoolConfigWidget::getConfigValue()
 {
-	unsigned char val = (bool)CheckBox->isChecked();
-	return &val;
+	unsigned char *val = (unsigned char*)malloc(sizeof(unsigned char));
+	*val = 0;
+	if (CheckBox->isChecked())
+		*val = 1;
+	return val;
 }
 
 void BoolConfigWidget::setConfigValue(void *val)
 {
-	CheckBox->setChecked((bool)((int)val));
+	CheckBox->setChecked((bool)*((unsigned char*)val));
 }
 
 unsigned int BoolConfigWidget::configSize()

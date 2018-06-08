@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3BDC8863-6A37-45CD-ABCE-7F495E5ECC87}</ProjectGuid>
     <BSP_ID>com.sysprogs.arm.stm32</BSP_ID>
-    <BSP_VERSION>4.6R4</BSP_VERSION>
+    <BSP_VERSION>4.7</BSP_VERSION>
     <InPlaceBSPSubdir />
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

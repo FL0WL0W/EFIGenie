@@ -31,6 +31,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)IFuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IFloatOutputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IIdleControlService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ServiceBuilder.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ServiceLocator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPrimeService.h" />
@@ -68,6 +69,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatOutputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IStepperService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)PistoneEngineIgnitionConfig_Static.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanOuputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineService.cpp" />

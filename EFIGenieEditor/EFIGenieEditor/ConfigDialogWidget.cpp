@@ -2,8 +2,10 @@
 
 extern QMdiArea *MainArea;
 
-ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short serviceId, bool isConfigPointer, bool isStatic, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
+ConfigDialogWidget::ConfigDialogWidget(const char * label, int serviceId, bool isConfigPointer, bool isStatic, bool enableDisable, std::map<int, std::map<unsigned char, std::pair<std::string, std::string>>> definitions)
 {
+	ServiceId = serviceId;
+	EnableDisable = enableDisable;
 	IsConfigPointer = isConfigPointer;
 
 	dialog = new QMdiSubWindow((QWidget *)MainArea);
@@ -20,21 +22,52 @@ ConfigDialogWidget::ConfigDialogWidget(const char * label, unsigned short servic
 	layout->setMargin(0);
 
 	Label = new QLabel(QString(label));
-	Label->setFixedSize(300, 25);
+	Label->setFixedSize(275, 25);
 	layout->addWidget(Label, 0, 0);
-
-	QLabel * padding = new QLabel(QString(""));
-	padding->setFixedSize(100, 25);
-	layout->addWidget(padding, 0, 2);
+	
+	if (enableDisable)
+	{
+		QLabel * padding = new QLabel(QString("Enabled"));
+		padding->setFixedSize(75, 25);
+		layout->addWidget(padding, 0, 3);
+	}
+	else
+	{
+		QLabel * padding = new QLabel(QString(""));
+		padding->setFixedSize(100, 25);
+		layout->addWidget(padding, 0, 2);
+	}
 
 	Button = new QPushButton();
 	Button->setText("Edit");
 	Button->setFixedSize(100, 25);
 	layout->addWidget(Button, 0, 1);
 
+	if (enableDisable)
+	{
+		CheckBox = new QCheckBox();
+		CheckBox->setFixedSize(25, 25);
+		CheckBox->setChecked(false);
+		Button->setDisabled(true);
+		layout->addWidget(CheckBox, 0, 2);
+		connect(CheckBox, SIGNAL(stateChanged(int)), this, SLOT(checkedStateChanged(int)));
+	}
+
 	connect(Button, SIGNAL(clicked(bool)), this, SLOT(edit()));
 
 	setLayout(layout);
+}
+
+void ConfigDialogWidget::checkedStateChanged(int checkState)
+{
+	if (checkState == Qt::Unchecked) 
+	{
+		Button->setDisabled(true);
+	}
+	else 
+	{
+		Button->setDisabled(false);
+	}
 }
 
 void * ConfigDialogWidget::getValue()
@@ -49,17 +82,55 @@ void ConfigDialogWidget::setValue(void *)
 
 void * ConfigDialogWidget::getConfigValue()
 {
-	return configSelectorWidget->getConfigValue();
+	if (EnableDisable)
+	{
+		if (CheckBox->isChecked())
+		{
+			void * val = malloc(configSize());
+			*((unsigned short*)val) = ServiceId;
+
+			void * configValue = configSelectorWidget->getConfigValue();
+
+			memcpy(((unsigned short*)val + 1), configValue, configSize());
+
+			return val;
+		}
+		else
+			return 0;
+	}
+	else
+		return configSelectorWidget->getConfigValue();
 }
 
 void ConfigDialogWidget::setConfigValue(void *val)
 {
-	configSelectorWidget->setConfigValue(val);
+	if (EnableDisable)
+	{
+		if (*((unsigned short*)val) == ServiceId)
+		{
+			CheckBox->setChecked(true);
+			configSelectorWidget->setConfigValue(((unsigned short*)val + 1));
+		}
+		else
+			CheckBox->setChecked(false);
+	}
+	else
+		configSelectorWidget->setConfigValue(val);
 }
 
 unsigned int ConfigDialogWidget::configSize()
 {
-	return configSelectorWidget->configSize();
+	if (EnableDisable)
+	{
+		if (CheckBox->isChecked())
+		{
+			return configSelectorWidget->configSize() + sizeof(unsigned short);
+		}
+		else
+			return 0;
+	}
+	else
+		return configSelectorWidget->configSize();
 }
 
 bool ConfigDialogWidget::isConfigPointer()

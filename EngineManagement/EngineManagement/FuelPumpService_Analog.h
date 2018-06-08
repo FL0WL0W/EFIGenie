@@ -24,7 +24,7 @@ namespace ApplicationService
 		{
 			FuelPumpService_AnalogConfig* ret = (FuelPumpService_AnalogConfig*)p;
 			
-			ret->AnalogTable = (unsigned char *)(ret + 1);
+			ret->AnalogTable = (float *)(ret + 1);
 			
 			return ret;
 		}
