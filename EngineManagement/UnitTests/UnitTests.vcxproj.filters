@@ -83,12 +83,6 @@
     <ClCompile Include="AfrService_Map_EthanolTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
-    <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
-    <ClCompile Include="EthanolService_PwmTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
     <ClCompile Include="IgnitorServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
@@ -102,6 +96,12 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="FloatInputService_AnalogPolynomialTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="FloatInputService_FrequencyPolynomialTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

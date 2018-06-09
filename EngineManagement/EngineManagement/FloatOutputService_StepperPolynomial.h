@@ -30,7 +30,7 @@ namespace IOService
 			return sizeof(FloatOutputService_StepperPolynomialConfig<Degree>);
 		}
 			
-		float A[Degree + 1];
+		float A[Degree+1];
 		short MinStepPosition;
 		short MaxStepPosition;
 	});

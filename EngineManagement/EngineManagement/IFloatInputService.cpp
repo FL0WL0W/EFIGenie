@@ -26,7 +26,7 @@ namespace IOService
 #ifdef FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H
 		case 2:
 			{
-				FloatInputService_AnalogPolynomialConfig<4> *analogPolynomialConfig = FloatInputService_AnalogPolynomialConfig<4>::Cast((unsigned char*)config + 1);
+				FloatInputService_AnalogPolynomialConfig<4> *analogPolynomialConfig = FloatInputService_AnalogPolynomialConfig<4>::Cast(config);
 				*size += analogPolynomialConfig->Size();
 				return new FloatInputService_AnalogPolynomial<4>(hardwareAbstractionCollection, analogPolynomialConfig);
 			}
@@ -35,7 +35,7 @@ namespace IOService
 #ifdef FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H
 		case 3:
 			{
-				FloatInputService_FrequencyPolynomialConfig<4> *frequencyPolynomialConfig = FloatInputService_FrequencyPolynomialConfig<4>::Cast((unsigned char*)config + 1);
+				FloatInputService_FrequencyPolynomialConfig<4> *frequencyPolynomialConfig = FloatInputService_FrequencyPolynomialConfig<4>::Cast(config);
 				*size += frequencyPolynomialConfig->Size();
 				return new FloatInputService_FrequencyPolynomial<4>(hardwareAbstractionCollection, frequencyPolynomialConfig);
 			}

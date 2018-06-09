@@ -171,8 +171,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EngineCoolantTemperatureService_AnalogTests.cpp" />
-    <ClCompile Include="EthanolService_PwmTests.cpp" />
+    <ClCompile Include="FloatInputService_AnalogPolynomialTests.cpp" />
+    <ClCompile Include="FloatInputService_FrequencyPolynomialTests.cpp" />
     <ClCompile Include="FuelPumpServiceTests.cpp" />
     <ClCompile Include="gmock_initialize.cpp" />
     <ClCompile Include="IgnitorServiceTests.cpp" />

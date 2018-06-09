@@ -31,7 +31,7 @@ namespace IOService
 		}
 		
 		unsigned char AdcPin;
-		float A[Degree];
+		float A[Degree+1];
 		float MinValue;
 		float MaxValue;
 		unsigned short DotSampleRate;
@@ -72,8 +72,8 @@ namespace IOService
 				return;
 
 			_lastReadTick = _hardwareAbstractionCollection->TimerService->GetTick();
-			_lastValue = Value;
 			ValueDot = (Value - _lastValue) / elapsedTime;
+			_lastValue = Value;
 		}
 	};
 }

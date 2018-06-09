@@ -31,7 +31,7 @@ namespace IOService
 		}
 		
 		unsigned char PwmPin;
-		float A[Degree + 1];
+		float A[Degree+1];
 		float MinDutyCycle;
 		float MaxDutyCycle;
 		unsigned short Frequency;
