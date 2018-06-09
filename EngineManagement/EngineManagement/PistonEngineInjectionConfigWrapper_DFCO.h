@@ -1,6 +1,7 @@
 #include "IPistonEngineInjectionConfig.h"
 #include "IFloatInputService.h"
 #include "IDecoder.h"
+#include "Packed.h"
 
 using namespace Decoder;
 using namespace IOService;
@@ -9,7 +10,8 @@ using namespace IOService;
 #define PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineInjectionConfigWrapper_DFCOConfig
+	PACK(
+	struct PistonEngineInjectionConfigWrapper_DFCOConfig
 	{
 	private:
 		PistonEngineInjectionConfigWrapper_DFCOConfig()
@@ -30,7 +32,7 @@ namespace EngineManagement
 		float TpsThreshold;
 		unsigned short RpmEnable;
 		unsigned short RpmDisable;
-	};
+	});
 
 	class PistonEngineInjectionConfigWrapper_DFCO : public IPistonEngineInjectionConfig
 	{

@@ -2,6 +2,7 @@
 #include "IDecoder.h"
 #include "IFloatInputService.h"
 #include "Interpolation.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace Decoder;
@@ -14,7 +15,8 @@ using namespace Interpolation;
 #define AFRSERVICE_MAP_ETHANOL_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) AfrService_Map_EthanolConfig
+	PACK(
+	struct AfrService_Map_EthanolConfig
 	{
 	private:
 		AfrService_Map_EthanolConfig()
@@ -25,20 +27,20 @@ namespace ApplicationService
 		static AfrService_Map_EthanolConfig* Cast(void *p)
 		{
 			AfrService_Map_EthanolConfig *ret = (AfrService_Map_EthanolConfig *)p;
-			
+
 			ret->GasMap = (unsigned short *)(ret + 1);
 			ret->EthanolMap = ret->GasMap + ret->AfrRpmResolution * ret->AfrMapResolution;
-			
+
 			ret->EctMultiplierTable = (unsigned char *)(ret->EthanolMap + ret->AfrRpmResolution * ret->AfrMapResolution);
-			
+
 			ret->StoichTable = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
-			
+
 			ret->TpsMinAfrGas = ret->StoichTable + ret->StoichResolution;
 			ret->TpsMinAfrEthanol = ret->TpsMinAfrGas + ret->AfrTpsResolution;
-				
+
 			return ret;
 		}
-		
+
 		unsigned int Size()
 		{
 			return sizeof(AfrService_Map_EthanolConfig) +
@@ -72,7 +74,7 @@ namespace ApplicationService
 		unsigned char AfrTpsResolution;
 		unsigned short *TpsMinAfrGas;
 		unsigned short *TpsMinAfrEthanol;
-	};
+	});
 	
 class AfrService_Map_Ethanol : public IAfrService
 	{

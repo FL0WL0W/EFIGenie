@@ -1,10 +1,12 @@
 #include "IFuelTrimService.h"
+#include "Packed.h"
 
 #if !defined(FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H) && defined(IFUELTRIMSERVICE_H)
 #define FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) FuelTrimServiceWrapper_MultiChannelConfig
+	PACK(
+	struct FuelTrimServiceWrapper_MultiChannelConfig
 	{
 	private:
 		FuelTrimServiceWrapper_MultiChannelConfig()
@@ -27,7 +29,7 @@ namespace ApplicationService
 		}
 		unsigned char NumberOfFuelTrimChannels;
 		unsigned short *FuelTrimChannelMask;
-	};
+	});
 	
 	class FuelTrimServiceWrapper_MultiChannel : public IFuelTrimService
 	{

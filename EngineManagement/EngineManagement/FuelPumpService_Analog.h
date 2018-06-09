@@ -3,6 +3,7 @@
 #include "IFloatInputService.h"
 #include "Interpolation.h"
 #include "IDecoder.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
@@ -13,7 +14,8 @@ using namespace Interpolation;
 #define FUELPUMPSERVICE_ANALOG_H
 namespace ApplicationService
 {	
-	struct __attribute__((__packed__)) FuelPumpService_AnalogConfig
+	PACK(
+	struct FuelPumpService_AnalogConfig
 	{
 	private:
 		FuelPumpService_AnalogConfig()
@@ -45,7 +47,7 @@ namespace ApplicationService
 		unsigned char RpmRes;
 		unsigned char YRes;
 		float *AnalogTable;
-	};
+	});
 	
 	class FuelPumpService_Analog : public IFuelPumpService
 	{

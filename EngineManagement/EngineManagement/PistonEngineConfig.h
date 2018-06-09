@@ -1,8 +1,11 @@
+#include "Packed.h"
+
 #ifndef PISTONENGINECONFIG_H
 #define PISTONENGINECONFIG_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineConfig
+	PACK(
+	struct PistonEngineConfig
 	{
 	private:
 		PistonEngineConfig()
@@ -23,6 +26,6 @@ namespace EngineManagement
 		unsigned short Ml8thPerCylinder;
 		bool IsThrottleBodyInjection;
 		bool IsDistributor;
-	};
+	});
 }
 #endif

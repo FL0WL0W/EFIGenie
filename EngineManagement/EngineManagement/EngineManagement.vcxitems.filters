@@ -204,6 +204,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Static.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Packed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">

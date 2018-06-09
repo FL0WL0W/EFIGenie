@@ -11,7 +11,7 @@ namespace Service
 	public:
 		void Register(unsigned short serviceId, void *service);
 		void* Locate(unsigned short serviceId);
-		void* Unregister(unsigned short serviceId);
+		void Unregister(unsigned short serviceId);
 	};
 }
 #endif

@@ -1,6 +1,7 @@
 #include "IFuelPumpService.h"
 #include "IBooleanOutputService.h"
 #include "ITimerService.h"
+#include "Packed.h"
 
 using namespace IOService;
 using namespace HardwareAbstraction;
@@ -9,7 +10,8 @@ using namespace HardwareAbstraction;
 #define FUELPUMPSERVICE_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) FuelPumpServiceConfig
+	PACK(
+	struct FuelPumpServiceConfig
 	{
 	private:
 		FuelPumpServiceConfig()
@@ -26,7 +28,7 @@ namespace ApplicationService
 			return sizeof(FuelPumpServiceConfig);
 		}
 		float PrimeTime;
-	};
+	});
 	
 	class FuelPumpService : public IFuelPumpService
 	{

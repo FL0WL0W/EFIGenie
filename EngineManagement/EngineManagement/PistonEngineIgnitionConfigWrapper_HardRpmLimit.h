@@ -1,6 +1,7 @@
 #include "IPistonEngineIgnitionConfig.h"
 #include "IDecoder.h"
 #include "IBooleanInputService.h"
+#include "Packed.h"
 
 using namespace Decoder;
 using namespace IOService;
@@ -9,7 +10,8 @@ using namespace IOService;
 #define PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig
+	PACK(
+	struct PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig
 	{
 	private:
 		PistonEngineIgnitionConfigWrapper_HardRpmLimitConfig()
@@ -28,7 +30,7 @@ namespace EngineManagement
 		
 		unsigned short RpmEnable;
 		unsigned short RpmDisable;
-	};
+	});
 	
 	class PistonEngineIgnitionConfigWrapper_HardRpmLimit : public IPistonEngineIgnitionConfig
 	{

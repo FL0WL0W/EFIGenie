@@ -1,6 +1,7 @@
 #include "HardwareAbstractionCollection.h"
 #include "IFloatInputService.h"
 #include "math.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 
@@ -8,8 +9,9 @@ using namespace HardwareAbstraction;
 #define FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H
 namespace IOService
 {
+	PACK(
 	template<unsigned char Degree>
-	struct __attribute__((__packed__)) FloatInputService_AnalogPolynomialConfig
+	struct FloatInputService_AnalogPolynomialConfig
 	{
 	private:
 		FloatInputService_AnalogPolynomialConfig()
@@ -33,7 +35,7 @@ namespace IOService
 		float MinValue;
 		float MaxValue;
 		unsigned short DotSampleRate;
-	};
+	});
 	
 	template<unsigned char Degree>
 	class FloatInputService_AnalogPolynomial : public IFloatInputService

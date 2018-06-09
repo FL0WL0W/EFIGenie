@@ -3,6 +3,7 @@
 #include "IDecoder.h"
 #include "IFloatInputService.h"
 #include "IFloatOutputService.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace Decoder;
@@ -12,7 +13,8 @@ using namespace IOService;
 #define IDLECONTROLSERVICE_PID_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) IdleControlService_PidConfig
+	PACK(
+	struct IdleControlService_PidConfig
 	{
 	private:
 		IdleControlService_PidConfig()
@@ -57,7 +59,7 @@ namespace ApplicationService
 		unsigned char SpeedResolution;
 		float *IdleAirmassSpeedAdder;
 		short *IdleTargetRpmSpeedAdder;
-	};
+	});
 
 	class IdleControlService_Pid : public IIdleControlService
 	{

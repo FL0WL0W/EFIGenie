@@ -3,6 +3,7 @@
 #include "ServiceLocator.h"
 #include "IDecoder.h"
 #include "IBooleanOutputService.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace Service;
@@ -13,7 +14,8 @@ using namespace Decoder;
 #define TACHOMETERSERVICE_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) TachometerServiceConfig
+	PACK(
+	struct TachometerServiceConfig
 	{
 	private:
 		TachometerServiceConfig()
@@ -30,7 +32,7 @@ namespace ApplicationService
 			return sizeof(TachometerServiceConfig);
 		}
 		unsigned char PulsesPer2Rpm;
-	};
+	});
 	
 	class TachometerService
 	{

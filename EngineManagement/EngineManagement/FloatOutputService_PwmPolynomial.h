@@ -1,6 +1,7 @@
 #include "HardwareAbstractionCollection.h"
 #include "IFloatOutputService.h"
 #include "math.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 
@@ -8,8 +9,9 @@ using namespace HardwareAbstraction;
 #define FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H
 namespace IOService
 {
+	PACK(
 	template<unsigned char Degree>
-	struct __attribute__((__packed__)) FloatOutputService_PwmPolynomialConfig
+	struct FloatOutputService_PwmPolynomialConfig
 	{
 	private:
 		FloatOutputService_PwmPolynomialConfig()
@@ -33,7 +35,7 @@ namespace IOService
 		float MinDutyCycle;
 		float MaxDutyCycle;
 		unsigned short Frequency;
-	};
+	});
 
 	template<unsigned char Degree>
 	class FloatOutputService_PwmPolynomial : public IFloatOutputService
@@ -62,7 +64,7 @@ namespace IOService
 			else if (pwmValue < _config->MinDutyCycle)
 				pwmValue = _config->MinDutyCycle;
 
-			_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1 / _config->Frequency, pwmValue / _config->Frequency });
+			_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1.0f / _config->Frequency, pwmValue / _config->Frequency });
 		}
 	};
 }

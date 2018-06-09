@@ -2,6 +2,7 @@
 #include "IDecoder.h"
 #include "IFloatInputService.h"
 #include "Interpolation.h"
+#include "Packed.h"
 
 using namespace Decoder;
 using namespace IOService;
@@ -11,7 +12,8 @@ using namespace Interpolation;
 #define PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineIgnitionConfig_Map_EthanolConfig
+	PACK(
+	struct PistonEngineIgnitionConfig_Map_EthanolConfig
 	{
 	private:
 		PistonEngineIgnitionConfig_Map_EthanolConfig()
@@ -44,7 +46,7 @@ namespace EngineManagement
 		unsigned char IgnitionMapResolution;
 		short *IgnitionAdvanceMapGas;
 		short *IgnitionAdvanceMapEthanol;
-	};
+	});
 	
 	class PistonEngineIgnitionConfig_Map_Ethanol : public IPistonEngineIgnitionConfig
 	{

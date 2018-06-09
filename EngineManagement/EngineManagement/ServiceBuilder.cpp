@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "ServiceBuilder.h"
 
 namespace Service
@@ -61,7 +62,7 @@ namespace Service
 					config = (void *)((unsigned char *)config + 1);
 					*totalSize++;
 
-					IBooleanOutputService *serviceArray[numberOfServices + 1];
+					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
 					for (int i = 0; i < numberOfServices; i++)
 					{
 						serviceArray[i] = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
@@ -258,7 +259,7 @@ namespace Service
 			{
 				FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = CastConfig < FuelTrimServiceWrapper_MultiChannelConfig >(&config, totalSize);
 				
-				IFuelTrimService *fuelTrimServices[fuelTrimConfig->NumberOfFuelTrimChannels];
+				IFuelTrimService **fuelTrimServices = (IFuelTrimService **)malloc(sizeof(IFuelTrimService *)*(fuelTrimConfig->NumberOfFuelTrimChannels));
 				
 				for (int i = 0; i < fuelTrimConfig->NumberOfFuelTrimChannels; i++)
 				{

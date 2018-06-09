@@ -1,5 +1,6 @@
 #include "HardwareAbstractionCollection.h"
 #include "IBooleanOutputService.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 
@@ -7,7 +8,8 @@ using namespace HardwareAbstraction;
 #define BOOLEANOUTPUTSERVICE_H
 namespace IOService
 {
-	struct __attribute__((__packed__)) BooleanOutputServiceConfig
+	PACK(
+	struct BooleanOutputServiceConfig
 	{
 	private:
 		BooleanOutputServiceConfig()
@@ -28,7 +30,7 @@ namespace IOService
 
 		unsigned char Pin;
 		bool NormalOn;
-	};
+	});
 
 	class BooleanOutputService : public IBooleanOutputService
 	{

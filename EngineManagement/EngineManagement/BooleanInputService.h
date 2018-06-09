@@ -1,11 +1,13 @@
 #include "HardwareAbstractionCollection.h"
 #include "IBooleanInputService.h"
+#include "Packed.h"
 
 #if !defined(BOOLEANINPUTSERVICE_H) && defined(IBOOLEANINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define BOOLEANINPUTSERVICE_H
 namespace IOService
 {
-	struct __attribute__((__packed__)) BooleanInputServiceConfig
+	PACK(
+	struct BooleanInputServiceConfig
 	{
 	private:
 		BooleanInputServiceConfig()
@@ -26,7 +28,7 @@ namespace IOService
 
 		unsigned char Pin;
 		bool Inverted;
-	};
+	});
 
 	class BooleanInputService : public IBooleanInputService
 	{

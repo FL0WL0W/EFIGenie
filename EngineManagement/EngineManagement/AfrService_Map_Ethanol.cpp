@@ -38,12 +38,12 @@ namespace ApplicationService
 		if (_engineCoolantTemperatureService != 0)
 		{
 			InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->AfrEctResolution);
-			ectAfrMultiplier = InterpolateTable1<unsigned char>(ectInterpolation, _config->EctMultiplierTable) / 255;
+			ectAfrMultiplier = InterpolateTable1<unsigned char>(ectInterpolation, _config->EctMultiplierTable) / 255.0f;
 		}
 
 		InterpolationResponse tpsInterpolation = Interpolate(_throttlePositionService->Value, 1, 0, _config->AfrTpsResolution);
 		
-		float afr = gasAfr;
+		float afr = gasAfr * ectAfrMultiplier;
 		float minAfrGas = InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMinAfrGas) / 1024.0f;
 		float minAfr = minAfrGas;
 		
@@ -51,7 +51,7 @@ namespace ApplicationService
 		{
 			float minAfrEthanol =  InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMinAfrEthanol) / 1024.0f;
 			minAfr = minAfrEthanol * _ethanolContentService->Value + minAfrGas * (1 - _ethanolContentService->Value);
-			afr = ((ethanolAfr * _ethanolContentService->Value + gasAfr * (1 - _ethanolContentService->Value)) * 0.0009765625) * ectAfrMultiplier;
+			afr = (ethanolAfr * _ethanolContentService->Value + gasAfr * (1 - _ethanolContentService->Value)) * ectAfrMultiplier;
 		}
 		
 		unsigned int _tick =  _timerService->GetTick();

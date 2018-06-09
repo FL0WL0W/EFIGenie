@@ -9,65 +9,66 @@ using namespace HardwareAbstraction;
 #define FLOATOUTPUTSERVICE_STEPPERPOLYNOMIAL_H
 namespace IOService
 {
+	PACK(
 	template<unsigned char Degree>
-		struct __attribute__((__packed__)) FloatOutputService_StepperPolynomialConfig
+	struct FloatOutputService_StepperPolynomialConfig
+	{
+	private:
+		FloatOutputService_StepperPolynomialConfig()
 		{
-		private:
-			FloatOutputService_StepperPolynomialConfig()
-			{
 			
-			}
+		}
 			
-		public:
-			static FloatOutputService_StepperPolynomialConfig* Cast(void *p)
-			{
-				return (FloatOutputService_StepperPolynomialConfig *)p;
-			}
+	public:
+		static FloatOutputService_StepperPolynomialConfig* Cast(void *p)
+		{
+			return (FloatOutputService_StepperPolynomialConfig *)p;
+		}
 			
-			unsigned int Size()
-			{
-				return sizeof(FloatOutputService_StepperPolynomialConfig<Degree>);
-			}
+		unsigned int Size()
+		{
+			return sizeof(FloatOutputService_StepperPolynomialConfig<Degree>);
+		}
 			
-			float A[Degree + 1];
-			short MinStepPosition;
-			short MaxStepPosition;
-		};
+		float A[Degree + 1];
+		short MinStepPosition;
+		short MaxStepPosition;
+	});
 
 	template<unsigned char Degree>
-		class FloatOutputService_StepperPolynomial : public IFloatOutputService
+	class FloatOutputService_StepperPolynomial : public IFloatOutputService
+	{
+	protected:
+		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
+		const FloatOutputService_StepperPolynomialConfig<Degree> *_config;
+
+		IStepperOutputService *_stepperService;
+		int _currentStepPosition;
+			
+	public:
+		FloatOutputService_StepperPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperPolynomialConfig<Degree> *config)
 		{
-		protected:
-			const HardwareAbstractionCollection *_hardwareAbstractionCollection;
-			const FloatOutputService_StepperPolynomialConfig<Degree> *_config;
+			_hardwareAbstractionCollection = hardwareAbstractionCollection;
+			_config = config;
 
-			IStepperOutputService *_stepperService;
-			int _currentStepPosition;
+			_stepperService = IStepperOutputService::CreateStepperOutputService(_hardwareAbstractionCollection, ((void *)(_config + 1)), 0);
+		}
 			
-		public:
-			FloatOutputService_StepperPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperPolynomialConfig<Degree> *config)
-			{
-				_hardwareAbstractionCollection = hardwareAbstractionCollection;
-				_config = config;
-
-				_stepperService = IStepperOutputService::CreateStepperOutputService(_hardwareAbstractionCollection, ((void *)(_config + 1)), 0);
-			}
-			
-			void SetOutput(float value)
-			{
-				float newStepPosition = _config->A[0];
-				for (int i = 1; i <= Degree; i++)
-					newStepPosition += _config->A[i] * pow(value, i);
+		void SetOutput(float value)
+		{
+			float newStepPosition = _config->A[0];
+			for (int i = 1; i <= Degree; i++)
+				newStepPosition += _config->A[i] * pow(value, i);
 		
-				if (newStepPosition > _config->MaxStepPosition)
-					newStepPosition = _config->MaxStepPosition;
-				else if (newStepPosition < _config->MinStepPosition)
-					newStepPosition = _config->MinStepPosition;
+			if (newStepPosition > _config->MaxStepPosition)
+				newStepPosition = _config->MaxStepPosition;
+			else if (newStepPosition < _config->MinStepPosition)
+				newStepPosition = _config->MinStepPosition;
 		
-				_stepperService->Step(newStepPosition - _currentStepPosition);
+			_stepperService->Step(newStepPosition - _currentStepPosition);
 		
-				_currentStepPosition = newStepPosition;
-			}
-		};
+			_currentStepPosition = newStepPosition;
+		}
+	};
 }
 #endif

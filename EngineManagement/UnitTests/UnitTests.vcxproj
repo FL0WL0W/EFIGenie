@@ -166,7 +166,7 @@
     <ClInclude Include="MockPrimeService.h" />
     <ClInclude Include="MockPwmService.h" />
     <ClInclude Include="MockTimerService.h" />
-    <ClInclude Include="MockSensorService.h" />
+    <ClInclude Include="MockFloatInputService.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

@@ -72,7 +72,7 @@
     <ClInclude Include="MockDigitalService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
-    <ClInclude Include="MockSensorService.h">
+    <ClInclude Include="MockFloatInputService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,5 +21,7 @@ namespace Interpolation
 				response.IndexH = resolution - 1;
 			}
 		}
+
+		return response;
 	}
 }

@@ -16,7 +16,7 @@ namespace Service
 		return 0;
 	}
 
-	void* ServiceLocator::Unregister(unsigned short serviceId)
+	void ServiceLocator::Unregister(unsigned short serviceId)
 	{
 		std::map<unsigned short, void *>::iterator it = _services.find(serviceId);
 		if (it != _services.end())

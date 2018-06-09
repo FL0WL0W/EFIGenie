@@ -5,6 +5,7 @@
 #include "Interpolation.h"
 #include "IFloatInputService.h"
 #include "IFuelTrimService.h"
+#include "Packed.h"
 
 using namespace IOService;
 using namespace ApplicationService;
@@ -15,7 +16,8 @@ using namespace Interpolation;
 #define PISTONENGINEINJECTIONCONFIG_SD_H
 namespace EngineManagement
 {	
-	struct __attribute__((__packed__)) PistonEngineInjectionConfig_SDConfig
+	PACK(
+	struct PistonEngineInjectionConfig_SDConfig
 	{
 	private:
 		PistonEngineInjectionConfig_SDConfig()
@@ -79,7 +81,7 @@ namespace EngineManagement
 		float MaxMapDot;
 		unsigned char MapDotAdderResolution;
 		short *MapDotAdder;
-	};
+	});
 	
 class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	{

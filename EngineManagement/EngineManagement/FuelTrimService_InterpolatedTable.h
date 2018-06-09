@@ -2,6 +2,7 @@
 #include "IFloatInputService.h"
 #include "IDecoder.h"
 #include "IAfrService.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
@@ -11,7 +12,8 @@ using namespace Decoder;
 #define FUELTRIMSERVICE_INTERPOLATEDTABLE_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) FuelTrimService_InterpolatedTableConfig
+	PACK(
+	struct FuelTrimService_InterpolatedTableConfig
 	{
 	private:
 		FuelTrimService_InterpolatedTableConfig()
@@ -48,7 +50,7 @@ namespace ApplicationService
 		float YInterpolationDistance;
 		bool IsPid;
 		float LambdaDeltaEnable;
-	};
+	});
 
 	class FuelTrimService_InterpolatedTable : public IFuelTrimService
 	{

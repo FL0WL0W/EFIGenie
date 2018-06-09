@@ -3,6 +3,7 @@
 #include "IBooleanOutputService.h"
 #include "ServiceLocator.h"
 #include "IPrimeService.h"
+#include "Packed.h"
 
 using namespace IOService;
 using namespace HardwareAbstraction;
@@ -11,7 +12,8 @@ using namespace HardwareAbstraction;
 #define PRIMESERVICE_STATICPULSEWIDTH_H
 namespace ApplicationService
 {
-	struct __attribute__((__packed__)) PrimeService_StaticPulseWidthConfig
+	PACK(
+	struct PrimeService_StaticPulseWidthConfig
 	{
 	private:
 		PrimeService_StaticPulseWidthConfig()
@@ -28,7 +30,7 @@ namespace ApplicationService
 			return sizeof(PrimeService_StaticPulseWidthConfig);
 		}
 		float PulseWidth;
-	};
+	});
 	
 	class PrimeService_StaticPulseWidth : public IPrimeService
 	{			

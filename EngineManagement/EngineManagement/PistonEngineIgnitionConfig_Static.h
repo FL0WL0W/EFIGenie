@@ -1,6 +1,7 @@
 #include "IPistonEngineIgnitionConfig.h"
 #include "IDecoder.h"
 #include "IBooleanInputService.h"
+#include "Packed.h"
 
 using namespace Decoder;
 using namespace IOService;
@@ -9,7 +10,8 @@ using namespace IOService;
 #define PISTONENGINEIGNITIONCONFIG_STATIC_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineIgnitionConfig_StaticConfig
+	PACK(
+	struct PistonEngineIgnitionConfig_StaticConfig
 	{
 	private:
 		PistonEngineIgnitionConfig_StaticConfig()
@@ -28,7 +30,7 @@ namespace EngineManagement
 
 		float IgnitionDwellTime;
 		short IgnitionAdvance64thDegree;
-	};
+	});
 
 	class PistonEngineIgnitionConfig_Static : public IPistonEngineIgnitionConfig
 	{

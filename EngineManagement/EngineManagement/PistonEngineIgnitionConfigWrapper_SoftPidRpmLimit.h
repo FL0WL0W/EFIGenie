@@ -2,6 +2,7 @@
 #include "IDecoder.h"
 #include "IBooleanInputService.h"
 #include "ITimerService.h"
+#include "Packed.h"
 
 using namespace Decoder;
 using namespace IOService;
@@ -11,7 +12,8 @@ using namespace HardwareAbstraction;
 #define PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 namespace EngineManagement
 {
-	struct __attribute__((__packed__)) PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig
+	PACK(
+	struct PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig
 	{
 	private:
 		PistonEngineIgnitionConfigWrapper_SoftPidRpmLimitConfig()
@@ -32,7 +34,7 @@ namespace EngineManagement
 		float RpmKp;
 		float RpmKi;
 		float RpmKd;
-	};
+	});
 	
 	class PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit : public IPistonEngineIgnitionConfig
 	{
