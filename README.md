@@ -69,7 +69,7 @@ TODO LIST<br>
       <li>QOL Paste Multiply table</li>
       <li>QOL Paste Multiply by % table</li>
       <li>QOL Paste Multiply by %/2 table</li>
-      <li>Interface with ECU, UART, USB, and STLink</li>
+      <li>Interface with ECU (UART, USB, and STLink)</li>
     </ul>
   <li>*Tuner Studio (Interface ECU)</li>
   <li>*Create unit tests</li>
