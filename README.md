@@ -84,7 +84,6 @@ TODO LIST<br>
       <li>PrimeService_StaticPulseWidth</li>
       <li>TachometerService</li>
       <li>BooleanInputService</li>
-      <li>BooleanOutputService</li>
       <li>BooleanInputService_Static</li>
       <li>FloatInputService_Static</li>
       <li>FloatOutputService_PwmPolynomial</li>
