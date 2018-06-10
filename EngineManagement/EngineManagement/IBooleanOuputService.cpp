@@ -28,7 +28,7 @@ namespace IOService
 #ifdef BOOLEANOUTPUTSERVICE_H
 		case 1:
 			{
-				BooleanOutputServiceConfig *booleanOutputServiceConfig = BooleanOutputServiceConfig::Cast((unsigned char*)config + 1);
+				BooleanOutputServiceConfig *booleanOutputServiceConfig = BooleanOutputServiceConfig::Cast((unsigned char*)config);
 				*size += booleanOutputServiceConfig->Size();
 				return new BooleanOutputService(hardwareAbstractionCollection, booleanOutputServiceConfig, highZ);
 			}

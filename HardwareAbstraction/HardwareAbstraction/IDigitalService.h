@@ -1,3 +1,5 @@
+#include "PinDirection.h"
+
 #ifndef IDIGITALSERVICE_H
 #define IDIGITALSERVICE_H
 namespace HardwareAbstraction

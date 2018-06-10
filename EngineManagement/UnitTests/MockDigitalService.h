@@ -1,3 +1,6 @@
+#include "IDigitalService.h"
+
+#ifndef MOCKDIGITALSERVICE_H
 namespace HardwareAbstraction
 {
 	class MockDigitalService : public IDigitalService
@@ -8,3 +11,4 @@ namespace HardwareAbstraction
 		MOCK_METHOD2(WritePin, void(unsigned char, bool));
 	};
 }
+#endif

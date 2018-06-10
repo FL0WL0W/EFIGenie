@@ -25,7 +25,7 @@ namespace IOService
 #ifdef BOOLEANINPUTSERVICE_H
 		case 2:
 			{
-				BooleanInputServiceConfig *booleanInputServiceConfig = BooleanInputServiceConfig::Cast((unsigned char*)config + 1);
+				BooleanInputServiceConfig *booleanInputServiceConfig = BooleanInputServiceConfig::Cast((unsigned char*)config);
 				*size += booleanInputServiceConfig->Size();
 				return new BooleanInputService(hardwareAbstractionCollection, booleanInputServiceConfig);
 			}
