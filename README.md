@@ -76,7 +76,6 @@ TODO LIST<br>
     <ul>
      <li>Idle Air Control Valve Stepper</li>
       <li>AfrService_Static</li>
-      <li>FuelPumpService</li>
       <li>FuelPumpService_Analog</li>
       <li>FuelTrimService_InterpolatedTable</li>
       <li>FuelTrimServiceWrapper_MultiChannel</li>
@@ -88,7 +87,6 @@ TODO LIST<br>
       <li>FloatInputService_Static</li>
       <li>FloatOutputService_PwmPolynomial</li>
       <li>FloatOutputService_StepperPolynomial</li>
-      <li>PistonEngineIgnitionConfig_Static</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
       <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
