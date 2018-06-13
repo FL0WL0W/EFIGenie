@@ -65,7 +65,7 @@ namespace Service
 					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
 					for (int i = 0; i < numberOfServices; i++)
 					{
-						serviceArray[i] = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
+						serviceArray[i] = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size);
 						config = (void *)((unsigned char *)config + size);
 						*totalSize += size;
 					}
@@ -85,7 +85,7 @@ namespace Service
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
 			case IDLE_AIR_CONTROL_VALVE_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ));
+					serviceLocator->Register(serviceId, IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size));
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -284,10 +284,14 @@ namespace Service
 			return 0;
 #ifdef FUELPUMPSERVICE_H
 		case 1:
+		{
+			FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(&config, totalSize);
+
 			return new FuelPumpService(
-				CastConfig < FuelPumpServiceConfig >(&config, totalSize), 
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
+				serviceConfig,
+				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 				CreateBooleanOutputService(serviceLocator, &config, totalSize));
+		}
 #endif
 #ifdef FUELPUMPSERVICE_ANALOG_H
 		case 2:						

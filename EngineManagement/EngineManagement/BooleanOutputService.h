@@ -30,6 +30,7 @@ namespace IOService
 
 		unsigned char Pin;
 		bool NormalOn;
+		bool HighZ;
 	});
 
 	class BooleanOutputService : public IBooleanOutputService
@@ -37,10 +38,9 @@ namespace IOService
 	protected:
 		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const BooleanOutputServiceConfig *_config;
-		bool _highZ;
 		
 	public:
-		BooleanOutputService(const HardwareAbstractionCollection *, const BooleanOutputServiceConfig *, bool highZ);
+		BooleanOutputService(const HardwareAbstractionCollection *, const BooleanOutputServiceConfig *);
 
 		void OutputSet();
 		void OutputReset();

@@ -3,14 +3,12 @@
 #ifdef BOOLEANOUTPUTSERVICE_H
 namespace IOService
 {
-	BooleanOutputService::BooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const BooleanOutputServiceConfig *config, bool highZ)
+	BooleanOutputService::BooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const BooleanOutputServiceConfig *config)
 	{
 		_hardwareAbstractionCollection = hardwareAbstractionCollection;
-		_config = config;
-		_highZ = highZ;
-		
+		_config = config;		
 
-		if (_highZ && _config->NormalOn)
+		if (_config->HighZ && _config->NormalOn)
 		{
 			_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, In);
 		}
@@ -24,13 +22,13 @@ namespace IOService
 	
 	void BooleanOutputService::OutputSet()
 	{
-		if (_highZ && !_config->NormalOn)
+		if (_config->HighZ && !_config->NormalOn)
 		{
 			_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, In);
 		}
 		else
 		{
-			if (_highZ)
+			if (_config->HighZ)
 			{
 				_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, Out);
 			}
@@ -41,13 +39,13 @@ namespace IOService
 	
 	void BooleanOutputService::OutputReset()
 	{
-		if (_highZ && _config->NormalOn)
+		if (_config->HighZ && _config->NormalOn)
 		{
 			_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, In);
 		}
 		else
 		{
-			if (_highZ)
+			if (_config->HighZ)
 			{
 				_hardwareAbstractionCollection->DigitalService->InitPin(_config->Pin, Out);
 			}

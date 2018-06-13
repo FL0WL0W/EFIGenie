@@ -9,6 +9,7 @@ namespace EngineManagement
 		_ignitionTiming = IgnitionTiming();
 		_ignitionTiming.IgnitionAdvance64thDegree = _config->IgnitionAdvance64thDegree;
 		_ignitionTiming.IgnitionDwellTime = _config->IgnitionDwellTime;
+		_ignitionTiming.IgnitionEnable = true;
 	}
 	
 	IgnitionTiming PistonEngineIgnitionConfig_Static::GetIgnitionTiming()

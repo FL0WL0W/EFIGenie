@@ -33,39 +33,42 @@ namespace UnitTests
 
 			outputConfig->Pin = 1;
 			outputConfig->NormalOn = false;
+			outputConfig->HighZ = false;
 
 			void *config = malloc(outputConfig->Size() + 1);
 			*(unsigned char *)config = 1;
 			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
 
 			unsigned int size = 0;
-			_booleanOutputService0 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size, false);
+			_booleanOutputService0 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size);
 
 			outputConfig->Pin = 3;
+			outputConfig->HighZ = true;
 			config = malloc(outputConfig->Size() + 1);
 			*(unsigned char *)config = 1;
 			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
-			_booleanOutputService2 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size, true);
+			_booleanOutputService2 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size);
 
 			outputConfig->Pin = 2;
 			outputConfig->NormalOn = true;
+			outputConfig->HighZ = false;
 			config = malloc(outputConfig->Size() + 1);
 			*(unsigned char *)config = 1;
 			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
-			_booleanOutputService1 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size, false);
+			_booleanOutputService1 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size);
 
 			outputConfig->Pin = 4;
+			outputConfig->HighZ = true;
 			config = malloc(outputConfig->Size() + 1);
 			*(unsigned char *)config = 1;
 			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
-			_booleanOutputService3 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size, true);
+			_booleanOutputService3 = IBooleanOutputService::CreateBooleanOutputService(&_hardwareAbstractionCollection, config, &size);
 		}
 
 		TEST_METHOD(WhenCallingBooleanOutputServiceThenCorrectPinIsChangedCorrectly)
 		{
 			CreateServices();
 
-			//dwell
 			EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
 			IBooleanOutputService::OutputSetTask(_booleanOutputService0);
 
@@ -79,7 +82,6 @@ namespace UnitTests
 			EXPECT_CALL(_digitalService, WritePin(4, false)).Times(1);
 			IBooleanOutputService::OutputSetTask(_booleanOutputService3);
 
-			//fire
 			EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 			IBooleanOutputService::OutputResetTask(_booleanOutputService0);
 

@@ -16,7 +16,7 @@ namespace IOService
 		static void OutputSetTask(void *booleanOutputService);
 		static void OutputResetTask(void *booleanOutputService);
 		
-		static IBooleanOutputService *CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size, bool highZ);
+		static IBooleanOutputService *CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
 	};
 }
 #endif

@@ -86,9 +86,6 @@
     <ClCompile Include="gmock_initialize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InjectorServiceTests.cpp">
-      <Filter>Source Files\Services</Filter>
-    </ClCompile>
     <ClCompile Include="FuelPumpServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
@@ -102,6 +99,9 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="BooleanOutputServiceTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

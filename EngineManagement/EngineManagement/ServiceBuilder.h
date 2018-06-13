@@ -33,8 +33,6 @@
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
 #define PISTON_ENGINE_SERVICE_ID				4007			// PistonEngineService
 
-#define BOOLEAN_OUTPUT_SERVICE_HIGHZ			false
-
 #include "ServiceLocator.h"
 
 //hardwareabstraction includes
@@ -100,7 +98,7 @@ namespace Service
 		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
 		{
 			unsigned int size;
-			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size, BOOLEAN_OUTPUT_SERVICE_HIGHZ);
+			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
 			*config = (void *)((unsigned char *)*config + size);
 			*totalSize += size;
 			return booleanOutputService;
