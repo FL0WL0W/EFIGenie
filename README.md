@@ -76,7 +76,6 @@ TODO LIST<br>
     <ul>
      <li>Idle Air Control Valve Stepper</li>
       <li>AfrService_Static</li>
-      <li>FuelPumpService</li>
       <li>FuelPumpService_Analog</li>
       <li>FuelTrimService_InterpolatedTable</li>
       <li>FuelTrimServiceWrapper_MultiChannel</li>
@@ -88,7 +87,6 @@ TODO LIST<br>
       <li>FloatInputService_Static</li>
       <li>FloatOutputService_PwmPolynomial</li>
       <li>FloatOutputService_StepperPolynomial</li>
-      <li>PistonEngineIgnitionConfig_Static</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
       <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
@@ -97,6 +95,8 @@ TODO LIST<br>
       <li>PistonEngineService</li>
       <li>ServiceBuilder</li>
     </ul>
+  <li>Customizable injection and iginition degree references</li>
+  <li>Move injection and iginition out of PistonEngineService into seperate services, maybe standardize this.</li>
   <li>*Create integration tests with integration test hardware</li>
   <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
