@@ -48,12 +48,6 @@
     <ClInclude Include="MockFuelTrimService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
-    <ClInclude Include="MockIgnitorService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
-    <ClInclude Include="MockInjectorService.h">
-      <Filter>Header Files\Services</Filter>
-    </ClInclude>
     <ClInclude Include="MockPrimeService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
@@ -73,6 +67,9 @@
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="MockFloatInputService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MockBooleanOutputService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
   </ItemGroup>
@@ -102,6 +99,9 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="PistonEngineServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

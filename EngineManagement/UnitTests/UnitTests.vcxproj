@@ -155,12 +155,11 @@
   <ItemGroup>
     <ClInclude Include="MockAfrService.h" />
     <ClInclude Include="MockAnalogService.h" />
+    <ClInclude Include="MockBooleanOutputService.h" />
     <ClInclude Include="MockDecoder.h" />
     <ClInclude Include="MockDigitalService.h" />
     <ClInclude Include="MockFuelPumpService.h" />
     <ClInclude Include="MockFuelTrimService.h" />
-    <ClInclude Include="MockIgnitorService.h" />
-    <ClInclude Include="MockInjectorService.h" />
     <ClInclude Include="MockPistonEngineIgnitionConfig.h" />
     <ClInclude Include="MockPistonEngineInjectionConfig.h" />
     <ClInclude Include="MockPrimeService.h" />
@@ -177,6 +176,7 @@
     <ClCompile Include="gmock_initialize.cpp" />
     <ClCompile Include="BooleanOutputServiceTests.cpp" />
     <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp" />
+    <ClCompile Include="PistonEngineServiceTests.cpp" />
     <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
