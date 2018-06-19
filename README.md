@@ -92,7 +92,8 @@ TODO LIST<br>
       <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
       <li>PistonEngineInjectionConfig_SD</li>
       <li>PistonEngineInjectionConfigWrapper_DFCO</li>
-      <li>PistonEngineService</li>
+      <li>IgnitionSchedulingService</li>
+      <li>InjectionSchedulingService</li>
       <li>ServiceBuilder</li>
     </ul>
   <li>Customizable injection and iginition degree references</li>
