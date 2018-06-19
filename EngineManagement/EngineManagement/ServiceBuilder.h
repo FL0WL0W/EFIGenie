@@ -31,7 +31,8 @@
 #define AFR_SERVICE_ID							4004			// IAfrService
 #define FUEL_TRIM_SERVICE_ID					4005			// IFuelTrimService
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
-#define PISTON_ENGINE_SERVICE_ID				4007			// PistonEngineService
+#define IGNITION_SCHEDULING_SERVICE_ID			4007			// IgnitionSchedulingService
+#define INJECTION_SCHEDULING_SERVICE_ID			4008			// InjectionSchedulingService
 
 #include "ServiceLocator.h"
 
@@ -72,7 +73,8 @@
 #include "PistonEngineIgnitionConfig_Static.h"
 #include "PistonEngineIgnitionConfigWrapper_HardRpmLimit.h"
 #include "PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.h"
-#include "PistonEngineService.h"
+#include "IgnitionSchedulingService.h"
+#include "InjectionSchedulingService.h"
 
 using namespace HardwareAbstraction;
 using namespace IOService;
@@ -148,9 +150,10 @@ namespace Service
 		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IPistonEngineInjectionConfig *CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
-		static IPistonEngineIgnitionConfig *CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *size);
-		static PistonEngineService *CreatePistonEngineService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IPistonEngineInjectionConfig *CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IPistonEngineIgnitionConfig *CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IgnitionSchedulingService *CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IDecoder *CreateDecoderService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 	};
 }

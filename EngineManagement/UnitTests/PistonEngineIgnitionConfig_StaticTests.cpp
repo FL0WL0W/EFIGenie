@@ -18,7 +18,6 @@ namespace UnitTests
 	{
 	public:
 		IPistonEngineIgnitionConfig *_ignitionConfig;
-		PistonEngineConfig *_pistonEngineConfig;
 
 		void CreateServices()
 		{
@@ -32,12 +31,8 @@ namespace UnitTests
 			*(unsigned char *)config = 1;
 			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
 
-			_pistonEngineConfig = (PistonEngineConfig *)malloc(sizeof(PistonEngineConfig));
-			_pistonEngineConfig->Cylinders = 8;
-			_pistonEngineConfig->Ml8thPerCylinder = 650*8;
-
 			unsigned int size = 0;
-			_ignitionConfig = ServiceBuilder::CreatePistonEngineIgnitionConfig(serviceLocator, _pistonEngineConfig, config, &size);
+			_ignitionConfig = ServiceBuilder::CreatePistonEngineIgnitionConfig(serviceLocator, config, &size);
 		}
 
 		TEST_METHOD(WhenGettingPistonEngineIgnitionConfig)

@@ -5,7 +5,6 @@ namespace EngineManagement
 {
 	PistonEngineInjectionConfig_SD::PistonEngineInjectionConfig_SD(
 		PistonEngineInjectionConfig_SDConfig *config, 
-		PistonEngineConfig *pistonEngineConfig, 
 		IDecoder *decoder,
 		IFloatInputService *manifoldAbsolutePressureService,
 		IAfrService *afrService,
@@ -16,7 +15,6 @@ namespace EngineManagement
 		IFloatInputService *voltageService)
 	{		
 		_config = config;
-		_pistonEngineConfig = pistonEngineConfig;
 		_decoder = decoder;
 		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
 		_afrService = afrService;
@@ -60,7 +58,7 @@ namespace EngineManagement
 		
 		float airFuelRatio = _afrService->Afr;
 		
-		float cylinderVolume = _pistonEngineConfig->Ml8thPerCylinder * 0.125f * VE * 0.01f; //ml
+		float cylinderVolume = _config->Ml8thPerCylinder * 0.125f * VE * 0.01f; //ml
 		
 		float injectorGrams = (cylinderVolume * airDensity) / (airFuelRatio + airDensity/0.7197f);
 		

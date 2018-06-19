@@ -22,6 +22,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimService_InterpolatedTable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IgnitionSchedulingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Interpolation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IBooleanInputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IBooleanOutputService.h" />
@@ -49,8 +50,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FloatInputService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineIgnitionConfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IPistonEngineInjectionConfig.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineConfig.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.h" />
@@ -64,6 +64,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionSchedulingService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Interpolation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pid.cpp" />
@@ -73,7 +74,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)PistoneEngineIgnitionConfig_Static.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanOuputService.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Map_Ethanol.cpp" />

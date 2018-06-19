@@ -136,14 +136,23 @@ namespace Service
 					break;
 				}
 #endif
-#if PISTON_ENGINE_SERVICE_ID
-			case PISTON_ENGINE_SERVICE_ID:
-				{
-					serviceLocator->Register(serviceId, CreatePistonEngineService(serviceLocator, config, &size));
-					config = (void *)((unsigned char *)config + size);
-					*totalSize += size;
-					break;
-				}
+#if IGNITION_SCHEDULING_SERVICE_ID
+			case IGNITION_SCHEDULING_SERVICE_ID:
+			{
+				serviceLocator->Register(serviceId, CreateIgnitionSchedulingService(serviceLocator, config, &size));
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+				break;
+			}
+#endif
+#if INJECTION_SCHEDULING_SERVICE_ID
+			case INJECTION_SCHEDULING_SERVICE_ID:
+			{
+				serviceLocator->Register(serviceId, CreateInjectionSchedulingService(serviceLocator, config, &size));
+				config = (void *)((unsigned char *)config + size);
+				*totalSize += size;
+				break;
+			}
 #endif
 #if DECODER_SERVICE_ID
 			case DECODER_SERVICE_ID:
@@ -307,7 +316,7 @@ namespace Service
 		return 0;
 	}
 	
-	IPistonEngineInjectionConfig *ServiceBuilder::CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *totalSize)
+	IPistonEngineInjectionConfig *ServiceBuilder::CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{		
 		switch (GetServiceId(&config, totalSize))
 		{
@@ -317,7 +326,6 @@ namespace Service
 		case 2:
 			return new PistonEngineInjectionConfig_SD(
 				CastConfig < PistonEngineInjectionConfig_SDConfig >(&config, totalSize),
-				pistonEngineConfig,
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				(IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID),
@@ -333,7 +341,7 @@ namespace Service
 				PistonEngineInjectionConfigWrapper_DFCOConfig *pistonEngineInjectionConfig = CastConfig < PistonEngineInjectionConfigWrapper_DFCOConfig >(&config, totalSize);
 
 				unsigned int size;
-				IPistonEngineInjectionConfig *child = CreatePistonEngineInjetionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				IPistonEngineInjectionConfig *child = CreatePistonEngineInjetionConfig(serviceLocator, config, &size);
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 
@@ -347,7 +355,7 @@ namespace Service
 		return 0;
 	}
 	
-	IPistonEngineIgnitionConfig *ServiceBuilder::CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, PistonEngineConfig *pistonEngineConfig, void *config, unsigned int *totalSize)
+	IPistonEngineIgnitionConfig *ServiceBuilder::CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{				
 		switch (GetServiceId(&config, totalSize))
 		{
@@ -374,7 +382,7 @@ namespace Service
 				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, &config, totalSize);
 				
 				unsigned int size;
-				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, config, &size);
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 				
@@ -393,7 +401,7 @@ namespace Service
 				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, &config, totalSize);
 				
 				unsigned int size;
-				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, pistonEngineConfig, config, &size);
+				IPistonEngineIgnitionConfig *child = CreatePistonEngineIgnitionConfig(serviceLocator, config, &size);
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 				
@@ -408,32 +416,39 @@ namespace Service
 		}
 		return 0;
 	}
-	
-	PistonEngineService *ServiceBuilder::CreatePistonEngineService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{				
-		PistonEngineConfig *engineConfig = CastConfig < PistonEngineConfig >(&config, totalSize);
-		
-		IPistonEngineInjectionConfig *injectionConfig = 0;
-		unsigned int size;
-#ifndef NOINJECTION
-		injectionConfig = CreatePistonEngineInjetionConfig(serviceLocator, engineConfig, config, &size);
-		config = (void *)((unsigned char *)config + size);
-		*totalSize += size;
-#endif
+
+	IgnitionSchedulingService *ServiceBuilder::CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
+	{
+		IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = CastConfig < IgnitionSchedulingServiceConfig >(&config, totalSize);
 		
 		IPistonEngineIgnitionConfig *ignitionConfig = 0;
-#ifndef NOIGNITION
-		ignitionConfig = CreatePistonEngineIgnitionConfig(serviceLocator, engineConfig, config, &size);
+		unsigned int size;
+		ignitionConfig = CreatePistonEngineIgnitionConfig(serviceLocator, config, &size);
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
-#endif
-		
-		return new PistonEngineService(
-			engineConfig, 
-			injectionConfig,
-			(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID),
+
+		return new IgnitionSchedulingService(
+			ignitionSchedulingConfig,
 			ignitionConfig,
 			(IBooleanOutputService**)serviceLocator->Locate(IGNITOR_SERVICES_ID),
+			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
+			(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+	}
+
+	InjectionSchedulingService *ServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
+	{
+		InjectionSchedulingServiceConfig *injectionSchedulingConfig = CastConfig < InjectionSchedulingServiceConfig >(&config, totalSize);
+
+		IPistonEngineInjectionConfig *injectionConfig = 0;
+		unsigned int size;
+		injectionConfig = CreatePistonEngineInjetionConfig(serviceLocator, config, &size);
+		config = (void *)((unsigned char *)config + size);
+		*totalSize += size;
+		
+		return new InjectionSchedulingService(
+			injectionSchedulingConfig,
+			injectionConfig,
+			(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID),
 			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 			(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
 	}

@@ -1,6 +1,5 @@
 #include "IAfrService.h"
 #include "IDecoder.h"
-#include "PistonEngineConfig.h"
 #include "IPistonEngineInjectionConfig.h"
 #include "Interpolation.h"
 #include "IFloatInputService.h"
@@ -51,6 +50,7 @@ namespace EngineManagement
 		}
 		
 		unsigned short GasConstant;//value in 0.1 unit
+		unsigned short Ml8thPerCylinder;
 		unsigned short InjectorOpenPosition64thDegree;
 		
 		unsigned short MaxRpm;
@@ -87,7 +87,6 @@ class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	{
 	protected:
 		PistonEngineInjectionConfig_SDConfig *_config;
-		PistonEngineConfig *_pistonEngineConfig;
 		IDecoder *_decoder;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IAfrService *_afrService;
@@ -100,7 +99,6 @@ class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 	public:
 		PistonEngineInjectionConfig_SD(
 			PistonEngineInjectionConfig_SDConfig *config, 
-			PistonEngineConfig *pistonEngineConfig, 
 			IDecoder *decoder,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IAfrService *afrService,

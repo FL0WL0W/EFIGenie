@@ -102,9 +102,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfigWrapper_DFCO.h">
       <Filter>Header Files\PistonEngine\InjectionConfig</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineConfig.h">
-      <Filter>Header Files\PistonEngine</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfigWrapper_HardRpmLimit.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
@@ -198,14 +195,17 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h">
       <Filter>Header Files\ApplicationService\FuelPumpService</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineService.h">
-      <Filter>Header Files\PistonEngine</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)PistonEngineIgnitionConfig_Static.h">
       <Filter>Header Files\PistonEngine\IgnitionConfig</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Packed.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)IgnitionSchedulingService.h">
+      <Filter>Header Files\PistonEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.h">
+      <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -278,11 +278,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp">
       <Filter>Source Files\ApplicationService\FuelPumpService</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineService.cpp">
-      <Filter>Source Files\PistonEngine</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistoneEngineIgnitionConfig_Static.cpp">
       <Filter>Source Files\PistonEngine\IgnitionConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionSchedulingService.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
