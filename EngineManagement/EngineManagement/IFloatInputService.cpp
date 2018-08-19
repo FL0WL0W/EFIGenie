@@ -6,6 +6,11 @@
 #ifdef IFLOATINPUTSERVICE_H
 namespace IOService
 {
+	void IFloatInputService::ReadValueCallBack(void *floatInputService)
+	{
+		((IFloatInputService *)floatInputService)->ReadValue();
+	}
+
 	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
 	{
 		unsigned char inputServiceId = *((unsigned char*)config);

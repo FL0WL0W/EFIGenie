@@ -21,9 +21,9 @@ namespace EngineManagement
 		{
 			if (_pistonEngineIgnitionConfig != 0)
 			{
-				_ignitorDwellTask[ignitor] = new Task(&IBooleanOutputService::OutputSetTask, ignitorOutputServices[ignitor], false);
+				_ignitorDwellTask[ignitor] = new Task(&IBooleanOutputService::OutputSetCallBack, ignitorOutputServices[ignitor], false);
 				_ignitorDwellTask[ignitor]->Tick = tickMinusSome;
-				_ignitorFireTask[ignitor] = new  Task(&IBooleanOutputService::OutputResetTask, ignitorOutputServices[ignitor], false);
+				_ignitorFireTask[ignitor] = new  Task(&IBooleanOutputService::OutputResetCallBack, ignitorOutputServices[ignitor], false);
 				_ignitorFireTask[ignitor]->Tick = tickMinusSome;
 			}
 		}

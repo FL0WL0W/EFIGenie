@@ -70,30 +70,30 @@ namespace UnitTests
 			CreateServices();
 
 			EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
-			IBooleanOutputService::OutputSetTask(_booleanOutputService0);
+			IBooleanOutputService::OutputSetCallBack(_booleanOutputService0);
 
 			EXPECT_CALL(_digitalService, WritePin(2, false)).Times(1);
-			IBooleanOutputService::OutputSetTask(_booleanOutputService1);
+			IBooleanOutputService::OutputSetCallBack(_booleanOutputService1);
 
 			EXPECT_CALL(_digitalService, InitPin(3, HardwareAbstraction::In)).Times(1);
-			IBooleanOutputService::OutputSetTask(_booleanOutputService2);
+			IBooleanOutputService::OutputSetCallBack(_booleanOutputService2);
 
 			EXPECT_CALL(_digitalService, InitPin(4, HardwareAbstraction::Out)).Times(1);
 			EXPECT_CALL(_digitalService, WritePin(4, false)).Times(1);
-			IBooleanOutputService::OutputSetTask(_booleanOutputService3);
+			IBooleanOutputService::OutputSetCallBack(_booleanOutputService3);
 
 			EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
-			IBooleanOutputService::OutputResetTask(_booleanOutputService0);
+			IBooleanOutputService::OutputResetCallBack(_booleanOutputService0);
 
 			EXPECT_CALL(_digitalService, WritePin(2, true)).Times(1);
-			IBooleanOutputService::OutputResetTask(_booleanOutputService1);
+			IBooleanOutputService::OutputResetCallBack(_booleanOutputService1);
 
 			EXPECT_CALL(_digitalService, InitPin(3, HardwareAbstraction::Out)).Times(1);
 			EXPECT_CALL(_digitalService, WritePin(3, false)).Times(1);
-			IBooleanOutputService::OutputResetTask(_booleanOutputService2);
+			IBooleanOutputService::OutputResetCallBack(_booleanOutputService2);
 
 			EXPECT_CALL(_digitalService, InitPin(4, HardwareAbstraction::In)).Times(1);
-			IBooleanOutputService::OutputResetTask(_booleanOutputService3);
+			IBooleanOutputService::OutputResetCallBack(_booleanOutputService3);
 		}
 	};
 }

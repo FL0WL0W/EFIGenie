@@ -4,12 +4,12 @@
 #ifdef IBOOLEANOUTPUTSERVICE_H
 namespace IOService
 {
-	void IBooleanOutputService::OutputSetTask(void *parameters)
+	void IBooleanOutputService::OutputSetCallBack(void *parameters)
 	{
 		((IBooleanOutputService *)parameters)->OutputSet();
 	}
 	
-	void IBooleanOutputService::OutputResetTask(void *parameters)
+	void IBooleanOutputService::OutputResetCallBack(void *parameters)
 	{
 		((IBooleanOutputService *)parameters)->OutputReset();
 	}

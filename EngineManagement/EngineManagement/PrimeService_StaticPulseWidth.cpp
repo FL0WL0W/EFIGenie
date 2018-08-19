@@ -19,7 +19,7 @@ namespace ApplicationService
 			for (unsigned char injector = 0; _injectorServices[injector] != 0; injector++)
 			{
 				_injectorServices[injector]->OutputSet();
-				_timerService->ScheduleTask(&IBooleanOutputService::OutputResetTask, _injectorServices[injector], currentTick + _pulseTick, true);
+				_timerService->ScheduleTask(&IBooleanOutputService::OutputResetCallBack, _injectorServices[injector], currentTick + _pulseTick, true);
 			}
 		}
 	}

@@ -5,6 +5,11 @@
 #ifdef IBOOLEANINPUTSERVICE_H
 namespace IOService
 {
+	void IBooleanInputService::ReadValueCallBack(void *booleanInputService)
+	{
+		((IBooleanInputService *)booleanInputService)->ReadValue();
+	}
+
 	IBooleanInputService* IBooleanInputService::CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
 	{
 		unsigned char inputServiceId = *((unsigned char*)config);

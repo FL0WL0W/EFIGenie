@@ -59,6 +59,8 @@ namespace EngineManagement
 			ITimerService *timerService,
 			IDecoder *decoder);
 		void ScheduleEvents(void);
+
+		static void ScheduleEventsCallBack(void *injectionSchedulingService);
 	};
 }
 #endif

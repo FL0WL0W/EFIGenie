@@ -12,6 +12,8 @@ namespace ApplicationService
 		float Afr;
 		float Lambda;
 		virtual void CalculateAfr() = 0;
+
+		static void CalculateAfrCallBack(void *afrService);
 	};
 }
 #endif

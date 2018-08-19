@@ -21,9 +21,9 @@ namespace EngineManagement
 		{
 			if (_pistonEngineInjectionConfig != 0)
 			{
-				_injectorOpenTask[injector] = new Task(&IBooleanOutputService::OutputSetTask, injectorOutputServices[injector], false);
+				_injectorOpenTask[injector] = new Task(&IBooleanOutputService::OutputSetCallBack, injectorOutputServices[injector], false);
 				_injectorOpenTask[injector]->Tick = tickMinusSome;
-				_injectorCloseTask[injector] = new Task(&IBooleanOutputService::OutputResetTask, injectorOutputServices[injector], false);
+				_injectorCloseTask[injector] = new Task(&IBooleanOutputService::OutputResetCallBack, injectorOutputServices[injector], false);
 				_injectorCloseTask[injector]->Tick = tickMinusSome;
 			}
 		}
