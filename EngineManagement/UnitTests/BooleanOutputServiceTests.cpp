@@ -94,7 +94,6 @@ namespace UnitTests
 
 			EXPECT_CALL(_digitalService, InitPin(4, HardwareAbstraction::In)).Times(1);
 			IBooleanOutputService::OutputResetTask(_booleanOutputService3);
-			
 		}
 	};
 }

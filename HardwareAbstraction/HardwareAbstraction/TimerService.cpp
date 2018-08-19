@@ -23,7 +23,7 @@ namespace HardwareAbstraction
 		while (StackSize > 0 && ((callTask = CallBackStackPointer[StackSize - 1]))->Tick == runTick)
 		{
 			callTask = CallBackStackPointer[StackSize - 1];
-			callTask->CallBack(callTask->Parameters);
+			callTask->Execute();
 			if (callTask->DeleteOnExecution)
 				delete callTask;
 			
@@ -73,8 +73,8 @@ namespace HardwareAbstraction
 		if (std::find(CallBackStackPointer, end, task) == end)
 		{
 			CallBackStackPointer[StackSize] = task;
-			SortCallBackStack();
 			StackSize++;
+			SortCallBackStack();
 		}
 		else
 		{

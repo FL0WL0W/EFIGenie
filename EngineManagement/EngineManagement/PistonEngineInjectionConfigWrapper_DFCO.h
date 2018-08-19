@@ -44,7 +44,7 @@ namespace EngineManagement
 		bool _dfcoEnabled;
 	public:
 		PistonEngineInjectionConfigWrapper_DFCO(PistonEngineInjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IDecoder *decoder, IPistonEngineInjectionConfig *child);
-		InjectorTiming GetInjectorTiming(unsigned char cylinder);
+		InjectorTiming GetInjectorTiming(unsigned char injector);
 	};
 }
 #endif

@@ -18,6 +18,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)BooleanInputService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)BooleanInputService_Static.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)BooleanOutputService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CallBackGroup.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.h" />

@@ -5,6 +5,7 @@
 #include "ITimerService.h"
 #include "IBooleanOutputService.h"
 #include "Packed.h"
+#include "stdlib.h"
 
 using namespace Decoder;
 using namespace HardwareAbstraction;
@@ -25,15 +26,21 @@ namespace EngineManagement
 	public:
 		static IgnitionSchedulingServiceConfig* Cast(void *p)
 		{
-			return (IgnitionSchedulingServiceConfig *)p;
+			IgnitionSchedulingServiceConfig *ignitorService = (IgnitionSchedulingServiceConfig *)p;
+
+			ignitorService->IgnitorTdc = (unsigned short*)(ignitorService + 1);
+
+			return ignitorService;
 		}
 		unsigned int Size()
 		{
-			return sizeof(IgnitionSchedulingServiceConfig);
+			return sizeof(IgnitionSchedulingServiceConfig)
+				+ sizeof(unsigned short) * Ignitors;
 		}
 
-		unsigned char Cylinders;
-		bool IsDistributor;
+		bool SequentialRequired;
+		unsigned char Ignitors;
+		unsigned short *IgnitorTdc;
 	});
 
 	class IgnitionSchedulingService
@@ -43,8 +50,8 @@ namespace EngineManagement
 		ITimerService *_timerService;
 		IDecoder *_decoder;
 		IPistonEngineIgnitionConfig *_pistonEngineIgnitionConfig;
-		HardwareAbstraction::Task *_ignitorDwellTask[MAX_CYLINDERS];
-		HardwareAbstraction::Task *_ignitorFireTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task **_ignitorDwellTask;
+		HardwareAbstraction::Task **_ignitorFireTask;
 	public:
 		IgnitionSchedulingService(
 			IgnitionSchedulingServiceConfig *ignitionSchedulingServiceConfig,

@@ -11,7 +11,7 @@ namespace EngineManagement
 	class IPistonEngineInjectionConfig
 	{
 	public:
-		virtual InjectorTiming GetInjectorTiming(unsigned char cylinder) = 0;
+		virtual InjectorTiming GetInjectorTiming(unsigned char injector) = 0;
 	};
 }
 #endif

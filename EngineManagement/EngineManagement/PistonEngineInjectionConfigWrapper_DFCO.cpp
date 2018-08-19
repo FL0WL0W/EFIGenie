@@ -11,7 +11,7 @@ namespace EngineManagement
 		_child = child;
 	}
 	
-	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char cylinder)
+	InjectorTiming PistonEngineInjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char injector)
 	{
 		float tps = _throttlePositionService->Value;
 		unsigned short rpm = _decoder->GetRpm();
@@ -29,7 +29,7 @@ namespace EngineManagement
 			return timing;
 		}
 		
-		return _child->GetInjectorTiming(cylinder);
+		return _child->GetInjectorTiming(injector);
 	}
 }
 #endif

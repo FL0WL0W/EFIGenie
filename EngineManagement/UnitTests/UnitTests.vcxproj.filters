@@ -98,11 +98,14 @@
     <ClCompile Include="BooleanOutputServiceTests.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
-    <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp">
-      <Filter>Source Files\Services</Filter>
+    <ClCompile Include="IgnitionSchedulingServiceTests.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PistonEngineServiceTests.cpp">
-      <Filter>Source Files\Services</Filter>
+    <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="PistonEngineIgnitionSchedulingServiceTests.cpp">
+      <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

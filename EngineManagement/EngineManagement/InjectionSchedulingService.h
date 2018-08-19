@@ -5,6 +5,7 @@
 #include "ITimerService.h"
 #include "IBooleanOutputService.h"
 #include "Packed.h"
+#include "stdlib.h"
 
 using namespace Decoder;
 using namespace HardwareAbstraction;
@@ -25,15 +26,20 @@ namespace EngineManagement
 	public:
 		static InjectionSchedulingServiceConfig* Cast(void *p)
 		{
-			return (InjectionSchedulingServiceConfig *)p;
+			InjectionSchedulingServiceConfig *injectorService = (InjectionSchedulingServiceConfig *)p;
+
+			injectorService->InjectorTdc = (unsigned short*)(injectorService + 1);
+
+			return injectorService;
 		}
 		unsigned int Size()
 		{
-			return sizeof(InjectionSchedulingServiceConfig);
+			return sizeof(InjectionSchedulingServiceConfig)
+				+ sizeof(unsigned short) * Injectors;
 		}
 
-		unsigned char Cylinders;
-		bool IsThrottleBodyInjection;
+		unsigned char Injectors;
+		unsigned short *InjectorTdc;
 	});
 
 	class InjectionSchedulingService
@@ -43,8 +49,8 @@ namespace EngineManagement
 		ITimerService *_timerService;
 		IDecoder *_decoder;
 		IPistonEngineInjectionConfig *_pistonEngineInjectionConfig;
-		HardwareAbstraction::Task *_injectorOpenTask[MAX_CYLINDERS];
-		HardwareAbstraction::Task *_injectorCloseTask[MAX_CYLINDERS];
+		HardwareAbstraction::Task **_injectorOpenTask;
+		HardwareAbstraction::Task **_injectorCloseTask;
 	public:
 		InjectionSchedulingService(
 			InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,

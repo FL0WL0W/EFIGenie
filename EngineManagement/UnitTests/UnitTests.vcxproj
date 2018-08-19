@@ -176,7 +176,8 @@
     <ClCompile Include="gmock_initialize.cpp" />
     <ClCompile Include="BooleanOutputServiceTests.cpp" />
     <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp" />
-    <ClCompile Include="PistonEngineServiceTests.cpp" />
+    <ClCompile Include="IgnitionSchedulingServiceTests.cpp" />
+    <ClCompile Include="PistonEngineIgnitionSchedulingServiceTests.cpp" />
     <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

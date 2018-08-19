@@ -25,7 +25,7 @@ namespace EngineManagement
 		_voltageService = voltageService;
 	}
 	
-	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(unsigned char cylinder)
+	InjectorTiming PistonEngineInjectionConfig_SD::GetInjectorTiming(unsigned char injector)
 	{
 		InjectorTiming timing = InjectorTiming();
 		timing.OpenPosition64thDegree = _config->InjectorOpenPosition64thDegree;
@@ -36,7 +36,7 @@ namespace EngineManagement
 		float VE = InterpolateTable2<unsigned short>((float)rpm, (float)_config->MaxRpm, 0.0f, _config->VeRpmResolution, map, _config->MaxMap, 0.0f, _config->VeMapResolution, _config->VolumetricEfficiencyMap) / 128.0f;
 				
 		if (_fuelTrimService != 0)
-			VE += _fuelTrimService->GetFuelTrim(cylinder);
+			VE += _fuelTrimService->GetFuelTrim(injector);
 		
 		VE *= 0.0078125f;
 				
@@ -62,7 +62,7 @@ namespace EngineManagement
 		
 		float injectorGrams = (cylinderVolume * airDensity) / (airFuelRatio + airDensity/0.7197f);
 		
-		float injectorDuration =  injectorGrams * 60.0f / _config->InjectorGramsPerMinute[cylinder];
+		float injectorDuration =  injectorGrams * 60.0f / _config->InjectorGramsPerMinute[injector];
 				
 		injectorDuration += InterpolateTable1<short>(_manifoldAbsolutePressureService->ValueDot, _config->MaxMapDot, -_config->MaxMapDot, _config->MapDotAdderResolution, _config->MapDotAdder) * 0.000001f;
 		

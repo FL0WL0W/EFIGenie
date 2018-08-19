@@ -29,7 +29,8 @@ namespace EngineManagement
 			PistonEngineInjectionConfig_SDConfig *ret = (PistonEngineInjectionConfig_SDConfig *)p;
 
 			ret->VolumetricEfficiencyMap = (unsigned short *)(ret + 1);
-			ret->ShortPulseAdder = (short *)(ret->VolumetricEfficiencyMap + ret->VeRpmResolution * ret->VeMapResolution);
+			ret->InjectorGramsPerMinute = (unsigned short *)(ret->VolumetricEfficiencyMap + ret->VeRpmResolution * ret->VeMapResolution);
+			ret->ShortPulseAdder = (short *)(ret->InjectorGramsPerMinute + ret->Injectors);
 			ret->Offset = (ret->ShortPulseAdder + (int)(ret->ShortPulseLimit / 0.00006f) + 1);
 			ret->TemperatureBias = (unsigned char *)(ret->Offset + ret->OffsetMapResolution *ret->OffsetVoltageResolution);
 			ret->TpsDotAdder = (short *)(ret->TemperatureBias + ret->TemperatureBiasResolution);
@@ -42,6 +43,7 @@ namespace EngineManagement
 		{
 			return sizeof(PistonEngineInjectionConfig_SDConfig) +
 				sizeof(unsigned short) * VeRpmResolution * VeMapResolution +
+				sizeof(unsigned short) * Injectors +
 				sizeof(short) * ((int)(ShortPulseLimit / 0.00006f) + 1) +
 				sizeof(short) * OffsetMapResolution * OffsetVoltageResolution +
 				sizeof(unsigned char) * TemperatureBiasResolution +
@@ -59,7 +61,8 @@ namespace EngineManagement
 		unsigned char VeMapResolution;
 		unsigned short *VolumetricEfficiencyMap;
 		
-		unsigned short InjectorGramsPerMinute[MAX_CYLINDERS];
+		unsigned char Injectors;
+		unsigned short *InjectorGramsPerMinute;
 		
 		float ShortPulseLimit;
 		short *ShortPulseAdder;
@@ -107,7 +110,7 @@ class PistonEngineInjectionConfig_SD : public IPistonEngineInjectionConfig
 			IFloatInputService *engineCoolantTemperatureService,
 			IFloatInputService *throttlePositionService,
 			IFloatInputService *voltageService);
-		InjectorTiming GetInjectorTiming(unsigned char cylinder);
+		InjectorTiming GetInjectorTiming(unsigned char injector);
 	};
 }
 #endif

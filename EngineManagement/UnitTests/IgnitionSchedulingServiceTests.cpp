@@ -1,7 +1,7 @@
 //#include "stdafx.h"
-//#include "CppUnitTest.h"
+//#include "CppUnitTest.h" 
 //#include "gmock/gmock.h"
-//#include "gtest/gtest.h"
+//#include "gtest/gtest.h" 
 //#include "BooleanOutputService.h"
 //#include "ServiceBuilder.h"
 //#include "FuelPumpService.h"
@@ -11,7 +11,7 @@
 //#include "MockTimerService.h"
 //#include "MockPistonEngineInjectionConfig.h"
 //#include "MockPistonEngineIgnitionConfig.h"
-//using ::testing::AtLeast;
+//using ::testing::AtLeast; 
 //using ::testing::Return;
 //
 //using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -21,7 +21,7 @@
 //
 //namespace UnitTests
 //{
-//	TEST_CLASS(PistonEngineServiceTests)
+//	TEST_CLASS(Pistm  onEngineServiceTests)
 //	{
 //	public:
 //

@@ -21,15 +21,15 @@ namespace UnitTests
 
 		void CreateServices()
 		{
-			PistonEngineIgnitionConfig_StaticConfig *outputConfig = (PistonEngineIgnitionConfig_StaticConfig *)malloc(sizeof(PistonEngineIgnitionConfig_StaticConfig));
+			PistonEngineIgnitionConfig_StaticConfig *ignitionConfig = (PistonEngineIgnitionConfig_StaticConfig *)malloc(sizeof(PistonEngineIgnitionConfig_StaticConfig));
 			ServiceLocator *serviceLocator = new ServiceLocator();
 
-			outputConfig->IgnitionAdvance64thDegree = 10 * 64;
-			outputConfig->IgnitionDwellTime = 4*0.001;
+			ignitionConfig->IgnitionAdvance64thDegree = 10 * 64;
+			ignitionConfig->IgnitionDwellTime = 4*0.001;
 
-			void *config = malloc(outputConfig->Size() + 1);
+			void *config = malloc(ignitionConfig->Size() + 1);
 			*(unsigned char *)config = 1;
-			memcpy(((unsigned char *)config + 1), outputConfig, outputConfig->Size());
+			memcpy(((unsigned char *)config + 1), ignitionConfig, ignitionConfig->Size());
 
 			unsigned int size = 0;
 			_ignitionConfig = ServiceBuilder::CreatePistonEngineIgnitionConfig(serviceLocator, config, &size);

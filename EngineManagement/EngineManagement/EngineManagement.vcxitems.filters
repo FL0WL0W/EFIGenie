@@ -207,6 +207,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CallBackGroup.h">
+      <Filter>Header Files\Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)PistonEngineInjectionConfig_SD.cpp">

@@ -1,3 +1,5 @@
+#include <map>
+
 #ifndef ITIMERSERVICE_H
 #define ITIMERSERVICE_H
 
@@ -5,19 +7,44 @@
 
 namespace HardwareAbstraction
 {
+	struct CallBack
+	{
+		CallBack(void(*callBackPointer)(void *), void *parameters)
+		{
+			CallBackPointer = callBackPointer;
+			Parameters = parameters;
+		}
+
+		void Execute()
+		{
+			CallBackPointer(Parameters);
+		}
+
+		void(*CallBackPointer)(void *);
+		void *Parameters;
+	};
+
 	struct Task
 	{
 	public:
 		Task() {}
 		Task(void(*callBack)(void *), void *parameters, bool deleteOnExecution)
 		{
-			CallBack = callBack;
-			Parameters = parameters;
+			CallBackInstance = new CallBack(callBack, parameters);
+			DeleteOnExecution = deleteOnExecution;
+		}
+		Task(CallBack *callBack, bool deleteOnExecution)
+		{
+			CallBackInstance = callBack;
 			DeleteOnExecution = deleteOnExecution;
 		}
 
-		void(*CallBack)(void *);
-		void *Parameters;
+		void Execute()
+		{
+			CallBackInstance->Execute();
+		}
+
+		CallBack *CallBackInstance;
 		bool DeleteOnExecution;
 		//only let TimerService edit these values
 		unsigned int Tick;
