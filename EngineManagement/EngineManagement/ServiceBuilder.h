@@ -34,6 +34,11 @@
 #define IGNITION_SCHEDULING_SERVICE_ID			4007			// IgnitionSchedulingService
 #define INJECTION_SCHEDULING_SERVICE_ID			4008			// InjectionSchedulingService
 
+//callback groups 5001-6000
+#define PRE_DECODER_SYNC_CALL_BACK_GROUP		5001
+#define POST_DECODER_SYNC_CALL_BACK_GROUP		5002
+#define TICK_CALL_BACK_GROUP					5003
+
 #include "ServiceLocator.h"
 
 //hardwareabstraction includes

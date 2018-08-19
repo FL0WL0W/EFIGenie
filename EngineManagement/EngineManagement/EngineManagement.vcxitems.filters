@@ -290,5 +290,20 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)InjectionSchedulingService.cpp">
       <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IAfrServicee.cpp">
+      <Filter>Source Files\ApplicationService\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp">
+      <Filter>Source Files\ApplicationService\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp">
+      <Filter>Source Files\ApplicationService\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleControlService.cpp">
+      <Filter>Source Files\ApplicationService\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IPrimeService.cpp">
+      <Filter>Source Files\ApplicationService\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

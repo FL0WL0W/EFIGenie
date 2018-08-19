@@ -117,5 +117,10 @@ namespace EngineManagement
 			}
 		}
 	}
+
+	void InjectionSchedulingService::ScheduleEventsCallBack(void *injectionSchedulingService)
+	{
+		((InjectionSchedulingService*)injectionSchedulingService)->ScheduleEvents();
+	}
 }
 #endif

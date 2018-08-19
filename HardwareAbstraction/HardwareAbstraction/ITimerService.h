@@ -1,4 +1,5 @@
 #include <map>
+#include <list>
 
 #ifndef ITIMERSERVICE_H
 #define ITIMERSERVICE_H
@@ -6,8 +7,14 @@
 #define TIMERSERVICE_MAX_STACK_SIZE 256
 
 namespace HardwareAbstraction
-{
-	struct CallBack
+{	
+	class ICallBack
+	{
+	public:
+		virtual void Execute() = 0;
+	};
+	
+	struct CallBack : public ICallBack
 	{
 		CallBack(void(*callBackPointer)(void *), void *parameters)
 		{
@@ -23,6 +30,17 @@ namespace HardwareAbstraction
 		void(*CallBackPointer)(void *);
 		void *Parameters;
 	};
+	
+	class CallBackGroup : public ICallBack
+	{
+	protected:
+		std::list<ICallBack *> _callBackList;
+	public:		
+		void Execute();
+		void Add(ICallBack *callBack);
+		void Add(void(*callBackPointer)(void *), void *parameters);
+		void Remove(ICallBack *callBack);
+	};
 
 	struct Task
 	{
@@ -33,7 +51,7 @@ namespace HardwareAbstraction
 			CallBackInstance = new CallBack(callBack, parameters);
 			DeleteOnExecution = deleteOnExecution;
 		}
-		Task(CallBack *callBack, bool deleteOnExecution)
+		Task(ICallBack *callBack, bool deleteOnExecution)
 		{
 			CallBackInstance = callBack;
 			DeleteOnExecution = deleteOnExecution;
@@ -44,7 +62,7 @@ namespace HardwareAbstraction
 			CallBackInstance->Execute();
 		}
 
-		CallBack *CallBackInstance;
+		ICallBack *CallBackInstance;
 		bool DeleteOnExecution;
 		//only let TimerService edit these values
 		unsigned int Tick;

@@ -76,5 +76,10 @@ namespace EngineManagement
 			}
 		}
 	}
+
+	void IgnitionSchedulingService::ScheduleEventsCallBack(void *ignitionSchedulingService)
+	{
+		((IgnitionSchedulingService*)ignitionSchedulingService)->ScheduleEvents();
+	}
 }
 #endif

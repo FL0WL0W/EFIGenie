@@ -66,14 +66,17 @@ int main()
 	config = (void *)((unsigned char *)config + size);
 		
 	_decoder = (IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID);
+	CallBackGroup *preSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP);
+	CallBackGroup *postSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP);
+	CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
 	
-	//TODO PreSync PresSyncableServices
+	preSyncCallBackGroup->Execute();
 	while(!_decoder->IsSynced());
-	//TODO PostSync ProstSyncableServices
+	postSyncCallBackGroup->Execute();
 	
 	for (;;)
 	{
-		//TODO Tick Tickable Services
+		tickSyncCallBackGroup->Execute();
 	}
 }
 

@@ -12,6 +12,29 @@ namespace HardwareAbstraction
 	{
 		return (i->Tick + 2147483647 > j->Tick + 2147483647);
 	}
+	
+	void CallBackGroup::Execute()
+	{
+		for (std::list<ICallBack *>::const_iterator iterator = _callBackList.begin(), end = _callBackList.end(); iterator != end; ++iterator)
+		{
+			(*iterator)->Execute();
+		}
+	}
+	
+	void CallBackGroup::Add(void(*callBackPointer)(void *), void *parameters)
+	{
+		Add(new CallBack(callBackPointer, parameters));
+	}
+	
+	void CallBackGroup::Add(ICallBack *callBack)
+	{
+		_callBackList.push_back(callBack);
+	}
+	
+	void CallBackGroup::Remove(ICallBack *callBack)
+	{
+		_callBackList.remove(callBack);
+	}
 
 	void ITimerService::ReturnCallBack(void)
 	{

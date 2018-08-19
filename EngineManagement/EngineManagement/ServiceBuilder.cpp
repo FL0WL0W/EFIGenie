@@ -12,6 +12,14 @@ namespace Service
 		serviceLocator->Register(DIGITAL_SERVICE_ID, (void *)hardwareAbstractionCollection->DigitalService);
 		serviceLocator->Register(PWM_SERVICE_ID, (void *)hardwareAbstractionCollection->PwmService);
 		serviceLocator->Register(TIMER_SERVICE_ID, (void *)hardwareAbstractionCollection->TimerService);
+		
+		//create callback groups
+		CallBackGroup *preDecoderCallBackGroup = new CallBackGroup();
+		serviceLocator->Register(PRE_DECODER_SYNC_CALL_BACK_GROUP, (void *)preDecoderCallBackGroup);
+		CallBackGroup *postDecoderCallBackGroup = new CallBackGroup();
+		serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, (void *)postDecoderCallBackGroup);
+		CallBackGroup *tickCallBackGroup = new CallBackGroup();
+		serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)tickCallBackGroup);
 
 		*totalSize = 0;
 		unsigned int size;
@@ -46,7 +54,9 @@ namespace Service
 			case VEHICLE_SPEED_SERVICE_ID:
 #endif
 				{
-					serviceLocator->Register(serviceId, IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size));
+					IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size);
+					tickCallBackGroup->Add(IFloatInputService::ReadValueCallBack, floatInputService);
+					serviceLocator->Register(serviceId, floatInputService);
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -85,7 +95,7 @@ namespace Service
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
 			case IDLE_AIR_CONTROL_VALVE_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size));
+					serviceLocator->Register(serviceId, IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size));
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -182,30 +192,41 @@ namespace Service
 	
 	IPrimeService* ServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
+		IPrimeService* ret = 0;
+		
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:
-			return new PrimeService_StaticPulseWidth(
+			ret = new PrimeService_StaticPulseWidth(
 				CastConfig < PrimeService_StaticPulseWidthConfig>(&config, totalSize), 
 				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
 				(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID));
+			break;
 #endif
 		}
-		return 0;
+		
+		if (ret != 0)
+		{
+			CallBackGroup *postSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP);
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			postSyncCallBackGroup->Add(IPrimeService::PrimeCallBack, ret);
+			tickSyncCallBackGroup->Add(IPrimeService::TickCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IIdleControlService* ServiceBuilder::CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
+		IIdleControlService*ret = 0;
+		
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:	
-			return new IdleControlService_Pid(
+			ret = new IdleControlService_Pid(
 				CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
 				(HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), 
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID), 
@@ -215,25 +236,34 @@ namespace Service
 				(IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				(IFloatOutputService*)serviceLocator->Locate(IDLE_AIR_CONTROL_VALVE_SERVICE_ID));
+			break;
 #endif
 		}
-		return 0;
+		
+		if (ret != 0)
+		{
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			tickSyncCallBackGroup->Add(IIdleControlService::TickCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IAfrService *ServiceBuilder::CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{		
+		IAfrService *ret = 0;
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef AFRSERVICE_STATIC_H
 		case 1:
 			*totalSize += 1;
-			return new AfrService_Static(*((float*)((unsigned char*)config)));
+			ret = new AfrService_Static(*((float*)((unsigned char*)config)));
+			break;
 #endif
 #ifdef AFRSERVICE_MAP_ETHANOL_H
 		case 2:
-			return new AfrService_Map_Ethanol(
+			ret = new AfrService_Map_Ethanol(
 				CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
 				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
@@ -241,27 +271,40 @@ namespace Service
 				(IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID));
+			break;
 #endif
 		}
-		return 0;
+		
+		if (ret != 0)
+		{
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			tickSyncCallBackGroup->Add(IAfrService::CalculateAfrCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IFuelTrimService *ServiceBuilder::CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{		
+	{
+		IFuelTrimService *ret = 0;
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef FUELTRIMSERVICE_INTERPOLATEDTABLE_H
 		case 1:
-			return new FuelTrimService_InterpolatedTable(
-				CastConfig < FuelTrimService_InterpolatedTableConfig >(&config, totalSize), 
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
-				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				CreateFloatInputService(serviceLocator, &config, totalSize),
-				(IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID));
+			{
+				FuelTrimService_InterpolatedTableConfig *serviceConfig = CastConfig < FuelTrimService_InterpolatedTableConfig >(&config, totalSize);
+				
+				ret = new FuelTrimService_InterpolatedTable(
+					serviceConfig, 
+					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
+					(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
+					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
+					(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					CreateFloatInputService(serviceLocator, &config, totalSize),
+					(IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID));
+				break;
+			}
 #endif
 #ifdef FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
 		case 2:
@@ -278,53 +321,79 @@ namespace Service
 					*totalSize += size;
 				}
 			
-				return new FuelTrimServiceWrapper_MultiChannel(fuelTrimConfig, fuelTrimServices);
+				ret = new FuelTrimServiceWrapper_MultiChannel(fuelTrimConfig, fuelTrimServices);
+				break;
 			}
 #endif
 		}
-		return 0;
+		
+		if (ret != 0)
+		{
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			tickSyncCallBackGroup->Add(IFuelTrimService::TickCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IFuelPumpService *ServiceBuilder::CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{		
+	{
+		IFuelPumpService *ret = 0;
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef FUELPUMPSERVICE_H
 		case 1:
-		{
-			FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(&config, totalSize);
+			{
+				FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(&config, totalSize);
 
-			return new FuelPumpService(
-				serviceConfig,
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
-				CreateBooleanOutputService(serviceLocator, &config, totalSize));
-		}
+				ret = new FuelPumpService(
+					serviceConfig,
+					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
+					CreateBooleanOutputService(serviceLocator, &config, totalSize));
+				break;
+			}
 #endif
 #ifdef FUELPUMPSERVICE_ANALOG_H
-		case 2:						
-			return new FuelPumpService_Analog(
-				CastConfig < FuelPumpService_AnalogConfig >(&config, totalSize), 
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
-				CreateFloatOutputService(serviceLocator, &config, totalSize), 
-				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID));
+		case 2:			
+			{
+				FuelPumpService_AnalogConfig *serviceConfig = CastConfig < FuelPumpService_AnalogConfig >(&config, totalSize);
+			
+				ret = new FuelPumpService_Analog(
+					serviceConfig, 
+					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
+					CreateFloatOutputService(serviceLocator, &config, totalSize), 
+					(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
+					(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID));
+				break;
+			}
 #endif
 		}
-		return 0;
+		
+		if (ret != 0)
+		{
+			CallBackGroup *preSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP);
+			CallBackGroup *postSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP);
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			preSyncCallBackGroup->Add(IFuelPumpService::PrimeCallBack, ret);
+			postSyncCallBackGroup->Add(IFuelPumpService::OnCallBack, ret);
+			tickSyncCallBackGroup->Add(IFuelPumpService::TickCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IPistonEngineInjectionConfig *ServiceBuilder::CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{		
+	{
+		IPistonEngineInjectionConfig *ret = 0;
+		
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0: 
-			return 0;
 #ifdef PISTONENGINEINJECTIONCONFIG_SD_H
 		case 2:
-			return new PistonEngineInjectionConfig_SD(
+			ret = new PistonEngineInjectionConfig_SD(
 				CastConfig < PistonEngineInjectionConfig_SDConfig >(&config, totalSize),
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
@@ -334,6 +403,7 @@ namespace Service
 				(IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(VOLTAGE_SERVICE_ID));
+			break;
 #endif
 #ifdef PISTONENGINEINJECTIONCONFIGWRAPPER_DFCO_H
 		case 3:
@@ -345,34 +415,38 @@ namespace Service
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 
-				return new PistonEngineInjectionConfigWrapper_DFCO(pistonEngineInjectionConfig, 
+				ret = new PistonEngineInjectionConfigWrapper_DFCO(pistonEngineInjectionConfig, 
 					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
 					(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 					child);
+				break;
 			}
 #endif
 		}
-		return 0;
+		
+		return ret;
 	}
 	
 	IPistonEngineIgnitionConfig *ServiceBuilder::CreatePistonEngineIgnitionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
-	{				
+	{	
+		IPistonEngineIgnitionConfig *ret = 0;
+		
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0: 
-			return 0;
 #ifdef PISTONENGINEIGNITIONCONFIG_STATIC_H
 		case 1:
-			return new PistonEngineIgnitionConfig_Static(
+			ret = new PistonEngineIgnitionConfig_Static(
 				CastConfig < PistonEngineIgnitionConfig_StaticConfig >(&config, totalSize));
+			break;
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIG_MAP_ETHANOL_H
 		case 2:
-			return new PistonEngineIgnitionConfig_Map_Ethanol(
+			ret = new PistonEngineIgnitionConfig_Map_Ethanol(
 				CastConfig < PistonEngineIgnitionConfig_Map_EthanolConfig >(&config, totalSize),
 				(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID),
 				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
+			break;
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 3:
@@ -386,11 +460,13 @@ namespace Service
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 				
-				return new PistonEngineIgnitionConfigWrapper_HardRpmLimit(
+				ret = new PistonEngineIgnitionConfigWrapper_HardRpmLimit(
 					pistonEngineIgnitionConfig,  
 					(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 					booleanInputService,
 					child);
+				
+				break;
 			}
 #endif
 #ifdef PISTONENGINEIGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
@@ -405,16 +481,18 @@ namespace Service
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 				
-				return new PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(
+				ret = new PistonEngineIgnitionConfigWrapper_SoftPidRpmLimit(
 					pistonEngineIgnitionConfig,
 					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
 					(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
 					booleanInputService,
 					child);
+				
+				break;
 			}
 #endif
 		}
-		return 0;
+		return ret;
 	}
 
 	IgnitionSchedulingService *ServiceBuilder::CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
@@ -427,12 +505,21 @@ namespace Service
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
 
-		return new IgnitionSchedulingService(
+		IgnitionSchedulingService *ret = new IgnitionSchedulingService(
 			ignitionSchedulingConfig,
 			ignitionConfig,
 			(IBooleanOutputService**)serviceLocator->Locate(IGNITOR_SERVICES_ID),
 			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 			(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+				
+		if (ret != 0)
+		{
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			tickSyncCallBackGroup->Add(IgnitionSchedulingService::ScheduleEventsCallBack, ret);
+		}
+		
+		return ret;
 	}
 
 	InjectionSchedulingService *ServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
@@ -445,25 +532,35 @@ namespace Service
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
 		
-		return new InjectionSchedulingService(
+		InjectionSchedulingService *ret = new InjectionSchedulingService(
 			injectionSchedulingConfig,
 			injectionConfig,
 			(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID),
 			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
 			(IDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+		
+		if (ret != 0)
+		{
+			CallBackGroup *tickSyncCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			
+			tickSyncCallBackGroup->Add(InjectionSchedulingService::ScheduleEventsCallBack, ret);
+		}
+		
+		return ret;
 	}
 	
 	IDecoder *ServiceBuilder::CreateDecoderService(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
+		IDecoder *ret = 0;
+		
 		switch (GetServiceId(&config, totalSize))
 		{
-		case 0:
-			return 0;
 #ifdef GM24XDECODER_H
 		case 1:
-			return new Gm24xDecoder((ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID));
+			ret = new Gm24xDecoder((ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID));
+			break;
 #endif
 		}
-		return 0;
+		return ret;
 	}
 }

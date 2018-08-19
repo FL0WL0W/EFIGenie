@@ -65,12 +65,17 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelPumpService_Analog.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_InterpolatedTable.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FuelTrimServiceWrapper_MultiChannel.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IAfrServicee.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelPumpService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IFuelTrimService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IgnitionSchedulingService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IIdleControlService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Interpolation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IBooleanInputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IdleControlService_Pid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatOutputService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IFloatInputService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)IPrimeService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IStepperService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PistoneEngineIgnitionConfig_Static.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)PrimeService_StaticPulseWidth.cpp" />

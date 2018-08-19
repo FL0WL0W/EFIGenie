@@ -11,7 +11,9 @@ namespace IOService
 	public:
 		virtual void ReadValue() = 0;
 		bool Value = false;
-		
+
+		static void ReadValueCallBack(void *booleanInputService);
+
 		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
 	};
 }
