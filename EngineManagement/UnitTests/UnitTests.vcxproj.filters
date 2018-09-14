@@ -33,10 +33,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MockPistonEngineIgnitionConfig.h">
+    <ClInclude Include="MockIgnitionConfig.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
-    <ClInclude Include="MockPistonEngineInjectionConfig.h">
+    <ClInclude Include="MockInjectionConfig.h">
       <Filter>Header Files\PistonEngine</Filter>
     </ClInclude>
     <ClInclude Include="MockAfrService.h">
@@ -101,7 +101,7 @@
     <ClCompile Include="IgnitionSchedulingServiceTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp">
+    <ClCompile Include="IgnitionConfig_StaticTests.cpp">
       <Filter>Source Files\PistonEngine</Filter>
     </ClCompile>
     <ClCompile Include="PistonEngineIgnitionSchedulingServiceTests.cpp">

@@ -160,8 +160,8 @@
     <ClInclude Include="MockDigitalService.h" />
     <ClInclude Include="MockFuelPumpService.h" />
     <ClInclude Include="MockFuelTrimService.h" />
-    <ClInclude Include="MockPistonEngineIgnitionConfig.h" />
-    <ClInclude Include="MockPistonEngineInjectionConfig.h" />
+    <ClInclude Include="MockIgnitionConfig.h" />
+    <ClInclude Include="MockInjectionConfig.h" />
     <ClInclude Include="MockPrimeService.h" />
     <ClInclude Include="MockPwmService.h" />
     <ClInclude Include="MockTimerService.h" />
@@ -175,7 +175,7 @@
     <ClCompile Include="FuelPumpServiceTests.cpp" />
     <ClCompile Include="gmock_initialize.cpp" />
     <ClCompile Include="BooleanOutputServiceTests.cpp" />
-    <ClCompile Include="PistonEngineIgnitionConfig_StaticTests.cpp" />
+    <ClCompile Include="IgnitionConfig_StaticTests.cpp" />
     <ClCompile Include="IgnitionSchedulingServiceTests.cpp" />
     <ClCompile Include="PistonEngineIgnitionSchedulingServiceTests.cpp" />
     <ClCompile Include="PrimeService_StaticPulseWidthTests.cpp" />
