@@ -81,7 +81,6 @@ TODO LIST<br>
       <li>ServiceBuilder</li>
     </ul>
   <li>Customizable injection and iginition degree references</li>
-  <li>Move injection and iginition out of PistonEngineService into seperate services, maybe standardize this.</li>
   <li>*Create integration tests with integration test hardware</li>
   <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
