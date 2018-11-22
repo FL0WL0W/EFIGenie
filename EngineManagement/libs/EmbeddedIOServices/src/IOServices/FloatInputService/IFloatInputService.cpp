@@ -1,7 +1,9 @@
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "IOServices/FloatInputService/FloatInputService_Static.h"
 #include "IOServices/FloatInputService/FloatInputService_AnalogPolynomial.h"
+#include "IOServices/FloatInputService/FloatInputService_AnalogInterpolatedTable.h"
 #include "IOServices/FloatInputService/FloatInputService_FrequencyPolynomial.h"
+#include "IOServices/FloatInputService/FloatInputService_FrequencyInterpolatedTable.h"
 
 #ifdef IFLOATINPUTSERVICE_H
 namespace IOServices
@@ -11,11 +13,11 @@ namespace IOServices
 		((IFloatInputService *)floatInputService)->ReadValue();
 	}
 
-	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
+	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut)
 	{
 		unsigned char inputServiceId = *((unsigned char*)config);
 		config = ((unsigned char *)config + 1);
-		*size = sizeof(unsigned char);
+		*sizeOut = sizeof(unsigned char);
 		
 		IFloatInputService *inputService = 0;
 
@@ -23,7 +25,7 @@ namespace IOServices
 		{
 #ifdef FLOATINPUTSERVICE_STATIC_H
 		case 1:
-			*size += 2 * sizeof(float);
+			*sizeOut += 2 * sizeof(float);
 			inputService = new FloatInputService_Static(*((float *)config), *((float *)config + 1));
 			break;
 #endif
@@ -32,7 +34,7 @@ namespace IOServices
 		case 2:
 			{
 				FloatInputService_AnalogPolynomialConfig<4> *analogPolynomialConfig = FloatInputService_AnalogPolynomialConfig<4>::Cast(config);
-				*size += analogPolynomialConfig->Size();
+				*sizeOut += analogPolynomialConfig->Size();
 				inputService = new FloatInputService_AnalogPolynomial<4>(hardwareAbstractionCollection, analogPolynomialConfig);
 				break;
 			}
@@ -42,8 +44,28 @@ namespace IOServices
 		case 3:
 			{
 				FloatInputService_FrequencyPolynomialConfig<4> *frequencyPolynomialConfig = FloatInputService_FrequencyPolynomialConfig<4>::Cast(config);
-				*size += frequencyPolynomialConfig->Size();
+				*sizeOut += frequencyPolynomialConfig->Size();
 				inputService = new FloatInputService_FrequencyPolynomial<4>(hardwareAbstractionCollection, frequencyPolynomialConfig);
+				break;
+			}
+#endif
+
+#ifdef FLOATINPUTSERVICE_ANALOGINTERPOLATEDTABLE_H
+		case 4:
+			{
+				FloatInputService_AnalogInterpolatedTableConfig *analogInterpolatedTableConfig = FloatInputService_AnalogInterpolatedTableConfig::Cast(config);
+				*sizeOut += analogInterpolatedTableConfig->Size();
+				inputService = new FloatInputService_AnalogInterpolatedTable(hardwareAbstractionCollection, analogInterpolatedTableConfig);
+				break;
+			}
+#endif
+
+#ifdef FLOATINPUTSERVICE_FREQUENCYINTERPOLATEDTABLE_H
+		case 5:
+			{
+				FloatInputService_FrequencyInterpolatedTableConfig *frequencyInterpolatedTableConfig = FloatInputService_FrequencyInterpolatedTableConfig::Cast(config);
+				*sizeOut += frequencyInterpolatedTableConfig->Size();
+				inputService = new FloatInputService_FrequencyInterpolatedTable(hardwareAbstractionCollection, frequencyInterpolatedTableConfig);
 				break;
 			}
 #endif

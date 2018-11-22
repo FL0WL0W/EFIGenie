@@ -10,11 +10,11 @@ namespace IOServices
 		((IBooleanInputService *)booleanInputService)->ReadValue();
 	}
 
-	IBooleanInputService* IBooleanInputService::CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size)
+	IBooleanInputService* IBooleanInputService::CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut)
 	{
 		unsigned char inputServiceId = *((unsigned char*)config);
 		config = ((unsigned char *)config + 1);
-		*size = sizeof(unsigned char);
+		*sizeOut = sizeof(unsigned char);
 		
 		IBooleanInputService *inputService = 0;
 
@@ -22,7 +22,7 @@ namespace IOServices
 		{
 #ifdef BOOLEANINPUTSERVICE_STATIC_H
 		case 1:
-			*size += sizeof(float);
+			*sizeOut += sizeof(float);
 			inputService = new BooleanInputService_Static(*((bool *)config));
 			break;
 #endif
@@ -31,7 +31,7 @@ namespace IOServices
 		case 2:
 			{
 				BooleanInputServiceConfig *booleanInputServiceConfig = BooleanInputServiceConfig::Cast((unsigned char*)config);
-				*size += booleanInputServiceConfig->Size();
+				*sizeOut += booleanInputServiceConfig->Size();
 				inputService = new BooleanInputService(hardwareAbstractionCollection, booleanInputServiceConfig);
 				break;
 			}

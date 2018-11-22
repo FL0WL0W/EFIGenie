@@ -15,7 +15,7 @@ namespace IOServices
 
 		static void ReadValueCallBack(void *floatInputService);
 
-		static IFloatInputService* CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
+		static IFloatInputService* CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut);
 	};
 }
 #endif

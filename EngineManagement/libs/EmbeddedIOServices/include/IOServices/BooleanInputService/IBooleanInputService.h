@@ -14,7 +14,7 @@ namespace IOServices
 
 		static void ReadValueCallBack(void *booleanInputService);
 
-		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *size);
+		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut);
 	};
 }
 #endif

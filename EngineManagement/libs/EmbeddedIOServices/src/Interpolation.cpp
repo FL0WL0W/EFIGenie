@@ -9,6 +9,10 @@ namespace Interpolation
 		{
 			float division = (maxValue - minValue) / (resolution - 1);
 			response.Multiplier = (value - minValue) / division;
+			if(response.Multiplier < 0)
+			{
+				response.Multiplier = 0;
+			}
 			response.IndexL = response.Multiplier;
 			response.Multiplier -= response.IndexL;
 			response.IndexH = response.IndexL + 1;
