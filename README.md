@@ -36,13 +36,6 @@ Features<br>
   <li>Vehicle Speed Sensor</li>
   <li>Idle control (PWM and Stepper - PD control loop)</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
-  <li>EFIGenie Editor</li>
-  <li>EFIGenie Editor</li>
-    <ul>
-      <li>Configged</li>
-      <li>Save and Load Bin</li>
-      <li>Uses QT for easy and optimized cross platform capability</li>
-    </ul>
   <li>Firmware features</li>
     <ul>
       <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
@@ -63,13 +56,9 @@ TODO LIST<br>
   <li>*Logging</li>
   <li>EFIGenie Editor</li>
     <ul>
+      <li>Create and edit configs</li>
       <li>Output tuner studio configs</li>
-      <li>QOL (Quality of Life) Copy table</li>
-      <li>QOL Paste table</li>
-      <li>QOL Paste Multiply table</li>
-      <li>QOL Paste Multiply by % table</li>
-      <li>QOL Paste Multiply by %/2 table</li>
-      <li>Interface with ECU (UART, USB, and STLink)</li>
+      <li>Interface with ECU (UART, USB, WiFi, Bluetooth, and STLink)</li>
     </ul>
   <li>*Tuner Studio (Interface ECU)</li>
   <li>*Create unit tests</li>
