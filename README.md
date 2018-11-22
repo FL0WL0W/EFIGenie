@@ -54,7 +54,7 @@ TODO LIST<br>
   <li>*Idle Control Ignition Wrapper</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
-  <li>EFIGenie Editor</li>
+  <li>*EFIGenie Editor</li>
     <ul>
       <li>Create and edit configs</li>
       <li>Output tuner studio configs</li>
