@@ -82,11 +82,6 @@ TODO LIST<br>
       <li>IdleControlService_Pd</li>
       <li>PrimeService_StaticPulseWidth</li>
       <li>TachometerService</li>
-      <li>BooleanInputService</li>
-      <li>BooleanInputService_Static</li>
-      <li>FloatInputService_Static</li>
-      <li>FloatOutputService_PwmPolynomial</li>
-      <li>FloatOutputService_StepperPolynomial</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
       <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
