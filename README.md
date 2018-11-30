@@ -49,8 +49,6 @@ Features<br>
 <br>
 TODO LIST<br>
 <ul>
-  <li>*Test Stm32F103 Services</li>
-  <li>*Stepper Services</li>
   <li>*Idle Control Ignition Wrapper</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
@@ -61,6 +59,7 @@ TODO LIST<br>
       <li>Interface with ECU (UART, USB, WiFi, Bluetooth, and STLink)</li>
     </ul>
   <li>*Tuner Studio (Interface ECU)</li>
+  <li>*Speeduino Service Builder</li>
   <li>*Create unit tests</li>
     <ul>
      <li>Idle Air Control Valve Stepper</li>
@@ -81,7 +80,6 @@ TODO LIST<br>
       <li>ServiceBuilder</li>
     </ul>
   <li>Customizable injection and iginition degree references</li>
-  <li>*Create integration tests with integration test hardware</li>
   <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
