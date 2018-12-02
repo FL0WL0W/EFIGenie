@@ -36,13 +36,6 @@ Features<br>
   <li>Vehicle Speed Sensor</li>
   <li>Idle control (PWM and Stepper - PD control loop)</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
-  <li>EFIGenie Editor</li>
-  <li>EFIGenie Editor</li>
-    <ul>
-      <li>Configged</li>
-      <li>Save and Load Bin</li>
-      <li>Uses QT for easy and optimized cross platform capability</li>
-    </ul>
   <li>Firmware features</li>
     <ul>
       <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
@@ -56,22 +49,17 @@ Features<br>
 <br>
 TODO LIST<br>
 <ul>
-  <li>*Test Stm32F103 Services</li>
-  <li>*Stepper Services</li>
   <li>*Idle Control Ignition Wrapper</li>
   <li>*Alpha-N</li>
   <li>*Logging</li>
-  <li>EFIGenie Editor</li>
+  <li>*EFIGenie Editor</li>
     <ul>
+      <li>Create and edit configs</li>
       <li>Output tuner studio configs</li>
-      <li>QOL (Quality of Life) Copy table</li>
-      <li>QOL Paste table</li>
-      <li>QOL Paste Multiply table</li>
-      <li>QOL Paste Multiply by % table</li>
-      <li>QOL Paste Multiply by %/2 table</li>
-      <li>Interface with ECU (UART, USB, and STLink)</li>
+      <li>Interface with ECU (UART, USB, WiFi, Bluetooth, and STLink)</li>
     </ul>
   <li>*Tuner Studio (Interface ECU)</li>
+  <li>*Speeduino Service Builder</li>
   <li>*Create unit tests</li>
     <ul>
      <li>Idle Air Control Valve Stepper</li>
@@ -82,11 +70,6 @@ TODO LIST<br>
       <li>IdleControlService_Pd</li>
       <li>PrimeService_StaticPulseWidth</li>
       <li>TachometerService</li>
-      <li>BooleanInputService</li>
-      <li>BooleanInputService_Static</li>
-      <li>FloatInputService_Static</li>
-      <li>FloatOutputService_PwmPolynomial</li>
-      <li>FloatOutputService_StepperPolynomial</li>
       <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
       <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
       <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
@@ -97,8 +80,6 @@ TODO LIST<br>
       <li>ServiceBuilder</li>
     </ul>
   <li>Customizable injection and iginition degree references</li>
-  <li>Move injection and iginition out of PistonEngineService into seperate services, maybe standardize this.</li>
-  <li>*Create integration tests with integration test hardware</li>
   <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
   <li>Create Throttle Body Injection code</li>
