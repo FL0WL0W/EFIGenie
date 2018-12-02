@@ -37,8 +37,7 @@ namespace IOServices
 
 		unsigned char PwmPin;
 		unsigned short MinFrequency;
-		float MinInputValue;
-		float MaxInputValue;
+		unsigned short MaxFrequency;
 		unsigned short DotSampleRate;
 		unsigned char Resolution;
 		float *Table;

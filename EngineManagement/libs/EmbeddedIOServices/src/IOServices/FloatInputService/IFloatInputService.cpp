@@ -4,6 +4,7 @@
 #include "IOServices/FloatInputService/FloatInputService_AnalogInterpolatedTable.h"
 #include "IOServices/FloatInputService/FloatInputService_FrequencyPolynomial.h"
 #include "IOServices/FloatInputService/FloatInputService_FrequencyInterpolatedTable.h"
+#include "IOServices/FloatInputService/FloatInputService_FaultDetectionWrapper.h"
 
 #ifdef IFLOATINPUTSERVICE_H
 namespace IOServices
@@ -66,6 +67,20 @@ namespace IOServices
 				FloatInputService_FrequencyInterpolatedTableConfig *frequencyInterpolatedTableConfig = FloatInputService_FrequencyInterpolatedTableConfig::Cast(config);
 				*sizeOut += frequencyInterpolatedTableConfig->Size();
 				inputService = new FloatInputService_FrequencyInterpolatedTable(hardwareAbstractionCollection, frequencyInterpolatedTableConfig);
+				break;
+			}
+#endif
+
+#ifdef FLOATINPUTSERVICE_FAULTDETECTIONWRAPPER_H
+		case 6:
+			{
+				FloatInputService_FaultDetectionWrapperConfig *faultDetectionConfig = FloatInputService_FaultDetectionWrapperConfig::Cast(config);
+				*sizeOut += faultDetectionConfig->Size();
+				config = (void*)((unsigned char *)config + faultDetectionConfig->Size());
+				unsigned int childSize = 0;
+				IFloatInputService *child = CreateFloatInputService(hardwareAbstractionCollection, config, &childSize);
+				*sizeOut += childSize;
+				inputService = new FloatInputService_FaultDetectionWrapper(faultDetectionConfig, child);
 				break;
 			}
 #endif

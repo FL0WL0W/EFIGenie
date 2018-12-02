@@ -20,7 +20,7 @@ namespace IOServices
 
 		float frequency = 1 / pwmValue.Period;
 
-		Value = Interpolation::InterpolateTable1<float>(frequency, _config->MaxInputValue, _config->MinInputValue, _config->Resolution, _config->Table);
+		Value = Interpolation::InterpolateTable1<float>(frequency, _config->MaxFrequency, _config->MinFrequency, _config->Resolution, _config->Table);
 
 		float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
 		if (elapsedTime * _config->DotSampleRate < 1.0)

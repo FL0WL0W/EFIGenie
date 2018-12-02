@@ -52,6 +52,7 @@ namespace IOServices
 		FloatOutputService_PwmInterpolatedTable(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_PwmInterpolatedTableConfig *config);
 		
 		void SetOutput(float value);
+		void Calibrate();
 	};
 }
 #endif

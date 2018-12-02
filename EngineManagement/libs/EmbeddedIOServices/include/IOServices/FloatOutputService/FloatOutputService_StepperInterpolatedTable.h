@@ -6,7 +6,7 @@
 
 using namespace HardwareAbstraction;
 
-#if !defined(FLOATOUTPUTSERVICE_STEPPERINTERPOLATEDTABLE_H) && defined(IFLOATOUTPUTSERVICE_H)
+#if !defined(FLOATOUTPUTSERVICE_STEPPERINTERPOLATEDTABLE_H) && defined(IFLOATOUTPUTSERVICE_H) && defined(ISTEPPEROUTPUTSERVICE_H)
 #define FLOATOUTPUTSERVICE_STEPPERINTERPOLATEDTABLE_H
 namespace IOServices
 {
@@ -44,16 +44,16 @@ namespace IOServices
 	class FloatOutputService_StepperInterpolatedTable : public IFloatOutputService
 	{
 	protected:
-		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatOutputService_StepperInterpolatedTableConfig *_config;
 
 		IStepperOutputService *_stepperService;
 		int _currentStepPosition;
 
 	public:
-		FloatOutputService_StepperInterpolatedTable(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperInterpolatedTableConfig *config);
+		FloatOutputService_StepperInterpolatedTable(const FloatOutputService_StepperInterpolatedTableConfig *config, IStepperOutputService *stepperService);
 		
 		void SetOutput(float value);
+		void Calibrate();
 	};
 }
 #endif

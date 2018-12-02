@@ -4,12 +4,11 @@
 #ifdef FLOATOUTPUTSERVICE_STEPPERINTERPOLATEDTABLE_H
 namespace IOServices
 {
-	FloatOutputService_StepperInterpolatedTable::FloatOutputService_StepperInterpolatedTable(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperInterpolatedTableConfig *config)
+	FloatOutputService_StepperInterpolatedTable::FloatOutputService_StepperInterpolatedTable(const FloatOutputService_StepperInterpolatedTableConfig *config, IStepperOutputService *stepperService)
 	{
-		_hardwareAbstractionCollection = hardwareAbstractionCollection;
 		_config = config;
-
-		_stepperService = IStepperOutputService::CreateStepperOutputService(_hardwareAbstractionCollection, ((void *)(_config + 1)), 0);
+		_stepperService = stepperService;
+		_currentStepPosition = 0;
 	}
 
 	void FloatOutputService_StepperInterpolatedTable::SetOutput(float value)
@@ -19,6 +18,11 @@ namespace IOServices
 		_stepperService->Step(newStepPosition - _currentStepPosition);
 
 		_currentStepPosition = newStepPosition;
+	}
+
+	void FloatOutputService_StepperInterpolatedTable::Calibrate() 
+	{ 
+		_stepperService->Calibrate();
 	}
 }
 #endif

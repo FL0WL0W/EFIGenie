@@ -2,10 +2,11 @@
 #include "IOServices/StepperOutputService/IStepperOutputService.h"
 #include "IFloatOutputService.h"
 #include "math.h"
+#include "Packed.h"
 
 using namespace HardwareAbstraction;
 
-#if !defined(FLOATOUTPUTSERVICE_STEPPERPOLYNOMIAL_H) && defined(IFLOATOUTPUTSERVICE_H)
+#if !defined(FLOATOUTPUTSERVICE_STEPPERPOLYNOMIAL_H) && defined(IFLOATOUTPUTSERVICE_H) && defined(ISTEPPEROUTPUTSERVICE_H)
 #define FLOATOUTPUTSERVICE_STEPPERPOLYNOMIAL_H
 namespace IOServices
 {
@@ -39,19 +40,17 @@ namespace IOServices
 	class FloatOutputService_StepperPolynomial : public IFloatOutputService
 	{
 	protected:
-		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatOutputService_StepperPolynomialConfig<Degree> *_config;
 
 		IStepperOutputService *_stepperService;
 		int _currentStepPosition;
 			
 	public:
-		FloatOutputService_StepperPolynomial(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_StepperPolynomialConfig<Degree> *config)
+		FloatOutputService_StepperPolynomial(const FloatOutputService_StepperPolynomialConfig<Degree> *config, IStepperOutputService *stepperService)
 		{
-			_hardwareAbstractionCollection = hardwareAbstractionCollection;
 			_config = config;
-
-			_stepperService = IStepperOutputService::CreateStepperOutputService(_hardwareAbstractionCollection, ((void *)(_config + 1)), 0);
+			_stepperService = stepperService;
+			_currentStepPosition = 0;
 		}
 			
 		void SetOutput(float value)
@@ -64,10 +63,17 @@ namespace IOServices
 				newStepPosition = _config->MaxStepPosition;
 			else if (newStepPosition < _config->MinStepPosition)
 				newStepPosition = _config->MinStepPosition;
+
+			newStepPosition = round(newStepPosition);
 		
 			_stepperService->Step(newStepPosition - _currentStepPosition);
 		
 			_currentStepPosition = newStepPosition;
+		}
+
+		void Calibrate() 
+		{ 
+			_stepperService->Calibrate();
 		}
 	};
 }

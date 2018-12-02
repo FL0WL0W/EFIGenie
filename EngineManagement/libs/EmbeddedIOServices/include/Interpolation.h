@@ -1,3 +1,5 @@
+#include "math.h"
+
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
 namespace Interpolation
@@ -20,6 +22,12 @@ namespace Interpolation
 	template<typename K>
 		K InterpolateTable1(InterpolationResponse interpolation, K* table)
 		{
+			K testValue = 0.5;
+			if(testValue == 0)
+			{
+				return round(table[interpolation.IndexL] * (1 - interpolation.Multiplier) + table[interpolation.IndexH] * interpolation.Multiplier);
+			}
+
 			return table[interpolation.IndexL] * (1 - interpolation.Multiplier) + table[interpolation.IndexH] * interpolation.Multiplier;
 		}
 	
@@ -32,6 +40,15 @@ namespace Interpolation
 	template<typename K>
 		K InterpolateTable2(InterpolationResponse interpolationX, unsigned char resolutionX, InterpolationResponse interpolationY, K* table)
 		{
+			K testValue = 0.5;
+			if(testValue == 0)
+			{
+				return	round(		table[interpolationX.IndexL + resolutionX * interpolationY.IndexL] * (1 - interpolationX.Multiplier) * (1 - interpolationY.Multiplier)
+				+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexL] * interpolationX.Multiplier * (1 - interpolationY.Multiplier)
+				+					table[interpolationX.IndexL + resolutionX * interpolationY.IndexH] * (1 - interpolationX.Multiplier) * interpolationY.Multiplier
+				+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexH] * interpolationX.Multiplier * interpolationY.Multiplier);
+			}
+
 			return				table[interpolationX.IndexL + resolutionX * interpolationY.IndexL] * (1 - interpolationX.Multiplier) * (1 - interpolationY.Multiplier)
 			+					table[interpolationX.IndexH + resolutionX * interpolationY.IndexL] * interpolationX.Multiplier * (1 - interpolationY.Multiplier)
 			+					table[interpolationX.IndexL + resolutionX * interpolationY.IndexH] * (1 - interpolationX.Multiplier) * interpolationY.Multiplier

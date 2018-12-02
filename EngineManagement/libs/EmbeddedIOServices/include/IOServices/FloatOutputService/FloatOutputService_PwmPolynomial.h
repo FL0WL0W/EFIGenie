@@ -66,6 +66,8 @@ namespace IOServices
 
 			_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1.0f / _config->Frequency, pwmValue / _config->Frequency });
 		}
+
+		void Calibrate() { }
 	};
 }
 #endif
