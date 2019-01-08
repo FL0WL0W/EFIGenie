@@ -35,7 +35,7 @@ namespace IOServices
 				(sizeof(float) * Resolution);
 		}
 		
-		unsigned char AdcPin;
+		unsigned short AdcPin;
 		float MinInputValue;
 		float MaxInputValue;
 		unsigned short DotSampleRate;

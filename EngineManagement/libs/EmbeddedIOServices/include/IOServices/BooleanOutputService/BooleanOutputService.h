@@ -28,7 +28,7 @@ namespace IOServices
 			return sizeof(BooleanOutputServiceConfig);
 		}
 
-		unsigned char Pin;
+		unsigned short Pin;
 		bool NormalOn;
 		bool HighZ;
 	});

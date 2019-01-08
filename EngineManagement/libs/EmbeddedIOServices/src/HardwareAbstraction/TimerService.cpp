@@ -51,11 +51,10 @@ namespace HardwareAbstraction
 		while (StackSize > 0 && ((callTask = CallBackStackPointer[StackSize - 1]))->Tick == runTick)
 		{
 			callTask = CallBackStackPointer[StackSize - 1];
+			StackSize--;
 			callTask->Execute();
 			if (callTask->DeleteOnExecution)
 				delete callTask;
-			
-			StackSize--;
 		}
 
 		if (StackSize == 0)

@@ -30,7 +30,7 @@ namespace IOServices
 			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
 		}
 		
-		unsigned char PwmPin;
+		unsigned short PwmPin;
 		float A[Degree+1];
 		float MinDutyCycle;
 		float MaxDutyCycle;

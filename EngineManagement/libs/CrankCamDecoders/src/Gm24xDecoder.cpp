@@ -28,12 +28,12 @@ namespace CrankCamDecoders
 	
 	float Gm24xDecoder::GetCrankPosition(void)
 	{
-		return (_state % 24) * 15 + (crankTime() * 15.0) / _crankPeriod;
+		return (_state % 24) * 15 + (crankTime() * 15) / (float)_crankPeriod;
 	}
 	
 	float Gm24xDecoder::GetCamPosition(void)
 	{
-		return _state * 15 + (crankTime() * 15.0) / _crankPeriod;
+		return _state * 15 + (crankTime() * 15) / (float)_crankPeriod;
 	}
 	
 	unsigned int Gm24xDecoder::GetTickPerDegree(void)

@@ -30,7 +30,7 @@ namespace IOServices
 			return sizeof(FloatInputService_FrequencyPolynomialConfig<Degree>);
 		}
 		
-		unsigned char PwmPin;
+		unsigned short PwmPin;
 		unsigned short MinFrequency;
 		float A[Degree + 1];
 		float MinValue;

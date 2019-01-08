@@ -30,7 +30,7 @@ namespace IOServices
 			return sizeof(FloatInputService_AnalogPolynomialConfig<Degree>);
 		}
 		
-		unsigned char AdcPin;
+		unsigned short AdcPin;
 		float A[Degree+1];
 		float MinValue;
 		float MaxValue;

@@ -34,7 +34,7 @@ namespace IOServices
 				(sizeof(float) * Resolution);
 		}
 		
-		unsigned char PwmPin;
+		unsigned short PwmPin;
 		unsigned short Frequency;
 		float MinValue;
 		float MaxValue;

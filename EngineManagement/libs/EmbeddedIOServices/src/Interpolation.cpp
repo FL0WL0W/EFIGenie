@@ -7,8 +7,8 @@ namespace Interpolation
 		InterpolationResponse response = { 0, 0, 0 };
 		if (resolution > 1)
 		{
-			float division = (maxValue - minValue) / (resolution - 1);
-			response.Multiplier = (value - minValue) / division;
+			resolution -= 1;
+			response.Multiplier = resolution * (value - minValue) / (maxValue - minValue);
 			if(response.Multiplier < 0)
 			{
 				response.Multiplier = 0;
@@ -16,13 +16,13 @@ namespace Interpolation
 			response.IndexL = response.Multiplier;
 			response.Multiplier -= response.IndexL;
 			response.IndexH = response.IndexL + 1;
-			if (response.IndexL > resolution - 1)
+			if (response.IndexL > resolution)
 			{
-				response.IndexL = response.IndexH = resolution - 1;
+				response.IndexL = response.IndexH = resolution;
 			}
-			else if (response.IndexH > resolution - 1)
+			else if (response.IndexH > resolution)
 			{
-				response.IndexH = resolution - 1;
+				response.IndexH = resolution;
 			}
 		}
 

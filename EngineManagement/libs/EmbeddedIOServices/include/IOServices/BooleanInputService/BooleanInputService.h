@@ -26,7 +26,7 @@ namespace IOServices
 			return sizeof(BooleanInputServiceConfig);
 		}
 
-		unsigned char Pin;
+		unsigned short Pin;
 		bool Inverted;
 	});
 
