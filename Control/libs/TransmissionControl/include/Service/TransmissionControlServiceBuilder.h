@@ -56,42 +56,11 @@
 #include "CrankCamDecoders/ICrankCamDecoder.h"
 #include "CrankCamDecoders/Gm24xDecoder.h"
 
-//EngineControlServices Includes
-#include "EngineControlServices/TachometerService/TachometerService.h"
-
-#include "EngineControlServices/PrimeService/IPrimeService.h"
-#include "EngineControlServices/PrimeService/PrimeService_StaticPulseWidth.h"
-
-#include "EngineControlServices/IdleControlService/IIdleControlService.h"
-#include "EngineControlServices/IdleControlService/IdleControlService_Pid.h"
-
-#include "EngineControlServices/AfrService/IAfrService.h"
-#include "EngineControlServices/AfrService/AfrService_Static.h"
-#include "EngineControlServices/AfrService/AfrService_Map_Ethanol.h"
-
-#include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
-#include "EngineControlServices/FuelTrimService/FuelTrimService_InterpolatedTable.h"
-#include "EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_MultiChannel.h"
-
-#include "EngineControlServices/FuelPumpService/IFuelPumpService.h"
-#include "EngineControlServices/FuelPumpService/FuelPumpService.h"
-#include "EngineControlServices/FuelPumpService/FuelPumpService_Analog.h"
-
-#include "EngineControlServices/InjectionService/InjectionSchedulingService.h"
-#include "EngineControlServices/InjectionService/IInjectionConfig.h"
-#include "EngineControlServices/InjectionService/InjectionConfig_SD.h"
-#include "EngineControlServices/InjectionService/InjectionConfigWrapper_DFCO.h"
-
-#include "EngineControlServices/IgnitionService/IgnitionSchedulingService.h"
-#include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "EngineControlServices/IgnitionService/IgnitionConfig_Map_Ethanol.h"
-#include "EngineControlServices/IgnitionService/IgnitionConfig_Static.h"
-#include "EngineControlServices/IgnitionService/IgnitionConfigWrapper_HardRpmLimit.h"
-#include "EngineControlServices/IgnitionService/IgnitionConfigWrapper_SoftPidRpmLimit.h"
+//TransmissionControlServices Includes
 
 using namespace HardwareAbstraction;
 using namespace IOServices;
-using namespace EngineControlServices;
+using namespace CrankCamDecoders;
 
 namespace Service
 {

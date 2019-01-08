@@ -62,6 +62,15 @@ namespace Service
 					*totalSize += size;
 					break;
 				}
+#if DECODER_SERVICE_ID
+			case DECODER_SERVICE_ID:
+				{
+					serviceLocator->Register(serviceId, CreateDecoderService(serviceLocator, config, &size));
+					config = (void *)((unsigned char *)config + size);
+					*totalSize += size;
+					break;
+				}
+#endif
 			}
 		}
 

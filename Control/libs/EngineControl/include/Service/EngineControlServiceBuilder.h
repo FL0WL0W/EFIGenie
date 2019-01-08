@@ -92,6 +92,7 @@
 using namespace HardwareAbstraction;
 using namespace IOServices;
 using namespace EngineControlServices;
+using namespace CrankCamDecoders;
 
 namespace Service
 {
