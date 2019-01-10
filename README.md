@@ -36,6 +36,7 @@ Features<br>
   <li>Vehicle Speed Sensor</li>
   <li>Idle control (PWM and Stepper - PD control loop)</li>
   <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
+  <li>Transmission Control (Paddle shift transmission solenoid)</li>
   <li>Firmware features</li>
     <ul>
       <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
@@ -79,6 +80,8 @@ TODO LIST<br>
       <li>InjectionSchedulingService</li>
       <li>ServiceBuilder</li>
     </ul>
+  <li>Transmission Control (line pressure control)</li>
+  <li>Transmission Control (automatic gear shifts)</li>
   <li>Customizable injection and iginition degree references</li>
   <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
