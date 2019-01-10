@@ -33,7 +33,8 @@
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
 #define IGNITION_SCHEDULING_SERVICE_ID			4007			// IgnitionSchedulingService
 #define INJECTION_SCHEDULING_SERVICE_ID			4008			// InjectionSchedulingService
-#define TRANSMISSION_CONTROL_SERVICE_ID			4009			// TransmissionControlService
+#define SHIFT_SERVICE_ID						4009			// ShiftService
+#define GEAR_CONTROL_SERVICE_ID					4010			// GearControlService
 
 //callback groups 5001-6000
 #define PRE_DECODER_SYNC_CALL_BACK_GROUP		5001
@@ -48,6 +49,7 @@
 //IOService Inlcudes
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
+#include "IOServices/ButtonService/IButtonService.h"
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "IOServices/StepperOutputService/IStepperOutputService.h"
@@ -125,6 +127,17 @@ namespace Service
 			*config = (void *)((unsigned char *)*config + size);
 			*totalSize += size;
 			return booleanInputService;
+		}
+		
+		static IButtonService * CreateButtonService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		{
+			unsigned int size;
+			IButtonService *buttonService = IButtonService::CreateButtonService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			CallBackGroup *tickCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+			tickCallBackGroup->Add(IButtonService::TickCallBack, buttonService);
+			*config = (void *)((unsigned char *)*config + size);
+			*totalSize += size;
+			return buttonService;
 		}
 		
 		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)

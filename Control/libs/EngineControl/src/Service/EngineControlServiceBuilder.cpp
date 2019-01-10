@@ -7,20 +7,29 @@ namespace Service
 	{
 		if(serviceLocator == 0)
 			serviceLocator = new ServiceLocator();
-
-		serviceLocator->Register(HARDWARE_ABSTRACTION_COLLECTION_ID, (void *)hardwareAbstractionCollection);
-		serviceLocator->Register(ANALOG_SERVICE_ID, (void *)hardwareAbstractionCollection->AnalogService);
-		serviceLocator->Register(DIGITAL_SERVICE_ID, (void *)hardwareAbstractionCollection->DigitalService);
-		serviceLocator->Register(PWM_SERVICE_ID, (void *)hardwareAbstractionCollection->PwmService);
-		serviceLocator->Register(TIMER_SERVICE_ID, (void *)hardwareAbstractionCollection->TimerService);
+		
+		if(serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID) == 0)
+			serviceLocator->Register(HARDWARE_ABSTRACTION_COLLECTION_ID, (void *)hardwareAbstractionCollection);
+		if(serviceLocator->Locate(ANALOG_SERVICE_ID) == 0)
+			serviceLocator->Register(ANALOG_SERVICE_ID, (void *)hardwareAbstractionCollection->AnalogService);
+		if(serviceLocator->Locate(DIGITAL_SERVICE_ID) == 0)
+			serviceLocator->Register(DIGITAL_SERVICE_ID, (void *)hardwareAbstractionCollection->DigitalService);
+		if(serviceLocator->Locate(PWM_SERVICE_ID) == 0)
+			serviceLocator->Register(PWM_SERVICE_ID, (void *)hardwareAbstractionCollection->PwmService);
+		if(serviceLocator->Locate(TIMER_SERVICE_ID) == 0)
+			serviceLocator->Register(TIMER_SERVICE_ID, (void *)hardwareAbstractionCollection->TimerService);
 		
 		//create callback groups
-		CallBackGroup *preDecoderCallBackGroup = new CallBackGroup();
-		serviceLocator->Register(PRE_DECODER_SYNC_CALL_BACK_GROUP, (void *)preDecoderCallBackGroup);
-		CallBackGroup *postDecoderCallBackGroup = new CallBackGroup();
-		serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, (void *)postDecoderCallBackGroup);
-		CallBackGroup *tickCallBackGroup = new CallBackGroup();
-		serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)tickCallBackGroup);
+		if(serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(PRE_DECODER_SYNC_CALL_BACK_GROUP, (void *)new CallBackGroup());
+		if(serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, (void *)new CallBackGroup());
+		if(serviceLocator->Locate(TICK_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)new CallBackGroup());
+
+		CallBackGroup *preDecoderCallBackGroup = (CallBackGroup *)serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *postDecoderCallBackGroup = (CallBackGroup *)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *tickCallBackGroup = (CallBackGroup *)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
 
 		*totalSize = 0;
 		unsigned int size;
@@ -259,7 +268,7 @@ namespace Service
 #ifdef AFRSERVICE_STATIC_H
 		case 1:
 			*totalSize += 1;
-			ret = new AfrService_Static(*((float*)((unsigned char*)config)));
+			ret = new AfrService_Static(*((float *)config));
 			break;
 #endif
 #ifdef AFRSERVICE_MAP_ETHANOL_H
