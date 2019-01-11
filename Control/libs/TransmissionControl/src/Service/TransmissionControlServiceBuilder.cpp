@@ -125,7 +125,7 @@ namespace Service
 
 				HardwareAbstractionCollection *hardwareAbstractionCollection = (HardwareAbstractionCollection *)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
 
-				IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(shiftConfig->Solenoids + 1));
+				IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(shiftConfig->Solenoids));
 				for (int i = 0; i < shiftConfig->Solenoids; i++)
 				{
 					unsigned int size = 0;
