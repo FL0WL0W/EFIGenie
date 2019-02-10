@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <script src="jquery-3.3.1.min.js"></script>
+        <script src="jquery-ui.min.js"></script>
+        <script src="utils.js"></script>
+        <script src="Config.js"></script>
+        <script src="IOServicesConfig.js"></script>
+        <script src="TransmissionControlServicesConfig.js"></script>
+        <script src="ConfigGuiModules/ConfigGuiModules.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel = "stylesheet" type = "text/css" href = "style.css" />
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var b = new ConfigGui(TransmissionControlServicesIni);
+                $('#chkAdvanced').change(function(){
+                    ShowAdvanced = this.checked;
+                                        
+                    $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                });
+                $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                $("#btnNew").click(function(){
+                    b = new ConfigGui(b.iniNameSpace);
+                    $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                });
+                $("#btnSave").click(function(){
+                    downloadBin(b.GetArrayBuffer(), "config.bin");
+                });
+                $("#btnLoad").change(function(evt){
+                    b = new ConfigGui(b.iniNameSpace);
+                    var test = new FileReader();
+
+                    test.onload = function(evt) {
+                        if(evt.target.readyState != 2) return;
+                        if(evt.target.error) {
+                            alert('Error while reading file');
+                            return;
+                        }
+
+                        b.SetArrayBuffer(evt.target.result);
+                        $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                    };
+                    
+                    test.readAsArrayBuffer(evt.target.files[0]);
+                });
+                $("#btnSaveIni").click(function(){
+                    downloadObject(b.iniNameSpace, "config.json");
+                });
+                $("#btnLoadIni").change(function(evt){
+                    var test = new FileReader();
+
+                    test.onload = function(evt) {
+                        if(evt.target.readyState != 2) return;
+                        if(evt.target.error) {
+                            alert('Error while reading file');
+                            return;
+                        }
+
+                        b = new ConfigGui(JSON.parse(evt.target.result));
+                        $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                    };
+                    
+                    test.readAsText(evt.target.files[0]);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <input id="btnNew" type="button" class="button" value="New">
+        <input id="btnSave" type="button" class="button" value="Save">
+        <label for="btnLoad" class="button">Open</label>
+        <input id="btnLoad" type="file" style="display: none;">
+        <input id="btnSaveIni" type="button" class="button" value="Save Ini">
+        <label for="btnLoadIni" class="button">Open Ini</label>
+        <input id="btnLoadIni" type="file" style="display: none;">
+        <input id="chkAdvanced" type="checkbox">Advanced</input>
+        <div id="workspace"></div>
+    </body>
+</html>
