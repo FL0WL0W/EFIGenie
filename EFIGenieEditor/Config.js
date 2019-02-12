@@ -1,296 +1,249 @@
 class Config {
-    constructor(iniNameSpace, ini) {
-        if(ini)
-            this.ini = ini;
-        else {
-            this.ini = "Main";
+    constructor(obj, configNameSpace, configName) {
+        if(obj)
+            Object.assign(this, obj);
+
+        this.ConfigNameSpace = configNameSpace;
+
+        if(!this.ConfigName) {
+            this.ConfigName = configName;
         }
-        this.iniNameSpace = iniNameSpace;
-    }
 
-    GetArrayBuffer() {
-        return getByteArray(this, this.iniNameSpace[this.ini]).buffer;
-    }
-    SetArrayBuffer(arrayBuffer) {
-        return setArrayBuffer(this, this.iniNameSpace[this.ini], arrayBuffer);
-    }
-}
-
-function iniReferencedByIniRow(ini, reference) {
-    referencedBy = [];
-    $.each(ini, function(index, iniRow) {
-        if(iniRow.XMin === reference 
-            || iniRow.XMax === reference 
-            || iniRow.YMin === reference 
-            || iniRow.YMax === reference 
-            || (typeof iniRow.Type === "string" && 
-                ((iniRow.Type.split("[").length > 1 && iniRow.Type.split("[")[1].split("]")[0] == reference) 
-                || (iniRow.Type.split("[").length > 2 && iniRow.Type.split("[")[2].split("]")[0] == reference)))) {
-            referencedBy.push(iniRow);
+        if(!this.ConfigName) {
+            this.ConfigName = "Main";
         }
-    });
 
-    return referencedBy;
-}
+        if(!this.Config) {
+            this.Config = this.ConfigNameSpace[this.ConfigName];
+        }
 
-function valueIsReferenceLocation(s) {
-    var ret = parseFloat(s);
-    if(isNaN(ret))
-    {
-        return true;
-    }
-    return false;
-}
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
 
-function parseValueString(obj, s) {
-    if(valueIsReferenceLocation(s))
-    {
-        return parseFloat(obj[s]);
-    }
+            if(!configRowObj)
+                configRowObj = configRow[configRowKey];
 
-    return parseFloat(s);
-}
-
-function iniGetValue(obj, iniRow, iniIndex) {
-    var value;
-
-    switch(iniGetLocation(obj, iniRow, iniIndex)) { 
-        case "static":
-            break;
-        default:
-            value = obj[iniRow.Location];
-    }
-    if(typeof iniRow.Type === "string")
-    {
-        var prevVal = value;
-
-        if(iniRow.Type.split("[").length == 2) {
-            var arrayLen = parseValueString(obj, iniRow.Type.split("[")[1].split("]")[0]);
-            var xMin = parseValueString(obj, iniRow.XMin);
-            var xMax = parseValueString(obj, iniRow.XMax);
-            if(!prevVal || arrayLen !== prevVal.length || prevVal.XMin !== xMin || prevVal.XMax !== xMax)
-            {
-                switch(iniRow.Type.split("[")[0]) {
-                    case "formula":
-                        arrayLen++;
-                        if(prevVal && arrayLen === prevVal.length)
+            if(configRowObj.Type) {
+                if(configRowObj.Type.split("[").length == 1)
+                {
+                    switch(configRowObj.Type) {
+                        case "uint8":
+                        case "uint16":
+                        case "uint32":
+                        case "uint64":
+                        case "int8":
+                        case "int16":
+                        case "int32":
+                        case "int64":
+                        case "float":
+                            this[configRowKey] = new ConfigNumber(configRowObj);
                             break;
-                    case "uint8":
-                    case "uint16":
-                    case "uint32":
-                    case "int8":
-                    case "int16":
-                    case "int32":
-                    case "float":
-                        value = new Array(arrayLen);
-                        value.XMin = xMin;
-                        value.XMax = xMax;
-                        //to default for now. change this to interpolate the table later.
-                        $.each(value, function(index, valuevalue) {
-                            value[index] = iniRow.DefaultValue;
-                        });
-                        break;
+                        case "bool":
+                            this[configRowKey] = new ConfigBoolean(configRowObj);
+                            break;
+                    }
                 }
             }
         }
+    }
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
 
-        if(!prevVal)
-        {
-            if(iniRow.Type.split("[").length == 2) {
-                $.each(value, function(index, valuevalue) {
-                    value[index] = iniRow.DefaultValue;
-                })
-            } else {
-                value = iniRow.DefaultValue;
-            }
+            arrayBuffer = arrayBuffer.concatArray(configRowObj.GetArrayBuffer());
         }
+        return arrayBuffer;
     }
+    SetArrayBuffer(arrayBuffer) {
+        var size = 0;
 
-    return value;
-}
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
 
-function iniSetValue(obj, iniRow, iniIndex, value) {
-    if(typeof iniRow.Type === "string") {
-        switch(iniGetLocation(obj, iniRow, iniIndex)) { 
-            case "static":
-                break;
-            default:
-                obj[iniRow.Location] = value;
+            arrayBuffer = arrayBuffer.slice(configRowObj.SetArrayBuffer(arrayBuffer));
         }
-    } else {
-        if(!obj[iniRow.Location])
-            obj[iniRow.Location] = new ConfigGui(obj.iniNameSpace, iniRow.Ini);
-        else
-            obj[iniRow.Location].ini = iniRow.Ini;
-        return setArrayBuffer(obj[iniRow.Location], obj.iniNameSpace[iniRow.Ini], value);
+
+        return size;
     }
-}
+    GetConfig() {
+        var returnConfig = []
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
 
-function iniGetMin(obj, iniRow) {
-    var min = iniRow.Min;
+            if(!configRowObj)
+                throw "Config not initialized";
+                
+            var configRowValue = configRowObj.GetConfig();
 
-    if(!min && typeof iniRow.Type === "string") {
-         switch(iniRow.Type.split("[")[0]) {
-             case "uint8":
-             case "uint16":
-             case "uint32":
-                 min = 0;
-                 break;
-            case "int8":
-                min = -128;
-                break;
-            case "int16":
-                min = -32768;
-                break;
-            case "int32":
-                min = -2147483648;
-                break;
-            case "float":
-            case "formula":
-                min = -3.402823e+38;
-                break;
-         }
-    }
-
-    return min;
-}
-
-function iniGetMax(obj, iniRow) {
-    var max = iniRow.Max;
-
-    if(!max && typeof iniRow.Type === "string") {
-        switch(iniRow.Type.split("[")[0]) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-                max = 0;
-                break;
-            case "int8":
-                max = 127;
-                break;
-            case "int16":
-                max = 32767;
-                break;
-            case "int32":
-                max = 2147483647;
-                break;
-            case "float":
-            case "formula":
-                max = 3.402823e+38;
-                break;
+            var returnConfigRow = {};
+            returnConfigRow[configRowKey] = configRowValue;
+            
+            returnConfig.push(returnConfigRow);
         }
-    }
-
-    return max;
-}
-
-function iniGetStep(obj, iniRow) {
-    var step = iniRow.Step;
-
-    if(!step && typeof iniRow.Type === "string") {
-        switch(iniRow.Type.split("[")[0]) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-            case "int8":
-            case "int16":
-            case "int32":
-                step = 1;
-                break;
-            case "float":
-            case "formula":
-                step = 0.01;
-                break;
-        }
-    }
-
-    return step;
-}
-
-function iniGetLabel(obj, iniRow) {
-    return iniRow.Label;
-}
-
-function iniGetLocation(obj, iniRow, iniIndex) {
-    var location = iniRow.Location;
-
-    if(!location) {
-        location = "Location" + iniIndex;
-    }
-
-    return location;
-}
-
-function getByteArray(obj, ini) {
-    var byteArray = new Uint8Array();
-    $.each(ini, function(iniIndex, iniRow){
-        var value = iniGetValue(obj, iniRow, iniIndex);
+        this.Config = returnConfig;
         
-        if(typeof iniRow.Type === "string")
-        {
-            switch(iniRow.Type) {
-                case "bool":
-                case "uint8":
-                    byteArray = byteArray.concatArray(new Uint8Array([value]));
-                    break;
-                case "uint16":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Uint16Array([value]).buffer));
-                    break;
-                case "uint32":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Uint32Array([value]).buffer));
-                    break;
-                case "int8":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Int8Array([value]).buffer));
-                    break;
-                case "int16":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Int16Array([value]).buffer));
-                    break;
-                case "int32":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Int32Array([value]).buffer));
-                    break;
-                case "float":
-                    byteArray = byteArray.concatArray(new Uint8Array(new Float32Array([value]).buffer));
-                    break;
-                case "iniselection":
-                    byteArray = byteArray.concatArray(new Uint8Array(value.Value.GetArrayBuffer()));
-                    break;
-                default:
-                    if(iniRow.Type.indexOf("[") > -1) {
-                        switch(iniRow.Type.split("[")[0]) {
-                            case "uint8":
-                                byteArray = byteArray.concatArray(new Uint8Array(value));
-                                break;
-                            case "uint16":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Uint16Array(value).buffer));
-                                break;
-                            case "uint32":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Uint32Array(value).buffer));
-                                break;
-                            case "int8":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int8Array(value).buffer));
-                                break;
-                            case "int16":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int16Array(value).buffer));
-                                break;
-                            case "int32":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int32Array(value).buffer));
-                                break;
-                            case "formula":
-                            case "float":
-                                byteArray = byteArray.concatArray(new Uint8Array(new Float32Array(value).buffer));
-                                break;
-                        }
-                    } else {
-                        throw "getByteArray Value Invalid";
-                    }
-                    break;
-            }
-        } else {
-            byteArray = byteArray.concatArray(new Uint8Array(value.GetArrayBuffer()));
-        }
-    });
+        return JSON.parse(JSON.stringify(this, function(key, value) {            
+            for(var configRowIndex in this.Config) {
+                var configRow = this.Config[configRowIndex];
+                if(key === "ConfigNameSpace")
+                    return undefined;
 
-    return byteArray;
+                if(key === Object.keys(configRow)[0]) {
+                    return undefined;
+                }
+            }
+            
+            return value;
+        }));
+    }
+}
+
+class ConfigNumber {
+    constructor(obj) {
+        if(obj)
+            Object.assign(this, obj);
+        switch(this.Type) {
+            case "uint8":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 255;
+                break;
+            case "uint16":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 65535;
+                break;
+            case "uint32":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 4294967295;
+                break;
+            case "uint64":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 18446744073709551615;
+                break;
+            case "int8":
+                if(!this.Min)
+                    this.Min = -128;
+                if(!this.Max)
+                    this.Max = 127;
+                break;
+            case "int16":
+                if(!this.Min)
+                    this.Min = -32768;
+                if(!this.Max)
+                    this.Max = 32767;
+                break;
+            case "int32":
+                if(!this.Min)
+                    this.Min = -2147483648;
+                if(!this.Max)
+                    this.Max = 2147483647;
+                break;
+            case "int64":
+                if(!this.Min)
+                    this.Min = -9223372036854775808;
+                if(!this.Max)
+                    this.Max = 9223372036854775807;
+                break;
+            case "float":
+                if(!this.Min)
+                    this.Min = -3.402823e+38;
+                if(!this.Max)
+                    this.Max = 3.402823e+38;
+                break;
+        }
+        if(!this.Value)
+            if(this.Min > 0)
+                this.Value = this.Min;
+            else
+                this.Value = 0;
+    }
+    GetArrayBuffer() {
+        switch(this.Type) {
+            case "uint8":
+                return new Uint8Array([this.Value]).buffer;
+            case "uint16":
+                return new Uint16Array([this.Value]).buffer;
+            case "uint32":
+                return new Uint32Array([this.Value]).buffer;
+            case "int8":
+                return new Int8Array([this.Value]).buffer;
+            case "int16":
+                return new Int16Array([this.Value]).buffer;
+            case "int32":
+                return new Int32Array([this.Value]).buffer;
+            case "float":
+                return new Float32Array([this.Value]).buffer;
+        }
+    }
+    SetArrayBuffer(arrayBuffer) {
+        switch(this.Type) {
+            case "uint8":
+                this.Value = new Uint8Array(arrayBuffer.slice(0,1))[0];
+                return 1;
+            case "uint16":
+                this.Value = new Uint16Array(arrayBuffer.slice(0,2))[0];
+                return 2;
+            case "uint32":
+                this.Value = new Uint32Array(arrayBuffer.slice(0,4))[0];
+                return 4;
+            case "uint64":
+                this.Value = new Uint64Array(arrayBuffer.slice(0,8))[0];
+                return 8;
+            case "int8":
+                this.Value = new Int8Array(arrayBuffer.slice(0,1))[0];
+                return 1;
+            case "int16":
+                this.Value = new Int16Array(arrayBuffer.slice(0,2))[0];
+                return 2;
+            case "int32":
+                this.Value = new Int32Array(arrayBuffer.slice(0,4))[0];
+                return 4;
+            case "int64":
+                this.Value = new Int64Array(arrayBuffer.slice(0,8))[0];
+                return 8;
+            case "float":
+                this.Value = new Float32Array(arrayBuffer.slice(0,4))[0];
+                return 4;
+        }
+    }
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this));
+    }
+}
+
+class ConfigBoolean {
+    constructor(obj) {
+        if(obj)
+            Object.assign(this, obj);
+        if(!this.Value)
+            this.Value = false;
+    }
+    GetArrayBuffer() {
+        return new Uint8Array([this.Value]).buffer;
+    }
+    SetArrayBuffer(arrayBuffer) {
+        this.Value = (new Uint8Array(arrayBuffer.slice(0,1))[0] === 1);
+        return 1;
+    }
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this));
+    }
 }
 
 function setArrayBuffer(obj, ini, arrayBuffer) {

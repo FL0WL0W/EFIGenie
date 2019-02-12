@@ -32,8 +32,8 @@ namespace IOServices
 		}
 			
 		float A[Degree+1];
-		short MinStepPosition;
-		short MaxStepPosition;
+		int MinStepPosition;
+		int MaxStepPosition;
 	});
 
 	template<unsigned char Degree>

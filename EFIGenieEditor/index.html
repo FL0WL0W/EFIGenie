@@ -11,7 +11,7 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
             $(document).ready(function() {
-                var b = new ConfigGui(TransmissionControlServicesIni);
+                var b = new ConfigGui(undefined, IOServicesIni, "BooleanOutputServiceConfig");
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
                                         
@@ -26,7 +26,7 @@
                     downloadBin(b.GetArrayBuffer(), "config.bin");
                 });
                 $("#btnLoad").change(function(evt){
-                    b = new ConfigGui(b.iniNameSpace);
+                    b = new ConfigGui(undefined, b.ConfigNameSpace, b.ConfigName);
                     var test = new FileReader();
 
                     test.onload = function(evt) {
@@ -43,7 +43,7 @@
                     test.readAsArrayBuffer(evt.target.files[0]);
                 });
                 $("#btnSaveIni").click(function(){
-                    downloadObject(b.iniNameSpace, "config.json");
+                    downloadObject(b.GetConfig(), "config.json");
                 });
                 $("#btnLoadIni").change(function(evt){
                     var test = new FileReader();

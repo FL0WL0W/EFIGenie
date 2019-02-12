@@ -2,11 +2,11 @@ Uint8Array.prototype.toHex = function() { // buffer is an ArrayBuffer
     return "0x" + Array.prototype.map.call(new Uint8Array(this), x => ('00' + x.toString(16)).slice(-2)).join(' 0x');
 }
 
-Uint8Array.prototype.concatArray = function(b) { // a, b TypedArray of same type
-    var c = new (this.constructor)(this.length + b.length);
-    c.set(this, 0);
-    c.set(b, this.length);
-    return c;
+ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same type
+    var tmp = new Uint8Array(this.byteLength + b.byteLength);
+    tmp.set(new Uint8Array(this), 0);
+    tmp.set(new Uint8Array(b), this.byteLength);
+    return tmp.buffer;
 }
 
 function getFileContents(url)
@@ -77,3 +77,21 @@ $(document).mousemove(function(event) {
 $(document).blur(function(event) {
     console.log("focus " + event.target.id);
 })
+
+function IsBrowserSupported() {
+    var obj = {
+        c: "test",
+        a: 1
+      };
+      obj = JSON.parse(JSON.stringify(obj));
+      var keys = [];
+      for (var key in obj) {
+        keys.push(key);
+      }
+      keys = JSON.parse(JSON.stringify(keys));
+      if(keys[0] !== "c") {
+          alert("Browser not supported. Try using a different browser.");
+          return false;
+      }
+      return true;
+}

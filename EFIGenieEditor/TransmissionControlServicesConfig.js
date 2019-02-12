@@ -51,8 +51,8 @@ var TransmissionControlServicesIni = {
     
     GearControlService_ButtonShiftConfig: [
         { Location: "static", Type: "uint8", DefaultValue: 1 },
-        { Location: "ButtonUp", Label: "Up", Ini: "IButtonServiceConfig"},
-        { Location: "ButtonDown", Label: "Down", Ini: "IButtonServiceConfig"}
+        { Location: "ButtonUp", Label: "Shift Up", Ini: "IButtonServiceConfig"},
+        { Location: "ButtonDown", Label: "Shift Down", Ini: "IButtonServiceConfig"}
     ],
 
     IGearControlServiceConfig: [
@@ -63,8 +63,8 @@ var TransmissionControlServicesIni = {
     ],
 
     SimpleButtonControlConfig: [
-        { Location: "ShiftService", Label: "Shift Service", Ini: "IShiftServiceConfig"},
-        { Location: "GearControlService", Label: "Gear Control", Ini: "IGearControlServiceConfig"}
+        { Location: "ShiftService", Ini: "IShiftServiceConfig"},
+        { Location: "GearControlService", Ini: "IGearControlServiceConfig"}
     ],
 
     Main: [
@@ -74,10 +74,14 @@ var TransmissionControlServicesIni = {
     ],
 };
 
-for(var k in SensorServicesIni) 
-    if(!TransmissionControlServicesIni[k])
-        TransmissionControlServicesIni[k]=IOServicesIni[k];
+for(var k in SensorServicesIni) {
+    if(!TransmissionControlServicesIni[k]) {
+        TransmissionControlServicesIni[k]=SensorServicesIni[k];
+    }
+}
 
-for(var k in IOServicesIni) 
-    if(!TransmissionControlServicesIni[k])
+for(var k in IOServicesIni) {
+    if(!TransmissionControlServicesIni[k]) {
         TransmissionControlServicesIni[k]=IOServicesIni[k];
+    }
+}

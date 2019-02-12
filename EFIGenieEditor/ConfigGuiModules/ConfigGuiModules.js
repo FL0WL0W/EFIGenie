@@ -1,27 +1,241 @@
 var numberConfigGuiTemplate;
-function getNumberConfigGui(id, label, value, min, max, step, displayMultiplier, callBack) {
-    if(!numberConfigGuiTemplate)
-        numberConfigGuiTemplate = getFileContents("ConfigGuiModules/Number.html");
-    var template = numberConfigGuiTemplate;
-    template = template.replace(/[$]id[$]/g, id);
-    template = template.replace(/[$]label[$]/g, label);
-    if(displayMultiplier)
-        value *= displayMultiplier;
-    template = template.replace(/[$]value[$]/g, value);
-    template = template.replace(/[$]min[$]/g, min);
-    template = template.replace(/[$]max[$]/g, max);
-    template = template.replace(/[$]step[$]/g, step);
+class ConfigNumberGui extends ConfigNumber {
+    constructor(obj, parent, callBack){
+        super(obj);
+        this.GUID = getGUID();
+        this.CallBack = callBack;
+        this.Parent = parent;
 
-    $(document).off("change."+id);
-    if(callBack) {
-        $(document).on("change."+id, "#" + id, function(){
-            val = parseFloat($(this).val());
-            if(displayMultiplier) 
-                val /= displayMultiplier;
-            callBack(val);
-        });
+        switch(this.Type) {
+            case "uint8":
+            case "uint16":
+            case "uint32":
+            case "uint64":
+            case "int8":
+            case "int16":
+            case "int32":
+            case "int64":
+                if(!this.DisplayMultiplier)
+                    this.DisplayMultiplier = 1;
+                if(!this.Step)
+                    this.Step = 1 * this.DisplayMultiplier;
+                break;
+            case "float":
+                if(!this.DisplayMultiplier)
+                    this.DisplayMultiplier = 1;
+                if(!this.Step)
+                    this.Step = 0.01;
+                break;
+        }
     }
-    return template;
+
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {
+            if(key === "GUID" || key === "CallBack" || key === "Parent")
+                return undefined;
+            return value;
+        }));
+    }
+
+    UpdateReferences() {}
+
+    GetHtml() {
+        if(this.Hidden)
+            return "";
+
+        if(!numberConfigGuiTemplate)
+            numberConfigGuiTemplate = getFileContents("ConfigGuiModules/Number.html");
+        var template = numberConfigGuiTemplate;
+        template = template.replace(/[$]id[$]/g, this.GUID);
+        template = template.replace(/[$]label[$]/g, this.Label);
+        template = template.replace(/[$]value[$]/g, this.Value * this.DisplayMultiplier);
+        template = template.replace(/[$]min[$]/g, this.Min);
+        template = template.replace(/[$]max[$]/g, this.Max);
+        template = template.replace(/[$]step[$]/g, this.Step);
+
+        var thisClass = this;
+
+        $(document).off("change."+this.GUID);
+        if(this.CallBack) {
+            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+                thisClass.Value = parseFloat($(this).val()) / thisClass.DisplayMultiplier;
+                
+                switch(this.Type) {
+                    case "uint8":
+                    case "uint16":
+                    case "uint32":
+                        if(thisClass.Value < 0)
+                            thisClass.Value = 0;
+                    case "int8":
+                    case "int16":
+                    case "int32":
+                        thisClass.Value = Math.round(thisClass.Value);
+                }
+
+                if(thisClass.Value < thisClass.Min)
+                    thisClass.Value = thisClass.Min;
+                if(thisClass.Value > thisClass.Max)
+                    thisClass.Value = thisClass.Max;
+
+                $(this).val(thisClass.Value * thisClass.DisplayMultiplier)
+
+                thisClass.CallBack();
+            });
+        }
+        return template;
+    }
+}
+
+var checkBoxConfigGuiTemplate;
+class ConfigBooleanGui extends ConfigBoolean {
+    constructor(obj, parent, callBack){
+        super(obj);
+        this.GUID = getGUID();
+        this.CallBack = callBack;
+        this.Parent = parent;
+    }
+
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {
+            if(key === "GUID" || key === "CallBack" || key === "Parent")
+                return undefined;
+            return value;
+        }));
+    }
+
+    UpdateReferences() {}
+
+    GetHtml() {
+        if(this.Hidden)
+            return "";
+
+        if(!checkBoxConfigGuiTemplate)
+            checkBoxConfigGuiTemplate = getFileContents("ConfigGuiModules/CheckBox.html");
+        var template = checkBoxConfigGuiTemplate;
+        template = template.replace(/[$]id[$]/g, this.GUID);
+        template = template.replace(/[$]label[$]/g, this.Label);
+        if(this.Value)
+            template = template.replace(/[$]checked[$]/g, "checked");
+        else
+            template = template.replace(/[$]checked[$]/g, "");
+    
+        var thisClass = this;
+
+        $(document).off("change."+this.GUID);
+        if(this.CallBack) {
+            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+                thisClass.Value = this.checked;
+                thisClass.CallBack();
+            });
+        }
+    
+        return template;
+    }
+}
+
+class ConfigNumberTableGui {
+
+}
+
+class ConfigGui extends Config {
+    constructor(obj, configNameSpace, configName, parent, mainCallBack){
+        super(obj, configNameSpace, configName);
+        this.GUID = getGUID();
+        this.CallBack = mainCallBack;
+        this.Parent = parent;
+
+        var thisClass = this;
+        function callBack() {
+            if(thisClass.CallBack)
+                thisClass.CallBack();
+            this.UpdateReferences();
+        }
+
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
+
+            if(configRowObj instanceof ConfigNumber) {
+                this[configRowKey] = new ConfigNumberGui(configRowObj, this, callBack);
+            } else if(configRowObj instanceof ConfigBoolean) {
+                this[configRowKey] = new ConfigBooleanGui(configRowObj, this, callBack);
+            }
+        }
+    }
+
+    GetConfig() {
+        var returnConfig = []
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
+            var configRowValue = configRowObj.GetConfig();
+
+            if(!configRowObj)
+                throw "Config not initialized";
+
+            var configRowValue = configRowObj.GetConfig();
+
+            var returnConfigRow = {};
+            returnConfigRow[configRowKey] = configRowValue;
+            
+            returnConfig.push(returnConfigRow);
+        }
+        this.Config = returnConfig;
+        
+        return JSON.parse(JSON.stringify(this, function(key, value) {            
+            for(var configRowIndex in this.Config) {
+                var configRow = this.Config[configRowIndex];
+                if(key === "ConfigNameSpace" || key === "GUID" || key === "CallBack" || key === "Parent")
+                    return undefined;
+
+                if(key === Object.keys(configRow)[0]) {
+                    return undefined;
+                }
+            }
+            
+            return value;
+        }));
+    }
+    
+    UpdateReferences() {
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
+            
+            if(!configRowObj || !configRowObj.UpdateReferences)
+                throw "ConfigGui not initialized";
+                
+            configRowObj.UpdateReferences();
+        }
+    }
+
+    GetHtml() {
+        if(this.Hidden)
+            return "";
+
+        var template = "";
+
+        for(var configRowIndex in this.Config) {
+            var configRow = this.Config[configRowIndex];
+            var configRowKey = Object.keys(configRow)[0];
+            var configRowObj = this[configRowKey];
+            
+            if(!configRowObj || !configRowObj.GetHtml)
+                throw "ConfigGui not initialized";
+
+            template += configRowObj.GetHtml();
+        }
+    
+        if(this.WrapInConfigContainer)
+            template = wrapInConfigContainerGui(this.GUID, template);
+        else
+            template = wrapInConfigDivGui(this.GUID, template);
+
+        return template;
+    }
 }
 
 function getNumberTableConfigGui(id, dialog, label,
@@ -346,7 +560,6 @@ function getFormulaConfigGui(id, label, values, min, max, step, callBack) {
     return template;
 }
 
-var checkBoxConfigGuiTemplate;
 function getCheckBoxConfigGui(id, label, value, callBack) {
     if(!checkBoxConfigGuiTemplate)
         checkBoxConfigGuiTemplate = getFileContents("ConfigGuiModules/CheckBox.html");
@@ -600,18 +813,6 @@ function getIniConfigGui(obj, ini, idPrefix, mainCallBack) {
     return template;
 }
 
-class ConfigGui extends Config {
-    constructor(iniNameSpace, ini, callBack){
-        super(iniNameSpace, ini);
-        this.GUID = getGUID();
-        this.callBack = callBack;
-        this.IsDefaultValues = true;
-    }
-
-    GetHtml() {
-        return getIniConfigGui(this, this.iniNameSpace[this.ini], this.GUID, this.callBack);
-    }
-}
 
 var configContainerGuiTemplate;
 function wrapInConfigContainerGui(id, content)
@@ -619,6 +820,17 @@ function wrapInConfigContainerGui(id, content)
     if(!configContainerGuiTemplate)
         configContainerGuiTemplate = getFileContents("ConfigGuiModules/ConfigContainer.html");
     var template = configContainerGuiTemplate;
+    template = template.replace(/[$]id[$]/g, id);
+    template = template.replace(/[$]content[$]/g, content);
+    return template;
+}
+
+var configDivGuiTemplate;
+function wrapInConfigDivGui(id, content)
+{
+    if(!configDivGuiTemplate)
+        configDivGuiTemplate = getFileContents("ConfigGuiModules/ConfigDiv.html");
+    var template = configDivGuiTemplate;
     template = template.replace(/[$]id[$]/g, id);
     template = template.replace(/[$]content[$]/g, content);
     return template;
