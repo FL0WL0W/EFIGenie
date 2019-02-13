@@ -10,30 +10,21 @@
     display:block;
     font-weight:bold;
 }
-.configContainer .configElementSpan {
-    display: inline-block;
-}
 .configContainer .sameLineSpacer {
     width: 40px;
     display: inline-block;
 }
-.configContainer span input {
+input {
     margin: 1px;
 }
-.configContainer span input[type="number"] {
-    width: 65px;
-    border-color: #666666;
-    -moz-appearance:textfield;
-}
-.configContainer span input::-webkit-outer-spin-button,
-.configContainer span input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-}
-.configContainer span input[type="checkbox"] {
+input[type="checkbox"] {
     margin: 5px;
     border-color: #666666;
 }
-.configContainer span select {
+input[type="number"] {
+    width: 65px;
+}
+select {
     margin-left: 1px;
     margin-right: 1px;
     margin-top: 2px;
@@ -62,24 +53,23 @@
     border-color: #666666;
     border-style: solid;
 }
-.configtable input[type="number"] {
-    width: 65px;
+.configtable select {
     border-style: none;
     margin: 0px;
     line-height: 20px;
 }
 
-.configContainer span label {
+.configContainer label {
     float: left;
     width: 170px;
     padding-right: 5px;
     margin: 1px;
 }
 
-.configContainer span .subConfigSameLineLabel {
+.configContainer .subConfigSameLineLabel {
     width: 170px;
 }
-.configContainer span .subConfigLabel {
+.configContainer .subConfigLabel {
     display: block;
     float: none;
 }
