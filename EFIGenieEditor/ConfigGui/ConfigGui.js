@@ -362,7 +362,24 @@ class ConfigNumberTableGui extends ConfigNumberTable {
     }
 
     UpdateReferences() {
-        $("#" + this.GUID + "table").replaceWith(this.GetTableHtml());
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
+        var xMinRef = GetReferenceByNumberOrReference(this.Parent, this.XMin, 0);
+        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
+        var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
+        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
+        for(var x = 0; x < xResRef.Value; x++) {
+            $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
+        }
+        for(var y = 0; y < yResRef.Value; y++) {
+            $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
+        }
+        for(var x = 0; x < xResRef.Value; x++) {
+            for(var y = 0; y < yResRef.Value; y++) {
+                var valuesIndex = x + xResRef.Value * y;
+                $("#" + this.GUID + "-" + valuesIndex).val(this.Value[valuesIndex]);
+            }
+        }
     }
     GetTableHtml() {
         var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
@@ -524,14 +541,14 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                 $.each(thisClass.Value, function(index, value) {
                     if($("#" + thisClass.GUID + "-" + index).hasClass("selected")) {
                         if(!prevRow)
-                            prevRow = index % xResRef.Value;
-                        if(prevRow !== index % xResRef.Value)
+                            prevRow = parseInt(index / xResRef.Value);
+                        if(prevRow !== parseInt(index / xResRef.Value))
                             copyData += "\n";
                         else
                             copyData += "\t";
                         copyData += value;
                     }
-                    prevRow = index % xResRef.Value;
+                    prevRow = parseInt(index / xResRef.Value);
                 });
                 copyData = copyData.substring(1);
                 e.originalEvent.clipboardData.setData('text/plain', copyData);
