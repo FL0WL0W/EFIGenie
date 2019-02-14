@@ -1,7 +1,8 @@
 class Config {
-    constructor(obj, configNameSpace, configName) {
+    constructor(obj, configNameSpace, configName, parent) {
         if(obj)
             Object.assign(this, obj);
+        this.Parent = parent;
 
         this.ConfigNameSpace = configNameSpace;
 
@@ -25,8 +26,10 @@ class Config {
             if(!configRowObj)
                 configRowObj = configRow[configRowKey];
 
-            if(configRowObj.Type) {
-                if(configRowObj.Type.split("[").length == 1)
+            if(configRowObj.XResolution) {
+                this[configRowKey] = new ConfigNumberTable(configRowObj, this);
+            } else if(configRowObj.Type) {
+                if(configRowObj.Type)
                 {
                     switch(configRowObj.Type) {
                         case "uint8":
@@ -38,17 +41,17 @@ class Config {
                         case "int32":
                         case "int64":
                         case "float":
-                            this[configRowKey] = new ConfigNumber(configRowObj);
+                            this[configRowKey] = new ConfigNumber(configRowObj, this);
                             break;
                         case "bool":
-                            this[configRowKey] = new ConfigBoolean(configRowObj);
+                            this[configRowKey] = new ConfigBoolean(configRowObj, this);
                             break;
                     }
                 }
             } else if (configRowObj.ConfigName) {
-                this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace);
+                this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace, this);
             } else if (configRowObj.Selections) {
-                this[configRowKey] = new ConfigSelection(configRowObj, this.ConfigNameSpace);
+                this[configRowKey] = new ConfigSelection(configRowObj, this.ConfigNameSpace, this);
             }
         }
     }
@@ -96,7 +99,7 @@ class Config {
         this.Config = returnConfig;
         
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace")
+            if(key === "ConfigNameSpace" || key === "Parent")
                 return undefined;         
             for(var configRowIndex in this.Config) {
                 var configRow = this.Config[configRowIndex];
@@ -114,9 +117,10 @@ class Config {
 }
 
 class ConfigSelection {
-    constructor(obj, configNameSpace) {
+    constructor(obj, configNameSpace, parent) {
         if(obj)
             Object.assign(this, obj);
+        this.Parent = parent;
 
         this.ConfigNameSpace = configNameSpace;
 
@@ -151,7 +155,7 @@ class ConfigSelection {
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace")    
+            if(key === "ConfigNameSpace" || key === "Parent")    
                 return undefined;     
             if(key != "" && value.GetConfig) 
                 return value.GetConfig();      
@@ -161,9 +165,10 @@ class ConfigSelection {
 }
 
 class ConfigNumber {
-    constructor(obj) {
+    constructor(obj, parent) {
         if(obj)
             Object.assign(this, obj);
+        this.Parent = parent;
         switch(this.Type) {
             case "uint8":
                 if(!this.Min)
@@ -276,14 +281,18 @@ class ConfigNumber {
         }
     }
     GetConfig() {
-        return JSON.parse(JSON.stringify(this));
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "ConfigNameSpace" || key === "Parent")    
+                return undefined; 
+        }));
     }
 }
 
 class ConfigBoolean {
-    constructor(obj) {
+    constructor(obj, parent) {
         if(obj)
             Object.assign(this, obj);
+        this.Parent = parent;
         if(!this.Value)
             this.Value = false;
     }
@@ -295,176 +304,145 @@ class ConfigBoolean {
         return 1;
     }
     GetConfig() {
-        return JSON.parse(JSON.stringify(this));
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "ConfigNameSpace" || key === "Parent")    
+                return undefined; 
+        }));
     }
 }
 
-
-function getByteArray(obj, ini) {
-    var byteArray = new Uint8Array();
-    $.each(ini, function(iniIndex, iniRow){
-        var value = iniGetValue(obj, iniRow, iniIndex);
-        
-        if(typeof iniRow.Type === "string")
-        {
-            switch(iniRow.Type) {
-                case "bool":
-                
-                case "iniselection":
-                    byteArray = byteArray.concatArray(new Uint8Array(value.Value.GetArrayBuffer()));
-                    break;
-                default:
-                    if(iniRow.Type.indexOf("[") > -1) {
-                        switch(iniRow.Type.split("[")[0]) {
-                            case "uint8":
-                                byteArray = byteArray.concatArray(new Uint8Array(value));
-                                break;
-                            case "uint16":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Uint16Array(value).buffer));
-                                break;
-                            case "uint32":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Uint32Array(value).buffer));
-                                break;
-                            case "int8":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int8Array(value).buffer));
-                                break;
-                            case "int16":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int16Array(value).buffer));
-                                break;
-                            case "int32":
-                            byteArray = byteArray.concatArray(new Uint8Array(new Int32Array(value).buffer));
-                                break;
-                            case "formula":
-                            case "float":
-                                byteArray = byteArray.concatArray(new Uint8Array(new Float32Array(value).buffer));
-                                break;
-                        }
-                    } else {
-                        throw "getByteArray Value Invalid";
-                    }
-                    break;
-            }
-        } else {
-            byteArray = byteArray.concatArray(new Uint8Array(value.GetArrayBuffer()));
+class ConfigNumberTable {
+    constructor(obj, parent) {
+        if(obj)
+            Object.assign(this, obj);
+        this.Parent = parent;
+        if(!this.XResolution)
+            this.XResolution = 1;
+        if(!this.YResolution)
+            this.YResolution = 1;
+        if(!this.Value)
+            this.Value = new Array(this.GetTableArrayLength());
+    }
+    GetTableArrayLength() {
+        return GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1).Value * GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1).Value;
+    }
+    GetArrayBuffer() {
+        switch(this.Type) {
+            case "bool":
+            case "uint8":
+                return Uint8Array.from(this.Value);
+            case "uint16":
+                return Uint16Array.from(this.Value);
+            case "uint32":
+                return Uint32Array.from(this.Value);
+            case "uint64":
+                return Uint64Array.from(this.Value);
+            case "int8":
+                return Int8Array.from(this.Value);
+            case "int16":
+                return Int16Array.from(this.Value);
+            case "int32":
+                return Int32Array.from(this.Value);
+            case "int64":
+                return Int64Array.from(this.Value);
+            case "float":
+                return Float32Array.from(this.Value);
         }
-    });
 
-    return byteArray;
+        throw "ConfigNumberTable Type Invalid";
+    }
+    SetArrayBuffer(arrayBuffer) {
+        var arrayLen = this.GetTableArrayLength();
+
+        switch(this.Type) {
+            case "bool":
+            case "uint8":
+                this.Value = Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen)));
+                return arrayLen;
+            case "uint16":
+                this.Value = Array.from(new Uint16Array(arrayBuffer.slice(0, 2 * arrayLen)));
+                return 2 * arrayLen;
+            case "uint32":
+                this.Value = Array.from(new Uint32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                return 4 * arrayLen;
+            case "uint64":
+                this.Value = Array.from(new Uint64Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                return 8 * arrayLen;
+            case "int8":
+                this.Value = Array.from(new Int8Array(arrayBuffer.slice(0, arrayLen)));
+                return arrayLen;
+            case "int16":
+                this.Value = Array.from(new Int16Array(arrayBuffer.slice(0, 2 * arrayLen)));
+                return 2 * arrayLen;
+            case "int32":
+                this.Value = Array.from(new Int32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                return 4 * arrayLen;
+            case "int64":
+                this.Value = Array.from(new Int64Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                return 8 * arrayLen;
+            case "float":
+                this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                return 4 * arrayLen;
+        }
+
+        throw "ConfigNumberTable Type Invalid";
+    }
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "ConfigNameSpace" || key === "Parent")    
+                return undefined; 
+        }));
+    }
 }
 
-function setArrayBuffer(obj, ini, arrayBuffer) {
-    var prevLength = arrayBuffer.byteLength;
-    var setIniRow = function(iniIndex, iniRow){        
-        if(typeof iniRow.Type === "string")
-        {
-            switch(iniRow.Type) {
-                case "bool":
-                case "uint8":
-                    iniSetValue(obj, iniRow, iniIndex, new Uint8Array(arrayBuffer.slice(0, 1))[0]);
-                    arrayBuffer = arrayBuffer.slice(1);
-                    break;
-                case "uint16":
-                    iniSetValue(obj, iniRow, iniIndex, new Uint16Array(arrayBuffer.slice(0, 2))[0]);
-                    arrayBuffer = arrayBuffer.slice(2);
-                    break;
-                case "uint32":
-                    iniSetValue(obj, iniRow, iniIndex, new Uint32Array(arrayBuffer.slice(0, 4))[0]);
-                    arrayBuffer = arrayBuffer.slice(4);
-                    break;
-                case "int8":
-                    iniSetValue(obj, iniRow, iniIndex, new Int8Array(arrayBuffer.slice(0, 1))[0]);
-                    arrayBuffer = arrayBuffer.slice(1);
-                    break;
-                case "int16":
-                    iniSetValue(obj, iniRow, iniIndex, new Int16Array(arrayBuffer.slice(0, 2))[0]);
-                    arrayBuffer = arrayBuffer.slice(2);
-                    break;
-                case "int32":
-                    iniSetValue(obj, iniRow, iniIndex, new Int32Array(arrayBuffer.slice(0, 4))[0]);
-                    arrayBuffer = arrayBuffer.slice(4);
-                    break;
-                case "float":
-                    iniSetValue(obj, iniRow, iniIndex, new Float32Array(arrayBuffer.slice(0, 4))[0]);
-                    arrayBuffer = arrayBuffer.slice(4);
-                    break;
-                case "iniselection":
-                    var selectionVal;
-                    $.each(iniRow.Selections, function(selectionIndex, selectionValue) {
-                        var selectionId;
-                        if(obj.iniNameSpace[selectionValue.Ini][0].Location === "static")
-                        {
-                            switch(obj.iniNameSpace[selectionValue.Ini][0].Type) {
-                                case "uint8":
-                                    selectionId = new Uint8Array(arrayBuffer.slice(0, 1))[0];
-                                    break;
-                                case "uint16":
-                                    selectionId = new Uint16Array(arrayBuffer.slice(0, 2))[0];
-                                    break;
-                            }
-                        }
-                        if(selectionId === obj.iniNameSpace[selectionValue.Ini][0].DefaultValue)
-                        {
-                            selectionVal = {Index: selectionIndex, Value: new ConfigGui(obj.iniNameSpace, selectionValue.Ini)}
-                        }
-                    });
+function GetReferenceByNumberOrReference(referenceObj, numberOrReference, defaultValue) {
+    var value = parseInt(numberOrReference);
+    if(isNaN(value)) {
+        var ref = referenceObj[numberOrReference];
+        if(!ref)
+            return { Value: defaultValue };
+        return ref;
+    }
 
-                    if(selectionVal)
-                    {
-                        arrayBuffer = arrayBuffer.slice(selectionVal.Value.SetArrayBuffer(arrayBuffer));
-                        iniSetValue(obj, iniRow, iniIndex, selectionVal);
-                    }
-                    break;
-                default:
-                    if(iniRow.Type.indexOf("[") > -1) {
-                        var arrayLen = parseValueString(obj, iniRow.Type.split("[")[1].split("]")[0]);;
-                        if(iniRow.Type.split("[").length === 3)
-                            arrayLen *= parseValueString(obj, iniRow.Type.split("[")[2].split("]")[0]);;
-                        switch(iniRow.Type.split("[")[0]) {
-                            case "bool":
-                            case "uint8":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(arrayLen);
-                                break;
-                            case "uint16":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Uint16Array(arrayBuffer.slice(0, 2 * arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(2 * arrayLen);
-                                break;
-                            case "uint32":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Uint32Array(arrayBuffer.slice(0, 4 * arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(4 * arrayLen);
-                                break;
-                            case "int8":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Int8Array(arrayBuffer.slice(0, arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(arrayLen);
-                                break;
-                            case "int16":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Int16Array(arrayBuffer.slice(0, 2 * arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(2 * arrayLen);
-                                break;
-                            case "int32":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Int32Array(arrayBuffer.slice(0, 4 * arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(4 * arrayLen);
-                                break;
-                            case "formula":
-                                arrayLen++;
-                            case "float":
-                                iniSetValue(obj, iniRow, iniIndex, Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen))));
-                                arrayBuffer = arrayBuffer.slice(4 * arrayLen);
-                                break;
-                        }
-                        obj[iniRow.Location].XMin = parseValueString(obj, iniRow.XMin);
-                        obj[iniRow.Location].XMax = parseValueString(obj, iniRow.XMax);
-                    } else {
-                        throw "setByteArray Type Invalid";
-                    }
-                    break;
-            }
-        } else {
-            arrayBuffer = arrayBuffer.slice(iniSetValue(obj, iniRow, iniIndex, arrayBuffer));
+    return { Value: value};
+}
+
+function GetReferenceCount(referenceObj, reference) {
+    var refernceCount = 0;
+    for(key in referenceObj) {
+        if(!referenceObj[key])
+            continue;
+
+        if(referenceObj[key].XResolution && referenceObj[key].XResolution === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].XMin && referenceObj[key].XMin === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].XMax && referenceObj[key].XMax === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].YResolution && referenceObj[key].YResolution === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].YMin && referenceObj[key].YMin === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].YMax && referenceObj[key].YMax === reference) {
+            refernceCount++;
+            continue;
         }
     }
 
-    $.each(ini, setIniRow);
-
-    return prevLength - arrayBuffer.byteLength;
+    return refernceCount;
 }

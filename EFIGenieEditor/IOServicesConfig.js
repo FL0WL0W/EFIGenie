@@ -22,6 +22,12 @@ var IOServicesIni = {
         { BooleanInputServiceConfig: { ConfigName: "IBooleanInputServiceConfig" } }
     ],
 
+    IButtonServiceConfig : [
+        { Selection: { Label: "Button", Selections: [
+             { Name: "Polling", ConfigName: "ButtonService_PollingConfig"}
+        ] } }
+    ],
+
     BooleanOutputServiceConfig: [
         { BooleanOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
@@ -34,13 +40,7 @@ var IOServicesIni = {
              { Name: "Pin", ConfigName: "BooleanOutputServiceConfig"}
         ] } }
     ],
-
-    IButtonServiceConfig : [
-        { Selection: { Label: "Button", Selections: [
-             { Name: "Polling", ConfigName: "ButtonService_PollingConfig"}
-        ] } }
-    ],
-
+    
     FloatInputService_StaticConfig: [
         { FloatInputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Value: { Type: "float", Label: "Static Value" } },
@@ -51,7 +51,7 @@ var IOServicesIni = {
         { FloatInputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { AdcPin: { LType: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
-        { A: { Type: "formula[4]", Label: "Coefficients" } },
+        { A: { Type: "formula", Degree: 4, Degree: 4, Label: "Coefficients" } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } }
     ],
@@ -64,7 +64,7 @@ var IOServicesIni = {
         { MaxInputValue: { LType: "float", Label: "Max Input Voltage", Value: 3.3 } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float[Resolution]", Label: "Voltage to Value", XLabel: "Input Voltage", ZLabel: "Value", XMin: "MinInputValue", XMax: "MaxInputValue", Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Voltage to Value", XLabel: "Input Voltage", ZLabel: "Value", XMin: "MinInputValue", XMax: "MaxInputValue", Dialog: true } }
     ],
 
     FloatInputService_FrequencyPolynomialConfig: [
@@ -72,7 +72,7 @@ var IOServicesIni = {
         { PwmPin: { Type: "uint16", Label: "Pin" } },
         { MinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
-        { A: { Type: "formula[4]", Label: "Coefficients" } },
+        { A: { Type: "formula", Degree: 4, Label: "Coefficients" } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } }
     ],
@@ -85,7 +85,7 @@ var IOServicesIni = {
         { MaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1 } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 11, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float[Resolution]", Label: "Duty Cycle to Value", XLabel: "Duty Cycle", ZLabel: "Value", XMin: "MinFrequency", XMax: "MaxFrequency", Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Duty Cycle to Value", XLabel: "Duty Cycle", ZLabel: "Value", XMin: "MinFrequency", XMax: "MaxFrequency", Dialog: true } }
     ],
 
     IFloatInputServiceConfig: [
@@ -145,7 +145,7 @@ var IOServicesIni = {
         { FloatOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { PwmPin: { Type: "uint16", Label: "Pin" } },
         { Frequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
-        { A: { Type: "formula[4]", Label: "Coefficients", DisplayMultiplier: 0.01 } },
+        { A: { Type: "formula", Degree: 4, Label: "Coefficients", DisplayMultiplier: 0.01 } },
         { MinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 1, DisplayMultiplier: 0.01 } },
         { MaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 1, DisplayMultiplier: 0.01 } }
     ],
@@ -158,12 +158,12 @@ var IOServicesIni = {
         { MaxValue: { Type: "float", Label: "Max Value" } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float[Resolution]", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", DisplayMultiplier: 0.01, Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", DisplayMultiplier: 0.01, Dialog: true } }
     ],
 
     FloatOutputService_StepperPolynomialConfig: [
         { FloatOutputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
-        { A: { Type: "formula[4]", Label: "Coefficients" } },
+        { A: { Type: "formula", Degree: 4, Label: "Coefficients" } },
         { MinStepPosition: { Type: "int32", Label: "Min Step Position" } },
         { MaxStepPosition: { Type: "int32", Label: "Max Step Position" } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
@@ -175,7 +175,7 @@ var IOServicesIni = {
         { MaxValue: { Type: "float", Label: "Max Value" } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float[Resolution]", Label: "Value to Steps", XLabel: "Value", ZLabel: "Steps", XMin: "MinValue", XMax: "MaxValue", Dialog: true } },
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Steps", XLabel: "Value", ZLabel: "Steps", XMin: "MinValue", XMax: "MaxValue", Dialog: true } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
     ],
 
