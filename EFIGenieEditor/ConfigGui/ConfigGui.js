@@ -50,7 +50,7 @@ class ConfigGui extends Config {
         this.Config = returnConfig;
         
         return JSON.parse(JSON.stringify(this, function(key, value) { 
-            if(key === "ConfigNameSpace" || key === "GUID" || key === "CallBack" || key === "Parent")
+            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent")
                 return undefined;
             for(var configRowIndex in this.Config) {
                 var configRow = this.Config[configRowIndex];
@@ -138,7 +138,7 @@ class ConfigSelectionGui extends ConfigSelection {
 
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "GUID" || key === "CallBack" || key === "Parent")    
+            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent")    
                 return undefined;   
             if(key != "" && value.GetConfig) 
                 return value.GetConfig();  
@@ -230,7 +230,7 @@ class ConfigNumberGui extends ConfigNumber {
 
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "CallBack" || key === "Parent")
+            if(key === "GUID" || key === "Parent")
                 return undefined;
             return value;
         }));
@@ -305,7 +305,7 @@ class ConfigBooleanGui extends ConfigBoolean {
 
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "CallBack" || key === "Parent")
+            if(key === "GUID" || key === "Parent")
                 return undefined;
             return value;
         }));
@@ -355,7 +355,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
 
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "CallBack" || key === "Parent")
+            if(key === "GUID" || key === "Parent")
                 return undefined;
             return value;
         }));
