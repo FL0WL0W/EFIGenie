@@ -145,9 +145,9 @@ var IOServicesIni = {
         { FloatOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { PwmPin: { Type: "uint16", Label: "Pin" } },
         { Frequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
-        { A: { Type: "formula", Degree: 4, Label: "Coefficients", DisplayMultiplier: 0.01 } },
-        { MinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 1, DisplayMultiplier: 0.01 } },
-        { MaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 1, DisplayMultiplier: 0.01 } }
+        { A: { Type: "formula", Degree: 4, Label: "Coefficients", DisplayMultiplier: 100 } },
+        { MinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 100, DisplayMultiplier: 100 } },
+        { MaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 100, DisplayMultiplier: 100 } }
     ],
 
     FloatOutputService_PwmInterpolatedTableConfig: [
@@ -158,7 +158,7 @@ var IOServicesIni = {
         { MaxValue: { Type: "float", Label: "Max Value" } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", DisplayMultiplier: 0.01, Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 100, XMin: "MinValue", XMax: "MaxValue", DisplayMultiplier: 100, Dialog: true } }
     ],
 
     FloatOutputService_StepperPolynomialConfig: [

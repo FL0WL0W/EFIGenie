@@ -223,9 +223,9 @@ class ConfigNumber {
                 break;
             case "float":
                 if(!this.Min)
-                    this.Min = -3.402823e+38;
+                    this.Min = -340282300000000000000000000000000000000;
                 if(!this.Max)
-                    this.Max = 3.402823e+38;
+                    this.Max = 340282300000000000000000000000000000000;
                 break;
         }
         if(!this.Value)
@@ -322,12 +322,71 @@ class ConfigNumberTable {
         if(!this.XResolution)
             this.XResolution = 1;
         if(!this.YResolution)
-            this.YResolution = 1;
+            this.YResolution = 1; 
+        switch(this.Type) {
+            case "uint8":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 255;
+                break;
+            case "uint16":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 65535;
+                break;
+            case "uint32":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 4294967295;
+                break;
+            case "uint64":
+                if(!this.Min)
+                    this.Min = 0;
+                if(!this.Max)
+                    this.Max = 18446744073709551615;
+                break;
+            case "int8":
+                if(!this.Min)
+                    this.Min = -128;
+                if(!this.Max)
+                    this.Max = 127;
+                break;
+            case "int16":
+                if(!this.Min)
+                    this.Min = -32768;
+                if(!this.Max)
+                    this.Max = 32767;
+                break;
+            case "int32":
+                if(!this.Min)
+                    this.Min = -2147483648;
+                if(!this.Max)
+                    this.Max = 2147483647;
+                break;
+            case "int64":
+                if(!this.Min)
+                    this.Min = -9223372036854775808;
+                if(!this.Max)
+                    this.Max = 9223372036854775807;
+                break;
+            case "float":
+                if(!this.Min)
+                    this.Min = -340282300000000000000000000000000000000;
+                if(!this.Max)
+                    this.Max = 340282300000000000000000000000000000000;
+                break;
+        }
         if(!this.Value) {
+            var val = 0
+            if(this.Min > 0)
+                val = this.Min;
             this.Value = new Array(this.GetTableArrayLength());
             var thisClass = this;
             $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = 0;
+                thisClass.Value[index] = val;
             });
         }
     }
@@ -410,11 +469,18 @@ class ConfigFormula {
         this.Parent = parent;
         if(!this.Degree)
             this.Degree = 1;
+        if(!this.Min)
+            this.Min = -340282300000000000000000000000000000000;
+        if(!this.Max)
+            this.Max = 340282300000000000000000000000000000000;
         if(!this.Value) {
+            var val = 0
+            if(this.Min > 0)
+                val = this.Min;
             this.Value = new Array(this.GetTableArrayLength());
             var thisClass = this;
             $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = 0;
+                thisClass.Value[index] = val;
             });
         }
     }
