@@ -43,6 +43,9 @@ class Config {
                         case "float":
                             this[configRowKey] = new ConfigNumber(configRowObj, this);
                             break;
+                        case "formula":
+                            this[configRowKey] = new ConfigFormula(configRowObj, this);
+                            break;
                         case "bool":
                             this[configRowKey] = new ConfigBoolean(configRowObj, this);
                             break;
@@ -320,8 +323,13 @@ class ConfigNumberTable {
             this.XResolution = 1;
         if(!this.YResolution)
             this.YResolution = 1;
-        if(!this.Value)
+        if(!this.Value) {
             this.Value = new Array(this.GetTableArrayLength());
+            var thisClass = this;
+            $.each(this.Value, function(index, value) {
+                thisClass.Value[index] = 0;
+            });
+        }
     }
     GetTableArrayLength() {
         return GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1).Value * GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1).Value;
@@ -389,7 +397,41 @@ class ConfigNumberTable {
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")    
+            if(key === "Parent")    
+                return undefined; 
+        }));
+    }
+}
+
+class ConfigFormula {
+    constructor(obj, parent) {
+        if(obj)
+            Object.assign(this, obj);
+        this.Parent = parent;
+        if(!this.Degree)
+            this.Degree = 1;
+        if(!this.Value) {
+            this.Value = new Array(this.GetTableArrayLength());
+            var thisClass = this;
+            $.each(this.Value, function(index, value) {
+                thisClass.Value[index] = 0;
+            });
+        }
+    }
+    GetTableArrayLength() {
+        return GetReferenceByNumberOrReference(this.Parent, this.Degree, 0).Value + 1;
+    }
+    GetArrayBuffer() {
+        return Float32Array.from(this.Value);
+    }
+    SetArrayBuffer(arrayBuffer) {
+        var arrayLen = this.GetTableArrayLength();
+        this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+        return 4 * arrayLen;
+    }
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "Parent")    
                 return undefined; 
         }));
     }
