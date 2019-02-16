@@ -25,4 +25,8 @@ namespace TransmissionControlServices
 			_solenoidOutputServices[i]->OutputWrite(solenoidGearPosition & (1 << i));
 		}
 	}
+	unsigned char ShiftService_Solenoid::GetNumberOfGears() 
+	{
+		return _config->Gears;
+	}
 }

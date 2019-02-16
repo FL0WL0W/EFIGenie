@@ -7,6 +7,7 @@ namespace TransmissionControlServices
 	{
 	public:
 		virtual void SetGear(unsigned char gear) = 0;
+		virtual unsigned char GetNumberOfGears();
 	};
 }
 #endif

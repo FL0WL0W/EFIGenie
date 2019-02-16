@@ -22,6 +22,8 @@ class ConfigGui extends Config {
                 this[configRowKey] = new ConfigBooleanGui(configRowObj, this, this.CallBack);
             } else if(configRowObj instanceof Config) {
                 this[configRowKey] = new ConfigGui(configRowObj, this[configRowKey].ConfigNameSpace, undefined, this, this.CallBack);
+            } else if(configRowObj instanceof ConfigArray) {
+                this[configRowKey] = new ConfigArrayGui(configRowObj, this[configRowKey].ConfigNameSpace, this, this.CallBack);
             } else if(configRowObj instanceof ConfigSelection) {
                 this[configRowKey] = new ConfigSelectionGui(configRowObj, this[configRowKey].ConfigNameSpace, this, this.CallBack);
             } else if(configRowObj instanceof ConfigNumberTable) {
@@ -108,7 +110,7 @@ class ConfigGui extends Config {
                 if(this.SameLine) 
                     template = "<label for=\"" + this.GUID + "\" class=\"subConfigSameLineLabel\">" + this.Label + ":</label>" + template;
                 else
-                    template = "<label for=\"" + this.GUID + "\" class=\"subConfigLabel\">" + this.Label + "</label><span class=\"sameLineSpacer\"></span>" + template;
+                    template = "<label for=\"" + this.GUID + "\" class=\"subConfigLabel\">" + this.Label + ":</label><span class=\"sameLineSpacer\"></span>" + template;
             }
 
         return "<span id=\"span"+this.GUID+"\">" + template + "</span>";
@@ -741,9 +743,9 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
 
         var template = "";
-        if(xResRef.GetHtml && GetReferenceCount(this.Parent, this.XResolution) === 1)
+        if(xResRef.GetHtml && GetReferenceCount(this.Parent, this.XResolution) === 1 && this.XMax !== this.XResolution && this.XMin !== this.XResolution)
             template += xResRef.GetHtml();
-        if(yResRef.GetHtml && GetReferenceCount(this.Parent, this.YResolution) === 1)
+        if(yResRef.GetHtml && GetReferenceCount(this.Parent, this.YResolution) === 1 && this.YMax !== this.YResolution && this.YMin !== this.YResolution)
             template += yResRef.GetHtml();
 
         template += this.GetTableHtml();
@@ -831,6 +833,93 @@ class ConfigFormulaGui extends ConfigNumberTable {
         });
     
         return "<span id=\"span" + this.GUID + "\">" + template + "</span>";
+    }
+}
+
+class ConfigArrayGui extends ConfigArray {
+    constructor(obj, configNameSpace, parent, mainCallBack){
+        super(obj, configNameSpace, parent);
+        this.GUID = getGUID();
+        this.CallBack = mainCallBack;
+
+        var thisClass = this;
+        this.CallBack = function() {
+            if(mainCallBack)
+                mainCallBack();
+            thisClass.UpdateReferences();
+        }
+
+        this.CurrentTableArrayLength = this.GetTableArrayLength();
+
+        var thisClass = this;
+        $.each(this.Value, function(index, value) {
+            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+        });
+    }
+
+    SetArrayBuffer(arrayBuffer) {
+        var size = super.SetArrayBuffer(arrayBuffer);
+        var thisClass = this;
+        $.each(this.Value, function(index, value) {
+            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+        });
+        return size;
+    }
+
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent" || key === "CurrentTableArrayLength")    
+                return undefined;   
+            if(key != "" && value.GetConfig) 
+                 return value.GetConfig();  
+            return value;
+        }));
+    }
+    
+    UpdateReferences() {
+        var tableArrayLength = this.GetTableArrayLength();
+        if(!this.Value || this.CurrentTableArrayLength !== tableArrayLength) {
+            var prevValue = this.Value;
+            var prevValueLength = 0;
+            if(prevValue)
+                prevValueLength = prevValue.length;
+            this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
+    
+            for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
+                var subConfig = {};
+                Object.assign(subConfig, this);
+                delete subConfig.Array;
+                delete subConfig.Value;
+                subConfig.Label = subConfig.Label + "[" + i + "]";
+
+                if(i < prevValueLength) {
+                    this.Value[i] = prevValue[i];
+                    $("#span"+this.Value[i].GUID).show();
+                    this.Value[i].UpdateReferences();
+                } else {
+                    this.Value[i] = new ConfigGui(subConfig, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+                    $("#span"+this.GUID).append(this.Value[i].GetHtml());
+                }
+
+                if(i >= tableArrayLength) {
+                    $("#span"+this.Value[i].GUID).hide();
+                }
+            }
+        }
+        this.CurrentTableArrayLength = tableArrayLength;
+    }
+
+    GetHtml() {
+        if(this.Hidden)
+            return "";
+
+        var template = "<span id=\"span"+this.GUID+"\">";
+
+        $.each(this.Value, function(index, value) {
+            template += value.GetHtml();
+        });
+
+        return template + "</span>";
     }
 }
 

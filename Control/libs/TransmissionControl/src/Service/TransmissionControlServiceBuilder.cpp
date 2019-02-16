@@ -156,7 +156,8 @@ namespace Service
 				IButtonService *buttonServiceDown = CreateButtonService(serviceLocator, &config, totalSize);
 
 				*totalSize += sizeof(unsigned char);
-				ret = new GearControlService_ButtonShift(*((unsigned char *)config),(IShiftService*)serviceLocator->Locate(GEAR_CONTROL_SERVICE_ID), buttonServiceUp, buttonServiceDown);
+				IShiftService *shiftService = (IShiftService*)serviceLocator->Locate(SHIFT_SERVICE_ID);
+				ret = new GearControlService_ButtonShift(shiftService->GetNumberOfGears(), shiftService, buttonServiceUp, buttonServiceDown);
 			break;
 #endif
 		}

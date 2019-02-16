@@ -1,31 +1,31 @@
 var SensorServicesIni = {
     IntakeAirTemperatureConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2002 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+        { IntakeAirTemperatureServiceId: { Type: "uint16", Value: 2002, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" }}
     ],
-    EngineCoolantTemperatureConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2003 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+    EngineCoolantTemperatureServiceId: [
+        { EngineCoolantTemperatureServiceId: { Type: "uint16", Value: 2003, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ],
-    ManifoldAbsolutePressureConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2004 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+    ManifoldAbsolutePressureServiceId: [
+        { ManifoldAbsolutePressureServiceId: { Type: "uint16", Value: 2004, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ],
     VoltageConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2005 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+        { VoltageServiceId: { Type: "uint16", Value: 2005, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ],
     ThrottlePositionConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2006 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+        { ThrottlePositionServiceId: { Type: "uint16", Value: 2006, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ],
     EthanolContentConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2007 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+        { EthanolContentServiceId: { Type: "uint16", Value: 2007, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ],
     VehicleSpeedConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 2008 },
-        { Location: "FloatInputService", Ini: "IFloatInputServiceConfig" }
+        { VehicleSpeedServiceId: { Type: "uint16", Value: 2008, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ]
 }
 
@@ -35,42 +35,42 @@ for(var k in IOServicesIni)
 
 var TransmissionControlServicesIni = {
     IShiftServiceConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 4009 },
-        { Location: "Selection", Type: "iniselection", Label: "Shift Service", DefaultValue: {Index: 0}, WrapInConfigContainer: false, Selections: [
-            { Name: "Solenoid", Ini: "ShiftService_SolenoidConfig"}
-        ] }
+        { IShiftServiceServiceId: { Type: "uint16", Value: 4009, Hidden: true } },
+        { Selection: { Label: "Shift Service", Selections: [
+            { Name: "Solenoid", ConfigName: "ShiftService_SolenoidConfig"}
+        ] } }
     ],
 
     ShiftService_SolenoidConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 1 },
-        { Location: "Gears", Type: "uint8", Label: "Gears", DefaultValue: 0, Min: 1, Max: 255, Step: 1 },
-        { Location: "Solenoids", Type: "uint8", Label: "Solenoids", DefaultValue: 0, Min: 1, Max: 32, Step: 1 },
-        { Location: "SolenoidGearPositions", Type: "uint32[Gears]", Label: "Solenoid Gear Positions", XLabel: "Gear", ZLabel: "Solenoid Position", DefaultValue: 0, Min: 0, Max: 4294967295, Step: 1, XMin: "1", XMax: "Gears", Dialog: true },
-        { Location: "SolenoidConfigs", Label: "Solenoid Configs", Ini: "BooleanOutputServiceConfig[Solenoids]"}
+        { ShiftService_SolenoidServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { Gears: { Type: "uint8", Label: "Gears", Value: 5, Min: 1, Max: 255, Step: 1 } },
+        { Solenoids: { Type: "uint8", Label: "Solenoids", Value: 2, Min: 1, Max: 32, Step: 1 } },
+        { SolenoidGearPositions: { Type: "uint32", Label: "Solenoid Gear Positions", XLabel: "Gear", ZLabel: "Solenoid Position", XResolution: "Gears", XMin: 1, XMax: "Gears", Dialog: true } },
+        { SolenoidConfigs: { Label: "Solenoid Config", ConfigName: "IBooleanOutputServiceConfig", Array: "Solenoids"} }
     ],
     
     GearControlService_ButtonShiftConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 1 },
-        { Location: "ButtonUp", Label: "Shift Up", Ini: "IButtonServiceConfig"},
-        { Location: "ButtonDown", Label: "Shift Down", Ini: "IButtonServiceConfig"}
+        { GearControlService_ButtonShiftServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { ButtonUp: { Label: "Shift Up", ConfigName: "IButtonServiceConfig"} },
+        { ButtonDown: { Label: "Shift Down", ConfigName: "IButtonServiceConfig"} }
     ],
 
     IGearControlServiceConfig: [
-        { Location: "static", Type: "uint8", DefaultValue: 4010 },
-        { Location: "Selection", Type: "iniselection", Label: "Gear Control", DefaultValue: {Index: 0}, WrapInConfigContainer: false, Selections: [
-            { Name: "Button Shift", Ini: "GearControlService_ButtonShiftConfig"}
-        ] }
+        { IGearControlServiceServiceId: { Type: "uint16", Value: 4010, Hidden: true } },
+        { Selection: { Label: "Gear Control", Selections: [
+            { Name: "Button Shift", ConfigName: "GearControlService_ButtonShiftConfig"}
+        ] } }
     ],
 
     SimpleButtonControlConfig: [
-        { Location: "ShiftService", Ini: "IShiftServiceConfig"},
-        { Location: "GearControlService", Ini: "IGearControlServiceConfig"}
+        { ShiftService: { ConfigName: "IShiftServiceConfig"} },
+        { GearControlService: { ConfigName: "IGearControlServiceConfig"} }
     ],
 
     Main: [
-        { Location: "Selection", Type: "iniselection", Label: "Gear Control", DefaultValue: {Index: 0}, WrapInConfigContainer: false, Selections: [
-            { Name: "Simple Button Control", Ini: "SimpleButtonControlConfig"}
-        ] }
+        { Selection: { Label: "Transmission Control", Selections: [
+            { Name: "Simple Button Control", ConfigName: "SimpleButtonControlConfig"}
+        ] } }
     ],
 };
 

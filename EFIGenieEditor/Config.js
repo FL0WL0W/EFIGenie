@@ -52,7 +52,11 @@ class Config {
                     }
                 }
             } else if (configRowObj.ConfigName) {
-                this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace, this);
+                if(!configRowObj.Array) {
+                    this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace, undefined, this);
+                } else {
+                    this[configRowKey] = new ConfigArray(configRowObj, this.ConfigNameSpace, this);
+                }
             } else if (configRowObj.Selections) {
                 this[configRowKey] = new ConfigSelection(configRowObj, this.ConfigNameSpace, this);
             }
@@ -77,7 +81,7 @@ class Config {
             var configRowKey = Object.keys(configRow)[0];
             var configRowObj = this[configRowKey];
 
-            arrayBuffer = arrayBuffer.slice(configRowObj.SetArrayBuffer(arrayBuffer));
+            size += configRowObj.SetArrayBuffer(arrayBuffer.slice(size));
         }
 
         return size;
@@ -132,7 +136,7 @@ class ConfigSelection {
         }
 
         if(!this.Value) {
-            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace);
+            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, undefined, this.Parent);
         }
     }
     GetArrayBuffer() {
@@ -144,7 +148,7 @@ class ConfigSelection {
             !(this.Value.Config[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === this.Value.Config[0].Value)) {
 
             $.each(this.Selections, function(selectionIndex, selectionValueObj) {
-                selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace);
+                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, undefined, this.Parent);
 
                 if( (selectionValue.Config[0].Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionValue.Config[0].Value) ||
                     (selectionValue.Config[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectionValue.Config[0].Value)) {
@@ -397,23 +401,23 @@ class ConfigNumberTable {
         switch(this.Type) {
             case "bool":
             case "uint8":
-                return Uint8Array.from(this.Value);
+                return Uint8Array.from(this.Value).buffer;
             case "uint16":
-                return Uint16Array.from(this.Value);
+                return Uint16Array.from(this.Value).buffer;
             case "uint32":
-                return Uint32Array.from(this.Value);
+                return Uint32Array.from(this.Value).buffer;
             case "uint64":
-                return Uint64Array.from(this.Value);
+                return Uint64Array.from(this.Value).buffer;
             case "int8":
-                return Int8Array.from(this.Value);
+                return Int8Array.from(this.Value).buffer;
             case "int16":
-                return Int16Array.from(this.Value);
+                return Int16Array.from(this.Value).buffer;
             case "int32":
-                return Int32Array.from(this.Value);
+                return Int32Array.from(this.Value).buffer;
             case "int64":
-                return Int64Array.from(this.Value);
+                return Int64Array.from(this.Value).buffer;
             case "float":
-                return Float32Array.from(this.Value);
+                return Float32Array.from(this.Value).buffer;
         }
 
         throw "ConfigNumberTable Type Invalid";
@@ -498,6 +502,82 @@ class ConfigFormula {
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
             if(key === "Parent")    
+                return undefined; 
+        }));
+    }
+}
+
+class ConfigArray {
+    constructor(obj, configNameSpace, parent) {
+        if(obj)
+            Object.assign(this, obj);
+        this.Parent = parent;
+        
+        this.ConfigNameSpace = configNameSpace;
+
+        var tableArrayLength = this.GetTableArrayLength()
+
+        if(!this.Value || this.Value.length < tableArrayLength) {
+            var prevValue = this.Value;
+            var prevValueLength = 0;
+            if(prevValue)
+                prevValueLength = prevValue.length;
+            this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
+    
+            for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
+                var subConfig = {};
+                Object.assign(subConfig, this);
+                delete subConfig.Array;
+                delete subConfig.Value;
+                subConfig.Label = subConfig.Label + "[" + i + "]";
+
+                if(i < prevValueLength)
+                    this.Value[i] = prevValue[i];
+                else
+                    this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, this.Parent);
+            }
+        }
+    }
+    GetTableArrayLength() {
+        return GetReferenceByNumberOrReference(this.Parent, this.Array, 0).Value;
+    }
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+        for(var config in this.Value) {
+            arrayBuffer = arrayBuffer.concatArray(this.Value[config].GetArrayBuffer());
+        }
+        return arrayBuffer;
+    }
+    SetArrayBuffer(arrayBuffer) {
+        var size = 0;
+
+        var tableArrayLength = this.GetTableArrayLength()
+
+        var prevValue = this.Value;
+        var prevValueLength = 0;
+        if(prevValue)
+            prevValueLength = prevValue.length;
+        this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
+
+        for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
+            if(i < tableArrayLength) {
+                var subConfig = {};
+                Object.assign(subConfig, this);
+                delete subConfig.Array;
+                delete subConfig.Value;
+                subConfig.Label = subConfig.Label + "[" + i + "]";
+                this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, this.Parent);
+                size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
+            } else {
+                this.Value[i] = prevValue[i];
+            }
+        }
+
+        return size;
+    }
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {   
+            if(key === "ConfigNameSpace" || key === "Parent")    
                 return undefined; 
         }));
     }

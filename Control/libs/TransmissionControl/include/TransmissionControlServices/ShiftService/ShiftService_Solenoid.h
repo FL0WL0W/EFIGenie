@@ -46,6 +46,7 @@ namespace TransmissionControlServices
 			ShiftService_SolenoidConfig *config,
 			IBooleanOutputService **solenoidOutputServices);
 		void SetGear(unsigned char gear);
+		unsigned char GetNumberOfGears();
 	};
 }
 #endif
