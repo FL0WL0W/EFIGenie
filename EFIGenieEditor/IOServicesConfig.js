@@ -1,4 +1,11 @@
 var IOServicesIni = {
+    BlankConfig: [
+    ],
+
+    NoneServiceConfig: [
+        { ServiceId: { Type: "uint8", Value: 0, Hidden:true }}
+    ],
+
     BooleanInputService_StaticConfig: [
         { BooleanInputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Value: { Type: "bool", Label: "Static Value" } }
@@ -11,9 +18,10 @@ var IOServicesIni = {
     ],
 
     IBooleanInputServiceConfig: [
-        { Selection: { Label: "Input", Index: 1, Selections: [
-             { Name: "Static", ConfigName: "BooleanInputService_StaticConfig"},
-             { Name: "Pin", ConfigName: "BooleanInputServiceConfig"}
+        { Selection: { Label: "Input", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "Static", ConfigName: "BooleanInputService_StaticConfig" },
+            { Name: "Pin", ConfigName: "BooleanInputServiceConfig" }
         ] } }
     ],
 
@@ -24,7 +32,8 @@ var IOServicesIni = {
 
     IButtonServiceConfig : [
         { Selection: { Label: "Button", Selections: [
-             { Name: "Polling", ConfigName: "ButtonService_PollingConfig"}
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "Polling", ConfigName: "ButtonService_PollingConfig" }
         ] } }
     ],
 
@@ -37,7 +46,8 @@ var IOServicesIni = {
 
     IBooleanOutputServiceConfig: [
         { Selection: { Label: "Output", Selections: [
-             { Name: "Pin", ConfigName: "BooleanOutputServiceConfig"}
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "Pin", ConfigName: "BooleanOutputServiceConfig" }
         ] } }
     ],
     
@@ -85,45 +95,46 @@ var IOServicesIni = {
         { MaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1 } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 11, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float", XResolution: "Resolution", Label: "Duty Cycle to Value", XLabel: "Duty Cycle", ZLabel: "Value", XMin: "MinFrequency", XMax: "MaxFrequency", Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Frequency to Value", XLabel: "Frequency", ZLabel: "Value", XMin: "MinFrequency", XMax: "MaxFrequency", Dialog: true } }
     ],
 
     IFloatInputServiceConfig: [
-        { Selection: { Label: "Input", Index: 4, Selections: [
-             { Name: "Static", ConfigName: "FloatInputService_StaticConfig"},
-             { Name: "Analog Pin Polynomial", ConfigName: "FloatInputService_AnalogPolynomialConfig"},
-             { Name: "Analog Pin Lookup Table", ConfigName: "FloatInputService_AnalogInterpolatedTableConfig"},
-             { Name: "Frequency Pin Polynomial", ConfigName: "FloatInputService_FrequencyPolynomialConfig"},
-             { Name: "Frequency Pin Lookup Table", ConfigName: "FloatInputService_FrequencyInterpolatedTableConfig"}
+        { Selection: { Label: "Input", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "Static", ConfigName: "FloatInputService_StaticConfig" },
+            { Name: "Analog Pin Polynomial", ConfigName: "FloatInputService_AnalogPolynomialConfig" },
+            { Name: "Analog Pin Lookup Table", ConfigName: "FloatInputService_AnalogInterpolatedTableConfig" },
+            { Name: "Frequency Pin Polynomial", ConfigName: "FloatInputService_FrequencyPolynomialConfig" },
+            { Name: "Frequency Pin Lookup Table", ConfigName: "FloatInputService_FrequencyInterpolatedTableConfig" }
         ] } }
     ],
 
     StepperOutputService_StepDirectionControlConfig: [
         { StepperOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
-        { StepWidth: { Type: "float", Label: "Step Pulse Width (ms)", Value: 0.005, Max: 1, DisplayMultiplier: 1000 } },
-        { StepBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "Step Output Config"} },
-        { DirectionBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "Direction Output Config"} }
+        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1} },
+        { StepBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "Step Output Config" } },
+        { DirectionBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "Direction Output Config" } }
     ],
 
     StepperOutputService_FullStepControlConfig: [
         { StepperOutputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
-        { StepWidth: { Type: "float", Label: "Step Pulse Width (ms)", Value: 0.005, Max: 1, DisplayMultiplier: 1000 } },
-        { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+"} },
-        { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-"} },
-        { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+"} },
-        { BMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B-"} }
+        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
+        { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
+        { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-" } },
+        { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+" } },
+        { BMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B-" } }
     ],
 
     StepperOutputService_HalfStepControlConfig: [
         { StepperOutputServiceTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
-        { StepWidth: { Type: "float", Label: "Step Pulse Width (ms)", Value: 0.005, Max: 1, DisplayMultiplier: 1000 } },
-        { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+"} },
-        { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-"} },
-        { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+"} },
-        { BMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B-"} }
+        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
+        { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
+        { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-" } },
+        { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+" } },
+        { BMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B-" } }
     ],
 
     StepperOutputService_StaticStepCalibrationWrapperConfig: [
@@ -134,10 +145,11 @@ var IOServicesIni = {
 
     IStepperOutputServiceConfig: [
         { Selection: { Label: "Input", Selections: [
-             { Name: "Step Direction", ConfigName: "StepperOutputService_StepDirectionControlConfig"},
-             { Name: "Full Step Coil Control", ConfigName: "StepperOutputService_FullStepControlConfig"},
-             { Name: "Half Step Coil Control", ConfigName: "StepperOutputService_HalfStepControlConfig"},
-             { Name: "Step Calibration Wrapper", ConfigName: "StepperOutputService_StaticStepCalibrationWrapperConfig"}
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "Step Direction", ConfigName: "StepperOutputService_StepDirectionControlConfig" },
+            { Name: "Full Step Coil Control", ConfigName: "StepperOutputService_FullStepControlConfig" },
+            { Name: "Half Step Coil Control", ConfigName: "StepperOutputService_HalfStepControlConfig" },
+            { Name: "Step Calibration Wrapper", ConfigName: "StepperOutputService_StaticStepCalibrationWrapperConfig" }
         ] } }
     ],
 
@@ -145,9 +157,9 @@ var IOServicesIni = {
         { FloatOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { PwmPin: { Type: "uint16", Label: "Pin" } },
         { Frequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
-        { A: { Type: "formula", Degree: 4, Label: "Coefficients", DisplayMultiplier: 100 } },
-        { MinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 100, DisplayMultiplier: 100 } },
-        { MaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 100, DisplayMultiplier: 100 } }
+        { A: { Type: "formula", Degree: 4, Label: "Coefficients" } },
+        { MinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 1 } },
+        { MaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 1 } }
     ],
 
     FloatOutputService_PwmInterpolatedTableConfig: [
@@ -158,7 +170,7 @@ var IOServicesIni = {
         { MaxValue: { Type: "float", Label: "Max Value" } },
         { Resolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 100, XMin: "MinValue", XMax: "MaxValue", DisplayMultiplier: 100, Dialog: true } }
+        { Table: { Type: "float", XResolution: "Resolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", Dialog: true } }
     ],
 
     FloatOutputService_StepperPolynomialConfig: [
@@ -180,11 +192,12 @@ var IOServicesIni = {
     ],
 
     IFloatOutputServiceConfig: [
-        { Selection: { Label: "Output", Index: 1, Selections: [
-             { Name: "PWM Pin Polynomial", ConfigName: "FloatOutputService_PwmPolynomialConfig"},
-             { Name: "PWM Pin Lookup Table", ConfigName: "FloatOutputService_PwmInterpolatedTableConfig"},
-             { Name: "Stepper Polynomial", ConfigName: "FloatOutputService_StepperPolynomialConfig"},
-             { Name: "Stepper Lookup Table", ConfigName: "FloatOutputService_StepperInterpolatedTableConfig"}
+        { Selection: { Label: "Output", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig" },
+            { Name: "PWM Pin Polynomial", ConfigName: "FloatOutputService_PwmPolynomialConfig" },
+            { Name: "PWM Pin Lookup Table", ConfigName: "FloatOutputService_PwmInterpolatedTableConfig" },
+            { Name: "Stepper Polynomial", ConfigName: "FloatOutputService_StepperPolynomialConfig" },
+            { Name: "Stepper Lookup Table", ConfigName: "FloatOutputService_StepperInterpolatedTableConfig" }
         ] } }
     ],
 

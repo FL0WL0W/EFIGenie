@@ -4,12 +4,14 @@
         <script src="utils.js"></script>
         <script src="Config.js"></script>
         <script src="IOServicesConfig.js"></script>
+        <script src="SensorServicesConfig.js"></script>
         <script src="TransmissionControlServicesConfig.js"></script>
+        <script src="EngineControlServicesConfig.js"></script>
         <script src="ConfigGui/ConfigGui.js"></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
             $(document).ready(function() {
-                var b = new ConfigGui(undefined, TransmissionControlServicesIni);
+                var b = new ConfigGui(undefined, EngineControlServicesIni);
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
                                         
@@ -53,7 +55,7 @@
                             return;
                         }
 
-                        b = new ConfigGui(JSON.parse(evt.target.result), IOServicesIni);
+                        b = new ConfigGui(JSON.parse(evt.target.result), EngineControlServicesIni);
                         $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                     };
                     

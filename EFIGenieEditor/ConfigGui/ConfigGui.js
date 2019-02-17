@@ -208,8 +208,6 @@ class ConfigNumberGui extends ConfigNumber {
         super(obj, parent);
         this.GUID = getGUID();
         this.CallBack = callBack;
-        if(!this.DisplayMultiplier) 
-            this.DisplayMultiplier = 1;
         switch(this.Type) {
             case "uint8":
             case "uint16":
@@ -220,7 +218,7 @@ class ConfigNumberGui extends ConfigNumber {
             case "int32":
             case "int64":
                 if(!this.Step)
-                    this.Step = Math.max(1 * this.DisplayMultiplier, 0.01);
+                    this.Step = Math.max(1, 0.01);
                 break;
             case "float":
                 if(!this.Step)
@@ -255,7 +253,7 @@ class ConfigNumberGui extends ConfigNumber {
         if(this.Value > this.Max)
             this.Value = this.Max;
 
-        $("#" + this.GUID).val(this.Value * this.DisplayMultiplier)
+        $("#" + this.GUID).val(this.Value)
     }
 
     GetHtml(inputOnly) {
@@ -276,16 +274,16 @@ class ConfigNumberGui extends ConfigNumber {
         }
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]label[$]/g, this.Label);
-        template = template.replace(/[$]value[$]/g, this.Value * this.DisplayMultiplier);
-        template = template.replace(/[$]min[$]/g, this.Min * this.DisplayMultiplier);
-        template = template.replace(/[$]max[$]/g, this.Max * this.DisplayMultiplier);
+        template = template.replace(/[$]value[$]/g, this.Value);
+        template = template.replace(/[$]min[$]/g, this.Min);
+        template = template.replace(/[$]max[$]/g, this.Max);
         template = template.replace(/[$]step[$]/g, this.Step);
 
         var thisClass = this;
 
         $(document).off("change."+this.GUID);
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = parseFloat($(this).val()) / thisClass.DisplayMultiplier;
+            thisClass.Value = parseFloat($(this).val());
             
             thisClass.UpdateReferences();
 
@@ -361,8 +359,6 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         super(obj, parent);
         this.GUID = getGUID();
         this.CallBack = callBack;
-        if(!this.DisplayMultiplier) 
-            this.DisplayMultiplier = 1;
         switch(this.Type) {
             case "uint8":
             case "uint16":
@@ -373,7 +369,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
             case "int32":
             case "int64":
                 if(!this.Step)
-                    this.Step = Math.max(1 * this.DisplayMultiplier, 0.01);
+                    this.Step = Math.max(1, 0.01);
                 break;
             case "float":
                 if(!this.Step)
@@ -439,39 +435,18 @@ class ConfigNumberTableGui extends ConfigNumberTable {
             this.InterpolateTable();
             $('#' + this.GUID + 'table').replaceWith(this.GetTableHtml());
         } else {
-            if(xMinRef.DisplayMultiplier && xMaxRef.DisplayMultiplier && xMinRef.DisplayMultiplier !== xMaxRef.DisplayMultiplier) {
-                throw "XMin and XMax references do not share the same DisplayMultiplier"
-            }
-    
-            var xMinDisplayMultiplier = xMinRef.DisplayMultiplier;
-            if(xMinDisplayMultiplier)
-                xMinDisplayMultiplier = 1;
-            var xMaxDisplayMultiplier = xMaxRef.DisplayMultiplier;
-            if(xMaxDisplayMultiplier)
-                xMaxDisplayMultiplier = 1;
-    
-            if(yMinRef.DisplayMultiplier && yMaxRef.DisplayMultiplier && yMinRef.DisplayMultiplier !== yMaxRef.DisplayMultiplier) {
-                throw "YMin and YMax references do not share the same DisplayMultiplier"
-            }
-    
-            var yMinDisplayMultiplier = yMinRef.DisplayMultiplier;
-            if(yMinDisplayMultiplier)
-                yMinDisplayMultiplier = 1;
-            var yMaxDisplayMultiplier = yMaxRef.DisplayMultiplier;
-            if(yMaxDisplayMultiplier)
-                yMaxDisplayMultiplier = 1;
                 
             this.InterpolateTable();
             for(var x = 0; x < xResRef.Value; x++) {
-                $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value * xMaxDisplayMultiplier - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value * xMinDisplayMultiplier).toFixed(6)).toPrecision(7)));
+                $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
             }
             for(var y = 0; y < yResRef.Value; y++) {
-                $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value * yMaxDisplayMultiplier - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value * yMinDisplayMultiplier).toFixed(6)).toPrecision(7)));
+                $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
             }
             for(var x = 0; x < xResRef.Value; x++) {
                 for(var y = 0; y < yResRef.Value; y++) {
                     var valuesIndex = x + xResRef.Value * y;
-                    $("#" + this.GUID + "-" + valuesIndex).val(this.Value[valuesIndex] * this.DisplayMultiplier);
+                    $("#" + this.GUID + "-" + valuesIndex).val(this.Value[valuesIndex]);
                 }
             }
         }
@@ -483,28 +458,6 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
         var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
         var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
-
-        if(xMinRef.DisplayMultiplier && xMaxRef.DisplayMultiplier && xMinRef.DisplayMultiplier !== xMaxRef.DisplayMultiplier) {
-            throw "XMin and XMax references do not share the same DisplayMultiplier"
-        }
-
-        var xMinDisplayMultiplier = xMinRef.DisplayMultiplier;
-        if(xMinDisplayMultiplier)
-            xMinDisplayMultiplier = 1;
-        var xMaxDisplayMultiplier = xMaxRef.DisplayMultiplier;
-        if(xMaxDisplayMultiplier)
-            xMaxDisplayMultiplier = 1;
-
-        if(yMinRef.DisplayMultiplier && yMaxRef.DisplayMultiplier && yMinRef.DisplayMultiplier !== yMaxRef.DisplayMultiplier) {
-            throw "YMin and YMax references do not share the same DisplayMultiplier"
-        }
-
-        var yMinDisplayMultiplier = yMinRef.DisplayMultiplier;
-        if(yMinDisplayMultiplier)
-            yMinDisplayMultiplier = 1;
-        var yMaxDisplayMultiplier = yMaxRef.DisplayMultiplier;
-        if(yMaxDisplayMultiplier)
-            yMaxDisplayMultiplier = 1;
 
         var thisClass = this;
         $(document).off("change."+this.GUID);
@@ -549,7 +502,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             // - - - -
-                            row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value * xMaxDisplayMultiplier - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value * xMinDisplayMultiplier).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                            row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
                         }
                     }
                 } else {
@@ -578,7 +531,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             if(yResRef.Value === 1) {
                                 row += "<th>" + this.ZLabel + "</th>";
                             } else {
-                                row += "<td><input id=\"" + id + "y" + y + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((yMaxRef.Value * yMaxDisplayMultiplier - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value * yMinDisplayMultiplier).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                                row += "<td><input id=\"" + id + "y" + y + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
                             }
                         }
                     } else {
@@ -594,15 +547,11 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         else
                             rowClass = "";
                         var value = this.Value[valuesIndex];
-                        if(this.DisplayMultiplier)
-                            value *= this.DisplayMultiplier;
-                        row += "<td><input id=\"" + inputId + "\" type=\"number\" min=\"" + (this.Min * this.DisplayMultiplier) + "\" max=\"" + (this.Max * this.DisplayMultiplier) + "\" step=\"" + this.Step + "\" value=\"" + value + "\""+rowClass+"/></td>";
+                        row += "<td><input id=\"" + inputId + "\" type=\"number\" min=\"" + (this.Min) + "\" max=\"" + (this.Max) + "\" step=\"" + this.Step + "\" value=\"" + value + "\""+rowClass+"/></td>";
 
                         var registerListener = function(valuesIndex) {
                             $(document).on("change."+thisClass.GUID, "#" + inputId, function(){
                                 var val = parseFloat($(this).val());
-                                if(thisClass.DisplayMultiplier) 
-                                    val /= thisClass.DisplayMultiplier;
                                 thisClass.Value[valuesIndex] = val;
                                 var selectedCount = 0;
                                 $.each(thisClass.Value, function(selectedindex, value) { if ($("#" + thisClass.GUID + "-" + selectedindex).hasClass("selected")) selectedCount++; });
@@ -780,8 +729,6 @@ class ConfigFormulaGui extends ConfigNumberTable {
         super(obj, parent);
         this.GUID = getGUID();
         this.CallBack = callBack;
-        if(!this.DisplayMultiplier) 
-            this.DisplayMultiplier = 1;
         if(!this.Step)
             this.Step = 0.01;
         var degreeRef = GetReferenceByNumberOrReference(this.Parent, this.Degree, 1);
@@ -804,7 +751,7 @@ class ConfigFormulaGui extends ConfigNumberTable {
         } else {
             $("#span" + this.GUID).replaceWith(this.GetHtml());
             for(var d = 0; d < degreeRef.Value + 1; d++) {
-                $("#" + this.GUID + "-" + d).val(this.Value[d] * this.DisplayMultiplier);
+                $("#" + this.GUID + "-" + d).val(this.Value[d]);
             }
         }
         this.CurrentDegree = degreeRef.Value;
@@ -813,13 +760,13 @@ class ConfigFormulaGui extends ConfigNumberTable {
         var template = "<label>" + this.Label + ":</label>";
         for(var i = this.Value.length-1; i > 0; i--)
         {
-            template += "<input id=\"" + this.GUID + "-" + i + "\" type=\"number\" min=\"" + (this.Min * this.DisplayMultiplier) + "\" max=\"" + (this.Max * this.DisplayMultiplier) + "\" step=\"" + this.Step + "\" value=\"" + this.Value[i] + "\"/>";
+            template += "<input id=\"" + this.GUID + "-" + i + "\" type=\"number\" min=\"" + this.Min + "\" max=\"" + this.Max + "\" step=\"" + this.Step + "\" value=\"" + this.Value[i] + "\"/>";
             if(i > 1)
                 template += " x<sup>" + i + "</sup> + ";
             else
                 template += " x + ";
         }
-        template += "<input id=\"" + this.GUID + "-0\" type=\"number\" min=\"" + (this.Min * this.DisplayMultiplier) + "\" max=\"" + (this.Max * this.DisplayMultiplier) + "\" step=\"" + this.Step + "\" value=\"" + this.Value[0] + "\"/>";
+        template += "<input id=\"" + this.GUID + "-0\" type=\"number\" min=\"" + this.Min + "\" max=\"" + this.Max + "\" step=\"" + this.Step + "\" value=\"" + this.Value[0] + "\"/>";
         
         var thisClass = this;
         $(document).off("change."+this.GUID);
@@ -890,7 +837,12 @@ class ConfigArrayGui extends ConfigArray {
                 Object.assign(subConfig, this);
                 delete subConfig.Array;
                 delete subConfig.Value;
-                subConfig.Label = subConfig.Label + "[" + i + "]";
+                delete subConfig.Labels;
+                if(this.Labels && i < this.Labels.length) {
+                    subConfig.Label = this.Labels[i];
+                } else {
+                    subConfig.Label = this.Label + "[" + i + "]";
+                }
 
                 if(i < prevValueLength) {
                     this.Value[i] = prevValue[i];

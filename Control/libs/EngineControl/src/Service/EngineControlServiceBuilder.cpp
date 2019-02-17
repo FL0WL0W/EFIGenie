@@ -65,8 +65,11 @@ namespace Service
 #endif
 				{
 					IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size);
-					tickCallBackGroup->Add(IFloatInputService::ReadValueCallBack, floatInputService);
-					serviceLocator->Register(serviceId, floatInputService);
+					if(floatInputService != 0)
+					{
+						tickCallBackGroup->Add(IFloatInputService::ReadValueCallBack, floatInputService);
+						serviceLocator->Register(serviceId, floatInputService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -96,7 +99,11 @@ namespace Service
 #if TACHOMETER_SERVICE_ID
 			case TACHOMETER_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateTachometerService(serviceLocator, config, &size)); //needs BooleanOutputService, TimerService and Decoder
+					TachometerService *tachometerService = CreateTachometerService(serviceLocator, config, &size);
+					if(tachometerService != 0)
+					{
+						serviceLocator->Register(serviceId, tachometerService); //needs BooleanOutputService, TimerService and Decoder
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -105,7 +112,11 @@ namespace Service
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
 			case IDLE_AIR_CONTROL_VALVE_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size));
+					IFloatOutputService *intakeAirControlValveService = IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size);
+					if(intakeAirControlValveService != 0)
+					{
+						serviceLocator->Register(serviceId, intakeAirControlValveService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -114,7 +125,11 @@ namespace Service
 #if PRIME_SERVICE_ID
 			case PRIME_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreatePrimeService(serviceLocator, config, &size));
+					IPrimeService *primeService = CreatePrimeService(serviceLocator, config, &size);
+					if(primeService != 0)
+					{
+						serviceLocator->Register(serviceId, primeService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -123,7 +138,11 @@ namespace Service
 #if IDLE_CONTROL_SERVICE_ID
 			case IDLE_CONTROL_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateIdleControlService(serviceLocator, config, &size));
+					IIdleControlService *idleControlService = CreateIdleControlService(serviceLocator, config, &size);
+					if(idleControlService != 0)
+					{
+						serviceLocator->Register(serviceId, idleControlService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -132,7 +151,11 @@ namespace Service
 #if AFR_SERVICE_ID
 			case AFR_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateAfrService(serviceLocator, config, &size));
+					IAfrService *afrService = CreateAfrService(serviceLocator, config, &size);
+					if(afrService != 0)
+					{
+						serviceLocator->Register(serviceId, afrService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -141,7 +164,11 @@ namespace Service
 #if FUEL_TRIM_SERVICE_ID
 			case FUEL_TRIM_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateFuelTrimService(serviceLocator, config, &size));
+					IFuelTrimService *fuelTrimService = CreateFuelTrimService(serviceLocator, config, &size);
+					if(fuelTrimService != 0)
+					{
+						serviceLocator->Register(serviceId, fuelTrimService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -150,7 +177,11 @@ namespace Service
 #if FUEL_PUMP_SERVICE_ID
 			case FUEL_PUMP_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateFuelPumpService(serviceLocator, config, &size));
+					IFuelPumpService *fuelPumpService = CreateFuelPumpService(serviceLocator, config, &size);
+					if(fuelPumpService != 0)
+					{
+						serviceLocator->Register(serviceId, fuelPumpService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -159,7 +190,11 @@ namespace Service
 #if IGNITION_SCHEDULING_SERVICE_ID
 			case IGNITION_SCHEDULING_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateIgnitionSchedulingService(serviceLocator, config, &size));
+					IgnitionSchedulingService *ignitionSchedulingService = CreateIgnitionSchedulingService(serviceLocator, config, &size);
+					if(ignitionSchedulingService != 0)
+					{
+						serviceLocator->Register(serviceId, ignitionSchedulingService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -168,7 +203,11 @@ namespace Service
 #if INJECTION_SCHEDULING_SERVICE_ID
 			case INJECTION_SCHEDULING_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateInjectionSchedulingService(serviceLocator, config, &size));
+					InjectionSchedulingService *injectionSchedulingService = CreateInjectionSchedulingService(serviceLocator, config, &size);
+					if(injectionSchedulingService != 0)
+					{
+						serviceLocator->Register(serviceId, injectionSchedulingService);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;
@@ -177,7 +216,11 @@ namespace Service
 #if DECODER_SERVICE_ID
 			case DECODER_SERVICE_ID:
 				{
-					serviceLocator->Register(serviceId, CreateDecoderService(serviceLocator, config, &size));
+					ICrankCamDecoder *decoder = CreateDecoderService(serviceLocator, config, &size);
+					if(decoder != 0)
+					{
+						serviceLocator->Register(serviceId, decoder);
+					}
 					config = (void *)((unsigned char *)config + size);
 					*totalSize += size;
 					break;

@@ -1,42 +1,8 @@
-var SensorServicesIni = {
-    IntakeAirTemperatureConfig: [
-        { IntakeAirTemperatureServiceId: { Type: "uint16", Value: 2002, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" }}
-    ],
-    EngineCoolantTemperatureServiceId: [
-        { EngineCoolantTemperatureServiceId: { Type: "uint16", Value: 2003, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ],
-    ManifoldAbsolutePressureServiceId: [
-        { ManifoldAbsolutePressureServiceId: { Type: "uint16", Value: 2004, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ],
-    VoltageConfig: [
-        { VoltageServiceId: { Type: "uint16", Value: 2005, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ],
-    ThrottlePositionConfig: [
-        { ThrottlePositionServiceId: { Type: "uint16", Value: 2006, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ],
-    EthanolContentConfig: [
-        { EthanolContentServiceId: { Type: "uint16", Value: 2007, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ],
-    VehicleSpeedConfig: [
-        { VehicleSpeedServiceId: { Type: "uint16", Value: 2008, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
-    ]
-}
-
-for(var k in IOServicesIni) 
-    if(!SensorServicesIni[k])
-        SensorServicesIni[k]=IOServicesIni[k];
-
 var TransmissionControlServicesIni = {
     IShiftServiceConfig: [
         { IShiftServiceServiceId: { Type: "uint16", Value: 4009, Hidden: true } },
         { Selection: { Label: "Shift Service", Selections: [
+            { Name: "None", ConfigName: "NoneConfig"},
             { Name: "Solenoid", ConfigName: "ShiftService_SolenoidConfig"}
         ] } }
     ],
@@ -46,7 +12,12 @@ var TransmissionControlServicesIni = {
         { Gears: { Type: "uint8", Label: "Gears", Value: 5, Min: 1, Max: 255, Step: 1 } },
         { Solenoids: { Type: "uint8", Label: "Solenoids", Value: 2, Min: 1, Max: 32, Step: 1 } },
         { SolenoidGearPositions: { Type: "uint32", Label: "Solenoid Gear Positions", XLabel: "Gear", ZLabel: "Solenoid Position", XResolution: "Gears", XMin: 1, XMax: "Gears", Dialog: true } },
-        { SolenoidConfigs: { Label: "Solenoid Config", ConfigName: "IBooleanOutputServiceConfig", Array: "Solenoids"} }
+        { SolenoidConfigs: { 
+            Label: "Solenoid",
+            Labels: ["Solenoid A", "Solenoid B", "Solenoid C", "Solenoid D", "Solenoid E", "Solenoid F", "Solenoid G", "Solenoid H", "Solenoid I", "Solenoid J", "Solenoid K", "Solenoid L", "Solenoid M", "Solenoid N", "Solenoid O", "Solenoid P"], 
+            ConfigName: "IBooleanOutputServiceConfig", 
+            Array: "Solenoids"
+        } }
     ],
     
     GearControlService_ButtonShiftConfig: [
@@ -58,20 +29,22 @@ var TransmissionControlServicesIni = {
     IGearControlServiceConfig: [
         { IGearControlServiceServiceId: { Type: "uint16", Value: 4010, Hidden: true } },
         { Selection: { Label: "Gear Control", Selections: [
+            { Name: "None", ConfigName: "NoneConfig"},
             { Name: "Button Shift", ConfigName: "GearControlService_ButtonShiftConfig"}
         ] } }
     ],
 
     SimpleButtonControlConfig: [
-        { ShiftService: { ConfigName: "IShiftServiceConfig"} },
-        { GearControlService: { ConfigName: "IGearControlServiceConfig"} }
+        { ShiftService: { ConfigName: "ShiftService_SolenoidConfig"} },
+        { GearControlService: { ConfigName: "GearControlService_ButtonShiftConfig"} }
     ],
 
     Main: [
         { Selection: { Label: "Transmission Control", Selections: [
+            { Name: "None", ConfigName: "BlankConfig"},
             { Name: "Simple Button Control", ConfigName: "SimpleButtonControlConfig"}
         ] } }
-    ],
+    ]
 };
 
 for(var k in SensorServicesIni) {

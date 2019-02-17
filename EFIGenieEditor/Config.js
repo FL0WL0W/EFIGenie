@@ -136,7 +136,7 @@ class ConfigSelection {
         }
 
         if(!this.Value) {
-            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, undefined, this.Parent);
+            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, undefined, this);
         }
     }
     GetArrayBuffer() {
@@ -529,7 +529,12 @@ class ConfigArray {
                 Object.assign(subConfig, this);
                 delete subConfig.Array;
                 delete subConfig.Value;
-                subConfig.Label = subConfig.Label + "[" + i + "]";
+                delete subConfig.Labels;
+                if(this.Labels && i < this.Labels.length) {
+                    subConfig.Label = this.Labels[i];
+                } else {
+                    subConfig.Label = this.Label + "[" + i + "]";
+                }
 
                 if(i < prevValueLength)
                     this.Value[i] = prevValue[i];
@@ -565,7 +570,13 @@ class ConfigArray {
                 Object.assign(subConfig, this);
                 delete subConfig.Array;
                 delete subConfig.Value;
-                subConfig.Label = subConfig.Label + "[" + i + "]";
+                delete subConfig.Labels;
+                if(this.Labels && i < this.Labels.length) {
+                    subConfig.Label = this.Labels[i];
+                } else {
+                    subConfig.Label = this.Label + "[" + i + "]";
+                }
+
                 this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, this.Parent);
                 size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
             } else {
