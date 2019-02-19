@@ -107,8 +107,11 @@ class ConfigGui extends Config {
             }
 
             if(this.Tabbed && !variableRowObj.Hidden) {
+                var tabClasses = "tabLink";
+                if(firstTab)
+                    tabClasses += " active";
                 firstTab = false;
-                tabs += "<button class=\"tabLink\" id=\"tab" + variableRowObj.GUID + "\" data-guid=\"" + variableRowObj.GUID + "\">" + variableRowObj.Label + "</button>";
+                tabs += "<button class=\"" + tabClasses + "\" id=\"tab" + variableRowObj.GUID + "\" data-guid=\"" + variableRowObj.GUID + "\">" + variableRowObj.Label + "</button>";
 
                 $(document).on("click."+this.GUID, "#tab" + variableRowObj.GUID, function(){
                     var GUID = $(this).data("guid");

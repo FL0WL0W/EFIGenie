@@ -3,6 +3,7 @@
         <script src="jquery-3.3.1.min.js"></script>
         <script src="utils.js"></script>
         <script src="Config.js"></script>
+        <script src="SpeeduinoIni.js"></script>
         <script src="IOServicesConfig.js"></script>
         <script src="SensorServicesConfig.js"></script>
         <script src="TransmissionControlServicesConfig.js"></script>
@@ -11,7 +12,7 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
             $(document).ready(function() {
-                var b = new ConfigGui(undefined, IOServicesIni);
+                var b = new ConfigGui(undefined, SpeeduinoIni);
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
                                         
@@ -26,7 +27,7 @@
                     downloadBin(b.GetArrayBuffer(), "config.bin");
                 });
                 $("#btnLoad").change(function(evt){
-                    b = new ConfigGui(undefined, b.ConfigNameSpace, b.ConfigName);
+                    b = new ConfigGui(undefined, b.ConfigNameSpace);
                     var test = new FileReader();
 
                     test.onload = function(evt) {
@@ -55,7 +56,7 @@
                             return;
                         }
 
-                        b = new ConfigGui(JSON.parse(evt.target.result), EngineControlServicesIni);
+                        b = new ConfigGui(JSON.parse(evt.target.result), b.ConfigNameSpace);
                         $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                     };
                     
