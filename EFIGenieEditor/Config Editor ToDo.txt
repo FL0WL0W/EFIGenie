@@ -1,0 +1,12 @@
+ConfigEditor ToDo
+x axis table
+y axis table
+Drop Down
+Drop Down bits
+Number bits
+views
+read TS ini
+write TS ini
+firmware upload/download
+logging
+autotune
