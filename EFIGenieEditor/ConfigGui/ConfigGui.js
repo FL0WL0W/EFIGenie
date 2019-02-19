@@ -1,6 +1,6 @@
 class ConfigGui extends Config {
-    constructor(obj, configNameSpace, configName, parent, mainCallBack){
-        super(obj, configNameSpace, configName, parent);
+    constructor(obj, configNameSpace, configName, config, parent, mainCallBack){
+        super(obj, configNameSpace, configName, config, parent);
         this.GUID = getGUID();
         this.CallBack = mainCallBack;
 
@@ -21,7 +21,7 @@ class ConfigGui extends Config {
             } else if(configRowObj instanceof ConfigBoolean) {
                 this[configRowKey] = new ConfigBooleanGui(configRowObj, this, this.CallBack);
             } else if(configRowObj instanceof Config) {
-                this[configRowKey] = new ConfigGui(configRowObj, this[configRowKey].ConfigNameSpace, undefined, this, this.CallBack);
+                this[configRowKey] = new ConfigGui(configRowObj, this[configRowKey].ConfigNameSpace, undefined, undefined, this, this.CallBack);
             } else if(configRowObj instanceof ConfigArray) {
                 this[configRowKey] = new ConfigArrayGui(configRowObj, this[configRowKey].ConfigNameSpace, this, this.CallBack);
             } else if(configRowObj instanceof ConfigSelection) {
@@ -83,12 +83,17 @@ class ConfigGui extends Config {
         }
     }
 
-    GetHtml() {
+    GetHtml(show) {
         if(this.Hidden)
             return "";
 
-        var template = "";
+        var thisClass = this;
 
+        var template = "";
+        var tabs = "";
+        var firstTab = true;
+
+        $(document).off("click."+this.GUID);
         for(var configRowIndex in this.Config) {
             var configRow = this.Config[configRowIndex];
             var configRowKey = Object.keys(configRow)[0];
@@ -97,23 +102,46 @@ class ConfigGui extends Config {
             if(!configRowObj || !configRowObj.GetHtml)
                 continue; //throw "ConfigGui not initialized";
 
-            if(GetReferenceCount(this, configRowKey) !== 1)
-                template += configRowObj.GetHtml();
+            if(GetReferenceCount(this, configRowKey) !== 1) {
+                template += configRowObj.GetHtml(firstTab);
+            }
+
+            if(this.Tabbed && !configRowObj.Hidden) {
+                firstTab = false;
+                tabs += "<button class=\"tabLink\" id=\"tab" + configRowObj.GUID + "\" data-guid=\"" + configRowObj.GUID + "\">" + configRowObj.Label + "</button>";
+
+                $(document).on("click."+this.GUID, "#tab" + configRowObj.GUID, function(){
+                    var GUID = $(this).data("guid");
+                    $("#span" + thisClass.GUID + " .tabLink").removeClass("active");
+                    $("#span" + thisClass.GUID + " .tabContent").hide();
+                    $(this).addClass("active");
+                    $("#span" + GUID).show()
+                });
+            }
         }
-    
+
+        if(this.Tabbed)
+            template = "<div class=\"tab\">" + tabs + "</div>" + template;
+        
         if(this.WrapInConfigContainer)
             template = wrapInConfigContainerGui(this.GUID, template);
         else
             template = wrapInConfigDivGui(this.GUID, template);
 
+        if(!this.Parent || !this.Parent.Tabbed) {
             if(this.Label) {
                 if(this.SameLine) 
                     template = "<label for=\"" + this.GUID + "\" class=\"subConfigSameLineLabel\">" + this.Label + ":</label>" + template;
                 else
                     template = "<label for=\"" + this.GUID + "\" class=\"subConfigLabel\">" + this.Label + ":</label><span class=\"sameLineSpacer\"></span>" + template;
             }
-
-        return "<span id=\"span"+this.GUID+"\">" + template + "</span>";
+            return "<span id=\"span"+this.GUID+"\">" + template + "</span>";
+        } else if (this.Parent.Tabbed) {
+            if(show)
+                return "<span id=\"span"+this.GUID+"\" class=\"tabContent\">" + template + "</span>";
+            else
+                return "<span id=\"span"+this.GUID+"\" class=\"tabContent\" style=\"display: none;\">" + template + "</span>";
+        }
     }
 }
 
@@ -131,12 +159,12 @@ class ConfigSelectionGui extends ConfigSelection {
             thisClass.UpdateReferences();
         }
 
-        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, undefined, this, this.CallBack);
+        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, undefined, undefined, this, this.CallBack);
     }
 
     SetArrayBuffer(arrayBuffer) {
         var size = super.SetArrayBuffer(arrayBuffer);
-        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, undefined, this, this.CallBack);
+        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, undefined, undefined, this, this.CallBack);
         return size;
     }
 
@@ -181,16 +209,13 @@ class ConfigSelectionGui extends ConfigSelection {
                 var selection = thisClass.Selections[selectionIndex];
 
                 thisClass.Index = selectionIndex;
-                thisClass.Value.Config = selection.Config;
-                thisClass.Value.ConfigName = selection.ConfigName;
-
-                thisClass.Value = new ConfigGui(thisClass.Value, thisClass.ConfigNameSpace, undefined, thisClass, thisClass.CallBack);
+                thisClass.Value = new ConfigGui(thisClass.Value, thisClass.ConfigNameSpace, selection.ConfigName, selection.Config, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             });
 
             $(document).off("click."+this.GUID);
             $(document).on("click."+this.GUID, "#" + this.GUID + "clear", function(){
-                thisClass.Value = new ConfigGui(undefined, thisClass.ConfigNameSpace, thisClass.Value.ConfigName, thisClass, thisClass.CallBack);
+                thisClass.Value = new ConfigGui(undefined, thisClass.ConfigNameSpace, thisClass.Value.ConfigName, thisClass.Value.Config, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             });
         }
@@ -353,7 +378,6 @@ document.addEventListener("dragstart", function(e){
     if($(e.target).hasClass("selected"))
         e.preventDefault();
 });//disable dragging of selected items
-
 class ConfigNumberTableGui extends ConfigNumberTable {
     constructor(obj, parent, callBack){
         super(obj, parent);
@@ -724,7 +748,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
     }
 }
 
-class ConfigFormulaGui extends ConfigNumberTable {
+class ConfigFormulaGui extends ConfigFormula {
     constructor(obj, parent, callBack){
         super(obj, parent);
         this.GUID = getGUID();
@@ -745,7 +769,7 @@ class ConfigFormulaGui extends ConfigNumberTable {
 
     UpdateReferences() {
         var degreeRef = GetReferenceByNumberOrReference(this.Parent, this.Degree, 1);
-        if(degreeRef.Value !== this.CurrentDegree || yResRef.Value !== this.CurrentYRes) {
+        if(degreeRef.Value !== this.CurrentDegree) {
             this.InterpolateTable();
             $("#span" + this.GUID).replaceWith(this.GetHtml());
         } else {
@@ -772,7 +796,7 @@ class ConfigFormulaGui extends ConfigNumberTable {
         $(document).off("change."+this.GUID);
         $.each(this.Value, function(index, value) {
             $(document).on("change."+thisClass.GUID, "#" + thisClass.GUID + "-" + index, function(){
-                thisClass.Values[index] = $(this).val();
+                thisClass.Value[index] = $(this).val();
 
                 if(thisClass.CallBack)
                     thisClass.CallBack();
@@ -800,7 +824,7 @@ class ConfigArrayGui extends ConfigArray {
 
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, undefined, this.Parent, this.CallBack);
         });
     }
 
@@ -808,7 +832,7 @@ class ConfigArrayGui extends ConfigArray {
         var size = super.SetArrayBuffer(arrayBuffer);
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, undefined, undefined, this.Parent, this.CallBack);
         });
         return size;
     }
@@ -849,7 +873,7 @@ class ConfigArrayGui extends ConfigArray {
                     $("#span"+this.Value[i].GUID).show();
                     this.Value[i].UpdateReferences();
                 } else {
-                    this.Value[i] = new ConfigGui(subConfig, this.ConfigNameSpace, undefined, this.Parent, this.CallBack);
+                    this.Value[i] = new ConfigGui(subConfig, this.ConfigNameSpace, undefined, undefined, this.Parent, this.CallBack);
                     $("#span"+this.GUID).append(this.Value[i].GetHtml());
                 }
 

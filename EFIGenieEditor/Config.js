@@ -1,17 +1,23 @@
 class Config {
-    constructor(obj, configNameSpace, configName, parent) {
+    constructor(obj, configNameSpace, configName, config, parent) {
         if(obj)
             Object.assign(this, obj);
         this.Parent = parent;
 
         this.ConfigNameSpace = configNameSpace;
 
-        if(!this.ConfigName) {
+        if(configName) {
             this.ConfigName = configName;
         }
 
         if(!this.ConfigName) {
             this.ConfigName = "Main";
+        }
+
+        if(config) {
+            this.Config = config;
+        } else if(configName) {
+            this.Config = this.ConfigNameSpace[this.ConfigName];
         }
 
         if(!this.Config) {
@@ -51,9 +57,9 @@ class Config {
                             break;
                     }
                 }
-            } else if (configRowObj.ConfigName) {
+            } else if (configRowObj.ConfigName || configRowObj.Config) {
                 if(!configRowObj.Array) {
-                    this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace, undefined, this);
+                    this[configRowKey] = new Config(configRowObj, this.ConfigNameSpace, undefined, undefined, this);
                 } else {
                     this[configRowKey] = new ConfigArray(configRowObj, this.ConfigNameSpace, this);
                 }
@@ -69,19 +75,41 @@ class Config {
             var configRowKey = Object.keys(configRow)[0];
             var configRowObj = this[configRowKey];
 
-            arrayBuffer = arrayBuffer.concatArray(configRowObj.GetArrayBuffer());
+            if(this.Size) {// we are in a statically mapped area
+                var offset = configRowObj.Offset;
+                if(!offset)
+                    throw "Config No offset specified";
+
+                var subArrayBuffer = configRowObj.GetArrayBuffer();
+
+                arrayBuffer = arrayBuffer.slice(0, offset).concatArray(subArrayBuffer).concatArray(arrayBuffer.slice(offset + subArrayBuffer.byteLength));
+            } else {
+                arrayBuffer = arrayBuffer.concatArray(configRowObj.GetArrayBuffer());
+            }
         }
         return arrayBuffer;
     }
     SetArrayBuffer(arrayBuffer) {
         var size = 0;
 
+        if(this.Size) {// we are in a statically mapped area
+            size = this.Size;
+        }
+
         for(var configRowIndex in this.Config) {
             var configRow = this.Config[configRowIndex];
             var configRowKey = Object.keys(configRow)[0];
             var configRowObj = this[configRowKey];
 
-            size += configRowObj.SetArrayBuffer(arrayBuffer.slice(size));
+            if(this.Size) {// we are in a statically mapped area
+                var offset = configRowObj.Offset;
+                if(!offset)
+                    throw "Config No offset specified";
+
+                configRowObj.SetArrayBuffer(arrayBuffer.slice(offset));
+            } else {
+                size += configRowObj.SetArrayBuffer(arrayBuffer.slice(size));
+            }
         }
 
         return size;
@@ -136,7 +164,7 @@ class ConfigSelection {
         }
 
         if(!this.Value) {
-            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, undefined, this);
+            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, undefined, undefined, this);
         }
     }
     GetArrayBuffer() {
@@ -148,7 +176,7 @@ class ConfigSelection {
             !(this.Value.Config[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === this.Value.Config[0].Value)) {
 
             $.each(this.Selections, function(selectionIndex, selectionValueObj) {
-                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, undefined, this.Parent);
+                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, undefined, undefined, this.Parent);
 
                 if( (selectionValue.Config[0].Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionValue.Config[0].Value) ||
                     (selectionValue.Config[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectionValue.Config[0].Value)) {
@@ -539,7 +567,7 @@ class ConfigArray {
                 if(i < prevValueLength)
                     this.Value[i] = prevValue[i];
                 else
-                    this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, this.Parent);
+                    this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, undefined, this.Parent);
             }
         }
     }
@@ -577,7 +605,7 @@ class ConfigArray {
                     subConfig.Label = this.Label + "[" + i + "]";
                 }
 
-                this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, this.Parent);
+                this.Value[i] = new Config(subConfig, this.ConfigNameSpace, undefined, undefined, this.Parent);
                 size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
             } else {
                 this.Value[i] = prevValue[i];

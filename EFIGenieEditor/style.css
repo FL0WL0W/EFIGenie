@@ -6,7 +6,8 @@
     margin: 2.5px;
     display: inline-block;
 }
-.configContainer span {
+.configContainer span,
+.configContainer div {
     display:block;
     font-weight:bold;
 }
@@ -89,3 +90,32 @@ select {
     border-bottom: 1px solid #333333;
     border-left: 1px solid #CCCCCC;
   }
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    padding: 0px;
+}
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    margin: 0px;
+}
+.tab button:hover {
+    background-color: #ddd;
+}
+.tab button.active {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
