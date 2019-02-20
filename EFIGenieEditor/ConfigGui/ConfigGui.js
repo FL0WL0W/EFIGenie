@@ -667,13 +667,13 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             // - - - -
-                            row += "<td>"+xMinRef.GetHtml(true)+"</td>";
+                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+xMinRef.GetHtml(true)+"</td>";
                         } else if (x === xResRef.Value && xMaxRef.GetHtml && GetReferenceCount(this.Parent, this.XMax) === 1) {
                             // - - - X
                             // - - - -
                             // - - - -
                             // - - - -
-                            row += "<td>"+xMaxRef.GetHtml(true)+"</td>";
+                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+xMaxRef.GetHtml(true)+"</td>";
                         } else if(xAxisRef.GetHtml && GetReferenceCount(this.Parent, this.XAxis) === 1) {
                             // X X X X
                             // - - - -
@@ -710,12 +710,12 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             if(xResRef.Value === 1 && !xAxisRef.Value) {
-                                row += "<th>" + this.ZLabel + "</th>";
+                                row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.ZLabel + "</th>";
                             } else {
                                 if(xAxisRef.Value) {
-                                    row += "<td><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + xAxisRef.Value[x-1] + "\"/></td>";
+                                    row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + xAxisRef.Value[x-1] + "\"/></td>";
                                 } else {
-                                    row += "<td><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                                    row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
                                 }
                             }
                         }
@@ -731,13 +731,13 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // X - - -
                             // - - - -
                             // - - - -
-                            row += "<td>"+yMinRef.GetHtml(true)+"</td>";
+                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+yMinRef.GetHtml(true)+"</td>";
                         } else if (x === yResRef.Value && yMaxRef.GetHtml && GetReferenceCount(this.Parent, this.YMax) === 1) {
                             // - - - -
                             // - - - -
                             // - - - -
                             // X - - -
-                            row += "<td>"+yMaxRef.GetHtml(true)+"</td>";
+                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+yMaxRef.GetHtml(true)+"</td>";
                         } else {
                             // - - - -
                             // - - - -
