@@ -343,7 +343,7 @@ class ConfigNumber {
         }
         if(!this.Value)
             if(this.Min > 0)
-                this.Value = this.Min;
+                this.Value = this.Min / this.ValueMultiplier;
             else
                 this.Value = 0;
         if(!this.ValueMultiplier)
@@ -499,7 +499,7 @@ class ConfigNumberTable {
         if(!this.Value) {
             var val = 0
             if(this.Min > 0)
-                val = this.Min;
+                val = this.Min / this.ValueMultiplier;
             this.Value = new Array(this.GetTableArrayLength());
             var thisClass = this;
             $.each(this.Value, function(index, value) {
@@ -763,6 +763,11 @@ function GetReferenceCount(referenceObj, reference) {
             continue;
         }
 
+        if(referenceObj[key].XAxis && referenceObj[key].XAxis === reference) {
+            refernceCount++;
+            continue;
+        }
+
         if(referenceObj[key].XMin && referenceObj[key].XMin === reference) {
             refernceCount++;
             continue;
@@ -774,6 +779,11 @@ function GetReferenceCount(referenceObj, reference) {
         }
 
         if(referenceObj[key].YResolution && referenceObj[key].YResolution === reference) {
+            refernceCount++;
+            continue;
+        }
+
+        if(referenceObj[key].YAxis && referenceObj[key].YAxis === reference) {
             refernceCount++;
             continue;
         }

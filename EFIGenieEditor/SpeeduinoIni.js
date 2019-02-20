@@ -15,7 +15,7 @@ SpeeduinoIni = {
 
     Main: { Tabbed: true, Variables: [
         { Page1: { Label: "General Page", ConfigName: "Page1" } },
-        { Page2: { Label: "Fuel Map Page", ConfigName: "Blank" } },
+        { Page2: { Label: "Fuel Map Page", ConfigName: "Page2" } },
         { Page3: { Label: "Ignition Table Page", ConfigName: "Blank" } },
         { Page4: { Label: "Ignition Settings Page", ConfigName: "Blank" } },
         { Page5: { Label: "AFR Table Page", ConfigName: "Blank" } },
@@ -93,8 +93,8 @@ SpeeduinoIni = {
         { idleUpPolarity: { offset: 57, BitSize: 1, BitOffset: 6, Label: "idleUpPolarity", Type: "uint8", Value: 0, Selections: [ "Normal", "Inverted" ] } },
         { idleUpEnabled: { offset: 57, BitSize: 1, BitOffset: 7, Label: "idleUpEnabled", Type: "bool", Value: 0 } },
         { idleUpAdder: { offset: 58, Label: "idleUpAdder", Type: "uint8", Value: 0, Units: [ { Name:"% / Steps", DisplayMultiplier: 1} ] } },
-        { taeTaperMin: { offset: 59, Label: "taeTaperMin", Type: "uint8", Value: 0, Min: 1000, Max: 10000, ValueMultiplier: 100, Units: RPMUnits } },
-        { taeTaperMax: { offset: 60, Label: "taeTaperMax", Type: "uint8", Value: 0, Min: 2000, Max: 10000, ValueMultiplier: 100, Units: RPMUnits } },
+        { taeTaperMin: { offset: 59, Label: "taeTaperMin", Type: "uint8", Value: 0, Min: 1000, Max: 10000, ValueMultiplier: 0.01, Units: RPMUnits } },
+        { taeTaperMax: { offset: 60, Label: "taeTaperMax", Type: "uint8", Value: 0, Min: 2000, Max: 10000, ValueMultiplier: 0.01, Units: RPMUnits } },
         { iacCLminDuty: { offset: 61, Label: "iacCLminDuty", Type: "uint8", Value: 0, Max: 100, ValueMultiplier: 100, Units: PercentUnits } },
         { iacCLmaxDuty: { offset: 62, Label: "iacCLmaxDuty", Type: "uint8", Value: 0, Max: 100, ValueMultiplier: 100, Units: PercentUnits } },
         { boostMinDuty: { offset: 63, Label: "boostMinDuty", Type: "uint8", Value: 0, Max: 100, ValueMultiplier: 100, Units: PercentUnits } },
@@ -105,7 +105,12 @@ SpeeduinoIni = {
         { fanWhenOff: { offset: 70, BitSize: 1, Label: "fanWhenOff", Type: "bool", Value: 0 } },
         { unused_fan_bits: { offset: 70, BitSize: 7, BitOffset: 2, Label: "unused_fan_bits", Hidden: true, Type: "uint8", Value: 0 } },
         { unused2_71: { offset: 71, Label: "unused2_71", Type: "uint8", Value: 0, XResolution: 56, Dialog: true, Hidden: true } },
+    ] },
 
-        
-    ]}
+    Page2: {  Size: 288, Variables: [
+        { rpmBins: { offset: 256, Label: "rpmBins", Type: "uint8", Value: [100, 700, 1300, 1900, 2500, 3100, 3700, 4300, 4900, 5600, 6200, 6800, 7400, 8000, 8600, 9200], Min: 1, XResolution: 16, XMin: 1, XMax:16, Dialog: true, ValueMultiplier: 0.01, Units: RPMUnits } },
+        { fuelLoadBins: { offset: 272, Label: "fuelLoadBins", Type: "uint8", Min: 0, XResolution: 16, XMin: 1, XMax:16, Dialog: true, ValueMultiplier: 0.5 } },
+        { veTable: { offset: 272, Label: "veTable", Type: "uint8", Min: 0, XResolution: 16, YResolution: 16, XAxis: "rpmBins", YAxis:"fuelLoadBins", Dialog: true, ValueMultiplier: 0.5 } },
+
+    ] }
 }
