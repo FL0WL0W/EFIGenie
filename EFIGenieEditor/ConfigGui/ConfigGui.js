@@ -274,6 +274,8 @@ class ConfigNumberGui extends ConfigNumber {
                     this.Step = 0.01;
                 break;
         }
+        if(this.Units && !this.UnitIndex)
+            this.UnitIndex = 0;
     }
 
     GetConfig() {
@@ -327,6 +329,10 @@ class ConfigNumberGui extends ConfigNumber {
         template = template.replace(/[$]min[$]/g, this.Min);
         template = template.replace(/[$]max[$]/g, this.Max);
         template = template.replace(/[$]step[$]/g, this.Step);
+        if(this.Units)
+            template = template.replace(/[$]units[$]/g, this.Units[this.UnitIndex].Name);
+        else
+            template = template.replace(/[$]units[$]/g, "");
 
         var thisClass = this;
 
