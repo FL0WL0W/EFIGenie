@@ -649,10 +649,21 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                                     xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr"));//get second row
                                     xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
                                     xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</tr"));
-                                    if(yAxisRef.Value || yResRef.Value !== 1) {//remove first cell
-                                        xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</td"));
-                                        xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
-                                    }
+                                } else {//more rows means y axis values
+                                    var newXAxisHtml = "";
+                                    $.each(xAxisHtml.split("<tr"), function(index, value) {
+                                        value = value.substring(value.indexOf("<td"));
+                                        value = value.substring(value.indexOf("<td")); //get second column
+                                        value = value.substring(value.indexOf(">") + 1);
+                                        value = value.substring(0, value.indexOf("</td"));
+                                        newXAxisHtml += "<td>" + value + "</td>";
+                                    });
+                                    xAxisHtml = newXAxisHtml;
+                                }
+                                
+                                if(yAxisRef.Value || yResRef.Value !== 1) {//remove first cell
+                                    xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</td"));
+                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
                                 }
 
                                 row += xAxisHtml;
@@ -662,10 +673,14 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             // - - - -
-                            if(xAxisRef.Value) {
-                                row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + xAxisRef.Value[x-1] + "\"/></td>";
-                            } else {}
-                                row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                            if(xResRef.Value === 1 && !xAxisRef.Value) {
+                                row += "<th>" + this.ZLabel + "</th>";
+                            } else {
+                                if(xAxisRef.Value) {
+                                    row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + xAxisRef.Value[x-1] + "\"/></td>";
+                                } else {}
+                                    row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                                }
                             }
                         }
                     }
@@ -692,7 +707,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // X - - -
                             // - - - -
-                            if(yResRef.Value === 1) {
+                            if(yResRef.Value === 1 && !yAxisRef.Value) {
                                 row += "<th>" + this.ZLabel + "</th>";
                             } else {
                                 row += "<td><input id=\"" + id + "y" + y + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
