@@ -56,7 +56,11 @@ class Config {
         }
     }
     GetArrayBuffer() {
-        var arrayBuffer = new ArrayBuffer();
+        var arrayBuffer;
+        if(this.Size)
+            arrayBuffer = new ArrayBuffer(this.Size);
+        else
+            arrayBuffer = new ArrayBuffer();
         for(var variableRowIndex in this.Variables) {
             var variableRow = this.Variables[variableRowIndex];
             var variableRowKey = Object.keys(variableRow)[0];
@@ -64,8 +68,9 @@ class Config {
 
             if(this.Size) {// we are in a statically mapped area
                 var offset = variableRowObj.Offset;
-                if(!offset)
+                if(offset === undefined) {
                     throw "Config No offset specified";
+                }
 
                 var subArrayBuffer = variableRowObj.GetArrayBuffer();
 
@@ -75,31 +80,28 @@ class Config {
                         if(variableRowObj instanceof ConfigBoolean)
                             bitSize = 1;
                         else
-                            bitSize = subArrayBuffer.length * 8;
+                            bitSize = subArrayBuffer.byteLength * 8;
                     }
                     
                     var bitOffset = variableRowObj.BitOffset;
                     if(!bitOffset)
                         bitOffset = 0;
 
-                    var bitMask = (0xFFFFFFFFFFFFFFFF >> (64 - bitSize)) << bitOffset;
+                    var bitMask = (0xFFFFFFFF >>> (64 - bitSize)) << bitOffset;
 
-                    switch(subArrayBuffer.length){
+                    switch(subArrayBuffer.byteLength){
                         case 1:
-                            subArrayBuffer = new Uint8Array( [ ( new Uint8Array(subArrayBuffer)[0] & bitMask ) | ( new Uint8Array(arrayBuffer.slice(offset, 1))[0] & ~bitMask ) ] ).buffer;
+                            subArrayBuffer = new Uint8Array( [ ( (new Uint8Array(subArrayBuffer)[0] << bitOffset) & bitMask ) | ( new Uint8Array(arrayBuffer.slice(offset, offset + 1))[0] & ~bitMask ) ] ).buffer;
                             break;
                         case 2:
-                            subArrayBuffer = new Uint16Array( [ ( new Uint16Array(subArrayBuffer)[0] & bitMask ) | ( new Uint16Array(arrayBuffer.slice(offset, 2))[0] & ~bitMask ) ] ).buffer;
+                            subArrayBuffer = new Uint16Array( [ ( (new Uint16Array(subArrayBuffer)[0] << bitOffset) & bitMask ) | ( new Uint16Array(arrayBuffer.slice(offset, offset + 2))[0] & ~bitMask ) ] ).buffer;
                             break;
                         case 4:
-                            subArrayBuffer = new Uint32Array( [ ( new Uint32Array(subArrayBuffer)[0] & bitMask ) | ( new Uint32Array(arrayBuffer.slice(offset, 4))[0] & ~bitMask ) ] ).buffer;
-                            break;
-                        case 8:
-                            subArrayBuffer = new Uint64Array( [ ( new Uint64Array(subArrayBuffer)[0] & bitMask ) | ( new Uint64Array(arrayBuffer.slice(offset, 8))[0] & ~bitMask ) ] ).buffer;
+                            subArrayBuffer = new Uint32Array( [ ( (new Uint32Array(subArrayBuffer)[0] << bitOffset) & bitMask ) | ( new Uint32Array(arrayBuffer.slice(offset, offset + 4))[0] & ~bitMask ) ] ).buffer;
                             break;
                         default:
                             throw "Config Object cannot be bit offset or sized"
-                    }                
+                    }      
                 }
 
                 arrayBuffer = arrayBuffer.slice(0, offset).concatArray(subArrayBuffer).concatArray(arrayBuffer.slice(offset + subArrayBuffer.byteLength));
@@ -123,8 +125,9 @@ class Config {
 
             if(this.Size) {// we are in a statically mapped area
                 var offset = variableRowObj.Offset;
-                if(!offset)
+                if(offset === undefined) {
                     throw "Config No offset specified";
+                }
                 
                 var subArrayBuffer = arrayBuffer.slice(offset);
 
@@ -146,16 +149,12 @@ class Config {
                                         bitSize = 16;
                                         byteSize = 2;
                                         break;
+                                    case "float":
                                     case "uint32":
                                     case "int32":
                                         bitSize = 32;
                                         byteSize = 4;
                                         break;
-                                    case "uint64":
-                                    case "int64":
-                                    case "float":
-                                        bitSize = 64;
-                                        byteSize = 8;
                                 }
                             } else {
                                 throw "Config Object cannot be bit offset or sized"
@@ -167,7 +166,7 @@ class Config {
                     if(!bitOffset)
                         bitOffset = 0;
 
-                    var bitMask = (0xFFFFFFFFFFFFFFFF >> (64 - bitSize)) << bitOffset;
+                        var bitMask = (0xFFFFFFFF >>> (64 - bitSize)) << bitOffset;
 
                     switch(byteSize){
                         case 1:
@@ -178,9 +177,6 @@ class Config {
                             break;
                         case 4:
                             subArrayBuffer = new Uint32Array( [ ( new Uint32Array(subArrayBuffer.slice(0,4))[0] & bitMask ) >> bitOffset ] ).buffer;
-                            break;
-                        case 8:
-                            subArrayBuffer = new Uint64Array( [ ( new Uint64Array(subArrayBuffer.slice(0,8))[0] & bitMask ) >> bitOffset ] ).buffer;
                             break;
                         default:
                             throw "Config Object cannot be bit offset or sized"
@@ -347,58 +343,56 @@ class ConfigNumber {
             else
                 this.Value = 0;
         if(!this.ValueMultiplier)
-            this.Value = 1;
+            this.ValueMultiplier = 1;
     }
     GetArrayBuffer() {
         switch(this.Type) {
             case "uint8":
-                return new Uint8Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Uint8Array([this.Value * this.ValueMultiplier]).buffer;
             case "uint16":
-                return new Uint16Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Uint16Array([this.Value * this.ValueMultiplier]).buffer;
             case "uint32":
-                return new Uint32Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Uint32Array([this.Value * this.ValueMultiplier]).buffer;
             case "int8":
-                return new Int8Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Int8Array([this.Value * this.ValueMultiplier]).buffer;
             case "int16":
-                return new Int16Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Int16Array([this.Value * this.ValueMultiplier]).buffer;
             case "int32":
-                return new Int32Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Int32Array([this.Value * this.ValueMultiplier]).buffer;
             case "float":
-                return new Float32Array([this.Value]).buffer * this.ValueMultiplier;
+                return new Float32Array([this.Value * this.ValueMultiplier]).buffer;
         }
     }
     SetArrayBuffer(arrayBuffer) {
         switch(this.Type) {
             case "uint8":
-                this.Value = new Uint8Array(arrayBuffer.slice(0,1))[0];
+                this.Value = new Uint8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
                 return 1;
             case "uint16":
-                this.Value = new Uint16Array(arrayBuffer.slice(0,2))[0];
+                this.Value = new Uint16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
                 return 2;
             case "uint32":
-                this.Value = new Uint32Array(arrayBuffer.slice(0,4))[0];
+                this.Value = new Uint32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
                 return 4;
             case "uint64":
-                this.Value = new Uint64Array(arrayBuffer.slice(0,8))[0];
+                this.Value = new Uint64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
                 return 8;
             case "int8":
-                this.Value = new Int8Array(arrayBuffer.slice(0,1))[0];
+                this.Value = new Int8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
                 return 1;
             case "int16":
-                this.Value = new Int16Array(arrayBuffer.slice(0,2))[0];
+                this.Value = new Int16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
                 return 2;
             case "int32":
-                this.Value = new Int32Array(arrayBuffer.slice(0,4))[0];
+                this.Value = new Int32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
                 return 4;
             case "int64":
-                this.Value = new Int64Array(arrayBuffer.slice(0,8))[0];
+                this.Value = new Int64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
                 return 8;
             case "float":
-                this.Value = new Float32Array(arrayBuffer.slice(0,4))[0];
+                this.Value = new Float32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
                 return 4;
         }
-
-        this.Value /= this.ValueMultiplier;
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
@@ -507,7 +501,7 @@ class ConfigNumberTable {
             });
         }
         if(!this.ValueMultiplier)
-            this.Value = 1;
+            this.ValueMultiplier = 1;
     }
     GetTableArrayLength() {
         return GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1).Value * GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1).Value;
