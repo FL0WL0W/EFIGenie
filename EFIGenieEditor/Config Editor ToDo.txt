@@ -1,5 +1,4 @@
 ConfigEditor ToDo
-y axis table
 views
 read TS ini
 write TS ini
