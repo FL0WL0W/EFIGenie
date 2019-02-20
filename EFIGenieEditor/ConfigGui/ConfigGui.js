@@ -554,17 +554,31 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
         var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
         var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
+        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.XAxis, undefined);
+        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.YAxis, undefined);
         if(xResRef.Value !== this.CurrentXRes || yResRef.Value !== this.CurrentYRes) {
             this.InterpolateTable();
             $('#' + this.GUID + 'table').replaceWith(this.GetTableHtml());
         } else {
                 
             this.InterpolateTable();
-            for(var x = 0; x < xResRef.Value; x++) {
-                $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
+            if(xAxisRef.Value) {
+                for(var x = 0; x < xResRef.Value; x++) {
+                    $("#" + this.GUID + "x" + x).val(xAxisRef.Value[x]);
+                }
+            } else {
+                for(var x = 0; x < xResRef.Value; x++) {
+                    $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
+                }
             }
-            for(var y = 0; y < yResRef.Value; y++) {
-                $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
+            if(yAxisRef.Value) {
+                for(var y = 0; y < yResRef.Value; y++) {
+                    $("#" + this.GUID + "y" + y).val(yAxisRef.Value[y]);
+                }
+            } else {
+                for(var y = 0; y < yResRef.Value; y++) {
+                    $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
+                }
             }
             for(var x = 0; x < xResRef.Value; x++) {
                 for(var y = 0; y < yResRef.Value; y++) {
@@ -581,6 +595,8 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
         var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
         var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
+        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.XAxis, undefined);
+        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.YAxis, undefined);
 
         var thisClass = this;
         $(document).off("change."+this.GUID);
@@ -588,7 +604,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var row = "";
         var table = "";
         for(var y = 0; y < (!yResRef.Value? 2 : yResRef.Value + 1); y++) {
-            var row = "<tr>"
+            var row = "<tr>";
             for(var x = 0; x < xResRef.Value + 1; x++) {
                 if(y === 0) {
                     if(x === 0) {
@@ -598,9 +614,9 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         // - - - -
                         if(yResRef.Value === 1 && xResRef.Value !== 1) {
                             row += "<th>" + this.XLabel + "</th>";
-                        } else if(xResRef.Value === 1) {
+                        } else if(yResRef.Value !== 1 && xResRef.Value === 1) {
                             row += "<th>" + this.YLabel + "</th>";
-                        } else {
+                        } else if((xAxisRef.Value && yAxisRef.Value) || (xAxisRef.Value && yResRef.Value !== 1) || (yAxisRef.Value && xResRef.Value !== 1) || (yResRef.Value !== 1 && xResRef.Value !== 1)) {
                             row += "<td></td>";
                         }
                     } else {
@@ -620,12 +636,37 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             row += "<td>"+xMaxRef.GetHtml(true)+"</td>";
+                        } else if(xAxisRef.GetHtml && GetReferenceCount(this.Parent, this.XAxis) === 1) {
+                            // X X X X
+                            // - - - -
+                            // - - - -
+                            // - - - -
+                            if(x == 1)
+                            {
+                                var xAxisHtml = xAxisRef.GetHtml(true);
+                                if(xAxisHtml.split("<tr").length == 2) {//2 rows means x axis values
+                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr"));
+                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr"));//get second row
+                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
+                                    xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</tr"));
+                                    if(yAxisRef.Value || yResRef.Value !== 1) {//remove first cell
+                                        xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</td"));
+                                        xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
+                                    }
+                                }
+
+                                row += xAxisHtml;
+                            }
                         } else {
                             // - - X -
                             // - - - -
                             // - - - -
                             // - - - -
-                            row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                            if(xAxisRef.Value) {
+                                row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + xAxisRef.Value[x-1] + "\"/></td>";
+                            } else {}
+                                row += "<td><input id=\"" + this.GUID + "x" + x + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
+                            }
                         }
                     }
                 } else {
