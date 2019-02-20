@@ -346,23 +346,25 @@ class ConfigNumber {
                 this.Value = this.Min;
             else
                 this.Value = 0;
+        if(!this.ValueMultiplier)
+            this.Value = 1;
     }
     GetArrayBuffer() {
         switch(this.Type) {
             case "uint8":
-                return new Uint8Array([this.Value]).buffer;
+                return new Uint8Array([this.Value]).buffer * this.ValueMultiplier;
             case "uint16":
-                return new Uint16Array([this.Value]).buffer;
+                return new Uint16Array([this.Value]).buffer * this.ValueMultiplier;
             case "uint32":
-                return new Uint32Array([this.Value]).buffer;
+                return new Uint32Array([this.Value]).buffer * this.ValueMultiplier;
             case "int8":
-                return new Int8Array([this.Value]).buffer;
+                return new Int8Array([this.Value]).buffer * this.ValueMultiplier;
             case "int16":
-                return new Int16Array([this.Value]).buffer;
+                return new Int16Array([this.Value]).buffer * this.ValueMultiplier;
             case "int32":
-                return new Int32Array([this.Value]).buffer;
+                return new Int32Array([this.Value]).buffer * this.ValueMultiplier;
             case "float":
-                return new Float32Array([this.Value]).buffer;
+                return new Float32Array([this.Value]).buffer * this.ValueMultiplier;
         }
     }
     SetArrayBuffer(arrayBuffer) {
@@ -395,6 +397,8 @@ class ConfigNumber {
                 this.Value = new Float32Array(arrayBuffer.slice(0,4))[0];
                 return 4;
         }
+
+        this.Value /= this.ValueMultiplier;
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
@@ -502,31 +506,39 @@ class ConfigNumberTable {
                 thisClass.Value[index] = val;
             });
         }
+        if(!this.ValueMultiplier)
+            this.Value = 1;
     }
     GetTableArrayLength() {
         return GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1).Value * GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1).Value;
     }
     GetArrayBuffer() {
+        var value = Array.from(this.Value);
+
+        for(var i = 0; i < value.length; i++) {
+            value[i] *= this.ValueMultiplier
+        }
+
         switch(this.Type) {
             case "bool":
             case "uint8":
-                return Uint8Array.from(this.Value).buffer;
+                return Uint8Array.from(value).buffer;
             case "uint16":
-                return Uint16Array.from(this.Value).buffer;
+                return Uint16Array.from(value).buffer;
             case "uint32":
-                return Uint32Array.from(this.Value).buffer;
+                return Uint32Array.from(value).buffer;
             case "uint64":
-                return Uint64Array.from(this.Value).buffer;
+                return Uint64Array.from(value).buffer;
             case "int8":
-                return Int8Array.from(this.Value).buffer;
+                return Int8Array.from(value).buffer;
             case "int16":
-                return Int16Array.from(this.Value).buffer;
+                return Int16Array.from(value).buffer;
             case "int32":
-                return Int32Array.from(this.Value).buffer;
+                return Int32Array.from(value).buffer;
             case "int64":
-                return Int64Array.from(this.Value).buffer;
+                return Int64Array.from(value).buffer;
             case "float":
-                return Float32Array.from(this.Value).buffer;
+                return Float32Array.from(value).buffer;
         }
 
         throw "ConfigNumberTable Type Invalid";
@@ -538,34 +550,48 @@ class ConfigNumberTable {
             case "bool":
             case "uint8":
                 this.Value = Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen)));
-                return arrayLen;
+                break;
             case "uint16":
                 this.Value = Array.from(new Uint16Array(arrayBuffer.slice(0, 2 * arrayLen)));
-                return 2 * arrayLen;
+                arrayLen = 2 * arrayLen;
+                break;
             case "uint32":
                 this.Value = Array.from(new Uint32Array(arrayBuffer.slice(0, 4 * arrayLen)));
-                return 4 * arrayLen;
+                arrayLen = 4 * arrayLen;
+                break;
             case "uint64":
                 this.Value = Array.from(new Uint64Array(arrayBuffer.slice(0, 4 * arrayLen)));
-                return 8 * arrayLen;
+                arrayLen = 8 * arrayLen;
+                break;
             case "int8":
                 this.Value = Array.from(new Int8Array(arrayBuffer.slice(0, arrayLen)));
-                return arrayLen;
+                arrayLen = arrayLen;
+                break;
             case "int16":
                 this.Value = Array.from(new Int16Array(arrayBuffer.slice(0, 2 * arrayLen)));
-                return 2 * arrayLen;
+                arrayLen = 2 * arrayLen;
+                break;
             case "int32":
                 this.Value = Array.from(new Int32Array(arrayBuffer.slice(0, 4 * arrayLen)));
-                return 4 * arrayLen;
+                arrayLen = 4 * arrayLen;
+                break;
             case "int64":
                 this.Value = Array.from(new Int64Array(arrayBuffer.slice(0, 4 * arrayLen)));
-                return 8 * arrayLen;
+                arrayLen = 8 * arrayLen;
+                break;
             case "float":
                 this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
-                return 4 * arrayLen;
+                arrayLen = 4 * arrayLen;
+                break;
+            default: 
+        throw "ConfigNumberTable Type Invalid";
         }
 
-        throw "ConfigNumberTable Type Invalid";
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i] /= this.ValueMultiplier
+        }
+
+        return arrayLen;
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
@@ -601,11 +627,22 @@ class ConfigFormula {
         return GetReferenceByNumberOrReference(this.Parent, this.Degree, 0).Value + 1;
     }
     GetArrayBuffer() {
-        return Float32Array.from(this.Value);
+        var value = Array.from(this.Value);
+
+        for(var i = 0; i < value.length; i++) {
+            value[i] *= this.ValueMultiplier
+        }
+
+        return Float32Array.from(value);
     }
     SetArrayBuffer(arrayBuffer) {
         var arrayLen = this.GetTableArrayLength();
         this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+        
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i] /= this.ValueMultiplier
+        }
+        
         return 4 * arrayLen;
     }
     GetConfig() {
