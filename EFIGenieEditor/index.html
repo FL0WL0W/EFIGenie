@@ -20,7 +20,7 @@
                 });
                 $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                 $("#btnNew").click(function(){
-                    b = new ConfigGui(b.iniNameSpace);
+                    b = new ConfigGui(undefined, b.ConfigNameSpace);
                     $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                 });
                 $("#btnSave").click(function(){
