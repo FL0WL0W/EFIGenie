@@ -828,8 +828,8 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         else
                             copyData += "\t";
                         copyData += value;
+                        prevRow = parseInt(index / xResRef.Value);
                     }
-                    prevRow = parseInt(index / xResRef.Value);
                 });
                 copyData = copyData.substring(1);
                 e.originalEvent.clipboardData.setData('text/plain', copyData);
