@@ -69,15 +69,40 @@ class Config {
 
                 var subArrayBuffer = variableRowObj.GetArrayBuffer();
 
-                if(variableRowObj instanceof configBoolean) {
-                    var bit = variableRowObj.Bit;
-                    if(!bit)
-                        bit = 0; //if there is not bit specified assume it is to be put at the first position. usualy when the bit takes the entire byte space
+                if(variableRowObj.BitOffset || variableRowObj.BitSize) {
+                    var bitSize = variableRowObj.BitSize;
+                    if(!bitSize) {
+                        if(variableRowObj instanceof ConfigBoolean)
+                            bitSize = 1;
+                        else
+                            bitSize = subArrayBuffer.length * 8;
+                    }
+                    
+                    var bitOffset = variableRowObj.BitOffset;
+                    if(!bitOffset)
+                        bitOffset = 0;
 
-                    subArrayBuffer[0] = subArrayBuffer[0] | (arrayBuffer.slice(offset)[0] & ~(0x01 << bit))                   
+                    var bitMask = (0xFFFFFFFFFFFFFFFF >> (64 - bitSize)) << bitOffset;
+
+                    switch(subArrayBuffer.length){
+                        case 1:
+                            subArrayBuffer = new Uint8Array( [ ( new Uint8Array(subArrayBuffer)[0] & bitMask ) | ( new Uint8Array(arrayBuffer.slice(offset, 1))[0] & ~bitMask ) ] ).buffer;
+                            break;
+                        case 2:
+                            subArrayBuffer = new Uint16Array( [ ( new Uint16Array(subArrayBuffer)[0] & bitMask ) | ( new Uint16Array(arrayBuffer.slice(offset, 2))[0] & ~bitMask ) ] ).buffer;
+                            break;
+                        case 4:
+                            subArrayBuffer = new Uint32Array( [ ( new Uint32Array(subArrayBuffer)[0] & bitMask ) | ( new Uint32Array(arrayBuffer.slice(offset, 4))[0] & ~bitMask ) ] ).buffer;
+                            break;
+                        case 8:
+                            subArrayBuffer = new Uint64Array( [ ( new Uint64Array(subArrayBuffer)[0] & bitMask ) | ( new Uint64Array(arrayBuffer.slice(offset, 8))[0] & ~bitMask ) ] ).buffer;
+                            break;
+                        default:
+                            throw "Config Object cannot be bit offset or sized"
+                    }                
                 }
 
-                arrayBuffer = arrayBuffer.slice(0, Math.floor(offset)).concatArray(subArrayBuffer).concatArray(arrayBuffer.slice(Math.floor(offset) + subArrayBuffer.byteLength));
+                arrayBuffer = arrayBuffer.slice(0, offset).concatArray(subArrayBuffer).concatArray(arrayBuffer.slice(offset + subArrayBuffer.byteLength));
             } else {
                 arrayBuffer = arrayBuffer.concatArray(variableRowObj.GetArrayBuffer());
             }
@@ -101,7 +126,68 @@ class Config {
                 if(!offset)
                     throw "Config No offset specified";
                 
-                variableRowObj.SetArrayBuffer(arrayBuffer.slice(offset));
+                var subArrayBuffer = arrayBuffer.slice(offset);
+
+                if(variableRowObj.BitOffset || variableRowObj.BitSize) {
+                    var bitSize = variableRowObj.BitSize;
+                    var byteSize = 1;
+                    if(!bitSize) {
+                        if(variableRowObj instanceof ConfigBoolean)
+                            bitSize = 1;
+                        else {
+                            if(variableRowObj.Type) {
+                                switch(variableRowObj.Type) {
+                                    case "uint8":
+                                    case "int8":
+                                        bitSize = 8;
+                                        break;
+                                    case "uint16":
+                                    case "int16":
+                                        bitSize = 16;
+                                        byteSize = 2;
+                                        break;
+                                    case "uint32":
+                                    case "int32":
+                                        bitSize = 32;
+                                        byteSize = 4;
+                                        break;
+                                    case "uint64":
+                                    case "int64":
+                                    case "float":
+                                        bitSize = 64;
+                                        byteSize = 8;
+                                }
+                            } else {
+                                throw "Config Object cannot be bit offset or sized"
+                            }
+                        }
+                    }
+                    
+                    var bitOffset = variableRowObj.BitOffset;
+                    if(!bitOffset)
+                        bitOffset = 0;
+
+                    var bitMask = (0xFFFFFFFFFFFFFFFF >> (64 - bitSize)) << bitOffset;
+
+                    switch(byteSize){
+                        case 1:
+                            subArrayBuffer = new Uint8Array( [ ( new Uint8Array(subArrayBuffer.slice(0,1))[0] & bitMask ) >> bitOffset ] ).buffer;
+                            break;
+                        case 2:
+                            subArrayBuffer = new Uint16Array( [ ( new Uint16Array(subArrayBuffer.slice(0,2))[0] & bitMask ) >> bitOffset ] ).buffer;
+                            break;
+                        case 4:
+                            subArrayBuffer = new Uint32Array( [ ( new Uint32Array(subArrayBuffer.slice(0,4))[0] & bitMask ) >> bitOffset ] ).buffer;
+                            break;
+                        case 8:
+                            subArrayBuffer = new Uint64Array( [ ( new Uint64Array(subArrayBuffer.slice(0,8))[0] & bitMask ) >> bitOffset ] ).buffer;
+                            break;
+                        default:
+                            throw "Config Object cannot be bit offset or sized"
+                    }                
+                }
+
+                variableRowObj.SetArrayBuffer(subArrayBuffer);
             } else {
                 size += variableRowObj.SetArrayBuffer(arrayBuffer.slice(size));
             }
@@ -327,30 +413,10 @@ class ConfigBoolean {
             this.Value = false;
     }
     GetArrayBuffer() {
-        var value = this.Value;
-
-        if(this.Bit) {
-            var bit = this.Bit;
-            if(!bit)
-                bit = 0; //if there is not bit specified assume it is to be at the first position. usualy when the bit takes the entire byte space
-            
-            value = (value << bit) & (0x01 << bit);
-        }
-
-        return new Uint8Array([value]).buffer;
+        return new Uint8Array([this.Value & 0x01]).buffer;
     }
     SetArrayBuffer(arrayBuffer) {
-        if(this.Bit) {
-            var bit = this.Bit;
-            if(!bit)
-                bit = 0; //if there is not bit specified assume it is to be at the first position. usualy when the bit takes the entire byte space
-
-            var byte = arrayBuffer.slice(offset)[0];
-            this.Value = (byte >> bit) & 0x01;
-        } else {
-            this.Value = (new Uint8Array(arrayBuffer.slice(0,1))[0] === 1);
-        }
-
+        this.Value = new Uint8Array(arrayBuffer)[0] & 0x01;
         return 1;
     }
     GetConfig() {

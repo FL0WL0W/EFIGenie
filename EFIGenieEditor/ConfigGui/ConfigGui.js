@@ -16,7 +16,9 @@ class ConfigGui extends Config {
             var variableRowKey = Object.keys(variableRow)[0];
             var variableRowObj = this[variableRowKey];
 
-            if(variableRowObj instanceof ConfigNumber) {
+            if(variableRowObj instanceof ConfigNumber && variableRowObj.Selections) {
+                this[variableRowKey] = new ConfigNumberSelectionGui(variableRowObj, this, this.CallBack);
+            } else if(variableRowObj instanceof ConfigNumber) {
                 this[variableRowKey] = new ConfigNumberGui(variableRowObj, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigBoolean) {
                 this[variableRowKey] = new ConfigBooleanGui(variableRowObj, this, this.CallBack);
@@ -219,6 +221,11 @@ class ConfigSelectionGui extends ConfigSelection {
                     
                 thisClass.Value = new ConfigGui(thisClass.Value, thisClass.ConfigNameSpace, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            
+                thisClass.UpdateReferences();
+    
+                if(thisClass.CallBack)
+                    thisClass.CallBack();
             });
 
             $(document).off("click."+this.GUID);
@@ -229,6 +236,11 @@ class ConfigSelectionGui extends ConfigSelection {
 
                 thisClass.Value = new ConfigGui(obj, thisClass.ConfigNameSpace, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            
+                thisClass.UpdateReferences();
+    
+                if(thisClass.CallBack)
+                    thisClass.CallBack();
             });
         }
 
@@ -332,6 +344,81 @@ class ConfigNumberGui extends ConfigNumber {
             $(this).select();
         });
         return template;
+    }
+}
+
+var numberSelectionConfigGuiTemplate;
+class ConfigNumberSelectionGui extends ConfigNumber {
+    constructor(obj, parent, callBack){
+        super(obj, parent);
+        this.GUID = getGUID();
+        this.CallBack = callBack;
+    }
+
+    GetConfig() {
+        return JSON.parse(JSON.stringify(this, function(key, value) {
+            if(key === "GUID" || key === "Parent")
+                return undefined;
+            return value;
+        }));
+    }
+
+    UpdateReferences() {
+        switch(this.Type) {
+            case "uint8":
+            case "uint16":
+            case "uint32":
+                if(this.Value < 0)
+                this.Value = 0;
+            case "int8":
+            case "int16":
+            case "int32":
+                this.Value = Math.round(this.Value);
+        }
+        
+        if(this.Value < this.Min)
+            this.Value = this.Min;
+        if(this.Value > this.Max)
+            this.Value = this.Max;
+
+        $("#" + this.GUID).val(this.Value)
+    }
+
+    GetHtml() {
+        if(this.Hidden)
+            return "";
+
+        var template = "<span id=\"span"+this.GUID+"\">";
+        if(this.Selections.length > 1) {
+            if(!numberSelectionConfigGuiTemplate)
+                numberSelectionConfigGuiTemplate = getFileContents("ConfigGui/NumberSelection.html");
+            template += numberSelectionConfigGuiTemplate;
+            template = template.replace(/[$]id[$]/g, this.GUID);
+            template = template.replace(/[$]label[$]/g, this.Label);
+            var selectionHtml = "";
+            var thisClass = this;
+            $.each(this.Selections, function(selectionIndex, selectionValue) {
+                if(selectionIndex === parseInt(thisClass.Value))
+                    selectionHtml += "<option selected value=\"" + selectionIndex + "\">" + selectionValue + "</option>";
+                else {
+                    if(selectionValue !== "INVALID") 
+                        selectionHtml += "<option value=\"" + selectionIndex + "\">" + selectionValue + "</option>";
+                }
+            });
+            template = template.replace(/[$]selections[$]/g, selectionHtml);
+            
+            $(document).off("change."+this.GUID);
+            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+                thisClass.Value = parseInt($(this).val());
+            
+                thisClass.UpdateReferences();
+    
+                if(thisClass.CallBack)
+                    thisClass.CallBack();
+            });
+        }
+
+        return template + "</span>";
     }
 }
 
