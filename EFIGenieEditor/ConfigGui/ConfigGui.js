@@ -579,7 +579,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                 }
             } else {
                 for(var x = 0; x < xResRef.Value; x++) {
-                    $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
+                    $("#" + this.GUID + "x" + x).val(parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)));
                 }
             }
             if(yAxisRef.Value) {
@@ -591,7 +591,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                 }
             } else {
                 for(var y = 0; y < yResRef.Value; y++) {
-                    $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
+                    $("#" + this.GUID + "y" + y).val(parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)));
                 }
             }
             for(var x = 0; x < xResRef.Value; x++) {
