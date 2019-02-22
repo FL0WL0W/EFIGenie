@@ -8,7 +8,7 @@ var IOServicesIni = {
 
     BooleanInputService_StaticConfig: { Variables : [
         { BooleanInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
-        { Value: { Type: "bool", Label: "Static Value" } }
+        { BooleanValue: { Type: "bool", Label: "Static Value" } }
     ] },
 
     BooleanInputServiceConfig: { Variables : [
@@ -53,8 +53,8 @@ var IOServicesIni = {
     
     FloatInputService_StaticConfig: { Variables : [
         { FloatInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
-        { Value: { Type: "float", Label: "Static Value" } },
-        { ValueDot: { Type: "float", Label: "Static Value Dot" } }
+        { FloatValue: { Type: "float", Label: "Static Value" } },
+        { FloatValueDot: { Type: "float", Label: "Static Value Dot" } }
     ] },
 
     FloatInputService_AnalogPolynomialConfig: { Variables : [
@@ -102,7 +102,7 @@ var IOServicesIni = {
         { FloatInputService_FaultDetectionWrapperConfigTypeId: { Type: "uint8", Value: 6, Hidden: true } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } },
-        { Value: { Type: "float", Label: "Static Value" } },
+        { DefaultValue: { Type: "float", Label: "Default Value" } },
         { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ] },
 
