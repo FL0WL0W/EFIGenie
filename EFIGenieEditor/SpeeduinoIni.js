@@ -1,21 +1,19 @@
-var PercentUnits = [ { Name: "%", DisplayMultiplier: 100 }, { Name: "0.0-1.0", DisplayMultiplier: 1} ];
-var PercentPerSecondUnits = [ { Name: "%/s", DisplayMultiplier: 100 }, { Name: "(0.0-1.0)/s", DisplayMultiplier: 1} ];
-var TimeUnits = [ { Name: "s", DisplayMultiplier: 1 }, { Name: "ms", DisplayMultiplier: 1000 }, { Name: "us", DisplayMultiplier: 1000000 }, { Name: "ns", DisplayMultiplier: 1000000000 } ];
-var FrequencyUnits = [ { Name: "Hz", DisplayMultiplier: 1 }, { Name: "KHz", DisplayMultiplier: 0.001 }, { Name: "MHz", DisplayMultiplier: 0.000001 } ];
-var DegreeUnits = [ { Name: "°", DisplayMultiplier: 1 } ];
-var VoltUnits = [ { Name: "V", DisplayMultiplier: 1 }, { Name: "mV", DisplayMultiplier: 1000 } ];
-var PressureUnits = [ { Name: "Bar", DisplayMultiplier: 1 }, { Name: "kPa", DisplayMultiplier: 100 } ];
-var RPMUnits = [ { Name: "RPM", DisplayMultiplier: 1 } ];
-
 var SpeeduinoIni_loadSourceNames = ["MAP", "TPS", "IMAP/EMAP", "INVALID",   "INVALID", "INVALID", "INVALID", "INVALID"];
 
 SpeeduinoIni = {
     Blank: { Variables : [
     ] },
 
+    Data0: { Size: 3, Variables: [
+        { dataVersion: { Offset: 0, Type: "int8", Value: 0, Hidden: true } },
+        { veXSize: { Offset: 1, Type: "int8", Value: 0, Hidden: true } },
+        { veYSize: { Offset: 0, Type: "int8", Value: 0, Hidden: true } }
+    ]},
+
     Main: { Tabbed: true, Variables: [
-        { Page1: { Label: "General Page", ConfigName: "Page1" } },
+        { Data0: { Label: "Data0", ConfigName: "Data0", Hidden:true } },
         { Page2: { Label: "Fuel Map Page", ConfigName: "Page2" } },
+        { Page1: { Label: "General Page", ConfigName: "Page1" } },
         { Page3: { Label: "Ignition Table Page", ConfigName: "Blank" } },
         { Page4: { Label: "Ignition Settings Page", ConfigName: "Blank" } },
         { Page5: { Label: "AFR Table Page", ConfigName: "Blank" } },
@@ -110,7 +108,7 @@ SpeeduinoIni = {
     Page2: {  Size: 288, Variables: [
         { rpmBins: { Offset: 256, Label: "rpmBins", Type: "uint8", Value: [100, 700, 1300, 1900, 2500, 3100, 3700, 4300, 4900, 5600, 6200, 6800, 7400, 8000, 8600, 9200], Min: 1, XResolution: 16, XMin: 1, XMax:16, Dialog: true, ValueMultiplier: 0.01, Units: RPMUnits } },
         { fuelLoadBins: { Offset: 272, Label: "fuelLoadBins", Type: "uint8", Min: 0, XResolution: 16, XMin: 1, XMax:16, Dialog: true, ValueMultiplier: 0.5 } },
-        { veTable: { Offset: 0, Label: "veTable", Type: "uint8", Min: 0, XResolution: 16, YResolution: 16, XAxis: "rpmBins", YAxis:"fuelLoadBins", Dialog: true, ValueMultiplier: 0.5 } },
+        { veTable: { Offset: 0, Label: "veTable", Type: "uint8", Min: 0, XResolution: 16, YResolution: 16, XAxis: "rpmBins", YAxis:"fuelLoadBins", YAxisInvertOrder:true, Dialog: true, ValueMultiplier: 0.5 } },
 
     ] }
 }

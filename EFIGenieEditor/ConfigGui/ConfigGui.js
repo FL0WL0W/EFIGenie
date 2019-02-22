@@ -53,7 +53,7 @@ class ConfigGui extends Config {
             
             returnVariables.push(returnVariableRow);
         }
-        this.Variables = returnVariable;
+        this.Variables = returnVariables;
         
         return JSON.parse(JSON.stringify(this, function(key, value) { 
             if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent")
@@ -117,8 +117,13 @@ class ConfigGui extends Config {
 
                 $(document).on("click."+this.GUID, "#tab" + variableRowObj.GUID, function(){
                     var GUID = $(this).data("guid");
-                    $("#span" + thisClass.GUID + " .tabLink").removeClass("active");
-                    $("#span" + thisClass.GUID + " .tabContent").hide();
+                    for(var tabRowIndex in thisClass.Variables) {
+                        var tabRow = thisClass.Variables[tabRowIndex];
+                        var tabRowKey = Object.keys(tabRow)[0];
+                        var tabRowObj = thisClass[tabRowKey];
+                        $("#tab" + tabRowObj.GUID).removeClass("active");
+                        $("#span" + tabRowObj.GUID).hide();
+                    }
                     $(this).addClass("active");
                     $("#span" + GUID).show()
                 });
@@ -579,7 +584,10 @@ class ConfigNumberTableGui extends ConfigNumberTable {
             }
             if(yAxisRef.Value) {
                 for(var y = 0; y < yResRef.Value; y++) {
-                    $("#" + this.GUID + "y" + y).val(yAxisRef.Value[y]);
+                    var yAxisIndex = y;
+                    if(this.YAxisInvertOrder)
+                        yAxisIndex = yResRef.Value - yAxisIndex;
+                    $("#" + this.GUID + "y" + y).val(yAxisRef.Value[yAxisIndex]);
                 }
             } else {
                 for(var y = 0; y < yResRef.Value; y++) {
@@ -610,7 +618,6 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var row = "";
         var table = "";
 
-
         var yAxisHtml = []
         if(yAxisRef.GetHtml) {
             yAxisHtml = yAxisRef.GetHtml(true);
@@ -637,6 +644,34 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                 newYAxisHtml.push(value);
             });
             yAxisHtml = newYAxisHtml;
+        }
+
+        var xAxisHtml = []
+        if(xAxisRef.GetHtml) {
+            xAxisHtml = xAxisRef.GetHtml(true);
+            if(xAxisHtml.split("<tr").length == 3) {//2 rows means x axis values
+                xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr") + 3);
+                xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr") + 3);//get second row
+                xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
+                xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</tr"));
+            } else {//more rows means x axis values
+                var newXAxisHtml = "";
+                $.each(xAxisHtml.split("<tr"), function(index, value) {
+                    value = value.substring(Math.min(value.indexOf("<th") === -1? 0xFFFFFFFF : value.indexOf("<th"), value.indexOf("<td")));
+                    value = value.substring(Math.min(value.indexOf("<th") === -1? 0xFFFFFFFF : value.indexOf("<th"), value.indexOf("<td"))); //get second column
+                    value = value.substring(value.indexOf(">") + 1);
+                    value = value.substring(0, value.indexOf("</td"));
+                    newXAxisHtml += "<td>" + value + "</td>";
+                });
+                xAxisHtml = newXAxisHtml;
+            }
+            var newXAxisHtml = [];
+            $.each(xAxisHtml.split("<td"), function(index, value) {
+                value = value.substring(value.indexOf(">") + 1);
+                value = value.substring(0, value.indexOf("</td"));
+                newXAxisHtml.push(value);
+            });
+            xAxisHtml = newXAxisHtml;
         }
 
         for(var y = 0; y < (!yResRef.Value? 2 : yResRef.Value + 1); y++) {
@@ -679,31 +714,10 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             // - - - -
-                            if(x == 1) {
-                                var xAxisHtml = xAxisRef.GetHtml(true);
-                                if(xAxisHtml.split("<tr").length === 3) {//2 rows means x axis values
-                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr") + 3);
-                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf("<tr") + 3);//get second row
-                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
-                                    xAxisHtml = xAxisHtml.substring(0, xAxisHtml.indexOf("</tr")).replace(new RegExp("<td", 'g'), "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"").replace(new RegExp("<th", 'g'), "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\"");
-                                } else {//more rows means y axis values
-                                    var newXAxisHtml = "";
-                                    $.each(xAxisHtml.split("<tr"), function(index, value) {
-                                        value = value.substring(Math.min(value.indexOf("<th") === -1? 0xFFFFFFFF : value.indexOf("<th"), value.indexOf("<td")) + 3);
-                                        value = value.substring(Math.min(value.indexOf("<th") === -1? 0xFFFFFFFF : value.indexOf("<th"), value.indexOf("<td")) + 3); //get second column
-                                        value = value.substring(value.indexOf(">") + 1);
-                                        value = value.substring(0, value.indexOf("</td"));
-                                        newXAxisHtml += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + value + "</td>";
-                                    });
-                                    xAxisHtml = newXAxisHtml;
-                                }
-
-                                if(yAxisRef.Value || yResRef.Value !== 1) {//remove first cell
-                                    xAxisHtml = xAxisHtml.substring(Math.min(xAxisHtml.indexOf("</th") === -1? 0xFFFFFFFF : xAxisHtml.indexOf("</th"), xAxisHtml.indexOf("</td")));
-                                    xAxisHtml = xAxisHtml.substring(xAxisHtml.indexOf(">") + 1);
-                                }
-                                row += xAxisHtml;
-                            }
+                            var xAxisIndex = x;
+                            if(this.XAxisInvertOrder && x > 0)
+                                xAxisIndex = xResRef.Value - (xAxisIndex-1);
+                            row += "<td style=\"border-right-style: sold; border-bottom-width:5px;\">" + xAxisHtml[xAxisIndex] + "</td>";
                         } else {
                             // - - X -
                             // - - - -
@@ -746,9 +760,15 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             if(yResRef.Value === 1 && !yAxisRef.Value) {
                                 row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
                             } else if(yAxisRef.GetHtml && GetReferenceCount(this.Parent, this.YAxis) === 1) {
-                                row += "<td style=\"border-right-style: sold; border-right-width:5px;\">" + yAxisHtml[y] + "</td>";
+                                var yAxisIndex = y;
+                                if(this.YAxisInvertOrder && y > 0)
+                                    yAxisIndex = yResRef.Value - (yAxisIndex-1);
+                                row += "<td style=\"border-right-style: sold; border-right-width:5px;\">" + yAxisHtml[yAxisIndex] + "</td>";
                             } else if(yAxisRef.Value) {
-                                row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input id=\"" + this.GUID + "y" + (y-1) + "\" type=\"number\" disabled value=\"" + yAxisRef.Value[y-1] + "\"/></td>";
+                                var yAxisIndex = y-1;
+                                if(this.YAxisInvertOrder)
+                                    yAxisIndex = yResRef.Value - yAxisIndex;
+                                row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input id=\"" + this.GUID + "y" + (y-1) + "\" type=\"number\" disabled value=\"" + yAxisRef.Value[yAxisIndex] + "\"/></td>";
                             } else {
                                 row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input id=\"" + this.GUID + "y" + (y-1) + "\" type=\"number\" disabled value=\"" + parseFloat(parseFloat(((yMaxRef.Value - yMinRef.Value) * (y-1) / (yResRef.Value-1) + yMinRef.Value).toFixed(6)).toPrecision(7)) + "\"/></td>";
                             }

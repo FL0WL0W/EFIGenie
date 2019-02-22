@@ -1,5 +1,5 @@
 var EngineControlServicesIni = {
-    IgnitorServicesConfig: [
+    IgnitorServicesConfig: { Variables: [
         { IgnitorServicesId: { Type: "uint16", Value: 3001, Hidden: true } },
         { Coils: { Type: "uint8", Label: "Ignition Coils", Value: 4, Min: 0, Max: 16, Step: 1 } },
         { CoilConfigs: { 
@@ -8,9 +8,9 @@ var EngineControlServicesIni = {
             ConfigName: "IBooleanOutputServiceConfig", 
             Array: "Coils"
         } }
-    ],
+    ] },
 
-    InjectorServicesConfig: [
+    InjectorServicesConfig: { Variables: [
         { InjectorServicesId: { Type: "uint16", Value: 3002, Hidden: true } },
         { Injectors: { Type: "uint8", Label: "Ignition Coils", Value: 4, Min: 0, Max: 32, Step: 1 } },
         { InjectorConfigs: { 
@@ -19,9 +19,9 @@ var EngineControlServicesIni = {
             ConfigName: "IBooleanOutputServiceConfig", 
             Array: "Injectors"
         } }
-    ],
+    ] },
 
-    IdleControlService_PidConfig: [
+    IdleControlService_PidConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint8", Value: 1, Hidden: true } },
         { TpsThreshold: { Type: "float", Value: 1 } },
 		// float TpsThreshold;
@@ -43,20 +43,35 @@ var EngineControlServicesIni = {
 		// unsigned char SpeedResolution;
 		// float *IdleAirmassSpeedAdder;
 		// short *IdleTargetRpmSpeedAdder;
-    ],
+    ] },
 
-    IIdleControlServiceConfig: [
+    IIdleControlServiceConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 4003, Hidden: true } },
         { Selection: { Label: "Idle Air Control Valve", Selections: [
             { Name: "None", ConfigName: "NoneConfig"},
             { Name: "PID", ConfigName: "IdleControlService_PidConfig"}
         ] } }
-    ],
+    ] },
 
-    Main: [
-        { IgnitorServices: { ConfigName: "IgnitorServices"} },
-        { InjectorServices: { ConfigName: "InjectorServices"} }
-    ]
+    SensorServices: { Tabbed: true, Variables: [
+        { IntakeAirTemperatureConfig: { Label: "IAT", ConfigName: "IntakeAirTemperatureConfig"} },
+        { EngineCoolantTemperatureServiceConfig: { Label: "ECT", ConfigName: "EngineCoolantTemperatureServiceConfig"} },
+        { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", ConfigName: "ManifoldAbsolutePressureServiceConfig"} },
+        { VoltageConfig: { Label: "Voltage", ConfigName: "VoltageConfig"} },
+        { ThrottlePositionConfig: { Label: "TPS", ConfigName: "ThrottlePositionConfig"} },
+        { EthanolContentConfig: { Label: "Ethanol", ConfigName: "EthanolContentConfig"} },
+        { VehicleSpeedConfig: { Label: "VSS", ConfigName: "VehicleSpeedConfig"} },
+    ] },
+
+    OutputServices: { Tabbed: true, Variables: [
+        { IgnitorServices: { Label: "Ignitors", ConfigName: "IgnitorServicesConfig"} },
+        { InjectorServices: { Label: "Injectors", ConfigName: "InjectorServicesConfig"} }
+    ] },
+
+    Main: { Tabbed: true, Variables: [
+        { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
+        { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
+    ] }
 };
 
 for(var k in SensorServicesIni) {

@@ -3,16 +3,16 @@ var IOServicesIni = {
     ] },
 
     NoneServiceConfig: { Variables : [
-        { ServiceId: { Type: "uint8", Value: 0, Hidden:true }}
+        { NoneServiceConfigServiceId: { Type: "uint8", Value: 0, Hidden:true }}
     ] },
 
     BooleanInputService_StaticConfig: { Variables : [
-        { BooleanInputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { BooleanInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Value: { Type: "bool", Label: "Static Value" } }
     ] },
 
     BooleanInputServiceConfig: { Variables : [
-        { BooleanInputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
+        { BooleanInputServiceConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { Inverted: { Type: "bool", Label: "Inverted" } }
     ] },
@@ -26,7 +26,7 @@ var IOServicesIni = {
     ] },
 
     ButtonService_PollingConfig : { Variables : [
-        { ButtonServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { ButtonService_PollingConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { BooleanInputServiceConfig: { ConfigName: "IBooleanInputServiceConfig" } }
     ] },
 
@@ -38,7 +38,7 @@ var IOServicesIni = {
     ] },
 
     BooleanOutputServiceConfig: { Variables : [
-        { BooleanOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { BooleanOutputServiceConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { NormalOn: { Type: "bool", Label: "Normal On" } },
         { HighZ: { Type: "bool", Label: "High Z" } }
@@ -52,13 +52,13 @@ var IOServicesIni = {
     ] },
     
     FloatInputService_StaticConfig: { Variables : [
-        { FloatInputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { FloatInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Value: { Type: "float", Label: "Static Value" } },
         { ValueDot: { Type: "float", Label: "Static Value Dot" } }
     ] },
 
     FloatInputService_AnalogPolynomialConfig: { Variables : [
-        { FloatInputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
+        { FloatInputService_AnalogPolynomialConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
         { APA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
@@ -67,7 +67,7 @@ var IOServicesIni = {
     ] },
 
     FloatInputService_AnalogInterpolatedTableConfig: { Variables : [
-        { FloatInputServiceTypeId: { Type: "uint8", Value: 4, Hidden: true } },
+        { FloatInputService_AnalogInterpolatedTableConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
         { AMinInputValue: { Type: "float", Label: "Min Input Voltage"  } },
@@ -78,7 +78,7 @@ var IOServicesIni = {
     ] },
 
     FloatInputService_FrequencyPolynomialConfig: { Variables : [
-        { FloatInputServiceTypeId: { Type: "uint8", Value: 3, Hidden: true } },
+        { FloatInputService_FrequencyPolynomialConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
@@ -88,7 +88,7 @@ var IOServicesIni = {
     ] },
 
     FloatInputService_FrequencyInterpolatedTableConfig: { Variables : [
-        { FloatInputServiceTypeId: { Type: "uint8", Value: 5, Hidden: true } },
+        { FloatInputService_FrequencyInterpolatedTableConfigTypeId: { Type: "uint8", Value: 5, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
         { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
@@ -98,6 +98,14 @@ var IOServicesIni = {
         { FITTable: { Type: "float", XResolution: "FITResolution", Label: "Frequency to Value", XLabel: "Frequency", ZLabel: "Value", XMin: "FMinFrequency", XMax: "FMaxFrequency", Dialog: true } }
     ] },
 
+    FloatInputService_FaultDetectionWrapperConfig: { Variables : [
+        { FloatInputService_FaultDetectionWrapperConfigTypeId: { Type: "uint8", Value: 6, Hidden: true } },
+        { MinValue: { Type: "float", Label: "Min Value" } },
+        { MaxValue: { Type: "float", Label: "Max Value" } },
+        { Value: { Type: "float", Label: "Static Value" } },
+        { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
+    ] },
+
     IFloatInputServiceConfig: { Variables : [
         { Selection: { Label: "Input", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig" },
@@ -105,12 +113,13 @@ var IOServicesIni = {
             { Name: "Analog Pin Polynomial", ConfigName: "FloatInputService_AnalogPolynomialConfig" },
             { Name: "Analog Pin Lookup Table", ConfigName: "FloatInputService_AnalogInterpolatedTableConfig" },
             { Name: "Frequency Pin Polynomial", ConfigName: "FloatInputService_FrequencyPolynomialConfig" },
-            { Name: "Frequency Pin Lookup Table", ConfigName: "FloatInputService_FrequencyInterpolatedTableConfig" }
+            { Name: "Frequency Pin Lookup Table", ConfigName: "FloatInputService_FrequencyInterpolatedTableConfig" },
+            { Name: "Fault Detection Wrapper", ConfigName: "FloatInputService_FaultDetectionWrapperConfig" }
         ] } }
     ] },
 
     StepperOutputService_StepDirectionControlConfig: { Variables : [
-        { StepperOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { StepperOutputService_StepDirectionControlConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
         { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1} },
         { StepBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "Step Output Config" } },
@@ -118,7 +127,7 @@ var IOServicesIni = {
     ] },
 
     StepperOutputService_FullStepControlConfig: { Variables : [
-        { StepperOutputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
+        { StepperOutputService_FullStepControlConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
         { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
         { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
@@ -128,7 +137,7 @@ var IOServicesIni = {
     ] },
 
     StepperOutputService_HalfStepControlConfig: { Variables : [
-        { StepperOutputServiceTypeId: { Type: "uint8", Value: 3, Hidden: true } },
+        {StepperOutputService_HalfStepControlConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
         { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
         { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
@@ -138,7 +147,7 @@ var IOServicesIni = {
     ] },
 
     StepperOutputService_StaticStepCalibrationWrapperConfig: { Variables : [
-        { StepperOutputServiceTypeId: { Type: "uint8", Value: 5, Hidden: true } },
+        { StepperOutputService_StaticStepCalibrationWrapperConfigTypeId: { Type: "uint8", Value: 5, Hidden: true } },
         { StepsOnCalibration: { Type: "int32", Label: "Reset Steps", Value: 300 } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
     ] },
@@ -154,7 +163,7 @@ var IOServicesIni = {
     ] },
 
     FloatOutputService_PwmPolynomialConfig: { Variables : [
-        { FloatOutputServiceTypeId: { Type: "uint8", Value: 1, Hidden: true } },
+        { FloatOutputService_PwmPolynomialConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
         { PA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
@@ -163,7 +172,7 @@ var IOServicesIni = {
     ] },
 
     FloatOutputService_PwmInterpolatedTableConfig: { Variables : [
-        { FloatOutputServiceTypeId: { Type: "uint8", Value: 3, Hidden: true } },
+        { FloatOutputService_PwmInterpolatedTableConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
         { MinValue: { Type: "float", Label: "Min Value" } },
@@ -174,7 +183,7 @@ var IOServicesIni = {
     ] },
 
     FloatOutputService_StepperPolynomialConfig: { Variables : [
-        { FloatOutputServiceTypeId: { Type: "uint8", Value: 2, Hidden: true } },
+        { FloatOutputService_StepperPolynomialConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { SA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
         { SMinStepPosition: { Type: "int32", Label: "Min Step Position" } },
         { SMaxStepPosition: { Type: "int32", Label: "Max Step Position" } },
@@ -182,7 +191,7 @@ var IOServicesIni = {
     ] },
 
     FloatOutputService_StepperInterpolatedTableConfig: { Variables : [
-        { FloatOutputServiceTypeId: { Type: "uint8", Value: 4, Hidden: true } },
+        { FloatOutputService_StepperInterpolatedTableConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } },
         { SResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },

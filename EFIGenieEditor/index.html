@@ -3,6 +3,7 @@
         <script src="jquery-3.3.1.min.js"></script>
         <script src="utils.js"></script>
         <script src="Config.js"></script>
+        <script src="Units.js"></script>
         <script src="SpeeduinoIni.js"></script>
         <script src="IOServicesConfig.js"></script>
         <script src="SensorServicesConfig.js"></script>
@@ -12,7 +13,7 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
             $(document).ready(function() {
-                var b = new ConfigGui(undefined, SpeeduinoIni);
+                var b = new ConfigGui(undefined, EngineControlServicesIni);
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
                                         
@@ -44,7 +45,7 @@
                     test.readAsArrayBuffer(evt.target.files[0]);
                 });
                 $("#btnSaveIni").click(function(){
-                    downloadObject(b.GetConfig(), "config.json");
+                    downloadObject({ configNameSpace: b.ConfigNameSpace, obj: b.GetConfig() }, "config.json");
                 });
                 $("#btnLoadIni").change(function(evt){
                     var test = new FileReader();
@@ -56,11 +57,19 @@
                             return;
                         }
 
-                        b = new ConfigGui(JSON.parse(evt.target.result), b.ConfigNameSpace);
+                        var ini = JSON.parse(evt.target.result);
+
+                        b = new ConfigGui(ini.obj, ini.configNameSpace);
                         $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                     };
                     
                     test.readAsText(evt.target.files[0]);
+                });
+                $("#btnSpeeduino").click(function(evt){
+                    var ini = JSON.parse(getFileContents("Ini/speeduino.json"));
+
+                    b = new ConfigGui(ini.obj, ini.configNameSpace);
+                    $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                 });
             });
         </script>
@@ -73,7 +82,7 @@
         <input id="btnSaveIni" type="button" class="button" value="Save Ini">
         <label for="btnLoadIni" class="button">Open Ini</label>
         <input id="btnLoadIni" type="file" style="display: none;">
-        <input id="chkAdvanced" type="checkbox">Advanced</input>
+        <input id="btnSpeeduino" type="button" class="button" value="Load Speeduino">
         <div id="workspace"></div>
     </body>
 </html>

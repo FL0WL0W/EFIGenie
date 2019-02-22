@@ -9,6 +9,10 @@ ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same typ
     return tmp.buffer;
 }
 
+jQuery.expr[':'].parents = function(a,i,m){
+    return jQuery(a).parents(m[3]).length < 1;
+};
+
 function getFileContents(url)
 {
     var contents
