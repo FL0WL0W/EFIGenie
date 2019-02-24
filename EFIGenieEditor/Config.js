@@ -840,6 +840,12 @@ function GetReference(referenceObj, reference, defaultReference) {
     }
 }
 
+function GetReferenceIfString(referenceObj, reference, defaultReference) {
+    if(typeof reference === "string")
+        return GetReference(referenceObj, reference, defaultReference);
+    return reference;
+}
+
 function GetReferenceCount(referenceObj, reference) {
     var refernceCount = 0;
     for(key in referenceObj) {

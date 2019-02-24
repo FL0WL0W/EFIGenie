@@ -60,13 +60,13 @@ var EngineControlServicesIni = {
     ] },
 
     SensorServices: { Tabbed: true, Variables: [
-        { IntakeAirTemperatureConfig: { Label: "IAT", ConfigName: "IntakeAirTemperatureConfig"} },
-        { EngineCoolantTemperatureServiceConfig: { Label: "ECT", ConfigName: "EngineCoolantTemperatureServiceConfig"} },
-        { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", ConfigName: "ManifoldAbsolutePressureServiceConfig"} },
-        { VoltageConfig: { Label: "Voltage", ConfigName: "VoltageConfig"} },
-        { ThrottlePositionConfig: { Label: "TPS", ConfigName: "ThrottlePositionConfig"} },
-        { EthanolContentConfig: { Label: "Ethanol", ConfigName: "EthanolContentConfig"} },
-        { VehicleSpeedConfig: { Label: "VSS", ConfigName: "VehicleSpeedConfig"} },
+        { IntakeAirTemperatureConfig: { Label: "IAT", ConfigName: "IntakeAirTemperatureConfig", ValueUnits: TemperatureUnits } },
+        { EngineCoolantTemperatureServiceConfig: { Label: "ECT", ConfigName: "EngineCoolantTemperatureServiceConfig", ValueUnits: TemperatureUnits } },
+        { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", ConfigName: "ManifoldAbsolutePressureServiceConfig", ValueUnits: PressureUnits} },
+        { VoltageConfig: { Label: "Voltage", ConfigName: "VoltageConfig", ValueUnits: VoltUnits} },
+        { ThrottlePositionConfig: { Label: "TPS", ConfigName: "ThrottlePositionConfig", ValueUnits: PercentUnits } },
+        { EthanolContentConfig: { Label: "Ethanol", ConfigName: "EthanolContentConfig", ValueUnits: PercentUnits } },
+        { VehicleSpeedConfig: { Label: "VSS", ConfigName: "VehicleSpeedConfig", ValueUnits: SpeedUnits} },
     ] },
 
     OutputServices: { Tabbed: true, Variables: [
@@ -84,10 +84,14 @@ var EngineControlServicesIni = {
         { IdleControlService: { Label: "Idle", ConfigName: "IIdleControlServiceConfig"} }
     ] },
 
-    Main: { Tabbed: true, Variables: [
+    BuilderConfig: { Tabbed: true, Variables: [
         { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
         { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
         { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
+    ] },
+
+    Main: { Variables: [
+        { BuilderConfig: { ConfigName: "BuilderConfig" } },
     ] }
 };
 

@@ -53,7 +53,7 @@ var IOServicesIni = {
     
     FloatInputService_StaticConfig: { Variables : [
         { FloatInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
-        { FloatValue: { Type: "float", Label: "Static Value" } },
+        { FloatValue: { Type: "float", Label: "Static Value", Units: "./ValueUnits" } },
         { FloatValueDot: { Type: "float", Label: "Static Value Dot" } }
     ] },
 
@@ -61,48 +61,48 @@ var IOServicesIni = {
         { FloatInputService_AnalogPolynomialConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
-        { APA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
-        { MinValue: { Type: "float", Label: "Min Value" } },
-        { MaxValue: { Type: "float", Label: "Max Value" } }
+        { APA: { Type: "formula", Degree: 4, Label: "Coefficients", Units: "./ValueUnits" } },
+        { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
+        { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } }
     ] },
 
     FloatInputService_AnalogInterpolatedTableConfig: { Variables : [
         { FloatInputService_AnalogInterpolatedTableConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
-        { AMinInputValue: { Type: "float", Label: "Min Input Voltage"  } },
-        { AMaxInputValue: { Type: "float", Label: "Max Input Voltage", Value: 3.3 } },
+        { AMinInputValue: { Type: "float", Label: "Min Input", Units: VoltUnits } },
+        { AMaxInputValue: { Type: "float", Label: "Max Input", Value: 3.3, Units: VoltUnits } },
         { AITResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { AITTable: { Type: "float", XResolution: "AITResolution", Label: "Voltage to Value", XLabel: "Input Voltage", ZLabel: "Value", XMin: "AMinInputValue", XMax: "AMaxInputValue", Dialog: true } }
+        { AITTable: { Type: "float", XResolution: "AITResolution", Label: "Voltage to Value", XLabel: "Input Voltage", ZLabel: "Value", XMin: "AMinInputValue", XMax: "AMaxInputValue", XUnits: VoltUnits, ZUnits: "./ValueUnits", Dialog: true } }
     ] },
 
     FloatInputService_FrequencyPolynomialConfig: { Variables : [
         { FloatInputService_FrequencyPolynomialConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
+        { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1, Units: FrequencyUnits } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
         { FPA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
-        { MinValue: { Type: "float", Label: "Min Value" } },
-        { MaxValue: { Type: "float", Label: "Max Value" } }
+        { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
+        { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } }
     ] },
 
     FloatInputService_FrequencyInterpolatedTableConfig: { Variables : [
         { FloatInputService_FrequencyInterpolatedTableConfigTypeId: { Type: "uint8", Value: 5, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
-        { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
-        { FMaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1 } },
+        { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1, Units: FrequencyUnits } },
+        { FMaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1, Units: FrequencyUnits } },
         { FITResolution: { Type: "uint8", Label: "Resolution", Value: 11, Min: 1, Max: 255 } },
         { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { FITTable: { Type: "float", XResolution: "FITResolution", Label: "Frequency to Value", XLabel: "Frequency", ZLabel: "Value", XMin: "FMinFrequency", XMax: "FMaxFrequency", Dialog: true } }
+        { FITTable: { Type: "float", XResolution: "FITResolution", Label: "Frequency to Value", XLabel: "Frequency", ZLabel: "Value", XMin: "FMinFrequency", XMax: "FMaxFrequency", XUnits: FrequencyUnits, ZUnits: "./ValueUnits", Dialog: true } }
     ] },
 
     FloatInputService_FaultDetectionWrapperConfig: { Variables : [
         { FloatInputService_FaultDetectionWrapperConfigTypeId: { Type: "uint8", Value: 6, Hidden: true } },
-        { MinValue: { Type: "float", Label: "Min Value" } },
-        { MaxValue: { Type: "float", Label: "Max Value" } },
-        { DefaultValue: { Type: "float", Label: "Default Value" } },
+        { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
+        { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } },
+        { DefaultValue: { Type: "float", Label: "Default Value", Units: "./ValueUnits" } },
         { FloatInputService: { ConfigName: "IFloatInputServiceConfig" } }
     ] },
 
@@ -129,7 +129,7 @@ var IOServicesIni = {
     StepperOutputService_FullStepControlConfig: { Variables : [
         { StepperOutputService_FullStepControlConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
-        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
+        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1, Units: TimeUnits } },
         { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
         { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-" } },
         { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+" } },
@@ -139,7 +139,7 @@ var IOServicesIni = {
     StepperOutputService_HalfStepControlConfig: { Variables : [
         {StepperOutputService_HalfStepControlConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { MaxStepsPerSecond: { Type: "uint16", Label: "Steps/Second", Value: 100, Min: 1 } },
-        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1 } },
+        { StepWidth: { Type: "float", Label: "Step Pulse Width", Value: 0.005, Max: 1, Units: TimeUnits } },
         { APlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A+" } },
         { AMinusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "A-" } },
         { BPlusBooleanOutputServiceConfig: { ConfigName: "IBooleanOutputServiceConfig", Label: "B+" } },
@@ -165,21 +165,21 @@ var IOServicesIni = {
     FloatOutputService_PwmPolynomialConfig: { Variables : [
         { FloatOutputService_PwmPolynomialConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
+        { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1, FrequencyUnits } },
         { PA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
-        { PMinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 1 } },
-        { PMaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 1 } }
+        { PMinDutyCycle: { Type: "float", Label: "Min Duty Cycle", Max: 1, Units: PercentUnits } },
+        { PMaxDutyCycle: { Type: "float", Label: "Max Duty Cycle", Max: 1, Units: PercentUnits } }
     ] },
 
     FloatOutputService_PwmInterpolatedTableConfig: { Variables : [
         { FloatOutputService_PwmInterpolatedTableConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1 } },
-        { MinValue: { Type: "float", Label: "Min Value" } },
-        { MaxValue: { Type: "float", Label: "Max Value" } },
+        { PFrequency: { Type: "uint16", Label: "Frequency", Value: 50, Min: 1, FrequencyUnits } },
+        { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
+        { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } },
         { PResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { PTablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { PTable: { Type: "float", XResolution: "PResolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", Dialog: true } }
+        { PTable: { Type: "float", XResolution: "PResolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", XUnits: "./ValueUnits", ZUnits: PercentUnits, Dialog: true } }
     ] },
 
     FloatOutputService_StepperPolynomialConfig: { Variables : [
@@ -192,11 +192,11 @@ var IOServicesIni = {
 
     FloatOutputService_StepperInterpolatedTableConfig: { Variables : [
         { FloatOutputService_StepperInterpolatedTableConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
-        { MinValue: { Type: "float", Label: "Min Value" } },
-        { MaxValue: { Type: "float", Label: "Max Value" } },
+        { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
+        { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } },
         { SResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
         { STablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
-        { STable: { Type: "float", XResolution: "SResolution", Label: "Value to Steps", XLabel: "Value", ZLabel: "Steps", XMin: "MinValue", XMax: "MaxValue", Dialog: true } },
+        { STable: { Type: "float", XResolution: "SResolution", Label: "Value to Steps", XLabel: "Value", ZLabel: "Steps", XMin: "MinValue", XMax: "MaxValue", XUnits: "./ValueUnits", Dialog: true } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
     ] },
 
