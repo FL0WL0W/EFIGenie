@@ -1,13 +1,13 @@
 var TransmissionControlServicesIni = {
-    IShiftServiceConfig: [
+    IShiftServiceConfig: { Variables: [
         { IShiftServiceServiceId: { Type: "uint16", Value: 4009, Hidden: true } },
         { Selection: { Label: "Shift Service", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "Solenoid", ConfigName: "ShiftService_SolenoidConfig"}
         ] } }
-    ],
+    ] },
 
-    ShiftService_SolenoidConfig: [
+    ShiftService_SolenoidConfig: { Variables: [
         { ShiftService_SolenoidServiceId: { Type: "uint8", Value: 1, Hidden: true } },
         { Gears: { Type: "uint8", Label: "Gears", Value: 5, Min: 1, Max: 255, Step: 1 } },
         { Solenoids: { Type: "uint8", Label: "Solenoids", Value: 2, Min: 1, Max: 32, Step: 1 } },
@@ -18,33 +18,30 @@ var TransmissionControlServicesIni = {
             ConfigName: "IBooleanOutputServiceConfig", 
             Array: "Solenoids"
         } }
-    ],
+    ] },
     
-    GearControlService_ButtonShiftConfig: [
+    GearControlService_ButtonShiftConfig: { Variables: [
         { GearControlService_ButtonShiftServiceId: { Type: "uint8", Value: 1, Hidden: true } },
         { ButtonUp: { Label: "Shift Up", ConfigName: "IButtonServiceConfig"} },
         { ButtonDown: { Label: "Shift Down", ConfigName: "IButtonServiceConfig"} }
-    ],
+    ] },
 
-    IGearControlServiceConfig: [
+    IGearControlServiceConfig: { Variables: [
         { IGearControlServiceServiceId: { Type: "uint16", Value: 4010, Hidden: true } },
         { Selection: { Label: "Gear Control", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "Button Shift", ConfigName: "GearControlService_ButtonShiftConfig"}
         ] } }
-    ],
+    ] },
 
-    SimpleButtonControlConfig: [
-        { ShiftService: { ConfigName: "ShiftService_SolenoidConfig"} },
-        { GearControlService: { ConfigName: "GearControlService_ButtonShiftConfig"} }
-    ],
+    TransmissionServices: { Tabbed: true, Variables: [
+        { ShiftService: {  Label: "Shift Service", ConfigName: "IShiftServiceConfig"} },
+        { GearControlService: {  Label: "Gear Control Service", ConfigName: "IGearControlServiceConfig"} }
+    ] },
 
-    Main: [
-        { Selection: { Label: "Transmission Control", Selections: [
-            { Name: "None", ConfigName: "BlankConfig"},
-            { Name: "Simple Button Control", ConfigName: "SimpleButtonControlConfig"}
-        ] } }
-    ]
+    Main: { Variables: [
+        { TransmissionServices: { ConfigName: "TransmissionServices" } },
+    ] }
 };
 
 for(var k in SensorServicesIni) {

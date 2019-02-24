@@ -388,14 +388,15 @@ var EngineControlServicesIni = {
         { InjectionSchedulingService: { Label: "Injection", ConfigName: "IInjectionSchedulingService"} }
     ] },
 
-    BuilderConfig: { Tabbed: true, Variables: [
+    EngineBuilderConfig: { Tabbed: true, Variables: [
         { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
         { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
         { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
+        { TransmissionServices: { Label: "Tranmission", ConfigName: "TransmissionServices"} },
     ] },
 
     Main: { Variables: [
-        { BuilderConfig: { ConfigName: "BuilderConfig" } },
+        { BuilderConfig: { ConfigName: "EngineBuilderConfig" } },
     ] }
 };
 
@@ -408,5 +409,11 @@ for(var k in SensorServicesIni) {
 for(var k in IOServicesIni) {
     if(!EngineControlServicesIni[k]) {
         EngineControlServicesIni[k]=IOServicesIni[k];
+    }
+}
+
+for(var k in TransmissionControlServicesIni) {
+    if(!EngineControlServicesIni[k]) {
+        EngineControlServicesIni[k]=TransmissionControlServicesIni[k];
     }
 }
