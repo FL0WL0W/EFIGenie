@@ -33,10 +33,10 @@ namespace EngineControlServices
 
 			ret->EctMultiplierTable = (unsigned char *)(ret->EthanolMap + ret->AfrRpmResolution * ret->AfrMapResolution);
 
-			ret->StoichTable = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
-
-			ret->TpsMinAfrGas = ret->StoichTable + ret->StoichResolution;
+			ret->TpsMinAfrGas = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
 			ret->TpsMinAfrEthanol = ret->TpsMinAfrGas + ret->AfrTpsResolution;
+			
+			ret->StoichTable = ret->TpsMinAfrEthanol + ret->AfrTpsResolution;
 
 			return ret;
 		}
@@ -47,9 +47,9 @@ namespace EngineControlServices
 				sizeof(unsigned short) * AfrRpmResolution * AfrMapResolution +
 				sizeof(unsigned short) * AfrRpmResolution * AfrMapResolution +
 				sizeof(unsigned char) * AfrEctResolution +
-				sizeof(unsigned short) * StoichResolution +
 				sizeof(unsigned short) * AfrTpsResolution +
-				sizeof(unsigned short) * AfrTpsResolution;
+				sizeof(unsigned short) * AfrTpsResolution +
+				sizeof(unsigned short) * StoichResolution;
 		}
 		
 		float StartupAfrMultiplier;
@@ -68,12 +68,12 @@ namespace EngineControlServices
 		unsigned char AfrEctResolution;
 		unsigned char *EctMultiplierTable; // values in 1/255
 		
-		unsigned char StoichResolution;
-		unsigned short *StoichTable; // value in 1/1024
-		
 		unsigned char AfrTpsResolution;
 		unsigned short *TpsMaxAfrGas; // value in 1/1024
 		unsigned short *TpsMaxAfrEthanol; // value in 1/1024
+		
+		unsigned char StoichResolution;
+		unsigned short *StoichTable; // value in 1/1024
 	});
 	
 class AfrService_Map_Ethanol : public IAfrService

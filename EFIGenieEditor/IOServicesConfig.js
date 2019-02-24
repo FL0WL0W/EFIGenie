@@ -54,7 +54,7 @@ var IOServicesIni = {
     FloatInputService_StaticConfig: { Variables : [
         { FloatInputService_StaticConfigTypeId: { Type: "uint8", Value: 1, Hidden: true } },
         { FloatValue: { Type: "float", Label: "Static Value", Units: "./ValueUnits" } },
-        { FloatValueDot: { Type: "float", Label: "Static Value Dot" } }
+        { FloatValueDot: { Type: "float", Label: "Static Value Dot", Units: "PerSecond(./ValueUnits)" } }
     ] },
 
     FloatInputService_AnalogPolynomialConfig: { Variables : [

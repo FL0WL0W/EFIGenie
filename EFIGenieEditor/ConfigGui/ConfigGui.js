@@ -294,7 +294,7 @@ class ConfigNumberGui extends ConfigNumber {
     }
 
     UpdateReferences() {
-        var units = GetReferenceIfString(this.Parent, this.Units, BlankUnits);
+        var units = GetUnits(this, this.Units);
         var unit = units[this.UnitIndex];
 
         if(isNaN(parseFloat(this.Value))){
@@ -338,7 +338,7 @@ class ConfigNumberGui extends ConfigNumber {
         }
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]label[$]/g, this.Label);
-        var units = GetReferenceIfString(this.Parent, this.Units, BlankUnits);
+        var units = GetUnits(this, this.Units);
         var unit = units[this.UnitIndex];
         var min = this.Min;
         var max = this.Max;
@@ -604,11 +604,11 @@ class ConfigNumberTableGui extends ConfigNumberTable {
     }
 
     UpdateReferences() {
-        var xunits = GetReferenceIfString(this.Parent, this.XUnits, BlankUnits);
+        var xunits = GetUnits(this, this.XUnits);
         var xunit = xunits[this.XUnitIndex];
-        var yunits = GetReferenceIfString(this.Parent, this.YUnits, BlankUnits);
+        var yunits = GetUnits(this, this.YUnits);
         var yunit = yunits[this.YUnitIndex];
-        var zunits = GetReferenceIfString(this.Parent, this.ZUnits, BlankUnits);
+        var zunits = GetUnits(this, this.ZUnits);
         var zunit = zunits[this.ZUnitIndex];
 
         var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
@@ -670,11 +670,11 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var row = "";
         var table = "";
         
-        var xunits = GetReferenceIfString(this.Parent, this.XUnits, BlankUnits);
+        var xunits = GetUnits(this, this.XUnits);
         var xunit = xunits[this.XUnitIndex];
-        var yunits = GetReferenceIfString(this.Parent, this.YUnits, BlankUnits);
+        var yunits = GetUnits(this, this.YUnits);
         var yunit = yunits[this.YUnitIndex];
-        var zunits = GetReferenceIfString(this.Parent, this.ZUnits, BlankUnits);
+        var zunits = GetUnits(this, this.ZUnits);
         var zunit = zunits[this.ZUnitIndex];
 
         var min = this.Min;
@@ -1069,7 +1069,7 @@ class ConfigFormulaGui extends ConfigFormula {
     }
 
     UpdateReferences() {
-        var units = GetReferenceIfString(this.Parent, this.Units, BlankUnits);
+        var units = GetUnits(this, this.Units);
         var unit = units[this.UnitIndex];
 
         var degreeRef = GetReferenceByNumberOrReference(this.Parent, this.Degree, 1);
@@ -1090,7 +1090,7 @@ class ConfigFormulaGui extends ConfigFormula {
         var min = this.Min;
         var max = this.Max;
         var step = this.Step;
-        var units = GetReferenceIfString(this.Parent, this.Units, BlankUnits);
+        var units = GetUnits(this, this.Units);
         var unit = units[this.UnitIndex];
 
         min = min * unit.DisplayMultiplier + unit.DisplayOffset;
@@ -1253,4 +1253,14 @@ function wrapInConfigDivGui(id, content)
     template = template.replace(/[$]id[$]/g, id);
     template = template.replace(/[$]content[$]/g, content);
     return template;
+}
+
+function GetUnits(obj, units){
+    if(typeof units === "string" && units.indexOf("PerSecond") == 0){
+        units = units.substring(10);
+        units = units.substring(0, units.length - 1);
+        return PerSecond(GetReferenceIfString(obj.Parent, units, BlankUnits));
+    }
+
+    return GetReferenceIfString(obj.Parent, units, BlankUnits);
 }
