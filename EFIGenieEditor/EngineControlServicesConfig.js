@@ -170,7 +170,7 @@ var EngineControlServicesIni = {
     ] },
 
     SensorServices: { Tabbed: true, Variables: [
-        { DecoderConfig: { Label: "Crank/Cam Decoder", ConfigName: "DecoderConfig" } },
+        { DecoderConfig: { Label: "Crank/Cam Decoder", ConfigName: "IDecoderConfig" } },
         { IntakeAirTemperatureConfig: { Label: "IAT", ConfigName: "IntakeAirTemperatureConfig" } },
         { EngineCoolantTemperatureServiceConfig: { Label: "ECT", ConfigName: "EngineCoolantTemperatureServiceConfig" } },
         { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", ConfigName: "ManifoldAbsolutePressureServiceConfig" } },

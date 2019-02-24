@@ -26,6 +26,16 @@ var SensorServicesIni = {
     VehicleSpeedConfig: { Variables: [
         { VehicleSpeedServiceId: { Type: "uint16", Value: 2008, Hidden: true } },
         { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: SpeedUnits } }
+    ] },
+    DecoderGM24x: { Variables: [
+        { DecoderGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } }
+    ] },
+    IDecoderConfig: { Variables: [
+        { DecoderServiceId: { Type: "uint16", Value: 2001, Hidden: true } },
+        { Selection: { Label: "Decoder", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig"},
+            { Name: "GM24x", ConfigName: "DecoderGM24x"}
+        ] } }
     ] }
 }
 
