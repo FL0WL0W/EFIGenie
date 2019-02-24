@@ -60,7 +60,7 @@ var IOServicesIni = {
     FloatInputService_AnalogPolynomialConfig: { Variables : [
         { FloatInputService_AnalogPolynomialConfigTypeId: { Type: "uint8", Value: 2, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
+        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
         { APA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } }
@@ -69,7 +69,7 @@ var IOServicesIni = {
     FloatInputService_AnalogInterpolatedTableConfig: { Variables : [
         { FloatInputService_AnalogInterpolatedTableConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
+        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
         { AMinInputValue: { Type: "float", Label: "Min Input Voltage"  } },
         { AMaxInputValue: { Type: "float", Label: "Max Input Voltage", Value: 3.3 } },
         { AITResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
@@ -81,7 +81,7 @@ var IOServicesIni = {
         { FloatInputService_FrequencyPolynomialConfigTypeId: { Type: "uint8", Value: 3, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
-        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
+        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
         { FPA: { Type: "formula", Degree: 4, Label: "Coefficients" } },
         { MinValue: { Type: "float", Label: "Min Value" } },
         { MaxValue: { Type: "float", Label: "Max Value" } }
@@ -90,7 +90,7 @@ var IOServicesIni = {
     FloatInputService_FrequencyInterpolatedTableConfig: { Variables : [
         { FloatInputService_FrequencyInterpolatedTableConfigTypeId: { Type: "uint8", Value: 5, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
-        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1 } },
+        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
         { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1 } },
         { FMaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1 } },
         { FITResolution: { Type: "uint8", Label: "Resolution", Value: 11, Min: 1, Max: 255 } },

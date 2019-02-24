@@ -20,35 +20,41 @@ var EngineControlServicesIni = {
             Array: "Injectors"
         } }
     ] },
+    
+    IdleAirControlValveConfig: { Variables: [
+        { IdleAirControlValveServiceId: { Type: "uint16", Value: 3003, Hidden: true } },
+        { FloatInputService: { ConfigName: "IFloatOutputServiceConfig" } }
+    ] },
 
     IdleControlService_PidConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint8", Value: 1, Hidden: true } },
-        { TpsThreshold: { Type: "float", Value: 1 } },
-		// float TpsThreshold;
-		// unsigned char SpeedThreshold;
-		// float P;
-		// float I;
-		// float D;
-		// float MaxIntegral;
-		// float MinIntegral;
-		// unsigned short DotSampleRate;
-
-		// unsigned short GasConstant;//values in 0.1 units
-
-		// unsigned short MaxEct;
-		// unsigned short MinEct;
-		// unsigned char EctResolution;
-		// float *IdleAirmass;
-		// unsigned short *IdleTargetRpm;
-		// unsigned char SpeedResolution;
-		// float *IdleAirmassSpeedAdder;
-		// short *IdleTargetRpmSpeedAdder;
+        { TpsThreshold: { Label: "TPS Threshold", Type: "float", Value: 1, Units: PercentUnits } },
+        { SpeedThreshold: { Label: "Speed Threshold", Type: "uint8", Value: 10, Units: SpeedUnits } },
+        { P: { Label: "P", Type: "float", Value: 1 } },
+        { I: { Label: "I", Type: "float", Value: 0 } },
+        { D: { Label: "D", Type: "float", Value: 0 } },
+        { MaxIntegral: { Label: "MaxIntegral", Type: "float", Value: 10 } },
+        { MaxIntegral: { Label: "MinIntegral", Type: "float", Value: -10 } },
+        { DotSampleRate: { Type: "uint16", Label: "Dot Sample Rate", Value: 1000, Min: 1, Units: FrequencyUnits } },
+        { GasConstant: { Label: "Gas Constant", Type: "uint16", Value: "//EngineGeneral/GasConstant", ValueMultiplier: 10, Hidden: true } },
+        { MinEct: { Label: "Min Ect", Type: "int8", Value: 0, Units: TemperatureUnits } },
+        { MaxEct: { Label: "Max Ect", Type: "int8", Value: 120, Units: TemperatureUnits } },
+        { EctResolution: { Label: "Ect Resolution", Type: "uint8", Value: 16 } },
+        { IdleAirmassPointer: { Type: "uint32", Hidden:true } },
+        { IdleTargetRpmPointer: { Type: "uint32", Hidden:true } },
+        { SpeedResolution: { Label: "Speed Resolution", Type: "uint8", Value: 16 } },
+        { IdleAirmassSpeedAdderPointer: { Type: "uint32", Hidden:true } },
+        { IdleTargetRpmSpeedAdderPointer: { Type: "uint32", Hidden:true } },
+        { IdleAirmassTable: { Type: "float", XResolution: "EctResolution", Label: "ECT to Airmass", XLabel: "ECT", ZLabel: "Airmass", XMin: "MinEct", XMax: "MaxEct", Dialog: true, ZUnits: AirmassUnits, XUnits: TemperatureUnits } },
+        { IdleTargetRpmTable: { Type: "uint16", XResolution: "EctResolution", Label: "ECT to Idle", XLabel: "ECT", ZLabel: "Idle Targe", XMin: "MinEct", XMax: "MaxEct", Dialog: true, ZUnits: RPMUnits, XUnits: TemperatureUnits } },
+        { IdleAirmassSpeedAdderTable: { Type: "float", XResolution: "SpeedResolution", Label: "Speed to Airmass", XLabel: "Speed", ZLabel: "Airmass Add", XMin: 0, XMax: "SpeedThreshold", Dialog: true, ZUnits: AirmassUnits, XUnits: SpeedUnits } },
+        { IdleTargetRpmSpeedAdder: { Type: "int16", XResolution: "SpeedResolution", Label: "Speed to Idle", XLabel: "Speed", ZLabel: "Idle Add", XMin: 0, XMax: "SpeedThreshold", Dialog: true, ZUnits: RPMUnits, XUnits: SpeedUnits } },
     ] },
 
     IIdleControlServiceConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 4003, Hidden: true } },
         { Selection: { Label: "Idle Air Control Valve", Selections: [
-            { Name: "None", ConfigName: "NoneConfig"},
+            { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "PID", ConfigName: "IdleControlService_PidConfig"}
         ] } }
     ] },
@@ -65,12 +71,23 @@ var EngineControlServicesIni = {
 
     OutputServices: { Tabbed: true, Variables: [
         { IgnitorServices: { Label: "Ignitors", ConfigName: "IgnitorServicesConfig"} },
-        { InjectorServices: { Label: "Injectors", ConfigName: "InjectorServicesConfig"} }
+        { InjectorServices: { Label: "Injectors", ConfigName: "InjectorServicesConfig"} },
+        { IdleAirControlValveService: { Label: "IAC Valve", ConfigName: "IdleAirControlValveConfig"} }
+    ] },
+
+    EngineGeneral: { Size: 0, Variables: [
+        { GasConstant: { Label: "Gas Constant", Type: "variable", Value: 287.05, Units: GasConstantUnits } },
+     ] },
+
+    EngineServices: { Tabbed: true, Variables: [
+        { EngineGeneral: { Label: "General", ConfigName: "EngineGeneral"} },
+        { IdleControlService: { Label: "Idle", ConfigName: "IIdleControlServiceConfig"} }
     ] },
 
     Main: { Tabbed: true, Variables: [
         { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
         { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
+        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
     ] }
 };
 

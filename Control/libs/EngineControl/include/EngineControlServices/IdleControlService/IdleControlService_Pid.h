@@ -51,8 +51,8 @@ namespace EngineControlServices
 
 		unsigned short GasConstant;//values in 0.1 units
 
-		unsigned short MaxEct;
-		unsigned short MinEct;
+		char MaxEct;
+		char MinEct;
 		unsigned char EctResolution;
 		float *IdleAirmass;
 		unsigned short *IdleTargetRpm;

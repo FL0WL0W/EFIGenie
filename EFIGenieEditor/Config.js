@@ -34,6 +34,7 @@ class Config {
                         case "int32":
                         case "int64":
                         case "float":
+                        case "variable":
                             this[variableRowKey] = new ConfigNumber(variableRowObj, this);
                             break;
                         case "formula":
@@ -57,7 +58,7 @@ class Config {
     }
     GetArrayBuffer() {
         var arrayBuffer;
-        if(this.Size)
+        if(this.Size !== undefined)
             arrayBuffer = new ArrayBuffer(this.Size);
         else
             arrayBuffer = new ArrayBuffer();
@@ -66,7 +67,9 @@ class Config {
             var variableRowKey = Object.keys(variableRow)[0];
             var variableRowObj = this[variableRowKey];
 
-            if(this.Size) {// we are in a statically mapped area
+            if(this.Size !== undefined) {// we are in a statically mapped area
+                if(this.Size === 0)
+                    return arrayBuffer;
                 var offset = variableRowObj.Offset;
                 if(offset === undefined) {
                     throw "Config No offset specified";
@@ -249,14 +252,16 @@ class ConfigSelection {
     }
     SetArrayBuffer(arrayBuffer) {
         var thisClass = this;
-        if( !(this.Value.Variables[0].Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === this.Value.Variables[0].Value) &&
-            !(this.Value.Variables[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === this.Value.Variables[0].Value)) {
+        var selectedConfig =  this.Value.Variables[0][Object.keys(this.Value.Variables[0])[0]];
 
+        if( !(selectedConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectedConfig.Value) &&
+            !(selectedConfig.Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectedConfig.Value)) {
             $.each(this.Selections, function(selectionIndex, selectionValueObj) {
-                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, this.Parent);
+                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, thisClass);
+                var selectionConfig =  selectionValue.Variables[0][Object.keys(selectionValue.Variables[0])[0]];
 
-                if( (selectionValue.Variables[0].Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionValue.Variables[0].Value) ||
-                    (selectionValue.Variables[0].Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectionValue.Variables[0].Value)) {
+                if( (selectionConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionConfig.Value) ||
+                    (selectionConfig.Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectionConfig.Value)) {
                     thisClass.Index = selectionIndex;
                     thisClass.Value = selectionValue;
                 }
@@ -346,53 +351,80 @@ class ConfigNumber {
             this.ValueMultiplier = 1;
     }
     GetArrayBuffer() {
+        var val = this.Value;
+        if(isNaN(parseFloat(val))){
+            var ref = GetReference(this.Parent, this.Value, {});
+            val = ref.Value;
+        }
+
         switch(this.Type) {
             case "uint8":
-                return new Uint8Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Uint8Array([val * this.ValueMultiplier]).buffer;
             case "uint16":
-                return new Uint16Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Uint16Array([val * this.ValueMultiplier]).buffer;
             case "uint32":
-                return new Uint32Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Uint32Array([val * this.ValueMultiplier]).buffer;
             case "int8":
-                return new Int8Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Int8Array([val * this.ValueMultiplier]).buffer;
             case "int16":
-                return new Int16Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Int16Array([val * this.ValueMultiplier]).buffer;
             case "int32":
-                return new Int32Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Int32Array([val * this.ValueMultiplier]).buffer;
             case "float":
-                return new Float32Array([this.Value * this.ValueMultiplier]).buffer;
+                return new Float32Array([val * this.ValueMultiplier]).buffer;
+            case "variable":
+                return new ArrayBuffer(0);
         }
     }
     SetArrayBuffer(arrayBuffer) {
+        var size = 0;
+        var val;
         switch(this.Type) {
             case "uint8":
-                this.Value = new Uint8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
-                return 1;
+                val = new Uint8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
+                size = 1;
+                break;
             case "uint16":
-                this.Value = new Uint16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
-                return 2;
+                val = new Uint16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
+                size = 2;
+                break;
             case "uint32":
-                this.Value = new Uint32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
-                return 4;
+                val = new Uint32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                size = 4;
+                break;
             case "uint64":
-                this.Value = new Uint64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
-                return 8;
+                val = new Uint64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
+                size = 8;
+                break;
             case "int8":
-                this.Value = new Int8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
-                return 1;
+                val = new Int8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
+                size = 1;
+                break;
             case "int16":
-                this.Value = new Int16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
-                return 2;
+                val = new Int16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
+                size = 2;
+                break;
             case "int32":
-                this.Value = new Int32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
-                return 4;
+                val = new Int32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                size = 4;
+                break;
             case "int64":
-                this.Value = new Int64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
-                return 8;
+                val = new Int64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
+                size = 8;
+                break;
             case "float":
-                this.Value = new Float32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
-                return 4;
+                val = new Float32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                size = 4;
+                break;
         }
+
+        if(isNaN(parseFloat(this.Value))){
+            var ref = GetReference(this.Parent, this.Value, {});
+            ref.Value = val;
+        } else
+            this.Value = val;
+
+        return size;
     }
     GetConfig() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
@@ -737,13 +769,75 @@ class ConfigArray {
 function GetReferenceByNumberOrReference(referenceObj, numberOrReference, defaultValue) {
     var value = parseInt(numberOrReference);
     if(isNaN(value)) {
-        var ref = referenceObj[numberOrReference];
-        if(!ref)
-            return { Value: defaultValue };
-        return ref;
+        return GetReference(referenceObj, numberOrReference, { Value: defaultValue });
     }
 
     return { Value: value};
+}
+
+function GetReference(referenceObj, reference, defaultReference) {
+    if(!reference) 
+        return defaultReference;
+
+    if(reference.indexOf("/") === 0) {//go to top config
+        var topObj = referenceObj;
+        while(topObj.Parent !== undefined)
+            topObj = topObj.Parent;
+
+        if(reference.substring(1).indexOf("/") === 0) { //search all subconfigs for value
+            var containingObj;
+            var topReference = reference.substring(2);
+            if(topReference.indexOf("/") > 0)
+                topReference = topReference.substring(0, topReference.indexOf("/"));
+
+            function objGetReferenceFromAll(obj) {
+                for(subObj in obj){
+                    if(subObj === "ConfigNameSpace" || subObj === "Parent" || subObj === "Variables")
+                        continue;
+                    if(subObj === topReference) {
+                        containingObj = obj;
+                        return;
+                    }
+
+                    if(typeof obj[subObj] === "object") {
+                        objGetReferenceFromAll(obj[subObj]);
+                        if(containingObj !== undefined)
+                            return;
+                    }
+                }
+            }
+
+            objGetReferenceFromAll(topObj);
+
+            return GetReference(containingObj, reference.substring(2), defaultReference);
+
+        } else {
+            return GetReference(topObj, reference.substring(1), defaultReference)
+        }
+    } else if(reference.indexOf(".") === 0) { //go up 1            
+        if(reference.indexOf("/") === 1) { //go up until value exists
+            var ref = GetReference(referenceObj, reference.substring(2), undefined);
+            if(ref !== undefined)
+                return ref;
+            if(referenceObj.Parent === undefined)
+                return defaultReference;
+            return GetReference(referenceObj.Parent, reference, defaultReference);
+        } else {
+            if(referenceObj.Parent === undefined)
+                return defaultReference;
+            return GetReference(referenceObj.Parent, reference.substring(1), defaultReference);
+        }
+    } else if(reference.indexOf("/") > 0) {
+        var ref = referenceObj[reference.substring(0,reference.indexOf("/"))];
+        if(ref === undefined)
+            return defaultReference;
+        return GetReference(ref, reference.substring(reference.indexOf("/") + 1), defaultReference);
+    } else {
+        var ref = referenceObj[reference];
+        if(ref === undefined)
+            return defaultReference;
+        return ref;
+    }
 }
 
 function GetReferenceCount(referenceObj, reference) {

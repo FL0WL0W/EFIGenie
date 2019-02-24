@@ -292,24 +292,28 @@ class ConfigNumberGui extends ConfigNumber {
     }
 
     UpdateReferences() {
-        switch(this.Type) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-                if(this.Value < 0)
-                this.Value = 0;
-            case "int8":
-            case "int16":
-            case "int32":
-                this.Value = Math.round(this.Value);
-        }
-        
-        if(this.Value < this.Min)
-            this.Value = this.Min;
-        if(this.Value > this.Max)
-            this.Value = this.Max;
+        if(isNaN(parseFloat(this.Value))){
+            $("#" + this.GUID).val(GetReference(this.Parent, this.Value, {}).Value);
+        } else {
+            switch(this.Type) {
+                case "uint8":
+                case "uint16":
+                case "uint32":
+                    if(this.Value < 0)
+                    this.Value = 0;
+                case "int8":
+                case "int16":
+                case "int32":
+                    this.Value = Math.round(this.Value);
+            }
+            
+            if(this.Value < this.Min)
+                this.Value = this.Min;
+            if(this.Value > this.Max)
+                this.Value = this.Max;
 
-        $("#" + this.GUID).val(this.Value)
+            $("#" + this.GUID).val(this.Value);
+        }
     }
 
     GetHtml(inputOnly) {
@@ -330,7 +334,7 @@ class ConfigNumberGui extends ConfigNumber {
         }
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]label[$]/g, this.Label);
-        template = template.replace(/[$]value[$]/g, this.Value);
+        template = template.replace(/[$]value[$]/g, GetReferenceByNumberOrReference(this.Parent, this.Value, 0).Value);
         template = template.replace(/[$]min[$]/g, this.Min);
         template = template.replace(/[$]max[$]/g, this.Max);
         template = template.replace(/[$]step[$]/g, this.Step);
@@ -343,7 +347,11 @@ class ConfigNumberGui extends ConfigNumber {
 
         $(document).off("change."+this.GUID);
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = parseFloat($(this).val());
+            if(!isNaN(parseFloat(thisClass.Value))) {
+                thisClass.Value = parseFloat($(this).val());
+            } else {
+                GetReference(thisClass.Parent, thisClass.Value, {}).Value = parseFloat($(this).val());
+            }
             
             thisClass.UpdateReferences();
 

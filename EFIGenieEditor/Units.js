@@ -6,3 +6,7 @@ var DegreeUnits = [ { Name: "°", DisplayMultiplier: 1 } ];
 var VoltUnits = [ { Name: "V", DisplayMultiplier: 1 }, { Name: "mV", DisplayMultiplier: 1000 } ];
 var PressureUnits = [ { Name: "Bar", DisplayMultiplier: 1 }, { Name: "kPa", DisplayMultiplier: 100 } ];
 var RPMUnits = [ { Name: "RPM", DisplayMultiplier: 1 } ];
+var SpeedUnits = [ { Name: "KPH", DisplayMultiplier: 1 }, { Name: "MPH", DisplayMultiplier: 1.61 } ];
+var TemperatureUnits = [ { Name: "C", DisplayMultiplier: 1 }, { Name: "F", DisplayMultiplier: 1.8, DisplayOffset: 32 } ];
+var GasConstantUnits = [ { Name: "J/kg K", DisplayMultiplier: 1 }, { Name: "kJ/kg K", DisplayMultiplier: 0.1 } ];
+var AirmassUnits = [ { Name: "forgot", DisplayMultiplier: 1 } ];

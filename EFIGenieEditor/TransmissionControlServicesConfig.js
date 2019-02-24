@@ -2,7 +2,7 @@ var TransmissionControlServicesIni = {
     IShiftServiceConfig: [
         { IShiftServiceServiceId: { Type: "uint16", Value: 4009, Hidden: true } },
         { Selection: { Label: "Shift Service", Selections: [
-            { Name: "None", ConfigName: "NoneConfig"},
+            { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "Solenoid", ConfigName: "ShiftService_SolenoidConfig"}
         ] } }
     ],
@@ -29,7 +29,7 @@ var TransmissionControlServicesIni = {
     IGearControlServiceConfig: [
         { IGearControlServiceServiceId: { Type: "uint16", Value: 4010, Hidden: true } },
         { Selection: { Label: "Gear Control", Selections: [
-            { Name: "None", ConfigName: "NoneConfig"},
+            { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "Button Shift", ConfigName: "GearControlService_ButtonShiftConfig"}
         ] } }
     ],
