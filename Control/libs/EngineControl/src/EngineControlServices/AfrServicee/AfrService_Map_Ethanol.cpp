@@ -44,13 +44,13 @@ namespace EngineControlServices
 		InterpolationResponse tpsInterpolation = Interpolate(_throttlePositionService->Value, 1, 0, _config->AfrTpsResolution);
 		
 		float afr = gasAfr * ectAfrMultiplier;
-		float minAfrGas = InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMinAfrGas) / 1024.0f;
-		float minAfr = minAfrGas;
+		float maxAfrGas = InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrGas) / 1024.0f;
+		float maxAfr = maxAfrGas;
 		
 		if (_ethanolContentService != 0)
 		{
-			float minAfrEthanol =  InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMinAfrEthanol) / 1024.0f;
-			minAfr = minAfrEthanol * _ethanolContentService->Value + minAfrGas * (1 - _ethanolContentService->Value);
+			float maxAfrEthanol =  InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrEthanol) / 1024.0f;
+			maxAfr = maxAfrEthanol * _ethanolContentService->Value + maxAfrGas * (1 - _ethanolContentService->Value);
 			afr = (ethanolAfr * _ethanolContentService->Value + gasAfr * (1 - _ethanolContentService->Value)) * ectAfrMultiplier;
 		}
 		
@@ -69,10 +69,10 @@ namespace EngineControlServices
 				afr *= 1 - (1 - _config->StartupAfrMultiplier) * ((_config->StartupAfrDecay * _timerService->GetTicksPerSecond() - (_tick - _startupTick)) * 1.0f / (_config->StartupAfrDecay * _timerService->GetTicksPerSecond() - _config->StartupAfrDelay * _timerService->GetTicksPerSecond()));
 		}
 				
-		if (minAfr > afr)
+		if (maxAfr > afr)
 			Afr = afr;
 		else
-			Afr = minAfr;
+			Afr = maxAfr;
 
 		float stoich = InterpolateTable1<unsigned short>(_ethanolContentService->Value, 1, 0, _config->StoichResolution, _config->StoichTable) / 1024.0f;
 

@@ -25,6 +25,31 @@ var EngineControlServicesIni = {
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 3003, Hidden: true } },
         { FloatInputService: { ConfigName: "IFloatOutputServiceConfig" } }
     ] },
+    
+    TachometerServiceConfig: { Variables: [
+        { TachometerServiceId: { Type: "uint16", Value: 4001, Hidden: true } },
+        { PulsesPer2Rpm: { Label: "Pulses Per RPM", Type: "uint8", Value: 1, ValueMultiplier: 2, Units: [ { Name:"Pulses/RPM", DisplayMultiplier: 1, DisplayOffset: 0} ] } },
+        { BooleanOutputService: { ConfigName: "IBooleanOutputServiceConfig" } }
+    ] },
+
+    ITachometerServiceConfig: { Variables: [
+        { Selection: { Label: "Tachometer Service", Selections: [
+            { Name: "None", ConfigName: "BlankConfig"},
+            { Name: "Pin", ConfigName: "TachometerServiceConfig"}
+        ] } }
+    ] },
+
+    PrimeService_StaticPulseWidthConfig: { Variables: [
+        { PulseWidth : { Label: "Pulse Width", Type: "float", Value: 0.1, Units: TimeUnits } }
+    ] },
+    
+    IPrimeServiceConfig: { Variables: [
+        { PrimeServiceId: { Type: "uint16", Value: 4002, Hidden: true } },
+        { Selection: { Label: "Prime Service", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig"},
+            { Name: "Static Pulse Width", ConfigName: "PrimeService_StaticPulseWidthConfig"}
+        ] } }
+    ] },
 
     IdleControlService_PidConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint8", Value: 1, Hidden: true } },
@@ -57,6 +82,51 @@ var EngineControlServicesIni = {
             { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "PID", ConfigName: "IdleControlService_PidConfig"}
         ] } }
+    ] },    
+
+    AfrService_StaticConfig: { Variables: [
+        { PulseWidth : { Label: "AFR", Type: "float", Value: 14.7, Units: AfrUnits } }
+    ] },
+
+    AfrService_Map_EthanolConfig: { Variables: [
+        { StartupAfrMultiplier : { Label: "Startup AFR Multiplier", Type: "float", Value: 1.1 } },
+        { StartupAfrDelay : { Label: "Startup AFR Delay", Type: "float", Value: 10, Units: TimeUnits } },
+        { StartupAfrDecay : { Label: "Startup AFR Decay", Type: "float", Value: 0.1, Units: PerSecond(BlankUnits) } },
+
+        { MaxRpm : { Label: "Max RPM", Type: "uint16", Value: 7000, Units: RPMUnits } },
+        { MaxMapBar : { Label: "Max MAP", Type: "float", Value: 1, Units: PressureUnits } },
+        { AfrRpmResolution : { Label: "AFR RPM Resolution", Type: "uint8", Value: 8 } },
+        { AfrMapResolution : { Label: "AFR MAP Resolution", Type: "uint8", Value: 8 } },
+        { GasMapPointer : { Type: "uint32", Hidden: true } },
+        { EthanolMapPointer : { Type: "uint32", Hidden: true } },
+        
+        { MaxEct : { Label: "Max ECT", Type: "int16", Value: 121, Units: TemperatureUnits } },
+        { MinEct : { Label: "Min ECT", Type: "int16", Value: -40, Units: TemperatureUnits } },
+        { AfrEctResolution : { Label: "AFR ECT Resolution", Type: "uint8", Value: 8 } },
+        { EctMultiplierPointer : { Type: "uint32", Hidden: true } },
+		
+        { StoichResolution : { Label: "Stoich Resolution", Type: "uint8", Value: 8 } },
+        { StoichPointer: { Type: "uint32", Hidden: true } },
+        
+        { AfrTpsResolution : { Label: "AFR TPS Resolution", Type: "uint8", Value: 8 } },
+        { TpsMinAfrGasPointer: { Type: "uint32", Hidden: true } },
+        { TpsMinAfrEthanolPointer: { Type: "uint32", Hidden: true } },        
+        
+        { GasMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Gas AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
+        { EthanolMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Ethanol AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
+        { EctMultiplierTable: { Type: "uint8", ValueMultiplier: 1/255, XResolution: "AfrEctResolution", Label: "ECT Multiplier", XLabel: "ECT", ZLabel: "Multiplier", XMin: "MinEct", XMax: "MaxEct", XUnits: TemperatureUnits, ZUnits: BlankUnits, Dialog: true } },
+        { StoichTable: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "StoichResolution", Label: "Stoich", XLabel: "Ethanol Content", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+        { TpsMaxAfrGas: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrTpsResolution", Label: "Max AFR Gas", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+        { TpsMaxAfrEthanol: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrTpsResolution", Label: "Max AFR Ethanol", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+    ] },
+    
+    IAfrServiceConfig: { Variables: [
+        { PrimeServiceId: { Type: "uint16", Value: 4004, Hidden: true } },
+        { Selection: { Label: "AFR Service", Selections: [
+            { Name: "None", ConfigName: "NoneServiceConfig"},
+            { Name: "Static", ConfigName: "AfrService_StaticConfig"},
+            { Name: "MAP + Ethanol", ConfigName: "AfrService_Map_EthanolConfig"}
+        ] } }
     ] },
 
     SensorServices: { Tabbed: true, Variables: [
@@ -72,7 +142,8 @@ var EngineControlServicesIni = {
     OutputServices: { Tabbed: true, Variables: [
         { IgnitorServices: { Label: "Ignitors", ConfigName: "IgnitorServicesConfig"} },
         { InjectorServices: { Label: "Injectors", ConfigName: "InjectorServicesConfig"} },
-        { IdleAirControlValveService: { Label: "IAC Valve", ConfigName: "IdleAirControlValveConfig"} }
+        { IdleAirControlValveService: { Label: "IAC Valve", ConfigName: "IdleAirControlValveConfig"} },
+        { TachometerService: { Label: "Tach", ConfigName: "ITachometerServiceConfig"} }
     ] },
 
     EngineGeneral: { Size: 0, Variables: [
@@ -81,7 +152,9 @@ var EngineControlServicesIni = {
 
     EngineServices: { Tabbed: true, Variables: [
         { EngineGeneral: { Label: "General", ConfigName: "EngineGeneral"} },
-        { IdleControlService: { Label: "Idle", ConfigName: "IIdleControlServiceConfig"} }
+        { IdleControlService: { Label: "Idle", ConfigName: "IIdleControlServiceConfig"} },
+        { PrimeService: { Label: "Prime", ConfigName: "IPrimeServiceConfig"} },
+        { AfrService: { Label: "AFR", ConfigName: "IAfrServiceConfig"} }
     ] },
 
     BuilderConfig: { Tabbed: true, Variables: [

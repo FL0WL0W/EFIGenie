@@ -72,8 +72,8 @@ namespace EngineControlServices
 		unsigned short *StoichTable; // value in 1/1024
 		
 		unsigned char AfrTpsResolution;
-		unsigned short *TpsMinAfrGas;
-		unsigned short *TpsMinAfrEthanol;
+		unsigned short *TpsMaxAfrGas; // value in 1/1024
+		unsigned short *TpsMaxAfrEthanol; // value in 1/1024
 	});
 	
 class AfrService_Map_Ethanol : public IAfrService
