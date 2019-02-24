@@ -12,7 +12,7 @@ var EngineControlServicesIni = {
 
     InjectorServicesConfig: { Variables: [
         { InjectorServicesId: { Type: "uint16", Value: 3002, Hidden: true } },
-        { Injectors: { Type: "uint8", Label: "Injectors", Value: 4, Min: 0, Max: 32, Step: 1 } },
+        { Injectors: { Type: "uint8", Label: "Injectors", Value: 8, Min: 0, Max: 32, Step: 1 } },
         { InjectorConfigs: { 
             Label: "Injector",
             Labels: ["Injector 1", "Injector 2", "Injector 3", "Injector 4", "Injector 5", "Injector 6", "Injector 7", "Injector 8", "Injector 9", "Injector 10", "Injector 11", "Injector 12", "Injector 13", "Injector 14", "Injector 15", "Injector 16", "Injector 17", "Injector 18", "Injector 19", "Injector 20", "Injector 21", "Injector 22", "Injector 23", "Injector 24", "Injector 25", "Injector 26", "Injector 27", "Injector 28", "Injector 29", "Injector 30", "Injector 31", "Injector 32"], 
@@ -79,7 +79,7 @@ var EngineControlServicesIni = {
 
     IIdleControlServiceConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 4003, Hidden: true } },
-        { Selection: { Label: "Idle Air Control Valve", Selections: [
+        { Selection: { Label: "Idle Control", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "PID", ConfigName: "IdleControlService_PidConfig"}
         ] } }
@@ -235,6 +235,7 @@ var EngineControlServicesIni = {
         { IgnitionConfigWrapper_HardRpmLimitConfigId: { Type: "uint8", Value: 3, Hidden: true } },
         { RpmEnable : { Label: "RPM Enable", Type: "uint16", Value: 6450, Units: RPMUnits } },
         { RpmDisable : { Label: "RPM Disable", Type: "uint16", Value: 6500, Units: RPMUnits } },
+        { BooleanInput: { ConfigName: "IBooleanInputServiceConfig" } },
         { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
     ] },
 
@@ -245,6 +246,7 @@ var EngineControlServicesIni = {
         { P: { Label: "P", Type: "float", Value: 1 } },
         { I: { Label: "I", Type: "float", Value: 0 } },
         { D: { Label: "D", Type: "float", Value: 0 } },
+        { BooleanInput: { ConfigName: "IBooleanInputServiceConfig" } },
         { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
     ] },
 
