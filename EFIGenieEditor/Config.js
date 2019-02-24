@@ -847,6 +847,9 @@ function GetReferenceIfString(referenceObj, reference, defaultReference) {
 }
 
 function GetReferenceCount(referenceObj, reference) {
+    if(reference.indexOf("/") > -1 || reference.indexOf(".") > -1)
+        return 0;
+
     var refernceCount = 0;
     for(key in referenceObj) {
         if(!referenceObj[key])

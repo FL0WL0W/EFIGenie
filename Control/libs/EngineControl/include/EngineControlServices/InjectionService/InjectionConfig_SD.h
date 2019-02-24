@@ -30,7 +30,7 @@ namespace EngineControlServices
 			ret->VolumetricEfficiencyMap = (unsigned short *)(ret + 1);
 			ret->InjectorGramsPerMinute = (unsigned short *)(ret->VolumetricEfficiencyMap + ret->VeRpmResolution * ret->VeMapResolution);
 			ret->ShortPulseAdder = (short *)(ret->InjectorGramsPerMinute + ret->Injectors);
-			ret->Offset = (ret->ShortPulseAdder + (int)(ret->ShortPulseLimit / 0.00006f) + 1);
+			ret->Offset = (ret->ShortPulseAdder + ret->ShortPulseAdderResolution);
 			ret->TemperatureBias = (unsigned char *)(ret->Offset + ret->OffsetMapResolution *ret->OffsetVoltageResolution);
 			ret->TpsDotAdder = (short *)(ret->TemperatureBias + ret->TemperatureBiasResolution);
 			ret->MapDotAdder = ret->TpsDotAdder + ret->TpsDotAdderResolution;
@@ -64,6 +64,7 @@ namespace EngineControlServices
 		unsigned short *InjectorGramsPerMinute;
 		
 		float ShortPulseLimit;
+		unsigned char ShortPulseAdderResolution;
 		short *ShortPulseAdder;
 		
 		float VoltageMax;

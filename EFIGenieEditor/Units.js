@@ -12,6 +12,10 @@ var TemperatureUnits = [ { Name: "C", DisplayMultiplier: 1, DisplayOffset: 0 }, 
 var GasConstantUnits = [ { Name: "J/kg K", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "kJ/kg K", DisplayMultiplier: 0.1, DisplayOffset: 0 } ];
 var AirmassUnits = [ { Name: "forgot", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var AfrUnits = [ { Name: ":1", DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var CycleUnits = [ { Name: "Cycles", DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var LambdaUnits = [ { Name: "λ", DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var VolumeUnits = [ { Name: "L", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mL", DisplayMultiplier: 1000, DisplayOffset: 0 } ];
+var FlowUnits = [ { Name: "g/min", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 
 function PerSecond(units)
 {

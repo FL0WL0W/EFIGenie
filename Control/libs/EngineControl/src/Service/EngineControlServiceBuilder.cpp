@@ -438,7 +438,7 @@ namespace Service
 		return ret;
 	}
 	
-	IInjectionConfig *EngineControlServiceBuilder::CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
+	IInjectionConfig *EngineControlServiceBuilder::CreateInjectionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *totalSize)
 	{
 		IInjectionConfig *ret = 0;
 		
@@ -464,7 +464,7 @@ namespace Service
 				InjectionConfigWrapper_DFCOConfig *injectionConfig = CastConfig < InjectionConfigWrapper_DFCOConfig >(&config, totalSize);
 
 				unsigned int size;
-				IInjectionConfig *child = CreatePistonEngineInjetionConfig(serviceLocator, config, &size);
+				IInjectionConfig *child = CreateInjectionConfig(serviceLocator, config, &size);
 				config = (void *)((unsigned char *)config + size);
 				*totalSize += size;
 
@@ -492,7 +492,7 @@ namespace Service
 				CastConfig < IgnitionConfig_StaticConfig >(&config, totalSize));
 			break;
 #endif
-#ifdef IGNITIONCONFIG_Map_Ethanol
+#ifdef IGNITIONCONFIG_MAP_ETHANOL_H
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
 				CastConfig < IgnitionConfig_Map_EthanolConfig >(&config, totalSize),
@@ -581,7 +581,7 @@ namespace Service
 
 		IInjectionConfig *injectionConfig = 0;
 		unsigned int size;
-		injectionConfig = CreatePistonEngineInjetionConfig(serviceLocator, config, &size);
+		injectionConfig = CreateInjectionConfig(serviceLocator, config, &size);
 		config = (void *)((unsigned char *)config + size);
 		*totalSize += size;
 		

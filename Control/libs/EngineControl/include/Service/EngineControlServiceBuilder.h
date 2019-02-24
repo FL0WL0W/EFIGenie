@@ -175,7 +175,7 @@ namespace Service
 		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IInjectionConfig *CreatePistonEngineInjetionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static IInjectionConfig *CreateInjectionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IIgnitionConfig *CreateIgnitionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static IgnitionSchedulingService *CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
 		static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
