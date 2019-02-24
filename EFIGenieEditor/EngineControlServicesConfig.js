@@ -1,7 +1,7 @@
 var EngineControlServicesIni = {
     IgnitorServicesConfig: { Variables: [
         { IgnitorServicesId: { Type: "uint16", Value: 3001, Hidden: true } },
-        { Coils: { Type: "uint8", Label: "Ignition Coils", Value: 4, Min: 0, Max: 16, Step: 1 } },
+        { Coils: { Type: "uint8", Label: "Ignition Coils", Value: 8, Min: 0, Max: 16, Step: 1 } },
         { CoilConfigs: { 
             Label: "Coil",
             Labels: ["Coil 1", "Coil 2", "Coil 3", "Coil 4", "Coil 5", "Coil 6", "Coil 7", "Coil 8", "Coil 9", "Coil 10", "Coil 11", "Coil 12", "Coil 13", "Coil 14", "Coil 15", "Coil 16"], 

@@ -1158,7 +1158,7 @@ class ConfigArrayGui extends ConfigArray {
 
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, this.Parent, this.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, thisClass.ConfigNameSpace, thisClass.Parent, thisClass.CallBack);
         });
     }
 
@@ -1166,7 +1166,7 @@ class ConfigArrayGui extends ConfigArray {
         var size = super.SetArrayBuffer(arrayBuffer);
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, this.ConfigNameSpace, this.Parent, this.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, thisClass.ConfigNameSpace, thisClass.Parent, thisClass.CallBack);
         });
         return size;
     }
