@@ -4,20 +4,20 @@
 #ifdef IBOOLEANOUTPUTSERVICE_H
 namespace IOServices
 {
-	void IBooleanOutputService::OutputSetCallBack(void *parameters)
+	void IBooleanOutputService::OutputSetCallBack(void *booleanOutputService)
 	{
-		((IBooleanOutputService *)parameters)->OutputSet();
+		reinterpret_cast<IBooleanOutputService *>(booleanOutputService)->OutputSet();
 	}
 	
-	void IBooleanOutputService::OutputResetCallBack(void *parameters)
+	void IBooleanOutputService::OutputResetCallBack(void *booleanOutputService)
 	{
-		((IBooleanOutputService *)parameters)->OutputReset();
+		reinterpret_cast<IBooleanOutputService *>(booleanOutputService)->OutputReset();
 	}
 	
 	IBooleanOutputService *IBooleanOutputService::CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
-		const unsigned char outputServiceId = *((unsigned char*)config);
-		config = ((unsigned char *)config + 1);
+		const unsigned char outputServiceId = *reinterpret_cast<const unsigned char *>(config);
+		config = reinterpret_cast<const unsigned char *>(config) + 1;
 		*sizeOut = sizeof(unsigned char);
 		
 		IBooleanOutputService *outputService = 0;
@@ -27,7 +27,7 @@ namespace IOServices
 #ifdef BOOLEANOUTPUTSERVICE_H
 		case 1:
 			{
-				const BooleanOutputServiceConfig *booleanOutputServiceConfig = (const BooleanOutputServiceConfig *)config;
+				const BooleanOutputServiceConfig *booleanOutputServiceConfig = reinterpret_cast<const BooleanOutputServiceConfig *>(config);
 				*sizeOut += booleanOutputServiceConfig->Size();
 				outputService = new BooleanOutputService(hardwareAbstractionCollection, booleanOutputServiceConfig);
 				break;

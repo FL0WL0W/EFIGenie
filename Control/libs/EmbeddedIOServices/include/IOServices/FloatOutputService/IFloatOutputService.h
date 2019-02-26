@@ -2,7 +2,7 @@
 
 using namespace HardwareAbstraction;
 
-#ifndef IFLOATOUTPUTSERVICE_H
+#if !defined(IFLOATOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IFLOATOUTPUTSERVICE_H
 namespace IOServices
 {

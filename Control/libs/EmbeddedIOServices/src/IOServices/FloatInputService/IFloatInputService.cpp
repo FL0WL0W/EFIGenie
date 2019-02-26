@@ -11,13 +11,13 @@ namespace IOServices
 {
 	void IFloatInputService::ReadValueCallBack(void *floatInputService)
 	{
-		((IFloatInputService *)floatInputService)->ReadValue();
+		reinterpret_cast<IFloatInputService *>(floatInputService)->ReadValue();
 	}
 
 	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
-		unsigned char inputServiceId = *((unsigned char*)config);
-		config = ((unsigned char *)config + 1);
+		const unsigned char inputServiceId = *reinterpret_cast<const unsigned char *>(config);
+		config = reinterpret_cast<const unsigned char *>(config) + 1;
 		*sizeOut = sizeof(unsigned char);
 		
 		IFloatInputService *inputService = 0;
@@ -27,14 +27,14 @@ namespace IOServices
 #ifdef FLOATINPUTSERVICE_STATIC_H
 		case 1:
 			*sizeOut += 2 * sizeof(float);
-			inputService = new FloatInputService_Static(*((const float *)config), *((const float *)config + 1));
+			inputService = new FloatInputService_Static(*reinterpret_cast<const float *>(config), *(reinterpret_cast<const float *>(config) + 1));
 			break;
 #endif
 			
 #ifdef FLOATINPUTSERVICE_ANALOGPOLYNOMIAL_H
 		case 2:
 			{
-				const FloatInputService_AnalogPolynomialConfig<4> *analogPolynomialConfig = (const FloatInputService_AnalogPolynomialConfig<4> *)config;
+				const FloatInputService_AnalogPolynomialConfig<4> *analogPolynomialConfig = reinterpret_cast<const FloatInputService_AnalogPolynomialConfig<4> *>(config);
 				*sizeOut += analogPolynomialConfig->Size();
 				inputService = new FloatInputService_AnalogPolynomial<4>(hardwareAbstractionCollection, analogPolynomialConfig);
 				break;
@@ -44,7 +44,7 @@ namespace IOServices
 #ifdef FLOATINPUTSERVICE_FREQUENCYPOLYNOMIAL_H
 		case 3:
 			{
-				const FloatInputService_FrequencyPolynomialConfig<4> *frequencyPolynomialConfig = (const FloatInputService_FrequencyPolynomialConfig<4> *)config;
+				const FloatInputService_FrequencyPolynomialConfig<4> *frequencyPolynomialConfig = reinterpret_cast<const FloatInputService_FrequencyPolynomialConfig<4> *>(config);
 				*sizeOut += frequencyPolynomialConfig->Size();
 				inputService = new FloatInputService_FrequencyPolynomial<4>(hardwareAbstractionCollection, frequencyPolynomialConfig);
 				break;
@@ -54,7 +54,7 @@ namespace IOServices
 #ifdef FLOATINPUTSERVICE_ANALOGINTERPOLATEDTABLE_H
 		case 4:
 			{
-				const FloatInputService_AnalogInterpolatedTableConfig *analogInterpolatedTableConfig = (const FloatInputService_AnalogInterpolatedTableConfig *)config;
+				const FloatInputService_AnalogInterpolatedTableConfig *analogInterpolatedTableConfig = reinterpret_cast<const FloatInputService_AnalogInterpolatedTableConfig *>(config);
 				*sizeOut += analogInterpolatedTableConfig->Size();
 				inputService = new FloatInputService_AnalogInterpolatedTable(hardwareAbstractionCollection, analogInterpolatedTableConfig);
 				break;
@@ -64,7 +64,7 @@ namespace IOServices
 #ifdef FLOATINPUTSERVICE_FREQUENCYINTERPOLATEDTABLE_H
 		case 5:
 			{
-				const FloatInputService_FrequencyInterpolatedTableConfig *frequencyInterpolatedTableConfig = (const FloatInputService_FrequencyInterpolatedTableConfig *)config;
+				const FloatInputService_FrequencyInterpolatedTableConfig *frequencyInterpolatedTableConfig = reinterpret_cast<const FloatInputService_FrequencyInterpolatedTableConfig *>(config);
 				*sizeOut += frequencyInterpolatedTableConfig->Size();
 				inputService = new FloatInputService_FrequencyInterpolatedTable(hardwareAbstractionCollection, frequencyInterpolatedTableConfig);
 				break;
@@ -74,9 +74,9 @@ namespace IOServices
 #ifdef FLOATINPUTSERVICE_FAULTDETECTIONWRAPPER_H
 		case 6:
 			{
-				const FloatInputService_FaultDetectionWrapperConfig *faultDetectionConfig = (const FloatInputService_FaultDetectionWrapperConfig *)config;
+				const FloatInputService_FaultDetectionWrapperConfig *faultDetectionConfig = reinterpret_cast<const FloatInputService_FaultDetectionWrapperConfig *>(config);
 				*sizeOut += faultDetectionConfig->Size();
-				config = (void*)((unsigned char *)config + faultDetectionConfig->Size());
+				config = reinterpret_cast<const unsigned char *>(config) + faultDetectionConfig->Size();
 				unsigned int childSize = 0;
 				IFloatInputService *child = CreateFloatInputService(hardwareAbstractionCollection, config, &childSize);
 				*sizeOut += childSize;

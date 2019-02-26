@@ -1,5 +1,6 @@
 #include "Interpolation.h"
 
+#ifdef INTERPOLATION_H
 namespace Interpolation
 {
 	InterpolationResponse Interpolate(const float value, const float maxValue, const float minValue, const unsigned char resolution)
@@ -13,7 +14,7 @@ namespace Interpolation
 			{
 				response.Multiplier = 0;
 			}
-			response.IndexL = (unsigned char)response.Multiplier;
+			response.IndexL = static_cast<unsigned char>(response.Multiplier);
 			response.Multiplier -= response.IndexL;
 			response.IndexH = response.IndexL + 1;
 			if (response.IndexL > resolutionMinus1)
@@ -29,3 +30,4 @@ namespace Interpolation
 		return response;
 	}
 }
+#endif

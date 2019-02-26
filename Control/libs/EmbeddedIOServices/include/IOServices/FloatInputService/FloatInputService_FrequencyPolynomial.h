@@ -13,14 +13,8 @@ namespace IOServices
 	template<unsigned char Degree>
 	struct FloatInputService_FrequencyPolynomialConfig
 	{
-	private:
-		FloatInputService_FrequencyPolynomialConfig()
-		{
-			
-		}
-		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatInputService_FrequencyPolynomialConfig<Degree>);
 		}
@@ -52,7 +46,7 @@ namespace IOServices
 			_hardwareAbstractionCollection->PwmService->InitPin(_config->PwmPin, HardwareAbstraction::In, _config->MinFrequency);
 		}
 
-		void ReadValue()
+		void ReadValue() override
 		{
 			HardwareAbstraction::PwmValue pwmValue = _hardwareAbstractionCollection->PwmService->ReadPin(_config->PwmPin);
 

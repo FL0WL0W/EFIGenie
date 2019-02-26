@@ -7,7 +7,7 @@
 
 namespace HardwareAbstraction
 {
-	struct Task
+	class Task
 	{
 	public:
 		Task() {}

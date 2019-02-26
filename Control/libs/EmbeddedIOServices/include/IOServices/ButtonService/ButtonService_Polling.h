@@ -15,11 +15,10 @@ namespace IOServices
 		ITimerService *_timerService;
 		unsigned int _lastPressed = 0;
 		bool _pressed = false;
-		CallBackGroup *callBackGroup;
 
 	public:
 		ButtonService_Polling(ITimerService *timerService, IBooleanInputService *booleanInputService);
-		void Tick();
+		void Tick() override;
 	};
 }
 #endif

@@ -3,9 +3,9 @@
 #ifdef STEPPEROUTPUTSERVICE_FULLSTEPCONTROL_H
 namespace IOServices
 {
-	void StepperOutputService_FullStepControl::StepCallBack(void *parameters)
+	void StepperOutputService_FullStepControl::StepCallBack(void *stepperOutputService_FullStepControl)
 	{
-		((StepperOutputService_FullStepControl *)parameters)->Step();
+		reinterpret_cast<StepperOutputService_FullStepControl *>(stepperOutputService_FullStepControl)->Step();
 	}
 
 	StepperOutputService_FullStepControl::StepperOutputService_FullStepControl(const HardwareAbstractionCollection *hardwareAbstractionCollection, const StepperOutputService_FullStepControlConfig *config, IBooleanOutputService *coilAPlusBooleanOutputService, IBooleanOutputService *coilAMinusBooleanOutputService, IBooleanOutputService *coilBPlusBooleanOutputService, IBooleanOutputService *coilBMinusBooleanOutputService)
@@ -57,7 +57,7 @@ namespace IOServices
 		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
 	}
 	
-	void StepperOutputService_FullStepControl::SetState(unsigned char state)
+	void StepperOutputService_FullStepControl::SetState(char state)
 	{
 		switch(state)
 		{

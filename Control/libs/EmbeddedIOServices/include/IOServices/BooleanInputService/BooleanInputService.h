@@ -9,14 +9,8 @@ namespace IOServices
 	PACK(
 	struct BooleanInputServiceConfig
 	{
-	private:
-		BooleanInputServiceConfig()
-		{
-
-		}
-		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(BooleanInputServiceConfig);
 		}
@@ -33,7 +27,7 @@ namespace IOServices
 		
 	public:
 		BooleanInputService(const HardwareAbstraction::HardwareAbstractionCollection *, const BooleanInputServiceConfig *);
-		void ReadValue();
+		void ReadValue() override;
 	};
 }
 #endif

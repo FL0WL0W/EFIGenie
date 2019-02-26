@@ -2,7 +2,7 @@
 
 using namespace HardwareAbstraction;
 
-#ifndef IBOOLEANOUTPUTSERVICE_H
+#if !defined(IBOOLEANOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IBOOLEANOUTPUTSERVICE_H
 namespace IOServices
 {

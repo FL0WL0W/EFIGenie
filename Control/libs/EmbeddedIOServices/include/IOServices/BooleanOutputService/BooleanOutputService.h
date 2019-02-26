@@ -11,14 +11,8 @@ namespace IOServices
 	PACK(
 	struct BooleanOutputServiceConfig
 	{
-	private:
-		BooleanOutputServiceConfig()
-		{
-
-		}
-		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(BooleanOutputServiceConfig);
 		}
@@ -37,9 +31,9 @@ namespace IOServices
 	public:
 		BooleanOutputService(const HardwareAbstractionCollection *, const BooleanOutputServiceConfig *);
 
-		void OutputSet();
-		void OutputReset();
-		void OutputWrite(bool value);
+		void OutputSet() override;
+		void OutputReset() override;
+		void OutputWrite(bool value) override;
 	};
 }
 #endif

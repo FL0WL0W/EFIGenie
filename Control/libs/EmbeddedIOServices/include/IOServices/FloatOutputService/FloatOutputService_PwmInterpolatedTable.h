@@ -5,7 +5,7 @@
 
 using namespace HardwareAbstraction;
 
-#if !defined(FLOATOUTPUTSERVICE_PWMINTERPOLATEDTABLE_H) && defined(IFLOATOUTPUTSERVICE_H)
+#if !defined(FLOATOUTPUTSERVICE_PWMINTERPOLATEDTABLE_H) && defined(IFLOATOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define FLOATOUTPUTSERVICE_PWMINTERPOLATEDTABLE_H
 namespace IOServices
 {
@@ -19,13 +19,13 @@ namespace IOServices
 		}
 		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_PwmInterpolatedTableConfig) +
 				(sizeof(float) * Resolution);
 		}
 		
-		const float *Table() const { return (float *)(this + 1); }
+		constexpr const float *Table() const { return reinterpret_cast<const float *>(this + 1); }
 		
 		unsigned short PwmPin;
 		unsigned short Frequency;
@@ -43,8 +43,8 @@ namespace IOServices
 	public:
 		FloatOutputService_PwmInterpolatedTable(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatOutputService_PwmInterpolatedTableConfig *config);
 		
-		void SetOutput(float value);
-		void Calibrate();
+		void SetOutput(float value) override;
+		void Calibrate() override;
 	};
 }
 #endif

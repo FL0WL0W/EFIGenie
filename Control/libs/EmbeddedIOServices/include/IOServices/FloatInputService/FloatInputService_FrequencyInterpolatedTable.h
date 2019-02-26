@@ -20,13 +20,13 @@ namespace IOServices
 		}
 		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatInputService_FrequencyInterpolatedTableConfig) +
 				(sizeof(float) * Resolution);
 		}
 
-		const float *Table() const { return (float *)(this + 1); }
+		constexpr const float *Table() const { return reinterpret_cast<const float *>(this + 1); }
 
 		unsigned short PwmPin;
 		unsigned short DotSampleRate;
@@ -47,7 +47,7 @@ namespace IOServices
 	public:
 		FloatInputService_FrequencyInterpolatedTable(const HardwareAbstractionCollection *hardwareAbstractionCollection, const FloatInputService_FrequencyInterpolatedTableConfig *config);
 
-		void ReadValue();
+		void ReadValue() override;
 	};
 }
 #endif

@@ -13,14 +13,8 @@ namespace IOServices
 	template<unsigned char Degree>
 	struct FloatInputService_AnalogPolynomialConfig
 	{
-	private:
-		FloatInputService_AnalogPolynomialConfig()
-		{
-			
-		}
-		
 	public:		
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatInputService_AnalogPolynomialConfig<Degree>);
 		}
@@ -51,7 +45,7 @@ namespace IOServices
 			_hardwareAbstractionCollection->AnalogService->InitPin(_config->AdcPin);
 		}
 
-		void ReadValue()
+		void ReadValue() override
 		{
 			float adcValue = _hardwareAbstractionCollection->AnalogService->ReadPin(_config->AdcPin);
 			Value = _config->A[0];

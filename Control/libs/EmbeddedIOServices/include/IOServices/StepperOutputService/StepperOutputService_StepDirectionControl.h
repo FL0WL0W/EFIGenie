@@ -2,22 +2,15 @@
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "Packed.h"
 
-#if !defined(STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H) && defined(ISTEPPEROUTPUTSERVICE_H)
+#if !defined(STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H) && defined(ISTEPPEROUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
-
 namespace IOServices
 {
 	PACK(
 	struct StepperOutputService_StepDirectionControlConfig
 	{
-	private:
-		StepperOutputService_StepDirectionControlConfig()
-		{
-			
-		}
-		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(StepperOutputService_StepDirectionControlConfig);
 		}
@@ -41,9 +34,8 @@ namespace IOServices
 
 	public:
 		StepperOutputService_StepDirectionControl(const HardwareAbstractionCollection *hardwareAbstractionCollection, const StepperOutputService_StepDirectionControlConfig *config, IBooleanOutputService *stepBooleanOutputService, IBooleanOutputService *directionBooleanOutputService);
-		void Step(int steps);
-		void Calibrate();
+		void Step(int steps) override;
+		void Calibrate() override;
 	};
 }
-
 #endif

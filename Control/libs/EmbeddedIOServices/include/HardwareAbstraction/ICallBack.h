@@ -18,7 +18,7 @@ namespace HardwareAbstraction
 			Parameters = parameters;
 		}
 
-		void Execute()
+		void Execute() override
 		{
 			CallBackPointer(Parameters);
 		}
@@ -32,7 +32,7 @@ namespace HardwareAbstraction
 	protected:
 		std::list<ICallBack *> _callBackList;
 	public:		
-		void Execute();
+		void Execute() override;
 		void Add(ICallBack *callBack);
 		void Add(void(*callBackPointer)(void *), void *parameters);
 		void Remove(ICallBack *callBack);

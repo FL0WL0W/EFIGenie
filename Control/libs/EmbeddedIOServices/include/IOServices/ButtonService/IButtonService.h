@@ -2,7 +2,7 @@
 
 using namespace HardwareAbstraction;
 
-#ifndef IBUTTONSERVICE_H
+#if !defined(IBUTTONSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IBUTTONSERVICE_H
 namespace IOServices
 {

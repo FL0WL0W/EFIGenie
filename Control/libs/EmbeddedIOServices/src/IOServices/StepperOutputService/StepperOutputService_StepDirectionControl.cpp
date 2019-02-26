@@ -3,9 +3,9 @@
 #ifdef STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
 namespace IOServices
 {
-	void StepperOutputService_StepDirectionControl::StepCallBack(void *parameters)
+	void StepperOutputService_StepDirectionControl::StepCallBack(void *stepperOutputService_StepDirectionControl)
 	{
-		((StepperOutputService_StepDirectionControl *)parameters)->Step();
+		reinterpret_cast<StepperOutputService_StepDirectionControl *>(stepperOutputService_StepDirectionControl)->Step();
 	}
 
 	StepperOutputService_StepDirectionControl::StepperOutputService_StepDirectionControl(const HardwareAbstractionCollection *hardwareAbstractionCollection, const StepperOutputService_StepDirectionControlConfig *config, IBooleanOutputService *stepBooleanOutputService, IBooleanOutputService *directionBooleanOutputService)

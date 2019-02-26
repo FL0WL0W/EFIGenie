@@ -8,8 +8,8 @@ namespace IOServices
 {
 	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
-		unsigned char stepperServiceId = *((unsigned char*)config);
-		config = ((unsigned char *)config + 1);
+		const unsigned char stepperServiceId = *reinterpret_cast<const unsigned char *>(config);
+		config = reinterpret_cast<const unsigned char *>(config) + 1;
 		*sizeOut = sizeof(unsigned char);
 		
 		IStepperOutputService *outputService = 0;
@@ -19,15 +19,15 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
 		case 1:
 			{
-				const StepperOutputService_StepDirectionControlConfig *stepperConfig = (const StepperOutputService_StepDirectionControlConfig *)config;
+				const StepperOutputService_StepDirectionControlConfig *stepperConfig = reinterpret_cast<const StepperOutputService_StepDirectionControlConfig *>(config);
 				*sizeOut += stepperConfig->Size();
 
-				config = (void*)((unsigned char *)config + stepperConfig->Size());
+				config = reinterpret_cast<const unsigned char *>(config) + stepperConfig->Size();
 				unsigned int subSize = 0;
 				IBooleanOutputService *stepBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *directionBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
@@ -39,23 +39,23 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_FULLSTEPCONTROL_H
 		case 2:
 			{
-				const StepperOutputService_FullStepControlConfig *stepperConfig = (const StepperOutputService_FullStepControlConfig *)config;
+				const StepperOutputService_FullStepControlConfig *stepperConfig = reinterpret_cast<const StepperOutputService_FullStepControlConfig *>(config);
 				*sizeOut += stepperConfig->Size();
 
-				config = (void*)((unsigned char *)config + stepperConfig->Size());
+				config = reinterpret_cast<const unsigned char *>(config) + stepperConfig->Size();
 				unsigned int subSize = 0;
 				IBooleanOutputService *coilAPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilAMinusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilBPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilBMinusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
@@ -67,23 +67,23 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_HALFSTEPCONTROL_H
 		case 3:
 			{
-				const StepperOutputService_HalfStepControlConfig *stepperConfig = (const StepperOutputService_HalfStepControlConfig *)config;
+				const StepperOutputService_HalfStepControlConfig *stepperConfig = reinterpret_cast<const StepperOutputService_HalfStepControlConfig *>(config);
 				*sizeOut += stepperConfig->Size();
 
-				config = (void*)((unsigned char *)config + stepperConfig->Size());
+				config = reinterpret_cast<const unsigned char *>(config) + stepperConfig->Size();
 				unsigned int subSize = 0;
 				IBooleanOutputService *coilAPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilAMinusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilBPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
-				config = (void*)((unsigned char *)config + subSize);
+				config = reinterpret_cast<const unsigned char *>(config) + subSize;
 				IBooleanOutputService *coilBMinusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 

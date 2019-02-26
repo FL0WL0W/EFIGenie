@@ -4,20 +4,13 @@
 
 #if !defined(STEPPEROUTPUTSERVICE_STATICSTEPCALIBRATIONWRAPER_H) && defined(ISTEPPEROUTPUTSERVICE_H)
 #define STEPPEROUTPUTSERVICE_STATICSTEPCALIBRATIONWRAPER_H
-
 namespace IOServices
 {
 	PACK(
 	struct StepperOutputService_StaticStepCalibrationWrapperConfig
 	{
-	private:
-		StepperOutputService_StaticStepCalibrationWrapperConfig()
-		{
-			
-		}
-		
 	public:
-		unsigned int Size()
+		constexpr const unsigned int Size()
 		{
 			return sizeof(StepperOutputService_StaticStepCalibrationWrapperConfig);
 		}
@@ -33,9 +26,8 @@ namespace IOServices
 
 	public:
 		StepperOutputService_StaticStepCalibrationWrapper(const StepperOutputService_StaticStepCalibrationWrapperConfig *config, IStepperOutputService *child);
-		void Step(int steps);
-		void Calibrate();
+		void Step(int steps) override;
+		void Calibrate() override;
 	};
 }
-
 #endif

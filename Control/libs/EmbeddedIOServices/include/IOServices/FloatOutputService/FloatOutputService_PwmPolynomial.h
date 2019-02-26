@@ -5,7 +5,7 @@
 
 using namespace HardwareAbstraction;
 
-#if !defined(FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H) && defined(IFLOATOUTPUTSERVICE_H)
+#if !defined(FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H) && defined(IFLOATOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H
 namespace IOServices
 {
@@ -13,14 +13,8 @@ namespace IOServices
 	template<unsigned char Degree>
 	struct FloatOutputService_PwmPolynomialConfig
 	{
-	private:
-		FloatOutputService_PwmPolynomialConfig()
-		{
-			
-		}
-		
 	public:
-		unsigned int Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
 		}
@@ -48,7 +42,7 @@ namespace IOServices
 			_hardwareAbstractionCollection->PwmService->InitPin(_config->PwmPin, HardwareAbstraction::Out, _config->Frequency);
 		}
 		
-		void SetOutput(float value)
+		void SetOutput(float value) override
 		{
 			float pwmValue = _config->A[0];
 			for (int i = 1; i <= Degree; i++)
@@ -62,7 +56,7 @@ namespace IOServices
 			_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1.0f / _config->Frequency, pwmValue / _config->Frequency });
 		}
 
-		void Calibrate() { }
+		void Calibrate() override { }
 	};
 }
 #endif

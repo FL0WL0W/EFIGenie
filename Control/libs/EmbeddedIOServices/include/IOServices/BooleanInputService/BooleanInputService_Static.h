@@ -7,9 +7,9 @@ namespace IOServices
 	class BooleanInputService_Static : public IBooleanInputService
 	{
 	public:
-		BooleanInputService_Static(const bool value) { Value = value; }
+		explicit BooleanInputService_Static(const bool value) { Value = value; }
 		
-		void ReadValue() { };
+		void ReadValue() override { };
 	};
 }
 #endif

@@ -2,7 +2,7 @@
 
 using namespace HardwareAbstraction;
 
-#ifndef ISTEPPEROUTPUTSERVICE_H
+#if !defined(ISTEPPEROUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define ISTEPPEROUTPUTSERVICE_H
 namespace IOServices
 {

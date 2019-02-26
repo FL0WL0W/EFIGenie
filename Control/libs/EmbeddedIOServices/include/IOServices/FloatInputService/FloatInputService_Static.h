@@ -9,7 +9,7 @@ namespace IOServices
 	public:
 		FloatInputService_Static(const float value, const float valueDot) { Value = value; ValueDot = valueDot; }
 		
-		void ReadValue() { };
+		void ReadValue() override { };
 	};
 }
 #endif
