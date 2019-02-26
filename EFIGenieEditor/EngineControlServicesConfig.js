@@ -66,11 +66,7 @@ var EngineControlServicesIni = {
         { MinEct: { Label: "Min Ect", Type: "int8", Value: 0, Units: TemperatureUnits } },
         { MaxEct: { Label: "Max Ect", Type: "int8", Value: 120, Units: TemperatureUnits } },
         { EctResolution: { Label: "Ect Resolution", Type: "uint8", Value: 16 } },
-        { IdleAirmassPointer: { Type: "uint32", Hidden:true } },
-        { IdleTargetRpmPointer: { Type: "uint32", Hidden:true } },
         { SpeedResolution: { Label: "Speed Resolution", Type: "uint8", Value: 16 } },
-        { IdleAirmassSpeedAdderPointer: { Type: "uint32", Hidden:true } },
-        { IdleTargetRpmSpeedAdderPointer: { Type: "uint32", Hidden:true } },
         { IdleAirmassTable: { Type: "float", XResolution: "EctResolution", Label: "ECT to Airmass", XLabel: "ECT", ZLabel: "Airmass", XMin: "MinEct", XMax: "MaxEct", Dialog: true, ZUnits: AirmassUnits, XUnits: TemperatureUnits } },
         { IdleTargetRpmTable: { Type: "uint16", XResolution: "EctResolution", Label: "ECT to Idle", XLabel: "ECT", ZLabel: "Idle Targe", XMin: "MinEct", XMax: "MaxEct", Dialog: true, ZUnits: RPMUnits, XUnits: TemperatureUnits } },
         { IdleAirmassSpeedAdderTable: { Type: "float", XResolution: "SpeedResolution", Label: "Speed to Airmass", XLabel: "Speed", ZLabel: "Airmass Add", XMin: 0, XMax: "SpeedThreshold", Dialog: true, ZUnits: AirmassUnits, XUnits: SpeedUnits } },
@@ -100,20 +96,14 @@ var EngineControlServicesIni = {
         { MaxMapBar : { Label: "Max MAP", Type: "float", Value: 1, Units: PressureUnits } },
         { AfrRpmResolution : { Label: "AFR RPM Resolution", Type: "uint8", Value: 8 } },
         { AfrMapResolution : { Label: "AFR MAP Resolution", Type: "uint8", Value: 8 } },
-        { GasMapPointer : { Type: "uint32", Hidden: true } },
-        { EthanolMapPointer : { Type: "uint32", Hidden: true } },
         
         { MaxEct : { Label: "Max ECT", Type: "int16", Value: 121, Units: TemperatureUnits } },
         { MinEct : { Label: "Min ECT", Type: "int16", Value: -40, Units: TemperatureUnits } },
         { AfrEctResolution : { Label: "AFR ECT Resolution", Type: "uint8", Value: 8 } },
-        { EctMultiplierPointer : { Type: "uint32", Hidden: true } },
         
         { AfrTpsResolution : { Label: "AFR TPS Resolution", Type: "uint8", Value: 8 } },
-        { TpsMinAfrGasPointer: { Type: "uint32", Hidden: true } },
-        { TpsMinAfrEthanolPointer: { Type: "uint32", Hidden: true } },     
 		
         { StoichResolution : { Label: "Stoich Resolution", Type: "uint8", Value: 8 } },
-        { StoichPointer: { Type: "uint32", Hidden: true } },   
         
         { GasMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Gas AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
         { EthanolMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Ethanol AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
@@ -141,12 +131,10 @@ var EngineControlServicesIni = {
         { D: { Label: "D", Type: "float", Value: 0 } },
 
         { RpmResolution : { Label: "RPM Resolution", Type: "uint8", Value: 3, Min: 1 } },
-        { RpmDivisionsPointer: { Type: "uint32", Hidden:true } },
         { RpmInterpolationDistance : { Label: "RPM Interpolation Distance", Type: "uint16", Value: 700, Min: 0, Units: RPMUnits } },
         { UseTps: { Label: "Y Source", Type: "uint8", Value: 0, Selections: [ "MAP", "TPS" ] } },
         
         { YResolution : { Label: "Y Resolution", Type: "uint8", Value: 3, Min: 1 } },
-        { YDivisionsPointer: { Type: "uint32", Hidden:true } },
         { YInterpolationDistance : { Label: "Y Interpolation Distance", Type: "float", Value: 0.1, Min: 0, Units: PressureUnits } },
 
         { IsPid: { Type: "bool", Label: "PID" } },
@@ -197,7 +185,6 @@ var EngineControlServicesIni = {
         { MaxY : { Label: "Max Y", Type: "float", Value: 1, Units: PressureUnits } },
         { RpmResolution : { Label: "RPM Resolution", Type: "uint8", Value: 4, Min: 1 } },
         { YResolution : { Label: "Y Resolution", Type: "uint8", Value: 4, Min: 1 } },
-        { AnalogTablePointer: { Type: "uint32", Hidden:true } },
 
         { AnalogTable: { Type: "float", XResolution: "RpmResolution", YResolution: "YResolution", Label: "Table", XLabel: "RPM", ZLabel: "Pressure", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxY", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: PressureUnits, Dialog: true } },
         
@@ -225,8 +212,6 @@ var EngineControlServicesIni = {
         { MaxMapBar : { Label: "Max MAP", Type: "float", Value: 1, Units: PressureUnits } },
         { IgnitionRpmResolution : { Label: "Advance RPM Resolution", Type: "uint8", Value: 8 } },
         { IgnitionMapResolution : { Label: "Advance MAP Resolution", Type: "uint8", Value: 8 } },
-        { GasMapPointer : { Type: "uint32", Hidden: true } },
-        { EthanolMapPointer : { Type: "uint32", Hidden: true } },
         { GasMap: { Type: "int16", ValueMultiplier: 1/64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Gas Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
         { EthanolMap: { Type: "int16", ValueMultiplier: 1/64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Ethanol Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
     ] },
@@ -264,7 +249,6 @@ var EngineControlServicesIni = {
         { IgnitionSchedulingServiceId: { Type: "uint16", Value: 4007, Hidden: true } },
         { SequentialRequired: { Type: "bool", Label: "Sequential Required" } },
         { Ignitors: { Type: "uint8", Value: "//IgnitorServices/Coils", Hidden: true } },
-        { IgnitorTdcPointer : { Type: "uint32", Hidden: true } },
 		{ IgnitorTdc: { Type: "uint16", XResolution: "//IgnitorServices/Coils", Label: "Coil TDC", XLabel: "Coil", ZLabel: "TDC", XMin: 1, XMax: "//IgnitorServices/Coils", ZUnits: DegreeUnits, Dialog: true } },
         
         { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
@@ -287,32 +271,25 @@ var EngineControlServicesIni = {
         { MaxMapBar: { Label: "Max MAP", Type: "float", Value: 1, Units: PressureUnits } },
         { VeRpmResolution: { Label: "VE RPM Resolution", Type: "uint8", Value: 8 } },
         { VeMapResolution: { Label: "VE MAP Resolution", Type: "uint8", Value: 8 } },
-        { VolumetricEfficiencyMapPointer: { Type: "uint32", Hidden: true } },
 
         { Injectors: { Type: "uint8", Value: "//InjectorServices/Injectors", Hidden: true } },
-        { InjectorGramsPerMinutePointer : { Type: "uint32", Hidden: true } },
 		
         { ShortPulseLimit: { Label: "Short Pulse Limit", Type: "float", Value: 0.1, Units: TimeUnits } },
         { ShortPulseAdderResolution: { Label: "Short Pulse Resolution", Type: "uint8", Value: 17 } },
-        { ShortPulseAdderPointer: { Type: "uint32", Hidden: true } },
 
         { VoltageMax: { Label: "Voltage Max", Type: "float", Value: 16, Units: VoltUnits } },
         { VoltageMin: { Label: "Voltage Min", Type: "float", Value: 8, Units: VoltUnits } },
         { OffsetMapResolution: { Label: "VE RPM Resolution", Type: "uint8", Value: 8 } },
         { OffsetVoltageResolution: { Label: "VE MAP Resolution", Type: "uint8", Value: 8 } },
-        { OffsetPointer: { Type: "uint32", Hidden: true } },
 
         { TemperatureBiasResolution: { Label: "Temperature Resolution", Type: "uint8", Value: 8 } },
         { MaxTemperatureBias: { Label: "Tempurature Bias Max Airflow", Type: "float", Value: 4000000, Units: FlowUnits } },
-        { TemperatureBiasPointer: { Type: "uint32", Hidden: true } },
 
         { MaxTpsDot: { Label: "Max TPS Dot", Type: "float", Value: 5, Units: PerSecond(PercentUnits) } },
         { TpsDotAdderResolution: { Label: "TPS Dot Resolution", Type: "uint8", Value: 8 } },
-        { TpsDotAdderPointer: { Type: "uint32", Hidden: true } },
 
         { MaxMapDot: { Label: "Max MAP Dot", Type: "float", Value: 5, Units: PerSecond(PressureUnits) } },
         { MapDotAdderResolution: { Label: "MAP Dot Resolution", Type: "uint8", Value: 8 } },
-        { MapDotAdderPointer: { Type: "uint32", Hidden: true } },
 
 
         { VolumetricEfficiencyMap: { Type: "uint16", ValueMultiplier: 1/8192, XResolution: "VeRpmResolution", YResolution: "VeMapResolution", Label: "Volumetric Efficiency", XLabel: "RPM", ZLabel: "VE", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: PercentUnits, Dialog: true } },
