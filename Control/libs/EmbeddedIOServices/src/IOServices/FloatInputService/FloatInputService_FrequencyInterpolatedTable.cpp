@@ -18,11 +18,11 @@ namespace IOServices
 		if (pwmValue.Period <= 0)
 			return;
 
-		float frequency = 1 / pwmValue.Period;
+		const float frequency = 1 / pwmValue.Period;
 
-		Value = Interpolation::InterpolateTable1<float>(frequency, _config->MaxFrequency, _config->MinFrequency, _config->Resolution, _config->Table);
+		Value = Interpolation::InterpolateTable1<float>(frequency, _config->MaxFrequency, _config->MinFrequency, _config->Resolution, _config->Table());
 
-		float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
+		const float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
 		if (elapsedTime * _config->DotSampleRate < 1.0)
 			return;
 

@@ -17,18 +17,13 @@ namespace IOServices
 		}
 		
 	public:
-		static StepperOutputService_StepDirectionControlConfig* Cast(void *p)
-		{
-			return (StepperOutputService_StepDirectionControlConfig *)p;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(StepperOutputService_StepDirectionControlConfig);
 		}
 		
-		unsigned int MaxStepsPerSecond;
-		unsigned float StepWidth;
+		unsigned short MaxStepsPerSecond;
+		float StepWidth;
 	});
 
 	class StepperOutputService_StepDirectionControl : public IStepperOutputService

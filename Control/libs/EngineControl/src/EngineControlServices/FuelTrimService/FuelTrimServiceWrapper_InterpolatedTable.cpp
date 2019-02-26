@@ -37,10 +37,10 @@ namespace EngineControlServices
 			if (elapsedTime * _config->UpdateRate < 1)
 				return;
 			_prevTick = _timerService->GetTick();
-			float rpm = _decoder->GetRpm();
-			_rpmDot = (rpm - _prevRpm) / elapsedTime;
+			unsigned short rpm = _decoder->GetRpm();
+			_rpmDot = (unsigned int)round((rpm - _prevRpm) / elapsedTime);
 			_prevRpm = rpm;
-			float delayTime = (60 * _config->CycleDelay) / rpm;
+			float delayTime = (60 * _config->CycleDelay) / (float)rpm;
 
 			float y = 0;
 			float yPredict = 0;
@@ -54,16 +54,17 @@ namespace EngineControlServices
 				y = _manifoldAbsolutePressureService->Value;
 				yPredict = y - delayTime * _manifoldAbsolutePressureService->ValueDot;
 			}
-			unsigned short rpmPredict = rpm - delayTime * _rpmDot;
+			unsigned short rpmPredict = rpm - (unsigned short)(delayTime * _rpmDot);
 
 			unsigned char yPredictIndexL = 0;
 			unsigned char yPredictIndexH = 0;
+			const float *yDivisions = _config->YDivisions();
 			float yDist = 0;
 			for (int i = _config->YResolution; i >= 0; i--)
 			{
 				if (i == 0)
 				{
-					yDist = _config->YDivisions[0] - yPredict;
+					yDist = yDivisions[0] - yPredict;
 					if (yDist > _config->YInterpolationDistance)
 					{
 						yPredictIndexH = 0;
@@ -75,11 +76,11 @@ namespace EngineControlServices
 						yPredictIndexH = 1;
 					}
 				}
-				else if (yPredict > _config->YDivisions[i - 1])
+				else if (yPredict > yDivisions[i - 1])
 				{
 					if (i == _config->YResolution)
 					{
-						yDist = yPredict - _config->YDivisions[i - 1];
+						yDist = yPredict - yDivisions[i - 1];
 						if (yDist > _config->YInterpolationDistance)
 						{
 							yPredictIndexH = i;
@@ -93,7 +94,7 @@ namespace EngineControlServices
 					}
 					else
 					{
-						if ((yDist = yPredict - _config->YDivisions[i - 1]) < _config->YDivisions[i] - yPredict)
+						if ((yDist = yPredict - yDivisions[i - 1]) < yDivisions[i] - yPredict)
 						{
 							if (yDist > _config->YInterpolationDistance)
 							{
@@ -108,7 +109,7 @@ namespace EngineControlServices
 						}
 						else
 						{
-							yDist = _config->YDivisions[i] - yPredict;
+							yDist = yDivisions[i] - yPredict;
 							if (yDist > _config->YInterpolationDistance)
 							{
 								yPredictIndexH = i;
@@ -128,11 +129,12 @@ namespace EngineControlServices
 			unsigned char rpmPredictIndexL = 0;
 			unsigned char rpmPredictIndexH = 0;
 			unsigned short rpmDist = 0;
+			const unsigned short *rpmDivisions = _config->RpmDivisions();
 			for (int i = _config->RpmResolution; i >= 0; i--)
 			{
 				if (i == 0)
 				{
-					rpmDist = _config->RpmDivisions[0] - rpmPredict;
+					rpmDist = rpmDivisions[0] - rpmPredict;
 					if (rpmDist > _config->RpmInterpolationDistance)
 					{
 						rpmPredictIndexH = 0;
@@ -144,11 +146,11 @@ namespace EngineControlServices
 						rpmPredictIndexH = 1;
 					}
 				}
-				else if (rpmPredict > _config->RpmDivisions[i - 1])
+				else if (rpmPredict > rpmDivisions[i - 1])
 				{
 					if (i == _config->RpmResolution)
 					{
-						rpmDist = rpmPredict - _config->RpmDivisions[i - 1];
+						rpmDist = rpmPredict - rpmDivisions[i - 1];
 						if (rpmDist > _config->RpmInterpolationDistance)
 						{
 							rpmPredictIndexH = i;
@@ -162,7 +164,7 @@ namespace EngineControlServices
 					}
 					else
 					{
-						if ((rpmDist = rpmPredict - _config->RpmDivisions[i - 1]) < _config->RpmDivisions[i] - rpmPredict)
+						if ((rpmDist = rpmPredict - rpmDivisions[i - 1]) < rpmDivisions[i] - rpmPredict)
 						{
 							if (rpmDist > _config->RpmInterpolationDistance)
 							{
@@ -177,7 +179,7 @@ namespace EngineControlServices
 						}
 						else
 						{
-							rpmDist = _config->RpmDivisions[i] - rpmPredict;
+							rpmDist = rpmDivisions[i] - rpmPredict;
 							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmPredictIndexH = i;
@@ -192,18 +194,18 @@ namespace EngineControlServices
 					}
 				}
 			}
-			float rpmPredictMultiplier = rpmDist / _config->RpmInterpolationDistance;
+			float rpmPredictMultiplier = (float)rpmDist / _config->RpmInterpolationDistance;
 			
 			unsigned char yIndexL = 0;
 			unsigned char yIndexH = 0;
 			yDist = 0;
 			for (int i = _config->YResolution - 1; i >= 0; i--)
 			{
-				if (y > _config->YDivisions[i])
+				if (y > yDivisions[i])
 				{
 					if (i == _config->YResolution - 1)
 					{
-						yDist = y - _config->YDivisions[i];
+						yDist = y - yDivisions[i];
 						if (yDist > _config->YInterpolationDistance)
 						{
 							yIndexH = i;
@@ -217,9 +219,9 @@ namespace EngineControlServices
 					}
 					else
 					{
-						if (y - _config->YDivisions[i] < _config->YDivisions[i + 1] - y)
+						if (y - yDivisions[i] < yDivisions[i + 1] - y)
 						{
-							yDist = y - _config->YDivisions[i];
+							yDist = y - yDivisions[i];
 							if (yDist > _config->YInterpolationDistance)
 							{
 								yIndexH = i;
@@ -233,7 +235,7 @@ namespace EngineControlServices
 						}
 						else
 						{
-							yDist = _config->YDivisions[i + 1] - y;
+							yDist = yDivisions[i + 1] - y;
 							if (yDist > _config->YInterpolationDistance)
 							{
 								yIndexH = i;
@@ -249,7 +251,7 @@ namespace EngineControlServices
 				}
 				else if (i == 0)
 				{
-					yDist = _config->YDivisions[0] - y;
+					yDist = yDivisions[0] - y;
 					if (yDist > _config->YInterpolationDistance)
 					{
 						yIndexH = 0;
@@ -262,18 +264,18 @@ namespace EngineControlServices
 					}
 				}
 			}
-			unsigned char yMultiplier = yDist / _config->YInterpolationDistance;
+			float yMultiplier = (float)yDist / _config->YInterpolationDistance;
 
 			unsigned char rpmIndexL = 0;
 			unsigned char rpmIndexH = 0;
 			rpmDist = 0;
 			for (int i = _config->RpmResolution - 1; i >= 0; i--)
 			{
-				if (rpm > _config->RpmDivisions[i])
+				if (rpm > rpmDivisions[i])
 				{
 					if (i == _config->RpmResolution - 1)
 					{
-						rpmDist = rpm - _config->RpmDivisions[i];
+						rpmDist = rpm - rpmDivisions[i];
 						if (rpmDist > _config->RpmInterpolationDistance)
 						{
 							rpmIndexH = i;
@@ -287,9 +289,9 @@ namespace EngineControlServices
 					}
 					else
 					{
-						if (rpm - _config->RpmDivisions[i] < _config->RpmDivisions[i + 1] - rpm)
+						if (rpm - rpmDivisions[i] < rpmDivisions[i + 1] - rpm)
 						{
-							rpmDist = rpm - _config->RpmDivisions[i];
+							rpmDist = rpm - rpmDivisions[i];
 							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmIndexH = i;
@@ -303,7 +305,7 @@ namespace EngineControlServices
 						}
 						else
 						{
-							rpmDist = _config->RpmDivisions[i + 1] - rpm;
+							rpmDist = rpmDivisions[i + 1] - rpm;
 							if (rpmDist > _config->RpmInterpolationDistance)
 							{
 								rpmIndexH = i;
@@ -319,7 +321,7 @@ namespace EngineControlServices
 				}
 				else if (i == 0)
 				{
-					rpmDist = _config->RpmDivisions[0] - rpm;
+					rpmDist = rpmDivisions[0] - rpm;
 					if (rpmDist > _config->RpmInterpolationDistance)
 					{
 						rpmIndexH = 0;
@@ -353,10 +355,10 @@ namespace EngineControlServices
 				}
 			}
 				
-			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * (1 - rpmPredictMultiplier);
-			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * rpmPredictMultiplier;
-			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexL] += fuelTrimIntegral * 128 * yPredictMultiplier * (1 - rpmPredictMultiplier);
-			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexH] += fuelTrimIntegral * 128 * yPredictMultiplier * rpmPredictMultiplier;
+			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexL] += (short)round(fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * (1 - rpmPredictMultiplier));
+			_fuelTrimIntegralTable[yPredictIndexL * _config->RpmResolution + rpmPredictIndexH] += (short)round(fuelTrimIntegral * 128 * (1 - yPredictMultiplier) * rpmPredictMultiplier);
+			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexL] += (short)round(fuelTrimIntegral * 128 * yPredictMultiplier * (1 - rpmPredictMultiplier));
+			_fuelTrimIntegralTable[yPredictIndexH * _config->RpmResolution + rpmPredictIndexH] += (short)round(fuelTrimIntegral * 128 * yPredictMultiplier * rpmPredictMultiplier);
 
 			fuelTrimIntegral =	 (_fuelTrimIntegralTable[yIndexL * _config->RpmResolution + rpmIndexL] * (1 - yMultiplier) * (1 - rpmMultiplier)
 								+ _fuelTrimIntegralTable[yIndexL * _config->RpmResolution + rpmIndexH] * (1 - yMultiplier) * rpmMultiplier

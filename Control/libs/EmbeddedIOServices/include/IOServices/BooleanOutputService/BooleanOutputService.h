@@ -18,12 +18,7 @@ namespace IOServices
 		}
 		
 	public:
-		static BooleanOutputServiceConfig* Cast(void *p)
-		{
-			return (BooleanOutputServiceConfig *)p;
-		}
-		
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(BooleanOutputServiceConfig);
 		}

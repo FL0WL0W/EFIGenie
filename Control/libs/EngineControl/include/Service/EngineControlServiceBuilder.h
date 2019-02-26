@@ -110,17 +110,27 @@ namespace Service
 			
 			return castedConfig;
 		}
-		
-		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+		template<typename T>
+		static const T* CastConfig(const void **config, unsigned int *size)
+		{
+			T *castedConfig = (T *)(*config);
+			const unsigned int confSize = castedConfig->Size();
+			*size += confSize;
+			*config = (const void *)((const unsigned char *)*config + confSize);
+			
+			return castedConfig;
+		}
+				
+		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
 		{
 			unsigned int size;
 			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			*config = (void *)((unsigned char *)*config + size);
+			*config = (const void *)((const unsigned char *)*config + size);
 			*totalSize += size;
 			return booleanOutputService;
 		}
-		
-		static IBooleanInputService * CreateBooleanInputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+				
+		static IBooleanInputService * CreateBooleanInputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
 		{
 			unsigned int size;
 			IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
@@ -128,19 +138,8 @@ namespace Service
 			*totalSize += size;
 			return booleanInputService;
 		}
-		
-		static IButtonService * CreateButtonService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
-		{
-			unsigned int size;
-			IButtonService *buttonService = IButtonService::CreateButtonService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			CallBackGroup *tickCallBackGroup = (CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
-			tickCallBackGroup->Add(IButtonService::TickCallBack, buttonService);
-			*config = (void *)((unsigned char *)*config + size);
-			*totalSize += size;
-			return buttonService;
-		}
-		
-		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+				
+		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
 		{
 			unsigned int size;
 			IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
@@ -148,8 +147,8 @@ namespace Service
 			*totalSize += size;
 			return floatOutputService;
 		}
-		
-		static IFloatInputService * CreateFloatInputService(ServiceLocator *serviceLocator, void **config, unsigned int *totalSize)
+
+		static IFloatInputService * CreateFloatInputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
 		{
 			unsigned int size;
 			IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
@@ -158,27 +157,27 @@ namespace Service
 			return floatInputService;
 		}
 		
-		static unsigned char GetServiceId(void **config, unsigned int *size)
+		static const unsigned char GetServiceId(const void **config, unsigned int *size)
 		{
-			unsigned char serviceId = *((unsigned char*)*config);
-			*config = (void *)((unsigned char*)*config + 1);
+			const unsigned char serviceId = *((const unsigned char*)*config);
+			*config = (void *)((const unsigned char*)*config + 1);
 			*size = 1;
 			return serviceId;
 		}
 		
 	public:
-		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *totalSize);
+		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize);
 		
-		static EngineControlServices::TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IInjectionConfig *CreateInjectionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IIgnitionConfig *CreateIgnitionConfig(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static IgnitionSchedulingService *CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
-		static ICrankCamDecoder *CreateDecoderService(ServiceLocator *serviceLocator, void *config, unsigned int *size);
+		static EngineControlServices::TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IFuelTrimService *CreateFuelTrimService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IFuelPumpService *CreateFuelPumpService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IInjectionConfig *CreateInjectionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IIgnitionConfig *CreateIgnitionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IgnitionSchedulingService *CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static ICrankCamDecoder *CreateDecoderService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 	};
 }

@@ -20,22 +20,17 @@ namespace IOServices
 		}
 		
 	public:
-		static FloatInputService_FrequencyPolynomialConfig<Degree>* Cast(void *p)
-		{
-			return (FloatInputService_FrequencyPolynomialConfig<Degree> *)p;
-		}
-		
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(FloatInputService_FrequencyPolynomialConfig<Degree>);
 		}
 		
 		unsigned short PwmPin;
 		unsigned short MinFrequency;
+		unsigned short DotSampleRate;
 		float A[Degree + 1];
 		float MinValue;
 		float MaxValue;
-		unsigned short DotSampleRate;
 	});
 
 	template<unsigned char Degree>

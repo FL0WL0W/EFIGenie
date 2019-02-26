@@ -17,7 +17,7 @@ namespace UnitTests
 		ServiceLocator *serviceLocator = new ServiceLocator();
 
 		ignitionConfigConfig->IgnitionAdvance64thDegree = 10 * 64;
-		ignitionConfigConfig->IgnitionDwellTime = 4*0.001;
+		ignitionConfigConfig->IgnitionDwellTime = 4*0.001f;
 
 		void *config = malloc(ignitionConfigConfig->Size() + 1);
 		*(unsigned char *)config = 1;

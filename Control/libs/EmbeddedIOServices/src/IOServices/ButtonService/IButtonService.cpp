@@ -33,7 +33,7 @@ namespace IOServices
 		((IButtonService*)buttonService)->Tick();
 	}
 
-	IButtonService* IButtonService::CreateButtonService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut)
+	IButtonService* IButtonService::CreateButtonService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
 		unsigned char inputServiceId = *((unsigned char*)config);
 		config = ((unsigned char *)config + 1);

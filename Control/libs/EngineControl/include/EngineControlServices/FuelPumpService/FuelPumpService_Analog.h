@@ -22,20 +22,12 @@ namespace EngineControlServices
 		{
 		}
 	public:
-		static FuelPumpService_AnalogConfig* Cast(void *p)
-		{
-			FuelPumpService_AnalogConfig* ret = (FuelPumpService_AnalogConfig*)p;
-			
-			ret->AnalogTable = (float *)(ret + 1);
-			
-			return ret;
-		}
-		
 		unsigned int Size()
 		{
 			return sizeof(FuelPumpService_AnalogConfig) +
 				sizeof(unsigned char) * RpmRes * YRes;
 		}
+		const float *AnalogTable() const { return (const float *)(this + 1); }
 
 		float PrimeValue;
 		float PrimeTime;
@@ -46,7 +38,6 @@ namespace EngineControlServices
 		float MaxY;
 		unsigned char RpmRes;
 		unsigned char YRes;
-		float *AnalogTable;
 	});
 	
 	class FuelPumpService_Analog : public IFuelPumpService
@@ -58,7 +49,7 @@ namespace EngineControlServices
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_throttlePositionService;
 
-		unsigned char _currentValue;
+		float _currentValue;
 		bool _isOn;
 	public:
 		bool Started = false;

@@ -22,14 +22,11 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static TachometerServiceConfig* Cast(void *p)
-		{
-			return (TachometerServiceConfig *)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(TachometerServiceConfig);
 		}
+		
 		unsigned char PulsesPer2Rpm;
 	});
 	

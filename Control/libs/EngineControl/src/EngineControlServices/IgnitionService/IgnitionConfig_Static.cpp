@@ -3,7 +3,7 @@
 #ifdef IGNITIONCONFIG_STATIC_H
 namespace EngineControlServices
 {
-	IgnitionConfig_Static::IgnitionConfig_Static(IgnitionConfig_StaticConfig *config)
+	IgnitionConfig_Static::IgnitionConfig_Static(const IgnitionConfig_StaticConfig *config)
 	{				
 		_config = config;
 		_ignitionTiming = IgnitionTiming();

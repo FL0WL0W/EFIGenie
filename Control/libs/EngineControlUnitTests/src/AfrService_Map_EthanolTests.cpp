@@ -54,7 +54,7 @@ namespace UnitTests
 													9000, 8400, 8400, 8400};	//100
 			
 			//ECT MULTIPLIER TABLE		   -40	 13	   67	 120
-			unsigned char ectMultiplierTable[4] = { 0.8 * 255, 0.85 * 255, 0.95 * 255, 1 * 255 };
+			unsigned char ectMultiplierTable[4] = { 0.8f * 255, 0.85f * 255, 0.95f * 255, 1 * 255 };
 
 			//TPS MIN AFR TABLE GAS values in 1/1024	 0		33	   67	  100
 			unsigned short tpsMinAfrTableGasTable[4] = { 16076, 15052, 14148, 13245 };
@@ -102,10 +102,6 @@ namespace UnitTests
 			memcpy(buildConfig, ectMultiplierTable, sizeof(ectMultiplierTable));
 			buildConfig = (void*)((unsigned char *)buildConfig + sizeof(ectMultiplierTable));
 
-			//Stoich table
-			memcpy(buildConfig, stoichTable, sizeof(stoichTable));
-			buildConfig = (void*)((unsigned char *)buildConfig + sizeof(stoichTable));
-
 			//TPS MIN AFR TABLE GAS
 			memcpy(buildConfig, tpsMinAfrTableGasTable, sizeof(tpsMinAfrTableGasTable));
 			buildConfig = (void*)((unsigned char *)buildConfig + sizeof(tpsMinAfrTableGasTable));
@@ -113,6 +109,10 @@ namespace UnitTests
 			//TPS MIN AFR TABLE ETHANOL
 			memcpy(buildConfig, tpsMinAfrTableEthanolTable, sizeof(tpsMinAfrTableEthanolTable));
 			buildConfig = (void*)((unsigned char *)buildConfig + sizeof(tpsMinAfrTableEthanolTable));
+
+			//Stoich table
+			memcpy(buildConfig, stoichTable, sizeof(stoichTable));
+			buildConfig = (void*)((unsigned char *)buildConfig + sizeof(stoichTable));
 
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
 				.WillRepeatedly(Return(5000));

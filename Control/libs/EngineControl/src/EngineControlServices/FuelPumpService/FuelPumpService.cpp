@@ -25,7 +25,7 @@ namespace EngineControlServices
 	{
 		_outputService->OutputSet();
 		
-		_timerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, _config->PrimeTime * _timerService->GetTicksPerSecond() + _timerService->GetTick(), true);
+		_timerService->ScheduleTask(&FuelPumpService::PrimeTaskOff, this, (unsigned int)round(_config->PrimeTime * _timerService->GetTicksPerSecond() + _timerService->GetTick()), true);
 	}
 	
 	void FuelPumpService::PrimeTaskOff(void *parameter)

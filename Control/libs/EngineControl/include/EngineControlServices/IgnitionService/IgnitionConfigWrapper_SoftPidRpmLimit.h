@@ -21,11 +21,7 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static IgnitionConfigWrapper_SoftPidRpmLimitConfig *Cast(void *p)
-		{
-			return (IgnitionConfigWrapper_SoftPidRpmLimitConfig *)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IgnitionConfigWrapper_SoftPidRpmLimitConfig);
 		}
@@ -39,7 +35,7 @@ namespace EngineControlServices
 	class IgnitionConfigWrapper_SoftPidRpmLimit : public IIgnitionConfig
 	{
 	protected:
-		IgnitionConfigWrapper_SoftPidRpmLimitConfig *_config;
+		const IgnitionConfigWrapper_SoftPidRpmLimitConfig *_config;
 		ITimerService *_timerService;
 		ICrankCamDecoder *_decoder;
 		IBooleanInputService *_booleanInputService;
@@ -49,7 +45,7 @@ namespace EngineControlServices
 		unsigned int _prevRpmTime;
 		float _integral;
 	public:
-		IgnitionConfigWrapper_SoftPidRpmLimit(IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
+		IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

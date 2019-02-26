@@ -14,9 +14,10 @@ namespace EngineControlServices
 	{
 		unsigned char fuelTrimsAdded = 0;
 		int fuelTrim = 0;
+		const unsigned short *fuelTrimChannelMask = _config->FuelTrimChannelMask();
 		for (int i = 0; i < _config->NumberOfFuelTrimChannels; i++)
 		{
-			if (_config->FuelTrimChannelMask[i] & (1 << cylinder))
+			if (fuelTrimChannelMask[i] & (1 << cylinder))
 			{
 				short channelTrim = _fuelTrimChannels[i]->GetFuelTrim(cylinder);
 				//if channelTrim is 0 then it might as well be off if it isn't actually off

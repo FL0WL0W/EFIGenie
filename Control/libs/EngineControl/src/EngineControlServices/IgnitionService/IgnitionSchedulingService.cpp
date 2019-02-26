@@ -4,7 +4,7 @@
 namespace EngineControlServices
 {
 	IgnitionSchedulingService::IgnitionSchedulingService(
-		IgnitionSchedulingServiceConfig *ignitionSchedulingServiceConfig,
+		const IgnitionSchedulingServiceConfig *ignitionSchedulingServiceConfig,
 		IIgnitionConfig *ignitionConfig,
 		IBooleanOutputService **ignitorOutputServices,
 		ITimerService *timerService,
@@ -44,6 +44,8 @@ namespace EngineControlServices
 		unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();
 		IgnitionTiming ignitionTiming = _ignitionConfig->GetIgnitionTiming();
 
+		const unsigned short *ignitorTdc = _ignitionSchedulingServiceConfig->IgnitorTdc();
+
 		for (unsigned char ignitor = 0; ignitor < _ignitionSchedulingServiceConfig->Ignitors; ignitor++)
 		{
 			unsigned int currentTickPlusSome = _timerService->GetTick() + 5;
@@ -56,20 +58,20 @@ namespace EngineControlServices
 				}
 				else
 				{
-					float degreesUntilFire = _ignitionSchedulingServiceConfig->IgnitorTdc[ignitor] - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
+					float degreesUntilFire = ignitorTdc[ignitor] - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
 					if (degreesUntilFire < 0)
 						degreesUntilFire += camResolution;
 					if (degreesUntilFire > camResolution)
 						degreesUntilFire -= camResolution >> 2;
 					if (degreesUntilFire < 0)
 						degreesUntilFire += camResolution;
-					unsigned int ignitionFireTick = scheduleTick + (scheduleTickPerDegree * degreesUntilFire);
+					unsigned int ignitionFireTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire));
 					_timerService->ReScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick);
 
 					//if ignition is not dwelling yet set both tasks
 					if (currentTickPlusSome < _ignitorDwellTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[ignitor]->Tick < 1431655765))
 					{
-						unsigned int ignitionDwellTick = ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond);
+						unsigned int ignitionDwellTick = (unsigned int)round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond));
 						_timerService->ReScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
 					}
 				}

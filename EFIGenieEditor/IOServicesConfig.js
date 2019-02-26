@@ -73,7 +73,6 @@ var IOServicesIni = {
         { AMinInputValue: { Type: "float", Label: "Min Input", Units: VoltUnits } },
         { AMaxInputValue: { Type: "float", Label: "Max Input", Value: 3.3, Units: VoltUnits } },
         { AITResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
-        { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
         { AITTable: { Type: "float", XResolution: "AITResolution", Label: "Voltage to Value", XLabel: "Input Voltage", ZLabel: "Value", XMin: "AMinInputValue", XMax: "AMaxInputValue", XUnits: VoltUnits, ZUnits: "./ValueUnits", Dialog: true } }
     ] },
 
@@ -94,7 +93,6 @@ var IOServicesIni = {
         { FMinFrequency: { Type: "uint16", Label: "Min Frequency", Value: 50, Min: 1, Units: FrequencyUnits } },
         { FMaxFrequency: { Type: "uint16", Label: "Max Frequency", Value: 100, Min: 1, Units: FrequencyUnits } },
         { FITResolution: { Type: "uint8", Label: "Resolution", Value: 11, Min: 1, Max: 255 } },
-        { TablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
         { FITTable: { Type: "float", XResolution: "FITResolution", Label: "Frequency to Value", XLabel: "Frequency", ZLabel: "Value", XMin: "FMinFrequency", XMax: "FMaxFrequency", XUnits: FrequencyUnits, ZUnits: "./ValueUnits", Dialog: true } }
     ] },
 
@@ -178,7 +176,6 @@ var IOServicesIni = {
         { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
         { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } },
         { PResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
-        { PTablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
         { PTable: { Type: "float", XResolution: "PResolution", Label: "Value to Duty Cycle", XLabel: "Value", ZLabel: "Duty Cycle", Max: 1, XMin: "MinValue", XMax: "MaxValue", XUnits: "./ValueUnits", ZUnits: PercentUnits, Dialog: true } }
     ] },
 
@@ -195,7 +192,6 @@ var IOServicesIni = {
         { MinValue: { Type: "float", Label: "Min Value", Units: "./ValueUnits" } },
         { MaxValue: { Type: "float", Label: "Max Value", Units: "./ValueUnits" } },
         { SResolution: { Type: "uint8", Label: "Resolution", Value: 8, Min: 1, Max: 255 } },
-        { STablePointer: { Type: "uint32", Label: "TablePointer", Hidden: true }},
         { STable: { Type: "float", XResolution: "SResolution", Label: "Value to Steps", XLabel: "Value", ZLabel: "Steps", XMin: "MinValue", XMax: "MaxValue", XUnits: "./ValueUnits", Dialog: true } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
     ] },

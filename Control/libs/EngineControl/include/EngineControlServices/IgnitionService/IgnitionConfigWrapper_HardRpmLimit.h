@@ -19,11 +19,7 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static IgnitionConfigWrapper_HardRpmLimitConfig *Cast(void *p)
-		{
-			return (IgnitionConfigWrapper_HardRpmLimitConfig *)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IgnitionConfigWrapper_HardRpmLimitConfig);
 		}
@@ -35,13 +31,13 @@ namespace EngineControlServices
 	class IgnitionConfigWrapper_HardRpmLimit : public IIgnitionConfig
 	{
 	protected:
-		IgnitionConfigWrapper_HardRpmLimitConfig *_config;
+		const IgnitionConfigWrapper_HardRpmLimitConfig *_config;
 		ICrankCamDecoder *_decoder;
 		IBooleanInputService *_booleanInputService;
 		IIgnitionConfig *_child;
 		bool _limitEnabled;
 	public:
-		IgnitionConfigWrapper_HardRpmLimit(IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
+		IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

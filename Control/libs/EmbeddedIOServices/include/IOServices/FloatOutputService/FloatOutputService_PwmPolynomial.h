@@ -20,21 +20,16 @@ namespace IOServices
 		}
 		
 	public:
-		static FloatOutputService_PwmPolynomialConfig* Cast(void *p)
-		{
-			return (FloatOutputService_PwmPolynomialConfig *)p;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
 		}
 		
 		unsigned short PwmPin;
+		unsigned short Frequency;
 		float A[Degree+1];
 		float MinDutyCycle;
 		float MaxDutyCycle;
-		unsigned short Frequency;
 	});
 
 	template<unsigned char Degree>

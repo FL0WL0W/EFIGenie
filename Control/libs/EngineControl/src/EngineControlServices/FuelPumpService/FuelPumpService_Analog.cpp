@@ -31,10 +31,10 @@ namespace EngineControlServices
 	
 	void FuelPumpService_Analog::Prime()
 	{
-		_currentValue= _config->PrimeValue;
+		_currentValue = _config->PrimeValue;
 		_outputService->SetOutput(_currentValue);
 		
-		_timerService->ScheduleTask(&FuelPumpService_Analog::PrimeTaskOff, this, _config->PrimeTime * _timerService->GetTicksPerSecond() + _timerService->GetTick(), true);
+		_timerService->ScheduleTask(&FuelPumpService_Analog::PrimeTaskOff, this, (unsigned int)round(_config->PrimeTime * _timerService->GetTicksPerSecond() + _timerService->GetTick()), true);
 	}
 	
 	void FuelPumpService_Analog::PrimeTaskOff(void *parameter)
@@ -62,7 +62,7 @@ namespace EngineControlServices
 			}
 		}
 		
-		_currentValue = InterpolateTable2<float>(_decoder->GetRpm(), _config->MaxRpm, 0, _config->RpmRes, y, _config->MaxY, 0, _config->YRes, _config->AnalogTable);
+		_currentValue = InterpolateTable2<float>(_decoder->GetRpm(), _config->MaxRpm, 0, _config->RpmRes, y, _config->MaxY, 0, _config->YRes, _config->AnalogTable());
 		
 		On();
 	}

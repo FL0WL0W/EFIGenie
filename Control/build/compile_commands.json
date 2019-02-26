@@ -1,0 +1,361 @@
+[
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\HardwareAbstraction\\TimerService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\HardwareAbstraction\\TimerService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/HardwareAbstraction/TimerService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\BooleanInputService\\BooleanInputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\BooleanInputService\\BooleanInputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/BooleanInputService/BooleanInputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\BooleanInputService\\IBooleanInputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\BooleanInputService\\IBooleanInputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/BooleanInputService/IBooleanInputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\BooleanOutputService\\BooleanOutputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\BooleanOutputService\\BooleanOutputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/BooleanOutputService/BooleanOutputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\BooleanOutputService\\IBooleanOuputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\BooleanOutputService\\IBooleanOuputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/BooleanOutputService/IBooleanOuputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\ButtonService\\ButtonService_Polling.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\ButtonService\\ButtonService_Polling.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/ButtonService/ButtonService_Polling.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\ButtonService\\IButtonService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\ButtonService\\IButtonService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/ButtonService/IButtonService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatInputService\\FloatInputService_AnalogInterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatInputService\\FloatInputService_AnalogInterpolatedTable.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatInputService/FloatInputService_AnalogInterpolatedTable.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatInputService\\FloatInputService_FaultDetectionWrapper.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatInputService\\FloatInputService_FaultDetectionWrapper.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatInputService/FloatInputService_FaultDetectionWrapper.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatInputService\\FloatInputService_FrequencyInterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatInputService\\FloatInputService_FrequencyInterpolatedTable.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatInputService/FloatInputService_FrequencyInterpolatedTable.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatInputService\\IFloatInputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatInputService\\IFloatInputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatInputService/IFloatInputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatOutputService\\FloatOutputService_PwmInterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatOutputService\\FloatOutputService_PwmInterpolatedTable.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatOutputService/FloatOutputService_PwmInterpolatedTable.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatOutputService\\FloatOutputService_StepperInterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatOutputService\\FloatOutputService_StepperInterpolatedTable.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatOutputService/FloatOutputService_StepperInterpolatedTable.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\FloatOutputService\\IFloatOutputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\FloatOutputService\\IFloatOutputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/FloatOutputService/IFloatOutputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\StepperOutputService\\IStepperOutputService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\StepperOutputService\\IStepperOutputService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/StepperOutputService/IStepperOutputService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\StepperOutputService\\StepperOutputService_FullStepControl.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\StepperOutputService\\StepperOutputService_FullStepControl.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/StepperOutputService/StepperOutputService_FullStepControl.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\StepperOutputService\\StepperOutputService_HalfStepControl.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\StepperOutputService\\StepperOutputService_HalfStepControl.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/StepperOutputService/StepperOutputService_HalfStepControl.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\StepperOutputService\\StepperOutputService_StaticStepCalibrationWrapper.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\StepperOutputService\\StepperOutputService_StaticStepCalibrationWrapper.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/StepperOutputService/StepperOutputService_StaticStepCalibrationWrapper.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\IOServices\\StepperOutputService\\StepperOutputService_StepDirectionControl.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\IOServices\\StepperOutputService\\StepperOutputService_StepDirectionControl.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/IOServices/StepperOutputService/StepperOutputService_StepDirectionControl.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Interpolation.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Interpolation.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Interpolation.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\ServiceLocator.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\ServiceLocator.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/ServiceLocator.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\CrankCamDecoders\\CMakeFiles\\CrankCamDecoders.dir\\src\\Gm24xDecoder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\CrankCamDecoders\\src\\Gm24xDecoder.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/CrankCamDecoders/src/Gm24xDecoder.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\AfrServicee\\AfrService_Map_Ethanol.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\AfrServicee\\AfrService_Map_Ethanol.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/AfrServicee/AfrService_Map_Ethanol.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\AfrServicee\\IAfrServicee.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\AfrServicee\\IAfrServicee.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/AfrServicee/IAfrServicee.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelPumpService/FuelPumpService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService_Analog.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService_Analog.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelPumpService/FuelPumpService_Analog.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelPumpService\\IFuelPumpService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelPumpService\\IFuelPumpService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelPumpService/IFuelPumpService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_InterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_InterpolatedTable.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_InterpolatedTable.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_MultiChannel.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_MultiChannel.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_MultiChannel.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelTrimService\\IFuelTrimService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelTrimService\\IFuelTrimService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelTrimService/IFuelTrimService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IdleControlService\\IIdleControlService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IdleControlService\\IIdleControlService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IdleControlService/IIdleControlService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IdleControlService\\IdleControlService_Pid.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IdleControlService\\IdleControlService_Pid.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IdleControlService/IdleControlService_Pid.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionConfigWrapper_HardRpmLimit.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionConfigWrapper_HardRpmLimit.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionConfigWrapper_HardRpmLimit.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionConfigWrapper_SoftPidRpmLimit.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionConfigWrapper_SoftPidRpmLimit.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionConfigWrapper_SoftPidRpmLimit.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionConfig_Map_Ethanol.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionConfig_Map_Ethanol.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionConfig_Map_Ethanol.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionConfig_Static.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionConfig_Static.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionConfig_Static.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionSchedulingService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionSchedulingService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionSchedulingService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\InjectionService\\InjectionConfigWrapper_DFCO.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\InjectionService\\InjectionConfigWrapper_DFCO.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/InjectionService/InjectionConfigWrapper_DFCO.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\InjectionService\\InjectionConfig_SD.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\InjectionService\\InjectionConfig_SD.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/InjectionService/InjectionConfig_SD.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\InjectionService\\InjectionSchedulingService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\InjectionService\\InjectionSchedulingService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/InjectionService/InjectionSchedulingService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\PrimeService\\IPrimeService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\PrimeService\\IPrimeService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/PrimeService/IPrimeService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\PrimeService\\PrimeService_StaticPulseWidth.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\PrimeService\\PrimeService_StaticPulseWidth.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/PrimeService/PrimeService_StaticPulseWidth.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\TachometerService\\TachometerService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\TachometerService\\TachometerService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/TachometerService/TachometerService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\Service\\EngineControlServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\Service\\EngineControlServiceBuilder.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/Service/EngineControlServiceBuilder.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\TransmissionControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\TransmissionControl\\CMakeFiles\\TransmissionControl.dir\\src\\Service\\TransmissionControlServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\TransmissionControl\\src\\Service\\TransmissionControlServiceBuilder.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl/src/Service/TransmissionControlServiceBuilder.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\TransmissionControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\TransmissionControl\\CMakeFiles\\TransmissionControl.dir\\src\\TransmissionControlServices\\GearControlService\\GearControlService_ButtonShift.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\TransmissionControl\\src\\TransmissionControlServices\\GearControlService\\GearControlService_ButtonShift.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl/src/TransmissionControlServices/GearControlService/GearControlService_ButtonShift.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\TransmissionControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\TransmissionControl\\CMakeFiles\\TransmissionControl.dir\\src\\TransmissionControlServices\\ShiftService\\ShiftService_Solenoid.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\TransmissionControl\\src\\TransmissionControlServices\\ShiftService\\ShiftService_Solenoid.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl/src/TransmissionControlServices/ShiftService/ShiftService_Solenoid.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\CMakeFiles\\gmock_main.dir\\__\\googletest\\src\\gtest-all.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googletest\\src\\gtest-all.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googletest/src/gtest-all.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\CMakeFiles\\gmock_main.dir\\src\\gmock-all.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googlemock\\src\\gmock-all.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googlemock/src/gmock-all.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\CMakeFiles\\gmock_main.dir\\src\\gmock_main.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googlemock\\src\\gmock_main.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googlemock/src/gmock_main.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\CMakeFiles\\gmock.dir\\__\\googletest\\src\\gtest-all.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googletest\\src\\gtest-all.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googletest/src/gtest-all.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\CMakeFiles\\gmock.dir\\src\\gmock-all.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googlemock\\src\\gmock-all.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googlemock/src/gmock-all.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\gtest\\CMakeFiles\\gtest.dir\\src\\gtest-all.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googletest\\src\\gtest-all.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googletest/src/gtest-all.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest  /DWIN32 /D_WINDOWS /W4 /GR  /MDd /Zi /Ob0 /Od /RTC1   -GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi -wd4702 -D_UNICODE -DUNICODE -DWIN32 -D_WIN32 -DSTRICT -DWIN32_LEAN_AND_MEAN -DGTEST_HAS_PTHREAD=0 -EHsc -D_HAS_EXCEPTIONS=1  /Folibs\\googletest\\googlemock\\gtest\\CMakeFiles\\gtest_main.dir\\src\\gtest_main.cc.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\googletest\\googletest\\src\\gtest_main.cc",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest/googletest/src/gtest_main.cc"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\AfrService_Map_EthanolTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\AfrService_Map_EthanolTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/AfrService_Map_EthanolTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\FuelPumpServiceTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\FuelPumpServiceTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/FuelPumpServiceTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\IgnitionConfig_StaticTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\IgnitionConfig_StaticTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/IgnitionConfig_StaticTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\IgnitionSchedulingServiceTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\IgnitionSchedulingServiceTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/IgnitionSchedulingServiceTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\PistonEngineServiceTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\PistonEngineServiceTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/PistonEngineServiceTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\CrankCamDecoders\\include -I..\\libs\\CrankCamDecodersMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\PrimeService_StaticPulseWidthTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\PrimeService_StaticPulseWidthTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/PrimeService_StaticPulseWidthTests.cpp"
+}
+]

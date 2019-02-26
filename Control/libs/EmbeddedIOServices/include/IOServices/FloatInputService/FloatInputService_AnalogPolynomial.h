@@ -19,22 +19,17 @@ namespace IOServices
 			
 		}
 		
-	public:
-		static FloatInputService_AnalogPolynomialConfig<Degree>* Cast(void *p)
-		{
-			return (FloatInputService_AnalogPolynomialConfig<Degree> *)p;
-		}
-		
-		unsigned int Size()
+	public:		
+		unsigned int Size() const
 		{
 			return sizeof(FloatInputService_AnalogPolynomialConfig<Degree>);
 		}
 		
 		unsigned short AdcPin;
+		unsigned short DotSampleRate;
 		float A[Degree+1];
 		float MinValue;
 		float MaxValue;
-		unsigned short DotSampleRate;
 	});
 	
 	template<unsigned char Degree>

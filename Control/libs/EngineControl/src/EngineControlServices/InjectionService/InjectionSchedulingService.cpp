@@ -4,7 +4,7 @@
 namespace EngineControlServices
 {
 	InjectionSchedulingService::InjectionSchedulingService(
-		InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
+		const InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
 		IInjectionConfig *injectionConfig,
 		IBooleanOutputService **injectorOutputServices,
 		ITimerService *timerService,
@@ -39,6 +39,8 @@ namespace EngineControlServices
 		unsigned int scheduleTick = _timerService->GetTick();
 		unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();	
 
+		const unsigned short *injectorTdc = _injectionSchedulingServiceConfig->InjectorTdc();
+
 		if (isSequential)
 		{
 			for (unsigned char injector = 0; injector < _injectionSchedulingServiceConfig->Injectors; injector++)
@@ -55,15 +57,15 @@ namespace EngineControlServices
 					else
 					{
 						float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
-						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
+						unsigned int injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = _injectionSchedulingServiceConfig->InjectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
 							degreesUntilOpen += 720;
-						unsigned int injectorOpenTick = scheduleTick + (scheduleTickPerDegree * degreesUntilOpen);
+						unsigned int injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
 						_timerService->ReScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
 						_timerService->ReScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
@@ -85,30 +87,30 @@ namespace EngineControlServices
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
 						InjectorTiming injectorTiming = _injectionConfig->GetInjectorTiming(injector);
 						float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
-						unsigned int injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
+						unsigned int injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = _injectionSchedulingServiceConfig->InjectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
 							degreesUntilOpen += 720;
-						unsigned int injectorOpenTick = scheduleTick + (scheduleTickPerDegree * degreesUntilOpen);
+						unsigned int injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
 						_timerService->ReScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
 						_timerService->ReScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
 						
 						injectorTiming = _injectionConfig->GetInjectorTiming(injector + injectosToGoTo);
 						injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
-						injectorPulseWidthTick = injectorTiming.PulseWidth * ticksPerSecond;
+						injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						degreesUntilOpen = _injectionSchedulingServiceConfig->InjectorTdc[injector + injectosToGoTo] + injectorStartPosition - scheduleCamPosition;
+						degreesUntilOpen = injectorTdc[injector + injectosToGoTo] + injectorStartPosition - scheduleCamPosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
 							degreesUntilOpen += 720;
-						injectorOpenTick = scheduleTick + (scheduleTickPerDegree * degreesUntilOpen);
+						injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
 						_timerService->ReScheduleTask(_injectorOpenTask[injector + injectosToGoTo], injectorOpenTick);
 						_timerService->ReScheduleTask(_injectorCloseTask[injector + injectosToGoTo], injectorCloseTick);

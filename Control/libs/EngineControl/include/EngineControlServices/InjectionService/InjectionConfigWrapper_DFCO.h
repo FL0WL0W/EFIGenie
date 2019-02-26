@@ -19,11 +19,6 @@ namespace EngineControlServices
 
 		}
 	public:
-		static InjectionConfigWrapper_DFCOConfig * Cast(void *p)
-		{
-			return (InjectionConfigWrapper_DFCOConfig *)p;
-		}
-
 		unsigned int Size()
 		{
 			return sizeof(InjectionConfigWrapper_DFCOConfig);
@@ -37,13 +32,13 @@ namespace EngineControlServices
 	class InjectionConfigWrapper_DFCO : public IInjectionConfig
 	{
 	protected:
-		InjectionConfigWrapper_DFCOConfig *_config;
+		const InjectionConfigWrapper_DFCOConfig *_config;
 		IFloatInputService *_throttlePositionService;
 		ICrankCamDecoder *_decoder;
 		IInjectionConfig *_child;
 		bool _dfcoEnabled;
 	public:
-		InjectionConfigWrapper_DFCO(InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child);
+		InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child);
 		InjectorTiming GetInjectorTiming(unsigned char injector);
 	};
 }

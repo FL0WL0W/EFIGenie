@@ -24,24 +24,7 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static AfrService_Map_EthanolConfig* Cast(void *p)
-		{
-			AfrService_Map_EthanolConfig *ret = (AfrService_Map_EthanolConfig *)p;
-
-			ret->GasMap = (unsigned short *)(ret + 1);
-			ret->EthanolMap = ret->GasMap + ret->AfrRpmResolution * ret->AfrMapResolution;
-
-			ret->EctMultiplierTable = (unsigned char *)(ret->EthanolMap + ret->AfrRpmResolution * ret->AfrMapResolution);
-
-			ret->TpsMinAfrGas = (unsigned short *)(ret->EctMultiplierTable + ret->AfrEctResolution);
-			ret->TpsMinAfrEthanol = ret->TpsMinAfrGas + ret->AfrTpsResolution;
-			
-			ret->StoichTable = ret->TpsMinAfrEthanol + ret->AfrTpsResolution;
-
-			return ret;
-		}
-
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(AfrService_Map_EthanolConfig) +
 				sizeof(unsigned short) * AfrRpmResolution * AfrMapResolution +
@@ -52,6 +35,13 @@ namespace EngineControlServices
 				sizeof(unsigned short) * StoichResolution;
 		}
 		
+		const unsigned short * GasMap() const { return (const unsigned short *)(this + 1); } // value in 1/1024
+		const unsigned short * EthanolMap() const { return (const unsigned short *)(this + 1) + (AfrRpmResolution * AfrMapResolution); } // value in 1/1024
+		const unsigned char * EctMultiplierTable() const { return (const unsigned char *)((const unsigned short *)(this + 1) + (2 * AfrRpmResolution * AfrMapResolution)); } // value in 1/255
+		const unsigned short * TpsMaxAfrGas() const { return (const unsigned short *)((const unsigned char *)((const unsigned short *)(this + 1) + (2 * AfrRpmResolution * AfrMapResolution)) + AfrEctResolution); } // value in 1/255
+		const unsigned short * TpsMaxAfrEthanol() const { return (const unsigned short *)((const unsigned char *)((const unsigned short *)(this + 1) + (2 * AfrRpmResolution * AfrMapResolution)) + AfrEctResolution) + AfrTpsResolution; } // value in 1/255
+		const unsigned short * StoichTable() const { return (const unsigned short *)((const unsigned char *)((const unsigned short *)(this + 1) + (2 * AfrRpmResolution * AfrMapResolution)) + AfrEctResolution) + (2 * AfrTpsResolution); } // value in 1/255
+
 		float StartupAfrMultiplier;
 		float StartupAfrDelay;
 		float StartupAfrDecay;
@@ -60,20 +50,12 @@ namespace EngineControlServices
 		float MaxMapBar;
 		unsigned char AfrRpmResolution;
 		unsigned char AfrMapResolution;
-		unsigned short *GasMap; // value in 1/1024
-		unsigned short *EthanolMap; // value in 1/1024
 		
 		short MaxEct;
 		short MinEct;
 		unsigned char AfrEctResolution;
-		unsigned char *EctMultiplierTable; // values in 1/255
-		
 		unsigned char AfrTpsResolution;
-		unsigned short *TpsMaxAfrGas; // value in 1/1024
-		unsigned short *TpsMaxAfrEthanol; // value in 1/1024
-		
 		unsigned char StoichResolution;
-		unsigned short *StoichTable; // value in 1/1024
 	});
 	
 class AfrService_Map_Ethanol : public IAfrService

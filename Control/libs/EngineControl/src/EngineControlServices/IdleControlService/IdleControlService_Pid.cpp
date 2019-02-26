@@ -51,19 +51,19 @@ namespace EngineControlServices
 			return;
 		_lastReadTick = _hardwareAbstractionCollection->TimerService->GetTick();
 		
-		InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->EctResolution);
-		float idleAirmass = _config->IdleAirmass[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _config->IdleAirmass[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
-		unsigned short idleTargetRpm = _config->IdleTargetRpm[ectInterpolation.IndexL] * (1 - ectInterpolation.Multiplier) + _config->IdleTargetRpm[ectInterpolation.IndexH] * ectInterpolation.Multiplier;
+		const InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->EctResolution);
+		float idleAirmass = InterpolateTable1<float>(ectInterpolation, _config->IdleAirmass());
+		unsigned short idleTargetRpm = InterpolateTable1<unsigned short>(ectInterpolation, _config->IdleTargetRpm());
 		
 		if (_vehicleSpeedService != 0)
 		{
-			InterpolationResponse speedtInterpolation = Interpolate(_vehicleSpeedService->Value, _config->SpeedThreshold, 0, _config->SpeedResolution);
-			idleAirmass += _config->IdleAirmassSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _config->IdleAirmassSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
-			idleTargetRpm += _config->IdleTargetRpmSpeedAdder[speedtInterpolation.IndexL] * (1 - speedtInterpolation.Multiplier) + _config->IdleTargetRpmSpeedAdder[speedtInterpolation.IndexH] * speedtInterpolation.Multiplier;
+			const InterpolationResponse speedtInterpolation = Interpolate(_vehicleSpeedService->Value, _config->SpeedThreshold, 0, _config->SpeedResolution);
+			idleAirmass += InterpolateTable1<float>(speedtInterpolation, _config->IdleAirmassSpeedAdder());
+			idleTargetRpm += InterpolateTable1<unsigned short>(speedtInterpolation, _config->IdleTargetRpmSpeedAdder());
 		}
 		
 		short thisRpmError = idleTargetRpm - rpm;
-		int rpmErrorDot = (thisRpmError - RpmError) / dt;
+		int rpmErrorDot = (int)round((thisRpmError - RpmError) / dt);
 		RpmError = thisRpmError;
 		_integral += RpmError * _config->I * dt;
 
@@ -77,7 +77,7 @@ namespace EngineControlServices
 		float temperature = 30;
 		if (_intakeAirTemperatureService != 0)
 			temperature = _intakeAirTemperatureService->Value;
-		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / ((_config->GasConstant / 10.0f) * (temperature + 273.15));   // kg/m^3
+		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / ((_config->GasConstant / 10.0f) * (temperature + 273.15f));   // kg/m^3
 		airDensity *= 1000000; //g/mm^3
 		
 		float pressure = 500000; // default to 50 kpa

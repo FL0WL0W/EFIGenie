@@ -22,29 +22,21 @@ namespace EngineControlServices
 
 		}
 	public:
-		static IgnitionSchedulingServiceConfig* Cast(void *p)
-		{
-			IgnitionSchedulingServiceConfig *ignitorService = (IgnitionSchedulingServiceConfig *)p;
-
-			ignitorService->IgnitorTdc = (unsigned short*)(ignitorService + 1);
-
-			return ignitorService;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IgnitionSchedulingServiceConfig)
 				+ sizeof(unsigned short) * Ignitors;
 		}
+		const unsigned short *IgnitorTdc() const { return (const unsigned short*)(this + 1); }
 
 		bool SequentialRequired;
 		unsigned char Ignitors;
-		unsigned short *IgnitorTdc;
 	});
 
 	class IgnitionSchedulingService
 	{
 	protected:
-		IgnitionSchedulingServiceConfig *_ignitionSchedulingServiceConfig;
+		const IgnitionSchedulingServiceConfig *_ignitionSchedulingServiceConfig;
 		ITimerService *_timerService;
 		ICrankCamDecoder *_decoder;
 		IIgnitionConfig *_ignitionConfig;
@@ -52,7 +44,7 @@ namespace EngineControlServices
 		HardwareAbstraction::Task **_ignitorFireTask;
 	public:
 		IgnitionSchedulingService(
-			IgnitionSchedulingServiceConfig *ignitionSchedulingServiceConfig,
+			const IgnitionSchedulingServiceConfig *ignitionSchedulingServiceConfig,
 			IIgnitionConfig *ignitionConfig,
 			IBooleanOutputService **ignitorOutputServices,
 			ITimerService *timerService,

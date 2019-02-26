@@ -10,7 +10,7 @@ namespace Service
 
 	void* ServiceLocator::Locate(unsigned short serviceId)
 	{
-		std::map<unsigned short, void *>::iterator it = _services.find(serviceId);
+		const std::map<unsigned short, void *>::iterator it = _services.find(serviceId);
 		if (it != _services.end())
 			return it->second;
 		return 0;
@@ -18,7 +18,7 @@ namespace Service
 
 	void ServiceLocator::Unregister(unsigned short serviceId)
 	{
-		std::map<unsigned short, void *>::iterator it = _services.find(serviceId);
+		const std::map<unsigned short, void *>::iterator it = _services.find(serviceId);
 		if (it != _services.end())
 			_services.erase(it);
 	}

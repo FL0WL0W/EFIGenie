@@ -19,27 +19,19 @@ namespace IOServices
 		}
 		
 	public:
-		static FloatOutputService_PwmInterpolatedTableConfig* Cast(void *p)
-		{
-			FloatOutputService_PwmInterpolatedTableConfig *ret = (FloatOutputService_PwmInterpolatedTableConfig *)p;
-
-			ret->Table = (float *)(ret + 1);
-
-			return ret;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_PwmInterpolatedTableConfig) +
 				(sizeof(float) * Resolution);
 		}
+		
+		const float *Table() const { return (float *)(this + 1); }
 		
 		unsigned short PwmPin;
 		unsigned short Frequency;
 		float MinValue;
 		float MaxValue;
 		unsigned char Resolution;
-		float *Table;
 	});
 
 	class FloatOutputService_PwmInterpolatedTable : public IFloatOutputService

@@ -22,17 +22,7 @@ namespace EngineControlServices
 
 		}
 	public:
-		static IdleControlService_PidConfig* Cast(void *p)
-		{
-			IdleControlService_PidConfig *ret = (IdleControlService_PidConfig *)p;
-
-			ret->IdleAirmass = (float *)(ret + 1);
-			ret->IdleTargetRpm = (unsigned short *)(ret->IdleAirmass + ret->EctResolution);
-			ret->IdleAirmassSpeedAdder = (float *)(ret->IdleTargetRpm + ret->SpeedResolution);
-			ret->IdleTargetRpmSpeedAdder = (short *)(ret->IdleAirmassSpeedAdder + ret->SpeedResolution);
-			return ret;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IdleControlService_PidConfig) + 
 				(sizeof(float) * EctResolution) + 
@@ -40,6 +30,12 @@ namespace EngineControlServices
 				(sizeof(float)) * SpeedResolution +
 				(sizeof(short)) * SpeedResolution;
 		}
+
+		const float *IdleAirmass() const { return (const float *)(this + 1); }
+		const unsigned short *IdleTargetRpm() const { return (const unsigned short *)((const float *)(this + 1) + EctResolution); }
+		const float *IdleAirmassSpeedAdder() const { return (const float *)((const unsigned short *)((const float *)(this + 1) + EctResolution) + EctResolution); }
+		const unsigned short *IdleTargetRpmSpeedAdder() const { return (const unsigned short *)((const float *)((const unsigned short *)((const float *)(this + 1) + EctResolution) + EctResolution) + SpeedResolution); }
+
 		float TpsThreshold;
 		unsigned char SpeedThreshold;
 		float P;
@@ -54,11 +50,7 @@ namespace EngineControlServices
 		char MaxEct;
 		char MinEct;
 		unsigned char EctResolution;
-		float *IdleAirmass;
-		unsigned short *IdleTargetRpm;
 		unsigned char SpeedResolution;
-		float *IdleAirmassSpeedAdder;
-		short *IdleTargetRpmSpeedAdder;
 	});
 
 	class IdleControlService_Pid : public IIdleControlService

@@ -19,11 +19,7 @@ namespace EngineControlServices
 
 		}
 	public:
-		static IgnitionConfig_StaticConfig *Cast(void *p)
-		{
-			return (IgnitionConfig_StaticConfig *)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IgnitionConfig_StaticConfig);
 		}
@@ -35,10 +31,10 @@ namespace EngineControlServices
 	class IgnitionConfig_Static : public IIgnitionConfig
 	{
 	protected:
-		IgnitionConfig_StaticConfig *_config;
+		const IgnitionConfig_StaticConfig *_config;
 		IgnitionTiming _ignitionTiming;
 	public:
-		IgnitionConfig_Static(IgnitionConfig_StaticConfig *config);
+		IgnitionConfig_Static(const IgnitionConfig_StaticConfig *config);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

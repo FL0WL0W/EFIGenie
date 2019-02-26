@@ -20,25 +20,17 @@ namespace IOServices
 		}
 		
 	public:
-		static FloatOutputService_StepperInterpolatedTableConfig* Cast(void *p)
-		{
-			FloatOutputService_StepperInterpolatedTableConfig *ret = (FloatOutputService_StepperInterpolatedTableConfig *)p;
-
-			ret->Table = (int *)(ret + 1);
-
-			return ret;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_StepperInterpolatedTableConfig) +
 				(sizeof(int) * Resolution);
 		}
 		
+		const int *Table() const { return (int *)(this + 1); }
+
 		float MinValue;
 		float MaxValue;
 		unsigned char Resolution;
-		int *Table;
 	});
 
 	class FloatOutputService_StepperInterpolatedTable : public IFloatOutputService

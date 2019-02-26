@@ -12,7 +12,7 @@ namespace IOServices
 		virtual void Step(int steps) = 0;
 		virtual void Calibrate() = 0;
 
-		static IStepperOutputService* CreateStepperOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut);
+		static IStepperOutputService* CreateStepperOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut);
 	};
 }
 #endif

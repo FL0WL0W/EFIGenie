@@ -21,14 +21,11 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static PrimeService_StaticPulseWidthConfig* Cast(void *p)
-		{
-			return (PrimeService_StaticPulseWidthConfig *)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(PrimeService_StaticPulseWidthConfig);
 		}
+
 		float PulseWidth;
 	});
 	

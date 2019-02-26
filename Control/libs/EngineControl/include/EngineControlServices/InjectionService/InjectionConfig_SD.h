@@ -23,22 +23,7 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static InjectionConfig_SDConfig * Cast(void *p)
-		{
-			InjectionConfig_SDConfig *ret = (InjectionConfig_SDConfig *)p;
-
-			ret->VolumetricEfficiencyMap = (unsigned short *)(ret + 1);
-			ret->InjectorGramsPerMinute = (unsigned short *)(ret->VolumetricEfficiencyMap + ret->VeRpmResolution * ret->VeMapResolution);
-			ret->ShortPulseAdder = (short *)(ret->InjectorGramsPerMinute + ret->Injectors);
-			ret->Offset = (ret->ShortPulseAdder + ret->ShortPulseAdderResolution);
-			ret->TemperatureBias = (unsigned char *)(ret->Offset + ret->OffsetMapResolution *ret->OffsetVoltageResolution);
-			ret->TpsDotAdder = (short *)(ret->TemperatureBias + ret->TemperatureBiasResolution);
-			ret->MapDotAdder = ret->TpsDotAdder + ret->TpsDotAdderResolution;
-
-			return ret;
-		}
-		
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(InjectionConfig_SDConfig) +
 				sizeof(unsigned short) * VeRpmResolution * VeMapResolution +
@@ -49,6 +34,13 @@ namespace EngineControlServices
 				sizeof(short) * TpsDotAdderResolution +
 				sizeof(short) * MapDotAdderResolution;
 		}
+		const unsigned short *VolumetricEfficiencyMap() const { return (const unsigned short *)(this + 1); }
+		const unsigned short *InjectorGramsPerMinute() const { return (const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution); }
+		const short *ShortPulseAdder() const { return (const short *)((const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution) + Injectors); }
+		const short *Offset() const { return (const short *)((const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution) + Injectors) + ShortPulseAdderResolution; }
+		const unsigned char *TemperatureBias() const { return (const unsigned char *)((const short *)((const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution) + Injectors) + ShortPulseAdderResolution + OffsetMapResolution * OffsetVoltageResolution); }
+		const short *TpsDotAdder() const { return (const short *)((const unsigned char *)((const short *)((const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution) + Injectors) + ShortPulseAdderResolution + OffsetMapResolution * OffsetVoltageResolution) + TemperatureBiasResolution); }
+		const short *MapDotAdder() const { return (const short *)((const unsigned char *)((const short *)((const unsigned short *)((const unsigned short *)(this + 1) + VeRpmResolution * VeMapResolution) + Injectors) + ShortPulseAdderResolution + OffsetMapResolution * OffsetVoltageResolution) + TemperatureBiasResolution) + TpsDotAdderResolution; }
 		
 		unsigned short GasConstant;//value in 0.1 unit
 		unsigned short Ml8thPerCylinder;
@@ -58,38 +50,31 @@ namespace EngineControlServices
 		float MaxMap;
 		unsigned char VeRpmResolution;
 		unsigned char VeMapResolution;
-		unsigned short *VolumetricEfficiencyMap;
 		
 		unsigned char Injectors;
-		unsigned short *InjectorGramsPerMinute;
 		
 		float ShortPulseLimit;
 		unsigned char ShortPulseAdderResolution;
-		short *ShortPulseAdder;
 		
 		float VoltageMax;
 		float VoltageMin;
 		unsigned char OffsetMapResolution;
 		unsigned char OffsetVoltageResolution;
-		short *Offset;
 		
 		unsigned char TemperatureBiasResolution;
 		float MaxTemperatureBias;
-		unsigned char *TemperatureBias;
 		
 		float MaxTpsDot;
 		unsigned char TpsDotAdderResolution;
-		short *TpsDotAdder;		
 		
 		float MaxMapDot;
 		unsigned char MapDotAdderResolution;
-		short *MapDotAdder;
 	});
 	
 class InjectionConfig_SD : public IInjectionConfig
 	{
 	protected:
-		InjectionConfig_SDConfig *_config;
+		const InjectionConfig_SDConfig *_config;
 		ICrankCamDecoder *_decoder;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IAfrService *_afrService;
@@ -101,7 +86,7 @@ class InjectionConfig_SD : public IInjectionConfig
 		
 	public:
 		InjectionConfig_SD(
-			InjectionConfig_SDConfig *config, 
+			const InjectionConfig_SDConfig *config, 
 			ICrankCamDecoder *decoder,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IAfrService *afrService,

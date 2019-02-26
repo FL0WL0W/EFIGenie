@@ -30,15 +30,15 @@ namespace UnitTests
 		IgnitionSchedulingServiceTests()
 		{
 			EXPECT_CALL(_timerService, GetTick()).WillOnce(Return(0));
-			IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = (IgnitionSchedulingServiceConfig *)malloc(sizeof(IgnitionSchedulingServiceConfig));
+			IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = (IgnitionSchedulingServiceConfig *)malloc(sizeof(IgnitionSchedulingServiceConfig) + 8);
 
 			ignitionSchedulingConfig->SequentialRequired = false;
 			ignitionSchedulingConfig->Ignitors = 4;
-			ignitionSchedulingConfig = IgnitionSchedulingServiceConfig::Cast(ignitionSchedulingConfig);
-			ignitionSchedulingConfig->IgnitorTdc[0] = 0;
-			ignitionSchedulingConfig->IgnitorTdc[1] = 180;
-			ignitionSchedulingConfig->IgnitorTdc[2] = 360;
-			ignitionSchedulingConfig->IgnitorTdc[3] = 540;
+			unsigned short *IgnitorTdc = (unsigned short *)(ignitionSchedulingConfig + 1);
+			IgnitorTdc[0] = 0;
+			IgnitorTdc[1] = 180;
+			IgnitorTdc[2] = 360;
+			IgnitorTdc[3] = 540;
 			
 			IBooleanOutputService **ignitorOutputServices = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService **) * 5);
 			ignitorOutputServices[0] = (IBooleanOutputService *)(&_ignitorOutputService0);

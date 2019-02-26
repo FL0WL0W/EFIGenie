@@ -26,30 +26,30 @@ namespace EngineControlServices
 		InterpolationResponse rpmInterpolation = Interpolate(_decoder->GetRpm(), _config->MaxRpm, 0, _config->AfrRpmResolution);
 		InterpolationResponse mapInterpolation = Interpolate(_manifoldAbsolutePressureService->Value, _config->MaxMapBar, 0, _config->AfrMapResolution);
 		
-		float gasAfr = InterpolateTable2<unsigned short>(rpmInterpolation, _config->AfrRpmResolution, mapInterpolation, _config->GasMap) / 1024.0f;
+		float gasAfr = InterpolateTable2<unsigned short>(rpmInterpolation, _config->AfrRpmResolution, mapInterpolation, _config->GasMap()) / 1024.0f;
 		
 		float ethanolAfr = gasAfr;
 		if (_ethanolContentService != 0)
 		{
-			ethanolAfr = InterpolateTable2<unsigned short>(rpmInterpolation, _config->AfrRpmResolution, mapInterpolation, _config->EthanolMap) / 1024.0f;
+			ethanolAfr = InterpolateTable2<unsigned short>(rpmInterpolation, _config->AfrRpmResolution, mapInterpolation, _config->EthanolMap()) / 1024.0f;
 		}
 		
 		float ectAfrMultiplier = 1;
 		if (_engineCoolantTemperatureService != 0)
 		{
 			InterpolationResponse ectInterpolation = Interpolate(_engineCoolantTemperatureService->Value, _config->MaxEct, _config->MinEct, _config->AfrEctResolution);
-			ectAfrMultiplier = InterpolateTable1<unsigned char>(ectInterpolation, _config->EctMultiplierTable) / 255.0f;
+			ectAfrMultiplier = InterpolateTable1<unsigned char>(ectInterpolation, _config->EctMultiplierTable()) / 255.0f;
 		}
 
 		InterpolationResponse tpsInterpolation = Interpolate(_throttlePositionService->Value, 1, 0, _config->AfrTpsResolution);
 		
 		float afr = gasAfr * ectAfrMultiplier;
-		float maxAfrGas = InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrGas) / 1024.0f;
+		float maxAfrGas = InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrGas()) / 1024.0f;
 		float maxAfr = maxAfrGas;
 		
 		if (_ethanolContentService != 0)
 		{
-			float maxAfrEthanol =  InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrEthanol) / 1024.0f;
+			float maxAfrEthanol =  InterpolateTable1<unsigned short>(tpsInterpolation, _config->TpsMaxAfrEthanol()) / 1024.0f;
 			maxAfr = maxAfrEthanol * _ethanolContentService->Value + maxAfrGas * (1 - _ethanolContentService->Value);
 			afr = (ethanolAfr * _ethanolContentService->Value + gasAfr * (1 - _ethanolContentService->Value)) * ectAfrMultiplier;
 		}
@@ -74,7 +74,7 @@ namespace EngineControlServices
 		else
 			Afr = maxAfr;
 
-		float stoich = InterpolateTable1<unsigned short>(_ethanolContentService->Value, 1, 0, _config->StoichResolution, _config->StoichTable) / 1024.0f;
+		float stoich = InterpolateTable1<unsigned short>(_ethanolContentService->Value, 1, 0, _config->StoichResolution, _config->StoichTable()) / 1024.0f;
 
 		Lambda = Afr / stoich;
 	}

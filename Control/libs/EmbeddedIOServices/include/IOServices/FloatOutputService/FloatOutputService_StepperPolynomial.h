@@ -21,19 +21,14 @@ namespace IOServices
 		}
 			
 	public:
-		static FloatOutputService_StepperPolynomialConfig* Cast(void *p)
-		{
-			return (FloatOutputService_StepperPolynomialConfig *)p;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_StepperPolynomialConfig<Degree>);
 		}
 			
 		float A[Degree+1];
-		int MinStepPosition;
-		int MaxStepPosition;
+		short MinStepPosition;
+		short MaxStepPosition;
 	});
 
 	template<unsigned char Degree>
@@ -66,9 +61,9 @@ namespace IOServices
 
 			newStepPosition = round(newStepPosition);
 		
-			_stepperService->Step(newStepPosition - _currentStepPosition);
+			_stepperService->Step((int)newStepPosition - _currentStepPosition);
 		
-			_currentStepPosition = newStepPosition;
+			_currentStepPosition = (int)newStepPosition;
 		}
 
 		void Calibrate() 

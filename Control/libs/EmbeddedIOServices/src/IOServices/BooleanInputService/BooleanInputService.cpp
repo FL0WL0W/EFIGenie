@@ -3,7 +3,7 @@
 #ifdef BOOLEANINPUTSERVICE_H
 namespace IOServices
 {
-	BooleanInputService::BooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, BooleanInputServiceConfig *config)
+	BooleanInputService::BooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const BooleanInputServiceConfig *config)
 	{
 		_hardwareAbstractionCollection = hardwareAbstractionCollection;
 		_config = config;

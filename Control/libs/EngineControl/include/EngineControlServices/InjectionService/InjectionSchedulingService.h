@@ -22,28 +22,20 @@ namespace EngineControlServices
 
 		}
 	public:
-		static InjectionSchedulingServiceConfig* Cast(void *p)
-		{
-			InjectionSchedulingServiceConfig *injectorService = (InjectionSchedulingServiceConfig *)p;
-
-			injectorService->InjectorTdc = (unsigned short*)(injectorService + 1);
-
-			return injectorService;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(InjectionSchedulingServiceConfig)
 				+ sizeof(unsigned short) * Injectors;
 		}
+		const unsigned short *InjectorTdc() const { return (const unsigned short *)(this + 1); }
 
 		unsigned char Injectors;
-		unsigned short *InjectorTdc;
 	});
 
 	class InjectionSchedulingService
 	{
 	protected:
-		InjectionSchedulingServiceConfig *_injectionSchedulingServiceConfig;
+		const InjectionSchedulingServiceConfig *_injectionSchedulingServiceConfig;
 		ITimerService *_timerService;
 		ICrankCamDecoder *_decoder;
 		IInjectionConfig *_injectionConfig;
@@ -51,7 +43,7 @@ namespace EngineControlServices
 		HardwareAbstraction::Task **_injectorCloseTask;
 	public:
 		InjectionSchedulingService(
-			InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
+			const InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
 			IInjectionConfig *injectionConfig,
 			IBooleanOutputService **injectorOutputServices,
 			ITimerService *timerService,

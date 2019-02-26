@@ -21,32 +21,25 @@ namespace EngineControlServices
 
 		}
 	public:
-		static FuelTrimService_InterpolatedTableConfig* Cast(void *p)
-		{
-			FuelTrimService_InterpolatedTableConfig *ret = (FuelTrimService_InterpolatedTableConfig *)p;
-
-			ret->RpmDivisions = (unsigned short *)(ret + 1);
-			ret->YDivisions = (float *)(ret->RpmDivisions + ret->RpmResolution);
-
-			return ret;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(FuelTrimService_InterpolatedTableConfig) +
 				sizeof(unsigned short) * RpmResolution +
 				sizeof(float) * YResolution;
 		}
+	
+		const unsigned short *RpmDivisions() const { return (const unsigned short *)(this + 1); }
+		const float *YDivisions() const { return (const float *)((const unsigned short *)(this + 1) + RpmResolution); }
+
 		unsigned short UpdateRate;
 		unsigned short CycleDelay;
 		float P;
 		float I;
 		float D;
 		unsigned char RpmResolution;
-		unsigned short *RpmDivisions;
 		unsigned short RpmInterpolationDistance;
 		bool UseTps;
 		unsigned char YResolution;
-		float *YDivisions;
 		float YInterpolationDistance;
 		bool IsPid;
 		float LambdaDeltaEnable;

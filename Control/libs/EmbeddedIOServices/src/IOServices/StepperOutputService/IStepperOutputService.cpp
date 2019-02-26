@@ -6,7 +6,7 @@
 #ifdef ISTEPPEROUTPUTSERVICE_H
 namespace IOServices
 {
-	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, void *config, unsigned int *sizeOut)
+	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
 		unsigned char stepperServiceId = *((unsigned char*)config);
 		config = ((unsigned char *)config + 1);
@@ -19,7 +19,7 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
 		case 1:
 			{
-				StepperOutputService_StepDirectionControlConfig *stepperConfig = StepperOutputService_StepDirectionControlConfig::Cast(config);
+				const StepperOutputService_StepDirectionControlConfig *stepperConfig = (const StepperOutputService_StepDirectionControlConfig *)config;
 				*sizeOut += stepperConfig->Size();
 
 				config = (void*)((unsigned char *)config + stepperConfig->Size());
@@ -39,7 +39,7 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_FULLSTEPCONTROL_H
 		case 2:
 			{
-				StepperOutputService_FullStepControlConfig *stepperConfig = StepperOutputService_FullStepControlConfig::Cast(config);
+				const StepperOutputService_FullStepControlConfig *stepperConfig = (const StepperOutputService_FullStepControlConfig *)config;
 				*sizeOut += stepperConfig->Size();
 
 				config = (void*)((unsigned char *)config + stepperConfig->Size());
@@ -67,7 +67,7 @@ namespace IOServices
 #ifdef STEPPEROUTPUTSERVICE_HALFSTEPCONTROL_H
 		case 3:
 			{
-				StepperOutputService_HalfStepControlConfig *stepperConfig = StepperOutputService_HalfStepControlConfig::Cast(config);
+				const StepperOutputService_HalfStepControlConfig *stepperConfig = (const StepperOutputService_HalfStepControlConfig *)config;
 				*sizeOut += stepperConfig->Size();
 
 				config = (void*)((unsigned char *)config + stepperConfig->Size());

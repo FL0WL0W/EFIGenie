@@ -3,7 +3,7 @@
 #ifdef IGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 namespace EngineControlServices
 {
-	IgnitionConfigWrapper_SoftPidRpmLimit::IgnitionConfigWrapper_SoftPidRpmLimit(IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
+	IgnitionConfigWrapper_SoftPidRpmLimit::IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
 	{		
 		_config = config;
 		_timerService = timerService;
@@ -30,7 +30,7 @@ namespace EngineControlServices
 			{
 				IgnitionTiming timing = _child->GetIgnitionTiming();
 												
-				short IgnitionAdvance64thDegreeError = error * _config->RpmKp + ((error - _prevError) / dt) * _config->RpmKd + _integral * _config->RpmKi;
+				short IgnitionAdvance64thDegreeError = (short)round(error * _config->RpmKp + ((error - _prevError) / dt) * _config->RpmKd + _integral * _config->RpmKi);
 			
 				if (IgnitionAdvance64thDegreeError > 0)
 					IgnitionAdvance64thDegreeError = 0;

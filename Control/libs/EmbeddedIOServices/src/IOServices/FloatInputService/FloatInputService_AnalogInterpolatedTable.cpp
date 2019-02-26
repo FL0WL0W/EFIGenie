@@ -13,11 +13,11 @@ namespace IOServices
 
 	void FloatInputService_AnalogInterpolatedTable::ReadValue()
 	{
-		float adcValue = _hardwareAbstractionCollection->AnalogService->ReadPin(_config->AdcPin);
+		const float adcValue = _hardwareAbstractionCollection->AnalogService->ReadPin(_config->AdcPin);
 
-		Value = Interpolation::InterpolateTable1<float>(adcValue, _config->MaxInputValue, _config->MinInputValue, _config->Resolution, _config->Table);
+		Value = Interpolation::InterpolateTable1<float>(adcValue, _config->MaxInputValue, _config->MinInputValue, _config->Resolution, _config->Table());
 
-		float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
+		const float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
 		if (elapsedTime * _config->DotSampleRate < 1.0)
 			return;
 

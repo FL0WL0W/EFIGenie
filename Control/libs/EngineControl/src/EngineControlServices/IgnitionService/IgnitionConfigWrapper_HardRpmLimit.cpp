@@ -3,7 +3,7 @@
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 namespace EngineControlServices
 {
-	IgnitionConfigWrapper_HardRpmLimit::IgnitionConfigWrapper_HardRpmLimit(IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
+	IgnitionConfigWrapper_HardRpmLimit::IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
 	{				
 		_config = config;
 		_decoder = decoder;

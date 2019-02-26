@@ -21,22 +21,14 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static IgnitionConfig_Map_EthanolConfig * Cast(void *p)
-		{
-			IgnitionConfig_Map_EthanolConfig *ret = (IgnitionConfig_Map_EthanolConfig *)p;
-
-			ret->IgnitionAdvanceMapGas = (short *)(ret + 1);
-			ret->IgnitionAdvanceMapEthanol = ret->IgnitionAdvanceMapGas + ret->IgnitionRpmResolution * ret->IgnitionMapResolution;
-
-			return ret;
-		}
-		
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(IgnitionConfig_Map_EthanolConfig) +
 				sizeof(short) * IgnitionRpmResolution * IgnitionMapResolution +
 				sizeof(short) * IgnitionRpmResolution * IgnitionMapResolution;
 		}
+		const short *IgnitionAdvanceMapGas() const { return (const short *)(this + 1); }
+		const short *IgnitionAdvanceMapEthanol() const { return (const short *)(this + 1) + IgnitionRpmResolution * IgnitionMapResolution; }
 		
 		float IgnitionDwellTime;
 		
@@ -44,20 +36,18 @@ namespace EngineControlServices
 		float MaxMapBar;
 		unsigned char IgnitionRpmResolution;
 		unsigned char IgnitionMapResolution;
-		short *IgnitionAdvanceMapGas;
-		short *IgnitionAdvanceMapEthanol;
 	});
 	
 	class IgnitionConfig_Map_Ethanol : public IIgnitionConfig
 	{
 	protected:
-		IgnitionConfig_Map_EthanolConfig *_config;
+		const IgnitionConfig_Map_EthanolConfig *_config;
 		ICrankCamDecoder *_decoder;
 		IFloatInputService *_ethanolContentService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		
 	public:
-		IgnitionConfig_Map_Ethanol(IgnitionConfig_Map_EthanolConfig *config, ICrankCamDecoder *decoder, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
+		IgnitionConfig_Map_Ethanol(const IgnitionConfig_Map_EthanolConfig *config, ICrankCamDecoder *decoder, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

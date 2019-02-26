@@ -3,7 +3,7 @@
 #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineControlServices
 {
-	InjectionConfigWrapper_DFCO::InjectionConfigWrapper_DFCO(InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child)
+	InjectionConfigWrapper_DFCO::InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child)
 	{
 		_config = config;
 		_throttlePositionService = throttlePositionService;

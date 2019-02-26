@@ -8,7 +8,7 @@ namespace EngineControlServices
 		_timerService = timerService;
 		_injectorServices = injectorServices;
 		
-		_pulseTick = config->PulseWidth * _timerService->GetTicksPerSecond();
+		_pulseTick = (unsigned int)round(config->PulseWidth * _timerService->GetTicksPerSecond());
 	}
 
 	void PrimeService_StaticPulseWidth::Prime()

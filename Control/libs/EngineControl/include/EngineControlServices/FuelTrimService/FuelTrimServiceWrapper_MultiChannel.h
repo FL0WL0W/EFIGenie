@@ -14,21 +14,13 @@ namespace EngineControlServices
 
 		}
 	public:
-		static FuelTrimServiceWrapper_MultiChannelConfig* Cast(void *p)
-		{
-			FuelTrimServiceWrapper_MultiChannelConfig *ret = (FuelTrimServiceWrapper_MultiChannelConfig *)p;
-
-			ret->FuelTrimChannelMask = (unsigned short *)(ret + 1)-1;
-
-			return ret;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(FuelTrimServiceWrapper_MultiChannelConfig) +
 				sizeof(unsigned short) * NumberOfFuelTrimChannels;
 		}
+		const unsigned short *FuelTrimChannelMask() const { return (const unsigned short *)(this + 1); }
 		unsigned char NumberOfFuelTrimChannels;
-		unsigned short *FuelTrimChannelMask;
 	});
 	
 	class FuelTrimServiceWrapper_MultiChannel : public IFuelTrimService

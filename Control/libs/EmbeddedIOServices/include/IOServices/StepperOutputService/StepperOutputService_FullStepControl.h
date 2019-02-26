@@ -17,18 +17,13 @@ namespace IOServices
 		}
 		
 	public:
-		static StepperOutputService_FullStepControlConfig* Cast(void *p)
-		{
-			return (StepperOutputService_FullStepControlConfig *)p;
-		}
-			
-		unsigned int Size()
+		unsigned int Size() const
 		{
 			return sizeof(StepperOutputService_FullStepControlConfig);
 		}
 		
-		unsigned int MaxStepsPerSecond;
-		unsigned float StepWidth;
+		unsigned short MaxStepsPerSecond;
+		float StepWidth;
 	});
 
 	class StepperOutputService_FullStepControl : public IStepperOutputService

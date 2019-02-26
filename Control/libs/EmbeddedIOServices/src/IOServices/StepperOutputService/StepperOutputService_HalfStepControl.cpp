@@ -51,9 +51,9 @@ namespace IOServices
 			_stepQueue++;
 		}
 
-		unsigned int ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
+		const unsigned int ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
 		SetState(_state);
-		unsigned int tick = _hardwareAbstractionCollection->TimerService->GetTick();
+		const unsigned int tick = _hardwareAbstractionCollection->TimerService->GetTick();
 		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
 	}
 	

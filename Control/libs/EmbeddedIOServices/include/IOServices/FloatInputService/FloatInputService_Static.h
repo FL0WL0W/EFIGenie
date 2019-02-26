@@ -7,7 +7,7 @@ namespace IOServices
 	class FloatInputService_Static : public IFloatInputService
 	{
 	public:
-		FloatInputService_Static(float value, float valueDot) { Value = value; ValueDot = valueDot; }
+		FloatInputService_Static(const float value, const float valueDot) { Value = value; ValueDot = valueDot; }
 		
 		void ReadValue() { };
 	};

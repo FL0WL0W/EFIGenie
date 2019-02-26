@@ -19,11 +19,7 @@ namespace EngineControlServices
 			
 		}
 	public:
-		static FuelPumpServiceConfig* Cast(void *p)
-		{
-			return (FuelPumpServiceConfig*)p;
-		}
-		unsigned int Size()
+		const unsigned int Size() const
 		{
 			return sizeof(FuelPumpServiceConfig);
 		}

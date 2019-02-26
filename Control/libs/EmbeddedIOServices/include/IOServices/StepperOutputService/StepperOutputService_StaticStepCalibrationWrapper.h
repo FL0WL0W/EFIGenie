@@ -17,11 +17,6 @@ namespace IOServices
 		}
 		
 	public:
-		static StepperOutputService_StaticStepCalibrationWrapperConfig* Cast(void *p)
-		{
-			return (StepperOutputService_StaticStepCalibrationWrapperConfig *)p;
-		}
-			
 		unsigned int Size()
 		{
 			return sizeof(StepperOutputService_StaticStepCalibrationWrapperConfig);
