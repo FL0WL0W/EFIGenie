@@ -19,7 +19,7 @@ namespace Service
 		if(serviceLocator->Locate(TIMER_SERVICE_ID) == 0)
 			serviceLocator->Register(TIMER_SERVICE_ID, hardwareAbstractionCollection->TimerService);
 
-		hardwareAbstractionCollection = (const HardwareAbstractionCollection *)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID);
+		hardwareAbstractionCollection = serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
 		
 		//create callback groups
 		if(serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP) == 0)
@@ -29,9 +29,9 @@ namespace Service
 		if(serviceLocator->Locate(TICK_CALL_BACK_GROUP) == 0)
 			serviceLocator->Register(TICK_CALL_BACK_GROUP, new CallBackGroup());
 
-		CallBackGroup *preDecoderCallBackGroup = (CallBackGroup *)serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP);
-		CallBackGroup *postDecoderCallBackGroup = (CallBackGroup *)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP);
-		CallBackGroup *tickCallBackGroup = (CallBackGroup *)serviceLocator->Locate(TICK_CALL_BACK_GROUP);
+		CallBackGroup *preDecoderCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(PRE_DECODER_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *postDecoderCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *tickCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP);
 
 		*totalSize = 0;
 		unsigned int size;
@@ -194,8 +194,8 @@ namespace Service
 		return new TachometerService(
 			CastConfig < TachometerServiceConfig >(&config, totalSize),
 			CreateBooleanOutputService(serviceLocator, &config, totalSize),
-			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
-			(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
 	}
 	
 	IPrimeService* EngineControlServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
@@ -208,19 +208,19 @@ namespace Service
 		case 1:
 			ret = new PrimeService_StaticPulseWidth(
 				CastConfig < PrimeService_StaticPulseWidthConfig >(&config, totalSize), 
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
-				(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID));
+				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID));
 			break;
 #endif
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP), 
 			IPrimeService::PrimeCallBack,
 			ret);
 
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IPrimeService::TickCallBack,
 			ret);
 		
@@ -237,20 +237,20 @@ namespace Service
 		case 1:	
 			ret = new IdleControlService_Pid(
 				CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
-				reinterpret_cast<const HardwareAbstractionCollection*>(serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID)), 
-				(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID), 
-				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID), 
-				(IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
-				(IFloatInputService*)serviceLocator->Locate(VEHICLE_SPEED_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				(IFloatOutputService*)serviceLocator->Locate(IDLE_AIR_CONTROL_VALVE_SERVICE_ID));
+				serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), 
+				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IFloatInputService>(VEHICLE_SPEED_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatOutputService>(IDLE_AIR_CONTROL_VALVE_SERVICE_ID));
 			break;
 #endif
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IIdleControlService::TickCallBack,
 			ret);
 		
@@ -272,18 +272,18 @@ namespace Service
 		case 2:
 			ret = new AfrService_Map_Ethanol(
 				CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
-				(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
-				(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID));
+				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
 			break;
 #endif
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IAfrService::CalculateAfrCallBack,
 			ret);
 		
@@ -302,12 +302,12 @@ namespace Service
 				
 				ret = new FuelTrimService_InterpolatedTable(
 					serviceConfig, 
-					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
-					(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
-					(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
+					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					CreateFloatInputService(serviceLocator, &config, totalSize),
-					(IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID));
+					serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID));
 				break;
 			}
 #endif
@@ -332,7 +332,7 @@ namespace Service
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IFuelTrimService::TickCallBack,
 			ret);
 		
@@ -351,7 +351,7 @@ namespace Service
 
 				ret = new FuelPumpService(
 					serviceConfig,
-					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
+					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
 					CreateBooleanOutputService(serviceLocator, &config, totalSize));
 				break;
 			}
@@ -363,26 +363,26 @@ namespace Service
 			
 				ret = new FuelPumpService_Analog(
 					serviceConfig, 
-					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
+					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 					CreateFloatOutputService(serviceLocator, &config, totalSize), 
-					(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-					(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID));
+					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
 				break;
 			}
 #endif
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(PRE_DECODER_SYNC_CALL_BACK_GROUP), 
 			IFuelPumpService::PrimeCallBack,
 			ret);
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP), 
 			IFuelPumpService::OnCallBack,
 			ret);
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IFuelPumpService::TickCallBack,
 			ret);
 		
@@ -399,14 +399,14 @@ namespace Service
 		case 2:
 			ret = new InjectionConfig_SD(
 				CastConfig < InjectionConfig_SDConfig >(&config, totalSize),
-				(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				(IAfrService*)serviceLocator->Locate(AFR_SERVICE_ID),
-				(IFuelTrimService*)serviceLocator->Locate(FUEL_TRIM_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(VOLTAGE_SERVICE_ID));
+				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(VOLTAGE_SERVICE_ID));
 			break;
 #endif
 #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
@@ -419,8 +419,8 @@ namespace Service
 				OffsetConfig(&config, totalSize, size);
 
 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
-					(IFloatInputService*)serviceLocator->Locate(THROTTLE_POSITION_SERVICE_ID),
-					(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
+					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
 					child);
 				break;
 			}
@@ -446,9 +446,9 @@ namespace Service
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
 				CastConfig < IgnitionConfig_Map_EthanolConfig >(&config, totalSize),
-				(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(ETHANOL_CONTENT_SERVICE_ID),
-				(IFloatInputService*)serviceLocator->Locate(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
+				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
 			break;
 #endif
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
@@ -464,7 +464,7 @@ namespace Service
 				
 				ret = new IgnitionConfigWrapper_HardRpmLimit(
 					ignitionConfig,  
-					(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
 					booleanInputService,
 					child);
 				
@@ -484,8 +484,8 @@ namespace Service
 				
 				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
 					ignitionConfig,
-					(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID), 
-					(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
+					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
 					booleanInputService,
 					child);
 				
@@ -508,12 +508,12 @@ namespace Service
 		IgnitionSchedulingService *ret = new IgnitionSchedulingService(
 			ignitionSchedulingConfig,
 			ignitionConfig,
-			(IBooleanOutputService**)serviceLocator->Locate(IGNITOR_SERVICES_ID),
-			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
-			(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<IBooleanOutputService *>(IGNITOR_SERVICES_ID),
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
 				
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			IgnitionSchedulingService::ScheduleEventsCallBack,
 			ret);
 		
@@ -532,12 +532,12 @@ namespace Service
 		InjectionSchedulingService *ret = new InjectionSchedulingService(
 			injectionSchedulingConfig,
 			injectionConfig,
-			(IBooleanOutputService**)serviceLocator->Locate(INJECTOR_SERVICES_ID),
-			(ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID),
-			(ICrankCamDecoder*)serviceLocator->Locate(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
 		
 		AddToCallBackGroupIfParametersNotNull(
-			(CallBackGroup*)serviceLocator->Locate(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
 			InjectionSchedulingService::ScheduleEventsCallBack,
 			ret);
 		
@@ -552,7 +552,7 @@ namespace Service
 		{
 #ifdef GM24XDECODER_H
 		case 1:
-			ret = new Gm24xDecoder((ITimerService*)serviceLocator->Locate(TIMER_SERVICE_ID));
+			ret = new Gm24xDecoder(serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID));
 			break;
 #endif
 		}

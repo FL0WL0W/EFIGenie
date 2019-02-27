@@ -12,9 +12,9 @@ namespace Service
 		void Register(uint16_t serviceId, void *service);
 		void* Locate(uint16_t serviceId);
 		template<typename K>
-		K *Locate(uint16_t serviceId)
+		K *LocateAndCast(uint16_t serviceId)
 		{
-			reinterpret_cast<K *>(Locate(serviceId));
+			return reinterpret_cast<K *>(Locate(serviceId));
 		}
 
 		void Unregister(uint16_t serviceId);
