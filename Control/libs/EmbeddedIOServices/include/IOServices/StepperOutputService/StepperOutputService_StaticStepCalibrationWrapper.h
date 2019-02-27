@@ -10,7 +10,7 @@ namespace IOServices
 	struct StepperOutputService_StaticStepCalibrationWrapperConfig
 	{
 	public:
-		constexpr const uint32_t Size()
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(StepperOutputService_StaticStepCalibrationWrapperConfig);
 		}

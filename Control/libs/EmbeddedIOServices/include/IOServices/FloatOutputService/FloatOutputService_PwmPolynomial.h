@@ -14,7 +14,7 @@ namespace IOServices
 	struct FloatOutputService_PwmPolynomialConfig
 	{
 	public:
-		constexpr const uint32_t Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
 		}

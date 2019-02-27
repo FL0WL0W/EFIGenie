@@ -14,7 +14,7 @@ namespace IOServices
 		reinterpret_cast<IFloatInputService *>(floatInputService)->ReadValue();
 	}
 
-	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, uint32_t *sizeOut)
+	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
 		const uint8_t inputServiceId = *reinterpret_cast<const uint8_t *>(config);
 		config = reinterpret_cast<const uint8_t *>(config) + 1;
@@ -77,7 +77,7 @@ namespace IOServices
 				const FloatInputService_FaultDetectionWrapperConfig *faultDetectionConfig = reinterpret_cast<const FloatInputService_FaultDetectionWrapperConfig *>(config);
 				*sizeOut += faultDetectionConfig->Size();
 				config = reinterpret_cast<const uint8_t *>(config) + faultDetectionConfig->Size();
-				uint32_t childSize = 0;
+				unsigned int childSize = 0;
 				IFloatInputService *child = CreateFloatInputService(hardwareAbstractionCollection, config, &childSize);
 				*sizeOut += childSize;
 				inputService = new FloatInputService_FaultDetectionWrapper(faultDetectionConfig, child);

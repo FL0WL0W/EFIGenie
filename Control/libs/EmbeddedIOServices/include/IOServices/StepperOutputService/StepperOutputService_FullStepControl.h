@@ -10,7 +10,7 @@ namespace IOServices
 	struct StepperOutputService_FullStepControlConfig
 	{
 	public:
-		constexpr const uint32_t Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(StepperOutputService_FullStepControlConfig);
 		}

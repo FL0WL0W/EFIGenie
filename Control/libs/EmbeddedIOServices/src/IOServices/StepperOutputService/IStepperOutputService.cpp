@@ -2,11 +2,12 @@
 #include "IOServices/StepperOutputService/StepperOutputService_StepDirectionControl.h"
 #include "IOServices/StepperOutputService/StepperOutputService_FullStepControl.h"
 #include "IOServices/StepperOutputService/StepperOutputService_HalfStepControl.h"
+#include "IOServices/StepperOutputService/StepperOutputService_StaticStepCalibrationWrapper.h"
 
 #ifdef ISTEPPEROUTPUTSERVICE_H
 namespace IOServices
 {
-	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, uint32_t *sizeOut)
+	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
 	{
 		const uint8_t stepperServiceId = *reinterpret_cast<const uint8_t *>(config);
 		config = reinterpret_cast<const uint8_t *>(config) + 1;
@@ -23,7 +24,7 @@ namespace IOServices
 				*sizeOut += stepperConfig->Size();
 
 				config = reinterpret_cast<const uint8_t *>(config) + stepperConfig->Size();
-				uint32_t subSize = 0;
+				unsigned int subSize = 0;
 				IBooleanOutputService *stepBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
@@ -43,7 +44,7 @@ namespace IOServices
 				*sizeOut += stepperConfig->Size();
 
 				config = reinterpret_cast<const uint8_t *>(config) + stepperConfig->Size();
-				uint32_t subSize = 0;
+				unsigned int subSize = 0;
 				IBooleanOutputService *coilAPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
@@ -71,7 +72,7 @@ namespace IOServices
 				*sizeOut += stepperConfig->Size();
 
 				config = reinterpret_cast<const uint8_t *>(config) + stepperConfig->Size();
-				uint32_t subSize = 0;
+				unsigned int subSize = 0;
 				IBooleanOutputService *coilAPlusBooleanOutputService = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &subSize);
 				*sizeOut += subSize;
 
@@ -88,6 +89,22 @@ namespace IOServices
 				*sizeOut += subSize;
 
 				outputService = new StepperOutputService_HalfStepControl(hardwareAbstractionCollection, stepperConfig, coilAPlusBooleanOutputService, coilAMinusBooleanOutputService, coilBPlusBooleanOutputService, coilBMinusBooleanOutputService);
+				break;
+			}
+#endif
+			
+#ifdef STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
+		case 4:
+			{
+				const StepperOutputService_StaticStepCalibrationWrapperConfig *stepperConfig = reinterpret_cast<const StepperOutputService_StaticStepCalibrationWrapperConfig *>(config);
+				*sizeOut += stepperConfig->Size();
+
+				config = reinterpret_cast<const uint8_t *>(config) + stepperConfig->Size();
+				unsigned int subSize = 0;
+				IStepperOutputService *child = IStepperOutputService::CreateStepperOutputService(hardwareAbstractionCollection, config, &subSize);
+				*sizeOut += subSize;
+
+				outputService = new StepperOutputService_StaticStepCalibrationWrapper(stepperConfig, child);
 				break;
 			}
 #endif

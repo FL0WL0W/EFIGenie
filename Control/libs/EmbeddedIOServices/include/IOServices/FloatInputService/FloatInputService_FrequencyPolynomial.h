@@ -14,7 +14,7 @@ namespace IOServices
 	struct FloatInputService_FrequencyPolynomialConfig
 	{
 	public:
-		constexpr const uint32_t Size() const
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FloatInputService_FrequencyPolynomialConfig<Degree>);
 		}
