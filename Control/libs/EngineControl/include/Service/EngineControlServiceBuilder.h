@@ -101,22 +101,11 @@ namespace Service
 	class EngineControlServiceBuilder
 	{
 		template<typename T>
-		static T* CastConfig(void **config, unsigned int *size)
-		{
-			T *castedConfig = T::Cast(*config);
-			unsigned int confSize = castedConfig->Size();
-			*size += confSize;
-			*config = (void *)((unsigned char *)*config + confSize);
-			
-			return castedConfig;
-		}
-		template<typename T>
 		static const T* CastConfig(const void **config, unsigned int *size)
 		{
-			T *castedConfig = (T *)(*config);
+			T *castedConfig = reinterpret_cast<T *>(*config);
 			const unsigned int confSize = castedConfig->Size();
-			*size += confSize;
-			*config = (const void *)((const unsigned char *)*config + confSize);
+			OffsetConfig(config, size, confSize);
 			
 			return castedConfig;
 		}
@@ -125,8 +114,7 @@ namespace Service
 		{
 			unsigned int size;
 			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			*config = (const void *)((const unsigned char *)*config + size);
-			*totalSize += size;
+			OffsetConfig(config, totalSize, size);
 			return booleanOutputService;
 		}
 				
@@ -134,8 +122,7 @@ namespace Service
 		{
 			unsigned int size;
 			IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			*config = (void *)((unsigned char *)*config + size);
-			*totalSize += size;
+			OffsetConfig(config, totalSize, size);
 			return booleanInputService;
 		}
 				
@@ -143,8 +130,7 @@ namespace Service
 		{
 			unsigned int size;
 			IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			*config = (void *)((unsigned char *)*config + size);
-			*totalSize += size;
+			OffsetConfig(config, totalSize, size);
 			return floatOutputService;
 		}
 
@@ -152,16 +138,15 @@ namespace Service
 		{
 			unsigned int size;
 			IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService((HardwareAbstractionCollection*)serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
-			*config = (void *)((unsigned char *)*config + size);
-			*totalSize += size;
+			OffsetConfig(config, totalSize, size);
 			return floatInputService;
 		}
 		
 		static const unsigned char GetServiceId(const void **config, unsigned int *size)
 		{
-			const unsigned char serviceId = *((const unsigned char*)*config);
-			*config = (void *)((const unsigned char*)*config + 1);
-			*size = 1;
+			const unsigned char serviceId = *reinterpret_cast<const unsigned char*>(*config);
+			*size = 0;
+			OffsetConfig(config, size, 1);
 			return serviceId;
 		}
 

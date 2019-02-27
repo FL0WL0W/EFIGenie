@@ -78,7 +78,7 @@ namespace Service
 			case INJECTOR_SERVICES_ID:
 #endif
 				{
-					const unsigned char numberOfServices = *(const unsigned char *)config;
+					const unsigned char numberOfServices = *reinterpret_cast<const unsigned char *>(config);
 					OffsetConfig(&config, totalSize, 1);
 
 					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
