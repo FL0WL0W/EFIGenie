@@ -145,7 +145,7 @@ var IOServicesIni = {
     ] },
 
     StepperOutputService_StaticStepCalibrationWrapperConfig: { Variables : [
-        { StepperOutputService_StaticStepCalibrationWrapperConfigTypeId: { Type: "uint8", Value: 5, Hidden: true } },
+        { StepperOutputService_StaticStepCalibrationWrapperConfigTypeId: { Type: "uint8", Value: 4, Hidden: true } },
         { StepsOnCalibration: { Type: "int32", Label: "Reset Steps", Value: 300 } },
         { StepperConfig: { ConfigName: "IStepperOutputServiceConfig" } }
     ] },
