@@ -103,7 +103,7 @@ namespace Service
 		template<typename T>
 		static const T* CastConfig(const void **config, unsigned int *size)
 		{
-			T *castedConfig = reinterpret_cast<T *>(*config);
+			const T *castedConfig = reinterpret_cast<const T *>(*config);
 			const unsigned int confSize = castedConfig->Size();
 			OffsetConfig(config, size, confSize);
 			

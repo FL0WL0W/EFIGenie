@@ -19,7 +19,7 @@ namespace EngineControlServices
 
 		}
 	public:
-		unsigned int Size()
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(InjectionConfigWrapper_DFCOConfig);
 		}

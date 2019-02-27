@@ -22,7 +22,7 @@ namespace EngineControlServices
 		{
 		}
 	public:
-		unsigned int Size()
+		constexpr const unsigned int Size() const
 		{
 			return sizeof(FuelPumpService_AnalogConfig) +
 				sizeof(unsigned char) * RpmRes * YRes;
