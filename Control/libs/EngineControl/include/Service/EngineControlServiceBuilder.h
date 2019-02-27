@@ -164,6 +164,31 @@ namespace Service
 			*size = 1;
 			return serviceId;
 		}
+
+		static void OffsetConfig(const void **config, unsigned int *totalSize, unsigned int offset) 
+		{
+			*config = reinterpret_cast<const void *>(reinterpret_cast<const unsigned char *>(*config) + offset);
+			if(totalSize != 0)
+			{
+				*totalSize += offset;
+			}
+		}
+
+		static void RegisterIfNotNull(ServiceLocator *serviceLocator, uint16_t serviceId, void *pointer) 
+		{
+			if(pointer != 0)
+			{
+				serviceLocator->Register(serviceId, pointer);
+			}
+		}
+
+		static void AddToCallBackGroupIfParametersNotNull(CallBackGroup *callback, void(*callBackPointer)(void *), void *parameters)
+		{
+			if(parameters != 0)
+			{
+				callback->Add(callBackPointer, parameters);
+			}
+		}
 		
 	public:
 		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize);
