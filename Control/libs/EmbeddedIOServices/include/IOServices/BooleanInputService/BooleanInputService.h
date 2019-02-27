@@ -10,12 +10,12 @@ namespace IOServices
 	struct BooleanInputServiceConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(BooleanInputServiceConfig);
 		}
 
-		unsigned short Pin;
+		uint16_t Pin;
 		bool Inverted;
 	});
 

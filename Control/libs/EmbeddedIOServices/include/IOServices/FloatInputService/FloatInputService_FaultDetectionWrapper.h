@@ -9,7 +9,7 @@ namespace IOServices
 	struct FloatInputService_FaultDetectionWrapperConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatInputService_FaultDetectionWrapperConfig);
 		}

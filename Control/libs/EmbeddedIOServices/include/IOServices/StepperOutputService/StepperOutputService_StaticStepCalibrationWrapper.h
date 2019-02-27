@@ -10,12 +10,12 @@ namespace IOServices
 	struct StepperOutputService_StaticStepCalibrationWrapperConfig
 	{
 	public:
-		constexpr const unsigned int Size()
+		constexpr const uint32_t Size()
 		{
 			return sizeof(StepperOutputService_StaticStepCalibrationWrapperConfig);
 		}
 		
-		int StepsOnCalibration;
+		int32_t StepsOnCalibration;
 	});
 
 	class StepperOutputService_StaticStepCalibrationWrapper : public IStepperOutputService
@@ -26,7 +26,7 @@ namespace IOServices
 
 	public:
 		StepperOutputService_StaticStepCalibrationWrapper(const StepperOutputService_StaticStepCalibrationWrapperConfig *config, IStepperOutputService *child);
-		void Step(int steps) override;
+		void Step(int32_t steps) override;
 		void Calibrate() override;
 	};
 }

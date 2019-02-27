@@ -7,11 +7,11 @@
 #ifdef IFLOATOUTPUTSERVICE_H
 namespace IOServices
 {
-	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
+	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, uint32_t *sizeOut)
 	{
-		const unsigned char outputServiceId = *reinterpret_cast<const unsigned char *>(config);
-		config = reinterpret_cast<const unsigned char *>(config) + 1;
-		*sizeOut = sizeof(unsigned char);
+		const uint8_t outputServiceId = *reinterpret_cast<const uint8_t *>(config);
+		config = reinterpret_cast<const uint8_t *>(config) + 1;
+		*sizeOut = sizeof(uint8_t);
 		
 		IFloatOutputService *outputService = 0;
 		
@@ -32,8 +32,8 @@ namespace IOServices
 			{
 				const FloatOutputService_StepperPolynomialConfig<4> *stepperConfig = reinterpret_cast<const FloatOutputService_StepperPolynomialConfig<4> *>(config);
 				*sizeOut += stepperConfig->Size();
-				config = (void*)((unsigned char *)config + stepperConfig->Size());
-				unsigned int stepperSize = 0;
+				config = (void*)((uint8_t *)config + stepperConfig->Size());
+				uint32_t stepperSize = 0;
 				IStepperOutputService *stepperService = IStepperOutputService::CreateStepperOutputService(hardwareAbstractionCollection, config, &stepperSize);
 				*sizeOut += stepperSize;
 				outputService = new FloatOutputService_StepperPolynomial<4>(stepperConfig, stepperService);
@@ -56,8 +56,8 @@ namespace IOServices
 			{
 				const FloatOutputService_StepperInterpolatedTableConfig *stepperConfig = reinterpret_cast<const FloatOutputService_StepperInterpolatedTableConfig *>(config);
 				*sizeOut += stepperConfig->Size();
-				config = (void*)((unsigned char *)config + stepperConfig->Size());
-				unsigned int stepperSize = 0;
+				config = (void*)((uint8_t *)config + stepperConfig->Size());
+				uint32_t stepperSize = 0;
 				IStepperOutputService *stepperService = IStepperOutputService::CreateStepperOutputService(hardwareAbstractionCollection, config, &stepperSize);
 				*sizeOut += stepperSize;
 				outputService = new FloatOutputService_StepperInterpolatedTable(stepperConfig, stepperService);

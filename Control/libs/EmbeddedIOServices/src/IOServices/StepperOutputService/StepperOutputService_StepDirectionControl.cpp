@@ -19,7 +19,7 @@ namespace IOServices
 		_stepTask = new Task(StepCallBack, this, false);
 	}
 
-	void StepperOutputService_StepDirectionControl::Step(int steps)
+	void StepperOutputService_StepDirectionControl::Step(int32_t steps)
 	{
 		if(_stepQueue == 0)
 		{
@@ -46,10 +46,10 @@ namespace IOServices
 			_stepQueue++;
 		}
 
-		const unsigned int ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
-		const unsigned int tick = _hardwareAbstractionCollection->TimerService->GetTick();
+		const uint32_t ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
+		const uint32_t tick = _hardwareAbstractionCollection->TimerService->GetTick();
 		_stepBooleanOutputService->OutputSet();
-		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_offTask, (unsigned int)round(tick + ticksPerSecond * _config->StepWidth));
+		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_offTask, (uint32_t)round(tick + ticksPerSecond * _config->StepWidth));
 		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
 	}
 	

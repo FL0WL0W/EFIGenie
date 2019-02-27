@@ -8,11 +8,11 @@ namespace HardwareAbstraction
 	class IDigitalService
 	{
 	public:
-		virtual void InitPin(unsigned short pin, PinDirection direction) = 0; //pin 0 should be for "null"
-		virtual bool ReadPin(unsigned short pin) = 0; //pin 0 should be for "null"
-		virtual void WritePin(unsigned short pin, bool value) = 0; //pin 0 should be for "null"
-		virtual void ScheduleRecurringInterrupt(unsigned short pin, ICallBack *) = 0;
-		virtual void ScheduleNextInterrupt(unsigned short pin, ICallBack *) = 0;
+		virtual void InitPin(uint16_t pin, PinDirection direction) = 0; //pin 0 should be for "null"
+		virtual bool ReadPin(uint16_t pin) = 0; //pin 0 should be for "null"
+		virtual void WritePin(uint16_t pin, bool value) = 0; //pin 0 should be for "null"
+		virtual void ScheduleRecurringInterrupt(uint16_t pin, ICallBack *) = 0;
+		virtual void ScheduleNextInterrupt(uint16_t pin, ICallBack *) = 0;
 	};
 }
 #endif

@@ -1,4 +1,5 @@
 #include "math.h"
+#include "stdint.h"
 
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
@@ -7,14 +8,14 @@ namespace Interpolation
 	struct InterpolationResponse
 	{
 		float Multiplier;
-		unsigned char IndexL;
-		unsigned char IndexH;
+		uint8_t IndexL;
+		uint8_t IndexH;
 	};
 
-	InterpolationResponse Interpolate(const float value, const float maxValue, const float minValue, const unsigned char resolution);
+	InterpolationResponse Interpolate(const float value, const float maxValue, const float minValue, const uint8_t resolution);
 	
 	template<typename K>
-		K InterpolateTable1(const float value, const float maxValue, const float minValue, const unsigned char resolution, const K* table)
+		K InterpolateTable1(const float value, const float maxValue, const float minValue, const uint8_t resolution, const K* table)
 		{
 			return InterpolateTable1<K>(Interpolate(value, maxValue, minValue, resolution), table);
 		}
@@ -31,13 +32,13 @@ namespace Interpolation
 		}
 	
 	template<typename K>
-		K InterpolateTable2(const float valueX, const float maxValueX, const float minValueX, const unsigned char resolutionX, const float valueY, const float maxValueY, const float minValueY, const unsigned char resolutionY, const K* table)
+		K InterpolateTable2(const float valueX, const float maxValueX, const float minValueX, const uint8_t resolutionX, const float valueY, const float maxValueY, const float minValueY, const uint8_t resolutionY, const K* table)
 		{
 			return InterpolateTable2<K>(Interpolate(valueX, maxValueX, minValueX, resolutionX), resolutionX, Interpolate(valueY, maxValueY, minValueY, resolutionY), table);
 		}
 	
 	template<typename K>
-		K InterpolateTable2(const InterpolationResponse interpolationX, const unsigned char resolutionX, const InterpolationResponse interpolationY, const K* table)
+		K InterpolateTable2(const InterpolationResponse interpolationX, const uint8_t resolutionX, const InterpolationResponse interpolationY, const K* table)
 		{
 			if (static_cast<K>(0.5f) == 0)
 			{

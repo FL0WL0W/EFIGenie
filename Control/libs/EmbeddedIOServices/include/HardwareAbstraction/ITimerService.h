@@ -30,35 +30,35 @@ namespace HardwareAbstraction
 		ICallBack *CallBackInstance;
 		bool DeleteOnExecution;
 		//only let TimerService edit these values
-		unsigned int Tick;
+		uint32_t Tick;
 	};
 
 	class ITimerService
 	{
 	protected:
 		void SortCallBackStack();
-		virtual void ScheduleCallBack(unsigned int tick) = 0;
+		virtual void ScheduleCallBack(uint32_t tick) = 0;
 	public:
 #if TIMERSERVICE_MAX_STACK_SIZE <= 2^8
-		unsigned char StackSize = 0;
+		uint8_t StackSize = 0;
 #elif TIMERSERVICE_MAX_STACK_SIZE <= 2^16
-		unsigned short StackSize = 0;
+		uint16_t StackSize = 0;
 #elif TIMERSERVICE_MAX_STACK_SIZE <= 2^32
-		unsigned int StackSize = 0;
+		uint32_t StackSize = 0;
 #endif
 		Task *CallBackStackPointer[TIMERSERVICE_MAX_STACK_SIZE];
 
-		virtual unsigned int GetTick(void) = 0;
-		virtual unsigned int GetTicksPerSecond() = 0;
+		virtual uint32_t GetTick(void) = 0;
+		virtual uint32_t GetTicksPerSecond() = 0;
 
 		void ReturnCallBack(void);
-		Task *ScheduleTask(void(*)(void *), void *, unsigned int, bool);
-		bool ScheduleTask(Task *, unsigned int);
-		bool ReScheduleTask(Task *, unsigned int);
+		Task *ScheduleTask(void(*)(void *), void *, uint32_t, bool);
+		bool ScheduleTask(Task *, uint32_t);
+		bool ReScheduleTask(Task *, uint32_t);
 		bool UnScheduleTask(Task *);
 		
-		unsigned int GetElapsedTick(unsigned int);
-		float GetElapsedTime(unsigned int);
+		uint32_t GetElapsedTick(uint32_t);
+		float GetElapsedTime(uint32_t);
 	};
 }
 #endif

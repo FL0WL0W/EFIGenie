@@ -13,7 +13,7 @@ namespace IOServices
 
 	void FloatOutputService_StepperInterpolatedTable::SetOutput(float value)
 	{
-		const int newStepPosition = Interpolation::InterpolateTable1<int>(value, _config->MaxValue, _config->MinValue, _config->Resolution, _config->Table());
+		const int32_t newStepPosition = Interpolation::InterpolateTable1<int>(value, _config->MaxValue, _config->MinValue, _config->Resolution, _config->Table());
 
 		_stepperService->Step(newStepPosition - _currentStepPosition);
 

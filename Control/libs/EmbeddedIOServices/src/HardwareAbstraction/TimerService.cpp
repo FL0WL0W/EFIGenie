@@ -48,7 +48,7 @@ namespace HardwareAbstraction
 			return;
 
 		HardwareAbstraction::Task *callTask = CallBackStackPointer[StackSize - 1];
-		unsigned int runTick = callTask->Tick;
+		uint32_t runTick = callTask->Tick;
 		while (StackSize > 0 && ((callTask = CallBackStackPointer[StackSize - 1]))->Tick == runTick)
 		{
 			callTask = CallBackStackPointer[StackSize - 1];
@@ -72,7 +72,7 @@ namespace HardwareAbstraction
 			std::sort(CallBackStackPointer, CallBackStackPointer + StackSize, OverFlowGreaterThan);
 	}
 
-	Task *ITimerService::ScheduleTask(void(*callBack)(void *), void *parameters, unsigned int tick, bool deleteOnExecution)
+	Task *ITimerService::ScheduleTask(void(*callBack)(void *), void *parameters, uint32_t tick, bool deleteOnExecution)
 	{
 		Task *taskToSchedule = new Task(callBack, parameters, deleteOnExecution);
 
@@ -81,7 +81,7 @@ namespace HardwareAbstraction
 		return taskToSchedule;
 	}
 
-	bool ITimerService::ScheduleTask(Task *task, unsigned int tick)
+	bool ITimerService::ScheduleTask(Task *task, uint32_t tick)
 	{
 		task->Tick = tick;
 		CallBackStackPointer[StackSize] = task;
@@ -94,7 +94,7 @@ namespace HardwareAbstraction
 		return true;
 	}
 
-	bool ITimerService::ReScheduleTask(Task *task, unsigned int tick)
+	bool ITimerService::ReScheduleTask(Task *task, uint32_t tick)
 	{
 		task->Tick = tick;
 		Task **end = CallBackStackPointer + StackSize;
@@ -120,19 +120,19 @@ namespace HardwareAbstraction
 		Task **end = CallBackStackPointer + StackSize;
 		if (CallBackStackPointer[StackSize - 1] == task)
 		{
-			StackSize = static_cast<unsigned char>(std::remove(CallBackStackPointer, end, task) - CallBackStackPointer);
+			StackSize = static_cast<uint8_t>(std::remove(CallBackStackPointer, end, task) - CallBackStackPointer);
 			ScheduleCallBack(CallBackStackPointer[StackSize - 1]->Tick);
 		}
 		else
 		{
-			StackSize = static_cast<unsigned char>(std::remove(CallBackStackPointer, end, task) - CallBackStackPointer);
+			StackSize = static_cast<uint8_t>(std::remove(CallBackStackPointer, end, task) - CallBackStackPointer);
 		}
 		return true;
 	}
 	
-	unsigned int ITimerService::GetElapsedTick(unsigned int lastTick)
+	uint32_t ITimerService::GetElapsedTick(uint32_t lastTick)
 	{
-		unsigned int tick = GetTick();
+		uint32_t tick = GetTick();
 		if (tick < lastTick)
 		{
 			lastTick += 2147483647;
@@ -141,7 +141,7 @@ namespace HardwareAbstraction
 		return tick - lastTick;
 	}
 	
-	float ITimerService::GetElapsedTime(unsigned int lastTick)
+	float ITimerService::GetElapsedTime(uint32_t lastTick)
 	{
 		return (GetElapsedTick(lastTick) / (float)GetTicksPerSecond());
 	}

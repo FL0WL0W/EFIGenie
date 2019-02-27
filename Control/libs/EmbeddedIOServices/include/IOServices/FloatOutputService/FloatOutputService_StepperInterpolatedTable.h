@@ -20,17 +20,17 @@ namespace IOServices
 		}
 		
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatOutputService_StepperInterpolatedTableConfig) +
 				(sizeof(int) * Resolution);
 		}
 		
-		constexpr const int *Table() const { return reinterpret_cast<const int *>(this + 1); }
+		constexpr const int32_t*Table() const { return reinterpret_cast<const int32_t*>(this + 1); }
 
 		float MinValue;
 		float MaxValue;
-		unsigned char Resolution;
+		uint8_t Resolution;
 	});
 
 	class FloatOutputService_StepperInterpolatedTable : public IFloatOutputService
@@ -39,7 +39,7 @@ namespace IOServices
 		const FloatOutputService_StepperInterpolatedTableConfig *_config;
 
 		IStepperOutputService *_stepperService;
-		int _currentStepPosition;
+		int32_t _currentStepPosition;
 
 	public:
 		FloatOutputService_StepperInterpolatedTable(const FloatOutputService_StepperInterpolatedTableConfig *config, IStepperOutputService *stepperService);

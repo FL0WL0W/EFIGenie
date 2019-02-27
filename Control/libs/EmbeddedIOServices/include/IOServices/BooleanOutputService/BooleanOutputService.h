@@ -12,12 +12,12 @@ namespace IOServices
 	struct BooleanOutputServiceConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(BooleanOutputServiceConfig);
 		}
 
-		unsigned short Pin;
+		uint16_t Pin;
 		bool NormalOn;
 		bool HighZ;
 	});

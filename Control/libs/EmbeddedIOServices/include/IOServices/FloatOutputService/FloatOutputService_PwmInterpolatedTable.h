@@ -19,7 +19,7 @@ namespace IOServices
 		}
 		
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatOutputService_PwmInterpolatedTableConfig) +
 				(sizeof(float) * Resolution);
@@ -27,11 +27,11 @@ namespace IOServices
 		
 		constexpr const float *Table() const { return reinterpret_cast<const float *>(this + 1); }
 		
-		unsigned short PwmPin;
-		unsigned short Frequency;
+		uint16_t PwmPin;
+		uint16_t Frequency;
 		float MinValue;
 		float MaxValue;
-		unsigned char Resolution;
+		uint8_t Resolution;
 	});
 
 	class FloatOutputService_PwmInterpolatedTable : public IFloatOutputService

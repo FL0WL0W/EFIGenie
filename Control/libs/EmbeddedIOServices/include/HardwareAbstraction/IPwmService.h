@@ -17,9 +17,9 @@ namespace HardwareAbstraction
 	class IPwmService
 	{
 	public:
-		virtual void InitPin(unsigned short pin, PinDirection direction, unsigned short minFreqeuncy) = 0;  //pin 0 should be for "null"
-		virtual PwmValue ReadPin(unsigned short pin) = 0; //pin 0 should be for "null"
-		virtual void WritePin(unsigned short pin, PwmValue value) = 0; //pin 0 should be for "null"
+		virtual void InitPin(uint16_t pin, PinDirection direction, uint16_t minFreqeuncy) = 0;  //pin 0 should be for "null"
+		virtual PwmValue ReadPin(uint16_t pin) = 0; //pin 0 should be for "null"
+		virtual void WritePin(uint16_t pin, PwmValue value) = 0; //pin 0 should be for "null"
 	};
 }
 #endif

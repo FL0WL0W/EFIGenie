@@ -20,7 +20,7 @@ namespace IOServices
 		}
 		
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatInputService_FrequencyInterpolatedTableConfig) +
 				(sizeof(float) * Resolution);
@@ -28,11 +28,11 @@ namespace IOServices
 
 		constexpr const float *Table() const { return reinterpret_cast<const float *>(this + 1); }
 
-		unsigned short PwmPin;
-		unsigned short DotSampleRate;
-		unsigned short MinFrequency;
-		unsigned short MaxFrequency;
-		unsigned char Resolution;
+		uint16_t PwmPin;
+		uint16_t DotSampleRate;
+		uint16_t MinFrequency;
+		uint16_t MaxFrequency;
+		uint8_t Resolution;
 	});
 	
 	class FloatInputService_FrequencyInterpolatedTable : public IFloatInputService
@@ -41,7 +41,7 @@ namespace IOServices
 		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatInputService_FrequencyInterpolatedTableConfig *_config;
 		
-		unsigned int _lastReadTick = 0;
+		uint32_t _lastReadTick = 0;
 		float _lastValue = 0;
 		
 	public:

@@ -10,12 +10,12 @@ namespace IOServices
 	struct StepperOutputService_FullStepControlConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(StepperOutputService_FullStepControlConfig);
 		}
 		
-		unsigned short MaxStepsPerSecond;
+		uint16_t MaxStepsPerSecond;
 		float StepWidth;
 	});
 
@@ -28,16 +28,16 @@ namespace IOServices
 		IBooleanOutputService *_coilAMinusBooleanOutputService;
 		IBooleanOutputService *_coilBPlusBooleanOutputService;
 		IBooleanOutputService *_coilBMinusBooleanOutputService;
-		int _stepQueue = 0;
-		char _state;
+		int32_t _stepQueue = 0;
+		int8_t _state;
 		Task *_stepTask;
 		static void StepCallBack(void *stepperOutputService_FullStepControl);
 		void Step();
-		void SetState(char state);
+		void SetState(int8_t state);
 
 	public:
 		StepperOutputService_FullStepControl(const HardwareAbstractionCollection *hardwareAbstractionCollection, const StepperOutputService_FullStepControlConfig *config, IBooleanOutputService *coilAPlusBooleanOutputService, IBooleanOutputService *coilAMinusBooleanOutputService, IBooleanOutputService *coilBPlusBooleanOutputService, IBooleanOutputService *coilBMinusBooleanOutputService);
-		void Step(int steps) override;
+		void Step(int32_t steps) override;
 		void Calibrate() override;
 	};
 }

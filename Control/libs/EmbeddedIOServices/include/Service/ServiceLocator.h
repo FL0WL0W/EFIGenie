@@ -7,11 +7,11 @@ namespace Service
 	class ServiceLocator
 	{
 	protected:
-		std::map<unsigned short, void *> _services;
+		std::map<uint16_t, void *> _services;
 	public:
-		void Register(unsigned short serviceId, void *service);
-		void* Locate(unsigned short serviceId);
-		void Unregister(unsigned short serviceId);
+		void Register(uint16_t serviceId, void *service);
+		void* Locate(uint16_t serviceId);
+		void Unregister(uint16_t serviceId);
 	};
 }
 #endif

@@ -9,7 +9,7 @@ namespace IOServices
 		_child = child;
 	}
 
-	void StepperOutputService_StaticStepCalibrationWrapper::Step(int steps)
+	void StepperOutputService_StaticStepCalibrationWrapper::Step(int32_t steps)
 	{
 		_child->Step(steps);
 	}

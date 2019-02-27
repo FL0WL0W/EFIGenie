@@ -13,7 +13,7 @@ namespace IOServices
 	protected:
 		IBooleanInputService *_booleanInputService;
 		ITimerService *_timerService;
-		unsigned int _lastPressed = 0;
+		uint32_t _lastPressed = 0;
 		bool _pressed = false;
 
 	public:

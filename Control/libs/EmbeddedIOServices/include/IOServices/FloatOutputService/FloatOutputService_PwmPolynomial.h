@@ -10,23 +10,23 @@ using namespace HardwareAbstraction;
 namespace IOServices
 {
 	PACK(
-	template<unsigned char Degree>
+	template<uint8_t Degree>
 	struct FloatOutputService_PwmPolynomialConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatOutputService_PwmPolynomialConfig<Degree>);
 		}
 		
-		unsigned short PwmPin;
-		unsigned short Frequency;
+		uint16_t PwmPin;
+		uint16_t Frequency;
 		float A[Degree+1];
 		float MinDutyCycle;
 		float MaxDutyCycle;
 	});
 
-	template<unsigned char Degree>
+	template<uint8_t Degree>
 	class FloatOutputService_PwmPolynomial : public IFloatOutputService
 	{
 	protected:
@@ -45,8 +45,8 @@ namespace IOServices
 		void SetOutput(float value) override
 		{
 			float pwmValue = _config->A[0];
-			for (int i = 1; i <= Degree; i++)
-				pwmValue += _config->A[i] * pow(value, i);
+			for (uint8_t i = 1; i <= Degree; i++)
+				pwmValue += _config->A[i] * powf(value, i);
 
 			if (pwmValue > _config->MaxDutyCycle)
 				pwmValue = _config->MaxDutyCycle;

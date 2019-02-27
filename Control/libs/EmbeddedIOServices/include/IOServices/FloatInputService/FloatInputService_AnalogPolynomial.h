@@ -10,30 +10,30 @@ using namespace HardwareAbstraction;
 namespace IOServices
 {
 	PACK(
-	template<unsigned char Degree>
+	template<uint8_t Degree>
 	struct FloatInputService_AnalogPolynomialConfig
 	{
 	public:		
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(FloatInputService_AnalogPolynomialConfig<Degree>);
 		}
 		
-		unsigned short AdcPin;
-		unsigned short DotSampleRate;
+		uint16_t AdcPin;
+		uint16_t DotSampleRate;
 		float A[Degree+1];
 		float MinValue;
 		float MaxValue;
 	});
 	
-	template<unsigned char Degree>
+	template<uint8_t Degree>
 	class FloatInputService_AnalogPolynomial : public IFloatInputService
 	{
 	protected:
 		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
 		const FloatInputService_AnalogPolynomialConfig<Degree> *_config;
 		
-		unsigned int _lastReadTick = 0;
+		uint32_t _lastReadTick = 0;
 		float _lastValue = 0;
 		
 	public:
@@ -49,8 +49,8 @@ namespace IOServices
 		{
 			float adcValue = _hardwareAbstractionCollection->AnalogService->ReadPin(_config->AdcPin);
 			Value = _config->A[0];
-			for (int i = 1; i <= Degree; i++)
-				Value += _config->A[i] * pow(adcValue, i);
+			for (uint8_t i = 1; i <= Degree; i++)
+				Value += _config->A[i] * powf(adcValue, i);
 			if (Value < _config->MinValue)
 				Value = _config->MinValue;
 			else if (Value > _config->MaxValue)

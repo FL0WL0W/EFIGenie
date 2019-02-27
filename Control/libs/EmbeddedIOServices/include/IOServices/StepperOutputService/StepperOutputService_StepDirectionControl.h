@@ -10,12 +10,12 @@ namespace IOServices
 	struct StepperOutputService_StepDirectionControlConfig
 	{
 	public:
-		constexpr const unsigned int Size() const
+		constexpr const uint32_t Size() const
 		{
 			return sizeof(StepperOutputService_StepDirectionControlConfig);
 		}
 		
-		unsigned short MaxStepsPerSecond;
+		uint16_t MaxStepsPerSecond;
 		float StepWidth;
 	});
 
@@ -26,7 +26,7 @@ namespace IOServices
 		const StepperOutputService_StepDirectionControlConfig *_config;
 		IBooleanOutputService *_stepBooleanOutputService;
 		IBooleanOutputService *_directionBooleanOutputService;
-		int _stepQueue = 0;
+		int32_t _stepQueue = 0;
 		Task *_offTask;
 		Task *_stepTask;
 		static void StepCallBack(void *stepperOutputService_StepDirectionControl);
@@ -34,7 +34,7 @@ namespace IOServices
 
 	public:
 		StepperOutputService_StepDirectionControl(const HardwareAbstractionCollection *hardwareAbstractionCollection, const StepperOutputService_StepDirectionControlConfig *config, IBooleanOutputService *stepBooleanOutputService, IBooleanOutputService *directionBooleanOutputService);
-		void Step(int steps) override;
+		void Step(int32_t steps) override;
 		void Calibrate() override;
 	};
 }

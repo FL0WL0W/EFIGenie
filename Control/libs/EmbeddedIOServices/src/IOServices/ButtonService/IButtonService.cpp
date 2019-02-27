@@ -34,11 +34,11 @@ namespace IOServices
 		reinterpret_cast<IButtonService*>(buttonService)->Tick();
 	}
 
-	IButtonService* IButtonService::CreateButtonService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
+	IButtonService* IButtonService::CreateButtonService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, uint32_t *sizeOut)
 	{
-		const unsigned char buttonServiceId = *reinterpret_cast<const unsigned char *>(config);
-		config = reinterpret_cast<const unsigned char *>(config) + 1;
-		*sizeOut = sizeof(unsigned char);
+		const uint8_t buttonServiceId = *reinterpret_cast<const uint8_t *>(config);
+		config = reinterpret_cast<const uint8_t *>(config) + 1;
+		*sizeOut = sizeof(uint8_t);
 		
 		IButtonService *buttonService = 0;
 
@@ -47,9 +47,9 @@ namespace IOServices
 #ifdef BUTTONSERVICE_POLLING_H
 		case 1:
 			{
-				unsigned int size;
+				uint32_t size;
 				IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService(hardwareAbstractionCollection, config, &size);
-				config = reinterpret_cast<const unsigned char *>(config) + size;
+				config = reinterpret_cast<const uint8_t *>(config) + size;
 				*sizeOut += size;
 
 				buttonService = new ButtonService_Polling(hardwareAbstractionCollection->TimerService, booleanInputService);

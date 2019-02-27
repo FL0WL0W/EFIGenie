@@ -14,11 +14,11 @@ namespace IOServices
 		reinterpret_cast<IBooleanOutputService *>(booleanOutputService)->OutputReset();
 	}
 	
-	IBooleanOutputService *IBooleanOutputService::CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut)
+	IBooleanOutputService *IBooleanOutputService::CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, uint32_t *sizeOut)
 	{
-		const unsigned char outputServiceId = *reinterpret_cast<const unsigned char *>(config);
-		config = reinterpret_cast<const unsigned char *>(config) + 1;
-		*sizeOut = sizeof(unsigned char);
+		const uint8_t outputServiceId = *reinterpret_cast<const uint8_t *>(config);
+		config = reinterpret_cast<const uint8_t *>(config) + 1;
+		*sizeOut = sizeof(uint8_t);
 		
 		IBooleanOutputService *outputService = 0;
 		

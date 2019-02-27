@@ -7,7 +7,7 @@ namespace IOServices
 	class MockStepperOutputService : public IStepperOutputService
 	{
 	public:
-		MOCK_METHOD1(Step, void(int));
+		MOCK_METHOD1(Step, void(int32_t));
 		MOCK_METHOD0(Calibrate, void());
 	};
 }
