@@ -3,9 +3,12 @@
 
 namespace CrankCamDecoders
 {
-	Gm24xDecoder::Gm24xDecoder(HardwareAbstraction::ITimerService *timerService)
+	Gm24xDecoder::Gm24xDecoder(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const Gm24xDecoderConfig *config)
 	{
-		_timerService = timerService;\
+		_hardwareAbstractionCollection = hardwareAbstractionCollection;
+		_config = config;
+		_hardwareAbstractionCollection->DigitalService->ScheduleRecurringInterrupt(_config->CrankPin, new HardwareAbstraction::CallBack(CrankInterruptCallBack, this));
+		_hardwareAbstractionCollection->DigitalService->ScheduleRecurringInterrupt(_config->CamPin, new HardwareAbstraction::CallBack(CamInterruptCallBack, this));
 		_camTicked = false;
 		_hasCamPosition = true;
 		_isSynced = false;
@@ -18,7 +21,7 @@ namespace CrankCamDecoders
 	
 	unsigned int Gm24xDecoder::crankTime()
 	{
-		unsigned int crankTick = _timerService->GetTick();
+		unsigned int crankTick = _hardwareAbstractionCollection->TimerService->GetTick();
 		if (crankTick < _lastCrankTick)
 		{
 			return crankTick + (4294967295 - _lastCrankTick);
@@ -36,21 +39,21 @@ namespace CrankCamDecoders
 		return _state * 15 + (crankTime() * 15) / (float)_crankPeriod;
 	}
 	
-	unsigned int Gm24xDecoder::GetTickPerDegree(void)
+	uint32_t Gm24xDecoder::GetTickPerDegree(void)
 	{
 		return _crankPeriod / 15;
 	}
 	
 	unsigned short Gm24xDecoder::GetRpm(void)
 	{
-		return ((60 * _timerService->GetTicksPerSecond()) / 24) / _crankPeriod;
+		return ((60 * _hardwareAbstractionCollection->TimerService->GetTicksPerSecond()) / 24) / _crankPeriod;
 	}
 	
 	void Gm24xDecoder::CrankEdgeTrigger(EdgeTrigger edgeTrigger)
 	{
 		if (edgeTrigger == Down)
 		{
-			unsigned int crankTick = _timerService->GetTick();
+			unsigned int crankTick = _hardwareAbstractionCollection->TimerService->GetTick();
 			if (crankTick < _lastCrankTick)
 			{
 				_crankPeriod = crankTick + (4294967295 - _lastCrankTick);
@@ -75,7 +78,7 @@ namespace CrankCamDecoders
 		}
 		else if (edgeTrigger == Up && !_hasCamPosition)
 		{
-			unsigned int crankTick = _timerService->GetTick();
+			unsigned int crankTick = _hardwareAbstractionCollection->TimerService->GetTick();
 			unsigned int interumCrankPeriod = 0;
 			if (crankTick < _lastCrankTick)
 			{
@@ -113,7 +116,7 @@ namespace CrankCamDecoders
 	
 	void Gm24xDecoder::CamEdgeTrigger(EdgeTrigger edgeTrigger)
 	{
-		_lastCamTick = _timerService->GetTick();
+		_lastCamTick = _hardwareAbstractionCollection->TimerService->GetTick();
 		_camTicked = true;
 		_isSynced = true;
 		_hasCamPosition = true;
@@ -135,5 +138,29 @@ namespace CrankCamDecoders
 	bool Gm24xDecoder::HasCamPosition()
 	{
 		return _hasCamPosition;
+	}
+
+	void Gm24xDecoder::CrankInterruptCallBack(void *decoder)
+	{
+		reinterpret_cast<Gm24xDecoder *>(decoder)->CrankInterrupt();
+	}
+
+	void Gm24xDecoder::CamInterruptCallBack(void *decoder)
+	{
+		reinterpret_cast<Gm24xDecoder *>(decoder)->CamInterrupt();
+	}
+
+	void Gm24xDecoder::CrankInterrupt()
+	{
+		bool rising = _hardwareAbstractionCollection->DigitalService->ReadPin(_config->CrankPin);
+
+		CrankEdgeTrigger(rising? Up : Down);
+	}
+
+	void Gm24xDecoder::CamInterrupt()
+	{
+		bool rising = _hardwareAbstractionCollection->DigitalService->ReadPin(_config->CamPin);
+
+		CamEdgeTrigger(rising? Up : Down);
 	}
 }

@@ -3,6 +3,7 @@
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
 #include "HardwareAbstraction/ITimerService.h"
 #include "Packed.h"
+#include "math.h"
 
 using namespace CrankCamDecoders;
 using namespace IOServices;

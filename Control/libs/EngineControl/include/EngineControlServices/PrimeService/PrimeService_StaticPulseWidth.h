@@ -4,6 +4,7 @@
 #include "Service/ServiceLocator.h"
 #include "EngineControlServices/PrimeService/IPrimeService.h"
 #include "Packed.h"
+#include "math.h"
 
 using namespace IOServices;
 using namespace HardwareAbstraction;

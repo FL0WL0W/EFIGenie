@@ -4,6 +4,7 @@
 #include "HardwareAbstraction/ITimerService.h"
 #include "Packed.h"
 #include "stdlib.h"
+#include "math.h"
 
 using namespace CrankCamDecoders;
 using namespace HardwareAbstraction;

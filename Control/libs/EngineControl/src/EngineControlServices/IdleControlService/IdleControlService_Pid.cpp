@@ -1,5 +1,4 @@
 #include "EngineControlServices/IdleControlService/IdleControlService_Pid.h"
-#include "math.h"
 #include "Interpolation.h"
 
 using namespace Interpolation;

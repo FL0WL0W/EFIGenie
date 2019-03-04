@@ -3,6 +3,7 @@
 #include "CrankCamDecoders/ICrankCamDecoder.h"
 #include "EngineControlServices/AfrService/IAfrService.h"
 #include "Packed.h"
+#include "math.h"
 
 using namespace HardwareAbstraction;
 using namespace IOServices;

@@ -552,7 +552,7 @@ namespace Service
 		{
 #ifdef GM24XDECODER_H
 		case 1:
-			ret = new Gm24xDecoder(serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID));
+			ret = new Gm24xDecoder(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Gm24xDecoderConfig >(&config, totalSize));
 			break;
 #endif
 		}

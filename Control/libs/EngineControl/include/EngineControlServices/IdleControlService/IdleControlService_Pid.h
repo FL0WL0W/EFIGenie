@@ -4,6 +4,7 @@
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "Packed.h"
+#include "math.h"
 
 using namespace HardwareAbstraction;
 using namespace CrankCamDecoders;

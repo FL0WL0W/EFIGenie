@@ -2,6 +2,7 @@
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "HardwareAbstraction/ITimerService.h"
 #include "Packed.h"
+#include "math.h"
 
 using namespace IOServices;
 using namespace HardwareAbstraction;

@@ -28,7 +28,9 @@ var SensorServicesIni = {
         { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: SpeedUnits } }
     ] },
     DecoderGM24x: { Variables: [
-        { DecoderGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } }
+        { DecoderGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { CrankPin: { Type: "uint16", Label: "Crank Pin" } },
+        { CamPin: { Type: "uint16", Label: "Cam Pin" } }
     ] },
     IDecoderConfig: { Variables: [
         { DecoderServiceId: { Type: "uint16", Value: 2001, Hidden: true } },

@@ -299,7 +299,7 @@ EngineControl_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Contro
 INSTALL_GTEST:BOOL=ON
 
 //Path to a program.
-PYTHON_EXECUTABLE:FILEPATH=PYTHON_EXECUTABLE-NOTFOUND
+PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/.platformio/penv/Scripts/python.exe
 
 //Value Computed by CMake
 TopLevelBuild_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build
@@ -523,6 +523,8 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding PythonInterp
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/Users/daniel/.platformio/penv/Scripts/python.exe][v2.7.13()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: PYTHON_EXECUTABLE

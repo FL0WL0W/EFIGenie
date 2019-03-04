@@ -661,13 +661,6 @@ build libs\TransmissionControl\list_install_components: phony
 # Order-only phony target for TransmissionControl
 
 build cmake_object_order_depends_target_TransmissionControl: phony || cmake_object_order_depends_target_CrankCamDecoders cmake_object_order_depends_target_EmbeddedIOServices
-build libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\Service\TransmissionControlServiceBuilder.cpp.obj: CXX_COMPILER__TransmissionControl ..\libs\TransmissionControl\src\Service\TransmissionControlServiceBuilder.cpp || cmake_object_order_depends_target_TransmissionControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\TransmissionControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\CrankCamDecoders\include
-  OBJECT_DIR = libs\TransmissionControl\CMakeFiles\TransmissionControl.dir
-  OBJECT_FILE_DIR = libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\Service
-  TARGET_COMPILE_PDB = libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\TransmissionControl.pdb
-  TARGET_PDB = libs\TransmissionControl\TransmissionControl.pdb
 build libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\TransmissionControlServices\GearControlService\GearControlService_ButtonShift.cpp.obj: CXX_COMPILER__TransmissionControl ..\libs\TransmissionControl\src\TransmissionControlServices\GearControlService\GearControlService_ButtonShift.cpp || cmake_object_order_depends_target_TransmissionControl
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   INCLUDES = -I..\libs\TransmissionControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\CrankCamDecoders\include
@@ -690,7 +683,7 @@ build libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\Transmissi
 #############################################
 # Link the static library libs\TransmissionControl\TransmissionControl.lib
 
-build libs\TransmissionControl\TransmissionControl.lib: CXX_STATIC_LIBRARY_LINKER__TransmissionControl libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\Service\TransmissionControlServiceBuilder.cpp.obj libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\TransmissionControlServices\GearControlService\GearControlService_ButtonShift.cpp.obj libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\TransmissionControlServices\ShiftService\ShiftService_Solenoid.cpp.obj || libs\CrankCamDecoders\CrankCamDecoders.lib libs\EmbeddedIOServices\EmbeddedIOServices.lib
+build libs\TransmissionControl\TransmissionControl.lib: CXX_STATIC_LIBRARY_LINKER__TransmissionControl libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\TransmissionControlServices\GearControlService\GearControlService_ButtonShift.cpp.obj libs\TransmissionControl\CMakeFiles\TransmissionControl.dir\src\TransmissionControlServices\ShiftService\ShiftService_Solenoid.cpp.obj || libs\CrankCamDecoders\CrankCamDecoders.lib libs\EmbeddedIOServices\EmbeddedIOServices.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = libs\TransmissionControl\CMakeFiles\TransmissionControl.dir

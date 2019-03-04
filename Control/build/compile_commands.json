@@ -265,12 +265,6 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\TransmissionControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\TransmissionControl\\CMakeFiles\\TransmissionControl.dir\\src\\Service\\TransmissionControlServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\TransmissionControl\\src\\Service\\TransmissionControlServiceBuilder.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl/src/Service/TransmissionControlServiceBuilder.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\TransmissionControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\CrankCamDecoders\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\TransmissionControl\\CMakeFiles\\TransmissionControl.dir\\src\\TransmissionControlServices\\GearControlService\\GearControlService_ButtonShift.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\TransmissionControl\\src\\TransmissionControlServices\\GearControlService\\GearControlService_ButtonShift.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl/src/TransmissionControlServices/GearControlService/GearControlService_ButtonShift.cpp"
 },
