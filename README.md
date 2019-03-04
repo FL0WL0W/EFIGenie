@@ -39,11 +39,9 @@ Features<br>
   <li>Transmission Control (Paddle shift transmission solenoid)</li>
   <li>Firmware features</li>
     <ul>
-      <li>Build Defines for NOINJECTION Control (Ignition only controller hardware / I.E. PiggyBack or Carburetor)</li>
-      <li>Build Defines for NOIGNITION Control (Injection only hardware / I.E. PiggyBack)</li>
+      <li>Ability to comment out header files in the service builder to disable features to minimize size</li>
       <li>Unit Tests to ensure everything works</li>
       <li>Service Oriented Architecture</li>
-      <li>Ability to easily remove services in order to conserve space</li>
       <li>Easily add new sensors</li>
     </ul>
 </ul>
