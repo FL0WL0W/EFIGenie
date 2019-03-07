@@ -14,7 +14,7 @@ namespace Reluctor
 		_state	  = false;
 	}
 	
-	const unsigned int Universal2xReluctor::time() const
+	const uint32_t Universal2xReluctor::time() const
 	{
 		unsigned int tick = _hardwareAbstractionCollection->TimerService->GetTick();
 		if (tick < _lastTick)
