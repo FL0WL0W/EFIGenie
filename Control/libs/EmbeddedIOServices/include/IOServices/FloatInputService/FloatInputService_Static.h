@@ -1,4 +1,5 @@
 #include "IFloatInputService.h"
+#include "stdint.h"
 
 #if !defined(FLOATINPUTSERVICE_STATIC_H) && defined(IFLOATINPUTSERVICE_H)
 #define FLOATINPUTSERVICE_STATIC_H

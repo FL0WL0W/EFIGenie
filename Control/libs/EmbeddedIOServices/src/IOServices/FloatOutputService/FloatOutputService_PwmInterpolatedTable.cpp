@@ -14,7 +14,7 @@ namespace IOServices
 
 	void FloatOutputService_PwmInterpolatedTable::SetOutput(float value)
 	{
-		const float pwmValue = Interpolation::InterpolateTable1<float>(value, _config->MaxValue, _config->MinValue, _config->Resolution, _config->Table());
+		const float pwmValue = Interpolation::InterpolateTable1<const float>(value, _config->MaxValue, _config->MinValue, _config->Resolution, _config->Table());
 		
 		_hardwareAbstractionCollection->PwmService->WritePin(_config->PwmPin, { 1.0f / _config->Frequency, pwmValue / _config->Frequency });
 	}

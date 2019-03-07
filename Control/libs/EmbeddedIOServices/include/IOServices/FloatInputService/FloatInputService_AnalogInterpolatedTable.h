@@ -3,6 +3,7 @@
 #include "math.h"
 #include "Packed.h"
 #include "Interpolation.h"
+#include "stdint.h"
 
 using namespace HardwareAbstraction;
 

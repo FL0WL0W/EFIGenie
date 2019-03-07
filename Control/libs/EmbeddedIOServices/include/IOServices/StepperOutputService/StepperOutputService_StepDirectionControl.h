@@ -1,6 +1,7 @@
 #include "IOServices/StepperOutputService/IStepperOutputService.h"
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "Packed.h"
+#include "stdint.h"
 #include "math.h"
 
 #if !defined(STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H) && defined(ISTEPPEROUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)

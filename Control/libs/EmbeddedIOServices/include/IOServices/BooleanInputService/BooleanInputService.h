@@ -1,6 +1,7 @@
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
 #include "IBooleanInputService.h"
 #include "Packed.h"
+#include "stdint.h"
 
 #if !defined(BOOLEANINPUTSERVICE_H) && defined(IBOOLEANINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define BOOLEANINPUTSERVICE_H

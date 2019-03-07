@@ -1,4 +1,5 @@
 #include <list>
+#include "stdint.h"
 
 #ifndef ITASK_H
 #define ITASK_H

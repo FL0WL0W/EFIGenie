@@ -1,4 +1,5 @@
 #include "ICallBack.h"
+#include "stdint.h"
 
 #ifndef ITIMERSERVICE_H
 #define ITIMERSERVICE_H

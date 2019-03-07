@@ -1,5 +1,6 @@
 #include "IFloatInputService.h"
 #include "Packed.h"
+#include "stdint.h"
 
 #if !defined(FLOATINPUTSERVICE_FAULTDETECTIONWRAPPER_H) && defined(IFLOATINPUTSERVICE_H)
 #define FLOATINPUTSERVICE_FAULTDETECTIONWRAPPER_H

@@ -1,5 +1,6 @@
 #include "PinDirection.h"
 #include "ICallBack.h"
+#include "stdint.h"
 
 #ifndef IDIGITALSERVICE_H
 #define IDIGITALSERVICE_H

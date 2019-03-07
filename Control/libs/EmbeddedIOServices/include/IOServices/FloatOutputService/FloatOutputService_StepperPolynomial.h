@@ -3,6 +3,7 @@
 #include "IFloatOutputService.h"
 #include "math.h"
 #include "Packed.h"
+#include "stdint.h"
 
 using namespace HardwareAbstraction;
 

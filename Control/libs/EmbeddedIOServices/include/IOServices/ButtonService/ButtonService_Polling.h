@@ -1,6 +1,7 @@
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
 #include "IButtonService.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
+#include "stdint.h"
 
 #define BUTTONDEBOUNCETIME 100
 

@@ -1,4 +1,5 @@
 #include <map>
+#include "stdint.h"
 
 #ifndef SERVICELOCATOR_H
 #define SERVICELOCATOR_H

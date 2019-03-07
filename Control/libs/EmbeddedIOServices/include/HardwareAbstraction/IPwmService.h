@@ -1,3 +1,5 @@
+#include "stdint.h"
+
 #ifndef IPWMSERVICE_H
 #define IPWMSERVICE_H
 namespace HardwareAbstraction

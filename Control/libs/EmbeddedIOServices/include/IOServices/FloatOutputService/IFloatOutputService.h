@@ -1,4 +1,5 @@
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
+#include "stdint.h"
 
 using namespace HardwareAbstraction;
 

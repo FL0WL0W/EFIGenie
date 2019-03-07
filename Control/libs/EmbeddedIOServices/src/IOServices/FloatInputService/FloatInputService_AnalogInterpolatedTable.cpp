@@ -15,7 +15,7 @@ namespace IOServices
 	{
 		const float adcValue = _hardwareAbstractionCollection->AnalogService->ReadPin(_config->AdcPin);
 
-		Value = Interpolation::InterpolateTable1<float>(adcValue, _config->MaxInputValue, _config->MinInputValue, _config->Resolution, _config->Table());
+		Value = Interpolation::InterpolateTable1<const float>(adcValue, _config->MaxInputValue, _config->MinInputValue, _config->Resolution, _config->Table());
 
 		const float elapsedTime = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
 		if (elapsedTime * _config->DotSampleRate < 1.0)

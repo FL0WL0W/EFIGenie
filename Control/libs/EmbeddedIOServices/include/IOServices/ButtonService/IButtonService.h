@@ -1,4 +1,5 @@
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
+#include "stdint.h"
 
 using namespace HardwareAbstraction;
 
@@ -19,7 +20,7 @@ namespace IOServices
 		virtual void Tick() = 0;
 
 		static IButtonService* CreateButtonService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *sizeOut);
-		static void IButtonService::TickCallBack(void *buttonService);
+		static void TickCallBack(void *buttonService);
 	};
 }
 #endif

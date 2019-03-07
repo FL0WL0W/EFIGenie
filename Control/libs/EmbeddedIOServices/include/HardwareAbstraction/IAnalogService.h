@@ -1,3 +1,5 @@
+#include "stdint.h"
+
 #ifndef IANALOGSERVICE_H
 #define IANALOGSERVICE_H
 namespace HardwareAbstraction

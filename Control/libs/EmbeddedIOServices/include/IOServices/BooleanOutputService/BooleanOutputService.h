@@ -1,6 +1,7 @@
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
 #include "IBooleanOutputService.h"
 #include "Packed.h"
+#include "stdint.h"
 
 using namespace HardwareAbstraction;
 
