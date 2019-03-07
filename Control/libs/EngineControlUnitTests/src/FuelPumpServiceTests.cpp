@@ -24,8 +24,8 @@ namespace UnitTests
 		HardwareAbstractionCollection _hardwareAbstractionCollection;
 		ServiceLocator *_serviceLocator;
 		CallBackGroup *_tickCallBackGroup;
-		CallBackGroup *_preDecoderCallBackGroup;
-		CallBackGroup *_postDecoderCallBackGroup;
+		CallBackGroup *_preReluctorCallBackGroup;
+		CallBackGroup *_postReluctorCallBackGroup;
 
 		FuelPumpServiceTests()
 		{
@@ -34,10 +34,10 @@ namespace UnitTests
 			_serviceLocator->Register(TIMER_SERVICE_ID, &_timerService);
 			_tickCallBackGroup = new CallBackGroup();
 			_serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)_tickCallBackGroup);
-			_preDecoderCallBackGroup = new CallBackGroup();
-			_serviceLocator->Register(PRE_DECODER_SYNC_CALL_BACK_GROUP, (void *)_preDecoderCallBackGroup);
-			_postDecoderCallBackGroup = new CallBackGroup();
-			_serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, (void *)_postDecoderCallBackGroup);
+			_preReluctorCallBackGroup = new CallBackGroup();
+			_serviceLocator->Register(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP, (void *)_preReluctorCallBackGroup);
+			_postReluctorCallBackGroup = new CallBackGroup();
+			_serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, (void *)_postReluctorCallBackGroup);
 
 			_hardwareAbstractionCollection.TimerService = &_timerService;
 			_hardwareAbstractionCollection.DigitalService = &_digitalService;
@@ -48,8 +48,8 @@ namespace UnitTests
 		void SetUp(bool normalOn, bool highZ) 
 		{
 			_tickCallBackGroup->Clear();
-			_preDecoderCallBackGroup->Clear();
-			_postDecoderCallBackGroup->Clear();
+			_preReluctorCallBackGroup->Clear();
+			_postReluctorCallBackGroup->Clear();
 			FuelPumpServiceConfig *fuelPumpServiceConfig = (FuelPumpServiceConfig *)malloc(sizeof(FuelPumpServiceConfig));
 			fuelPumpServiceConfig->PrimeTime = 1;
 
@@ -87,13 +87,13 @@ namespace UnitTests
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
-		_preDecoderCallBackGroup->Execute();
+		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
-		_postDecoderCallBackGroup->Execute();
+		_postReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		_fuelPumpService->Off();
@@ -106,13 +106,13 @@ namespace UnitTests
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
-		_preDecoderCallBackGroup->Execute();
+		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
-		_postDecoderCallBackGroup->Execute();
+		_postReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
 		_fuelPumpService->Off();
@@ -126,14 +126,14 @@ namespace UnitTests
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
-		_preDecoderCallBackGroup->Execute();
+		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
-		_postDecoderCallBackGroup->Execute();
+		_postReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
@@ -147,14 +147,14 @@ namespace UnitTests
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
-		_preDecoderCallBackGroup->Execute();
+		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
-		_postDecoderCallBackGroup->Execute();
+		_postReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
 		_fuelPumpService->Off();

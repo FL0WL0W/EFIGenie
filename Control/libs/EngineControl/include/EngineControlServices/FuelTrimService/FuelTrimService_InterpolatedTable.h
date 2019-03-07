@@ -1,13 +1,13 @@
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "EngineControlServices/AfrService/IAfrService.h"
 #include "Packed.h"
 #include "math.h"
 
 using namespace HardwareAbstraction;
 using namespace IOServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 
 #if !defined(FUELTRIMSERVICE_INTERPOLATEDTABLE_H) && defined(IFUELTRIMSERVICE_H)
 #define FUELTRIMSERVICE_INTERPOLATEDTABLE_H
@@ -51,7 +51,7 @@ namespace EngineControlServices
 	protected:
 		const FuelTrimService_InterpolatedTableConfig *_config;
 		ITimerService *_timerService;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_throttlePositionService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_lambdaSensorService;
@@ -67,7 +67,7 @@ namespace EngineControlServices
 		FuelTrimService_InterpolatedTable(
 			const FuelTrimService_InterpolatedTableConfig *config, 
 			ITimerService *timerService, 
-			ICrankCamDecoder *decoder,
+			IReluctor *reluctor,
 			IFloatInputService *throttlePositionService, 
 			IFloatInputService *manifoldAbsolutePressureService, 
 			IFloatInputService *lambdaSensorService,

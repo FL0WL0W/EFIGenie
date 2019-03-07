@@ -1,9 +1,9 @@
 #include "EngineControlServices/InjectionService/IInjectionConfig.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "Packed.h"
 
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 
 #if !defined(INJECTIONCONFIGWRAPPER_DFCO_H) && defined(IINJECTIONCONFIG_H)
@@ -34,11 +34,11 @@ namespace EngineControlServices
 	protected:
 		const InjectionConfigWrapper_DFCOConfig *_config;
 		IFloatInputService *_throttlePositionService;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IInjectionConfig *_child;
 		bool _dfcoEnabled;
 	public:
-		InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child);
+		InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IReluctor *reluctor, IInjectionConfig *child);
 		InjectorTiming GetInjectorTiming(unsigned char injector);
 	};
 }

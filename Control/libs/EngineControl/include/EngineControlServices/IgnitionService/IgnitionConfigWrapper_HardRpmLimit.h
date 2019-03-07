@@ -1,9 +1,9 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
 #include "Packed.h"
 
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 
 #if !defined(IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H) && defined(IIGNITIONCONFIG_H)
@@ -32,12 +32,12 @@ namespace EngineControlServices
 	{
 	protected:
 		const IgnitionConfigWrapper_HardRpmLimitConfig *_config;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IBooleanInputService *_booleanInputService;
 		IIgnitionConfig *_child;
 		bool _limitEnabled;
 	public:
-		IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
+		IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, IReluctor *reluctor, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

@@ -8,12 +8,14 @@ namespace EngineControlServices
 		IIgnitionConfig *ignitionConfig,
 		IBooleanOutputService **ignitorOutputServices,
 		ITimerService *timerService,
-		ICrankCamDecoder *decoder)
+		IReluctor *crankReluctor,
+		IReluctor *camReluctor)
 	{
 		_ignitionSchedulingServiceConfig = ignitionSchedulingServiceConfig;
 		_ignitionConfig = ignitorOutputServices != 0 ? ignitionConfig : 0;
 		_timerService = timerService;
-		_decoder = decoder;
+		_crankReluctor = crankReluctor;
+		_camReluctor = camReluctor;
 		_ignitorDwellTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _ignitionSchedulingServiceConfig->Ignitors);
 		_ignitorFireTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _ignitionSchedulingServiceConfig->Ignitors);
 		int tickMinusSome = _timerService->GetTick() - 6;
@@ -31,17 +33,59 @@ namespace EngineControlServices
 
 	void IgnitionSchedulingService::ScheduleEvents(void)
 	{
-		bool isSequential = _decoder->HasCamPosition();
-		if (_ignitionSchedulingServiceConfig->SequentialRequired && !isSequential)
+		bool isSequential;
+		float schedulePosition;//0-720 when sequential and 0-360 otherwise
+		uint32_t scheduleTickPerDegree;
+		if(_crankReluctor != 0 && _crankReluctor->IsSynced())
+		{
+			if(_camReluctor != 0 && _camReluctor->IsSynced())
+			{
+				//we have both crank and cam
+				//decide which one to use for scheduling.
+				if(_camReluctor->GetResolution() <= _crankReluctor->GetResolution() * 2)
+				{
+					schedulePosition = _crankReluctor->GetPosition();
+					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
+					if(_camReluctor->GetPosition() >= 180)
+					{
+						//we are on the second half of the cam
+						schedulePosition += 360;
+					}
+				}
+				else
+				{
+					//the crank reluctor is essential useless unless the cam sensor goes out of sync
+					schedulePosition = _camReluctor->GetPosition() * 2;
+					scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				}
+				isSequential = true;
+			}
+			else
+			{
+				//we only have the crank sensor
+				if (_ignitionSchedulingServiceConfig->SequentialRequired)
+					return;
+				schedulePosition = _crankReluctor->GetPosition();
+				scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				isSequential = false;
+			}
+		}
+		else if(_camReluctor != 0 && _camReluctor->IsSynced())
+		{
+			//we only have the cam sensor
+			schedulePosition = _camReluctor->GetPosition() * 2;
+			isSequential = true;
+		}
+		else
+		{
+			//we dont have any reluctors to use for scheduling
 			return;
+		}
 
-		float scheduleCamPosition = _decoder->GetCamPosition();
-		if (isSequential && scheduleCamPosition > 360)
-			scheduleCamPosition -= 360;
-		unsigned short camResolution = isSequential ? 720 : 360;
-		unsigned int scheduleTickPerDegree = _decoder->GetTickPerDegree();
-		unsigned int scheduleTick = _timerService->GetTick();
-		unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();
+		uint32_t scheduleTick = _timerService->GetTick();
+		uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();	
+		
+		unsigned short scheduleResolution = isSequential ? 720 : 360;
 		IgnitionTiming ignitionTiming = _ignitionConfig->GetIgnitionTiming();
 
 		const unsigned short *ignitorTdc = _ignitionSchedulingServiceConfig->IgnitorTdc();
@@ -58,13 +102,13 @@ namespace EngineControlServices
 				}
 				else
 				{
-					float degreesUntilFire = ignitorTdc[ignitor] - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - scheduleCamPosition;
+					float degreesUntilFire = ignitorTdc[ignitor] - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - schedulePosition;
 					if (degreesUntilFire < 0)
-						degreesUntilFire += camResolution;
-					if (degreesUntilFire > camResolution)
-						degreesUntilFire -= camResolution >> 2;
+						degreesUntilFire += scheduleResolution;
+					if (degreesUntilFire > scheduleResolution)
+						degreesUntilFire -= scheduleResolution >> 2;
 					if (degreesUntilFire < 0)
-						degreesUntilFire += camResolution;
+						degreesUntilFire += scheduleResolution;
 					unsigned int ignitionFireTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire));
 					_timerService->ReScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick);
 

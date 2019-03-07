@@ -24,5 +24,6 @@
     "gtest-adapter.debugConfig": [
         "(Windows) Launch"
     ],
-    "gtest-adapter.supportLocation": true
+    "gtest-adapter.supportLocation": true,
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
 }

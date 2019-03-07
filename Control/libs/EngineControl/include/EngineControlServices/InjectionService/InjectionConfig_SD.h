@@ -1,5 +1,5 @@
 #include "EngineControlServices/AfrService/IAfrService.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "EngineControlServices/InjectionService/IInjectionConfig.h"
 #include "Interpolation.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
@@ -7,10 +7,10 @@
 #include "Packed.h"
 
 using namespace IOServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace Interpolation;
 
-#if !defined(INJECTIONCONFIG_SD_H) && defined(IINJECTIONCONFIG_H) && defined(IAFRSERVICE_H) && defined(ICRANKCAMDECODER_H)
+#if !defined(INJECTIONCONFIG_SD_H) && defined(IINJECTIONCONFIG_H) && defined(IAFRSERVICE_H) && defined(IRELUCTOR_H)
 #define INJECTIONCONFIG_SD_H
 namespace EngineControlServices
 {	
@@ -75,7 +75,7 @@ class InjectionConfig_SD : public IInjectionConfig
 	{
 	protected:
 		const InjectionConfig_SDConfig *_config;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IAfrService *_afrService;
 		IFuelTrimService *_fuelTrimService;
@@ -87,7 +87,7 @@ class InjectionConfig_SD : public IInjectionConfig
 	public:
 		InjectionConfig_SD(
 			const InjectionConfig_SDConfig *config, 
-			ICrankCamDecoder *decoder,
+			IReluctor *reluctor,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IAfrService *afrService,
 			IFuelTrimService *fuelTrimService,

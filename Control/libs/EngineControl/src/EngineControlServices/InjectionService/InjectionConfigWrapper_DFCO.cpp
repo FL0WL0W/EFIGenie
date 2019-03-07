@@ -3,18 +3,18 @@
 #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
 namespace EngineControlServices
 {
-	InjectionConfigWrapper_DFCO::InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, ICrankCamDecoder *decoder, IInjectionConfig *child)
+	InjectionConfigWrapper_DFCO::InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IReluctor *reluctor, IInjectionConfig *child)
 	{
 		_config = config;
 		_throttlePositionService = throttlePositionService;
-		_decoder = decoder;
+		_reluctor = reluctor;
 		_child = child;
 	}
 	
 	InjectorTiming InjectionConfigWrapper_DFCO::GetInjectorTiming(unsigned char injector)
 	{
 		float tps = _throttlePositionService->Value;
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = _reluctor->GetRpm();
 		
 		if (tps < _config->TpsThreshold && rpm > _config->RpmEnable)
 			_dfcoEnabled = true;

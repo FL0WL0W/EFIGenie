@@ -22,15 +22,15 @@ namespace Service
 		hardwareAbstractionCollection = serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
 		
 		//create callback groups
-		if(serviceLocator->Locate(PRE_DECODER_SYNC_CALL_BACK_GROUP) == 0)
-			serviceLocator->Register(PRE_DECODER_SYNC_CALL_BACK_GROUP, new CallBackGroup());
-		if(serviceLocator->Locate(POST_DECODER_SYNC_CALL_BACK_GROUP) == 0)
-			serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, new CallBackGroup());
+		if(serviceLocator->Locate(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
+		if(serviceLocator->Locate(POST_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
 		if(serviceLocator->Locate(TICK_CALL_BACK_GROUP) == 0)
 			serviceLocator->Register(TICK_CALL_BACK_GROUP, new CallBackGroup());
 
-		CallBackGroup *preDecoderCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(PRE_DECODER_SYNC_CALL_BACK_GROUP);
-		CallBackGroup *postDecoderCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *preReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP);
+		CallBackGroup *postReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP);
 		CallBackGroup *tickCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP);
 
 		*totalSize = 0;
@@ -172,21 +172,25 @@ namespace Service
 					break;
 				}
 #endif
-#if DECODER_SERVICE_ID
-			case DECODER_SERVICE_ID:
+#if CRANK_RELUCTOR_SERVICE_ID
+			case CRANK_RELUCTOR_SERVICE_ID:
+#endif
+#if CAM_RELUCTOR_SERVICE_ID
+			case CAM_RELUCTOR_SERVICE_ID:
+#endif
 				{
-					ICrankCamDecoder *decoder = CreateDecoderService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, decoder);
+					IReluctor *reluctor = CreateReluctor(serviceLocator, config, &size);
+					RegisterIfNotNull(serviceLocator, serviceId, reluctor);
 					OffsetConfig(&config, totalSize, size);
 					break;
 				}
-#endif
 			}
 		}
 
 		return serviceLocator;
 	}
 	
+#if TACHOMETER_SERVICE_ID
 	TachometerService *EngineControlServiceBuilder::CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{		
 		*totalSize = 0;
@@ -195,8 +199,9 @@ namespace Service
 			CastConfig < TachometerServiceConfig >(&config, totalSize),
 			CreateBooleanOutputService(serviceLocator, &config, totalSize),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID));
 	}
+#endif
 	
 	IPrimeService* EngineControlServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
@@ -215,7 +220,7 @@ namespace Service
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP), 
 			IPrimeService::PrimeCallBack,
 			ret);
 
@@ -238,7 +243,7 @@ namespace Service
 			ret = new IdleControlService_Pid(
 				CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
 				serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), 
-				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(VEHICLE_SPEED_SERVICE_ID),
@@ -273,7 +278,7 @@ namespace Service
 			ret = new AfrService_Map_Ethanol(
 				CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
@@ -303,7 +308,7 @@ namespace Service
 				ret = new FuelTrimService_InterpolatedTable(
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					CreateFloatInputService(serviceLocator, &config, totalSize),
@@ -365,7 +370,7 @@ namespace Service
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 					CreateFloatOutputService(serviceLocator, &config, totalSize), 
-					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
 				break;
@@ -374,11 +379,11 @@ namespace Service
 		}
 		
 		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(PRE_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP), 
 			IFuelPumpService::PrimeCallBack,
 			ret);
 		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(POST_DECODER_SYNC_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP), 
 			IFuelPumpService::OnCallBack,
 			ret);
 		AddToCallBackGroupIfParametersNotNull(
@@ -399,7 +404,7 @@ namespace Service
 		case 2:
 			ret = new InjectionConfig_SD(
 				CastConfig < InjectionConfig_SDConfig >(&config, totalSize),
-				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
@@ -420,7 +425,7 @@ namespace Service
 
 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 					child);
 				break;
 			}
@@ -446,7 +451,7 @@ namespace Service
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
 				CastConfig < IgnitionConfig_Map_EthanolConfig >(&config, totalSize),
-				serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
 			break;
@@ -464,7 +469,7 @@ namespace Service
 				
 				ret = new IgnitionConfigWrapper_HardRpmLimit(
 					ignitionConfig,  
-					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 					booleanInputService,
 					child);
 				
@@ -485,7 +490,7 @@ namespace Service
 				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
 					ignitionConfig,
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID),
+					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
 					booleanInputService,
 					child);
 				
@@ -510,7 +515,8 @@ namespace Service
 			ignitionConfig,
 			serviceLocator->LocateAndCast<IBooleanOutputService *>(IGNITOR_SERVICES_ID),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
 				
 		AddToCallBackGroupIfParametersNotNull(
 			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
@@ -534,7 +540,8 @@ namespace Service
 			injectionConfig,
 			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<ICrankCamDecoder>(DECODER_SERVICE_ID));
+			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
 		
 		AddToCallBackGroupIfParametersNotNull(
 			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
@@ -544,15 +551,21 @@ namespace Service
 		return ret;
 	}
 	
-	ICrankCamDecoder *EngineControlServiceBuilder::CreateDecoderService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
+	IReluctor *EngineControlServiceBuilder::CreateReluctor(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
-		ICrankCamDecoder *ret = 0;
+		IReluctor *ret = 0;
 		
 		switch (GetServiceId(&config, totalSize))
 		{
-#ifdef GM24XDECODER_H
+#ifdef GM24XRELUCTOR_H
 		case 1:
-			ret = new Gm24xDecoder(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Gm24xDecoderConfig >(&config, totalSize));
+			ret = new Gm24xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *reinterpret_cast<const uint16_t *>(config));
+			config = reinterpret_cast<const uint16_t *>(config) + 1;
+			break;
+#endif
+#ifdef UNIVERSAL2XRELUCTOR_H
+		case 2:
+			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Universal2xReluctorConfig >(&config, totalSize));
 			break;
 #endif
 		}

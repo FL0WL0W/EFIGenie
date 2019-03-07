@@ -8,12 +8,14 @@ namespace EngineControlServices
 		IInjectionConfig *injectionConfig,
 		IBooleanOutputService **injectorOutputServices,
 		ITimerService *timerService,
-		ICrankCamDecoder *decoder)
+		IReluctor *crankReluctor,
+		IReluctor *camReluctor)
 	{
 		_injectionSchedulingServiceConfig = injectionSchedulingServiceConfig;
 		_injectionConfig = injectorOutputServices != 0? injectionConfig : 0;
 		_timerService = timerService;
-		_decoder = decoder;
+		_crankReluctor = crankReluctor;
+		_camReluctor = camReluctor;
 		_injectorOpenTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _injectionSchedulingServiceConfig->Injectors);
 		_injectorCloseTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _injectionSchedulingServiceConfig->Injectors);
 		int tickMinusSome = _timerService->GetTick() - 6;
@@ -31,13 +33,55 @@ namespace EngineControlServices
 	
 	void InjectionSchedulingService::ScheduleEvents(void)
 	{
-		bool isSequential = _decoder->HasCamPosition();
-		float scheduleCamPosition = _decoder->GetCamPosition();
-		if (isSequential && scheduleCamPosition > 360)
-			scheduleCamPosition -= 360;
-		unsigned int scheduleTickPerDegree = _decoder->GetTickPerDegree();
-		unsigned int scheduleTick = _timerService->GetTick();
-		unsigned int ticksPerSecond = _timerService->GetTicksPerSecond();	
+		bool isSequential;
+		float schedulePosition;//0-720 when sequential and 0-360 otherwise
+		uint32_t scheduleTickPerDegree;
+		if(_crankReluctor != 0 && _crankReluctor->IsSynced())
+		{
+			if(_camReluctor != 0 && _camReluctor->IsSynced())
+			{
+				//we have both crank and cam
+				//decide which one to use for scheduling.
+				if(_camReluctor->GetResolution() <= _crankReluctor->GetResolution() * 2)
+				{
+					schedulePosition = _crankReluctor->GetPosition();
+					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
+					if(_camReluctor->GetPosition() >= 180)
+					{
+						//we are on the second half of the cam
+						schedulePosition += 360;
+					}
+				}
+				else
+				{
+					//the crank reluctor is essential useless unless the cam sensor goes out of sync
+					schedulePosition = _camReluctor->GetPosition() * 2;
+					scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				}
+				isSequential = true;
+			}
+			else
+			{
+				//we only have the crank sensor
+				schedulePosition = _crankReluctor->GetPosition();
+				scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				isSequential = false;
+			}
+		}
+		else if(_camReluctor != 0 && _camReluctor->IsSynced())
+		{
+			//we only have the cam sensor
+			schedulePosition = _camReluctor->GetPosition() * 2;
+			isSequential = true;
+		}
+		else
+		{
+			//we dont have any reluctors to use for scheduling
+			return;
+		}
+
+		uint32_t scheduleTick = _timerService->GetTick();
+		uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();	
 
 		const unsigned short *injectorTdc = _injectionSchedulingServiceConfig->InjectorTdc();
 
@@ -60,7 +104,7 @@ namespace EngineControlServices
 						unsigned int injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - schedulePosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
@@ -90,7 +134,7 @@ namespace EngineControlServices
 						unsigned int injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - scheduleCamPosition;
+						float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - schedulePosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)
@@ -105,7 +149,7 @@ namespace EngineControlServices
 						injectorPulseWidthTick = (unsigned int)round(injectorTiming.PulseWidth * ticksPerSecond);
 					
 						//if injector has not opened yet and will not be opening for sufficient time then schedule its opening time
-						degreesUntilOpen = injectorTdc[injector + injectosToGoTo] + injectorStartPosition - scheduleCamPosition;
+						degreesUntilOpen = injectorTdc[injector + injectosToGoTo] + injectorStartPosition - schedulePosition;
 						if (degreesUntilOpen > 720)
 							degreesUntilOpen -= 1440;
 						if (degreesUntilOpen < 0)

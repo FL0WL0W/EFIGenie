@@ -23,15 +23,15 @@ namespace UnitTests
 		MockBooleanOutputService _ignitorOutputService2;
 		MockBooleanOutputService _ignitorOutputService3;
 		CallBackGroup *_tickCallBackGroup;
-		CallBackGroup *_postDecoderCallBackGroup;
+		CallBackGroup *_postReluctorCallBackGroup;
 
 		PrimeService_StaticPulseWidthTests()
 		{
 			_serviceLocator = new ServiceLocator();
 			_tickCallBackGroup = new CallBackGroup();
 			_serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)_tickCallBackGroup);
-			_postDecoderCallBackGroup = new CallBackGroup();
-			_serviceLocator->Register(POST_DECODER_SYNC_CALL_BACK_GROUP, (void *)_postDecoderCallBackGroup);
+			_postReluctorCallBackGroup = new CallBackGroup();
+			_serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, (void *)_postReluctorCallBackGroup);
 
 			IBooleanOutputService **ignitorOutputServices = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService **) * 5);
 			ignitorOutputServices[0] = (IBooleanOutputService *)(&_ignitorOutputService0);
@@ -70,7 +70,7 @@ namespace UnitTests
 		EXPECT_CALL(_ignitorOutputService3, OutputSet()).Times(1);
 		EXPECT_CALL(_timerService, GetTick()).Times(5).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(4);
-		_postDecoderCallBackGroup->Execute();
+		_postReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_ignitorOutputService0, OutputReset()).Times(1);
 		EXPECT_CALL(_ignitorOutputService1, OutputReset()).Times(1);

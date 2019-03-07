@@ -5,7 +5,7 @@ namespace EngineControlServices
 {
 	InjectionConfig_SD::InjectionConfig_SD(
 		const InjectionConfig_SDConfig *config, 
-		ICrankCamDecoder *decoder,
+		IReluctor *reluctor,
 		IFloatInputService *manifoldAbsolutePressureService,
 		IAfrService *afrService,
 		IFuelTrimService *fuelTrimService,
@@ -15,7 +15,7 @@ namespace EngineControlServices
 		IFloatInputService *voltageService)
 	{		
 		_config = config;
-		_decoder = decoder;
+		_reluctor = reluctor;
 		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
 		_afrService = afrService;
 		_fuelTrimService = fuelTrimService;
@@ -30,7 +30,7 @@ namespace EngineControlServices
 		InjectorTiming timing = InjectorTiming();
 		timing.OpenPosition64thDegree = _config->InjectorOpenPosition64thDegree;
 		timing.PulseWidth = 0;
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = _reluctor->GetRpm();
 		float map = _manifoldAbsolutePressureService->Value;
 				
 		float VE = InterpolateTable2<unsigned short>((float)rpm, (float)_config->MaxRpm, 0.0f, _config->VeRpmResolution, map, _config->MaxMap, 0.0f, _config->VeMapResolution, _config->VolumetricEfficiencyMap()) / 8192.0f;

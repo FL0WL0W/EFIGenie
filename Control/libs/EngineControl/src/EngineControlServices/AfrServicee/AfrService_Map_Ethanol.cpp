@@ -6,7 +6,7 @@ namespace EngineControlServices
 	AfrService_Map_Ethanol::AfrService_Map_Ethanol(
 		const AfrService_Map_EthanolConfig *config,
 		ITimerService *timerService, 
-		ICrankCamDecoder *decoder,
+		IReluctor *reluctor,
 		IFloatInputService *manifoldAbsolutePressureService,
 		IFloatInputService *engineCoolantTemperatureService,  
 		IFloatInputService *ethanolContentService, 
@@ -14,7 +14,7 @@ namespace EngineControlServices
 	{
 		_config = config;
 		_timerService = timerService;
-		_decoder = decoder;
+		_reluctor = reluctor;
 		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
 		_engineCoolantTemperatureService = engineCoolantTemperatureService;
 		_ethanolContentService =  ethanolContentService;
@@ -23,7 +23,7 @@ namespace EngineControlServices
 	
 	void AfrService_Map_Ethanol::CalculateAfr()
 	{
-		InterpolationResponse rpmInterpolation = Interpolate(_decoder->GetRpm(), _config->MaxRpm, 0, _config->AfrRpmResolution);
+		InterpolationResponse rpmInterpolation = Interpolate(_reluctor->GetRpm(), _config->MaxRpm, 0, _config->AfrRpmResolution);
 		InterpolationResponse mapInterpolation = Interpolate(_manifoldAbsolutePressureService->Value, _config->MaxMapBar, 0, _config->AfrMapResolution);
 		
 		float gasAfr = InterpolateTable2<unsigned short>(rpmInterpolation, _config->AfrRpmResolution, mapInterpolation, _config->GasMap()) / 1024.0f;

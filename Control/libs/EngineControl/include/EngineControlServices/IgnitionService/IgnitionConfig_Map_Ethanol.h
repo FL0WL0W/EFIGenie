@@ -1,10 +1,10 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
 #include "Packed.h"
 
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 using namespace Interpolation;
 
@@ -42,12 +42,12 @@ namespace EngineControlServices
 	{
 	protected:
 		const IgnitionConfig_Map_EthanolConfig *_config;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_ethanolContentService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		
 	public:
-		IgnitionConfig_Map_Ethanol(const IgnitionConfig_Map_EthanolConfig *config, ICrankCamDecoder *decoder, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
+		IgnitionConfig_Map_Ethanol(const IgnitionConfig_Map_EthanolConfig *config, IReluctor *reluctor, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

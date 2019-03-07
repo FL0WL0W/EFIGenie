@@ -3,11 +3,11 @@
 #ifdef IGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 namespace EngineControlServices
 {
-	IgnitionConfigWrapper_SoftPidRpmLimit::IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
+	IgnitionConfigWrapper_SoftPidRpmLimit::IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, IReluctor *reluctor, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
 	{		
 		_config = config;
 		_timerService = timerService;
-		_decoder = decoder;
+		_reluctor = reluctor;
 		_booleanInputService = booleanInputService;
 		_child = child;
 	}
@@ -16,7 +16,7 @@ namespace EngineControlServices
 	{
 		_booleanInputService->ReadValue();
 		
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = _reluctor->GetRpm();
 		int error = rpm - _config->RpmLimit;		
 		
 		float dt = _timerService->GetElapsedTime(_prevRpmTime);

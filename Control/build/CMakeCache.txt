@@ -247,21 +247,6 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
-CrankCamDecodersMockedObjects_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/CrankCamDecodersMockedObjects
-
-//Value Computed by CMake
-CrankCamDecodersMockedObjects_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/CrankCamDecodersMockedObjects
-
-//Value Computed by CMake
-CrankCamDecoders_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/CrankCamDecoders
-
-//Dependencies for the target
-CrankCamDecoders_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;
-
-//Value Computed by CMake
-CrankCamDecoders_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/CrankCamDecoders
-
-//Value Computed by CMake
 EmbeddedIOServicesMockedObjects_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects
 
 //Value Computed by CMake
@@ -289,7 +274,7 @@ EngineControlUnitTests_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGen
 EngineControl_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControl
 
 //Dependencies for the target
-EngineControl_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;general;CrankCamDecoders;
+EngineControl_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;general;Reluctor;
 
 //Value Computed by CMake
 EngineControl_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl
@@ -299,7 +284,22 @@ EngineControl_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Contro
 INSTALL_GTEST:BOOL=ON
 
 //Path to a program.
-PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/.platformio/penv/Scripts/python.exe
+PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/.platformio/python27/python.exe
+
+//Value Computed by CMake
+ReluctorMockedObjects_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects
+
+//Value Computed by CMake
+ReluctorMockedObjects_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/ReluctorMockedObjects
+
+//Value Computed by CMake
+Reluctor_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctor
+
+//Dependencies for the target
+Reluctor_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;
+
+//Value Computed by CMake
+Reluctor_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor
 
 //Value Computed by CMake
 TopLevelBuild_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build
@@ -311,7 +311,7 @@ TopLevelBuild_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Contro
 TransmissionControl_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/TransmissionControl
 
 //Dependencies for the target
-TransmissionControl_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;general;CrankCamDecoders;
+TransmissionControl_LIB_DEPENDS:STATIC=general;EmbeddedIOServices;general;Reluctor;
 
 //Value Computed by CMake
 TransmissionControl_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl
@@ -524,7 +524,7 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/Users/daniel/.platformio/penv/Scripts/python.exe][v2.7.13()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/Users/daniel/.platformio/python27/python.exe][v2.7.13()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: PYTHON_EXECUTABLE

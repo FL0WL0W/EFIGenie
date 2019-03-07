@@ -3,10 +3,10 @@
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 namespace EngineControlServices
 {
-	IgnitionConfigWrapper_HardRpmLimit::IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, ICrankCamDecoder *decoder, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
+	IgnitionConfigWrapper_HardRpmLimit::IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, IReluctor *reluctor, IBooleanInputService *booleanInputService, IIgnitionConfig *child)
 	{				
 		_config = config;
-		_decoder = decoder;
+		_reluctor = reluctor;
 		_booleanInputService = booleanInputService;
 		_child = child;
 	}
@@ -14,7 +14,7 @@ namespace EngineControlServices
 	IgnitionTiming IgnitionConfigWrapper_HardRpmLimit::GetIgnitionTiming()
 	{
 		_booleanInputService->ReadValue();
-		unsigned short rpm = _decoder->GetRpm();
+		unsigned short rpm = _reluctor->GetRpm();
 		
 		if (rpm < _config->RpmDisable)
 			_limitEnabled = false;

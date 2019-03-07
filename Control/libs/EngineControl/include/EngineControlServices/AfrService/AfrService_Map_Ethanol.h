@@ -1,11 +1,11 @@
 #include "HardwareAbstraction/ITimerService.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
 #include "Packed.h"
 
 using namespace HardwareAbstraction;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 using namespace Interpolation;
 
@@ -63,7 +63,7 @@ class AfrService_Map_Ethanol : public IAfrService
 	protected:
 		const AfrService_Map_EthanolConfig* _config;
 		ITimerService *_timerService;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_engineCoolantTemperatureService;  
 		IFloatInputService *_ethanolContentService;
@@ -76,7 +76,7 @@ class AfrService_Map_Ethanol : public IAfrService
 		AfrService_Map_Ethanol(
 		const AfrService_Map_EthanolConfig *config,
 			ITimerService *timerService, 
-			ICrankCamDecoder *decoder,
+			IReluctor *reluctor,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IFloatInputService *engineCoolantTemperatureService,  
 			IFloatInputService *ethanolContentService, 

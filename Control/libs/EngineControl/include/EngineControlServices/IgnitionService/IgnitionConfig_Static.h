@@ -1,9 +1,9 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
 #include "Packed.h"
 
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 
 #if !defined(IGNITIONCONFIG_STATIC_H) && defined(IIGNITIONCONFIG_H)

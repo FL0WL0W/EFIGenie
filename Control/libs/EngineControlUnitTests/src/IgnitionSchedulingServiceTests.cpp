@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "Service/EngineControlServiceBuilder.h"
 #include "MockBooleanOutputService.h"
-#include "MockCrankCamDecoder.h"
+#include "MockReluctor.h"
 #include "MockTimerService.h"
 #include "MockIgnitionConfig.h"
 using ::testing::AtLeast;
@@ -11,7 +11,7 @@ using ::testing::Return;
 using namespace HardwareAbstraction;
 using namespace EngineControlServices;
 using namespace IOServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 
 namespace UnitTests
 {
@@ -23,7 +23,8 @@ namespace UnitTests
 		MockBooleanOutputService _ignitorOutputService1;
 		MockBooleanOutputService _ignitorOutputService2;
 		MockBooleanOutputService _ignitorOutputService3;
-		MockCrankCamDecoder _decoder;
+		MockReluctor _camReluctor;
+		MockReluctor _crankReluctor;
 		MockTimerService _timerService;
 		MockIgnitionConfig _ignitionConfig;
 
@@ -48,18 +49,21 @@ namespace UnitTests
 			ignitorOutputServices[4] = 0;
 
 			unsigned int size = 0;
-			_ignitionSchedulingService = new IgnitionSchedulingService(ignitionSchedulingConfig, &_ignitionConfig, ignitorOutputServices, &_timerService, &_decoder);
+			_ignitionSchedulingService = new IgnitionSchedulingService(ignitionSchedulingConfig, &_ignitionConfig, ignitorOutputServices, &_timerService, &_crankReluctor, &_camReluctor);
 		}
 	};
 
 	TEST_F(IgnitionSchedulingServiceTests, IgnitionSchedulingServiceTests_WhenSchedulingIgnition)
 	{
-
-		EXPECT_CALL(_decoder, HasCamPosition()).WillRepeatedly(Return(true));
-		EXPECT_CALL(_decoder, GetTickPerDegree()).WillRepeatedly(Return(1));
+		EXPECT_CALL(_camReluctor, IsSynced()).WillRepeatedly(Return(true));
+		EXPECT_CALL(_crankReluctor, IsSynced()).WillRepeatedly(Return(true));
+		EXPECT_CALL(_camReluctor, GetResolution()).WillRepeatedly(Return(2));
+		EXPECT_CALL(_crankReluctor, GetResolution()).WillRepeatedly(Return(24));
+		EXPECT_CALL(_crankReluctor, GetTickPerDegree()).WillRepeatedly(Return(1));
 		EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 			
-		EXPECT_CALL(_decoder, GetCamPosition()).WillOnce(Return(15));
+		EXPECT_CALL(_crankReluctor, GetPosition()).WillOnce(Return(15));
+		EXPECT_CALL(_camReluctor, GetPosition()).WillOnce(Return(7.5));
 		EXPECT_CALL(_timerService, GetTick()).WillRepeatedly(Return(0));
 		IgnitionTiming ignitionTiming = IgnitionTiming();
 		ignitionTiming.IgnitionAdvance64thDegree = 15 * 64;

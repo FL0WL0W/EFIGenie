@@ -1,15 +1,15 @@
 #include "HardwareAbstraction/ITimerService.h"
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
 #include "Service/ServiceLocator.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "Packed.h"
 
 using namespace HardwareAbstraction;
 using namespace IOServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 
-#if !defined(TACHOMETERSERVICE_H) && defined(ICRANKCAMDECODER_H) && defined(ITIMERSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)
+#if !defined(TACHOMETERSERVICE_H) && defined(IRELUCTOR_H) && defined(ITIMERSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)
 #define TACHOMETERSERVICE_H
 namespace EngineControlServices
 {
@@ -38,12 +38,12 @@ namespace EngineControlServices
 		const TachometerServiceConfig *_config;
 		IBooleanOutputService *_booleanOutputService;
 		ITimerService *_timerService;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		
 		unsigned short _ticksPerRpm;
 		bool _pinStatus;
 	public:
-		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, ICrankCamDecoder *decoder);
+		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, IReluctor *reluctor);
 		static void TogglePinTask(void *parameters);
 	};
 }

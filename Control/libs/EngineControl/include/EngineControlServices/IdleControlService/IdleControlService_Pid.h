@@ -1,13 +1,13 @@
 #include "EngineControlServices/IdleControlService/IIdleControlService.h"
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "Packed.h"
 #include "math.h"
 
 using namespace HardwareAbstraction;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace IOServices;
 
 #if !defined(IDLECONTROLSERVICE_PID_H) && defined(IIDLECONTROLSERVICE_H)
@@ -59,7 +59,7 @@ namespace EngineControlServices
 	protected:
 		const IdleControlService_PidConfig *_config;
 		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_throttlePositionService;
 		IFloatInputService *_engineCoolantTemperatureService;
 		IFloatInputService *_vehicleSpeedService;
@@ -73,7 +73,7 @@ namespace EngineControlServices
 		IdleControlService_Pid(
 			const IdleControlService_PidConfig *config, 
 			const HardwareAbstractionCollection *hardwareAbstractionCollection, 
-			ICrankCamDecoder *decoder, 
+			IReluctor *reluctor, 
 			IFloatInputService *throttlePositionService, 
 			IFloatInputService *engineCoolantTemperatureService, 
 			IFloatInputService *vehicleSpeedService,

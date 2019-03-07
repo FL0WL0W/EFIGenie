@@ -2,13 +2,13 @@
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
-#include "CrankCamDecoders/ICrankCamDecoder.h"
+#include "Reluctor/IReluctor.h"
 #include "Packed.h"
 #include "math.h"
 
 using namespace HardwareAbstraction;
 using namespace IOServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 using namespace Interpolation;
 
 #if !defined(FUELPUMPSERVICE_ANALOG_H) && defined(IFUELPUMPSERVICE_H)
@@ -46,7 +46,7 @@ namespace EngineControlServices
 		const FuelPumpService_AnalogConfig *_config;
 		ITimerService *_timerService;
 		IFloatOutputService *_outputService;
-		ICrankCamDecoder *_decoder;
+		IReluctor *_reluctor;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_throttlePositionService;
 
@@ -54,7 +54,7 @@ namespace EngineControlServices
 		bool _isOn;
 	public:
 		bool Started = false;
-		FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, ICrankCamDecoder *decoder, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService);
+		FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, IReluctor *reluctor, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService);
 		void Prime();
 		void On();
 		void Off();

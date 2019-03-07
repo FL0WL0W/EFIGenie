@@ -10,7 +10,7 @@
 #define INJECTION_CONFIG_ID						1002
 
 //inputs 2001-3000
-#define DECODER_SERVICE_ID						2001			// ICrankCamDecoderService
+#define RELUCTOR_SERVICE_ID						2001			// IReluctor
 #define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2002			// IFloatInputService		degrees C
 #define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2003			// IFloatInputService		degrees C
 #define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2004			// IFloatInputService		Bar
@@ -18,6 +18,8 @@
 #define THROTTLE_POSITION_SERVICE_ID			2006			// IFloatInputService		TPS 0.0-1.0
 #define ETHANOL_CONTENT_SERVICE_ID				2007			// IFloatInputService		Content 0.0-1.0
 #define VEHICLE_SPEED_SERVICE_ID				2008			// IFloatInputService		MPH cause thats what people care about
+#define CRANK_RELUCTOR_SERVICE_ID				2009			// IReluctor
+#define CAM_RELUCTOR_SERVICE_ID					2010			// IReluctor
 
 //outputs 3001-4000
 #define IGNITOR_SERVICES_ID						3001			// IBooleanOutputService[]
@@ -37,8 +39,8 @@
 #define GEAR_CONTROL_SERVICE_ID					4010			// GearControlService
 
 //callback groups 5001-6000
-#define PRE_DECODER_SYNC_CALL_BACK_GROUP		5001
-#define POST_DECODER_SYNC_CALL_BACK_GROUP		5002
+#define PRE_RELUCTOR_SYNC_CALL_BACK_GROUP		5001
+#define POST_RELUCTOR_SYNC_CALL_BACK_GROUP		5002
 #define TICK_CALL_BACK_GROUP					5003
 
 #include "Service/ServiceLocator.h"
@@ -54,9 +56,10 @@
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "IOServices/StepperOutputService/IStepperOutputService.h"
 
-//Decoder
-#include "CrankCamDecoders/ICrankCamDecoder.h"
-#include "CrankCamDecoders/Gm24xDecoder.h"
+//Reluctor
+#include "Reluctor/IReluctor.h"
+#include "Reluctor/Gm24xReluctor.h"
+#include "Reluctor/Universal2xReluctor.h"
 
 //EngineControlServices Includes
 #include "EngineControlServices/TachometerService/TachometerService.h"
@@ -94,7 +97,7 @@
 using namespace HardwareAbstraction;
 using namespace IOServices;
 using namespace EngineControlServices;
-using namespace CrankCamDecoders;
+using namespace Reluctor;
 
 namespace Service
 {
@@ -178,7 +181,7 @@ namespace Service
 	public:
 		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize);
 		
-		static EngineControlServices::TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IAfrService *CreateAfrService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
@@ -188,6 +191,6 @@ namespace Service
 		static IIgnitionConfig *CreateIgnitionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IgnitionSchedulingService *CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
-		static ICrankCamDecoder *CreateDecoderService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static IReluctor *CreateReluctor(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 	};
 }

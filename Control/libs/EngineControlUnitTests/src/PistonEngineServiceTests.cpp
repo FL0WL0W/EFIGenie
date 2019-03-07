@@ -5,7 +5,7 @@
 //#include "BooleanOutputService.h"
 //#include "EngineControlServiceBuilder.h"
 //#include "FuelPumpService.h"
-//#include "MockDecoder.h"
+//#include "MockReluctor.h"
 //#include "MockBooleanOutputService.h"
 //#include "MockDigitalService.h"
 //#include "MockTimerService.h"
@@ -26,7 +26,7 @@
 //	public:
 //
 //		MockTimerService _timerService;
-//		MockDecoder _decoder;
+//		MockReluctor _reluctor;
 //		PistonEngineConfig *_pistonEngineConfig;
 //		MockInjectionConfig _injectionConfig;
 //		MockIgnitionConfig _ignitionConfig;
@@ -79,19 +79,19 @@
 //			_ignitorOutputServices[6] = (IBooleanOutputService *)(&_ignitorOutputService6);
 //			_ignitorOutputServices[7] = (IBooleanOutputService *)(&_ignitorOutputService7);
 //
-//			_pistonEngineServiceIgnitionOnly = new PistonEngineService(_pistonEngineConfig, 0, 0, &_ignitionConfig, _ignitorOutputServices, &_timerService, &_decoder);
-//			_pistonEngineServiceInjectionOnly = new PistonEngineService(_pistonEngineConfig, &_injectionConfig, _injectorOutputServices, 0, 0, &_timerService, &_decoder);
-//			_pistonEngineService = new PistonEngineService(_pistonEngineConfig, &_injectionConfig, _injectorOutputServices, &_ignitionConfig, _ignitorOutputServices, &_timerService, &_decoder);
+//			_pistonEngineServiceIgnitionOnly = new PistonEngineService(_pistonEngineConfig, 0, 0, &_ignitionConfig, _ignitorOutputServices, &_timerService, &_reluctor);
+//			_pistonEngineServiceInjectionOnly = new PistonEngineService(_pistonEngineConfig, &_injectionConfig, _injectorOutputServices, 0, 0, &_timerService, &_reluctor);
+//			_pistonEngineService = new PistonEngineService(_pistonEngineConfig, &_injectionConfig, _injectorOutputServices, &_ignitionConfig, _ignitorOutputServices, &_timerService, &_reluctor);
 //		}
 //
 //		TEST_METHOD(WhenCallingPistonEngineService)
 //		{
-//			EXPECT_CALL(_decoder, HasCamPosition()).WillRepeatedly(Return(true));
-//			EXPECT_CALL(_decoder, GetTickPerDegree()).WillRepeatedly(Return(1));
+//			EXPECT_CALL(_reluctor, HasCamPosition()).WillRepeatedly(Return(true));
+//			EXPECT_CALL(_reluctor, GetTickPerDegree()).WillRepeatedly(Return(1));
 //			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 //
 //			CreateServices();
-//			EXPECT_CALL(_decoder, GetCamPosition()).WillOnce(Return(15));
+//			EXPECT_CALL(_reluctor, GetCamPosition()).WillOnce(Return(15));
 //			EXPECT_CALL(_timerService, GetTick()).WillOnce(Return(0));
 //			EXPECT_CALL(_ignitionConfig, GetIgnitionTiming()).WillOnce(Return(10));
 //
