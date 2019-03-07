@@ -9,7 +9,7 @@ namespace EngineControlServices
 	IdleControlService_Pid::IdleControlService_Pid(
 		const IdleControlService_PidConfig *config, 
 		const HardwareAbstractionCollection *hardwareAbstractionCollection, 
-		IReluctor *reluctor, 
+		RpmService *rpmService, 
 		IFloatInputService *throttlePositionService, 
 		IFloatInputService *engineCoolantTemperatureService, 
 		IFloatInputService *vehicleSpeedService,
@@ -19,7 +19,7 @@ namespace EngineControlServices
 	{
 		_config = config;
 		_hardwareAbstractionCollection = hardwareAbstractionCollection;
-		_reluctor = reluctor;
+		_rpmService = rpmService;
 		_engineCoolantTemperatureService = engineCoolantTemperatureService;
 		_vehicleSpeedService = vehicleSpeedService;
 		_intakeAirTemperatureService = intakeAirTemperatureService;
@@ -43,7 +43,7 @@ namespace EngineControlServices
 			return;
 		}
 		
-		unsigned short rpm = _reluctor->GetRpm();
+		unsigned short rpm = _rpmService->Rpm;
 		
 		float dt = _hardwareAbstractionCollection->TimerService->GetElapsedTime(_lastReadTick);
 		if (dt * _config->DotSampleRate < 1)

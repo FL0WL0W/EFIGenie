@@ -3,7 +3,7 @@
 #include "EngineControlServices/AfrService/AfrService_Map_Ethanol.h"
 #include "MockTimerService.h"
 #include "MockFloatInputService.h"
-#include "MockReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "Service/EngineControlServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -25,7 +25,7 @@ namespace UnitTests
 		MockFloatInputService _ethanolService;
 		ServiceLocator *_serviceLocator;
 		EngineControlServices::IAfrService *_afrService;
-		MockReluctor _reluctor;
+		RpmService *_rpmService;
 		CallBackGroup *_tickCallBackGroup;
 
 		AfrService_Map_EthanolTests() 
@@ -36,7 +36,8 @@ namespace UnitTests
 			_serviceLocator->Register(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID, &_ectService);
 			_serviceLocator->Register(THROTTLE_POSITION_SERVICE_ID, &_tpsService);
 			_serviceLocator->Register(ETHANOL_CONTENT_SERVICE_ID, &_ethanolService);
-			_serviceLocator->Register(RELUCTOR_SERVICE_ID, &_reluctor);
+			_rpmService = new RpmService(0, 0);
+			_serviceLocator->Register(RPM_SERVICE_ID, _rpmService);
 			_serviceLocator->Register(TIMER_SERVICE_ID, &_timerService);
 			_tickCallBackGroup = new CallBackGroup();
 			_serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)_tickCallBackGroup);
@@ -130,7 +131,7 @@ namespace UnitTests
 	TEST_F(AfrService_Map_EthanolTests, WhenGettingAfrThenCorrectAfrIsReturned)
 	{
 		EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(0));
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_mapService.Value = 0;
 		_ectService.Value = -40;
 		_tpsService.Value = 0;
@@ -140,59 +141,59 @@ namespace UnitTests
 		ASSERT_NEAR(0.769f, _afrService->Lambda, 0.001f);
 
 		EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(5000));
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_FLOAT_EQ(11.3034375f, _afrService->Afr);
 		ASSERT_NEAR(0.769f, _afrService->Lambda, 0.001f);
 
 		EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(27500));
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_FLOAT_EQ(11.93140625f, _afrService->Afr);
 		ASSERT_NEAR(0.81f, _afrService->Lambda, 0.002f);
 
 		EXPECT_CALL(_timerService, GetTick()).Times(1).WillOnce(Return(50000));
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_FLOAT_EQ(12.559375f, _afrService->Afr);
 		ASSERT_NEAR(0.855f, _afrService->Lambda, 0.001f);
 		EXPECT_CALL(_timerService, GetTick()).WillRepeatedly(Return(50001));
 
 		_mapService.Value = 0.33;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(2000));
+		_rpmService->Rpm = 2000;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(11.76f, _afrService->Afr, 0.01f);
 		ASSERT_NEAR(0.8f, _afrService->Lambda, 0.001f);
 
 		_mapService.Value = 0.165;
 		_ectService.Value = 100;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(1000));
+		_rpmService->Rpm = 1000;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(15.14f, _afrService->Afr, 0.01f);
 
 		_mapService.Value = 0.165;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(2000));
+		_rpmService->Rpm = 2000;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(14.9f, _afrService->Afr, 0.01f);
 
 		_mapService.Value = 0;
 		_tpsService.Value = 1;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(12.94f, _afrService->Afr, 0.01f);
 
 		_ethanolService.Value = 1;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(8.79f, _afrService->Afr, 0.01f);
 
 		_tpsService.Value = 0;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(10.55f, _afrService->Afr, 0.01f);
 
 		_ethanolService.Value = 0.5;
-		EXPECT_CALL(_reluctor, GetRpm()).Times(1).WillOnce(Return(0));
+		_rpmService->Rpm = 0;
 		_tickCallBackGroup->Execute();
 		ASSERT_NEAR(12.97f, _afrService->Afr, 0.01f);
 	}

@@ -1,7 +1,7 @@
 #include "HardwareAbstraction/ITimerService.h"
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
 #include "Service/ServiceLocator.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "Packed.h"
 
@@ -9,7 +9,7 @@ using namespace HardwareAbstraction;
 using namespace IOServices;
 using namespace Reluctor;
 
-#if !defined(TACHOMETERSERVICE_H) && defined(IRELUCTOR_H) && defined(ITIMERSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)
+#if !defined(TACHOMETERSERVICE_H) && defined(RPMSERVICE_H) && defined(ITIMERSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)
 #define TACHOMETERSERVICE_H
 namespace EngineControlServices
 {
@@ -38,12 +38,12 @@ namespace EngineControlServices
 		const TachometerServiceConfig *_config;
 		IBooleanOutputService *_booleanOutputService;
 		ITimerService *_timerService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		
 		unsigned short _ticksPerRpm;
 		bool _pinStatus;
 	public:
-		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, IReluctor *reluctor);
+		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, RpmService *rpmService);
 		static void TogglePinTask(void *parameters);
 	};
 }

@@ -1,5 +1,5 @@
 #include "EngineControlServices/AfrService/IAfrService.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "EngineControlServices/InjectionService/IInjectionConfig.h"
 #include "Interpolation.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
@@ -75,7 +75,7 @@ class InjectionConfig_SD : public IInjectionConfig
 	{
 	protected:
 		const InjectionConfig_SDConfig *_config;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IAfrService *_afrService;
 		IFuelTrimService *_fuelTrimService;
@@ -87,7 +87,7 @@ class InjectionConfig_SD : public IInjectionConfig
 	public:
 		InjectionConfig_SD(
 			const InjectionConfig_SDConfig *config, 
-			IReluctor *reluctor,
+			RpmService *rpmService,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IAfrService *afrService,
 			IFuelTrimService *fuelTrimService,

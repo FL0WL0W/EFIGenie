@@ -1,6 +1,6 @@
 #include "EngineControlServices/IdleControlService/IIdleControlService.h"
 #include "HardwareAbstraction/HardwareAbstractionCollection.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "Packed.h"
@@ -59,7 +59,7 @@ namespace EngineControlServices
 	protected:
 		const IdleControlService_PidConfig *_config;
 		const HardwareAbstractionCollection *_hardwareAbstractionCollection;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_throttlePositionService;
 		IFloatInputService *_engineCoolantTemperatureService;
 		IFloatInputService *_vehicleSpeedService;
@@ -73,7 +73,7 @@ namespace EngineControlServices
 		IdleControlService_Pid(
 			const IdleControlService_PidConfig *config, 
 			const HardwareAbstractionCollection *hardwareAbstractionCollection, 
-			IReluctor *reluctor, 
+			RpmService *rpmService, 
 			IFloatInputService *throttlePositionService, 
 			IFloatInputService *engineCoolantTemperatureService, 
 			IFloatInputService *vehicleSpeedService,

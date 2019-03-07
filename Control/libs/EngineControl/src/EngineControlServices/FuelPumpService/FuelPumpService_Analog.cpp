@@ -3,12 +3,12 @@
 #ifdef FUELPUMPSERVICE_ANALOG_H
 namespace EngineControlServices
 {
-	FuelPumpService_Analog::FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, IReluctor *reluctor, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService)
+	FuelPumpService_Analog::FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, RpmService *rpmService, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService)
 	{
 		_config = config;
 		_timerService = timerService;
 		_outputService = outputService;
-		_reluctor = reluctor;
+		_rpmService = rpmService;
 		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
 		_throttlePositionService = throttlePositionService;
 		
@@ -62,7 +62,7 @@ namespace EngineControlServices
 			}
 		}
 		
-		_currentValue = InterpolateTable2<float>(_reluctor->GetRpm(), _config->MaxRpm, 0, _config->RpmRes, y, _config->MaxY, 0, _config->YRes, _config->AnalogTable());
+		_currentValue = InterpolateTable2<float>(_rpmService->Rpm, _config->MaxRpm, 0, _config->RpmRes, y, _config->MaxY, 0, _config->YRes, _config->AnalogTable());
 		
 		On();
 	}

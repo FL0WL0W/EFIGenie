@@ -189,6 +189,34 @@ namespace Service
 
 		return serviceLocator;
 	}
+
+	
+	void EngineControlServiceBuilder::RegisterRpmService(ServiceLocator *serviceLocator)
+	{
+		RpmService *existing = serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID);
+
+		if(existing != 0)
+		{
+			existing->_crankReluctor = serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID);
+			existing->_camReluctor = serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID);
+		}
+		else
+		{
+			RpmService *rpmService = new RpmService(
+				serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID), 
+				serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
+
+			RegisterIfNotNull(serviceLocator, RPM_SERVICE_ID, rpmService);
+			
+			AddToCallBackGroupIfParametersNotNull(
+				serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
+				RpmService::TickCallBack,
+				rpmService);
+		}
+		
+
+		
+	}
 	
 #if TACHOMETER_SERVICE_ID
 	TachometerService *EngineControlServiceBuilder::CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
@@ -199,7 +227,7 @@ namespace Service
 			CastConfig < TachometerServiceConfig >(&config, totalSize),
 			CreateBooleanOutputService(serviceLocator, &config, totalSize),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID));
+			serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID));
 	}
 #endif
 	
@@ -243,7 +271,7 @@ namespace Service
 			ret = new IdleControlService_Pid(
 				CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
 				serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), 
-				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID), 
+				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(VEHICLE_SPEED_SERVICE_ID),
@@ -278,7 +306,7 @@ namespace Service
 			ret = new AfrService_Map_Ethanol(
 				CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
@@ -308,7 +336,7 @@ namespace Service
 				ret = new FuelTrimService_InterpolatedTable(
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					CreateFloatInputService(serviceLocator, &config, totalSize),
@@ -370,7 +398,7 @@ namespace Service
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 					CreateFloatOutputService(serviceLocator, &config, totalSize), 
-					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
 				break;
@@ -404,7 +432,7 @@ namespace Service
 		case 2:
 			ret = new InjectionConfig_SD(
 				CastConfig < InjectionConfig_SDConfig >(&config, totalSize),
-				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
@@ -425,7 +453,7 @@ namespace Service
 
 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					child);
 				break;
 			}
@@ -451,7 +479,7 @@ namespace Service
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
 				CastConfig < IgnitionConfig_Map_EthanolConfig >(&config, totalSize),
-				serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
 			break;
@@ -469,7 +497,7 @@ namespace Service
 				
 				ret = new IgnitionConfigWrapper_HardRpmLimit(
 					ignitionConfig,  
-					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					booleanInputService,
 					child);
 				
@@ -490,7 +518,7 @@ namespace Service
 				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
 					ignitionConfig,
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<IReluctor>(RELUCTOR_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					booleanInputService,
 					child);
 				

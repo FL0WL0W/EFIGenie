@@ -2,7 +2,7 @@
 #include "IOServices/FloatOutputService/IFloatOutputService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "Packed.h"
 #include "math.h"
 
@@ -46,7 +46,7 @@ namespace EngineControlServices
 		const FuelPumpService_AnalogConfig *_config;
 		ITimerService *_timerService;
 		IFloatOutputService *_outputService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_throttlePositionService;
 
@@ -54,7 +54,7 @@ namespace EngineControlServices
 		bool _isOn;
 	public:
 		bool Started = false;
-		FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, IReluctor *reluctor, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService);
+		FuelPumpService_Analog(const FuelPumpService_AnalogConfig *config, ITimerService *timerService, IFloatOutputService *outputService, RpmService *rpmService, IFloatInputService *manifoldAbsolutePressureService, IFloatInputService *throttlePositionService);
 		void Prime();
 		void On();
 		void Off();

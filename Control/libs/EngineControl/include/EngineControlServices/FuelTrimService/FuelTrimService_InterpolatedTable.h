@@ -1,6 +1,6 @@
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "EngineControlServices/AfrService/IAfrService.h"
 #include "Packed.h"
 #include "math.h"
@@ -51,7 +51,7 @@ namespace EngineControlServices
 	protected:
 		const FuelTrimService_InterpolatedTableConfig *_config;
 		ITimerService *_timerService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_throttlePositionService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_lambdaSensorService;
@@ -67,7 +67,7 @@ namespace EngineControlServices
 		FuelTrimService_InterpolatedTable(
 			const FuelTrimService_InterpolatedTableConfig *config, 
 			ITimerService *timerService, 
-			IReluctor *reluctor,
+			RpmService *rpmService,
 			IFloatInputService *throttlePositionService, 
 			IFloatInputService *manifoldAbsolutePressureService, 
 			IFloatInputService *lambdaSensorService,

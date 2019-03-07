@@ -3,12 +3,12 @@
 #ifdef TACHOMETERSERVICE_H
 namespace EngineControlServices
 {
-	TachometerService::TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, IReluctor *reluctor)
+	TachometerService::TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, RpmService *rpmService)
 	{
 		_config = config;
 		_booleanOutputService = booleanOutputService;
 		_timerService = timerService;
-		_reluctor = reluctor;
+		_rpmService = rpmService;
 				
 		_ticksPerRpm = (15 * _timerService->GetTicksPerSecond()) / _config->PulsesPer2Rpm;
 		
@@ -23,8 +23,8 @@ namespace EngineControlServices
 		TachometerService *service = ((TachometerService *) parameters);
 		service->_pinStatus = !service->_pinStatus;
 		service->_booleanOutputService->OutputWrite(service->_pinStatus);
-		if (service->_reluctor->GetRpm() < 1)
-			service->_timerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / service->_reluctor->GetRpm());
+		if (service->_rpmService->Rpm < 1)
+			service->_timerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / service->_rpmService->Rpm);
 		else
 			service->_timerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm);
 	}

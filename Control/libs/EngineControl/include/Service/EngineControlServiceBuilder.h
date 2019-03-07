@@ -10,7 +10,7 @@
 #define INJECTION_CONFIG_ID						1002
 
 //inputs 2001-3000
-#define RELUCTOR_SERVICE_ID						2001			// IReluctor
+#define RPM_SERVICE_ID							2001			// RpmService
 #define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2002			// IFloatInputService		degrees C
 #define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2003			// IFloatInputService		degrees C
 #define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2004			// IFloatInputService		Bar
@@ -62,6 +62,8 @@
 #include "Reluctor/Universal2xReluctor.h"
 
 //EngineControlServices Includes
+#include "EngineControlServices/RpmService/RpmService.h"
+
 #include "EngineControlServices/TachometerService/TachometerService.h"
 
 #include "EngineControlServices/PrimeService/IPrimeService.h"
@@ -181,6 +183,7 @@ namespace Service
 	public:
 		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize);
 		
+		static void RegisterRpmService(ServiceLocator *serviceLocator);
 		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IPrimeService* CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
 		static IIdleControlService* CreateIdleControlService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);

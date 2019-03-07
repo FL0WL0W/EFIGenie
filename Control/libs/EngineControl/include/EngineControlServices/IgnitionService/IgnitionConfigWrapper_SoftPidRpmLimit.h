@@ -1,5 +1,5 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
 #include "HardwareAbstraction/ITimerService.h"
 #include "Packed.h"
@@ -38,7 +38,7 @@ namespace EngineControlServices
 	protected:
 		const IgnitionConfigWrapper_SoftPidRpmLimitConfig *_config;
 		ITimerService *_timerService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IBooleanInputService *_booleanInputService;
 		IIgnitionConfig *_child;
 		
@@ -46,7 +46,7 @@ namespace EngineControlServices
 		unsigned int _prevRpmTime;
 		float _integral;
 	public:
-		IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, IReluctor *reluctor, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
+		IgnitionConfigWrapper_SoftPidRpmLimit(const IgnitionConfigWrapper_SoftPidRpmLimitConfig * config, ITimerService *timerService, RpmService *rpmService, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

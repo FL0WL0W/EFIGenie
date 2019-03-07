@@ -259,6 +259,12 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\RpmService\\RpmService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\RpmService\\RpmService.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/RpmService/RpmService.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\TachometerService\\TachometerService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\TachometerService\\TachometerService.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/TachometerService/TachometerService.cpp"
 },

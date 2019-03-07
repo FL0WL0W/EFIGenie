@@ -1,5 +1,5 @@
 #include "HardwareAbstraction/ITimerService.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
 #include "Packed.h"
@@ -63,7 +63,7 @@ class AfrService_Map_Ethanol : public IAfrService
 	protected:
 		const AfrService_Map_EthanolConfig* _config;
 		ITimerService *_timerService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		IFloatInputService *_engineCoolantTemperatureService;  
 		IFloatInputService *_ethanolContentService;
@@ -76,7 +76,7 @@ class AfrService_Map_Ethanol : public IAfrService
 		AfrService_Map_Ethanol(
 		const AfrService_Map_EthanolConfig *config,
 			ITimerService *timerService, 
-			IReluctor *reluctor,
+			RpmService *rpmService,
 			IFloatInputService *manifoldAbsolutePressureService,
 			IFloatInputService *engineCoolantTemperatureService,  
 			IFloatInputService *ethanolContentService, 

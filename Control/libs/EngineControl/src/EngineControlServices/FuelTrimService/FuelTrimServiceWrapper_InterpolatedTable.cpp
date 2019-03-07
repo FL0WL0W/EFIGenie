@@ -7,7 +7,7 @@ namespace EngineControlServices
 	FuelTrimService_InterpolatedTable::FuelTrimService_InterpolatedTable(
 		const FuelTrimService_InterpolatedTableConfig *config, 
 		ITimerService *timerService, 
-		IReluctor *reluctor,
+		RpmService *rpmService,
 		IFloatInputService *throttlePositionService, 
 		IFloatInputService *manifoldAbsolutePressureService, 
 		IFloatInputService *lambdaSensorService,
@@ -15,7 +15,7 @@ namespace EngineControlServices
 	{				
 		_config = config;
 		_timerService = timerService;
-		_reluctor = reluctor;
+		_rpmService = rpmService;
 		_throttlePositionService = throttlePositionService;
 		_manifoldAbsolutePressureService = manifoldAbsolutePressureService;
 		_lambdaSensorService = lambdaSensorService;
@@ -37,7 +37,7 @@ namespace EngineControlServices
 			if (elapsedTime * _config->UpdateRate < 1)
 				return;
 			_prevTick = _timerService->GetTick();
-			unsigned short rpm = _reluctor->GetRpm();
+			unsigned short rpm = _rpmService->Rpm;
 			_rpmDot = (unsigned int)round((rpm - _prevRpm) / elapsedTime);
 			_prevRpm = rpm;
 			float delayTime = (60 * _config->CycleDelay) / (float)rpm;

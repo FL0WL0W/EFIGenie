@@ -1,5 +1,5 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/BooleanInputService/IBooleanInputService.h"
 #include "Packed.h"
 
@@ -32,12 +32,12 @@ namespace EngineControlServices
 	{
 	protected:
 		const IgnitionConfigWrapper_HardRpmLimitConfig *_config;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IBooleanInputService *_booleanInputService;
 		IIgnitionConfig *_child;
 		bool _limitEnabled;
 	public:
-		IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, IReluctor *reluctor, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
+		IgnitionConfigWrapper_HardRpmLimit(const IgnitionConfigWrapper_HardRpmLimitConfig *config, RpmService *rpmService, IBooleanInputService *booleanInputService, IIgnitionConfig *child);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }

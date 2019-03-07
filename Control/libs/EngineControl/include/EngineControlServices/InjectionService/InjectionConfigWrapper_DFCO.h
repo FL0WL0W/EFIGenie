@@ -1,6 +1,6 @@
 #include "EngineControlServices/InjectionService/IInjectionConfig.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "Packed.h"
 
 using namespace Reluctor;
@@ -34,11 +34,11 @@ namespace EngineControlServices
 	protected:
 		const InjectionConfigWrapper_DFCOConfig *_config;
 		IFloatInputService *_throttlePositionService;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IInjectionConfig *_child;
 		bool _dfcoEnabled;
 	public:
-		InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, IReluctor *reluctor, IInjectionConfig *child);
+		InjectionConfigWrapper_DFCO(const InjectionConfigWrapper_DFCOConfig *config, IFloatInputService *throttlePositionService, RpmService *rpmService, IInjectionConfig *child);
 		InjectorTiming GetInjectorTiming(unsigned char injector);
 	};
 }

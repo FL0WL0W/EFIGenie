@@ -1,5 +1,5 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "Reluctor/IReluctor.h"
+#include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/FloatInputService/IFloatInputService.h"
 #include "Interpolation.h"
 #include "Packed.h"
@@ -42,12 +42,12 @@ namespace EngineControlServices
 	{
 	protected:
 		const IgnitionConfig_Map_EthanolConfig *_config;
-		IReluctor *_reluctor;
+		RpmService *_rpmService;
 		IFloatInputService *_ethanolContentService;
 		IFloatInputService *_manifoldAbsolutePressureService;
 		
 	public:
-		IgnitionConfig_Map_Ethanol(const IgnitionConfig_Map_EthanolConfig *config, IReluctor *reluctor, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
+		IgnitionConfig_Map_Ethanol(const IgnitionConfig_Map_EthanolConfig *config, RpmService *rpmService, IFloatInputService *ethanolContentService, IFloatInputService *manifoldAbsolutePressureService);
 		IgnitionTiming GetIgnitionTiming();
 	};
 }
