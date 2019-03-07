@@ -27,17 +27,31 @@ var SensorServicesIni = {
         { VehicleSpeedServiceId: { Type: "uint16", Value: 2008, Hidden: true } },
         { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: SpeedUnits } }
     ] },
-    DecoderGM24x: { Variables: [
-        { DecoderGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
-        { CrankPin: { Type: "uint16", Label: "Crank Pin" } },
-        { CamPin: { Type: "uint16", Label: "Cam Pin" } }
+    ReluctorGM24x: { Variables: [
+        { ReluctorGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { Pin: { Type: "uint16", Label: "Pin" } }
     ] },
-    IDecoderConfig: { Variables: [
-        { DecoderServiceId: { Type: "uint16", Value: 2001, Hidden: true } },
-        { Selection: { Label: "Decoder", Selections: [
+    Reluctor2x: { Variables: [
+        { ReluctorGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { Pin: { Type: "uint16", Label: "Pin" } },
+        { RisingPosition: { Type: "float", Label: "Rising Position", Units: DegreeUnits } },
+        { FallingPosition: { Type: "float", Label: "Falling Position", Units: DegreeUnits } }
+    ] },
+    IReluctorConfig: { Variables: [
+        { ReluctorServiceId: { Type: "uint16", Value: 2001, Hidden: true } },
+        { Selection: { Label: "Reluctor", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "GM24x", ConfigName: "DecoderGM24x"}
+            { Name: "GM24x", ConfigName: "ReluctorGM24x"},
+            { Name: "2x", ConfigName: "Reluctor2x"}
         ] } }
+    ] },
+    CrankReluctorConfig: { Variables: [
+        { CrankReluctorServiceId: { Type: "uint16", Value: 2009, Hidden: true } },
+        { Reluctor: { ConfigName: "IReluctorConfig" } }
+    ] },
+    CamReluctorConfig: { Variables: [
+        { CamReluctorServiceId: { Type: "uint16", Value: 2010, Hidden: true } },
+        { Reluctor: { ConfigName: "IReluctorConfig" } }
     ] }
 }
 
