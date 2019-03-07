@@ -17,7 +17,7 @@ namespace EngineControlServices
 		if(crankAvailable && (!camAvailable || _crankReluctor->GetResolution() >= _camReluctor->GetResolution()))
 			Rpm = _crankReluctor->GetRpm();
 		else if(camAvailable)
-			Rpm = _camReluctor->GetRpm();
+			Rpm = _camReluctor->GetRpm() * 2;
 		else
 			Rpm = 0;
 	}
