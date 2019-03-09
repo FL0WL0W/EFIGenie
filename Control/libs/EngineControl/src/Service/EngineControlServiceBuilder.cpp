@@ -424,6 +424,8 @@ namespace Service
 	
 	IInjectionConfig *EngineControlServiceBuilder::CreateInjectionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
+		*totalSize = 0;
+
 		IInjectionConfig *ret = 0;
 		
 		switch (GetServiceId(&config, totalSize))
@@ -465,6 +467,8 @@ namespace Service
 	
 	IIgnitionConfig *EngineControlServiceBuilder::CreateIgnitionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{	
+		*totalSize = 0;
+
 		IIgnitionConfig *ret = 0;
 		
 		switch (GetServiceId(&config, totalSize))
@@ -531,6 +535,8 @@ namespace Service
 
 	IgnitionSchedulingService *EngineControlServiceBuilder::CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
+		*totalSize = 0;
+
 		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = CastConfig < IgnitionSchedulingServiceConfig >(&config, totalSize);
 		
 		IIgnitionConfig *ignitionConfig = 0;
@@ -556,6 +562,8 @@ namespace Service
 
 	InjectionSchedulingService *EngineControlServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
+		*totalSize = 0;
+		
 		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = CastConfig < InjectionSchedulingServiceConfig >(&config, totalSize);
 
 		IInjectionConfig *injectionConfig = 0;
@@ -588,7 +596,7 @@ namespace Service
 #ifdef GM24XRELUCTOR_H
 		case 1:
 			ret = new Gm24xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *reinterpret_cast<const uint16_t *>(config));
-			config = reinterpret_cast<const uint16_t *>(config) + 1;
+			OffsetConfig(&config, totalSize, sizeof(uint16_t));
 			break;
 #endif
 #ifdef UNIVERSAL2XRELUCTOR_H
