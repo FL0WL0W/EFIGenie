@@ -56,6 +56,7 @@ namespace HardwareAbstraction
 			callTask->Execute();
 			if (callTask->DeleteOnExecution)
 				delete callTask;
+			callTask->Scheduled = false;
 		}
 
 		if (StackSize == 0)
@@ -91,6 +92,7 @@ namespace HardwareAbstraction
 		{
 			ScheduleCallBack(task->Tick);
 		}
+		task->Scheduled = true;
 		return true;
 	}
 
@@ -112,6 +114,7 @@ namespace HardwareAbstraction
 		{
 			ScheduleCallBack(task->Tick);
 		}
+		task->Scheduled = true;
 		return true;
 	}
 
@@ -127,6 +130,7 @@ namespace HardwareAbstraction
 		{
 			StackSize = static_cast<uint8_t>(std::remove(CallBackStackPointer, end, task) - CallBackStackPointer);
 		}
+		task->Scheduled = false;
 		return true;
 	}
 	

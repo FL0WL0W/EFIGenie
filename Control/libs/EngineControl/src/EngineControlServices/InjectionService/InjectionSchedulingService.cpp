@@ -64,7 +64,7 @@ namespace EngineControlServices
 			{
 				//we only have the crank sensor
 				schedulePosition = _crankReluctor->GetPosition();
-				scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				isSequential = false;
 			}
 		}

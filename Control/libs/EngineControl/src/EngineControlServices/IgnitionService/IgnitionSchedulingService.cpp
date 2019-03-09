@@ -66,7 +66,7 @@ namespace EngineControlServices
 				if (_ignitionSchedulingServiceConfig->SequentialRequired)
 					return;
 				schedulePosition = _crankReluctor->GetPosition();
-				scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				isSequential = false;
 			}
 		}
