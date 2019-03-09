@@ -37,9 +37,9 @@ namespace UnitTests
 			ignitionSchedulingConfig->Ignitors = 4;
 			unsigned short *IgnitorTdc = (unsigned short *)(ignitionSchedulingConfig + 1);
 			IgnitorTdc[0] = 0;
-			IgnitorTdc[1] = 180;
-			IgnitorTdc[2] = 360;
-			IgnitorTdc[3] = 540;
+			IgnitorTdc[1] = 180 * 64;
+			IgnitorTdc[2] = 360 * 64;
+			IgnitorTdc[3] = 540 * 64;
 			
 			IBooleanOutputService **ignitorOutputServices = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService **) * 5);
 			ignitorOutputServices[0] = (IBooleanOutputService *)(&_ignitorOutputService0);

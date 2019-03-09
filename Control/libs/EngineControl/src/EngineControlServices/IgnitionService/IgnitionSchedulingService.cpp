@@ -24,9 +24,7 @@ namespace EngineControlServices
 			if (_ignitionConfig != 0)
 			{
 				_ignitorDwellTask[ignitor] = new Task(&IBooleanOutputService::OutputSetCallBack, ignitorOutputServices[ignitor], false);
-				_ignitorDwellTask[ignitor]->Tick = tickMinusSome;
 				_ignitorFireTask[ignitor] = new  Task(&IBooleanOutputService::OutputResetCallBack, ignitorOutputServices[ignitor], false);
-				_ignitorFireTask[ignitor]->Tick = tickMinusSome;
 			}
 		}
 	}
