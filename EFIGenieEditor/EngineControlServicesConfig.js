@@ -371,8 +371,8 @@ var EngineControlServicesIni = {
     EngineBuilderConfig: { Tabbed: true, Variables: [
         { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
         { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
-        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
-        { TransmissionServices: { Label: "Tranmission", ConfigName: "TransmissionServices"} },
+        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} }
+        { EOF: { Type: "uint16", Value: 0, Hidden: true } },
     ] },
 
     Main: { Variables: [
