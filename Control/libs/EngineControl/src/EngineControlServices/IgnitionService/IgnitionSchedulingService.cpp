@@ -92,30 +92,35 @@ namespace EngineControlServices
 
 		for (unsigned char ignitor = 0; ignitor < _ignitionSchedulingServiceConfig->Ignitors; ignitor++)
 		{
-			unsigned int currentTickPlusSome = _timerService->GetTick() + 5;
-			if (currentTickPlusSome < _ignitorDwellTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[ignitor]->Tick < 1431655765))
+			if (!ignitionTiming.IgnitionEnable)
 			{
-				if (!ignitionTiming.IgnitionEnable)
+				_timerService->UnScheduleTask(_ignitorDwellTask[ignitor]);
+			}
+			else
+			{
+				float tdc = ignitorTdc[ignitor] * 0.015625f;
+				if(tdc > scheduleResolution)
+					tdc -= scheduleResolution;
+
+				float degreesUntilFire = tdc - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - schedulePosition;
+				while (degreesUntilFire < 0)
+					degreesUntilFire += scheduleResolution;
+				while (degreesUntilFire > scheduleResolution)
+					degreesUntilFire -= scheduleResolution;
+					
+				uint32_t ignitionFireTick = static_cast<uint32_t>(round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire)));
+				uint32_t ignitionDwellTick = static_cast<uint32_t>(round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond)));
+
+				uint32_t currentTickPlusSome = _timerService->GetTick() + 5;
+				if (currentTickPlusSome < _ignitorFireTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorFireTask[ignitor]->Tick < 1431655765)
+					|| (!_ignitorFireTask[ignitor]->Scheduled && (currentTickPlusSome < ignitionFireTick || (currentTickPlusSome >= 2863311531 && ignitionFireTick < 1431655765))))
 				{
-					_timerService->UnScheduleTask(_ignitorFireTask[ignitor]);
-					_timerService->UnScheduleTask(_ignitorDwellTask[ignitor]);
-				}
-				else
-				{
-					float degreesUntilFire = ignitorTdc[ignitor] - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - schedulePosition;
-					if (degreesUntilFire < 0)
-						degreesUntilFire += scheduleResolution;
-					if (degreesUntilFire > scheduleResolution)
-						degreesUntilFire -= scheduleResolution >> 2;
-					if (degreesUntilFire < 0)
-						degreesUntilFire += scheduleResolution;
-					unsigned int ignitionFireTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire));
 					_timerService->ReScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick);
 
 					//if ignition is not dwelling yet set both tasks
-					if (currentTickPlusSome < _ignitorDwellTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[ignitor]->Tick < 1431655765))
+					if (currentTickPlusSome < _ignitorDwellTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[ignitor]->Tick < 1431655765)
+						|| (!_ignitorDwellTask[ignitor]->Scheduled && (currentTickPlusSome < ignitionDwellTick || (currentTickPlusSome >= 2863311531 && ignitionDwellTick < 1431655765))))
 					{
-						unsigned int ignitionDwellTick = (unsigned int)round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond));
 						_timerService->ReScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
 					}
 				}
