@@ -32,13 +32,12 @@ var SensorServicesIni = {
         { Pin: { Type: "uint16", Label: "Pin" } }
     ] },
     Reluctor2x: { Variables: [
-        { ReluctorGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
+        { ReluctorGM24xServiceId: { Type: "uint8", Value: 2, Hidden: true } },
         { Pin: { Type: "uint16", Label: "Pin" } },
         { RisingPosition: { Type: "float", Label: "Rising Position", Units: DegreeUnits } },
         { FallingPosition: { Type: "float", Label: "Falling Position", Units: DegreeUnits } }
     ] },
     IReluctorConfig: { Variables: [
-        { ReluctorServiceId: { Type: "uint16", Value: 2001, Hidden: true } },
         { Selection: { Label: "Reluctor", Selections: [
             { Name: "None", ConfigName: "NoneServiceConfig"},
             { Name: "GM24x", ConfigName: "ReluctorGM24x"},
