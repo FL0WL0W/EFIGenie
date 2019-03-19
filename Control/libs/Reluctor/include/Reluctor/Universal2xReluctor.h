@@ -25,22 +25,25 @@ namespace Reluctor
 	{
 	protected:
 		const HardwareAbstraction::HardwareAbstractionCollection *_hardwareAbstractionCollection;
+		HardwareAbstraction::ITimerService *_timerService;
+		HardwareAbstraction::IDigitalService *_digitalService;
 		const Universal2xReluctorConfig *_config;
+		uint16_t _pin;
 
 		bool _state;
 		bool _isSynced;
 		uint32_t _lastTick;
 		uint32_t _period;
 		const uint32_t time() const;
+		bool _interruptCalled = false;
 	public:
 		Universal2xReluctor(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const Universal2xReluctorConfig *config);
 		float GetPosition() override;
-		uint32_t GetTickPerDegree() override;
+		float GetTickPerDegree() override;
 		uint16_t GetRpm() override;
 		uint16_t GetResolution() override;
 		bool IsSynced() override;
 		static void InterruptCallBack(void *reluctor);
-		void Interrupt();
 	};
 }
 #endif

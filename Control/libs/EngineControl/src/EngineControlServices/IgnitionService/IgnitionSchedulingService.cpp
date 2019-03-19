@@ -33,7 +33,8 @@ namespace EngineControlServices
 	{
 		bool isSequential;
 		float schedulePosition;//0-720 when sequential and 0-360 otherwise
-		uint32_t scheduleTickPerDegree;
+		float scheduleTickPerDegree;
+		uint32_t scheduleTick;
 		if(_crankReluctor != 0 && _crankReluctor->IsSynced())
 		{
 			if(_camReluctor != 0 && _camReluctor->IsSynced())
@@ -43,17 +44,19 @@ namespace EngineControlServices
 				if(_camReluctor->GetResolution() <= _crankReluctor->GetResolution() * 2)
 				{
 					schedulePosition = _crankReluctor->GetPosition();
-					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
+					scheduleTick = _timerService->GetTick();
 					if(_camReluctor->GetPosition() >= 180)
 					{
 						//we are on the second half of the cam
 						schedulePosition += 360;
 					}
+					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				}
 				else
 				{
 					//the crank reluctor is essential useless unless the cam sensor goes out of sync
 					schedulePosition = _camReluctor->GetPosition() * 2;
+					scheduleTick = _timerService->GetTick();
 					scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
 				}
 				isSequential = true;
@@ -64,6 +67,7 @@ namespace EngineControlServices
 				if (_ignitionSchedulingServiceConfig->SequentialRequired)
 					return;
 				schedulePosition = _crankReluctor->GetPosition();
+				scheduleTick = _timerService->GetTick();
 				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				isSequential = false;
 			}
@@ -72,6 +76,8 @@ namespace EngineControlServices
 		{
 			//we only have the cam sensor
 			schedulePosition = _camReluctor->GetPosition() * 2;
+			scheduleTick = _timerService->GetTick();
+			scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
 			isSequential = true;
 		}
 		else
@@ -80,7 +86,6 @@ namespace EngineControlServices
 			return;
 		}
 
-		uint32_t scheduleTick = _timerService->GetTick();
 		uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();	
 		
 		unsigned short scheduleResolution = isSequential ? 720 : 360;
@@ -102,26 +107,30 @@ namespace EngineControlServices
 
 				float degreesUntilFire = tdc - (ignitionTiming.IgnitionAdvance64thDegree * 0.015625f) - schedulePosition;
 				while (degreesUntilFire < 0)
-					degreesUntilFire += scheduleResolution;
+					degreesUntilFire += scheduleResolution;		
 				while (degreesUntilFire > scheduleResolution)
-					degreesUntilFire -= scheduleResolution;
-					
+					degreesUntilFire -= scheduleResolution;	
+				if(degreesUntilFire > scheduleResolution / 2)
+					continue;
+
 				uint32_t ignitionFireTick = static_cast<uint32_t>(round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire)));
+				
 				uint32_t ignitionDwellTick = static_cast<uint32_t>(round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond)));
 
-				uint32_t currentTickPlusSome = _timerService->GetTick() + 5;
-				if (currentTickPlusSome < _ignitorFireTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorFireTask[ignitor]->Tick < 1431655765)
-					|| (!_ignitorFireTask[ignitor]->Scheduled && (currentTickPlusSome < ignitionFireTick || (currentTickPlusSome >= 2863311531 && ignitionFireTick < 1431655765))))
+				if(ITimerService::TickLessThanTick(_timerService->GetTick(), ignitionFireTick))
 				{
-					_timerService->ReScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick);
-
-					//if ignition is not dwelling yet set both tasks
-					if (currentTickPlusSome < _ignitorDwellTask[ignitor]->Tick || (currentTickPlusSome >= 2863311531 && _ignitorDwellTask[ignitor]->Tick < 1431655765)
-						|| (!_ignitorDwellTask[ignitor]->Scheduled && (currentTickPlusSome < ignitionDwellTick || (currentTickPlusSome >= 2863311531 && ignitionDwellTick < 1431655765))))
+					if(_timerService->ScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick)
+						&& ITimerService::TickLessThanTick(_timerService->GetTick(), ignitionDwellTick))
 					{
-						_timerService->ReScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
+						_timerService->ScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
 					}
 				}
+
+				uint32_t fire = _ignitorFireTask[ignitor]->Tick;
+				uint32_t dwell = _ignitorDwellTask[ignitor]->Tick;
+
+				//  if(fire != 0 && dwell != 0 && fire-dwell > 500000)
+				//  	asm("bkpt");
 			}
 		}
 	}

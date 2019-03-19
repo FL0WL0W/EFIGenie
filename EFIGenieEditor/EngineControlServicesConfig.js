@@ -105,12 +105,12 @@ var EngineControlServicesIni = {
 		
         { StoichResolution : { Label: "Stoich Resolution", Type: "uint8", Value: 8 } },
         
-        { GasMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Gas AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
-        { EthanolMap: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Ethanol AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
-        { EctMultiplierTable: { Type: "uint8", ValueMultiplier: 1/255, XResolution: "AfrEctResolution", Label: "ECT Multiplier", XLabel: "ECT", ZLabel: "Multiplier", XMin: "MinEct", XMax: "MaxEct", XUnits: TemperatureUnits, ZUnits: BlankUnits, Dialog: true } },
-        { TpsMaxAfrGas: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrTpsResolution", Label: "Max AFR Gas", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
-        { TpsMaxAfrEthanol: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "AfrTpsResolution", Label: "Max AFR Ethanol", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
-        { StoichTable: { Type: "uint16", ValueMultiplier: 1/1024, XResolution: "StoichResolution", Label: "Stoich", XLabel: "Ethanol Content", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+        { GasMap: { Type: "uint16", ValueMultiplier: 1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Gas AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
+        { EthanolMap: { Type: "uint16", ValueMultiplier: 1024, XResolution: "AfrRpmResolution", YResolution: "AfrMapResolution", Label: "Ethanol AFR", XLabel: "RPM", ZLabel: "AFR", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: AfrUnits, Dialog: true } },
+        { EctMultiplierTable: { Type: "uint8", ValueMultiplier: 255, XResolution: "AfrEctResolution", Label: "ECT Multiplier", XLabel: "ECT", ZLabel: "Multiplier", XMin: "MinEct", XMax: "MaxEct", XUnits: TemperatureUnits, ZUnits: BlankUnits, Dialog: true } },
+        { TpsMaxAfrGas: { Type: "uint16", ValueMultiplier: 1024, XResolution: "AfrTpsResolution", Label: "Max AFR Gas", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+        { TpsMaxAfrEthanol: { Type: "uint16", ValueMultiplier: 1024, XResolution: "AfrTpsResolution", Label: "Max AFR Ethanol", XLabel: "TPS", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
+        { StoichTable: { Type: "uint16", ValueMultiplier: 1024, XResolution: "StoichResolution", Label: "Stoich", XLabel: "Ethanol Content", ZLabel: "AFR", XMin: 0, XMax: 1, XUnits: PercentUnits, ZUnits: AfrUnits, Dialog: true } },
     ] },
     
     IAfrServiceConfig: { Variables: [
@@ -203,7 +203,7 @@ var EngineControlServicesIni = {
     IgnitionConfig_StaticConfig: { Variables: [
         { IgnitionConfig_StaticConfigId: { Type: "uint8", Value: 1, Hidden: true } },
         { IgnitionDwellTime : { Label: "Dwell Time", Type: "float", Value: 0.0035, Units: TimeUnits } },
-        { IgnitionAdvance64thDegree : { Label: "Advance", Type: "int16", ValueMultiplier: 1/64, Value: 10, Units: DegreeUnits } }
+        { IgnitionAdvance64thDegree : { Label: "Advance", Type: "int16", ValueMultiplier: 64, Value: 10, Units: DegreeUnits } }
     ] },
 
     IgnitionConfig_Map_EthanolConfig: { Variables: [
@@ -212,8 +212,8 @@ var EngineControlServicesIni = {
         { MaxMapBar : { Label: "Max MAP", Type: "float", Value: 1, Units: PressureUnits } },
         { IgnitionRpmResolution : { Label: "Advance RPM Resolution", Type: "uint8", Value: 8 } },
         { IgnitionMapResolution : { Label: "Advance MAP Resolution", Type: "uint8", Value: 8 } },
-        { GasMap: { Type: "int16", ValueMultiplier: 1/64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Gas Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
-        { EthanolMap: { Type: "int16", ValueMultiplier: 1/64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Ethanol Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
+        { GasMap: { Type: "int16", ValueMultiplier: 64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Gas Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
+        { EthanolMap: { Type: "int16", ValueMultiplier: 64, XResolution: "IgnitionRpmResolution", YResolution: "IgnitionMapResolution", Label: "Ethanol Advance", XLabel: "RPM", ZLabel: "Advance", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: DegreeUnits, Dialog: true } },
     ] },
     
     IgnitionConfigWrapper_HardRpmLimitConfig:  { Variables: [
@@ -249,7 +249,7 @@ var EngineControlServicesIni = {
         { IgnitionSchedulingServiceId: { Type: "uint16", Value: 4007, Hidden: true } },
         { SequentialRequired: { Type: "bool", Label: "Sequential Required" } },
         { Ignitors: { Type: "uint8", Value: "//IgnitorServices/Coils", Hidden: true } },
-		{ IgnitorTdc: { Type: "uint16", XResolution: "//IgnitorServices/Coils", Label: "Coil TDC", XLabel: "Coil", ZLabel: "TDC", XMin: 1, XMax: "//IgnitorServices/Coils", ZUnits: DegreeUnits, Dialog: true } },
+		{ IgnitorTdc: { Type: "uint16", XResolution: "//IgnitorServices/Coils", ValueMultiplier: 64, Label: "Coil TDC", XLabel: "Coil", ZLabel: "TDC", XMin: 1, XMax: "//IgnitorServices/Coils", ZUnits: DegreeUnits, Dialog: true } },
         
         { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
     ] },
@@ -292,11 +292,11 @@ var EngineControlServicesIni = {
         { MapDotAdderResolution: { Label: "MAP Dot Resolution", Type: "uint8", Value: 8 } },
 
 
-        { VolumetricEfficiencyMap: { Type: "uint16", ValueMultiplier: 1/8192, XResolution: "VeRpmResolution", YResolution: "VeMapResolution", Label: "Volumetric Efficiency", XLabel: "RPM", ZLabel: "VE", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: PercentUnits, Dialog: true } },
+        { VolumetricEfficiencyMap: { Type: "uint16", ValueMultiplier: 8192, XResolution: "VeRpmResolution", YResolution: "VeMapResolution", Label: "Volumetric Efficiency", XLabel: "RPM", ZLabel: "VE", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: PercentUnits, Dialog: true } },
         { InjectorGramsPerMinute: { Type: "uint16", XResolution: "//InjectorServices/Injectors", Label: "Injector Flow", XLabel: "Injector", ZLabel: "Injector Flow", XMin: 1, XMax: "//InjectorServices/Injectors", ZUnits: FlowUnits, Dialog: true } },
         { ShortPulseAdder: { Type: "short16", ValueMultiplier: 1000000, XResolution: "ShortPulseAdderResolution", Label: "Short Pulse Adder", XLabel: "Short Pulse", ZLabel: "Pulse Width", XMin: 0, XMax: "ShortPulseLimit", XUnits: TimeUnits, ZUnits: TimeUnits, Dialog: true } },
         { Offset: { Type: "uint16", ValueMultiplier: 1000000, XResolution: "OffsetVoltageResolution", YResolution: "OffsetMapResolution", Label: "Injector Offset", XLabel: "Voltage", ZLabel: "Offset", XMin: "VoltageMin", XMax: "VoltageMax", YLabel: "MAP", YMin: 0, YMax: "MaxMapBar", XUnits: VoltUnits, YUnits: PressureUnits, ZUnits: TimeUnits, Dialog: true } },
-        { TemperatureBias: { Type: "uint8", ValueMultiplier: 1/255, XResolution: "TemperatureBiasResolution", Label: "Temperature Bias IAT:ECT", XLabel: "Airflow/Cylinder", ZLabel: "Temperature Bias", XMin: 0, XMax: "MaxTemperatureBias", XUnits: FlowUnits, Dialog: true } },
+        { TemperatureBias: { Type: "uint8", ValueMultiplier: 255, XResolution: "TemperatureBiasResolution", Label: "Temperature Bias IAT:ECT", XLabel: "Airflow/Cylinder", ZLabel: "Temperature Bias", XMin: 0, XMax: "MaxTemperatureBias", XUnits: FlowUnits, Dialog: true } },
         { TpsDotAdder: { Type: "short16", ValueMultiplier: 1000000, XResolution: "TpsDotAdderResolution", Label: "TPS Dot Adder", XLabel: "TPS Dot", ZLabel: "Pulse Width", XMin: 0, XMax: "MaxTpsDot", XUnits: PercentUnits, ZUnits: TimeUnits, Dialog: true } },
         { MapDotAdder: { Type: "short16", ValueMultiplier: 1000000, XResolution: "MapDotAdderResolution", Label: "MAP Dot Adder", XLabel: "MAP Dot", ZLabel: "Pulse Width", XMin: 0, XMax: "MaxMapDot", XUnits: PressureUnits, ZUnits: TimeUnits, Dialog: true } },
     ] },
@@ -371,8 +371,8 @@ var EngineControlServicesIni = {
     EngineBuilderConfig: { Tabbed: true, Variables: [
         { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
         { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
-        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} }
-        { EOF: { Type: "uint16", Value: 0, Hidden: true } },
+        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
+        { EOF: { Type: "uint16", Value: 0, Hidden: true } }
     ] },
 
     Main: { Variables: [

@@ -20,14 +20,14 @@ namespace Reluctor
 		uint32_t _lastTick;
 		uint32_t _period;
 		const uint32_t time() const;
+		bool _interruptCalled = false;
 	public:
 		Gm24xReluctor(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const uint16_t pin);
 		float GetPosition() override;
-		uint32_t GetTickPerDegree() override;
+		float GetTickPerDegree() override;
 		uint16_t GetRpm() override;
 		uint16_t GetResolution() override;
 		static void InterruptCallBack(void *reluctor);
-		void Interrupt();
 		bool IsSynced() override;
 	};
 }

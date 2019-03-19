@@ -49,8 +49,8 @@ namespace IOServices
 		const uint32_t ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
 		const uint32_t tick = _hardwareAbstractionCollection->TimerService->GetTick();
 		_stepBooleanOutputService->OutputSet();
-		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_offTask, (uint32_t)round(tick + ticksPerSecond * _config->StepWidth));
-		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
+		_hardwareAbstractionCollection->TimerService->ScheduleTask(_offTask, (uint32_t)round(tick + ticksPerSecond * _config->StepWidth));
+		_hardwareAbstractionCollection->TimerService->ScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
 	}
 	
 	void StepperOutputService_StepDirectionControl::Calibrate()

@@ -36,6 +36,7 @@ namespace EngineControlServices
 		bool isSequential;
 		float schedulePosition;//0-720 when sequential and 0-360 otherwise
 		uint32_t scheduleTickPerDegree;
+		uint32_t scheduleTick;
 		if(_crankReluctor != 0 && _crankReluctor->IsSynced())
 		{
 			if(_camReluctor != 0 && _camReluctor->IsSynced())
@@ -44,17 +45,19 @@ namespace EngineControlServices
 				//decide which one to use for scheduling.
 				if(_camReluctor->GetResolution() <= _crankReluctor->GetResolution() * 2)
 				{
+					scheduleTick = _timerService->GetTick();
 					schedulePosition = _crankReluctor->GetPosition();
-					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 					if(_camReluctor->GetPosition() >= 180)
 					{
 						//we are on the second half of the cam
 						schedulePosition += 360;
 					}
+					scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				}
 				else
 				{
 					//the crank reluctor is essential useless unless the cam sensor goes out of sync
+					scheduleTick = _timerService->GetTick();
 					schedulePosition = _camReluctor->GetPosition() * 2;
 					scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
 				}
@@ -63,6 +66,7 @@ namespace EngineControlServices
 			else
 			{
 				//we only have the crank sensor
+				scheduleTick = _timerService->GetTick();
 				schedulePosition = _crankReluctor->GetPosition();
 				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
 				isSequential = false;
@@ -71,7 +75,9 @@ namespace EngineControlServices
 		else if(_camReluctor != 0 && _camReluctor->IsSynced())
 		{
 			//we only have the cam sensor
+			scheduleTick = _timerService->GetTick();
 			schedulePosition = _camReluctor->GetPosition() * 2;
+			scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
 			isSequential = true;
 		}
 		else
@@ -80,7 +86,6 @@ namespace EngineControlServices
 			return;
 		}
 
-		uint32_t scheduleTick = _timerService->GetTick();
 		uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();	
 
 		const unsigned short *injectorTdc = _injectionSchedulingServiceConfig->InjectorTdc();
@@ -111,8 +116,8 @@ namespace EngineControlServices
 							degreesUntilOpen += 720;
 						unsigned int injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
-						_timerService->ReScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
-						_timerService->ReScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
+						_timerService->ScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
+						_timerService->ScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
 					}
 				}
 			}
@@ -141,8 +146,8 @@ namespace EngineControlServices
 							degreesUntilOpen += 720;
 						unsigned int injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						unsigned int injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
-						_timerService->ReScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
-						_timerService->ReScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
+						_timerService->ScheduleTask(_injectorOpenTask[injector], injectorOpenTick);
+						_timerService->ScheduleTask(_injectorCloseTask[injector], injectorCloseTick);
 						
 						injectorTiming = _injectionConfig->GetInjectorTiming(injector + injectosToGoTo);
 						injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
@@ -156,8 +161,8 @@ namespace EngineControlServices
 							degreesUntilOpen += 720;
 						injectorOpenTick = (unsigned int)round(scheduleTick + (scheduleTickPerDegree * degreesUntilOpen));
 						injectorCloseTick = injectorOpenTick + injectorPulseWidthTick;
-						_timerService->ReScheduleTask(_injectorOpenTask[injector + injectosToGoTo], injectorOpenTick);
-						_timerService->ReScheduleTask(_injectorCloseTask[injector + injectosToGoTo], injectorCloseTick);
+						_timerService->ScheduleTask(_injectorOpenTask[injector + injectosToGoTo], injectorOpenTick);
+						_timerService->ScheduleTask(_injectorCloseTask[injector + injectosToGoTo], injectorCloseTick);
 					}
 				}
 			}

@@ -54,7 +54,7 @@ namespace IOServices
 		const uint32_t ticksPerSecond = _hardwareAbstractionCollection->TimerService->GetTicksPerSecond();
 		SetState(_state);
 		const uint32_t tick = _hardwareAbstractionCollection->TimerService->GetTick();
-		_hardwareAbstractionCollection->TimerService->ReScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
+		_hardwareAbstractionCollection->TimerService->ScheduleTask(_stepTask, tick + ticksPerSecond / _config->MaxStepsPerSecond);
 	}
 	
 	void StepperOutputService_HalfStepControl::SetState(int8_t state)

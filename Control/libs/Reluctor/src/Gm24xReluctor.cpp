@@ -7,7 +7,7 @@ namespace Reluctor
 	{
 		_hardwareAbstractionCollection = hardwareAbstractionCollection;
 		_pin = pin;
-		_hardwareAbstractionCollection->DigitalService->ScheduleRecurringInterrupt(_pin, new HardwareAbstraction::CallBack(InterruptCallBack, this));
+		_hardwareAbstractionCollection->DigitalService->ScheduleRecurringInterrupt(_pin, new HardwareAbstraction::CallBack(Gm24xReluctor::InterruptCallBack, this));
 		_isSynced = false;
 		_lastTick = 0;
 		_period   = 0;
@@ -15,22 +15,21 @@ namespace Reluctor
 		_subState = 0;
 	}
 	
-	const uint32_t Gm24xReluctor::time() const
+	float Gm24xReluctor::GetPosition()
 	{
-		uint32_t tick = _hardwareAbstractionCollection->TimerService->GetTick();
-		if (tick < _lastTick)
-			return tick + (4294967295 - _lastTick);
-		return tick - _lastTick;
+		float position;
+		do
+		{
+			_interruptCalled = false;
+			position = _state * 15 + (_hardwareAbstractionCollection->TimerService->GetElapsedTick(_lastTick) * 15) / static_cast<float>(_period);
+		} while(_interruptCalled);
+		
+		return position;
 	}
 	
-	float Gm24xReluctor::GetPosition(void)
+	float Gm24xReluctor::GetTickPerDegree(void)
 	{
-		return _state * 15 + (time() * 15) / static_cast<float>(_period);
-	}
-	
-	uint32_t Gm24xReluctor::GetTickPerDegree(void)
-	{
-		return _period / 15;
+		return _period / 15.0f;
 	}
 	
 	uint16_t Gm24xReluctor::GetRpm(void)
@@ -45,48 +44,46 @@ namespace Reluctor
 
 	bool Gm24xReluctor::IsSynced()
 	{
+		if(_isSynced && _hardwareAbstractionCollection->TimerService->GetElapsedTick(_lastTick) > _period * 2)
+			_isSynced = false;
 		return _isSynced;
 	}
 
-	void Gm24xReluctor::InterruptCallBack(void *reluctor)
+	void Gm24xReluctor::InterruptCallBack(void *reluctorPointer)
 	{
-		reinterpret_cast<Gm24xReluctor *>(reluctor)->Interrupt();
-	}
+		Gm24xReluctor *reluctor = reinterpret_cast<Gm24xReluctor *>(reluctorPointer);
+		bool rising = reluctor->_hardwareAbstractionCollection->DigitalService->ReadPin(reluctor->_pin);
+		uint32_t tick = reluctor->_hardwareAbstractionCollection->TimerService->GetTick();
 
-	void Gm24xReluctor::Interrupt()
-	{
-		bool rising = _hardwareAbstractionCollection->DigitalService->ReadPin(_pin);
+		int32_t elapsedTick = tick - reluctor->_lastTick;
 
-		uint32_t tick = _hardwareAbstractionCollection->TimerService->GetTick();
-			
+		if(reluctor->_isSynced && elapsedTick < 0)
+			return;
+
 		if (!rising)
 		{
-			if (tick < _lastTick)
-				_period = tick + (4294967295 - _lastTick);
+			reluctor->_period = elapsedTick;
+			
+			reluctor->_state++;
+			if (reluctor->_state > 23)
+				reluctor->_state = 0;
+			
+			if(tick == 0)
+				reluctor->_lastTick = 1;
 			else
-				_period = tick - _lastTick;
-			
-			_state++;
-			if (_state > 23)
-				_state = 0;
-			
-			_lastTick = tick;
+				reluctor->_lastTick = tick;
 		}
-		else if(_period != 0)
+		else if(reluctor->_period != 0)
 		{
-			uint32_t interumPeriod;
-			if (tick < _lastTick)
-				interumPeriod = tick + (4294967295 - _lastTick);
-			else
-				interumPeriod = tick - _lastTick;
+			uint32_t interumPeriod = elapsedTick;
 			
-			if (interumPeriod > _period * 0.6)
+			if (interumPeriod > reluctor->_period * 0.6)
 			{
 				//short pulse
 				//    _
 				//|__| |
 				//   ^
-				_subState = 0;
+				reluctor->_subState = 0;
 			}
 			else
 			{
@@ -94,13 +91,15 @@ namespace Reluctor
 				//   __
 				//|_|  |
 				//  ^
-				_subState++;
-				if (_subState == 5)
+				reluctor->_subState++;
+				if (reluctor->_subState == 5)
 				{
-					_state = 5;
-					_isSynced = true;
+					reluctor->_state = 5;
+					reluctor->_isSynced = true;
 				}
 			}
 		}
+		
+		reluctor->_interruptCalled = true;
 	}
 }

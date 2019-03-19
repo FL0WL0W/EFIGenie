@@ -4,8 +4,6 @@
 #ifndef ITIMERSERVICE_H
 #define ITIMERSERVICE_H
 
-#define TIMERSERVICE_MAX_STACK_SIZE 256
-
 namespace HardwareAbstraction
 {
 	class Task
@@ -29,38 +27,47 @@ namespace HardwareAbstraction
 		}
 
 		ICallBack *CallBackInstance;
-		bool DeleteOnExecution;
+		bool DeleteOnExecution = false;
 		//only let TimerService edit these values
-		bool Scheduled;
+		bool Scheduled = false;
+		Task *NextTask = 0;
 		uint32_t Tick;
 	};
 
 	class ITimerService
 	{
+	private:
+		bool _disableCallBack = false;
+		bool _callBackCalledWhileDisabled = false;
+		uint32_t _maxDelay = 0;
+		int _delayStack = 0;
 	protected:
-		void SortCallBackStack();
-		virtual void ScheduleCallBack(uint32_t tick) = 0;
+		virtual void ScheduleCallBack(const uint32_t tick) = 0;
+		uint32_t TimerCallBackAdvance;
 	public:
-#if TIMERSERVICE_MAX_STACK_SIZE <= 2^8
-		uint8_t StackSize = 0;
-#elif TIMERSERVICE_MAX_STACK_SIZE <= 2^16
-		uint16_t StackSize = 0;
-#elif TIMERSERVICE_MAX_STACK_SIZE <= 2^32
-		uint32_t StackSize = 0;
-#endif
-		Task *CallBackStackPointer[TIMERSERVICE_MAX_STACK_SIZE];
+	
+		virtual const uint32_t GetTick() = 0;
+		virtual const uint32_t GetTicksPerSecond() = 0;
 
-		virtual uint32_t GetTick(void) = 0;
-		virtual uint32_t GetTicksPerSecond() = 0;
+		Task *FirstTask = 0;
 
 		void ReturnCallBack(void);
-		Task *ScheduleTask(void(*)(void *), void *, uint32_t, bool);
-		bool ScheduleTask(Task *, uint32_t);
-		bool ReScheduleTask(Task *, uint32_t);
-		bool UnScheduleTask(Task *);
+		Task *ScheduleTask(void(*)(void *), void *, const uint32_t, const bool);
+		const bool ScheduleTask(Task *, const uint32_t);
+		const bool UnScheduleTask(Task *);
 		
-		uint32_t GetElapsedTick(uint32_t);
-		float GetElapsedTime(uint32_t);
+		const uint32_t GetElapsedTick(const uint32_t);
+		const float GetElapsedTime(const uint32_t);
+
+		constexpr static bool TickLessThanTick(const uint32_t i, const uint32_t j)
+		{
+			return (i + 1) - j > 0x10000000;
+		}
+
+		constexpr static bool TickLessThanEqualToTick(const uint32_t i, const uint32_t j)
+		{
+			return i - j > 0x10000000;
+		}
 	};
 }
 #endif
