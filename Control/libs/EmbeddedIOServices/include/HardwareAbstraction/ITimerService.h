@@ -43,7 +43,7 @@ namespace HardwareAbstraction
 		int _delayStack = 0;
 	protected:
 		virtual void ScheduleCallBack(const uint32_t tick) = 0;
-		uint32_t TimerCallBackAdvance;
+		uint32_t TimerCallBackAdvance = 0;
 	public:
 	
 		virtual const uint32_t GetTick() = 0;
@@ -61,12 +61,12 @@ namespace HardwareAbstraction
 
 		constexpr static bool TickLessThanTick(const uint32_t i, const uint32_t j)
 		{
-			return (i + 1) - j > 0x10000000;
+			return i - j > 0x10000000;
 		}
 
 		constexpr static bool TickLessThanEqualToTick(const uint32_t i, const uint32_t j)
 		{
-			return i - j > 0x10000000;
+			return i - (j + 1) > 0x10000000;
 		}
 	};
 }

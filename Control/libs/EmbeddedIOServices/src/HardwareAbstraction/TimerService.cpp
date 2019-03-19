@@ -35,20 +35,12 @@ namespace HardwareAbstraction
 	
 	void ITimerService::ReturnCallBack(void)
 	{
-		uint32_t tick;
 		Task *next = 0;
 		int i = 0;
 		while (FirstTask != 0 && TickLessThanEqualToTick(FirstTask->Tick, GetTick() + TimerCallBackAdvance))
 		{
 			i++;
 			next = FirstTask->NextTask;
-			
-			uint32_t delay = GetTick() - FirstTask->Tick;
-			if(delay > _maxDelay && delay < 0x10000000)
-			{
-				_maxDelay = delay;
-				_delayStack = i;
-			}
 
 			while(TickLessThanTick(GetTick(), FirstTask->Tick)) ;
 			
@@ -76,7 +68,7 @@ namespace HardwareAbstraction
 	const bool ITimerService::ScheduleTask(Task *task, const uint32_t tick)
 	{
 		//make this not static 1ms
-		uint32_t minTick = GetTick() + 72000;
+		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
 		if(FirstTask != 0 && TickLessThanTick(FirstTask->Tick, minTick))
 			return false;
 
@@ -163,7 +155,7 @@ namespace HardwareAbstraction
 	const bool ITimerService::UnScheduleTask(Task *task)
 	{
 		//make this not static 1ms
-		uint32_t minTick = GetTick() + 72000;
+		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
 		if(FirstTask != 0 && TickLessThanTick(FirstTask->Tick, minTick))
 			return false;
 

@@ -83,13 +83,14 @@ namespace UnitTests
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		SetUp(false, false);
 
-		EXPECT_CALL(_timerService, GetTicksPerSecond()).Times(1).WillOnce(Return(5000));
+		EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
 		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(5000));
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
@@ -102,13 +103,13 @@ namespace UnitTests
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
 		SetUp(true, false);
 
-		EXPECT_CALL(_timerService, GetTicksPerSecond()).Times(1).WillOnce(Return(5000));
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, WritePin(1, true)).Times(1);
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(5000));
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
@@ -122,7 +123,6 @@ namespace UnitTests
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
 		SetUp(false, true);
 
-		EXPECT_CALL(_timerService, GetTicksPerSecond()).Times(1).WillOnce(Return(5000));
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
@@ -130,6 +130,7 @@ namespace UnitTests
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
 		EXPECT_CALL(_digitalService, WritePin(1, false)).Times(1);
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(5000));
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
@@ -142,7 +143,6 @@ namespace UnitTests
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
 		SetUp(true, true);
 
-		EXPECT_CALL(_timerService, GetTicksPerSecond()).Times(1).WillOnce(Return(5000));
 		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0));
 		EXPECT_CALL(_timerService, ScheduleCallBack(5000)).Times(1);
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);
@@ -150,6 +150,7 @@ namespace UnitTests
 		_preReluctorCallBackGroup->Execute();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::In)).Times(1);
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(5000));
 		_timerService.ReturnCallBack();
 
 		EXPECT_CALL(_digitalService, InitPin(1, HardwareAbstraction::Out)).Times(1);

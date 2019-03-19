@@ -55,8 +55,7 @@ namespace UnitTests
 			buildConfig = (void*)((float *)buildConfig + 1);
 
 			EXPECT_CALL(_timerService, GetTicksPerSecond())
-				.Times(1)
-				.WillOnce(Return(5000));
+				.WillRepeatedly(Return(5000));
 			unsigned int sizeOut = 0;
 			_primeService = EngineControlServiceBuilder::CreatePrimeService(_serviceLocator, config, &sizeOut);
 		}
@@ -76,6 +75,7 @@ namespace UnitTests
 		EXPECT_CALL(_ignitorOutputService1, OutputReset()).Times(1);
 		EXPECT_CALL(_ignitorOutputService2, OutputReset()).Times(1);
 		EXPECT_CALL(_ignitorOutputService3, OutputReset()).Times(1);
+		EXPECT_CALL(_timerService, GetTick()).Times(8).WillRepeatedly(Return(5000));
 		_timerService.ReturnCallBack();
 	}
 }

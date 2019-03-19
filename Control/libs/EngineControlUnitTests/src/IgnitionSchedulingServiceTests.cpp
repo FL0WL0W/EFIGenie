@@ -73,21 +73,28 @@ namespace UnitTests
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x2B2));
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x29e));
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x96));
-		EXPECT_CALL(_timerService, ScheduleCallBack(0x82));
+		EXPECT_CALL(_timerService, ScheduleCallBack(0x82)).Times(3);
 		_ignitionSchedulingService->ScheduleEvents();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x96));
+		EXPECT_CALL(_timerService, GetTick()).Times(3).WillRepeatedly(Return(0x82));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x136));
+		EXPECT_CALL(_timerService, GetTick()).Times(3).WillRepeatedly(Return(0x96));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x14a));
+		EXPECT_CALL(_timerService, GetTick()).Times(3).WillRepeatedly(Return(0x136));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x1ea));
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0x14a));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x1fe));
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0x1ea));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x29e));
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0x1fe));
 		_timerService.ReturnCallBack();
 		EXPECT_CALL(_timerService, ScheduleCallBack(0x2B2));
+		EXPECT_CALL(_timerService, GetTick()).Times(2).WillRepeatedly(Return(0x29e));
 		_timerService.ReturnCallBack();
 
 		//TODO: More comprehensive testing
