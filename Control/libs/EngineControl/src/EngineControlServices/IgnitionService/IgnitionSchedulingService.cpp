@@ -110,13 +110,15 @@ namespace EngineControlServices
 					degreesUntilFire += scheduleResolution;		
 				while (degreesUntilFire > scheduleResolution)
 					degreesUntilFire -= scheduleResolution;	
-				if(degreesUntilFire > scheduleResolution / 2)
-					continue;
 
 				uint32_t ignitionFireTick = static_cast<uint32_t>(round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire)));
 				
 				uint32_t ignitionDwellTick = static_cast<uint32_t>(round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond)));
-
+				
+				//if we still haven't fired the previous revolution then continue
+				if(degreesUntilFire > scheduleResolution / 2 && _ignitorFireTask[ignitor]->Scheduled && ITimerService::TickLessThanTick(_ignitorFireTask[ignitor]->Tick, ignitionFireTick - (scheduleResolution / 2) * scheduleTickPerDegree))
+					continue;
+					
 				if(ITimerService::TickLessThanTick(_timerService->GetTick(), ignitionFireTick))
 				{
 					if(_timerService->ScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick)
