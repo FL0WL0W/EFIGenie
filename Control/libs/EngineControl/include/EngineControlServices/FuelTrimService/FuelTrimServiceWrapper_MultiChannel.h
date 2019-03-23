@@ -31,7 +31,7 @@ namespace EngineControlServices
 		IFuelTrimService **_fuelTrimChannels;
 	public:
 		FuelTrimServiceWrapper_MultiChannel(const FuelTrimServiceWrapper_MultiChannelConfig *config, IFuelTrimService **fuelTrimChannels);
-		short GetFuelTrim(unsigned char cylinder);
+		float GetFuelTrim(unsigned char cylinder);
 		void Tick();
 	};
 }

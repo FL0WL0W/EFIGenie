@@ -10,16 +10,16 @@ namespace EngineControlServices
 		_fuelTrimChannels = fuelTrimChannels;
 	}
 	
-	short FuelTrimServiceWrapper_MultiChannel::GetFuelTrim(unsigned char cylinder)
+	float FuelTrimServiceWrapper_MultiChannel::GetFuelTrim(unsigned char cylinder)
 	{
 		unsigned char fuelTrimsAdded = 0;
-		int fuelTrim = 0;
+		float fuelTrim = 0;
 		const unsigned short *fuelTrimChannelMask = _config->FuelTrimChannelMask();
 		for (int i = 0; i < _config->NumberOfFuelTrimChannels; i++)
 		{
 			if (fuelTrimChannelMask[i] & (1 << cylinder))
 			{
-				short channelTrim = _fuelTrimChannels[i]->GetFuelTrim(cylinder);
+				float channelTrim = _fuelTrimChannels[i]->GetFuelTrim(cylinder);
 				//if channelTrim is 0 then it might as well be off if it isn't actually off
 				if (channelTrim != 0)
 				{

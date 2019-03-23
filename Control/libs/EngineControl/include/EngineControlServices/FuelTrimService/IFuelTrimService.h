@@ -5,8 +5,7 @@ namespace EngineControlServices
 	class IFuelTrimService
 	{
 	public:
-		//returns 1/128 %
-		virtual short GetFuelTrim(unsigned char cylinder) = 0;
+		virtual float GetFuelTrim(unsigned char cylinder) = 0;
 		virtual void Tick() = 0;
 
 		static void TickCallBack(void *fuelTrimService);

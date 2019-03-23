@@ -77,7 +77,6 @@
 #include "EngineControlServices/AfrService/AfrService_Map_Ethanol.h"
 
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
-#include "EngineControlServices/FuelTrimService/FuelTrimService_InterpolatedTable.h"
 #include "EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_MultiChannel.h"
 
 #include "EngineControlServices/FuelPumpService/IFuelPumpService.h"
@@ -87,7 +86,6 @@
 #include "EngineControlServices/InjectionService/InjectionSchedulingService.h"
 #include "EngineControlServices/InjectionService/IInjectionConfig.h"
 #include "EngineControlServices/InjectionService/InjectionConfig_SD.h"
-#include "EngineControlServices/InjectionService/InjectionConfigWrapper_DFCO.h"
 
 #include "EngineControlServices/IgnitionService/IgnitionSchedulingService.h"
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
@@ -106,61 +104,61 @@ namespace Service
 	class EngineControlServiceBuilder
 	{
 		template<typename T>
-		static const T* CastConfig(const void **config, unsigned int *size)
+		static const T* CastConfig(const void *&config, unsigned int &size)
 		{
-			const T *castedConfig = reinterpret_cast<const T *>(*config);
+			const T *castedConfig = reinterpret_cast<const T *>(config);
 			const unsigned int confSize = castedConfig->Size();
 			OffsetConfig(config, size, confSize);
 			
 			return castedConfig;
 		}
 				
-		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
+		static IBooleanOutputService * CreateBooleanOutputService(ServiceLocator *&serviceLocator, const void *&config, unsigned int &totalSize)
 		{
 			unsigned int size;
-			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			IBooleanOutputService *booleanOutputService = IBooleanOutputService::CreateBooleanOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, &size);
 			OffsetConfig(config, totalSize, size);
 			return booleanOutputService;
 		}
 				
-		static IBooleanInputService * CreateBooleanInputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
+		static IBooleanInputService * CreateBooleanInputService(ServiceLocator *serviceLocator, const void *&config, unsigned int &totalSize)
 		{
 			unsigned int size;
-			IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			IBooleanInputService *booleanInputService = IBooleanInputService::CreateBooleanInputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, &size);
 			OffsetConfig(config, totalSize, size);
 			return booleanInputService;
 		}
 				
-		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
+		static IFloatOutputService * CreateFloatOutputService(ServiceLocator *serviceLocator, const void *&config, unsigned int &totalSize)
 		{
 			unsigned int size;
-			IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			IFloatOutputService *floatOutputService = IFloatOutputService::CreateFloatOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, &size);
 			OffsetConfig(config, totalSize, size);
 			return floatOutputService;
 		}
 
-		static IFloatInputService * CreateFloatInputService(ServiceLocator *serviceLocator, const void **config, unsigned int *totalSize)
+		static IFloatInputService * CreateFloatInputService(ServiceLocator *serviceLocator, const void *&config, unsigned int &totalSize)
 		{
 			unsigned int size;
-			IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *config, &size);
+			IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, &size);
 			OffsetConfig(config, totalSize, size);
 			return floatInputService;
 		}
 		
-		static const unsigned char GetServiceId(const void **config, unsigned int *size)
+		static const unsigned char GetServiceId(const void *&config, unsigned int &size)
 		{
-			const unsigned char serviceId = *reinterpret_cast<const unsigned char*>(*config);
-			*size = 0;
+			const unsigned char serviceId = *reinterpret_cast<const unsigned char*>(config);
+			size = 0;
 			OffsetConfig(config, size, 1);
 			return serviceId;
 		}
 
-		static void OffsetConfig(const void **config, unsigned int *totalSize, unsigned int offset) 
+		static void OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset) 
 		{
-			*config = reinterpret_cast<const void *>(reinterpret_cast<const unsigned char *>(*config) + offset);
+			config = reinterpret_cast<const void *>(reinterpret_cast<const unsigned char *>(config) + offset);
 			if(totalSize != 0)
 			{
-				*totalSize += offset;
+				totalSize += offset;
 			}
 		}
 
@@ -181,7 +179,7 @@ namespace Service
 		}
 		
 	public:
-		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize);
+		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &totalSize);
 		
 		static void RegisterRpmService(ServiceLocator *serviceLocator);
 		static TachometerService *CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);

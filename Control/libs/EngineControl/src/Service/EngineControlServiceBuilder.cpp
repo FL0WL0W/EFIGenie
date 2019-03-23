@@ -3,7 +3,7 @@
 
 namespace Service
 {
-	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int *totalSize)
+	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &totalSize)
 	{
 		if(serviceLocator == 0)
 			serviceLocator = new ServiceLocator();
@@ -33,13 +33,13 @@ namespace Service
 		CallBackGroup *postReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP);
 		CallBackGroup *tickCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP);
 
-		*totalSize = 0;
+		totalSize = 0;
 		unsigned int size;
 		unsigned short serviceId;
 
 		while ((serviceId = *reinterpret_cast<const unsigned short *>(config)) != 0)
 		{
-			OffsetConfig(&config, totalSize, sizeof(const unsigned short));
+			OffsetConfig(config, totalSize, sizeof(const unsigned short));
 
 			switch (serviceId)
 			{
@@ -68,7 +68,7 @@ namespace Service
 					IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size);
 					AddToCallBackGroupIfParametersNotNull(tickCallBackGroup, IFloatInputService::ReadValueCallBack, floatInputService);
 					RegisterIfNotNull(serviceLocator, serviceId, floatInputService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #if IGNITOR_SERVICES_ID
@@ -79,13 +79,13 @@ namespace Service
 #endif
 				{
 					const unsigned char numberOfServices = *reinterpret_cast<const unsigned char *>(config);
-					OffsetConfig(&config, totalSize, 1);
+					OffsetConfig(config, totalSize, 1);
 
 					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
 					for (int i = 0; i < numberOfServices; i++)
 					{
 						serviceArray[i] = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size);
-						OffsetConfig(&config, totalSize, size);
+						OffsetConfig(config, totalSize, size);
 					}
 					serviceArray[numberOfServices] = 0;
 					serviceLocator->Register(serviceId, serviceArray);
@@ -96,7 +96,7 @@ namespace Service
 				{
 					TachometerService *tachometerService = CreateTachometerService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, tachometerService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -105,7 +105,7 @@ namespace Service
 				{
 					IFloatOutputService *intakeAirControlValveService = IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, intakeAirControlValveService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -114,7 +114,7 @@ namespace Service
 				{
 					IPrimeService *primeService = CreatePrimeService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, primeService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -123,7 +123,7 @@ namespace Service
 				{
 					IIdleControlService *idleControlService = CreateIdleControlService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, idleControlService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -132,7 +132,7 @@ namespace Service
 				{
 					IAfrService *afrService = CreateAfrService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, afrService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -141,7 +141,7 @@ namespace Service
 				{
 					IFuelTrimService *fuelTrimService = CreateFuelTrimService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, fuelTrimService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -150,7 +150,7 @@ namespace Service
 				{
 					IFuelPumpService *fuelPumpService = CreateFuelPumpService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, fuelPumpService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -159,7 +159,7 @@ namespace Service
 				{
 					IgnitionSchedulingService *ignitionSchedulingService = CreateIgnitionSchedulingService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, ignitionSchedulingService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -168,7 +168,7 @@ namespace Service
 				{
 					InjectionSchedulingService *injectionSchedulingService = CreateInjectionSchedulingService(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, injectionSchedulingService);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
@@ -181,7 +181,7 @@ namespace Service
 				{
 					IReluctor *reluctor = CreateReluctor(serviceLocator, config, &size);
 					RegisterIfNotNull(serviceLocator, serviceId, reluctor);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, totalSize, size);
 					break;
 				}
 			}
@@ -224,8 +224,8 @@ namespace Service
 		*totalSize = 0;
 				
 		return new TachometerService(
-			CastConfig < TachometerServiceConfig >(&config, totalSize),
-			CreateBooleanOutputService(serviceLocator, &config, totalSize),
+			CastConfig < TachometerServiceConfig >(config, *totalSize),
+			CreateBooleanOutputService(serviceLocator, config, *totalSize),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
 			serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID));
 	}
@@ -235,12 +235,12 @@ namespace Service
 	{
 		IPrimeService* ret = 0;
 		
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:
 			ret = new PrimeService_StaticPulseWidth(
-				CastConfig < PrimeService_StaticPulseWidthConfig >(&config, totalSize), 
+				CastConfig < PrimeService_StaticPulseWidthConfig >(config, *totalSize), 
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID));
 			break;
@@ -264,12 +264,12 @@ namespace Service
 	{
 		IIdleControlService*ret = 0;
 		
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:	
 			ret = new IdleControlService_Pid(
-				CastConfig < IdleControlService_PidConfig >(&config, totalSize),  
+				CastConfig < IdleControlService_PidConfig >(config, *totalSize),  
 				serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), 
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID), 
@@ -293,7 +293,7 @@ namespace Service
 	IAfrService *EngineControlServiceBuilder::CreateAfrService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{		
 		IAfrService *ret = 0;
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef AFRSERVICE_STATIC_H
 		case 1:
@@ -304,7 +304,7 @@ namespace Service
 #ifdef AFRSERVICE_MAP_ETHANOL_H
 		case 2:
 			ret = new AfrService_Map_Ethanol(
-				CastConfig < AfrService_Map_EthanolConfig >(&config, totalSize),  
+				CastConfig < AfrService_Map_EthanolConfig >(config, *totalSize),  
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
@@ -326,28 +326,12 @@ namespace Service
 	IFuelTrimService *EngineControlServiceBuilder::CreateFuelTrimService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
 		IFuelTrimService *ret = 0;
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
-#ifdef FUELTRIMSERVICE_INTERPOLATEDTABLE_H
+#ifdef FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
 		case 1:
 			{
-				const FuelTrimService_InterpolatedTableConfig *serviceConfig = CastConfig < FuelTrimService_InterpolatedTableConfig >(&config, totalSize);
-				
-				ret = new FuelTrimService_InterpolatedTable(
-					serviceConfig, 
-					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-					CreateFloatInputService(serviceLocator, &config, totalSize),
-					serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID));
-				break;
-			}
-#endif
-#ifdef FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
-		case 2:
-			{
-				const FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = CastConfig < FuelTrimServiceWrapper_MultiChannelConfig >(&config, totalSize);
+				const FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = CastConfig < FuelTrimServiceWrapper_MultiChannelConfig >(config, *totalSize);
 				
 				IFuelTrimService **fuelTrimServices = (IFuelTrimService **)malloc(sizeof(IFuelTrimService *)*(fuelTrimConfig->NumberOfFuelTrimChannels));
 				
@@ -355,7 +339,7 @@ namespace Service
 				{
 					unsigned int size;
 					fuelTrimServices[i] = CreateFuelTrimService(serviceLocator, config, &size);
-					OffsetConfig(&config, totalSize, size);
+					OffsetConfig(config, *totalSize, size);
 				}
 			
 				ret = new FuelTrimServiceWrapper_MultiChannel(fuelTrimConfig, fuelTrimServices);
@@ -375,29 +359,29 @@ namespace Service
 	IFuelPumpService *EngineControlServiceBuilder::CreateFuelPumpService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
 	{
 		IFuelPumpService *ret = 0;
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef FUELPUMPSERVICE_H
 		case 1:
 			{
-				const FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(&config, totalSize);
+				const FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(config, *totalSize);
 
 				ret = new FuelPumpService(
 					serviceConfig,
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-					CreateBooleanOutputService(serviceLocator, &config, totalSize));
+					CreateBooleanOutputService(serviceLocator, config, *totalSize));
 				break;
 			}
 #endif
 #ifdef FUELPUMPSERVICE_ANALOG_H
 		case 2:			
 			{
-				const FuelPumpService_AnalogConfig *serviceConfig = CastConfig < FuelPumpService_AnalogConfig >(&config, totalSize);
+				const FuelPumpService_AnalogConfig *serviceConfig = CastConfig < FuelPumpService_AnalogConfig >(config, *totalSize);
 			
 				ret = new FuelPumpService_Analog(
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					CreateFloatOutputService(serviceLocator, &config, totalSize), 
+					CreateFloatOutputService(serviceLocator, config, *totalSize), 
 					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
@@ -428,12 +412,12 @@ namespace Service
 
 		IInjectionConfig *ret = 0;
 		
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef INJECTIONCONFIG_SD_H
 		case 2:
 			ret = new InjectionConfig_SD(
-				CastConfig < InjectionConfig_SDConfig >(&config, totalSize),
+				CastConfig < InjectionConfig_SDConfig >(config, *totalSize),
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
@@ -447,11 +431,11 @@ namespace Service
 #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
 		case 3:
 			{
-				const InjectionConfigWrapper_DFCOConfig *injectionConfig = CastConfig < InjectionConfigWrapper_DFCOConfig >(&config, totalSize);
+				const InjectionConfigWrapper_DFCOConfig *injectionConfig = CastConfig < InjectionConfigWrapper_DFCOConfig >(config, *totalSize);
 
 				unsigned int size;
 				IInjectionConfig *child = CreateInjectionConfig(serviceLocator, config, &size);
-				OffsetConfig(&config, totalSize, size);
+				OffsetConfig(config, *totalSize, size);
 
 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
@@ -471,18 +455,18 @@ namespace Service
 
 		IIgnitionConfig *ret = 0;
 		
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef IGNITIONCONFIG_STATIC_H
 		case 1:
 			ret = new IgnitionConfig_Static(
-				CastConfig < IgnitionConfig_StaticConfig >(&config, totalSize));
+				CastConfig < IgnitionConfig_StaticConfig >(config, *totalSize));
 			break;
 #endif
 #ifdef IGNITIONCONFIG_MAP_ETHANOL_H
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
-				CastConfig < IgnitionConfig_Map_EthanolConfig >(&config, totalSize),
+				CastConfig < IgnitionConfig_Map_EthanolConfig >(config, *totalSize),
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
@@ -491,13 +475,13 @@ namespace Service
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 3:
 			{
-				const IgnitionConfigWrapper_HardRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_HardRpmLimitConfig >(&config, totalSize);
+				const IgnitionConfigWrapper_HardRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_HardRpmLimitConfig >(config, *totalSize);
 
-				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, &config, totalSize);
+				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, config, *totalSize);
 				
 				unsigned int size;
 				IIgnitionConfig *child = CreateIgnitionConfig(serviceLocator, config, &size);
-				OffsetConfig(&config, totalSize, size);
+				OffsetConfig(config, *totalSize, size);
 				
 				ret = new IgnitionConfigWrapper_HardRpmLimit(
 					ignitionConfig,  
@@ -511,13 +495,13 @@ namespace Service
 #ifdef IGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 		case 4:
 			{
-				const IgnitionConfigWrapper_SoftPidRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_SoftPidRpmLimitConfig >(&config, totalSize);
+				const IgnitionConfigWrapper_SoftPidRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_SoftPidRpmLimitConfig >(config, *totalSize);
 
-				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, &config, totalSize);
+				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, config, *totalSize);
 				
 				unsigned int size;
 				IIgnitionConfig *child = CreateIgnitionConfig(serviceLocator, config, &size);
-				OffsetConfig(&config, totalSize, size);
+				OffsetConfig(config, *totalSize, size);
 				
 				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
 					ignitionConfig,
@@ -537,12 +521,12 @@ namespace Service
 	{
 		*totalSize = 0;
 
-		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = CastConfig < IgnitionSchedulingServiceConfig >(&config, totalSize);
+		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = CastConfig < IgnitionSchedulingServiceConfig >(config, *totalSize);
 		
 		IIgnitionConfig *ignitionConfig = 0;
 		unsigned int size;
 		ignitionConfig = CreateIgnitionConfig(serviceLocator, config, &size);
-		OffsetConfig(&config, totalSize, size);
+		OffsetConfig(config, *totalSize, size);
 
 		IgnitionSchedulingService *ret = new IgnitionSchedulingService(
 			ignitionSchedulingConfig,
@@ -564,12 +548,12 @@ namespace Service
 	{
 		*totalSize = 0;
 		
-		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = CastConfig < InjectionSchedulingServiceConfig >(&config, totalSize);
+		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = CastConfig < InjectionSchedulingServiceConfig >(config, *totalSize);
 
 		IInjectionConfig *injectionConfig = 0;
 		unsigned int size;
 		injectionConfig = CreateInjectionConfig(serviceLocator, config, &size);
-		OffsetConfig(&config, totalSize, size);
+		OffsetConfig(config, *totalSize, size);
 		
 		InjectionSchedulingService *ret = new InjectionSchedulingService(
 			injectionSchedulingConfig,
@@ -591,17 +575,17 @@ namespace Service
 	{
 		IReluctor *ret = 0;
 		
-		switch (GetServiceId(&config, totalSize))
+		switch (GetServiceId(config, *totalSize))
 		{
 #ifdef GM24XRELUCTOR_H
 		case 1:
 			ret = new Gm24xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *reinterpret_cast<const uint16_t *>(config));
-			OffsetConfig(&config, totalSize, sizeof(uint16_t));
+			OffsetConfig(config, *totalSize, sizeof(uint16_t));
 			break;
 #endif
 #ifdef UNIVERSAL2XRELUCTOR_H
 		case 2:
-			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Universal2xReluctorConfig >(&config, totalSize));
+			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Universal2xReluctorConfig >(config, *totalSize));
 			break;
 #endif
 		}

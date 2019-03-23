@@ -46,8 +46,6 @@ namespace EngineControlServices
 		float MinIntegral;
 		unsigned short DotSampleRate;
 
-		unsigned short GasConstant;//values in 0.1 units
-
 		char MaxEct;
 		char MinEct;
 		unsigned char EctResolution;

@@ -76,7 +76,7 @@ namespace EngineControlServices
 		float temperature = 30;
 		if (_intakeAirTemperatureService != 0)
 			temperature = _intakeAirTemperatureService->Value;
-		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / ((_config->GasConstant / 10.0f) * (temperature + 273.15f));   // kg/m^3
+		float airDensity = (100 * 1000) /*assuming 1 bar at throttlebody*/ / (287 /*GasConstant*/ * (temperature + 273.15f));   // kg/m^3
 		airDensity *= 1000000; //g/mm^3
 		
 		float pressure = 500000; // default to 50 kpa

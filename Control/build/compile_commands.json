@@ -151,6 +151,30 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\CylinderAirTemperatureService\\CylinderAirTemperatureService_IAT_ECT_Bias.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\CylinderAirTemperatureService\\CylinderAirTemperatureService_IAT_ECT_Bias.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/CylinderAirTemperatureService/CylinderAirTemperatureService_IAT_ECT_Bias.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\CylinderAirmassService\\CylinderAirmassService_SD.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\CylinderAirmassService\\CylinderAirmassService_SD.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/CylinderAirmassService/CylinderAirmassService_SD.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelConfig\\FuelConfig.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelConfig\\FuelConfig.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelConfig/FuelConfig.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelConfig\\FuelConfigWrapper_DFCO.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelConfig\\FuelConfigWrapper_DFCO.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelConfig/FuelConfigWrapper_DFCO.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelPumpService\\FuelPumpService.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelPumpService/FuelPumpService.cpp"
 },
@@ -165,12 +189,6 @@
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelPumpService\\IFuelPumpService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelPumpService\\IFuelPumpService.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelPumpService/IFuelPumpService.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_InterpolatedTable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\FuelTrimService\\FuelTrimServiceWrapper_InterpolatedTable.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_InterpolatedTable.cpp"
 },
 
 {
@@ -225,12 +243,6 @@
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\IgnitionService\\IgnitionSchedulingService.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\IgnitionService\\IgnitionSchedulingService.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/IgnitionService/IgnitionSchedulingService.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\EngineControlServices\\InjectionService\\InjectionConfigWrapper_DFCO.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\EngineControlServices\\InjectionService\\InjectionConfigWrapper_DFCO.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/EngineControlServices/InjectionService/InjectionConfigWrapper_DFCO.cpp"
 },
 
 {

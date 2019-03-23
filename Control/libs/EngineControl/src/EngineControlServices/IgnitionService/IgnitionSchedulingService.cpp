@@ -112,27 +112,26 @@ namespace EngineControlServices
 					degreesUntilFire -= scheduleResolution;	
 
 				uint32_t ignitionFireTick = static_cast<uint32_t>(round(scheduleTick + (scheduleTickPerDegree * degreesUntilFire)));
-				
-				uint32_t ignitionDwellTick = static_cast<uint32_t>(round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond)));
-				
+								
 				//if we still haven't fired the previous revolution then continue
 				if(degreesUntilFire > scheduleResolution / 2 && _ignitorFireTask[ignitor]->Scheduled && ITimerService::TickLessThanTick(_ignitorFireTask[ignitor]->Tick, ignitionFireTick - (scheduleResolution / 2) * scheduleTickPerDegree))
 					continue;
+				
+				//if the firetick has already past then continue
+				if(ITimerService::TickLessThanEqualToTick(ignitionFireTick, _timerService->GetTick()))
+					continue;
+
+				//if we aren't able to schedule the fire task then continue
+				if(!_timerService->ScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick))
+					continue;
 					
-				if(ITimerService::TickLessThanTick(_timerService->GetTick(), ignitionFireTick))
-				{
-					if(_timerService->ScheduleTask(_ignitorFireTask[ignitor], ignitionFireTick)
-						&& ITimerService::TickLessThanTick(_timerService->GetTick(), ignitionDwellTick))
-					{
-						_timerService->ScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
-					}
-				}
+				uint32_t ignitionDwellTick = static_cast<uint32_t>(round(ignitionFireTick - (ignitionTiming.IgnitionDwellTime * ticksPerSecond)));
 
-				uint32_t fire = _ignitorFireTask[ignitor]->Tick;
-				uint32_t dwell = _ignitorDwellTask[ignitor]->Tick;
+				//if the dwelltick has already past then continue
+				if(ITimerService::TickLessThanEqualToTick(ignitionDwellTick, _timerService->GetTick()))
+					continue;
 
-				//  if(fire != 0 && dwell != 0 && fire-dwell > 500000)
-				//  	asm("bkpt");
+				_timerService->ScheduleTask(_ignitorDwellTask[ignitor], ignitionDwellTick);
 			}
 		}
 	}
