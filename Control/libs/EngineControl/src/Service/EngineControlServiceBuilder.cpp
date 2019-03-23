@@ -65,10 +65,9 @@ namespace Service
 			case VEHICLE_SPEED_SERVICE_ID:
 #endif
 				{
-					IFloatInputService *floatInputService = IFloatInputService::CreateFloatInputService(hardwareAbstractionCollection, config, &size);
+					IFloatInputService *floatInputService = CreateFloatInputService(serviceLocator, config, size);
 					AddToCallBackGroupIfParametersNotNull(tickCallBackGroup, IFloatInputService::ReadValueCallBack, floatInputService);
 					RegisterIfNotNull(serviceLocator, serviceId, floatInputService);
-					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #if IGNITOR_SERVICES_ID
@@ -84,8 +83,7 @@ namespace Service
 					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
 					for (int i = 0; i < numberOfServices; i++)
 					{
-						serviceArray[i] = IBooleanOutputService::CreateBooleanOutputService(hardwareAbstractionCollection, config, &size);
-						OffsetConfig(config, totalSize, size);
+						serviceArray[i] = CreateBooleanOutputService(serviceLocator, config, size);
 					}
 					serviceArray[numberOfServices] = 0;
 					serviceLocator->Register(serviceId, serviceArray);
@@ -103,9 +101,8 @@ namespace Service
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
 			case IDLE_AIR_CONTROL_VALVE_SERVICE_ID:
 				{
-					IFloatOutputService *intakeAirControlValveService = IFloatOutputService::CreateFloatOutputService(hardwareAbstractionCollection, config, &size);
+					IFloatOutputService *intakeAirControlValveService = CreateFloatOutputService(serviceLocator, config, size);
 					RegisterIfNotNull(serviceLocator, serviceId, intakeAirControlValveService);
-					OffsetConfig(config, totalSize, size);
 					break;
 				}
 #endif
