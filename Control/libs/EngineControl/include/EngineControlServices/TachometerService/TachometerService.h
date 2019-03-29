@@ -4,7 +4,9 @@
 #include "EngineControlServices/RpmService/RpmService.h"
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "Packed.h"
+#include "Service/ServiceLocator.h"
 
+using namespace Service;
 using namespace HardwareAbstraction;
 using namespace IOServices;
 using namespace Reluctor;
@@ -45,6 +47,7 @@ namespace EngineControlServices
 	public:
 		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, RpmService *rpmService);
 		static void TogglePinTask(void *parameters);
+		static void *TachometerService::CreateTachometerService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

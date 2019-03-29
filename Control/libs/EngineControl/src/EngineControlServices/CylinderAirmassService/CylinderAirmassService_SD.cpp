@@ -21,7 +21,7 @@ namespace EngineControlServices
 		CylinderAirmass = reinterpret_cast<float *>(calloc(sizeof(float) * _config->Cylinders, sizeof(float) * _config->Cylinders));
 	}
 	
-	void CylinderAirmassService_SD::CalculateAirmass()
+	void CylinderAirmassService_SD::CalculateCylinderAirmass()
 	{
 		unsigned short rpm = _rpmService->Rpm;
 		float map = _manifoldAbsolutePressureService->Value;
@@ -32,10 +32,10 @@ namespace EngineControlServices
 				
 		float cylinderVolume = _config->Ml8thPerCylinder * (1/8.0f) * VE; //ml
 		
-		for(int cylinder = 0; cylinder < _config->Cylinders; cylinder++)
+		for(unsigned char cylinder = 0; cylinder < _config->Cylinders; cylinder++)
 		{
 			float cylinderAirTemperature = 30;
-			if(_cylinderAirTemperatureService != 0)
+			if(_cylinderAirTemperatureService != 0 && _cylinderAirTemperatureService->CylinderAirTemperature != 0)
 			{
 				_cylinderAirTemperatureService->CylinderAirTemperature[cylinder];
 			}

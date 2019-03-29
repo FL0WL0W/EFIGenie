@@ -36,6 +36,7 @@ namespace HardwareAbstraction
 		void Execute() override;
 		void Add(ICallBack *callBack);
 		void Add(void(*callBackPointer)(void *), void *parameters);
+		void AddIfParametersNotNull(void(*callBackPointer)(void *), void *parameters);
 		void Remove(ICallBack *callBack);
 		void Clear();
 	};

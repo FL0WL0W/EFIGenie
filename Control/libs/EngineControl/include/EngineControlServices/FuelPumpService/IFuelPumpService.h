@@ -1,3 +1,7 @@
+#include "Service/ServiceLocator.h"
+
+using namespace Service;
+
 #ifndef IFUELPUMPSERVICE_H
 #define IFUELPUMPSERVICE_H
 namespace EngineControlServices
@@ -14,6 +18,7 @@ namespace EngineControlServices
 		static void PrimeCallBack(void *fuelPumpService);
 		static void OnCallBack(void *fuelPumpService);
 		static void OffCallBack(void *fuelPumpService);
+		static void* IFuelPumpService::CreateFuelPumpService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

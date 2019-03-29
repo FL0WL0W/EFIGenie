@@ -1,3 +1,7 @@
+#include "Service/ServiceLocator.h"
+
+using namespace Service;
+
 #ifndef IIGNITIONCONFIG_H
 #define IIGNITIONCONFIG_H
 namespace EngineControlServices
@@ -13,6 +17,8 @@ namespace EngineControlServices
 	{
 	public:
 		virtual IgnitionTiming GetIgnitionTiming() = 0;
+		
+		static void* IIgnitionConfig::CreateIgnitionConfig(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

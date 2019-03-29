@@ -1,9 +1,10 @@
 #include "stdlib.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/ServiceBuilder.h"
 
 namespace Service
 {
-	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &totalSize)
+	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
 		if(serviceLocator == 0)
 			serviceLocator = new ServiceLocator();
@@ -33,160 +34,193 @@ namespace Service
 		CallBackGroup *postReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP);
 		CallBackGroup *tickCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP);
 
-		totalSize = 0;
-		unsigned int size;
-		unsigned short serviceId;
+		sizeOut = 0;
 
-		while ((serviceId = *reinterpret_cast<const unsigned short *>(config)) != 0)
-		{
-			OffsetConfig(config, totalSize, sizeof(const unsigned short));
+		ServiceBuilder *serviceBuilder = new ServiceBuilder();
 
-			switch (serviceId)
-			{
 #if INTAKE_AIR_TEMPERATURE_SERVICE_ID
-			case INTAKE_AIR_TEMPERATURE_SERVICE_ID:
+		serviceBuilder->Register(INTAKE_AIR_TEMPERATURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if ENGINE_COOLANT_TEMPERATURE_SERVICE_ID
-			case ENGINE_COOLANT_TEMPERATURE_SERVICE_ID:
+		serviceBuilder->Register(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
-			case MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID:
+		serviceBuilder->Register(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if VOLTAGE_SERVICE_ID
-			case VOLTAGE_SERVICE_ID:
+		serviceBuilder->Register(VOLTAGE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if THROTTLE_POSITION_SERVICE_ID
-			case THROTTLE_POSITION_SERVICE_ID:
+		serviceBuilder->Register(THROTTLE_POSITION_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if ETHANOL_CONTENT_SERVICE_ID
-			case ETHANOL_CONTENT_SERVICE_ID:
+		serviceBuilder->Register(ETHANOL_CONTENT_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
 #if VEHICLE_SPEED_SERVICE_ID
-			case VEHICLE_SPEED_SERVICE_ID:
+		serviceBuilder->Register(VEHICLE_SPEED_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
-				{
-					IFloatInputService *floatInputService = CreateFloatInputService(serviceLocator, config, size);
-					AddToCallBackGroupIfParametersNotNull(tickCallBackGroup, IFloatInputService::ReadValueCallBack, floatInputService);
-					RegisterIfNotNull(serviceLocator, serviceId, floatInputService);
-					break;
-				}
-#if IGNITOR_SERVICES_ID
-			case IGNITOR_SERVICES_ID:
-#endif
-#if INJECTOR_SERVICES_ID
-			case INJECTOR_SERVICES_ID:
-#endif
-				{
-					const unsigned char numberOfServices = *reinterpret_cast<const unsigned char *>(config);
-					OffsetConfig(config, totalSize, 1);
-
-					IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
-					for (int i = 0; i < numberOfServices; i++)
-					{
-						serviceArray[i] = CreateBooleanOutputService(serviceLocator, config, size);
-					}
-					serviceArray[numberOfServices] = 0;
-					serviceLocator->Register(serviceId, serviceArray);
-					break;
-				}
 #if TACHOMETER_SERVICE_ID
-			case TACHOMETER_SERVICE_ID:
-				{
-					TachometerService *tachometerService = CreateTachometerService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, tachometerService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(TACHOMETER_SERVICE_ID, TachometerService::CreateTachometerService);
 #endif
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
-			case IDLE_AIR_CONTROL_VALVE_SERVICE_ID:
-				{
-					IFloatOutputService *intakeAirControlValveService = CreateFloatOutputService(serviceLocator, config, size);
-					RegisterIfNotNull(serviceLocator, serviceId, intakeAirControlValveService);
-					break;
-				}
+		serviceBuilder->Register(IDLE_AIR_CONTROL_VALVE_SERVICE_ID, IFloatOutputService::CreateFloatOutputService);
 #endif
 #if PRIME_SERVICE_ID
-			case PRIME_SERVICE_ID:
-				{
-					IPrimeService *primeService = CreatePrimeService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, primeService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(PRIME_SERVICE_ID, IPrimeService::CreatePrimeService);
 #endif
 #if IDLE_CONTROL_SERVICE_ID
-			case IDLE_CONTROL_SERVICE_ID:
-				{
-					IIdleControlService *idleControlService = CreateIdleControlService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, idleControlService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(IDLE_CONTROL_SERVICE_ID, IIdleControlService::CreateIdleControlService);
 #endif
 #if AFR_SERVICE_ID
-			case AFR_SERVICE_ID:
-				{
-					IAfrService *afrService = CreateAfrService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, afrService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(AFR_SERVICE_ID, IAfrService::CreateAfrService);
 #endif
 #if FUEL_TRIM_SERVICE_ID
-			case FUEL_TRIM_SERVICE_ID:
-				{
-					IFuelTrimService *fuelTrimService = CreateFuelTrimService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, fuelTrimService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(FUEL_TRIM_SERVICE_ID, IFuelTrimService::CreateFuelTrimService);
 #endif
 #if FUEL_PUMP_SERVICE_ID
-			case FUEL_PUMP_SERVICE_ID:
-				{
-					IFuelPumpService *fuelPumpService = CreateFuelPumpService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, fuelPumpService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(FUEL_PUMP_SERVICE_ID, IFuelPumpService::CreateFuelPumpService);
 #endif
 #if IGNITION_SCHEDULING_SERVICE_ID
-			case IGNITION_SCHEDULING_SERVICE_ID:
-				{
-					IgnitionSchedulingService *ignitionSchedulingService = CreateIgnitionSchedulingService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, ignitionSchedulingService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
-#endif
-#if INJECTION_SCHEDULING_SERVICE_ID
-			case INJECTION_SCHEDULING_SERVICE_ID:
-				{
-					InjectionSchedulingService *injectionSchedulingService = CreateInjectionSchedulingService(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, injectionSchedulingService);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
+		serviceBuilder->Register(IGNITION_SCHEDULING_SERVICE_ID, CreateIgnitionSchedulingService);
 #endif
 #if CRANK_RELUCTOR_SERVICE_ID
-			case CRANK_RELUCTOR_SERVICE_ID:
+		serviceBuilder->Register(CRANK_RELUCTOR_SERVICE_ID, CreateReluctor);
 #endif
 #if CAM_RELUCTOR_SERVICE_ID
-			case CAM_RELUCTOR_SERVICE_ID:
+		serviceBuilder->Register(CAM_RELUCTOR_SERVICE_ID, CreateReluctor);
 #endif
-				{
-					IReluctor *reluctor = CreateReluctor(serviceLocator, config, &size);
-					RegisterIfNotNull(serviceLocator, serviceId, reluctor);
-					OffsetConfig(config, totalSize, size);
-					break;
-				}
-			}
-		}
+#if IGNITOR_SERVICES_ID
+		serviceBuilder->Register(IGNITOR_SERVICES_ID, CreateBooleanOutputArray);
+#endif
+#if INJECTOR_SERVICES_ID
+		serviceBuilder->Register(INJECTOR_SERVICES_ID, CreateBooleanOutputArray);
+#endif
+
+// #if INJECTION_SCHEDULING_SERVICE_ID
+// 			case INJECTION_SCHEDULING_SERVICE_ID:
+// 				{
+// 					InjectionSchedulingService *injectionSchedulingService = CreateInjectionSchedulingService(serviceLocator, config, &size);
+// 					ServiceBuilder::RegisterIfNotNull(serviceLocator, serviceId, injectionSchedulingService);
+// 					ServiceBuilder::OffsetConfig(config, totalSize, size);
+// 					break;
+// 				}
+// #endif
+
+		serviceBuilder->Build(serviceLocator, config, sizeOut);
 
 		return serviceLocator;
 	}
+	
+// 	IInjectionConfig *EngineControlServiceBuilder::CreateInjectionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
+// 	{
+// 		*totalSize = 0;
 
+// 		IInjectionConfig *ret = 0;
+		
+// 		switch (ServiceBuilder::GetServiceTypeId(config, *totalSize))
+// 		{
+// #ifdef INJECTIONCONFIG_SD_H
+// 		case 2:
+// 			ret = new InjectionConfig_SD(
+// 				ServiceBuilder::CastConfig < InjectionConfig_SDConfig >(config, *totalSize),
+// 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
+// 				serviceLocator->LocateAndCast<IFloatInputService>(VOLTAGE_SERVICE_ID));
+// 			break;
+// #endif
+// #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
+// 		case 3:
+// 			{
+// 				const InjectionConfigWrapper_DFCOConfig *injectionConfig = ServiceBuilder::CastConfig < InjectionConfigWrapper_DFCOConfig >(config, *totalSize);
+
+// 				unsigned int size;
+// 				IInjectionConfig *child = CreateInjectionConfig(serviceLocator, config, &size);
+// 				ServiceBuilder::OffsetConfig(config, *totalSize, size);
+
+// 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
+// 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
+// 					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
+// 					child);
+// 				break;
+// 			}
+// #endif
+// 		}
+		
+// 		return ret;
+// 	}
+	
+	void* EngineControlServiceBuilder::CreateBooleanOutputArray(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		sizeOut = 0;
+		
+		const unsigned char numberOfServices = *reinterpret_cast<const unsigned char *>(config);
+		ServiceBuilder::OffsetConfig(config, sizeOut, 1);
+
+		IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
+		for (int i = 0; i < numberOfServices; i++)
+		{
+			serviceArray[i] = ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::CreateBooleanOutputService, serviceLocator, config, sizeOut);
+		}
+		serviceArray[numberOfServices] = 0;
+
+		return serviceArray;
+	}
+	
+	void* EngineControlServiceBuilder::CreateIgnitionSchedulingService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		sizeOut = 0;
+
+		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = ServiceBuilder::CastConfig < IgnitionSchedulingServiceConfig >(config, sizeOut);
+		
+		IIgnitionConfig *ignitionConfig = 0;
+		ignitionConfig = ServiceBuilder::CreateServiceAndOffset<IIgnitionConfig>(IIgnitionConfig::CreateIgnitionConfig, serviceLocator, config, sizeOut);
+
+		IgnitionSchedulingService *ret = new IgnitionSchedulingService(
+			ignitionSchedulingConfig,
+			ignitionConfig,
+			serviceLocator->LocateAndCast<IBooleanOutputService *>(IGNITOR_SERVICES_ID),
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
+				
+		serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP)->AddIfParametersNotNull( 
+			IgnitionSchedulingService::ScheduleEventsCallBack,
+			ret);
+		
+		return ret;
+	}
+
+// 	InjectionSchedulingService *EngineControlServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
+// 	{
+// 		*totalSize = 0;
+		
+// 		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = ServiceBuilder::CastConfig < InjectionSchedulingServiceConfig >(config, *totalSize);
+
+// 		IInjectionConfig *injectionConfig = 0;
+// 		unsigned int size;
+// 		injectionConfig = CreateInjectionConfig(serviceLocator, config, &size);
+// 		ServiceBuilder::OffsetConfig(config, *totalSize, size);
+		
+// 		InjectionSchedulingService *ret = new InjectionSchedulingService(
+// 			injectionSchedulingConfig,
+// 			injectionConfig,
+// 			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
+// 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+// 			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
+// 			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
+		
+// 		AddToCallBackGroupIfParametersNotNull(
+// 			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
+// 			InjectionSchedulingService::ScheduleEventsCallBack,
+// 			ret);
+		
+// 		return ret;
+// 	}
 	
 	void EngineControlServiceBuilder::RegisterRpmService(ServiceLocator *serviceLocator)
 	{
@@ -203,386 +237,29 @@ namespace Service
 				serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
 
-			RegisterIfNotNull(serviceLocator, RPM_SERVICE_ID, rpmService);
+			ServiceBuilder::RegisterIfNotNull(serviceLocator, RPM_SERVICE_ID, rpmService);
 			
-			AddToCallBackGroupIfParametersNotNull(
-				serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
+			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP)->AddIfParametersNotNull( 
 				RpmService::TickCallBack,
 				rpmService);
 		}
-		
-
-		
-	}
-	
-#if TACHOMETER_SERVICE_ID
-	TachometerService *EngineControlServiceBuilder::CreateTachometerService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{		
-		*totalSize = 0;
-				
-		return new TachometerService(
-			CastConfig < TachometerServiceConfig >(config, *totalSize),
-			CreateBooleanOutputService(serviceLocator, config, *totalSize),
-			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID));
-	}
-#endif
-	
-	IPrimeService* EngineControlServiceBuilder::CreatePrimeService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		IPrimeService* ret = 0;
-		
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef PRIMESERVICE_STATICPULSEWIDTH_H
-		case 1:
-			ret = new PrimeService_StaticPulseWidth(
-				CastConfig < PrimeService_StaticPulseWidthConfig >(config, *totalSize), 
-				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-				serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID));
-			break;
-#endif
-		}
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP), 
-			IPrimeService::PrimeCallBack,
-			ret);
-
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IPrimeService::TickCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IIdleControlService* EngineControlServiceBuilder::CreateIdleControlService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		IIdleControlService*ret = 0;
-		
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef PRIMESERVICE_STATICPULSEWIDTH_H
-		case 1:	
-			ret = new IdleControlService_Pid(
-				CastConfig < IdleControlService_PidConfig >(config, *totalSize),  
-				serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), 
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID), 
-				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID), 
-				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID), 
-				serviceLocator->LocateAndCast<IFloatInputService>(VEHICLE_SPEED_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatOutputService>(IDLE_AIR_CONTROL_VALVE_SERVICE_ID));
-			break;
-#endif
-		}
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IIdleControlService::TickCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IAfrService *EngineControlServiceBuilder::CreateAfrService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{		
-		IAfrService *ret = 0;
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef AFRSERVICE_STATIC_H
-		case 1:
-			*totalSize += 1;
-			ret = new AfrService_Static(*reinterpret_cast<const float *>(config));
-			break;
-#endif
-#ifdef AFRSERVICE_MAP_ETHANOL_H
-		case 2:
-			ret = new AfrService_Map_Ethanol(
-				CastConfig < AfrService_Map_EthanolConfig >(config, *totalSize),  
-				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
-			break;
-#endif
-		}
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IAfrService::CalculateAfrCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IFuelTrimService *EngineControlServiceBuilder::CreateFuelTrimService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		IFuelTrimService *ret = 0;
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
-		case 1:
-			{
-				const FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = CastConfig < FuelTrimServiceWrapper_MultiChannelConfig >(config, *totalSize);
-				
-				IFuelTrimService **fuelTrimServices = (IFuelTrimService **)malloc(sizeof(IFuelTrimService *)*(fuelTrimConfig->NumberOfFuelTrimChannels));
-				
-				for (int i = 0; i < fuelTrimConfig->NumberOfFuelTrimChannels; i++)
-				{
-					unsigned int size;
-					fuelTrimServices[i] = CreateFuelTrimService(serviceLocator, config, &size);
-					OffsetConfig(config, *totalSize, size);
-				}
-			
-				ret = new FuelTrimServiceWrapper_MultiChannel(fuelTrimConfig, fuelTrimServices);
-				break;
-			}
-#endif
-		}
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IFuelTrimService::TickCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IFuelPumpService *EngineControlServiceBuilder::CreateFuelPumpService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		IFuelPumpService *ret = 0;
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef FUELPUMPSERVICE_H
-		case 1:
-			{
-				const FuelPumpServiceConfig *serviceConfig = CastConfig < FuelPumpServiceConfig >(config, *totalSize);
-
-				ret = new FuelPumpService(
-					serviceConfig,
-					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-					CreateBooleanOutputService(serviceLocator, config, *totalSize));
-				break;
-			}
-#endif
-#ifdef FUELPUMPSERVICE_ANALOG_H
-		case 2:			
-			{
-				const FuelPumpService_AnalogConfig *serviceConfig = CastConfig < FuelPumpService_AnalogConfig >(config, *totalSize);
-			
-				ret = new FuelPumpService_Analog(
-					serviceConfig, 
-					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					CreateFloatOutputService(serviceLocator, config, *totalSize), 
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
-				break;
-			}
-#endif
-		}
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP), 
-			IFuelPumpService::PrimeCallBack,
-			ret);
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP), 
-			IFuelPumpService::OnCallBack,
-			ret);
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IFuelPumpService::TickCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IInjectionConfig *EngineControlServiceBuilder::CreateInjectionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		*totalSize = 0;
-
-		IInjectionConfig *ret = 0;
-		
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef INJECTIONCONFIG_SD_H
-		case 2:
-			ret = new InjectionConfig_SD(
-				CastConfig < InjectionConfig_SDConfig >(config, *totalSize),
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(VOLTAGE_SERVICE_ID));
-			break;
-#endif
-#ifdef INJECTIONCONFIGWRAPPER_DFCO_H
-		case 3:
-			{
-				const InjectionConfigWrapper_DFCOConfig *injectionConfig = CastConfig < InjectionConfigWrapper_DFCOConfig >(config, *totalSize);
-
-				unsigned int size;
-				IInjectionConfig *child = CreateInjectionConfig(serviceLocator, config, &size);
-				OffsetConfig(config, *totalSize, size);
-
-				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
-					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					child);
-				break;
-			}
-#endif
-		}
-		
-		return ret;
-	}
-	
-	IIgnitionConfig *EngineControlServiceBuilder::CreateIgnitionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{	
-		*totalSize = 0;
-
-		IIgnitionConfig *ret = 0;
-		
-		switch (GetServiceId(config, *totalSize))
-		{
-#ifdef IGNITIONCONFIG_STATIC_H
-		case 1:
-			ret = new IgnitionConfig_Static(
-				CastConfig < IgnitionConfig_StaticConfig >(config, *totalSize));
-			break;
-#endif
-#ifdef IGNITIONCONFIG_MAP_ETHANOL_H
-		case 2:
-			ret = new IgnitionConfig_Map_Ethanol(
-				CastConfig < IgnitionConfig_Map_EthanolConfig >(config, *totalSize),
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
-			break;
-#endif
-#ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
-		case 3:
-			{
-				const IgnitionConfigWrapper_HardRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_HardRpmLimitConfig >(config, *totalSize);
-
-				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, config, *totalSize);
-				
-				unsigned int size;
-				IIgnitionConfig *child = CreateIgnitionConfig(serviceLocator, config, &size);
-				OffsetConfig(config, *totalSize, size);
-				
-				ret = new IgnitionConfigWrapper_HardRpmLimit(
-					ignitionConfig,  
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					booleanInputService,
-					child);
-				
-				break;
-			}
-#endif
-#ifdef IGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
-		case 4:
-			{
-				const IgnitionConfigWrapper_SoftPidRpmLimitConfig *ignitionConfig = CastConfig < IgnitionConfigWrapper_SoftPidRpmLimitConfig >(config, *totalSize);
-
-				IBooleanInputService *booleanInputService = CreateBooleanInputService(serviceLocator, config, *totalSize);
-				
-				unsigned int size;
-				IIgnitionConfig *child = CreateIgnitionConfig(serviceLocator, config, &size);
-				OffsetConfig(config, *totalSize, size);
-				
-				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
-					ignitionConfig,
-					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					booleanInputService,
-					child);
-				
-				break;
-			}
-#endif
-		}
-		return ret;
 	}
 
-	IgnitionSchedulingService *EngineControlServiceBuilder::CreateIgnitionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		*totalSize = 0;
-
-		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = CastConfig < IgnitionSchedulingServiceConfig >(config, *totalSize);
-		
-		IIgnitionConfig *ignitionConfig = 0;
-		unsigned int size;
-		ignitionConfig = CreateIgnitionConfig(serviceLocator, config, &size);
-		OffsetConfig(config, *totalSize, size);
-
-		IgnitionSchedulingService *ret = new IgnitionSchedulingService(
-			ignitionSchedulingConfig,
-			ignitionConfig,
-			serviceLocator->LocateAndCast<IBooleanOutputService *>(IGNITOR_SERVICES_ID),
-			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
-			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
-				
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			IgnitionSchedulingService::ScheduleEventsCallBack,
-			ret);
-		
-		return ret;
-	}
-
-	InjectionSchedulingService *EngineControlServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-	{
-		*totalSize = 0;
-		
-		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = CastConfig < InjectionSchedulingServiceConfig >(config, *totalSize);
-
-		IInjectionConfig *injectionConfig = 0;
-		unsigned int size;
-		injectionConfig = CreateInjectionConfig(serviceLocator, config, &size);
-		OffsetConfig(config, *totalSize, size);
-		
-		InjectionSchedulingService *ret = new InjectionSchedulingService(
-			injectionSchedulingConfig,
-			injectionConfig,
-			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
-			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
-			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
-		
-		AddToCallBackGroupIfParametersNotNull(
-			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-			InjectionSchedulingService::ScheduleEventsCallBack,
-			ret);
-		
-		return ret;
-	}
-	
-	IReluctor *EngineControlServiceBuilder::CreateReluctor(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
+	void* EngineControlServiceBuilder::CreateReluctor(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		IReluctor *ret = 0;
 		
-		switch (GetServiceId(config, *totalSize))
+		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
 		{
 #ifdef GM24XRELUCTOR_H
 		case 1:
 			ret = new Gm24xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), *reinterpret_cast<const uint16_t *>(config));
-			OffsetConfig(config, *totalSize, sizeof(uint16_t));
+			ServiceBuilder::OffsetConfig(config, sizeOut, sizeof(uint16_t));
 			break;
 #endif
 #ifdef UNIVERSAL2XRELUCTOR_H
 		case 2:
-			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), CastConfig < Universal2xReluctorConfig >(config, *totalSize));
+			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), ServiceBuilder::CastConfig < Universal2xReluctorConfig >(config, sizeOut));
 			break;
 #endif
 		}

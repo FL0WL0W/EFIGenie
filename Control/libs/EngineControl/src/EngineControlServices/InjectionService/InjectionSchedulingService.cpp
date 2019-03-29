@@ -5,14 +5,14 @@ namespace EngineControlServices
 {
 	InjectionSchedulingService::InjectionSchedulingService(
 		const InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
-		IInjectionConfig *injectionConfig,
+		IInjectorTimingService *injectorTimingService,
 		IBooleanOutputService **injectorOutputServices,
 		ITimerService *timerService,
 		IReluctor *crankReluctor,
 		IReluctor *camReluctor)
 	{
 		_injectionSchedulingServiceConfig = injectionSchedulingServiceConfig;
-		_injectionConfig = injectorOutputServices != 0? injectionConfig : 0;
+		_injectorTimingService = injectorOutputServices != 0? injectorTimingService : 0;
 		_timerService = timerService;
 		_crankReluctor = crankReluctor;
 		_camReluctor = camReluctor;
@@ -21,7 +21,7 @@ namespace EngineControlServices
 		int tickMinusSome = _timerService->GetTick() - 6;
 		for (unsigned char injector = 0; injector < _injectionSchedulingServiceConfig->Injectors; injector++)
 		{
-			if (_injectionConfig != 0)
+			if (_injectorTimingService != 0)
 			{
 				_injectorOpenTask[injector] = new Task(&IBooleanOutputService::OutputSetCallBack, injectorOutputServices[injector], false);
 				_injectorOpenTask[injector]->Tick = tickMinusSome;
@@ -95,14 +95,18 @@ namespace EngineControlServices
 		{
 			for (unsigned char injector = 0; injector < _injectionSchedulingServiceConfig->Injectors; injector++)
 			{
-				InjectorTiming injectorTiming = _injectionConfig->GetInjectorTiming(injector);
+				InjectorTiming injectorTiming = _injectorTimingService->InjectorTiming[injector];
 				if (injectorTiming.PulseWidth == 0)
 				{
 					_timerService->UnScheduleTask(_injectorOpenTask[injector]);
 				}
 				else
 				{
-					float injectorStartPosition = (injectorTiming.OpenPosition64thDegree % (720 * 64)) / 64.0f;
+					float injectorStartPosition = injectorTiming.OpenPosition;
+					while (injectorStartPosition > scheduleResolution)
+						injectorStartPosition -= scheduleResolution;
+					while (injectorStartPosition < 0)
+						injectorStartPosition += scheduleResolution;
 
 					float degreesUntilOpen = injectorTdc[injector] + injectorStartPosition - schedulePosition;
 					while (degreesUntilOpen > scheduleResolution)

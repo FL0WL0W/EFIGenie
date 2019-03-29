@@ -5,6 +5,14 @@
 #ifdef ITIMERSERVICE_H
 namespace HardwareAbstraction
 {		
+	void CallBackGroup::AddIfParametersNotNull(void(*callBackPointer)(void *), void *parameters)
+	{
+		if(parameters != 0)
+		{
+			Add(callBackPointer, parameters);
+		}
+	}
+
 	void CallBackGroup::Execute()
 	{
 		for (std::list<ICallBack *>::const_iterator iterator = _callBackList.begin(), end = _callBackList.end(); iterator != end; ++iterator)

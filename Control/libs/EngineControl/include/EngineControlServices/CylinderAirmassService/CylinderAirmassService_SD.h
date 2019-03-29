@@ -58,7 +58,7 @@ namespace EngineControlServices
 			IFloatInputService *intakeAirTemperatureService,
 			IFloatInputService *engineCoolantTemperatureService,
 			ICylinderAirTemperatureService *cylinderAirTemperatureService);
-		void CalculateAirmass() override;
+		void CalculateCylinderAirmass() override;
 	};
 }
 #endif

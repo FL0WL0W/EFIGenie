@@ -1,5 +1,5 @@
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
-#include "EngineControlServices/InjectionService/IInjectionConfig.h"
+#include "EngineControlServices/InjectorTimingService/IInjectorTimingService.h"
 #include "Reluctor/IReluctor.h"
 #include "HardwareAbstraction/ITimerService.h"
 #include "Packed.h"
@@ -10,7 +10,7 @@ using namespace Reluctor;
 using namespace HardwareAbstraction;
 using namespace IOServices;
 
-#if !defined(INJECTIONSCHEDULINGSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H)  && defined(IRELUCTOR_H) && (defined(IIGNITIONCONFIG_H)) ||  defined(IINJECTIONCONFIG_H)
+#if !defined(INJECTIONSCHEDULINGSERVICE_H) && defined(IBOOLEANOUTPUTSERVICE_H) && defined(IRELUCTOR_H) && defined(IINJECTORTIMINGSERVICE_H)
 #define INJECTIONSCHEDULINGSERVICE_H
 namespace EngineControlServices
 {
@@ -40,13 +40,13 @@ namespace EngineControlServices
 		ITimerService *_timerService;
 		IReluctor *_crankReluctor;
 		IReluctor *_camReluctor;
-		IInjectionConfig *_injectionConfig;
+		IInjectorTimingService *_injectorTimingService;
 		HardwareAbstraction::Task **_injectorOpenTask;
 		HardwareAbstraction::Task **_injectorCloseTask;
 	public:
 		InjectionSchedulingService(
 			const InjectionSchedulingServiceConfig *injectionSchedulingServiceConfig,
-			IInjectionConfig *injectionConfig,
+			IInjectorTimingService *injectorTimingService,
 			IBooleanOutputService **injectorOutputServices,
 			ITimerService *timerService,
 			IReluctor *crankReluctor,

@@ -1,4 +1,6 @@
 #include "EngineControlServices/TachometerService/TachometerService.h"
+#include "Service/EngineControlServiceIds.h"
+#include "Service/ServiceBuilder.h"
 
 #ifdef TACHOMETERSERVICE_H
 namespace EngineControlServices
@@ -27,6 +29,17 @@ namespace EngineControlServices
 			service->_timerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm / service->_rpmService->Rpm);
 		else
 			service->_timerService->ScheduleTask(service->TachometerTask, service->_ticksPerRpm);
+	}
+	
+	void *TachometerService::CreateTachometerService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{		
+		sizeOut = 0;
+				
+		return new TachometerService(
+			ServiceBuilder::CastConfig < TachometerServiceConfig >(config, sizeOut),
+			ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::CreateBooleanOutputService, serviceLocator, config, sizeOut),
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID));
 	}
 }
 #endif

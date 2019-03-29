@@ -11,8 +11,8 @@ using namespace IOServices;
 using namespace Reluctor;
 using namespace Interpolation;
 
-#if !defined(CYLINDERAIRMASSSERVICE_IAT_ECT_BIAS_H) && defined(ICYLINDERAIRTEMPERATURESERVICE_H) && defined(ICYLINDERAIRMASSSERVICE_H) && defined(RPMSERVICE_H)
-#define CYLINDERAIRMASSSERVICE_IAT_ECT_BIAS_H
+#if !defined(CYLINDERAIRTEMPERATURESERVICE_IAT_ECT_BIAS_H) && defined(ICYLINDERAIRTEMPERATURESERVICE_H) && defined(ICYLINDERAIRMASSSERVICE_H) && defined(RPMSERVICE_H)
+#define CYLINDERAIRTEMPERATURESERVICE_IAT_ECT_BIAS_H
 namespace EngineControlServices
 {	
 	PACK(
@@ -34,7 +34,8 @@ namespace EngineControlServices
 		unsigned char Cylinders;
 
 		unsigned char TemperatureBiasResolution;
-		float MaxTemperatureBias;
+		float MaxTemperatureBiasAirflow;
+		unsigned char DefaultTemperatureBias;
 	});
 	
 	class CylinderAirTemperatureService_IAT_ECT_Bias : public ICylinderAirTemperatureService
@@ -44,17 +45,19 @@ namespace EngineControlServices
 		RpmService *_rpmService;
 		IFloatInputService *_intakeAirTemperatureService;
 		IFloatInputService *_engineCoolantTemperatureService;
-		//this is a circular dependency but this value is circularly dependent soooo
+		//this is a circular dependency but this value is circularly dependent soooo. avoid this when possible
 		ICylinderAirmassService *_cylinderAirmassService;
+		const ServiceLocator *_serviceLocator;
 		
 	public:
 		CylinderAirTemperatureService_IAT_ECT_Bias(
 			const CylinderAirTemperatureService_IAT_ECT_BiasConfig *config, 
 			RpmService *rpmService,
 			IFloatInputService *intakeAirTemperatureService,
-			IFloatInputService *engineCoolantTemperatureService);
+			IFloatInputService *engineCoolantTemperatureService,
+			const ServiceLocator *serviceLocator);
 		void SetCylinderAirmassService(ICylinderAirmassService *cylinderAirmassService);
-		void CalculateAirTemperature() override;
+		void CalculateCylinderAirTemperature() override;
 	};
 }
 #endif

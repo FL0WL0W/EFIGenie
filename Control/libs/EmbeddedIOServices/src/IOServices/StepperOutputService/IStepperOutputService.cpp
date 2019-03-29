@@ -7,6 +7,11 @@
 #ifdef ISTEPPEROUTPUTSERVICE_H
 namespace IOServices
 {
+	void* IStepperOutputService::CreateStepperOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		return CreateStepperOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
+	}
+	
 	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
 		const uint8_t stepperServiceId = *reinterpret_cast<const uint8_t *>(config);

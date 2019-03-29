@@ -1,3 +1,7 @@
+#include "Service/ServiceLocator.h"
+
+using namespace Service;
+
 #ifndef IPRIMESERVICE_H
 #define IPRIMESERVICE_H
 namespace EngineControlServices
@@ -10,6 +14,8 @@ namespace EngineControlServices
 
 		static void PrimeCallBack(void *primeService);
 		static void TickCallBack(void *primeService);
+		
+		static void* CreatePrimeService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif
