@@ -1,8 +1,3 @@
-
-//config 1001-2000
-#define IGNITION_CONFIG_ID						1001
-#define INJECTION_CONFIG_ID						1002
-
 //inputs 2001-3000
 #define RPM_SERVICE_ID							2001			// RpmService
 #define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2002			// IFloatInputService		degrees C
@@ -27,13 +22,12 @@
 #define AFR_SERVICE_ID							4004			// IAfrService
 #define FUEL_TRIM_SERVICE_ID					4005			// IFuelTrimService
 #define FUEL_PUMP_SERVICE_ID					4006			// IFuelPumpService
-#define IGNITION_SCHEDULING_SERVICE_ID			4007			// IgnitionSchedulingService
-#define INJECTION_SCHEDULING_SERVICE_ID			4008			// InjectionSchedulingService
-#define SHIFT_SERVICE_ID						4009			// ShiftService
-#define GEAR_CONTROL_SERVICE_ID					4010			// GearControlService
-#define CYLINDER_AIR_TEMPERATURE_SERVICE_ID		4011			// ICylinderAirTemperatureService
-#define CYLINDER_AIRMASS_SERVICE_ID		    	4012			// ICylinderAirmassService
-#define INJECTOR_GRAM_SERVICE_ID				4013			// IInjectorGramService
+#define CYLINDER_AIR_TEMPERATURE_SERVICE_ID		4007			// ICylinderAirTemperatureService
+#define CYLINDER_AIRMASS_SERVICE_ID		    	4008			// ICylinderAirmassService
+#define INJECTOR_GRAM_SERVICE_ID				4009			// IInjectorGramService
+#define INJECTOR_TIMING_SERVICE_ID				4010			// IInjectorTimingService
+#define IGNITION_SCHEDULING_SERVICE_ID			4011			// IgnitionSchedulingService
+#define INJECTION_SCHEDULING_SERVICE_ID			4012			// InjectionSchedulingService
 
 //callback groups 5001-6000
 #define PRE_RELUCTOR_SYNC_CALL_BACK_GROUP		5002

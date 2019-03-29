@@ -26,6 +26,10 @@
 #include "EngineControlServices/AfrService/IAfrService.h"
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
 #include "EngineControlServices/FuelPumpService/IFuelPumpService.h"
+#include "EngineControlServices/CylinderAirTemperatureService/ICylinderAirTemperatureService.h"
+#include "EngineControlServices/CylinderAirmassService/ICylinderAirmassService.h"
+#include "EngineControlServices/InjectorGramService/IInjectorGramService.h"
+#include "EngineControlServices/InjectorTimingService/IInjectorTimingService.h"
 #include "EngineControlServices/InjectionService/InjectionSchedulingService.h"
 #include "EngineControlServices/IgnitionService/IgnitionSchedulingService.h"
 
@@ -44,7 +48,7 @@ namespace Service
 		
 		static void* EngineControlServiceBuilder::CreateBooleanOutputArray(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		static void* CreateIgnitionSchedulingService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
-		// static InjectionSchedulingService *CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *size);
+		static void* EngineControlServiceBuilder::CreateInjectionSchedulingService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		static void RegisterRpmService(ServiceLocator *serviceLocator);
 		static void* CreateReluctor(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};

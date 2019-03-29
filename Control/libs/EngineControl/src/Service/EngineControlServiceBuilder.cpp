@@ -38,6 +38,7 @@ namespace Service
 
 		ServiceBuilder *serviceBuilder = new ServiceBuilder();
 
+		//inputs
 #if INTAKE_AIR_TEMPERATURE_SERVICE_ID
 		serviceBuilder->Register(INTAKE_AIR_TEMPERATURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
@@ -59,11 +60,27 @@ namespace Service
 #if VEHICLE_SPEED_SERVICE_ID
 		serviceBuilder->Register(VEHICLE_SPEED_SERVICE_ID, IFloatInputService::CreateFloatInputService);
 #endif
-#if TACHOMETER_SERVICE_ID
-		serviceBuilder->Register(TACHOMETER_SERVICE_ID, TachometerService::CreateTachometerService);
+#if CRANK_RELUCTOR_SERVICE_ID
+		serviceBuilder->Register(CRANK_RELUCTOR_SERVICE_ID, CreateReluctor);
+#endif
+#if CAM_RELUCTOR_SERVICE_ID
+		serviceBuilder->Register(CAM_RELUCTOR_SERVICE_ID, CreateReluctor);
+#endif
+
+	//outputs
+#if IGNITOR_SERVICES_ID
+		serviceBuilder->Register(IGNITOR_SERVICES_ID, CreateBooleanOutputArray);
+#endif
+#if INJECTOR_SERVICES_ID
+		serviceBuilder->Register(INJECTOR_SERVICES_ID, CreateBooleanOutputArray);
 #endif
 #if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
 		serviceBuilder->Register(IDLE_AIR_CONTROL_VALVE_SERVICE_ID, IFloatOutputService::CreateFloatOutputService);
+#endif
+
+	//application services
+#if TACHOMETER_SERVICE_ID
+		serviceBuilder->Register(TACHOMETER_SERVICE_ID, TachometerService::CreateTachometerService);
 #endif
 #if PRIME_SERVICE_ID
 		serviceBuilder->Register(PRIME_SERVICE_ID, IPrimeService::CreatePrimeService);
@@ -80,79 +97,34 @@ namespace Service
 #if FUEL_PUMP_SERVICE_ID
 		serviceBuilder->Register(FUEL_PUMP_SERVICE_ID, IFuelPumpService::CreateFuelPumpService);
 #endif
+#if CYLINDER_AIR_TEMPERATURE_SERVICE_ID
+		serviceBuilder->Register(CYLINDER_AIR_TEMPERATURE_SERVICE_ID, ICylinderAirTemperatureService::CreateCylinderAirTemperatureService);
+#endif
+#if CYLINDER_AIRMASS_SERVICE_ID
+		serviceBuilder->Register(CYLINDER_AIRMASS_SERVICE_ID, ICylinderAirmassService::CreateCylinderAirmassService);
+#endif
+#if INJECTOR_GRAM_SERVICE_ID
+		serviceBuilder->Register(INJECTOR_GRAM_SERVICE_ID, IInjectorGramService::CreateInjectorGramService);
+#endif
+#if INJECTOR_TIMING_SERVICE_ID
+		serviceBuilder->Register(INJECTOR_TIMING_SERVICE_ID, IInjectorTimingService::CreateInjectorTimingService);
+#endif
 #if IGNITION_SCHEDULING_SERVICE_ID
 		serviceBuilder->Register(IGNITION_SCHEDULING_SERVICE_ID, CreateIgnitionSchedulingService);
 #endif
-#if CRANK_RELUCTOR_SERVICE_ID
-		serviceBuilder->Register(CRANK_RELUCTOR_SERVICE_ID, CreateReluctor);
-#endif
-#if CAM_RELUCTOR_SERVICE_ID
-		serviceBuilder->Register(CAM_RELUCTOR_SERVICE_ID, CreateReluctor);
-#endif
-#if IGNITOR_SERVICES_ID
-		serviceBuilder->Register(IGNITOR_SERVICES_ID, CreateBooleanOutputArray);
-#endif
-#if INJECTOR_SERVICES_ID
-		serviceBuilder->Register(INJECTOR_SERVICES_ID, CreateBooleanOutputArray);
+#if INJECTION_SCHEDULING_SERVICE_ID
+		serviceBuilder->Register(INJECTION_SCHEDULING_SERVICE_ID, CreateInjectionSchedulingService);
 #endif
 
-// #if INJECTION_SCHEDULING_SERVICE_ID
-// 			case INJECTION_SCHEDULING_SERVICE_ID:
-// 				{
-// 					InjectionSchedulingService *injectionSchedulingService = CreateInjectionSchedulingService(serviceLocator, config, &size);
-// 					ServiceBuilder::RegisterIfNotNull(serviceLocator, serviceId, injectionSchedulingService);
-// 					ServiceBuilder::OffsetConfig(config, totalSize, size);
-// 					break;
-// 				}
-// #endif
+		//hack until i can find a better way to register the rpm service. probably going to create an initialize callback for this and CylinderAirTemperatureService_IAT_ECT_Bias
+		RegisterRpmService(serviceLocator);
 
 		serviceBuilder->Build(serviceLocator, config, sizeOut);
 
+		RegisterRpmService(serviceLocator);
+
 		return serviceLocator;
 	}
-	
-// 	IInjectionConfig *EngineControlServiceBuilder::CreateInjectionConfig(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-// 	{
-// 		*totalSize = 0;
-
-// 		IInjectionConfig *ret = 0;
-		
-// 		switch (ServiceBuilder::GetServiceTypeId(config, *totalSize))
-// 		{
-// #ifdef INJECTIONCONFIG_SD_H
-// 		case 2:
-// 			ret = new InjectionConfig_SD(
-// 				ServiceBuilder::CastConfig < InjectionConfig_SDConfig >(config, *totalSize),
-// 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-// 				serviceLocator->LocateAndCast<IFloatInputService>(VOLTAGE_SERVICE_ID));
-// 			break;
-// #endif
-// #ifdef INJECTIONCONFIGWRAPPER_DFCO_H
-// 		case 3:
-// 			{
-// 				const InjectionConfigWrapper_DFCOConfig *injectionConfig = ServiceBuilder::CastConfig < InjectionConfigWrapper_DFCOConfig >(config, *totalSize);
-
-// 				unsigned int size;
-// 				IInjectionConfig *child = CreateInjectionConfig(serviceLocator, config, &size);
-// 				ServiceBuilder::OffsetConfig(config, *totalSize, size);
-
-// 				ret = new InjectionConfigWrapper_DFCO(injectionConfig, 
-// 					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID),
-// 					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-// 					child);
-// 				break;
-// 			}
-// #endif
-// 		}
-		
-// 		return ret;
-// 	}
 	
 	void* EngineControlServiceBuilder::CreateBooleanOutputArray(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
@@ -195,32 +167,24 @@ namespace Service
 		return ret;
 	}
 
-// 	InjectionSchedulingService *EngineControlServiceBuilder::CreateInjectionSchedulingService(ServiceLocator *serviceLocator, const void *config, unsigned int *totalSize)
-// 	{
-// 		*totalSize = 0;
+	void *EngineControlServiceBuilder::CreateInjectionSchedulingService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		sizeOut = 0;
 		
-// 		const InjectionSchedulingServiceConfig *injectionSchedulingConfig = ServiceBuilder::CastConfig < InjectionSchedulingServiceConfig >(config, *totalSize);
-
-// 		IInjectionConfig *injectionConfig = 0;
-// 		unsigned int size;
-// 		injectionConfig = CreateInjectionConfig(serviceLocator, config, &size);
-// 		ServiceBuilder::OffsetConfig(config, *totalSize, size);
+		InjectionSchedulingService *ret = new InjectionSchedulingService(
+			ServiceBuilder::CastConfig < InjectionSchedulingServiceConfig >(config, sizeOut),
+			serviceLocator->LocateAndCast<IInjectorTimingService>(INJECTOR_TIMING_SERVICE_ID),
+			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
+			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
+			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
 		
-// 		InjectionSchedulingService *ret = new InjectionSchedulingService(
-// 			injectionSchedulingConfig,
-// 			injectionConfig,
-// 			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
-// 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-// 			serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID),
-// 			serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
+		serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP)->AddIfParametersNotNull( 
+			InjectionSchedulingService::ScheduleEventsCallBack,
+			ret);
 		
-// 		AddToCallBackGroupIfParametersNotNull(
-// 			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP), 
-// 			InjectionSchedulingService::ScheduleEventsCallBack,
-// 			ret);
-		
-// 		return ret;
-// 	}
+		return ret;
+	}
 	
 	void EngineControlServiceBuilder::RegisterRpmService(ServiceLocator *serviceLocator)
 	{
@@ -263,6 +227,7 @@ namespace Service
 			break;
 #endif
 		}
+
 		return ret;
 	}
 }
