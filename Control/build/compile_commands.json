@@ -385,6 +385,12 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\Reluctor\\include -I..\\libs\\ReluctorMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\CylinderAirmassService_SDTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\CylinderAirmassService_SDTests.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/CylinderAirmassService_SDTests.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControlUnitTests\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\EmbeddedIOServicesMockedObjects\\include -I..\\libs\\Reluctor\\include -I..\\libs\\ReluctorMockedObjects\\include -I..\\libs\\EngineControl\\include -I..\\libs\\EngineControlMockedObjects\\include -I..\\libs\\googletest\\googletest\\include -I..\\libs\\googletest\\googletest -I..\\libs\\googletest\\googlemock\\include -I..\\libs\\googletest\\googlemock  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControlUnitTests\\CMakeFiles\\EngineControlUnitTests.dir\\src\\FuelPumpServiceTests.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControlUnitTests\\src\\FuelPumpServiceTests.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControlUnitTests/src/FuelPumpServiceTests.cpp"
 },

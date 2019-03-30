@@ -46,8 +46,6 @@ namespace EngineControlServices
 		const CylinderAirmassService_SDConfig *_config;
 		RpmService *_rpmService;
 		IFloatInputService *_manifoldAbsolutePressureService;
-		IFloatInputService *_intakeAirTemperatureService;
-		IFloatInputService *_engineCoolantTemperatureService;
 		ICylinderAirTemperatureService *_cylinderAirTemperatureService;
 		
 	public:
@@ -55,8 +53,6 @@ namespace EngineControlServices
 			const CylinderAirmassService_SDConfig *config, 
 			RpmService *rpmService,
 			IFloatInputService *manifoldAbsolutePressureService,
-			IFloatInputService *intakeAirTemperatureService,
-			IFloatInputService *engineCoolantTemperatureService,
 			ICylinderAirTemperatureService *cylinderAirTemperatureService);
 		void CalculateCylinderAirmass() override;
 	};

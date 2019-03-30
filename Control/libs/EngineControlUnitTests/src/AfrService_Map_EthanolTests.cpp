@@ -124,6 +124,8 @@ namespace UnitTests
 		~AfrService_Map_EthanolTests() override 
 		{
 			free(_afrService);
+			free(_rpmService);
+			free(_tickCallBackGroup);
 			free(_serviceLocator);
 		}
 	};

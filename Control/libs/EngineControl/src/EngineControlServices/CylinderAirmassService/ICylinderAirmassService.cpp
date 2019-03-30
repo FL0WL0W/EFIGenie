@@ -21,8 +21,6 @@ namespace EngineControlServices
 				ServiceBuilder::CastConfig < CylinderAirmassService_SDConfig >(config, sizeOut),  
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
 				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
 				serviceLocator->LocateAndCast<ICylinderAirTemperatureService>(CYLINDER_AIR_TEMPERATURE_SERVICE_ID));
 			break;
 #endif
