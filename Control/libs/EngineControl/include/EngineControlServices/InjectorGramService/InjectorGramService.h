@@ -26,9 +26,9 @@ namespace EngineControlServices
 			return sizeof(InjectorGramServiceConfig)
 				+ sizeof(float) * Injectors;
 		}
-		constexpr const unsigned char *InjectorToCylinder() const { return reinterpret_cast<const unsigned char *>(this + 1); }
+		constexpr const uint8_t *InjectorToCylinder() const { return reinterpret_cast<const uint8_t *>(this + 1); }
 
-		unsigned char Injectors;
+		uint8_t Injectors;
 	});
 	
 class InjectorGramService : public IInjectorGramService

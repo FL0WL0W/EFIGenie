@@ -29,7 +29,7 @@ namespace EngineControlServices
 		if(_cylinderAirmassService == 0)
 			_cylinderAirmassService = _serviceLocator->LocateAndCast<ICylinderAirmassService>(CYLINDER_AIRMASS_SERVICE_ID);
 
-		unsigned short rpm = _rpmService->Rpm;
+		float rps = _rpmService->Rpm / 60.0f;
 
 		for(unsigned char cylinder = 0; cylinder < _config->Cylinders; cylinder++)
 		{
@@ -37,23 +37,23 @@ namespace EngineControlServices
 			float temperatureBias = _config->DefaultTemperatureBias;
 			if(_cylinderAirmassService != 0 && _cylinderAirmassService->CylinderAirmass[cylinder] != 0)
 			{
-				unsigned char temperatureBias = InterpolateTable1<unsigned char>(rpm * _cylinderAirmassService->CylinderAirmass[cylinder], _config->MaxTemperatureBiasAirflow, 0.0f, _config->TemperatureBiasResolution, _config->TemperatureBias());
+				temperatureBias = InterpolateTable1<float>(rps * _config->Cylinders * 0.5f * _cylinderAirmassService->CylinderAirmass[cylinder], _config->MaxTemperatureBiasAirflow, 0.0f, _config->TemperatureBiasResolution, _config->TemperatureBias());
 			}
 
 			if (_intakeAirTemperatureService != 0)
 			{
 				if (_engineCoolantTemperatureService != 0)
 				{
-					cylinderAirTemperature = (_intakeAirTemperatureService->Value * temperatureBias + _engineCoolantTemperatureService->Value * (255 - temperatureBias)) / 255;
+					cylinderAirTemperature = (_intakeAirTemperatureService->Value * (1 - temperatureBias) + _engineCoolantTemperatureService->Value * temperatureBias);
 				}
 				else
 				{
-					cylinderAirTemperature = _intakeAirTemperatureService->Value * temperatureBias + 100 * (1-temperatureBias);
+					cylinderAirTemperature = _intakeAirTemperatureService->Value * (1 - temperatureBias) + 100 * temperatureBias;
 				}
 			}
 			else if (_engineCoolantTemperatureService != 0)
 			{
-				cylinderAirTemperature = 14.6f * temperatureBias + _engineCoolantTemperatureService->Value * (1-temperatureBias);
+				cylinderAirTemperature = 14.6f * (1 - temperatureBias) + _engineCoolantTemperatureService->Value * temperatureBias;
 			}
 
 			CylinderAirTemperature[cylinder] = cylinderAirTemperature;

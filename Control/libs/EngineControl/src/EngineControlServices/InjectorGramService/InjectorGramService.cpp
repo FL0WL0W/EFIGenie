@@ -19,10 +19,16 @@ namespace EngineControlServices
 	
 	void InjectorGramService::CalculateInjectorGrams()
 	{					
-		for(unsigned char injector; injector < _config->Injectors; injector++)
+		for(unsigned char injector = 0; injector < _config->Injectors; injector++)
 		{	
 			unsigned char cylinder = _config->InjectorToCylinder()[injector];
-			InjectorGrams[injector] = (_cylinderArmassService->CylinderAirmass[cylinder] / _afrService->Afr) * _fuelTrimService->GetFuelTrim(cylinder);
+			float fuelTrim = 1;
+			if(_fuelTrimService != 0)
+			{
+				fuelTrim = _fuelTrimService->GetFuelTrim(cylinder);
+			}
+
+			InjectorGrams[injector] = (_cylinderArmassService->CylinderAirmass[cylinder] / _afrService->Afr) * fuelTrim;
 		}
 	}
 }

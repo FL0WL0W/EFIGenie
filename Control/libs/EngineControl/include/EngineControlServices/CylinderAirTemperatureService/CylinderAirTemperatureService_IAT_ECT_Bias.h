@@ -27,15 +27,15 @@ namespace EngineControlServices
 		const unsigned int Size() const
 		{
 			return sizeof(CylinderAirTemperatureService_IAT_ECT_BiasConfig) +
-				sizeof(unsigned char) * TemperatureBiasResolution;
+				sizeof(float) * TemperatureBiasResolution;
 		}
-		constexpr const unsigned char *TemperatureBias() const { return reinterpret_cast<const unsigned char *>(this + 1); }
+		constexpr const float *TemperatureBias() const { return reinterpret_cast<const float *>(this + 1); }
 
-		unsigned char Cylinders;
+		uint8_t Cylinders;
 
-		unsigned char TemperatureBiasResolution;
+		uint8_t TemperatureBiasResolution;
 		float MaxTemperatureBiasAirflow;
-		unsigned char DefaultTemperatureBias;
+		float DefaultTemperatureBias;
 	});
 	
 	class CylinderAirTemperatureService_IAT_ECT_Bias : public ICylinderAirTemperatureService
@@ -46,7 +46,7 @@ namespace EngineControlServices
 		IFloatInputService *_intakeAirTemperatureService;
 		IFloatInputService *_engineCoolantTemperatureService;
 		//this is a circular dependency but this value is circularly dependent soooo. avoid this when possible
-		ICylinderAirmassService *_cylinderAirmassService;
+		ICylinderAirmassService *_cylinderAirmassService = 0;
 		const ServiceLocator *_serviceLocator;
 		
 	public:
@@ -56,7 +56,6 @@ namespace EngineControlServices
 			IFloatInputService *intakeAirTemperatureService,
 			IFloatInputService *engineCoolantTemperatureService,
 			const ServiceLocator *serviceLocator);
-		void SetCylinderAirmassService(ICylinderAirmassService *cylinderAirmassService);
 		void CalculateCylinderAirTemperature() override;
 	};
 }

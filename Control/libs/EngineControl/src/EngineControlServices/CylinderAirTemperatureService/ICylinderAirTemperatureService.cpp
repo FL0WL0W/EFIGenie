@@ -17,21 +17,12 @@ namespace EngineControlServices
 		{
 #ifdef CYLINDERAIRTEMPERATURESERVICE_IAT_ECT_BIAS_H
 		case 1:
-			//this create needs to be called twice in order to register the cylinder airmass service
-			CylinderAirTemperatureService_IAT_ECT_Bias *existing = serviceLocator->LocateAndCast<CylinderAirTemperatureService_IAT_ECT_Bias>(CYLINDER_AIR_TEMPERATURE_SERVICE_ID);
-			if(existing != 0)
-			{
-				existing->SetCylinderAirmassService(serviceLocator->LocateAndCast<ICylinderAirmassService>(CYLINDER_AIRMASS_SERVICE_ID));
-			}
-			else 
-			{
-				ret = new CylinderAirTemperatureService_IAT_ECT_Bias(
-					ServiceBuilder::CastConfig < CylinderAirTemperatureService_IAT_ECT_BiasConfig >(config, sizeOut),  
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
-					serviceLocator);//try to avoid passing in serviceLocator. This means circular dependency which is bad. allowed here till i find a better solution/model
-			}
+			ret = new CylinderAirTemperatureService_IAT_ECT_Bias(
+				ServiceBuilder::CastConfig < CylinderAirTemperatureService_IAT_ECT_BiasConfig >(config, sizeOut),  
+				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(INTAKE_AIR_TEMPERATURE_SERVICE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID),
+				serviceLocator);//try to avoid passing in serviceLocator. This means circular dependency which is bad. allowed here till i find a better solution/model
 			break;
 #endif
 		}
