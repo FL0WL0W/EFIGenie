@@ -70,9 +70,9 @@ namespace UnitTests
 		
 	TEST_F(InjectorGramServiceTests, WhenGettingInjectorGramsThenCorrectInjectorGramsIsReturned)
 	{
-		_cylinderAirmassService.CylinderAirmass[0] = 500;
+		_cylinderAirmassService.CylinderAirmass[0] = 1.2;
 		_afrService.Afr = 14.7f;
 		_injectorGramService->CalculateInjectorGrams();
-		ASSERT_NEAR(34.01360544217687f, _injectorGramService->InjectorGrams[0], 0.01f);
+		ASSERT_NEAR(0.0816326530612245f, _injectorGramService->InjectorGrams[0], 0.0001f);
 	}
 }

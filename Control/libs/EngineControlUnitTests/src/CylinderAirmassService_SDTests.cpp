@@ -87,14 +87,14 @@ namespace UnitTests
 		_mapService.Value = 0.33f;
 		_cylinderAirTemperatureService.CylinderAirTemperature[0] = 50;
 		_cylinderAirmassService->CalculateCylinderAirmass();
-		ASSERT_NEAR(180.27f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
+		ASSERT_NEAR(0.18027f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
 		
 		_mapService.Value = 0.66f;
 		_cylinderAirmassService->CalculateCylinderAirmass();
-		ASSERT_NEAR(360.54f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
+		ASSERT_NEAR(0.36054f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
 		
 		_rpmService->Rpm = 4000;
 		_cylinderAirmassService->CalculateCylinderAirmass();
-		ASSERT_NEAR(180.27f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
+		ASSERT_NEAR(0.18027f, _cylinderAirmassService->CylinderAirmass[0], 0.01f);
 	}
 }

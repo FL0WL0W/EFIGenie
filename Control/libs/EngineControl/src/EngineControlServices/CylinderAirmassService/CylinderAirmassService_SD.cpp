@@ -34,7 +34,7 @@ namespace EngineControlServices
 				cylinderAirTemperature = _cylinderAirTemperatureService->CylinderAirTemperature[cylinder];
 			}
 
-			float airDensity = (map * 101325) / (287 /*GasConstant*/ * (cylinderAirTemperature + 273.15f)); // kg/m^3
+			float airDensity = (map * 101.325f) / (287 /*GasConstant*/ * (cylinderAirTemperature + 273.15f)); // kg/m^3
 
 			CylinderAirmass[cylinder] = cylinderVolume * airDensity;
 		}

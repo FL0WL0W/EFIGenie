@@ -23,24 +23,27 @@ namespace EngineControlServices
 	public:
 		const unsigned int Size() const
 		{
-			return sizeof(InjectorTimingServiceConfig);
+			return sizeof(InjectorTimingServiceConfig)
+			+ sizeof(uint16_t) * Injectors
+			+ sizeof(int16_t) * ShortPulseAdderResolution
+			+ sizeof(int16_t) * MapResolution * VoltageResolution;
 		}
-		constexpr const unsigned short *InjectorGramsPerMinute() const { return reinterpret_cast<const unsigned short *>(this + 1); }
-		constexpr const short *ShortPulseAdder() const { return reinterpret_cast<const short *>(InjectorGramsPerMinute() + Injectors); }
-		constexpr const short *Offset() const { return reinterpret_cast<const short *>(ShortPulseAdder() + ShortPulseAdderResolution); }
+		constexpr const uint16_t *InjectorGramsPerMinute() const { return reinterpret_cast<const uint16_t *>(this + 1); }
+		constexpr const int16_t *ShortPulseAdder() const { return reinterpret_cast<const int16_t *>(InjectorGramsPerMinute() + Injectors); }
+		constexpr const int16_t *Offset() const { return reinterpret_cast<const int16_t *>(ShortPulseAdder() + ShortPulseAdderResolution); }
 		
-		unsigned char Injectors;
+		uint8_t Injectors;
 		
-		unsigned short InjectorOpenPosition;
+		uint16_t InjectorOpenPosition;
 
-		float ShortPulseLimit;
-		unsigned char ShortPulseAdderResolution;
+		int16_t ShortPulseLimit;
+		uint8_t ShortPulseAdderResolution;
 		
 		float VoltageMax;
 		float VoltageMin;
-		unsigned char OffsetMapMax;
-		unsigned char OffsetMapResolution;
-		unsigned char OffsetVoltageResolution;
+		float MapMax;
+		uint8_t MapResolution;
+		uint8_t VoltageResolution;
 	});
 	
 class InjectorTimingService : public IInjectorTimingService
