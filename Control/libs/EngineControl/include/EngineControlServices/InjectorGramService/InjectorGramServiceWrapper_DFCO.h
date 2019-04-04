@@ -13,11 +13,6 @@ namespace EngineControlServices
 	PACK(
 	struct InjectorGramServiceWrapper_DFCOConfig
 	{
-	private:
-		InjectorGramServiceWrapper_DFCOConfig()
-		{
-
-		}
 	public:
 		constexpr const unsigned int Size() const
 		{

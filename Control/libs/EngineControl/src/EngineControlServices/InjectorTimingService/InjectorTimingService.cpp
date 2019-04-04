@@ -32,11 +32,15 @@ namespace EngineControlServices
 
 		for(uint8_t injector = 0; injector < _config->Injectors; injector++)
 		{	
-			float injectorDuration = _injectorGramService->InjectorGrams[injector] * 60.0f / _config->InjectorGramsPerMinute()[injector];
-			if(injectorDuration < _config->ShortPulseLimit)
-				injectorDuration += InterpolateTable1<short>(injectorDuration, _config->ShortPulseLimit, 0, _config->ShortPulseAdderResolution, _config->ShortPulseAdder()) * 0.000001f;
-							
-			injectorDuration += offset;
+			float injectorDuration = 0;
+			if(_injectorGramService != 0)
+			{
+				injectorDuration = _injectorGramService->InjectorGrams[injector] * 60.0f / _config->InjectorGramsPerMinute()[injector];
+				if(injectorDuration < _config->ShortPulseLimit)
+					injectorDuration += InterpolateTable1<short>(injectorDuration, _config->ShortPulseLimit, 0, _config->ShortPulseAdderResolution, _config->ShortPulseAdder()) * 0.000001f;
+								
+				injectorDuration += offset;
+			}
 					
 			if (injectorDuration <= 0) 
 				InjectorTiming[injector].PulseWidth = 0;
