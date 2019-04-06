@@ -7,6 +7,7 @@
 #include "MockCylinderAirMassService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 

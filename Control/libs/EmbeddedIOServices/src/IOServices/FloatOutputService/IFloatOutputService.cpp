@@ -3,24 +3,23 @@
 #include "IOServices/FloatOutputService/FloatOutputService_PwmInterpolatedTable.h"
 #include "IOServices/FloatOutputService/FloatOutputService_StepperPolynomial.h"
 #include "IOServices/FloatOutputService/FloatOutputService_StepperInterpolatedTable.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
+#include "Service/ServiceBuilder.h"
 
 #ifdef IFLOATOUTPUTSERVICE_H
 namespace IOServices
 {
-	void* IFloatOutputService::CreateFloatOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	void* IFloatOutputService::BuildFloatOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		return CreateFloatOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
 	}
 	
 	IFloatOutputService* IFloatOutputService::CreateFloatOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
-		const uint8_t outputServiceId = *reinterpret_cast<const uint8_t *>(config);
-		config = reinterpret_cast<const uint8_t *>(config) + 1;
-		sizeOut = sizeof(uint8_t);
-		
+		sizeOut = 0;		
 		IFloatOutputService *outputService = 0;
 		
-		switch (outputServiceId)
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef FLOATOUTPUTSERVICE_PWMPOLYNOMIAL_H
 		case 1:

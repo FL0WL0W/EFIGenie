@@ -1,5 +1,6 @@
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
 #include "Service/EngineControlServiceIds.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "HardwareAbstraction/ICallBack.h"
 #include "EngineControlServices/FuelTrimService/FuelTrimServiceWrapper_MultiChannel.h"
@@ -15,13 +16,14 @@ namespace EngineControlServices
 	
 	void* IFuelTrimService::CreateFuelTrimService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
+		sizeOut = 0;
 		IFuelTrimService *ret = 0;
-		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef FUELTRIMSERVICEWRAPPER_MULTICHANNEL_H
 		case 1:
 			{
-				const FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = ServiceBuilder::CastConfig < FuelTrimServiceWrapper_MultiChannelConfig >(config, sizeOut);
+				const FuelTrimServiceWrapper_MultiChannelConfig *fuelTrimConfig = ServiceBuilder::CastConfigAndOffset < FuelTrimServiceWrapper_MultiChannelConfig >(config, sizeOut);
 				
 				IFuelTrimService **fuelTrimServices = (IFuelTrimService **)malloc(sizeof(IFuelTrimService *)*(fuelTrimConfig->NumberOfFuelTrimChannels));
 				

@@ -1,5 +1,7 @@
 #include "IOServices/BooleanOutputService/IBooleanOutputService.h"
 #include "IOServices/BooleanOutputService/BooleanOutputService.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
+#include "Service/ServiceBuilder.h"
 
 #ifdef IBOOLEANOUTPUTSERVICE_H
 namespace IOServices
@@ -14,20 +16,17 @@ namespace IOServices
 		reinterpret_cast<IBooleanOutputService *>(booleanOutputService)->OutputReset();
 	}
 	
-	void* IBooleanOutputService::CreateBooleanOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	void* IBooleanOutputService::BuildBooleanOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		return CreateBooleanOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
 	}
 	
 	IBooleanOutputService *IBooleanOutputService::CreateBooleanOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
-		const uint8_t outputServiceId = *reinterpret_cast<const uint8_t *>(config);
-		config = reinterpret_cast<const uint8_t *>(config) + 1;
-		sizeOut = sizeof(uint8_t);
-		
+		sizeOut = 0;		
 		IBooleanOutputService *outputService = 0;
 		
-		switch (outputServiceId)
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{			
 #ifdef BOOLEANOUTPUTSERVICE_H
 		case 1:

@@ -7,6 +7,7 @@ using namespace Service;
 
 #if !defined(ISTEPPEROUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define ISTEPPEROUTPUTSERVICE_H
+#define BUILDER_ISTEPPEROUTPUTSERVICE 3003
 namespace IOServices
 {
 	class IStepperOutputService
@@ -15,7 +16,7 @@ namespace IOServices
 		virtual void Step(int32_t steps) = 0;
 		virtual void Calibrate() = 0;
 
-		static void* CreateStepperOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void* BuildStepperOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		static IStepperOutputService* CreateStepperOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut);
 	};
 }

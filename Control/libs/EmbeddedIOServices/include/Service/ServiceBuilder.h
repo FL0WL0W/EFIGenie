@@ -1,5 +1,4 @@
 #include "Service/ServiceLocator.h"
-#include <map>
 #include "stdint.h"
 
 #ifndef SERVICEBUILDER_H
@@ -22,20 +21,25 @@ namespace Service
 		static constexpr void OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset) 
 		{
 			config = reinterpret_cast<const void *>(reinterpret_cast<const unsigned char *>(config) + offset);
-			if(totalSize != 0)
-			{
-				totalSize += offset;
-			}
+			totalSize += offset;
 		}
 		
 		template<typename T>
-		static constexpr const T* CastConfig(const void *&config, unsigned int &size)
+		static constexpr const T* CastConfigAndOffset(const void *&config, unsigned int &size)
 		{
 			const T *castedConfig = reinterpret_cast<const T *>(config);
-			const unsigned int confSize = castedConfig->Size();
-			OffsetConfig(config, size, confSize);
+			OffsetConfig(config, size, castedConfig->Size());
 			
 			return castedConfig;
+		}
+		
+		template<typename T>
+		static constexpr const T CastAndOffset(const void *&config, unsigned int &size)
+		{
+			const T casted = *reinterpret_cast<const T *>(config);
+			OffsetConfig(config, size, sizeof(T));
+			
+			return casted;
 		}
 
 		template<typename Service> 
@@ -45,22 +49,6 @@ namespace Service
 			Service *service = reinterpret_cast<Service *>(factory(serviceLocator, config, size));
 			OffsetConfig(config, totalSize, size);
 			return service;
-		}
-
-		static constexpr const unsigned char GetServiceTypeId(const void *&config, unsigned int &size)
-		{
-			const unsigned char serviceId = *reinterpret_cast<const unsigned char*>(config);
-			size = 0;
-			OffsetConfig(config, size, 1);
-			return serviceId;
-		}
-
-		static constexpr void RegisterIfNotNull(ServiceLocator *&serviceLocator, uint16_t serviceId, void *pointer) 
-		{
-			if(pointer != 0)
-			{
-				serviceLocator->Register(serviceId, pointer);
-			}
 		}
 	};
 }

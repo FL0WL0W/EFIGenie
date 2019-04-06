@@ -1,5 +1,6 @@
 #include "EngineControlServices/FuelPumpService/IFuelPumpService.h"
 #include "Service/EngineControlServiceIds.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "EngineControlServices/FuelPumpService/FuelPumpService.h"
 #include "EngineControlServices/FuelPumpService/FuelPumpService_Analog.h"
@@ -28,33 +29,34 @@ namespace EngineControlServices
 	
 	void* IFuelPumpService::CreateFuelPumpService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
+		sizeOut = 0;
 		IFuelPumpService *ret = 0;
-		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef FUELPUMPSERVICE_H
 		case 1:
 			{
-				const FuelPumpServiceConfig *serviceConfig = ServiceBuilder::CastConfig < FuelPumpServiceConfig >(config, sizeOut);
+				const FuelPumpServiceConfig *serviceConfig = ServiceBuilder::CastConfigAndOffset < FuelPumpServiceConfig >(config, sizeOut);
 
 				ret = new FuelPumpService(
 					serviceConfig,
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-					ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::CreateBooleanOutputService, serviceLocator, config, sizeOut));
+					ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::BuildBooleanOutputService, serviceLocator, config, sizeOut));
 				break;
 			}
 #endif
 #ifdef FUELPUMPSERVICE_ANALOG_H
 		case 2:			
 			{
-				const FuelPumpService_AnalogConfig *serviceConfig = ServiceBuilder::CastConfig < FuelPumpService_AnalogConfig >(config, sizeOut);
+				const FuelPumpService_AnalogConfig *serviceConfig = ServiceBuilder::CastConfigAndOffset < FuelPumpService_AnalogConfig >(config, sizeOut);
 			
 				ret = new FuelPumpService_Analog(
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					ServiceBuilder::CreateServiceAndOffset<IFloatOutputService>(IFloatOutputService::CreateFloatOutputService, serviceLocator, config, sizeOut), 
+					ServiceBuilder::CreateServiceAndOffset<IFloatOutputService>(IFloatOutputService::BuildFloatOutputService, serviceLocator, config, sizeOut), 
 					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(THROTTLE_POSITION_SERVICE_ID));
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, THROTTLE_POSITION_INSTANCE_ID));
 				break;
 			}
 #endif

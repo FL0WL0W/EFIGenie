@@ -1,6 +1,7 @@
 #include "EngineControlServices/PrimeService/IPrimeService.h"
 #include "Service/EngineControlServiceIds.h"
 #include "Service/ServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "EngineControlServices/PrimeService/PrimeService_StaticPulseWidth.h"
 
 namespace EngineControlServices
@@ -17,14 +18,14 @@ namespace EngineControlServices
 	
 	void* IPrimeService::CreatePrimeService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
-		IPrimeService* ret = 0;
-		
-		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
+		sizeOut = 0;
+		IPrimeService* ret = 0;		
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef PRIMESERVICE_STATICPULSEWIDTH_H
 		case 1:
 			ret = new PrimeService_StaticPulseWidth(
-				ServiceBuilder::CastConfig < PrimeService_StaticPulseWidthConfig >(config, sizeOut), 
+				ServiceBuilder::CastConfigAndOffset < PrimeService_StaticPulseWidthConfig >(config, sizeOut), 
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID));
 			break;

@@ -6,6 +6,7 @@
 #include "MockCylinderAirTemperatureService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 
@@ -30,7 +31,7 @@ namespace UnitTests
 		{
 			_serviceLocator = new ServiceLocator();
 
-			_serviceLocator->Register(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID, &_mapService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID, &_mapService);
 			_serviceLocator->Register(CYLINDER_AIR_TEMPERATURE_SERVICE_ID, &_cylinderAirTemperatureService);
 			_rpmService = new RpmService(0, 0);
 			_serviceLocator->Register(RPM_SERVICE_ID, _rpmService);

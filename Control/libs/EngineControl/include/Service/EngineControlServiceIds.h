@@ -1,12 +1,12 @@
 //inputs 2001-3000
 #define RPM_SERVICE_ID							2001			// RpmService
-#define INTAKE_AIR_TEMPERATURE_SERVICE_ID		2002			// IFloatInputService		degrees C
-#define ENGINE_COOLANT_TEMPERATURE_SERVICE_ID	2003			// IFloatInputService		degrees C
-#define MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID	2004			// IFloatInputService		Bar
-#define VOLTAGE_SERVICE_ID						2005			// IFloatInputService		Volts
-#define THROTTLE_POSITION_SERVICE_ID			2006			// IFloatInputService		TPS 0.0-1.0
-#define ETHANOL_CONTENT_SERVICE_ID				2007			// IFloatInputService		Content 0.0-1.0
-#define VEHICLE_SPEED_SERVICE_ID				2008			// IFloatInputService		MPH cause thats what people care about
+#define INTAKE_AIR_TEMPERATURE_INSTANCE_ID		0		    	// IFloatInputService		degrees C
+#define ENGINE_COOLANT_TEMPERATURE_INSTANCE_ID	1		    	// IFloatInputService		degrees C
+#define MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID	2		    	// IFloatInputService		Bar
+#define VOLTAGE_INSTANCE_ID						3		    	// IFloatInputService		Volts
+#define THROTTLE_POSITION_INSTANCE_ID			4			    // IFloatInputService		TPS 0.0-1.0
+#define ETHANOL_CONTENT_INSTANCE_ID				5			    // IFloatInputService		Content 0.0-1.0
+#define VEHICLE_SPEED_INSTANCE_ID				6			    // IFloatInputService		MPH cause thats what people care about
 #define CRANK_RELUCTOR_SERVICE_ID				2009			// IReluctor
 #define CAM_RELUCTOR_SERVICE_ID					2010			// IReluctor
 

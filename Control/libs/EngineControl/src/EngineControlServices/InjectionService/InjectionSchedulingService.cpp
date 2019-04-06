@@ -18,15 +18,12 @@ namespace EngineControlServices
 		_camReluctor = camReluctor;
 		_injectorOpenTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _injectionSchedulingServiceConfig->Injectors);
 		_injectorCloseTask = (HardwareAbstraction::Task **)malloc(sizeof(HardwareAbstraction::Task *) * _injectionSchedulingServiceConfig->Injectors);
-		int tickMinusSome = _timerService->GetTick() - 6;
 		for (unsigned char injector = 0; injector < _injectionSchedulingServiceConfig->Injectors; injector++)
 		{
 			if (_injectorTimingService != 0)
 			{
 				_injectorOpenTask[injector] = new Task(&IBooleanOutputService::OutputSetCallBack, injectorOutputServices[injector], false);
-				_injectorOpenTask[injector]->Tick = tickMinusSome;
 				_injectorCloseTask[injector] = new Task(&IBooleanOutputService::OutputResetCallBack, injectorOutputServices[injector], false);
-				_injectorCloseTask[injector]->Tick = tickMinusSome;
 			}
 		}
 	}

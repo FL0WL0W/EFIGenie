@@ -7,6 +7,7 @@ using namespace Service;
 
 #if !defined(IFLOATOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IFLOATOUTPUTSERVICE_H
+#define BUILDER_IFLOATOUTPUTSERVICE 3002
 namespace IOServices
 {
 	class IFloatOutputService
@@ -15,7 +16,7 @@ namespace IOServices
 		virtual void SetOutput(float output) = 0;
 		virtual void Calibrate() = 0;
 		
-		static void* CreateFloatOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void* BuildFloatOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		static IFloatOutputService* CreateFloatOutputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut);
 	};
 }

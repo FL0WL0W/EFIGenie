@@ -3,6 +3,7 @@
 #include "MockBooleanOutputService.h"
 #include "MockTimerService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 

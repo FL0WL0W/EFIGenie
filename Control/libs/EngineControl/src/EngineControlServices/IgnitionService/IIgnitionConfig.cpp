@@ -1,5 +1,6 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
 #include "Service/EngineControlServiceIds.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
 #include "EngineControlServices/IgnitionService/IgnitionConfig_Map_Ethanol.h"
@@ -11,31 +12,32 @@ namespace EngineControlServices
 {
 	void* IIgnitionConfig::CreateIgnitionConfig(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{	
+		sizeOut = 0;
 		IIgnitionConfig *ret = 0;
 		
-		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef IGNITIONCONFIG_STATIC_H
 		case 1:
 			ret = new IgnitionConfig_Static(
-				ServiceBuilder::CastConfig < IgnitionConfig_StaticConfig >(config, sizeOut));
+				ServiceBuilder::CastConfigAndOffset < IgnitionConfig_StaticConfig >(config, sizeOut));
 			break;
 #endif
 #ifdef IGNITIONCONFIG_MAP_ETHANOL_H
 		case 2:
 			ret = new IgnitionConfig_Map_Ethanol(
-				ServiceBuilder::CastConfig < IgnitionConfig_Map_EthanolConfig >(config, sizeOut),
+				ServiceBuilder::CastConfigAndOffset < IgnitionConfig_Map_EthanolConfig >(config, sizeOut),
 				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(ETHANOL_CONTENT_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID));
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, ETHANOL_CONTENT_INSTANCE_ID),
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID));
 			break;
 #endif
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 3:
 			{
-				const IgnitionConfigWrapper_HardRpmLimitConfig *ignitionConfig = ServiceBuilder::CastConfig < IgnitionConfigWrapper_HardRpmLimitConfig >(config, sizeOut);
+				const IgnitionConfigWrapper_HardRpmLimitConfig *ignitionConfig = ServiceBuilder::CastConfigAndOffset < IgnitionConfigWrapper_HardRpmLimitConfig >(config, sizeOut);
 
-				IBooleanInputService *booleanInputService = ServiceBuilder::CreateServiceAndOffset<IBooleanInputService>(IBooleanInputService::CreateBooleanInputService, serviceLocator, config, sizeOut);
+				IBooleanInputService *booleanInputService = ServiceBuilder::CreateServiceAndOffset<IBooleanInputService>(IBooleanInputService::BuildBooleanInputService, serviceLocator, config, sizeOut);
 				
 				IIgnitionConfig *child = ServiceBuilder::CreateServiceAndOffset<IIgnitionConfig>(IIgnitionConfig::CreateIgnitionConfig, serviceLocator, config, sizeOut);
 				
@@ -51,9 +53,9 @@ namespace EngineControlServices
 #ifdef IGNITIONCONFIGWRAPPER_SOFTPIDRPMLIMIT_H
 		case 4:
 			{
-				const IgnitionConfigWrapper_SoftPidRpmLimitConfig *ignitionConfig = ServiceBuilder::CastConfig < IgnitionConfigWrapper_SoftPidRpmLimitConfig >(config, sizeOut);
+				const IgnitionConfigWrapper_SoftPidRpmLimitConfig *ignitionConfig = ServiceBuilder::CastConfigAndOffset < IgnitionConfigWrapper_SoftPidRpmLimitConfig >(config, sizeOut);
 
-				IBooleanInputService *booleanInputService = ServiceBuilder::CreateServiceAndOffset<IBooleanInputService>(IBooleanInputService::CreateBooleanInputService, serviceLocator, config, sizeOut);
+				IBooleanInputService *booleanInputService = ServiceBuilder::CreateServiceAndOffset<IBooleanInputService>(IBooleanInputService::BuildBooleanInputService, serviceLocator, config, sizeOut);
 				
 				IIgnitionConfig *child = ServiceBuilder::CreateServiceAndOffset<IIgnitionConfig>(IIgnitionConfig::CreateIgnitionConfig, serviceLocator, config, sizeOut);
 				

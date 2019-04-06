@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "IOServices/BooleanOutputService/BooleanOutputService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "EngineControlServices/FuelPumpService/FuelPumpService.h"
 #include "MockDigitalService.h"
 #include "MockTimerService.h"

@@ -5,6 +5,7 @@
 #include "MockFloatInputService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 
@@ -32,10 +33,10 @@ namespace UnitTests
 		{
 			_serviceLocator = new ServiceLocator();
 
-			_serviceLocator->Register(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID, &_mapService);
-			_serviceLocator->Register(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID, &_ectService);
-			_serviceLocator->Register(THROTTLE_POSITION_SERVICE_ID, &_tpsService);
-			_serviceLocator->Register(ETHANOL_CONTENT_SERVICE_ID, &_ethanolService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID, &_mapService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, ENGINE_COOLANT_TEMPERATURE_INSTANCE_ID, &_ectService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, THROTTLE_POSITION_INSTANCE_ID, &_tpsService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, ETHANOL_CONTENT_INSTANCE_ID, &_ethanolService);
 			_rpmService = new RpmService(0, 0);
 			_serviceLocator->Register(RPM_SERVICE_ID, _rpmService);
 			_serviceLocator->Register(TIMER_SERVICE_ID, &_timerService);

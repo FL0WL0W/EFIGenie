@@ -6,6 +6,7 @@
 #include "MockInjectorGramService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
 #include "Service/EngineControlServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 
@@ -30,8 +31,8 @@ namespace UnitTests
 		{
 			_serviceLocator = new ServiceLocator();
 
-			_serviceLocator->Register(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID, &_mapService);
-			_serviceLocator->Register(VOLTAGE_SERVICE_ID, &_voltageService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID, &_mapService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, VOLTAGE_INSTANCE_ID, &_voltageService);
 			_serviceLocator->Register(INJECTOR_GRAM_SERVICE_ID, &_injectorGramService);
 
 			_tickCallBackGroup = new CallBackGroup();

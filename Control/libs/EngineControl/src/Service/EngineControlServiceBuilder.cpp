@@ -1,6 +1,7 @@
 #include "stdlib.h"
 #include "Service/EngineControlServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 
 namespace Service
 {
@@ -39,27 +40,6 @@ namespace Service
 		ServiceBuilder *serviceBuilder = new ServiceBuilder();
 
 		//inputs
-#if INTAKE_AIR_TEMPERATURE_SERVICE_ID
-		serviceBuilder->Register(INTAKE_AIR_TEMPERATURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if ENGINE_COOLANT_TEMPERATURE_SERVICE_ID
-		serviceBuilder->Register(ENGINE_COOLANT_TEMPERATURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID
-		serviceBuilder->Register(MANIFOLD_ABSOLUTE_PRESSURE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if VOLTAGE_SERVICE_ID
-		serviceBuilder->Register(VOLTAGE_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if THROTTLE_POSITION_SERVICE_ID
-		serviceBuilder->Register(THROTTLE_POSITION_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if ETHANOL_CONTENT_SERVICE_ID
-		serviceBuilder->Register(ETHANOL_CONTENT_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
-#if VEHICLE_SPEED_SERVICE_ID
-		serviceBuilder->Register(VEHICLE_SPEED_SERVICE_ID, IFloatInputService::CreateFloatInputService);
-#endif
 #if CRANK_RELUCTOR_SERVICE_ID
 		serviceBuilder->Register(CRANK_RELUCTOR_SERVICE_ID, CreateReluctor);
 #endif
@@ -73,9 +53,6 @@ namespace Service
 #endif
 #if INJECTOR_SERVICES_ID
 		serviceBuilder->Register(INJECTOR_SERVICES_ID, CreateBooleanOutputArray);
-#endif
-#if IDLE_AIR_CONTROL_VALVE_SERVICE_ID
-		serviceBuilder->Register(IDLE_AIR_CONTROL_VALVE_SERVICE_ID, IFloatOutputService::CreateFloatOutputService);
 #endif
 
 	//application services
@@ -136,7 +113,7 @@ namespace Service
 		IBooleanOutputService **serviceArray = (IBooleanOutputService **)malloc(sizeof(IBooleanOutputService *)*(numberOfServices + 1));
 		for (int i = 0; i < numberOfServices; i++)
 		{
-			serviceArray[i] = ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::CreateBooleanOutputService, serviceLocator, config, sizeOut);
+			serviceArray[i] = ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::BuildBooleanOutputService, serviceLocator, config, sizeOut);
 		}
 		serviceArray[numberOfServices] = 0;
 
@@ -147,7 +124,7 @@ namespace Service
 	{
 		sizeOut = 0;
 
-		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = ServiceBuilder::CastConfig < IgnitionSchedulingServiceConfig >(config, sizeOut);
+		const IgnitionSchedulingServiceConfig *ignitionSchedulingConfig = ServiceBuilder::CastConfigAndOffset < IgnitionSchedulingServiceConfig >(config, sizeOut);
 		
 		IIgnitionConfig *ignitionConfig = 0;
 		ignitionConfig = ServiceBuilder::CreateServiceAndOffset<IIgnitionConfig>(IIgnitionConfig::CreateIgnitionConfig, serviceLocator, config, sizeOut);
@@ -172,7 +149,7 @@ namespace Service
 		sizeOut = 0;
 		
 		InjectionSchedulingService *ret = new InjectionSchedulingService(
-			ServiceBuilder::CastConfig < InjectionSchedulingServiceConfig >(config, sizeOut),
+			ServiceBuilder::CastConfigAndOffset < InjectionSchedulingServiceConfig >(config, sizeOut),
 			serviceLocator->LocateAndCast<IInjectorTimingService>(INJECTOR_TIMING_SERVICE_ID),
 			serviceLocator->LocateAndCast<IBooleanOutputService *>(INJECTOR_SERVICES_ID),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
@@ -201,7 +178,7 @@ namespace Service
 				serviceLocator->LocateAndCast<IReluctor>(CRANK_RELUCTOR_SERVICE_ID), 
 				serviceLocator->LocateAndCast<IReluctor>(CAM_RELUCTOR_SERVICE_ID));
 
-			ServiceBuilder::RegisterIfNotNull(serviceLocator, RPM_SERVICE_ID, rpmService);
+			serviceLocator->RegisterIfNotNull(RPM_SERVICE_ID, rpmService);
 			
 			serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP)->AddIfParametersNotNull( 
 				RpmService::TickCallBack,
@@ -211,9 +188,9 @@ namespace Service
 
 	void* EngineControlServiceBuilder::CreateReluctor(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
-		IReluctor *ret = 0;
-		
-		switch (ServiceBuilder::GetServiceTypeId(config, sizeOut))
+		sizeOut = 0;
+		IReluctor *ret = 0;		
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef GM24XRELUCTOR_H
 		case 1:
@@ -223,7 +200,7 @@ namespace Service
 #endif
 #ifdef UNIVERSAL2XRELUCTOR_H
 		case 2:
-			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), ServiceBuilder::CastConfig < Universal2xReluctorConfig >(config, sizeOut));
+			ret = new Universal2xReluctor(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), ServiceBuilder::CastConfigAndOffset < Universal2xReluctorConfig >(config, sizeOut));
 			break;
 #endif
 		}

@@ -7,6 +7,7 @@ using namespace Service;
 
 #if !defined(IBOOLEANINPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IBOOLEANINPUTSERVICE_H
+#define BUILDER_IBOOLEANINPUTSERVICE 2001
 namespace IOServices
 {
 	class IBooleanInputService
@@ -17,7 +18,7 @@ namespace IOServices
 
 		static void ReadValueCallBack(void *booleanInputService);
 
-		static void* CreateBooleanInputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void* BuildBooleanInputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		static IBooleanInputService* CreateBooleanInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut);
 	};
 }

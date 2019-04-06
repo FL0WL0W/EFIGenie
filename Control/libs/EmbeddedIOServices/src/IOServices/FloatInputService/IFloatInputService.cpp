@@ -5,6 +5,8 @@
 #include "IOServices/FloatInputService/FloatInputService_FrequencyPolynomial.h"
 #include "IOServices/FloatInputService/FloatInputService_FrequencyInterpolatedTable.h"
 #include "IOServices/FloatInputService/FloatInputService_FaultDetectionWrapper.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
+#include "Service/ServiceBuilder.h"
 
 #ifdef IFLOATINPUTSERVICE_H
 namespace IOServices
@@ -14,7 +16,7 @@ namespace IOServices
 		reinterpret_cast<IFloatInputService *>(floatInputService)->ReadValue();
 	}
 
-	void* IFloatInputService::CreateFloatInputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	void* IFloatInputService::BuildFloatInputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		IFloatInputService *ret = CreateFloatInputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
 		
@@ -27,13 +29,10 @@ namespace IOServices
 	
 	IFloatInputService* IFloatInputService::CreateFloatInputService(const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
-		const uint8_t inputServiceId = *reinterpret_cast<const uint8_t *>(config);
-		config = reinterpret_cast<const uint8_t *>(config) + 1;
-		sizeOut = sizeof(uint8_t);
-		
+		sizeOut = 0;		
 		IFloatInputService *inputService = 0;
 
-		switch (inputServiceId)
+		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef FLOATINPUTSERVICE_STATIC_H
 		case 1:
