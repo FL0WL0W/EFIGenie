@@ -16,7 +16,7 @@ namespace Service
 	class IOServicesServiceBuilderRegister
 	{
 	public:
-		static constexpr void Register(ServiceBuilder *&serviceBuilder)
+		static void Register(ServiceBuilder *&serviceBuilder)
 		{
 			serviceBuilder->Register(BUILDER_IBOOLEANINPUTSERVICE, IBooleanInputService::BuildBooleanInputService);
 			serviceBuilder->Register(BUILDER_IBOOLEANOUTPUTSERVICE, IBooleanOutputService::BuildBooleanOutputService);

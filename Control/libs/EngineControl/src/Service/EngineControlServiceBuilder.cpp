@@ -2,42 +2,31 @@
 #include "Service/EngineControlServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 
 namespace Service
 {
-	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, const HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
+	ServiceLocator *EngineControlServiceBuilder::CreateServices(ServiceLocator *serviceLocator, HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
 	{
 		if(serviceLocator == 0)
 			serviceLocator = new ServiceLocator();
 		
 		if(serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID) == 0)
-			serviceLocator->Register(HARDWARE_ABSTRACTION_COLLECTION_ID, (void *)hardwareAbstractionCollection); //this could pose a risk if the hardwareAbstractionCollection is actually a const and it is located as non const and edited
-		if(serviceLocator->Locate(ANALOG_SERVICE_ID) == 0)
-			serviceLocator->Register(ANALOG_SERVICE_ID, hardwareAbstractionCollection->AnalogService);
-		if(serviceLocator->Locate(DIGITAL_SERVICE_ID) == 0)
-			serviceLocator->Register(DIGITAL_SERVICE_ID, hardwareAbstractionCollection->DigitalService);
-		if(serviceLocator->Locate(PWM_SERVICE_ID) == 0)
-			serviceLocator->Register(PWM_SERVICE_ID, hardwareAbstractionCollection->PwmService);
-		if(serviceLocator->Locate(TIMER_SERVICE_ID) == 0)
-			serviceLocator->Register(TIMER_SERVICE_ID, hardwareAbstractionCollection->TimerService);
+			HardwareAbstractionServiceBuilder::Build(serviceLocator, hardwareAbstractionCollection);
 
-		hardwareAbstractionCollection = serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
+		hardwareAbstractionCollection = serviceLocator->LocateAndCast<HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
 		
 		//create callback groups
 		if(serviceLocator->Locate(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
 			serviceLocator->Register(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
 		if(serviceLocator->Locate(POST_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
 			serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
-		if(serviceLocator->Locate(TICK_CALL_BACK_GROUP) == 0)
-			serviceLocator->Register(TICK_CALL_BACK_GROUP, new CallBackGroup());
-
-		CallBackGroup *preReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP);
-		CallBackGroup *postReluctorCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(POST_RELUCTOR_SYNC_CALL_BACK_GROUP);
-		CallBackGroup *tickCallBackGroup = serviceLocator->LocateAndCast<CallBackGroup>(TICK_CALL_BACK_GROUP);
 
 		sizeOut = 0;
 
 		ServiceBuilder *serviceBuilder = new ServiceBuilder();
+
+		IOServicesServiceBuilderRegister::Register(serviceBuilder);
 
 		//inputs
 #if CRANK_RELUCTOR_SERVICE_ID
