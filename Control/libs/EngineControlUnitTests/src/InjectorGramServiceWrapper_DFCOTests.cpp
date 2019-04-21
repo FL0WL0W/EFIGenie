@@ -6,7 +6,7 @@
 #include "MockInjectorGramService.h"
 #include "MockFloatInputService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 using ::testing::AtLeast;
 using ::testing::Return;
 

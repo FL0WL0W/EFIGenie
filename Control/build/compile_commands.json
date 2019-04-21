@@ -121,6 +121,18 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\HardwareAbstractionServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\HardwareAbstractionServiceBuilder.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/HardwareAbstractionServiceBuilder.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\IOServicesServiceBuilderRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\IOServicesServiceBuilderRegister.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/IOServicesServiceBuilderRegister.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\ServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\ServiceBuilder.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/ServiceBuilder.cpp"
 },
@@ -133,14 +145,26 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Gm24xReluctor.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Gm24xReluctor.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Gm24xReluctor.cpp"
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Reluctor\\Gm24xReluctor.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Reluctor\\Gm24xReluctor.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Reluctor/Gm24xReluctor.cpp"
 },
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Universal2xReluctor.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Universal2xReluctor.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Universal2xReluctor.cpp"
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Reluctor\\IReluctor.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Reluctor\\IReluctor.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Reluctor/IReluctor.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Reluctor\\Universal2xReluctor.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Reluctor\\Universal2xReluctor.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Reluctor/Universal2xReluctor.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Service\\ReluctorServiceBuilderRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Service\\ReluctorServiceBuilderRegister.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Service/ReluctorServiceBuilderRegister.cpp"
 },
 
 {
@@ -319,8 +343,8 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\Service\\EngineControlServiceBuilder.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\Service\\EngineControlServiceBuilder.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/Service/EngineControlServiceBuilder.cpp"
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\Service\\EngineControlServicesServiceBuilderRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\Service\\EngineControlServicesServiceBuilderRegister.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/Service/EngineControlServicesServiceBuilderRegister.cpp"
 },
 
 {

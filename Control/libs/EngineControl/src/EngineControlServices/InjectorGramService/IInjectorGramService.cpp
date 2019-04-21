@@ -1,6 +1,7 @@
 #include "EngineControlServices/InjectorGramService/IInjectorGramService.h"
 #include "EngineControlServices/InjectorGramService/InjectorGramService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "HardwareAbstraction/ICallBack.h"
@@ -24,9 +25,9 @@ namespace EngineControlServices
 		case 1:
 			ret = new InjectorGramService(
 				ServiceBuilder::CastConfigAndOffset < InjectorGramServiceConfig >(config, sizeOut),  
-				serviceLocator->LocateAndCast<ICylinderAirmassService>(CYLINDER_AIRMASS_SERVICE_ID),
-				serviceLocator->LocateAndCast<IAfrService>(AFR_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFuelTrimService>(FUEL_TRIM_SERVICE_ID));
+				serviceLocator->LocateAndCast<ICylinderAirmassService>(BUILDER_ICYLINDERAIRMASSSERVICE, 0),
+				serviceLocator->LocateAndCast<IAfrService>(BUILDER_IAFRSERVICE, 0),
+				serviceLocator->LocateAndCast<IFuelTrimService>(BUILDER_IFUELTRIMSERVICE, 0));
 			break;
 #endif
 		}

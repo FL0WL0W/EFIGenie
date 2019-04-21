@@ -1,5 +1,5 @@
 #include "EngineControlServices/FuelTrimService/IFuelTrimService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "HardwareAbstraction/ICallBack.h"

@@ -1,5 +1,5 @@
 #include "EngineControlServices/TachometerService/TachometerService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 #include "Service/ServiceBuilder.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 
@@ -40,7 +40,7 @@ namespace EngineControlServices
 			ServiceBuilder::CastConfigAndOffset < TachometerServiceConfig >(config, sizeOut),
 			ServiceBuilder::CreateServiceAndOffset<IBooleanOutputService>(IBooleanOutputService::BuildBooleanOutputService, serviceLocator, config, sizeOut),
 			serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-			serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID));
+			serviceLocator->LocateAndCast<RpmService>(RPMSERVICE));
 	}
 }
 #endif

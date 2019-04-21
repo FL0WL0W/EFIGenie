@@ -1,6 +1,7 @@
 #include "EngineControlServices/InjectorTimingService/IInjectorTimingService.h"
 #include "EngineControlServices/InjectorTimingService/InjectorTimingService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "HardwareAbstraction/ICallBack.h"
@@ -20,12 +21,15 @@ namespace EngineControlServices
 		{
 #ifdef INJECTORTIMINGSERVICE_H
 		case 1:
-			ret = new InjectorTimingService(
-				ServiceBuilder::CastConfigAndOffset < InjectorTimingServiceConfig >(config, sizeOut),  
-				serviceLocator->LocateAndCast<IInjectorGramService>(INJECTOR_GRAM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, VOLTAGE_INSTANCE_ID));
-			break;
+			{
+				const InjectorTimingServiceConfig *injectorTimingServiceConfig = ServiceBuilder::CastConfigAndOffset < InjectorTimingServiceConfig >(config, sizeOut);
+				ret = new InjectorTimingService(
+					injectorTimingServiceConfig,  
+					serviceLocator->LocateAndCast<IInjectorGramService>(BUILDER_IINJECTORGRAMSERVICE, 0),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_VOLTAGE));
+				break;
+			}
 #endif
 		}
 		

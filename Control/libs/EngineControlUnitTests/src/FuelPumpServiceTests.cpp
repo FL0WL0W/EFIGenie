@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "IOServices/BooleanOutputService/BooleanOutputService.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "EngineControlServices/FuelPumpService/FuelPumpService.h"
 #include "MockDigitalService.h"

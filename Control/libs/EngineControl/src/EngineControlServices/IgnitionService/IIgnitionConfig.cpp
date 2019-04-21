@@ -1,5 +1,6 @@
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "EngineControlServices/IgnitionService/IIgnitionConfig.h"
@@ -25,12 +26,15 @@ namespace EngineControlServices
 #endif
 #ifdef IGNITIONCONFIG_MAP_ETHANOL_H
 		case 2:
-			ret = new IgnitionConfig_Map_Ethanol(
-				ServiceBuilder::CastConfigAndOffset < IgnitionConfig_Map_EthanolConfig >(config, sizeOut),
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, ETHANOL_CONTENT_INSTANCE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID));
-			break;
+			{
+				const IgnitionConfig_Map_EthanolConfig *ignitionConfigConfig = ServiceBuilder::CastConfigAndOffset < IgnitionConfig_Map_EthanolConfig >(config, sizeOut);
+				ret = new IgnitionConfig_Map_Ethanol(
+					ignitionConfigConfig,
+					serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_ETHANOL_CONTENT),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE));
+				break;
+			}
 #endif
 #ifdef IGNITIONCONFIGWRAPPER_HARDRPMLIMIT_H
 		case 3:
@@ -43,7 +47,7 @@ namespace EngineControlServices
 				
 				ret = new IgnitionConfigWrapper_HardRpmLimit(
 					ignitionConfig,  
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
 					booleanInputService,
 					child);
 				
@@ -62,7 +66,7 @@ namespace EngineControlServices
 				ret = new IgnitionConfigWrapper_SoftPidRpmLimit(
 					ignitionConfig,
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
+					serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
 					booleanInputService,
 					child);
 				

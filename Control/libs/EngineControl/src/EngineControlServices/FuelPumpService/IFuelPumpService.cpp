@@ -1,5 +1,6 @@
 #include "EngineControlServices/FuelPumpService/IFuelPumpService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceBuilder.h"
 #include "EngineControlServices/FuelPumpService/FuelPumpService.h"
@@ -54,9 +55,9 @@ namespace EngineControlServices
 					serviceConfig, 
 					serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID), 
 					ServiceBuilder::CreateServiceAndOffset<IFloatOutputService>(IFloatOutputService::BuildFloatOutputService, serviceLocator, config, sizeOut), 
-					serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID),
-					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, THROTTLE_POSITION_INSTANCE_ID));
+					serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_THROTTLE_POSITION));
 				break;
 			}
 #endif

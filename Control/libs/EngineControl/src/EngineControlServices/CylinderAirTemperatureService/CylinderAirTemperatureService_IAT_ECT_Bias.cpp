@@ -1,5 +1,6 @@
 #include "EngineControlServices/CylinderAirTemperatureService/CylinderAirTemperatureService_IAT_ECT_Bias.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/ServiceBuilder.h"
 
 #ifdef CYLINDERAIRTEMPERATURESERVICE_IAT_ECT_BIAS_H
@@ -27,7 +28,7 @@ namespace EngineControlServices
 	void CylinderAirTemperatureService_IAT_ECT_Bias::CalculateCylinderAirTemperature()
 	{
 		if(_cylinderAirmassService == 0)
-			_cylinderAirmassService = _serviceLocator->LocateAndCast<ICylinderAirmassService>(CYLINDER_AIRMASS_SERVICE_ID);
+			_cylinderAirmassService = _serviceLocator->LocateAndCast<ICylinderAirmassService>(BUILDER_ICYLINDERAIRMASSSERVICE, 0);
 
 		float rps = _rpmService->Rpm / 60.0f;
 

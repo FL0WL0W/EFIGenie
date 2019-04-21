@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "MockBooleanOutputService.h"
 #include "MockTimerService.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -41,7 +41,7 @@ namespace UnitTests
 			ignitorOutputServices[3] = (IBooleanOutputService *)(&_ignitorOutputService3);
 			ignitorOutputServices[4] = 0;
 
-			_serviceLocator->Register(INJECTOR_SERVICES_ID, ignitorOutputServices);
+			_serviceLocator->Register(BUILDER_IBOOLEANOUTPUTSERVICEARRAY, INSTANCE_INJECTORS, ignitorOutputServices);
 			_serviceLocator->Register(TIMER_SERVICE_ID, &_timerService);
 
 			void *config = malloc(5);

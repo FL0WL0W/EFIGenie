@@ -7,7 +7,6 @@ using namespace Service;
 
 #if !defined(ISTEPPEROUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define ISTEPPEROUTPUTSERVICE_H
-#define BUILDER_ISTEPPEROUTPUTSERVICE 3003
 namespace IOServices
 {
 	class IStepperOutputService

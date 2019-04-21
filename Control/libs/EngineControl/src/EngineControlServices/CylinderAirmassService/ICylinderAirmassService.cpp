@@ -1,6 +1,7 @@
 #include "EngineControlServices/CylinderAirmassService/ICylinderAirmassService.h"
 #include "EngineControlServices/CylinderAirmassService/CylinderAirmassService_SD.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/ServiceBuilder.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 
@@ -19,12 +20,15 @@ namespace EngineControlServices
 		{
 #ifdef CYLINDERAIRMASSSERVICE_SD_H
 		case 1:
-			ret = new CylinderAirmassService_SD(
-				ServiceBuilder::CastConfigAndOffset < CylinderAirmassService_SDConfig >(config, sizeOut),  
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID),
-				serviceLocator->LocateAndCast<ICylinderAirTemperatureService>(CYLINDER_AIR_TEMPERATURE_SERVICE_ID));
-			break;
+			{
+				const CylinderAirmassService_SDConfig *cylinderAirmassServiceConfig = ServiceBuilder::CastConfigAndOffset < CylinderAirmassService_SDConfig >(config, sizeOut);
+				ret = new CylinderAirmassService_SD(
+					cylinderAirmassServiceConfig,  
+					serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
+					serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE),
+					serviceLocator->LocateAndCast<ICylinderAirTemperatureService>(BUILDER_ICYLINDERAIRTEMPERATURESERVICE, 0));
+				break;
+			}
 #endif
 		}
 		

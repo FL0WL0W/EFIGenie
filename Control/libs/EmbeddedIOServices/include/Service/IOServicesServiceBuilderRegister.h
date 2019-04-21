@@ -10,21 +10,18 @@ using namespace IOServices;
 
 #ifndef IOSERVICESSERVICEBUILDEREGISTER_H
 #define IOSERVICESSERVICEBUILDEREGISTER_H
-
+#define BUILDER_IBOOLEANINPUTSERVICE 2001
+#define BUILDER_IBUTTONSERVICE 2002
+#define BUILDER_IFLOATINPUTSERVICE 2003
+#define BUILDER_IBOOLEANOUTPUTSERVICE 3001
+#define BUILDER_IFLOATOUTPUTSERVICE 3002
+#define BUILDER_ISTEPPEROUTPUTSERVICE 3003
 namespace Service
 {
 	class IOServicesServiceBuilderRegister
 	{
 	public:
-		static void Register(ServiceBuilder *&serviceBuilder)
-		{
-			serviceBuilder->Register(BUILDER_IBOOLEANINPUTSERVICE, IBooleanInputService::BuildBooleanInputService);
-			serviceBuilder->Register(BUILDER_IBOOLEANOUTPUTSERVICE, IBooleanOutputService::BuildBooleanOutputService);
-			serviceBuilder->Register(BUILDER_IBUTTONSERVICE, IButtonService::BuildButtonService);
-			serviceBuilder->Register(BUILDER_IFLOATINPUTSERVICE, IFloatInputService::BuildFloatInputService);
-			serviceBuilder->Register(BUILDER_IFLOATOUTPUTSERVICE, IFloatOutputService::BuildFloatOutputService);
-			serviceBuilder->Register(BUILDER_ISTEPPEROUTPUTSERVICE, IStepperOutputService::BuildStepperOutputService);
-		}
+		static void Register(ServiceBuilder *&serviceBuilder);
 	};
 }
 #endif

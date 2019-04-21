@@ -7,7 +7,6 @@ using namespace Service;
 
 #if !defined(IFLOATOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IFLOATOUTPUTSERVICE_H
-#define BUILDER_IFLOATOUTPUTSERVICE 3002
 namespace IOServices
 {
 	class IFloatOutputService

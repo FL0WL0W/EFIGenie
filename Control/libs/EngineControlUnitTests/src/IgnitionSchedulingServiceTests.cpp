@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
 #include "MockBooleanOutputService.h"
 #include "MockReluctor.h"
 #include "MockTimerService.h"

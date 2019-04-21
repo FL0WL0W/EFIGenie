@@ -5,7 +5,8 @@
 #include "MockFloatInputService.h"
 #include "MockInjectorGramService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -31,9 +32,9 @@ namespace UnitTests
 		{
 			_serviceLocator = new ServiceLocator();
 
-			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID, &_mapService);
-			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, VOLTAGE_INSTANCE_ID, &_voltageService);
-			_serviceLocator->Register(INJECTOR_GRAM_SERVICE_ID, &_injectorGramService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE, &_mapService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, INSTANCE_VOLTAGE, &_voltageService);
+			_serviceLocator->Register(BUILDER_IINJECTORGRAMSERVICE, 0, &_injectorGramService);
 
 			_tickCallBackGroup = new CallBackGroup();
 			_serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)_tickCallBackGroup);

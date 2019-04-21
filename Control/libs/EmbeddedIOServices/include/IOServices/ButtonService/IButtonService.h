@@ -7,7 +7,6 @@ using namespace Service;
 
 #if !defined(IBUTTONSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IBUTTONSERVICE_H
-#define BUILDER_IBUTTONSERVICE 2002
 namespace IOServices
 {
 	class IButtonService

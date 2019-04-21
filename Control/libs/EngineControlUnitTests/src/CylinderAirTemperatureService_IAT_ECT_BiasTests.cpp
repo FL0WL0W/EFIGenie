@@ -6,7 +6,8 @@
 #include "MockCylinderAirTemperatureService.h"
 #include "MockCylinderAirMassService.h"
 #include "EngineControlServices/RpmService/RpmService.h"
-#include "Service/EngineControlServiceBuilder.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -33,11 +34,11 @@ namespace UnitTests
 		{
 			_serviceLocator = new ServiceLocator();
 
-			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, INTAKE_AIR_TEMPERATURE_INSTANCE_ID, &_intakeAirTemperatureService);
-			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, ENGINE_COOLANT_TEMPERATURE_INSTANCE_ID, &_engineCoolantTemperatureService);
-			_serviceLocator->Register(CYLINDER_AIRMASS_SERVICE_ID, &_cylinderAirmassService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, INSTANCE_INTAKE_AIR_TEMPERATURE, &_intakeAirTemperatureService);
+			_serviceLocator->Register(BUILDER_IFLOATINPUTSERVICE, INSTANCE_ENGINE_COOLANT_TEMPERATURE, &_engineCoolantTemperatureService);
+			_serviceLocator->Register(BUILDER_ICYLINDERAIRMASSSERVICE, 0, &_cylinderAirmassService);
 			_rpmService = new RpmService(0, 0);
-			_serviceLocator->Register(RPM_SERVICE_ID, _rpmService);
+			_serviceLocator->Register(RPMSERVICE, _rpmService);
 
 			_tickCallBackGroup = new CallBackGroup();
 			_serviceLocator->Register(TICK_CALL_BACK_GROUP, (void *)_tickCallBackGroup);

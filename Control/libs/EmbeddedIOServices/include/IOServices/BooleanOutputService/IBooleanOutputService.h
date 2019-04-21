@@ -7,7 +7,6 @@ using namespace Service;
 
 #if !defined(IBOOLEANOUTPUTSERVICE_H) && defined(HARDWAREABSTRACTIONCOLLECTION_H)
 #define IBOOLEANOUTPUTSERVICE_H
-#define BUILDER_IBOOLEANOUTPUTSERVICE 3001
 namespace IOServices
 {
 	class IBooleanOutputService

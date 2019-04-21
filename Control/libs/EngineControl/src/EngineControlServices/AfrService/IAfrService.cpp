@@ -1,5 +1,6 @@
 #include "EngineControlServices/AfrService/IAfrService.h"
-#include "Service/EngineControlServiceIds.h"
+#include "Service/EngineControlServicesServiceBuilderRegister.h"
+#include "Service/IOServicesServiceBuilderRegister.h"
 #include "Service/ServiceBuilder.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "EngineControlServices/AfrService/AfrService_Static.h"
@@ -29,11 +30,11 @@ namespace EngineControlServices
 			ret = new AfrService_Map_Ethanol(
 				ServiceBuilder::CastConfigAndOffset < AfrService_Map_EthanolConfig >(config, sizeOut),  
 				serviceLocator->LocateAndCast<ITimerService>(TIMER_SERVICE_ID),
-				serviceLocator->LocateAndCast<RpmService>(RPM_SERVICE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, MANIFOLD_ABSOLUTE_PRESSURE_INSTANCE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, ENGINE_COOLANT_TEMPERATURE_INSTANCE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, ETHANOL_CONTENT_INSTANCE_ID),
-				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, THROTTLE_POSITION_INSTANCE_ID));
+				serviceLocator->LocateAndCast<RpmService>(RPMSERVICE),
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_MANIFOLD_ABSOLUTE_PRESSURE),
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_ENGINE_COOLANT_TEMPERATURE),
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_ETHANOL_CONTENT),
+				serviceLocator->LocateAndCast<IFloatInputService>(BUILDER_IFLOATINPUTSERVICE, INSTANCE_THROTTLE_POSITION));
 			break;
 #endif
 		}
