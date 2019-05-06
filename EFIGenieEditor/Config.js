@@ -1,15 +1,15 @@
 class Config {
-    constructor(obj, configNameSpace, parent) {
+    constructor(obj, iniNamespace, parent) {
         if(obj && obj.ConfigName) {
-            Object.assign(this, configNameSpace[obj.ConfigName]);
+            Object.assign(this, iniNamespace[obj.ConfigName]);
         } else {
-            Object.assign(this, configNameSpace["Main"]);
+            Object.assign(this, iniNamespace["Main"]);
         }
         if(obj)
             Object.assign(this, obj);
 
         this.Parent = parent;
-        this.ConfigNameSpace = configNameSpace;
+        this.IniNamespace = iniNamespace;
 
         for(var variableRowIndex in this.Variables) {
             var variableRow = this.Variables[variableRowIndex];
@@ -47,12 +47,12 @@ class Config {
                 }
             } else if (variableRowObj.ConfigName || variableRowObj.Variables) {
                 if(!variableRowObj.Array) {
-                    this[variableRowKey] = new Config(variableRowObj, this.ConfigNameSpace, this);
+                    this[variableRowKey] = new Config(variableRowObj, this.IniNamespace, this);
                 } else {
-                    this[variableRowKey] = new ConfigArray(variableRowObj, this.ConfigNameSpace, this);
+                    this[variableRowKey] = new ConfigArray(variableRowObj, this.IniNamespace, this);
                 }
             } else if (variableRowObj.Selections) {
-                this[variableRowKey] = new ConfigSelection(variableRowObj, this.ConfigNameSpace, this);
+                this[variableRowKey] = new ConfigSelection(variableRowObj, this.IniNamespace, this);
             }
         }
     }
@@ -194,7 +194,7 @@ class Config {
 
         return size;
     }
-    GetConfig() {
+    GetIni() {
         var returnVariables = []
         for(var variableRowIndex in this.Variables) {
             var variableRow = this.Variables[variableRowIndex];
@@ -204,7 +204,7 @@ class Config {
             if(!variableRowObj)
                 throw "Config not initialized";
                 
-            var variableRowValue = variableRowObj.GetConfig();
+            var variableRowValue = variableRowObj.GetIni();
 
             var returnVariableRow = {};
             returnVariableRow[variableRowKey] = variableRowValue;
@@ -214,7 +214,7 @@ class Config {
         this.Variables = returnVariables;
         
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")
+            if(key === "IniNamespace" || key === "Parent")
                 return undefined;         
             for(var variableRowIndex in this.Variables) {
                 var variableRow = this.Variables[variableRowIndex];
@@ -223,8 +223,8 @@ class Config {
                     return undefined;
                 }
             }
-            if(key != "" && value.GetConfig) 
-                return value.GetConfig();  
+            if(key != "" && value.GetIni) 
+                return value.GetIni();  
             
             return value;
         }));
@@ -232,20 +232,10 @@ class Config {
 }
 
 class ConfigSelection {
-    constructor(obj, configNameSpace, parent) {
-        if(obj)
-            Object.assign(this, obj);
+    constructor(ini, iniNamespace, parent) {
+        this.IniNamespace = iniNamespace;
         this.Parent = parent;
-
-        this.ConfigNameSpace = configNameSpace;
-
-        if(!this.Index) {
-            this.Index = 0;
-        }
-
-        if(!this.Value) {
-            this.Value = new Config(this.Selections[this.Index], this.ConfigNameSpace, this);
-        }
+        this.SetIni(ini);
     }
     GetArrayBuffer() {
         return this.Value.GetArrayBuffer();
@@ -257,7 +247,7 @@ class ConfigSelection {
         if( !(selectedConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectedConfig.Value) &&
             !(selectedConfig.Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectedConfig.Value)) {
             $.each(this.Selections, function(selectionIndex, selectionValueObj) {
-                var selectionValue = new Config(selectionValueObj, thisClass.ConfigNameSpace, thisClass);
+                var selectionValue = new Config(selectionValueObj, thisClass.IniNamespace, thisClass);
                 var selectionConfig =  selectionValue.Variables[0][Object.keys(selectionValue.Variables[0])[0]];
 
                 if( (selectionConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionConfig.Value) ||
@@ -270,91 +260,43 @@ class ConfigSelection {
 
         return this.Value.SetArrayBuffer(arrayBuffer);
     }
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")    
-                return undefined;     
-            if(key != "" && value.GetConfig) 
-                return value.GetConfig();      
-            return value;
-        }));
+    GetIni() {
+        return this.Ini;
+    }
+    SetIni(ini) {
+        this.Ini = ini
+        if(this.Index === undefined && this.Ini.Index !== undefined) {
+            this.Index = this.Ini.Index;
+        }
+        if(this.Index === undefined) {
+            this.Index = 0;
+        }
+        if(this.Value === undefined && this.Ini.Value !== undefined) {
+            this.Value = this.Ini.Value;
+        }
+        if(this.Value !== undefined) {
+            $.each(this.Ini.Selections, function(index, value) {
+                if(this.Value.ConfigName, value.ConfigName) {
+                    if(this.Value.Instance !== undefined) {
+                        if(this.Value.Instance == value.Instance) {
+                            this.Index = index;
+                        }
+                    } else {
+                        this.Index = index;
+                    }
+                }
+            });
+        }
+        if(this.Value === undefined) {
+            this.Value = new Config(this.Ini.Selections[this.Index], this.IniNamespace, this);
+        }
     }
 }
 
 class ConfigNumber {
-    constructor(obj, parent) {
-        if(obj)
-            Object.assign(this, obj);
+    constructor(ini, parent) {
         this.Parent = parent;
-        switch(this.Type) {
-            case "uint8":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 255;
-                break;
-            case "uint16":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 65535;
-                break;
-            case "uint32":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 4294967295;
-                break;
-            case "uint64":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 18446744073709551615;
-                break;
-            case "int8":
-                if(!this.Min)
-                    this.Min = -128;
-                if(!this.Max)
-                    this.Max = 127;
-                break;
-            case "int16":
-                if(!this.Min)
-                    this.Min = -32768;
-                if(!this.Max)
-                    this.Max = 32767;
-                break;
-            case "int32":
-                if(!this.Min)
-                    this.Min = -2147483648;
-                if(!this.Max)
-                    this.Max = 2147483647;
-                break;
-            case "int64":
-                if(!this.Min)
-                    this.Min = -9223372036854775808;
-                if(!this.Max)
-                    this.Max = 9223372036854775807;
-                break;
-            case "float":
-                if(!this.Min)
-                    this.Min = -340282300000000000000000000000000000000;
-                if(!this.Max)
-                    this.Max = 340282300000000000000000000000000000000;
-                break;
-            case "variable":
-                if(!this.Min)
-                    this.Min = -340282300000000000000000000000000000000;
-                if(!this.Max)
-                    this.Max = 340282300000000000000000000000000000000;
-                break;
-        }
-        if(!this.Value)
-            if(this.Min > 0)
-                this.Value = this.Min / this.ValueMultiplier;
-            else
-                this.Value = 0;
-        if(!this.ValueMultiplier)
-            this.ValueMultiplier = 1;
+        this.SetIni(ini);
     }
     GetArrayBuffer() {
         var val = this.Value;
@@ -363,21 +305,23 @@ class ConfigNumber {
             val = ref.Value;
         }
 
-        switch(this.Type) {
+        valMult = GetIniValueMultiplier(this.Ini);
+
+        switch(this.Ini.Type) {
             case "uint8":
-                return new Uint8Array([val * this.ValueMultiplier]).buffer;
+                return new Uint8Array([val * valMult]).buffer;
             case "uint16":
-                return new Uint16Array([val * this.ValueMultiplier]).buffer;
+                return new Uint16Array([val * valMult]).buffer;
             case "uint32":
-                return new Uint32Array([val * this.ValueMultiplier]).buffer;
+                return new Uint32Array([val * valMult]).buffer;
             case "int8":
-                return new Int8Array([val * this.ValueMultiplier]).buffer;
+                return new Int8Array([val * valMult]).buffer;
             case "int16":
-                return new Int16Array([val * this.ValueMultiplier]).buffer;
+                return new Int16Array([val * valMult]).buffer;
             case "int32":
-                return new Int32Array([val * this.ValueMultiplier]).buffer;
+                return new Int32Array([val * valMult]).buffer;
             case "float":
-                return new Float32Array([val * this.ValueMultiplier]).buffer;
+                return new Float32Array([val * valMult]).buffer;
             case "variable":
                 return new ArrayBuffer(0);
         }
@@ -385,41 +329,42 @@ class ConfigNumber {
     SetArrayBuffer(arrayBuffer) {
         var size = 0;
         var val;
-        switch(this.Type) {
+        valMult = GetIniValueMultiplier(this.Ini);
+        switch(this.Ini.Type) {
             case "uint8":
-                val = new Uint8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
+                val = new Uint8Array(arrayBuffer.slice(0,1))[0] / valMult;
                 size = 1;
                 break;
             case "uint16":
-                val = new Uint16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
+                val = new Uint16Array(arrayBuffer.slice(0,2))[0] / valMult;
                 size = 2;
                 break;
             case "uint32":
-                val = new Uint32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                val = new Uint32Array(arrayBuffer.slice(0,4))[0] / valMult;
                 size = 4;
                 break;
             case "uint64":
-                val = new Uint64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
+                val = new Uint64Array(arrayBuffer.slice(0,8))[0] / valMult;
                 size = 8;
                 break;
             case "int8":
-                val = new Int8Array(arrayBuffer.slice(0,1))[0] / this.ValueMultiplier;
+                val = new Int8Array(arrayBuffer.slice(0,1))[0] / valMult;
                 size = 1;
                 break;
             case "int16":
-                val = new Int16Array(arrayBuffer.slice(0,2))[0] / this.ValueMultiplier;
+                val = new Int16Array(arrayBuffer.slice(0,2))[0] / valMult;
                 size = 2;
                 break;
             case "int32":
-                val = new Int32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                val = new Int32Array(arrayBuffer.slice(0,4))[0] / valMult;
                 size = 4;
                 break;
             case "int64":
-                val = new Int64Array(arrayBuffer.slice(0,8))[0] / this.ValueMultiplier;
+                val = new Int64Array(arrayBuffer.slice(0,8))[0] / valMult;
                 size = 8;
                 break;
             case "float":
-                val = new Float32Array(arrayBuffer.slice(0,4))[0] / this.ValueMultiplier;
+                val = new Float32Array(arrayBuffer.slice(0,4))[0] / valMult;
                 size = 4;
                 break;
         }
@@ -432,21 +377,28 @@ class ConfigNumber {
 
         return size;
     }
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")    
-                return undefined; 
-        }));
+    GetIni() {
+        return this.Ini;
+    }
+    SetIni(ini) {
+        this.Ini = ini
+        if(this.Value === undefined && this.Ini.Value !== undefined) {
+            this.Value = this.Ini.Value;
+        }
+        if(this.Value === undefined) {
+            this.Value = GetIniMin(this.Ini);
+            if(this.Value < 0)
+                this.Value = 0;
+            if(this.Value > GetIniMax(this.Ini))
+                this.Value = GetIniMax(this.Ini);
+        }
     }
 }
 
 class ConfigBoolean {
-    constructor(obj, parent) {
-        if(obj)
-            Object.assign(this, obj);
+    constructor(ini, parent) {
         this.Parent = parent;
-        if(!this.Value)
-            this.Value = false;
+        this.SetIni(ini);
     }
     GetArrayBuffer() {
         return new Uint8Array([this.Value & 0x01]).buffer;
@@ -455,103 +407,37 @@ class ConfigBoolean {
         this.Value = new Uint8Array(arrayBuffer)[0] & 0x01;
         return 1;
     }
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")    
-                return undefined; 
-        }));
+    GetIni() {
+        return this.Ini;
+    }
+    SetIni(ini) {
+        this.Ini = ini
+        if(this.Value === undefined && this.Ini.Value !== undefined) {
+            this.Value = this.Ini.Value;
+        }
+        if(this.Value === undefined) {
+            this.Value = false;
+        }
     }
 }
 
 class ConfigNumberTable {
-    constructor(obj, parent) {
-        if(obj)
-            Object.assign(this, obj);
+    constructor(ini, parent) {
         this.Parent = parent;
-        if(!this.XResolution)
-            this.XResolution = 1;
-        if(!this.YResolution)
-            this.YResolution = 1; 
-        switch(this.Type) {
-            case "uint8":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 255;
-                break;
-            case "uint16":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 65535;
-                break;
-            case "uint32":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 4294967295;
-                break;
-            case "uint64":
-                if(!this.Min)
-                    this.Min = 0;
-                if(!this.Max)
-                    this.Max = 18446744073709551615;
-                break;
-            case "int8":
-                if(!this.Min)
-                    this.Min = -128;
-                if(!this.Max)
-                    this.Max = 127;
-                break;
-            case "int16":
-                if(!this.Min)
-                    this.Min = -32768;
-                if(!this.Max)
-                    this.Max = 32767;
-                break;
-            case "int32":
-                if(!this.Min)
-                    this.Min = -2147483648;
-                if(!this.Max)
-                    this.Max = 2147483647;
-                break;
-            case "int64":
-                if(!this.Min)
-                    this.Min = -9223372036854775808;
-                if(!this.Max)
-                    this.Max = 9223372036854775807;
-                break;
-            case "float":
-                if(!this.Min)
-                    this.Min = -340282300000000000000000000000000000000;
-                if(!this.Max)
-                    this.Max = 340282300000000000000000000000000000000;
-                break;
-        }
-        if(!this.Value) {
-            var val = 0
-            if(this.Min > 0)
-                val = this.Min / this.ValueMultiplier;
-            this.Value = new Array(this.GetTableArrayLength());
-            var thisClass = this;
-            $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = val;
-            });
-        }
-        if(!this.ValueMultiplier)
-            this.ValueMultiplier = 1;
+        this.SetIni(ini);
     }
     GetTableArrayLength() {
-        return GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1).Value * GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1).Value;
+        return GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1).Value * GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1).Value;
     }
     GetArrayBuffer() {
         var value = Array.from(this.Value);
 
+        valMult = GetIniValueMultiplier(this.Ini);
         for(var i = 0; i < value.length; i++) {
-            value[i] *= this.ValueMultiplier
+            value[i] *= valMult;
         }
 
-        switch(this.Type) {
+        switch(this.Ini.Type) {
             case "bool":
             case "uint8":
                 return Uint8Array.from(value).buffer;
@@ -578,7 +464,7 @@ class ConfigNumberTable {
     SetArrayBuffer(arrayBuffer) {
         var arrayLen = this.GetTableArrayLength();
 
-        switch(this.Type) {
+        switch(this.Ini.Type) {
             case "bool":
             case "uint8":
                 this.Value = Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen)));
@@ -619,17 +505,35 @@ class ConfigNumberTable {
         throw "ConfigNumberTable Type Invalid";
         }
 
+        valMult = GetIniValueMultiplier(this.Ini);
+
         for(var i = 0; i < this.Value.length; i++) {
-            this.Value[i] /= this.ValueMultiplier
+            this.Value[i] /= valMultl;
         }
 
         return arrayLen;
     }
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "Parent")    
-                return undefined; 
-        }));
+    GetIni() {
+        return this.Ini;
+    }
+    SetIni(ini) {
+        this.Ini = ini
+        if(this.Value === undefined && this.Ini.Value !== undefined) {
+            this.Value = this.Ini.Value;
+        }
+        if(this.Value === undefined) {
+            var val = GetIniMin(this.Ini);
+            if(val < 0)
+                val = 0;
+            if(val > GetIniMax(this.Ini))
+                val = GetIniMax(this.Ini);
+
+            this.Value = new Array(this.GetTableArrayLength());
+            var thisClass = this;
+            $.each(this.Value, function(index, value) {
+                thisClass.Value[index] = val;
+            });
+        }
     }
 }
 
@@ -677,7 +581,7 @@ class ConfigFormula {
         
         return 4 * arrayLen;
     }
-    GetConfig() {
+    GetIni() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
             if(key === "Parent")    
                 return undefined; 
@@ -686,12 +590,12 @@ class ConfigFormula {
 }
 
 class ConfigArray {
-    constructor(obj, configNameSpace, parent) {
+    constructor(obj, iniNamespace, parent) {
         if(obj)
             Object.assign(this, obj);
         this.Parent = parent;
         
-        this.ConfigNameSpace = configNameSpace;
+        this.IniNamespace = iniNamespace;
 
         var tableArrayLength = this.GetTableArrayLength()
 
@@ -717,7 +621,7 @@ class ConfigArray {
                 if(i < prevValueLength)
                     this.Value[i] = prevValue[i];
                 else
-                    this.Value[i] = new Config(subConfig, this.ConfigNameSpace, this.Parent);
+                    this.Value[i] = new Config(subConfig, this.IniNamespace, this.Parent);
             }
         }
     }
@@ -726,8 +630,8 @@ class ConfigArray {
     }
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
-        for(var config in this.Value) {
-            arrayBuffer = arrayBuffer.concatArray(this.Value[config].GetArrayBuffer());
+        for(var ini in this.Value) {
+            arrayBuffer = arrayBuffer.concatArray(this.Value[ini].GetArrayBuffer());
         }
         return arrayBuffer;
     }
@@ -755,7 +659,7 @@ class ConfigArray {
                     subConfig.Label = this.Label + "[" + i + "]";
                 }
 
-                this.Value[i] = new Config(subConfig, this.ConfigNameSpace, this.Parent);
+                this.Value[i] = new Config(subConfig, this.IniNamespace, this.Parent);
                 size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
             } else {
                 this.Value[i] = prevValue[i];
@@ -764,9 +668,9 @@ class ConfigArray {
 
         return size;
     }
-    GetConfig() {
+    GetIni() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "Parent")    
+            if(key === "IniNamespace" || key === "Parent")    
                 return undefined; 
         }));
     }
@@ -802,7 +706,7 @@ function GetReference(referenceObj, reference, defaultReference) {
 
             function objGetReferenceFromAll(obj) {
                 for(subObj in obj){
-                    if(subObj === "ConfigNameSpace" || subObj === "Parent" || subObj === "Variables")
+                    if(subObj === "IniNamespace" || subObj === "Parent" || subObj === "Variables")
                         continue;
                     if(subObj === topReference) {
                         containingObj = obj;
@@ -909,4 +813,71 @@ function GetReferenceCount(referenceObj, reference) {
     }
 
     return refernceCount;
+}
+
+function GetIniValueMultiplier(ini) {
+    if(ini.ValueMultiplier)
+        return ini.ValueMultiplier;
+    return 1;
+}
+function GetIniMin(ini) {
+    if(ini.Min !== undefined)
+        return ini.Min;
+    switch(ini.Type) {
+        case "uint8":
+        case "uint16":
+        case "uint32":
+        case "uint64":
+            return 0;
+        case "int8":
+            return -128 / GetIniValueMultiplier(ini);
+        case "int16":
+            return -32768 / GetIniValueMultiplier(ini);
+        case "int32":
+            return -2147483648 / GetIniValueMultiplier(ini);
+        case "int64":
+            return -9223372036854775808 / GetIniValueMultiplier(ini);
+        case "float":
+        case "variable":
+            return -340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
+        default:
+            throw "Invalid Type " + ini.Type;
+    }
+}
+function GetIniMax(ini) {
+    if(ini.Max !== undefined)
+        return ini.Max;
+    switch(ini.Type) {
+        case "uint8":
+            return 255 / GetIniValueMultiplier(ini);
+        case "uint16":
+            return 65535 / GetIniValueMultiplier(ini);
+        case "uint32":
+            return 4294967295 / GetIniValueMultiplier(ini);
+        case "uint64":
+            return 18446744073709551615 / GetIniValueMultiplier(ini);
+        case "int8":
+            return 127 / GetIniValueMultiplier(ini);
+        case "int16":
+            return 32767 / GetIniValueMultiplier(ini);
+        case "int32":
+            return 2147483647 / GetIniValueMultiplier(ini);
+        case "int64":
+            return 9223372036854775807 / GetIniValueMultiplier(ini);
+        case "variable":
+        case "float":
+            return 340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
+        default:
+            throw "Invalid Type " + ini.Type;
+    }
+}
+function GetIniXResolution(ini) {
+    if(ini.XResolution !== undefined)
+        return ini.XResolution;
+    return 1;
+}
+function GetIniYResolution(ini) {
+    if(ini.YResolution !== undefined)
+        return ini.YResolution;
+    return 1;
 }

@@ -1,6 +1,6 @@
 class ConfigGui extends Config {
-    constructor(obj, configNameSpace, parent, mainCallBack){
-        super(obj, configNameSpace, parent);
+    constructor(obj, iniNamespace, parent, mainCallBack){
+        super(obj, iniNamespace, parent);
         this.GUID = getGUID();
         this.CallBack = mainCallBack;
 
@@ -16,27 +16,27 @@ class ConfigGui extends Config {
             var variableRowKey = Object.keys(variableRow)[0];
             var variableRowObj = this[variableRowKey];
 
-            if(variableRowObj instanceof ConfigNumber && variableRowObj.Selections) {
-                this[variableRowKey] = new ConfigNumberSelectionGui(variableRowObj, this, this.CallBack);
+            if(variableRowObj instanceof ConfigNumber && variableRowObj.Ini.Selections) {
+                this[variableRowKey] = new ConfigNumberSelectionGui(variableRowObj.Ini, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigNumber) {
-                this[variableRowKey] = new ConfigNumberGui(variableRowObj, this, this.CallBack);
+                this[variableRowKey] = new ConfigNumberGui(variableRowObj.Ini, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigBoolean) {
-                this[variableRowKey] = new ConfigBooleanGui(variableRowObj, this, this.CallBack);
+                this[variableRowKey] = new ConfigBooleanGui(variableRowObj.Ini, this, this.CallBack);
             } else if(variableRowObj instanceof Config) {
-                this[variableRowKey] = new ConfigGui(variableRowObj, this[variableRowKey].ConfigNameSpace, this, this.CallBack);
+                this[variableRowKey] = new ConfigGui(variableRowObj, this[variableRowKey].IniNamespace, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigArray) {
-                this[variableRowKey] = new ConfigArrayGui(variableRowObj, this[variableRowKey].ConfigNameSpace, this, this.CallBack);
+                this[variableRowKey] = new ConfigArrayGui(variableRowObj, this[variableRowKey].IniNamespace, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigSelection) {
-                this[variableRowKey] = new ConfigSelectionGui(variableRowObj, this[variableRowKey].ConfigNameSpace, this, this.CallBack);
+                this[variableRowKey] = new ConfigSelectionGui(variableRowObj.Ini, this[variableRowKey].IniNamespace, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigNumberTable) {
-                this[variableRowKey] = new ConfigNumberTableGui(variableRowObj, this, this.CallBack);
+                this[variableRowKey] = new ConfigNumberTableGui(variableRowObj.Ini, this, this.CallBack);
             } else if(variableRowObj instanceof ConfigFormula) {
                 this[variableRowKey] = new ConfigFormulaGui(variableRowObj, this, this.CallBack);
             }
         }
     }
 
-    GetConfig() {
+    GetIni() {
         var returnVariables = []
         for(var variableRowIndex in this.Variables) {
             var variableRow = this.Variables[variableRowIndex];
@@ -46,7 +46,7 @@ class ConfigGui extends Config {
             if(!variableRowObj)
                 throw "Config not initialized";
 
-            var variableRowValue = variableRowObj.GetConfig();
+            var variableRowValue = variableRowObj.GetIni();
 
             var returnVariableRow = {};
             returnVariableRow[variableRowKey] = variableRowValue;
@@ -56,7 +56,7 @@ class ConfigGui extends Config {
         this.Variables = returnVariables;
         
         return JSON.parse(JSON.stringify(this, function(key, value) { 
-            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent")
+            if(key === "IniNamespace" || key === "GUID" || key === "Parent")
                 return undefined;
             for(var variableRowIndex in this.Variables) {
                 var variableRow = this.Variables[variableRowIndex];
@@ -65,8 +65,8 @@ class ConfigGui extends Config {
                     return undefined;
                 }
             }
-            if(key != "" && value.GetConfig) 
-                return value.GetConfig();  
+            if(key != "" && value.GetIni) 
+                return value.GetIni();  
             
             return value;
         }));
@@ -157,8 +157,8 @@ class ConfigGui extends Config {
 
 var selectionConfigGuiTemplate;
 class ConfigSelectionGui extends ConfigSelection {
-    constructor(obj, configNameSpace, parent, mainCallBack){
-        super(obj, configNameSpace, parent);
+    constructor(ini, iniNamespace, parent, mainCallBack){
+        super(ini, iniNamespace, parent);
         this.GUID = getGUID();
         this.CallBack = mainCallBack;
 
@@ -169,23 +169,13 @@ class ConfigSelectionGui extends ConfigSelection {
             thisClass.UpdateReferences();
         }
 
-        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, this, this.CallBack);
+        this.Value = new ConfigGui(this.Value, this.IniNamespace, this, this.CallBack);
     }
 
     SetArrayBuffer(arrayBuffer) {
         var size = super.SetArrayBuffer(arrayBuffer);
-        this.Value = new ConfigGui(this.Value, this.ConfigNameSpace, this, this.CallBack);
+        this.Value = new ConfigGui(this.Value, this.IniNamespace, this, this.CallBack);
         return size;
-    }
-
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent")    
-                return undefined;   
-            if(key != "" && value.GetConfig) 
-                return value.GetConfig();  
-            return value;
-        }));
     }
     
     UpdateReferences() {
@@ -197,15 +187,15 @@ class ConfigSelectionGui extends ConfigSelection {
             return "";
 
         var template = "<span id=\"span"+this.GUID+"\">";
-        if(this.Selections.length > 1) {
+        if(this.Ini.Selections.length > 1) {
             if(!selectionConfigGuiTemplate)
                 selectionConfigGuiTemplate = getFileContents("ConfigGui/Selection.html");
             template += selectionConfigGuiTemplate;
             template = template.replace(/[$]id[$]/g, this.GUID);
-            template = template.replace(/[$]label[$]/g, this.Label);
+            template = template.replace(/[$]label[$]/g, this.Ini.Label);
             var selectionHtml = "";
             var thisClass = this;
-            $.each(this.Selections, function(selectionIndex, selectionValue) {
+            $.each(this.Ini.Selections, function(selectionIndex, selectionValue) {
                 if(selectionIndex === parseInt(thisClass.Index))
                     selectionHtml += "<option selected value=\"" + selectionIndex + "\">" + selectionValue.Name + "</option>";
                 else
@@ -216,7 +206,7 @@ class ConfigSelectionGui extends ConfigSelection {
             $(document).off("change."+this.GUID);
             $(document).on("change."+this.GUID, "#" + this.GUID, function(){
                 var selectionIndex = parseInt($(this).val());
-                var selection = thisClass.Selections[selectionIndex];
+                var selection = thisClass.Ini.Selections[selectionIndex];
 
                 thisClass.Index = selectionIndex;
                 thisClass.Value.ConfigName = selection.ConfigName;
@@ -224,7 +214,7 @@ class ConfigSelectionGui extends ConfigSelection {
                 if(selection.Variables)
                     thisClass.Value.Variables = selection.Variables;
                     
-                thisClass.Value = new ConfigGui(thisClass.Value, thisClass.ConfigNameSpace, thisClass, thisClass.CallBack);
+                thisClass.Value = new ConfigGui(thisClass.Value, thisClass.IniNamespace, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             
                 thisClass.UpdateReferences();
@@ -239,7 +229,7 @@ class ConfigSelectionGui extends ConfigSelection {
                 if(thisClass.Value.Variables)
                     obj.Variables = thisClass.Value.Variables;
 
-                thisClass.Value = new ConfigGui(obj, thisClass.ConfigNameSpace, thisClass, thisClass.CallBack);
+                thisClass.Value = new ConfigGui(obj, thisClass.IniNamespace, thisClass, thisClass.CallBack);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             
                 thisClass.UpdateReferences();
@@ -262,45 +252,16 @@ class ConfigNumberGui extends ConfigNumber {
         super(obj, parent);
         this.GUID = getGUID();
         this.CallBack = callBack;
-        switch(this.Type) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-            case "uint64":
-            case "int8":
-            case "int16":
-            case "int32":
-            case "int64":
-                if(!this.Step)
-                    this.Step = Math.max(1, 0.01);
-                break;
-            case "float":
-                if(!this.Step)
-                    this.Step = 0.01;
-                break;
-        }
-        if(!this.Units) 
-            this.Units = BlankUnits;
-        if(!this.UnitIndex)
-            this.UnitIndex = 0;
-    }
-
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "Parent")
-                return undefined;
-            return value;
-        }));
     }
 
     UpdateReferences() {
-        var units = GetUnits(this, this.Units);
+        var units = GetUnits(this, GetIniUnits(this.Ini));
         var unit = units[this.UnitIndex];
 
         if(isNaN(parseFloat(this.Value))){
             $("#" + this.GUID).val(GetReference(this.Parent, this.Value, {}).Value * unit.DisplayMultiplier + unit.DisplayOffset);
         } else {
-            switch(this.Type) {
+            switch(this.Ini.Type) {
                 case "uint8":
                 case "uint16":
                 case "uint32":
@@ -311,17 +272,17 @@ class ConfigNumberGui extends ConfigNumber {
                 case "int32":
                     this.Value = Math.round(this.Value);
             }
-            if(this.Value < this.Min)
-                this.Value = this.Min;
-            if(this.Value > this.Max)
-                this.Value = this.Max;
+            if(this.Value < GetIniMin(this.Ini))
+                this.Value = GetIniMin(this.Ini);
+            if(this.Value > GetIniMax(this.Ini))
+                this.Value = GetIniMax(this.Ini);
 
             $("#" + this.GUID).val(this.Value * unit.DisplayMultiplier + unit.DisplayOffset);
         }
     }
 
     GetHtml(inputOnly) {
-        if(this.Hidden)
+        if(this.Ini.Hidden)
             return "";
 
         var template = "";
@@ -337,12 +298,12 @@ class ConfigNumberGui extends ConfigNumber {
             template = numberConfigGuiTemplate;
         }
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]label[$]/g, this.Label);
-        var units = GetUnits(this, this.Units);
+        template = template.replace(/[$]label[$]/g, this.Ini.Label);
+        var units = GetUnits(this, GetIniUnits(this.Ini));
         var unit = units[this.UnitIndex];
-        var min = this.Min;
-        var max = this.Max;
-        var step = this.Step;
+        var min = GetIniMin(this.Ini);
+        var max = GetIniMax(this.Ini);
+        var step = GetIniStep(this.Ini);
         template = template.replace(/[$]value[$]/g, GetReferenceByNumberOrReference(this.Parent, this.Value, 0).Value * unit.DisplayMultiplier + unit.DisplayOffset);
         template = template.replace(/[$]units[$]/g, unit.Name);
         min = min * unit.DisplayMultiplier + unit.DisplayOffset;
@@ -389,6 +350,15 @@ class ConfigNumberGui extends ConfigNumber {
         });
         return template;
     }
+    SetIni(ini) {
+        super.SetIni(ini);
+        if(this.UnitIndex === undefined && this.Ini.UnitIndex !== undefined) {
+            this.UnitIndex = this.Ini.UnitIndex;
+        }
+        if(this.UnitIndex === undefined) {
+            this.UnitIndex = 0;
+        }
+    }
 }
 
 var numberSelectionConfigGuiTemplate;
@@ -399,16 +369,8 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         this.CallBack = callBack;
     }
 
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "Parent")
-                return undefined;
-            return value;
-        }));
-    }
-
     UpdateReferences() {
-        switch(this.Type) {
+        switch(this.IniType) {
             case "uint8":
             case "uint16":
             case "uint32":
@@ -420,28 +382,28 @@ class ConfigNumberSelectionGui extends ConfigNumber {
                 this.Value = Math.round(this.Value);
         }
         
-        if(this.Value < this.Min)
-            this.Value = this.Min;
-        if(this.Value > this.Max)
-            this.Value = this.Max;
+        if(this.Value < GetIniMin(this.Ini))
+            this.Value = GetIniMin(this.Ini);
+        if(this.Value > GetIniMax(this.Ini))
+            this.Value = GetIniMax(this.Ini);
 
         $("#" + this.GUID).val(this.Value)
     }
 
     GetHtml() {
-        if(this.Hidden)
+        if(this.Ini.Hidden)
             return "";
 
         var template = "<span id=\"span"+this.GUID+"\">";
-        if(this.Selections.length > 1) {
+        if(this.Ini.Selections.length > 1) {
             if(!numberSelectionConfigGuiTemplate)
                 numberSelectionConfigGuiTemplate = getFileContents("ConfigGui/NumberSelection.html");
             template += numberSelectionConfigGuiTemplate;
             template = template.replace(/[$]id[$]/g, this.GUID);
-            template = template.replace(/[$]label[$]/g, this.Label);
+            template = template.replace(/[$]label[$]/g, this.Ini.Label);
             var selectionHtml = "";
             var thisClass = this;
-            $.each(this.Selections, function(selectionIndex, selectionValue) {
+            $.each(this.Ini.Selections, function(selectionIndex, selectionValue) {
                 if(selectionIndex === parseInt(thisClass.Value))
                     selectionHtml += "<option selected value=\"" + selectionIndex + "\">" + selectionValue + "</option>";
                 else {
@@ -474,28 +436,20 @@ class ConfigBooleanGui extends ConfigBoolean {
         this.CallBack = callBack;
     }
 
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "Parent")
-                return undefined;
-            return value;
-        }));
-    }
-
     UpdateReferences() {
         $("#" + this.GUID).val(this.Value);
         console.log("ConfigBooleanGui.UpdateReferences() make sure this works");
     }
 
     GetHtml() {
-        if(this.Hidden)
+        if(this.Ini.Hidden)
             return "";
 
         if(!checkBoxConfigGuiTemplate)
             checkBoxConfigGuiTemplate = getFileContents("ConfigGui/CheckBox.html");
         var template = checkBoxConfigGuiTemplate;
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]label[$]/g, this.Label);
+        template = template.replace(/[$]label[$]/g, this.Ini.Label);
         if(this.Value)
             template = template.replace(/[$]checked[$]/g, "checked");
         else
@@ -526,69 +480,42 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         super(obj, parent);
         this.GUID = getGUID();
         this.CallBack = callBack;
-        switch(this.Type) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-            case "uint64":
-            case "int8":
-            case "int16":
-            case "int32":
-            case "int64":
-                if(!this.Step)
-                    this.Step = Math.max(1, 0.01);
-                break;
-            case "float":
-                if(!this.Step)
-                    this.Step = 0.01;
-                break;
-        }
-        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
-        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
-        var xMinRef = GetReferenceByNumberOrReference(this.Parent, this.XMin, 0);
-        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
-        var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
-        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1);
+        var xMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMin(this.Ini), 0);
+        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMax(this.Ini), 0);
+        var yMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMin(this.Ini), 0);
+        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMax(this.Ini), 0);
         this.CurrentXRes = xResRef.Value;
         this.CurrentYRes = yResRef.Value;
         this.CurrentXMin = xMinRef.Value;
         this.CurrentXMax = xMaxRef.Value;
         this.CurrentYMin = yMinRef.Value;
         this.CurrentYMax = yMaxRef.Value;
-        if(!this.ZUnits) 
-            this.ZUnits = BlankUnits;
         if(!this.ZUnitIndex)
             this.ZUnitIndex = 0;
-        if(!this.XUnits) 
-            this.XUnits = BlankUnits;
         if(!this.XUnitIndex)
             this.XUnitIndex = 0;
-        if(!this.YUnits) 
-            this.YUnits = BlankUnits;
         if(!this.YUnitIndex)
             this.YUnitIndex = 0;
     }
 
-    GetConfig() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {
-            if(key === "GUID" || key === "Parent" || key === "CurrentXRes"  || key === "CurrentXMin" || key === "CurrentXMax"  || key === "CurrentYRes"  || key === "CurrentYMin" || key === "CurrentYMax")
-                return undefined;
-            return value;
-        }));
-    }
     InterpolateTable() {
-        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
-        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
-        var xMinRef = GetReferenceByNumberOrReference(this.Parent, this.XMin, 0);
-        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
-        var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
-        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1);
+        var xMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMin(this.Ini), 0);
+        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMax(this.Ini), 0);
+        var yMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMin(this.Ini), 0);
+        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMax(this.Ini), 0);
         if(xResRef.Value !== this.CurrentXRes || xMinRef.Value !== this.CurrentXMin || xMaxRef.Value !== this.CurrentXMax ||
             yResRef.Value !== this.CurrentYRes || yMinRef.Value !== this.CurrentYMin || yMaxRef.Value !== this.CurrentYMax) {
             //TODO: Add interpolation logic. creating new table now.
-            var val = 0
-            if(this.Min > 0)
-                val = this.Min;
+            var val = GetIniMin(this.Ini);
+            if(val < 0)
+                val = 0;
+            if(val > GetIniMax(this.Ini))
+                val = GetIniMax(this.Ini);
+
             this.Value = new Array(this.GetTableArrayLength());
             var thisClass = this;
             $.each(this.Value, function(index, value) {
@@ -604,21 +531,21 @@ class ConfigNumberTableGui extends ConfigNumberTable {
     }
 
     UpdateReferences() {
-        var xunits = GetUnits(this, this.XUnits);
+        var xunits = GetUnits(this, GetIniXUnits(this.Ini));
         var xunit = xunits[this.XUnitIndex];
-        var yunits = GetUnits(this, this.YUnits);
+        var yunits = GetUnits(this, GetIniYUnits(this.Ini));
         var yunit = yunits[this.YUnitIndex];
-        var zunits = GetUnits(this, this.ZUnits);
+        var zunits = GetUnits(this, GetIniZUnits(this.Ini));
         var zunit = zunits[this.ZUnitIndex];
 
-        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
-        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
-        var xMinRef = GetReferenceByNumberOrReference(this.Parent, this.XMin, 0);
-        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
-        var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
-        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
-        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.XAxis, undefined);
-        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.YAxis, undefined);
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1);
+        var xMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMin(this.Ini), 0);
+        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMax(this.Ini), 0);
+        var yMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMin(this.Ini), 0);
+        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMax(this.Ini), 0);
+        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.Ini.XAxis, undefined);
+        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.Ini.YAxis, undefined);
         if(xResRef.Value !== this.CurrentXRes || yResRef.Value !== this.CurrentYRes) {
             this.InterpolateTable();
             $('#' + this.GUID + 'table').replaceWith(this.GetTableHtml());
@@ -627,7 +554,10 @@ class ConfigNumberTableGui extends ConfigNumberTable {
             this.InterpolateTable();
             if(xAxisRef.Value) {
                 for(var x = 0; x < xResRef.Value; x++) {
-                    $("#" + this.GUID + "x" + x).val(xAxisRef.Value[x] * xunit.DisplayMultiplier + xunit.DisplayOffset);
+                    var xAxisIndex = y;
+                    if(this.Ini.XAxisInvertOrder)
+                        xAxisIndex = xResRef.Value - xAxisIndex;
+                    $("#" + this.GUID + "x" + x).val(xAxisRef.Value[xAxisIndex] * xunit.DisplayMultiplier + xunit.DisplayOffset);
                 }
             } else {
                 for(var x = 0; x < xResRef.Value; x++) {
@@ -637,7 +567,7 @@ class ConfigNumberTableGui extends ConfigNumberTable {
             if(yAxisRef.Value) {
                 for(var y = 0; y < yResRef.Value; y++) {
                     var yAxisIndex = y;
-                    if(this.YAxisInvertOrder)
+                    if(this.Ini.YAxisInvertOrder)
                         yAxisIndex = yResRef.Value - yAxisIndex;
                     $("#" + this.GUID + "y" + y).val(yAxisRef.Value[yAxisIndex] * yunit.DisplayMultiplier + yunit.DisplayOffset);
                 }
@@ -655,14 +585,14 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         }
     }
     GetTableHtml() {
-        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
-        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
-        var xMinRef = GetReferenceByNumberOrReference(this.Parent, this.XMin, 0);
-        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, this.XMax, 0);
-        var yMinRef = GetReferenceByNumberOrReference(this.Parent, this.YMin, 0);
-        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, this.YMax, 0);
-        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.XAxis, undefined);
-        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.YAxis, undefined);
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1);
+        var xMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMin(this.Ini), 0);
+        var xMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniXMax(this.Ini), 0);
+        var yMinRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMin(this.Ini), 0);
+        var yMaxRef = GetReferenceByNumberOrReference(this.Parent, GetIniYMax(this.Ini), 0);
+        var xAxisRef = GetReferenceByNumberOrReference(this.Parent, this.Ini.XAxis, undefined);
+        var yAxisRef = GetReferenceByNumberOrReference(this.Parent, this.Ini.YAxis, undefined);
 
         var thisClass = this;
         $(document).off("change."+this.GUID);
@@ -670,16 +600,16 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         var row = "";
         var table = "";
         
-        var xunits = GetUnits(this, this.XUnits);
+        var xunits = GetUnits(this, GetIniXUnits(this.Ini));
         var xunit = xunits[this.XUnitIndex];
-        var yunits = GetUnits(this, this.YUnits);
+        var yunits = GetUnits(this, GetIniYUnits(this.Ini));
         var yunit = yunits[this.YUnitIndex];
-        var zunits = GetUnits(this, this.ZUnits);
+        var zunits = GetUnits(this, GetIniZUnits(this.Ini));
         var zunit = zunits[this.ZUnitIndex];
 
-        var min = this.Min;
-        var max = this.Max;
-        var step = this.Step;
+        var min = GetIniMin(this.Ini);
+        var max = GetIniMax(this.Ini);
+        var step = GetIniStep(this.Ini);
         min = min * zunit.DisplayMultiplier + zunit.DisplayOffset;
         min = max * zunit.DisplayMultiplier + zunit.DisplayOffset;
         step *= zunit.DisplayMultiplier;
@@ -763,9 +693,9 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         // - - - -
                         // - - - -
                         if(yResRef.Value === 1 && xResRef.Value !== 1) {
-                            row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.XLabel + "</th>";
+                            row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.Ini.XLabel + "</th>";
                         } else if(yResRef.Value !== 1 && xResRef.Value === 1) {
-                            row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.YLabel + "</th>";
+                            row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.Ini.YLabel + "</th>";
                         } else if((xAxisRef.GetHtml && yAxisRef.GetHtml) || (xAxisRef.GetHtml && yResRef.Value !== 1) || (yAxisRef.GetHtml && xResRef.Value !== 1) || (yResRef.Value !== 1 && xResRef.Value !== 1)) {
                             row += "<td style=\"border-right-style: sold; border-right-width:5px; border-bottom-style: sold; border-bottom-width:5px;\"></td>";
                         } else if (yAxisRef.GetHtml) {
@@ -776,25 +706,25 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         // - - - -
                         // - - - -
                         // - - - -
-                        if(x === 1 && xMinRef.GetHtml && GetReferenceCount(this.Parent, this.XMin) === 1) {
+                        if(x === 1 && xMinRef.GetHtml && GetReferenceCount(this.Parent, GetIniXMin(this.Ini)) === 1) {
                             // - X - -
                             // - - - -
                             // - - - -
                             // - - - -
                             row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+xMinRef.GetHtml(true)+"</td>";
-                        } else if (x === xResRef.Value && xMaxRef.GetHtml && GetReferenceCount(this.Parent, this.XMax) === 1) {
+                        } else if (x === xResRef.Value && xMaxRef.GetHtml && GetReferenceCount(this.Parent, GetIniXMax(this.Ini)) === 1) {
                             // - - - X
                             // - - - -
                             // - - - -
                             // - - - -
                             row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+xMaxRef.GetHtml(true)+"</td>";
-                        } else if(xAxisRef.GetHtml && GetReferenceCount(this.Parent, this.XAxis) === 1) {
+                        } else if(xAxisRef.GetHtml && GetReferenceCount(this.Parent, this.Ini.XAxis) === 1) {
                             // X X X X
                             // - - - -
                             // - - - -
                             // - - - -
                             var xAxisIndex = x;
-                            if(this.XAxisInvertOrder && x > 0)
+                            if(this.Ini.XAxisInvertOrder && x > 0)
                                 xAxisIndex = xResRef.Value - (xAxisIndex-1);
                             row += "<td style=\"border-right-style: sold; border-bottom-width:5px;\">" + xAxisHtml[xAxisIndex] + "</td>";
                         } else {
@@ -803,10 +733,13 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // - - - -
                             // - - - -
                             if(xResRef.Value === 1 && !xAxisRef.Value) {
-                                row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.ZLabel + "</th>";
+                                row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.Ini.ZLabel + "</th>";
                             } else {
                                 if(xAxisRef.Value) {
-                                    row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + (xAxisRef.Value[x-1] * xunit.DisplayMultiplier + xunit.DisplayOffset) + "\"/></td>";
+                                    var xAxisIndex = y-1;
+                                    if(this.Ini.XAxisInvertOrder)
+                                        xAxisIndex = xResRef.Value - xAxisIndex;
+                                    row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + (xAxisRef.Value[xAxisIndex] * xunit.DisplayMultiplier + xunit.DisplayOffset) + "\"/></td>";
                                 } else {
                                     row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "x" + (x-1) + "\" type=\"number\" disabled value=\"" + (parseFloat(parseFloat(((xMaxRef.Value - xMinRef.Value) * (x-1) / (xResRef.Value-1) + xMinRef.Value).toFixed(6)).toPrecision(7)) * xunit.DisplayMultiplier + xunit.DisplayOffset) + "\"/></td>";
                                 }
@@ -819,13 +752,13 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                         // X - - -
                         // X - - -
                         // X - - -
-                        if(y === 1 && yMinRef.GetHtml && GetReferenceCount(this.Parent, this.YMin) === 1) {
+                        if(y === 1 && yMinRef.GetHtml && GetReferenceCount(this.Parent, GetIniYMin(this.Ini)) === 1) {
                             // - - - -
                             // X - - -
                             // - - - -
                             // - - - -
                             row += "<td style=\"border-right-style: sold; border-right-width:5px;\">"+yMinRef.GetHtml(true)+"</td>";
-                        } else if (y === yResRef.Value && yMaxRef.GetHtml && GetReferenceCount(this.Parent, this.YMax) === 1) {
+                        } else if (y === yResRef.Value && yMaxRef.GetHtml && GetReferenceCount(this.Parent, GetIniYMax(this.Ini)) === 1) {
                             // - - - -
                             // - - - -
                             // - - - -
@@ -837,15 +770,15 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // X - - -
                             // - - - -
                             if(yResRef.Value === 1 && !yAxisRef.Value) {
-                                row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
-                            } else if(yAxisRef.GetHtml && GetReferenceCount(this.Parent, this.YAxis) === 1) {
+                                row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.Ini.ZLabel + "</th>";
+                            } else if(yAxisRef.GetHtml && GetReferenceCount(this.Parent, this.Ini.YAxis) === 1) {
                                 var yAxisIndex = y;
-                                if(this.YAxisInvertOrder && y > 0)
+                                if(this.Ini.YAxisInvertOrder && y > 0)
                                     yAxisIndex = yResRef.Value - (yAxisIndex-1);
                                 row += "<td style=\"border-right-style: sold; border-right-width:5px;\">" + yAxisHtml[yAxisIndex] + "</td>";
                             } else if(yAxisRef.Value) {
                                 var yAxisIndex = y-1;
-                                if(this.YAxisInvertOrder)
+                                if(this.Ini.YAxisInvertOrder)
                                     yAxisIndex = yResRef.Value - yAxisIndex;
                                 row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input id=\"" + this.GUID + "y" + (y-1) + "\" type=\"number\" disabled value=\"" + (yAxisRef.Value[yAxisIndex] * yunit.DisplayMultiplier + yunit.DisplayOffset) + "\"/></td>";
                             } else {
@@ -1009,25 +942,25 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         if(this.Hidden)
             return "";
 
-        var xResRef = GetReferenceByNumberOrReference(this.Parent, this.XResolution, 1);
-        var yResRef = GetReferenceByNumberOrReference(this.Parent, this.YResolution, 1);
+        var xResRef = GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1);
+        var yResRef = GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1);
 
         var template = "";
-        if(xResRef.GetHtml && GetReferenceCount(this.Parent, this.XResolution) === 1 && this.XMax !== this.XResolution && this.XMin !== this.XResolution)
+        if(xResRef.GetHtml && GetReferenceCount(this.Parent, GetIniXResolution(this.Ini)) === 1 && GetIniXMax(this.Ini) !== GetIniXResolution(this.Ini) && GetIniXMin(this.Ini) !== GetIniXResolution(this.Ini))
             template += xResRef.GetHtml();
-        if(yResRef.GetHtml && GetReferenceCount(this.Parent, this.YResolution) === 1 && this.YMax !== this.YResolution && this.YMin !== this.YResolution)
+        if(yResRef.GetHtml && GetReferenceCount(this.Parent, GetIniYResolution(this.Ini)) === 1 && GetIniYMax(this.Ini) !== GetIniYResolution(this.Ini) && GetIniYMin(this.Ini) !== GetIniYResolution(this.Ini))
             template += yResRef.GetHtml();
 
         template += this.GetTableHtml();
         
         var thisClass = this;
-        if(this.Dialog) {
+        if(this.Ini.Dialog) {
             var style = $("#" + this.GUID + "dialog").is(":visible")? "style=\"margin-left:40px;\"" : "style=\"margin-left:40px; display: none;\"";
             var buttonVal = $("#" + this.GUID + "edit").val();
             if(!buttonVal)
                 buttonVal = "Show/Edit";
 
-            template = "<label for=\"" + this.GUID + "edit\">" + this.Label + ":</label><input type=\"button\" id=\"" + this.GUID + "edit\" value=\""+buttonVal+"\"><div id=\"" + this.GUID + "dialog\" "+style+">" + template + "</div>";
+            template = "<label for=\"" + this.GUID + "edit\">" + this.Ini.Label + ":</label><input type=\"button\" id=\"" + this.GUID + "edit\" value=\""+buttonVal+"\"><div id=\"" + this.GUID + "dialog\" "+style+">" + template + "</div>";
             
             $(document).off("click."+this.GUID);
             $(document).on("click."+this.GUID, "#" + this.GUID + "edit", function(){
@@ -1042,6 +975,27 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         }
 
         return "<span id=\"span" + this.GUID + "\">" + template + "</span>";
+    }
+    SetIni(ini) {
+        super.SetIni(ini);
+        if(this.XUnitIndex === undefined && this.Ini.XUnitIndex !== undefined) {
+            this.XUnitIndex = this.Ini.XUnitIndex;
+        }
+        if(this.XUnitIndex === undefined) {
+            this.XUnitIndex = 0;
+        }
+        if(this.YUnitIndex === undefined && this.Ini.YUnitIndex !== undefined) {
+            this.YUnitIndex = this.Ini.YUnitIndex;
+        }
+        if(this.YUnitIndex === undefined) {
+            this.YUnitIndex = 0;
+        }
+        if(this.ZUnitIndex === undefined && this.Ini.ZUnitIndex !== undefined) {
+            this.ZUnitIndex = this.Ini.ZUnitIndex;
+        }
+        if(this.ZUnitIndex === undefined) {
+            this.ZUnitIndex = 0;
+        }
     }
 }
 
@@ -1060,7 +1014,7 @@ class ConfigFormulaGui extends ConfigFormula {
             this.UnitIndex = 0;
     }
 
-    GetConfig() {
+    GetIni() {
         return JSON.parse(JSON.stringify(this, function(key, value) {
             if(key === "GUID" || key === "Parent")
                 return undefined;
@@ -1142,8 +1096,8 @@ class ConfigFormulaGui extends ConfigFormula {
 }
 
 class ConfigArrayGui extends ConfigArray {
-    constructor(obj, configNameSpace, parent, mainCallBack){
-        super(obj, configNameSpace, parent);
+    constructor(obj, iniNamespace, parent, mainCallBack){
+        super(obj, iniNamespace, parent);
         this.GUID = getGUID();
         this.CallBack = mainCallBack;
 
@@ -1158,7 +1112,7 @@ class ConfigArrayGui extends ConfigArray {
 
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, thisClass.ConfigNameSpace, thisClass.Parent, thisClass.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, thisClass.IniNamespace, thisClass.Parent, thisClass.CallBack);
         });
     }
 
@@ -1166,17 +1120,17 @@ class ConfigArrayGui extends ConfigArray {
         var size = super.SetArrayBuffer(arrayBuffer);
         var thisClass = this;
         $.each(this.Value, function(index, value) {
-            thisClass.Value[index] = new ConfigGui(value, thisClass.ConfigNameSpace, thisClass.Parent, thisClass.CallBack);
+            thisClass.Value[index] = new ConfigGui(value, thisClass.IniNamespace, thisClass.Parent, thisClass.CallBack);
         });
         return size;
     }
 
-    GetConfig() {
+    GetIni() {
         return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "ConfigNameSpace" || key === "GUID" || key === "Parent" || key === "CurrentTableArrayLength")    
+            if(key === "IniNamespace" || key === "GUID" || key === "Parent" || key === "CurrentTableArrayLength")    
                 return undefined;   
-            if(key != "" && value.GetConfig) 
-                 return value.GetConfig();  
+            if(key != "" && value.GetIni) 
+                 return value.GetIni();  
             return value;
         }));
     }
@@ -1207,7 +1161,7 @@ class ConfigArrayGui extends ConfigArray {
                     $("#span"+this.Value[i].GUID).show();
                     this.Value[i].UpdateReferences();
                 } else {
-                    this.Value[i] = new ConfigGui(subConfig, this.ConfigNameSpace, this.Parent, this.CallBack);
+                    this.Value[i] = new ConfigGui(subConfig, this.IniNamespace, this.Parent, this.CallBack);
                     $("#span"+this.GUID).append(this.Value[i].GetHtml());
                 }
 
@@ -1263,4 +1217,63 @@ function GetUnits(obj, units){
     }
 
     return GetReferenceIfString(obj.Parent, units, BlankUnits);
+}
+
+function GetIniStep(ini){
+    if(ini.Step)
+        return ini.Step;
+
+    switch(ini.Type) {
+        case "uint8":
+        case "uint16":
+        case "uint32":
+        case "uint64":
+        case "int8":
+        case "int16":
+        case "int32":
+        case "int64":
+            return Math.max(1 / GetIniValueMultiplier(ini), 0.01);
+        case "float":
+            return 0.01;
+    }
+}
+function GetIniUnits(ini){
+    if(ini.Units !== undefined)
+        return ini.Units;
+    return BlankUnits; 
+}
+function GetIniXUnits(ini){
+    if(ini.XUnits !== undefined)
+        return ini.XUnits;
+    return BlankUnits; 
+}
+function GetIniYUnits(ini){
+    if(ini.YUnits !== undefined)
+        return ini.YUnits;
+    return BlankUnits; 
+}
+function GetIniZUnits(ini){
+    if(ini.ZUnits !== undefined)
+        return ini.ZUnits;
+    return BlankUnits; 
+}
+function GetIniXMin(ini){
+    if(ini.XMin !== undefined)
+        return ini.XMin;
+    return 0; 
+}
+function GetIniXMax(ini){
+    if(ini.XMax !== undefined)
+        return ini.XMax;
+    return 0; 
+}
+function GetIniYMin(ini){
+    if(ini.YMin !== undefined)
+        return ini.YMin;
+    return 0; 
+}
+function GetIniYMax(ini){
+    if(ini.YMax !== undefined)
+        return ini.YMax;
+    return 0; 
 }
