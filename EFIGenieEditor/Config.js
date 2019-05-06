@@ -1,60 +1,7 @@
 class Config {
-    constructor(obj, iniNamespace, parent) {
-        if(obj && obj.ConfigName) {
-            Object.assign(this, iniNamespace[obj.ConfigName]);
-        } else {
-            Object.assign(this, iniNamespace["Main"]);
-        }
-        if(obj)
-            Object.assign(this, obj);
-
+    constructor(ini, iniNamespace, parent) {
         this.Parent = parent;
-        this.IniNamespace = iniNamespace;
-
-        for(var variableRowIndex in this.Variables) {
-            var variableRow = this.Variables[variableRowIndex];
-            var variableRowKey = Object.keys(variableRow)[0];
-            var variableRowObj = this[variableRowKey];
-
-            if(!variableRowObj)
-                variableRowObj = variableRow[variableRowKey];
-
-            if(variableRowObj.XResolution) {
-                this[variableRowKey] = new ConfigNumberTable(variableRowObj, this);
-            } else if(variableRowObj.Type) {
-                if(variableRowObj.Type)
-                {
-                    switch(variableRowObj.Type) {
-                        case "uint8":
-                        case "uint16":
-                        case "uint32":
-                        case "uint64":
-                        case "int8":
-                        case "int16":
-                        case "int32":
-                        case "int64":
-                        case "float":
-                        case "variable":
-                            this[variableRowKey] = new ConfigNumber(variableRowObj, this);
-                            break;
-                        case "formula":
-                            this[variableRowKey] = new ConfigFormula(variableRowObj, this);
-                            break;
-                        case "bool":
-                            this[variableRowKey] = new ConfigBoolean(variableRowObj, this);
-                            break;
-                    }
-                }
-            } else if (variableRowObj.ConfigName || variableRowObj.Variables) {
-                if(!variableRowObj.Array) {
-                    this[variableRowKey] = new Config(variableRowObj, this.IniNamespace, this);
-                } else {
-                    this[variableRowKey] = new ConfigArray(variableRowObj, this.IniNamespace, this);
-                }
-            } else if (variableRowObj.Selections) {
-                this[variableRowKey] = new ConfigSelection(variableRowObj, this.IniNamespace, this);
-            }
-        }
+        this.SetIni(ini, iniNamespace);
     }
     GetArrayBuffer() {
         var arrayBuffer;
@@ -229,13 +176,73 @@ class Config {
             return value;
         }));
     }
+    SetIni(ini, iniNamespace) {
+        if(iniNamespace !== undefined)
+            this.IniNamespace = iniNamespace;
+        else if (this.IniNamespace === undefined)
+            throw "No IniNamespace defined for ConfigSelection";
+            
+        this.Ini = {};
+        if(ini && ini.ConfigName) {
+            Object.assign(this.Ini, this.IniNamespace[ini.ConfigName]);
+        } else {
+            Object.assign(this.Ini, this.IniNamespace["Main"]);
+        }
+        if(ini)
+            Object.assign(this.Ini, ini);
+            
+        for(var variableRowIndex in this.Ini.Variables) {
+            var variableRow = this.Ini.Variables[variableRowIndex];
+            var variableRowKey = Object.keys(variableRow)[0];
+            var variableRowObj = this[variableRowKey];
+
+            if(!variableRowObj) {
+                if(variableRow[variableRowKey].XResolution) {
+                    this[variableRowKey] = new ConfigNumberTable(variableRow[variableRowKey], this);
+                } else if(variableRow[variableRowKey].Type) {
+                    if(variableRow[variableRowKey].Type)
+                    {
+                        switch(variableRow[variableRowKey].Type) {
+                            case "uint8":
+                            case "uint16":
+                            case "uint32":
+                            case "uint64":
+                            case "int8":
+                            case "int16":
+                            case "int32":
+                            case "int64":
+                            case "float":
+                            case "variable":
+                                this[variableRowKey] = new ConfigNumber(variableRow[variableRowKey], this);
+                                break;
+                            case "formula":
+                                this[variableRowKey] = new ConfigFormula(variableRow[variableRowKey], this);
+                                break;
+                            case "bool":
+                                this[variableRowKey] = new ConfigBoolean(variableRow[variableRowKey], this);
+                                break;
+                        }
+                    }
+                } else if (variableRow[variableRowKey].ConfigName || variableRow[variableRowKey].Variables) {
+                    if(!variableRow[variableRowKey].Array) {
+                        this[variableRowKey] = new Config(variableRow[variableRowKey], this.IniNamespace, this);
+                    } else {
+                        this[variableRowKey] = new ConfigArray(variableRow[variableRowKey], this.IniNamespace, this);
+                    }
+                } else if (variableRow[variableRowKey].Selections) {
+                    this[variableRowKey] = new ConfigSelection(variableRow[variableRowKey], this.IniNamespace, this);
+                }
+            } else {
+                variableRowObj.SetIni(variableRow[variableRowKey]);
+            }
+        }
+    }
 }
 
 class ConfigSelection {
     constructor(ini, iniNamespace, parent) {
-        this.IniNamespace = iniNamespace;
         this.Parent = parent;
-        this.SetIni(ini);
+        this.SetIni(ini, iniNamespace);
     }
     GetArrayBuffer() {
         return this.Value.GetArrayBuffer();
@@ -260,10 +267,12 @@ class ConfigSelection {
 
         return this.Value.SetArrayBuffer(arrayBuffer);
     }
-    GetIni() {
-        return this.Ini;
-    }
-    SetIni(ini) {
+    SetIni(ini, iniNamespace) {
+        if(iniNamespace !== undefined)
+            this.IniNamespace = iniNamespace;
+        else if (this.IniNamespace === undefined)
+            throw "No IniNamespace defined for ConfigSelection";
+
         this.Ini = ini
         if(this.Index === undefined && this.Ini.Index !== undefined) {
             this.Index = this.Ini.Index;
@@ -377,9 +386,6 @@ class ConfigNumber {
 
         return size;
     }
-    GetIni() {
-        return this.Ini;
-    }
     SetIni(ini) {
         this.Ini = ini
         if(this.Value === undefined && this.Ini.Value !== undefined) {
@@ -406,9 +412,6 @@ class ConfigBoolean {
     SetArrayBuffer(arrayBuffer) {
         this.Value = new Uint8Array(arrayBuffer)[0] & 0x01;
         return 1;
-    }
-    GetIni() {
-        return this.Ini;
     }
     SetIni(ini) {
         this.Ini = ini
@@ -513,9 +516,6 @@ class ConfigNumberTable {
 
         return arrayLen;
     }
-    GetIni() {
-        return this.Ini;
-    }
     SetIni(ini) {
         this.Ini = ini
         if(this.Value === undefined && this.Ini.Value !== undefined) {
@@ -538,29 +538,12 @@ class ConfigNumberTable {
 }
 
 class ConfigFormula {
-    constructor(obj, parent) {
-        if(obj)
-            Object.assign(this, obj);
+    constructor(ini, parent) {
         this.Parent = parent;
-        if(!this.Degree)
-            this.Degree = 1;
-        if(!this.Min)
-            this.Min = -340282300000000000000000000000000000000;
-        if(!this.Max)
-            this.Max = 340282300000000000000000000000000000000;
-        if(!this.Value) {
-            var val = 0
-            if(this.Min > 0)
-                val = this.Min;
-            this.Value = new Array(this.GetTableArrayLength());
-            var thisClass = this;
-            $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = val;
-            });
-        }
+        this.SetIni(ini);
     }
     GetTableArrayLength() {
-        return GetReferenceByNumberOrReference(this.Parent, this.Degree, 0).Value + 1;
+        return GetReferenceByNumberOrReference(this.Parent, GetIniDegree(this.Ini), 0).Value + 1;
     }
     GetArrayBuffer() {
         var value = Array.from(this.Value);
@@ -581,11 +564,21 @@ class ConfigFormula {
         
         return 4 * arrayLen;
     }
-    GetIni() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "Parent")    
-                return undefined; 
-        }));
+    SetIni(ini) {
+        this.Ini = ini;
+        if(this.Value === undefined) {
+            var val = GetIniMin(this.Ini);
+            if(val < 0)
+                val = 0;
+            if(val > GetIniMax(this.Ini))
+                val = GetIniMax(this.Ini);
+
+            this.Value = new Array(this.GetTableArrayLength());
+            var thisClass = this;
+            $.each(this.Value, function(index, value) {
+                thisClass.Value[index] = val;
+            });
+        }
     }
 }
 
@@ -667,12 +660,6 @@ class ConfigArray {
         }
 
         return size;
-    }
-    GetIni() {
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "IniNamespace" || key === "Parent")    
-                return undefined; 
-        }));
     }
 }
 
@@ -838,6 +825,7 @@ function GetIniMin(ini) {
         case "int64":
             return -9223372036854775808 / GetIniValueMultiplier(ini);
         case "float":
+        case "formula":
         case "variable":
             return -340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
         default:
@@ -865,6 +853,7 @@ function GetIniMax(ini) {
         case "int64":
             return 9223372036854775807 / GetIniValueMultiplier(ini);
         case "variable":
+        case "formula":
         case "float":
             return 340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
         default:
@@ -879,5 +868,10 @@ function GetIniXResolution(ini) {
 function GetIniYResolution(ini) {
     if(ini.YResolution !== undefined)
         return ini.YResolution;
+    return 1;
+}
+function GetIniDegree(ini) {
+    if(ini.Degree !== undefined)
+        return ini.Degree;
     return 1;
 }

@@ -45,7 +45,7 @@
                     test.readAsArrayBuffer(evt.target.files[0]);
                 });
                 $("#btnSaveIni").click(function(){
-                    downloadObject({ configNameSpace: b.ConfigNameSpace, obj: b.GetConfig() }, "config.json");
+                    downloadObject(b.IniNamespace, "ini.json");
                 });
                 $("#btnLoadIni").change(function(evt){
                     var test = new FileReader();
@@ -57,9 +57,9 @@
                             return;
                         }
 
-                        var ini = JSON.parse(evt.target.result);
+                        var iniNamespace = JSON.parse(evt.target.result);
 
-                        b = new ConfigGui(ini.obj, ini.configNameSpace);
+                        b = new ConfigGui(undefined, iniNamespace);
                         $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                     };
                     
