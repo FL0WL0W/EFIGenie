@@ -18,7 +18,7 @@ namespace EngineControlServices
 	public:
 		virtual IgnitionTiming GetIgnitionTiming() = 0;
 		
-		static void* IIgnitionConfig::CreateIgnitionConfig(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void* CreateIgnitionConfig(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

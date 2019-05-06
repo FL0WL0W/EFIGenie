@@ -9,34 +9,12 @@ using namespace Reluctor;
 
 namespace Service
 {
-	ServiceLocator *EngineControlServicesServiceBuilderRegister::CreateServices(ServiceLocator *serviceLocator, HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
+	void EngineControlServicesServiceBuilderRegister::Register(ServiceBuilder *&serviceBuilder)
 	{
-		if(serviceLocator == 0)
-			serviceLocator = new ServiceLocator();
-		
-		if(serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID) == 0)
-			HardwareAbstractionServiceBuilder::Build(serviceLocator, hardwareAbstractionCollection);
-
-		hardwareAbstractionCollection = serviceLocator->LocateAndCast<HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
-		
-		//create callback groups
-		if(serviceLocator->Locate(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
-			serviceLocator->Register(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
-		if(serviceLocator->Locate(POST_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
-			serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
-
-		sizeOut = 0;
-
-		ServiceBuilder *serviceBuilder = new ServiceBuilder();
-
-		IOServicesServiceBuilderRegister::Register(serviceBuilder);
-		ReluctorServiceBuilderRegister::Register(serviceBuilder);
-
 	//outputs
 #if BUILDER_IBOOLEANOUTPUTSERVICEARRAY
 		serviceBuilder->Register(BUILDER_IBOOLEANOUTPUTSERVICEARRAY, CreateBooleanOutputArray);
 #endif
-
 	//application services
 #if BUILDER_TACHOMETERSERVICE
 		serviceBuilder->Register(BUILDER_TACHOMETERSERVICE, TachometerService::CreateTachometerService);
@@ -74,6 +52,31 @@ namespace Service
 #if BUILDER_IINJECTIONSCHEDULINGSERVICE
 		serviceBuilder->Register(BUILDER_IINJECTIONSCHEDULINGSERVICE, CreateInjectionSchedulingService);
 #endif
+	}
+
+	ServiceLocator *EngineControlServicesServiceBuilderRegister::CreateServices(ServiceLocator *serviceLocator, HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
+	{
+		if(serviceLocator == 0)
+			serviceLocator = new ServiceLocator();
+		
+		if(serviceLocator->Locate(HARDWARE_ABSTRACTION_COLLECTION_ID) == 0)
+			HardwareAbstractionServiceBuilder::Build(serviceLocator, hardwareAbstractionCollection);
+
+		hardwareAbstractionCollection = serviceLocator->LocateAndCast<HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID);
+		
+		//create callback groups
+		if(serviceLocator->Locate(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(PRE_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
+		if(serviceLocator->Locate(POST_RELUCTOR_SYNC_CALL_BACK_GROUP) == 0)
+			serviceLocator->Register(POST_RELUCTOR_SYNC_CALL_BACK_GROUP, new CallBackGroup());
+
+		sizeOut = 0;
+
+		ServiceBuilder *serviceBuilder = new ServiceBuilder();
+
+		IOServicesServiceBuilderRegister::Register(serviceBuilder);
+		ReluctorServiceBuilderRegister::Register(serviceBuilder);
+		Register(serviceBuilder);
 
 		//hack until i can find a better way to register the rpm service. probably going to create an initialize callback for this and CylinderAirTemperatureService_IAT_ECT_Bias
 		RegisterRpmService(serviceLocator);

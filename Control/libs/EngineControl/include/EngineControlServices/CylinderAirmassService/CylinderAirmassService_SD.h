@@ -32,7 +32,7 @@ namespace EngineControlServices
 		constexpr const unsigned short *VolumetricEfficiencyMap() const { return reinterpret_cast<const unsigned short *>(this + 1); }
 		
 		unsigned char Cylinders;
-		unsigned short Ml8thPerCylinder;
+		float CylinderVolume;
 		
 		unsigned short MaxRpm;
 		float MaxMap;

@@ -34,7 +34,7 @@ namespace EngineControlServices
 		
 		uint8_t Injectors;
 		
-		uint16_t InjectorOpenPosition;
+		float InjectorOpenPosition;
 
 		int16_t ShortPulseLimit;
 		uint8_t ShortPulseAdderResolution;

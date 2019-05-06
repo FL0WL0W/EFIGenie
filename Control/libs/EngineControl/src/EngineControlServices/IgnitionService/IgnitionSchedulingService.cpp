@@ -45,7 +45,9 @@ namespace EngineControlServices
 				{
 					schedulePosition = _crankReluctor->GetPosition();
 					scheduleTick = _timerService->GetTick();
-					if(_camReluctor->GetPosition() >= 180)
+					float camPosition = _camReluctor->GetPosition();
+					float decision = camPosition * 2 - schedulePosition;
+					if(decision > 180 || decision < -180)
 					{
 						//we are on the second half of the cam
 						schedulePosition += 360;
@@ -69,7 +71,7 @@ namespace EngineControlServices
 				schedulePosition = _crankReluctor->GetPosition();
 				scheduleTick = _timerService->GetTick();
 				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
-				isSequential = false;
+				isSequential = true;
 			}
 		}
 		else if(_camReluctor != 0 && _camReluctor->IsSynced())
@@ -77,7 +79,7 @@ namespace EngineControlServices
 			//we only have the cam sensor
 			schedulePosition = _camReluctor->GetPosition() * 2;
 			scheduleTick = _timerService->GetTick();
-			scheduleTickPerDegree = _camReluctor->GetTickPerDegree() * 2;
+			scheduleTickPerDegree = _camReluctor->GetTickPerDegree() / 2;
 			isSequential = true;
 		}
 		else

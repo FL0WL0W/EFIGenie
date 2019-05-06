@@ -47,7 +47,7 @@ namespace EngineControlServices
 	public:
 		TachometerService(const TachometerServiceConfig *config, IBooleanOutputService *booleanOutputService, ITimerService *timerService, RpmService *rpmService);
 		static void TogglePinTask(void *parameters);
-		static void *TachometerService::CreateTachometerService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void *CreateTachometerService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

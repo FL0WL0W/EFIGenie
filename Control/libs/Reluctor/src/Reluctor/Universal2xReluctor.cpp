@@ -16,6 +16,8 @@ namespace Reluctor
 		_period   = 0;
 		_state	  = false;
 	}
+
+	uint32_t errCnt = 0;
 	
 	float Universal2xReluctor::GetPosition()
 	{
@@ -38,7 +40,12 @@ namespace Reluctor
 
 			position = (_state? _config->RisingPosition : _config->FallingPosition) + _timerService->GetElapsedTick(_lastTick) * degreesSinceLastTick / _period;
 		} while(_interruptCalled);
-		
+	
+		while(position < 0)
+			position += 360;
+		while(position > 360)
+			position -= 360;
+
 		return position;
 	}
 	
@@ -121,7 +128,7 @@ namespace Reluctor
 			maxPeriod = (static_cast<uint32_t>(360 * _period / degreesSinceLastTick) - _period) * 2;
 		} while(_interruptCalled);
 		
-		if(_period == 0 || _period > maxPeriod || rpm < 6 || rpm > 20000)
+		if(_period == 0 || _period > maxPeriod || _timerService->GetTick() - _lastTick > maxPeriod || rpm < 6 || rpm > 20000)
 			_isSynced = false;
 
 		return _isSynced;

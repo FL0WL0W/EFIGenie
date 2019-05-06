@@ -18,7 +18,7 @@ namespace EngineControlServices
 		static void PrimeCallBack(void *fuelPumpService);
 		static void OnCallBack(void *fuelPumpService);
 		static void OffCallBack(void *fuelPumpService);
-		static void* IFuelPumpService::CreateFuelPumpService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static void* CreateFuelPumpService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

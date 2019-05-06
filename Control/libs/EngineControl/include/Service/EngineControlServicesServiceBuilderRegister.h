@@ -49,7 +49,7 @@ using namespace Reluctor;
 #define INSTANCE_CAM_RELUCTOR					1			    // IReluctor
 
 //outputs 3001-4000
-#define BUILDER_IBOOLEANOUTPUTSERVICEARRAY			3002
+#define BUILDER_IBOOLEANOUTPUTSERVICEARRAY			3004
 #define INSTANCE_IGNITORS							0			// IBooleanOutputService[]
 #define INSTANCE_INJECTORS							1			// IBooleanOutputService[]
 #define INSTANCE_IDLE_AIR_CONTROL_VALVE				0  			// IFloatOutputService		sq mm
@@ -64,7 +64,7 @@ using namespace Reluctor;
 #define BUILDER_IFUELPUMPSERVICE					4007			// IFuelPumpService
 #define BUILDER_ICYLINDERAIRTEMPERATURESERVICE		4008			// ICylinderAirTemperatureService
 #define BUILDER_ICYLINDERAIRMASSSERVICE		    	4009			// ICylinderAirmassService
-#define BUILDER_IINJECTORGRAMSERVICE				4000			// IInjectorGramService
+#define BUILDER_IINJECTORGRAMSERVICE				4010			// IInjectorGramService
 #define BUILDER_IINJECTORTIMINGSERVICE				4011			// IInjectorTimingService
 #define BUILDER_IIGNITIONSCHEDULINGSERVICE			4012			// IgnitionSchedulingService
 #define BUILDER_IINJECTIONSCHEDULINGSERVICE			4013			// InjectionSchedulingService
@@ -77,9 +77,8 @@ namespace Service
 {
 	class EngineControlServicesServiceBuilderRegister
 	{
-		void Register(ServiceBuilder *&serviceBuilder);
-		
 	public:
+		static void Register(ServiceBuilder *&serviceBuilder);
 		static ServiceLocator *CreateServices(ServiceLocator *serviceLocator, HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &totalSize);
 		
 		static void* CreateBooleanOutputArray(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);

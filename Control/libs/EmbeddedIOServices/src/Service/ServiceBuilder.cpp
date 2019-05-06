@@ -20,9 +20,9 @@ namespace Service
 		}
 	}
 	
-	void ServiceBuilder::Unregister(uint16_t builderId)
+	void ServiceBuilder::Register(uint16_t serviceId, void*(*factory)(const ServiceLocator * const &, const void *, unsigned int &))
 	{
-		ServiceLocator::Unregister(builderId);
+		ServiceLocator::Register(serviceId, reinterpret_cast<void *>(factory));
 	}
 }
 #endif

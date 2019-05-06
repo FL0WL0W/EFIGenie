@@ -9,14 +9,9 @@ namespace Service
 	class ServiceBuilder : protected ServiceLocator
 	{
 	public:
-		void Build(ServiceLocator *&serviceLocator, const void *config, unsigned int &sizeOut);
+		virtual void Build(ServiceLocator *&serviceLocator, const void *config, unsigned int &sizeOut);
 		
-		void Register(uint16_t serviceId, void*(*factory)(const ServiceLocator * const &, const void *, unsigned int &))
-		{
-			ServiceLocator::Register(serviceId, reinterpret_cast<void *>(factory));
-		}
-
-		void Unregister(uint16_t serviceId);
+		virtual void Register(uint16_t serviceId, void*(*factory)(const ServiceLocator * const &, const void *, unsigned int &));
 
 		static constexpr void OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset) 
 		{

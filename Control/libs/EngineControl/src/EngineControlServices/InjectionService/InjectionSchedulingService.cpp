@@ -44,7 +44,8 @@ namespace EngineControlServices
 				{
 					schedulePosition = _crankReluctor->GetPosition();
 					scheduleTick = _timerService->GetTick();
-					if(_camReluctor->GetPosition() >= 180)
+					float camPosition = _camReluctor->GetPosition();
+					if((camPosition >= 120 && schedulePosition <= 180) || (camPosition >= 240 && schedulePosition >= 180))
 					{
 						//we are on the second half of the cam
 						schedulePosition += 360;

@@ -1,4 +1,5 @@
 #include "Service/ServiceLocator.h"
+#include <cstring>
 
 #ifdef SERVICELOCATOR_H
 namespace Service
@@ -38,7 +39,7 @@ namespace Service
 			{
 				void* oldServiceArray = serviceArray;
 				serviceArray = calloc((instanceId + 2) * sizeof(void *) + sizeof(uint32_t), (instanceId + 2) * sizeof(void *) + sizeof(uint32_t));
-				memcpy(serviceArray, oldServiceArray, (size + 1) * sizeof(void *) + sizeof(uint32_t));
+				std::memcpy(serviceArray, oldServiceArray, (size + 1) * sizeof(void *) + sizeof(uint32_t));
 				*reinterpret_cast<uint32_t *>(serviceArray) = instanceId + 1;
 				
 				Register(serviceId, serviceArray);

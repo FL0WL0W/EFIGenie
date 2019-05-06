@@ -24,7 +24,7 @@ namespace EngineControlServices
 				
 		float VE = InterpolateTable2<unsigned short>((float)rpm, (float)_config->MaxRpm, 0.0f, _config->VeRpmResolution, map, _config->MaxMap, 0.0f, _config->VeMapResolution, _config->VolumetricEfficiencyMap()) / 8192.0f;
 								
-		float cylinderVolume = _config->Ml8thPerCylinder * (1/8.0f) * VE; //ml
+		float cylinderVolume = _config->CylinderVolume * 1000 * VE; //ml
 		
 		for(unsigned char cylinder = 0; cylinder < _config->Cylinders; cylinder++)
 		{
