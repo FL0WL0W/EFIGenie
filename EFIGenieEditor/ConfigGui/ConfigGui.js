@@ -824,13 +824,13 @@ class ConfigNumberTableGui extends ConfigNumberTable {
                             // X - - -
                             // - - - -
                             // - - - -
-                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+yMinRef.GetHtml(true)+"</td>";
-                        } else if (x === yResRef.Value && yMaxRef.GetHtml && GetReferenceCount(this.Parent, this.YMax) === 1) {
+                            row += "<td style=\"border-right-style: sold; border-right-width:5px;\">"+yMinRef.GetHtml(true)+"</td>";
+                        } else if (y === yResRef.Value && yMaxRef.GetHtml && GetReferenceCount(this.Parent, this.YMax) === 1) {
                             // - - - -
                             // - - - -
                             // - - - -
                             // X - - -
-                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\">"+yMaxRef.GetHtml(true)+"</td>";
+                            row += "<td style=\"border-right-style: sold; border-right-width:5px;\">"+yMaxRef.GetHtml(true)+"</td>";
                         } else {
                             // - - - -
                             // - - - -

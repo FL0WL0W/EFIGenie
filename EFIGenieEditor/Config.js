@@ -341,6 +341,12 @@ class ConfigNumber {
                 if(!this.Max)
                     this.Max = 340282300000000000000000000000000000000;
                 break;
+            case "variable":
+                if(!this.Min)
+                    this.Min = -340282300000000000000000000000000000000;
+                if(!this.Max)
+                    this.Max = 340282300000000000000000000000000000000;
+                break;
         }
         if(!this.Value)
             if(this.Min > 0)
@@ -767,9 +773,13 @@ class ConfigArray {
 }
 
 function GetReferenceByNumberOrReference(referenceObj, numberOrReference, defaultValue) {
-    var value = parseInt(numberOrReference);
+    var value = parseFloat(numberOrReference);
     if(isNaN(value)) {
-        return GetReference(referenceObj, numberOrReference, { Value: defaultValue });
+        var ref = GetReference(referenceObj, numberOrReference, { Value: defaultValue });
+        if(isNaN(parseFloat(ref.Value)) && numberOrReference != undefined) {
+            return GetReferenceByNumberOrReference(referenceObj, ref.Value, defaultValue);
+        }
+        return ref;
     }
 
     return { Value: value};
@@ -836,6 +846,8 @@ function GetReference(referenceObj, reference, defaultReference) {
         var ref = referenceObj[reference];
         if(ref === undefined)
             return defaultReference;
+        if(!isNaN(ref))
+            return { Value: ref };
         return ref;
     }
 }
