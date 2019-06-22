@@ -1,31 +1,31 @@
 var SensorServicesIni = {
     IntakeAirTemperatureConfig: { Variables: [
         { IntakeAirTemperatureServiceId: { Type: "uint16", Value: 2002, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: TemperatureUnits }}
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: TemperatureUnits }}
     ] },
     EngineCoolantTemperatureServiceConfig: { Variables: [
         { EngineCoolantTemperatureServiceId: { Type: "uint16", Value: 2003, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: TemperatureUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: TemperatureUnits } }
     ] },
     ManifoldAbsolutePressureServiceConfig: { Variables: [
         { ManifoldAbsolutePressureServiceId: { Type: "uint16", Value: 2004, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: PressureUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: PressureUnits } }
     ] },
     VoltageConfig: { Variables: [
         { VoltageServiceId: { Type: "uint16", Value: 2005, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: VoltUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: VoltUnits } }
     ] },
     ThrottlePositionConfig: { Variables: [
         { ThrottlePositionServiceId: { Type: "uint16", Value: 2006, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: PercentUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: PercentUnits } }
     ] },
     EthanolContentConfig: { Variables: [
         { EthanolContentServiceId: { Type: "uint16", Value: 2007, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: PercentUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: PercentUnits } }
     ] },
     VehicleSpeedConfig: { Variables: [
         { VehicleSpeedServiceId: { Type: "uint16", Value: 2008, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatInputServiceConfig", ValueUnits: SpeedUnits } }
+        { FloatInputService: { IniName: "IFloatInputServiceConfig", ValueUnits: SpeedUnits } }
     ] },
     ReluctorGM24x: { Variables: [
         { ReluctorGM24xServiceId: { Type: "uint8", Value: 1, Hidden: true } },
@@ -39,18 +39,18 @@ var SensorServicesIni = {
     ] },
     IReluctorConfig: { Variables: [
         { Selection: { Label: "Reluctor", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "GM24x", ConfigName: "ReluctorGM24x"},
-            { Name: "2x", ConfigName: "Reluctor2x"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "GM24x", IniName: "ReluctorGM24x"},
+            { Name: "2x", IniName: "Reluctor2x"}
         ] } }
     ] },
     CrankReluctorConfig: { Variables: [
         { CrankReluctorServiceId: { Type: "uint16", Value: 2009, Hidden: true } },
-        { Reluctor: { ConfigName: "IReluctorConfig" } }
+        { Reluctor: { IniName: "IReluctorConfig" } }
     ] },
     CamReluctorConfig: { Variables: [
         { CamReluctorServiceId: { Type: "uint16", Value: 2010, Hidden: true } },
-        { Reluctor: { ConfigName: "IReluctorConfig" } }
+        { Reluctor: { IniName: "IReluctorConfig" } }
     ] }
 }
 

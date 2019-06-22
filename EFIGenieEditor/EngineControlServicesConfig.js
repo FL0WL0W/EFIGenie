@@ -5,7 +5,7 @@ var EngineControlServicesIni = {
         { CoilConfigs: { 
             Label: "Coil",
             Labels: ["Coil 1", "Coil 2", "Coil 3", "Coil 4", "Coil 5", "Coil 6", "Coil 7", "Coil 8", "Coil 9", "Coil 10", "Coil 11", "Coil 12", "Coil 13", "Coil 14", "Coil 15", "Coil 16"], 
-            ConfigName: "IBooleanOutputServiceConfig", 
+            IniName: "IBooleanOutputServiceConfig", 
             Array: "Coils"
         } }
     ] },
@@ -16,26 +16,26 @@ var EngineControlServicesIni = {
         { InjectorConfigs: { 
             Label: "Injector",
             Labels: ["Injector 1", "Injector 2", "Injector 3", "Injector 4", "Injector 5", "Injector 6", "Injector 7", "Injector 8", "Injector 9", "Injector 10", "Injector 11", "Injector 12", "Injector 13", "Injector 14", "Injector 15", "Injector 16", "Injector 17", "Injector 18", "Injector 19", "Injector 20", "Injector 21", "Injector 22", "Injector 23", "Injector 24", "Injector 25", "Injector 26", "Injector 27", "Injector 28", "Injector 29", "Injector 30", "Injector 31", "Injector 32"], 
-            ConfigName: "IBooleanOutputServiceConfig", 
+            IniName: "IBooleanOutputServiceConfig", 
             Array: "Injectors"
         } }
     ] },
     
     IdleAirControlValveConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 3003, Hidden: true } },
-        { FloatInputService: { ConfigName: "IFloatOutputServiceConfig" } }
+        { FloatInputService: { IniName: "IFloatOutputServiceConfig" } }
     ] },
     
     TachometerServiceConfig: { Variables: [
         { TachometerServiceId: { Type: "uint16", Value: 4001, Hidden: true } },
         { PulsesPer2Rpm: { Label: "Pulses Per RPM", Type: "uint8", Value: 1, ValueMultiplier: 2, Units: [ { Name:"Pulses/RPM", DisplayMultiplier: 1, DisplayOffset: 0} ] } },
-        { BooleanOutputService: { ConfigName: "IBooleanOutputServiceConfig" } }
+        { BooleanOutputService: { IniName: "IBooleanOutputServiceConfig" } }
     ] },
 
     ITachometerServiceConfig: { Variables: [
         { Selection: { Label: "Tachometer Service", Selections: [
-            { Name: "None", ConfigName: "BlankConfig"},
-            { Name: "Pin", ConfigName: "TachometerServiceConfig"}
+            { Name: "None", IniName: "BlankConfig"},
+            { Name: "Pin", IniName: "TachometerServiceConfig"}
         ] } }
     ] },
 
@@ -47,8 +47,8 @@ var EngineControlServicesIni = {
     IPrimeServiceConfig: { Variables: [
         { PrimeServiceId: { Type: "uint16", Value: 4002, Hidden: true } },
         { Selection: { Label: "Prime Service", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Static Pulse Width", ConfigName: "PrimeService_StaticPulseWidthConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Static Pulse Width", IniName: "PrimeService_StaticPulseWidthConfig"}
         ] } }
     ] },
 
@@ -76,8 +76,8 @@ var EngineControlServicesIni = {
     IIdleControlServiceConfig: { Variables: [
         { IdleAirControlValveServiceId: { Type: "uint16", Value: 4003, Hidden: true } },
         { Selection: { Label: "Idle Control", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "PID", ConfigName: "IdleControlService_PidConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "PID", IniName: "IdleControlService_PidConfig"}
         ] } }
     ] },    
 
@@ -116,9 +116,9 @@ var EngineControlServicesIni = {
     IAfrServiceConfig: { Variables: [
         { AfrServiceId: { Type: "uint16", Value: 4004, Hidden: true } },
         { Selection: { Label: "AFR Service", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Static", ConfigName: "AfrService_StaticConfig"},
-            { Name: "MAP + Ethanol", ConfigName: "AfrService_Map_EthanolConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Static", IniName: "AfrService_StaticConfig"},
+            { Name: "MAP + Ethanol", IniName: "AfrService_Map_EthanolConfig"}
         ] } }
     ] },
 
@@ -143,7 +143,7 @@ var EngineControlServicesIni = {
         { RpmDivisions: { Type: "uint16", XResolution: "RpmResolution", Label: "RPM Divisions", XLabel: "Division", ZLabel: "RPM", XMin: 1, XMax: "RpmResolution", ZUnits: RPMUnits, Dialog: true } },
         { YDivisions: { Type: "float", XResolution: "YResolution", Label: "Y Divisions", XLabel: "Division", ZLabel: "Y", XMin: 1, XMax: "YResolution", ZUnits: PressureUnits, Dialog: true } },
         
-        { LamdaSensor: { ConfigName: "IFloatInputServiceConfig", ValueUnits: LambdaUnits } }
+        { LamdaSensor: { IniName: "IFloatInputServiceConfig", ValueUnits: LambdaUnits } }
     ] },
     
     FuelTrimServiceWrapper_MultiChannelConfig: { Variables: [
@@ -153,7 +153,7 @@ var EngineControlServicesIni = {
         { ChannelConfigs: { 
             Label: "Channel",
             Labels: ["Channel 1", "Channel 2", "Channel 3", "Channel 4", "Channel 5", "Channel 6", "Channel 7", "Channel 8", "Channel 9", "Channel 10", "Channel 11", "Channel 12", "Channel 13", "Channel 14", "Channel 15", "Channel 16"], 
-            ConfigName: "IFuelTrimServiceConfig", 
+            IniName: "IFuelTrimServiceConfig", 
             Array: "NumberOfFuelTrimChannels"
         } }
     ] },
@@ -161,9 +161,9 @@ var EngineControlServicesIni = {
     IFuelTrimServiceConfig: { Variables: [
         { FuelTrimServiceId: { Type: "uint16", Value: 4005, Hidden: true } },
         { Selection: { Label: "Fuel Trim Service", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Table", ConfigName: "FuelTrimService_InterpolatedTableConfig"},
-            { Name: "Multi Channel", ConfigName: "FuelTrimServiceWrapper_MultiChannelConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Table", IniName: "FuelTrimService_InterpolatedTableConfig"},
+            { Name: "Multi Channel", IniName: "FuelTrimServiceWrapper_MultiChannelConfig"}
         ] } }
     ] },
     
@@ -171,7 +171,7 @@ var EngineControlServicesIni = {
         { FuelPumpServiceId: { Type: "uint8", Value: 1, Hidden: true } },
         { PrimeTime : { Label: "Prime Time", Type: "float", Value: 3, Units: TimeUnits } },
         
-        { BooleanOutputService: { ConfigName: "IBooleanOutputServiceConfig" } }
+        { BooleanOutputService: { IniName: "IBooleanOutputServiceConfig" } }
     ] },
     
     FuelPumpService_AnalogConfig: { Variables: [
@@ -188,15 +188,15 @@ var EngineControlServicesIni = {
 
         { AnalogTable: { Type: "float", XResolution: "RpmResolution", YResolution: "YResolution", Label: "Table", XLabel: "RPM", ZLabel: "Pressure", XMin: 0, XMax: "MaxRpm", YLabel: "MAP", YMin: 0, YMax: "MaxY", XUnits: RPMUnits, YUnits: PressureUnits, ZUnits: PressureUnits, Dialog: true } },
         
-        { AnalogOutputService: { ConfigName: "IFloatOutputServiceConfig", ValueUnits: PressureUnits } }
+        { AnalogOutputService: { IniName: "IFloatOutputServiceConfig", ValueUnits: PressureUnits } }
     ] },
     
     IFuelPumpServiceConfig: { Variables: [
         { FuelPumpServiceId: { Type: "uint16", Value: 4006, Hidden: true } },
         { Selection: { Label: "Fuel Pump Service", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Pin", ConfigName: "FuelPumpServiceConfig"},
-            { Name: "Analog", ConfigName: "FuelPumpService_AnalogConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Pin", IniName: "FuelPumpServiceConfig"},
+            { Name: "Analog", IniName: "FuelPumpService_AnalogConfig"}
         ] } }
     ] },
     
@@ -220,8 +220,8 @@ var EngineControlServicesIni = {
         { IgnitionConfigWrapper_HardRpmLimitConfigId: { Type: "uint8", Value: 3, Hidden: true } },
         { RpmEnable : { Label: "RPM Enable", Type: "uint16", Value: 6450, Units: RPMUnits } },
         { RpmDisable : { Label: "RPM Disable", Type: "uint16", Value: 6500, Units: RPMUnits } },
-        { BooleanInput: { ConfigName: "IBooleanInputServiceConfig" } },
-        { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
+        { BooleanInput: { IniName: "IBooleanInputServiceConfig" } },
+        { IgnitionConfig: { IniName: "IIgnitionConfig" } }
     ] },
 
     IgnitionConfigWrapper_SoftPidRpmLimitConfig:  { Variables: [
@@ -231,17 +231,17 @@ var EngineControlServicesIni = {
         { P: { Label: "P", Type: "float", Value: 1 } },
         { I: { Label: "I", Type: "float", Value: 0 } },
         { D: { Label: "D", Type: "float", Value: 0 } },
-        { BooleanInput: { ConfigName: "IBooleanInputServiceConfig" } },
-        { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
+        { BooleanInput: { IniName: "IBooleanInputServiceConfig" } },
+        { IgnitionConfig: { IniName: "IIgnitionConfig" } }
     ] },
 
     IIgnitionConfig: { Variables: [
         { Selection: { Label: "Ignition Config", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Static", ConfigName: "IgnitionConfig_StaticConfig"},
-            { Name: "MAP + Ethanol", ConfigName: "IgnitionConfig_Map_EthanolConfig"},
-            { Name: "RPM Limit Wrapper (Hard)", ConfigName: "IgnitionConfigWrapper_HardRpmLimitConfig"},
-            { Name: "RPM Limit Wrapper (Soft PID)", ConfigName: "IgnitionConfigWrapper_SoftPidRpmLimitConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Static", IniName: "IgnitionConfig_StaticConfig"},
+            { Name: "MAP + Ethanol", IniName: "IgnitionConfig_Map_EthanolConfig"},
+            { Name: "RPM Limit Wrapper (Hard)", IniName: "IgnitionConfigWrapper_HardRpmLimitConfig"},
+            { Name: "RPM Limit Wrapper (Soft PID)", IniName: "IgnitionConfigWrapper_SoftPidRpmLimitConfig"}
         ] } }
     ] },
     
@@ -251,13 +251,13 @@ var EngineControlServicesIni = {
         { Ignitors: { Type: "uint8", Value: "//IgnitorServices/Coils", Hidden: true } },
 		{ IgnitorTdc: { Type: "uint16", XResolution: "//IgnitorServices/Coils", ValueMultiplier: 64, Label: "Coil TDC", XLabel: "Coil", ZLabel: "TDC", XMin: 1, XMax: "//IgnitorServices/Coils", ZUnits: DegreeUnits, Dialog: true } },
         
-        { IgnitionConfig: { ConfigName: "IIgnitionConfig" } }
+        { IgnitionConfig: { IniName: "IIgnitionConfig" } }
     ] },
 
     IIgnitionSchedulingService: { Variables: [
         { Selection: { Label: "Ignition Scheduling Service", Selections: [
-            { Name: "None", ConfigName: "BlankConfig"},
-            { Name: "Schedule", ConfigName: "IgnitionSchedulingService"}
+            { Name: "None", IniName: "BlankConfig"},
+            { Name: "Schedule", IniName: "IgnitionSchedulingService"}
         ] } }
     ] },
     
@@ -307,14 +307,14 @@ var EngineControlServicesIni = {
         { RpmEnable : { Label: "RPM Enable", Type: "uint16", Value: 1500, Units: RPMUnits } },
         { RpmDisable : { Label: "RPM Disable", Type: "uint16", Value: 1200, Units: RPMUnits } },
         
-        { InjectionConfig: { ConfigName: "IInjectionConfig" } }
+        { InjectionConfig: { IniName: "IInjectionConfig" } }
     ] },
     
     IInjectionConfig: { Variables: [
         { Selection: { Label: "Injection Config", Selections: [
-            { Name: "None", ConfigName: "NoneServiceConfig"},
-            { Name: "Speed Density", ConfigName: "InjectionConfig_SDConfig"},
-            { Name: "DFCO Wrapper", ConfigName: "InjectionConfigWrapper_DFCOConfig"}
+            { Name: "None", IniName: "NoneServiceConfig"},
+            { Name: "Speed Density", IniName: "InjectionConfig_SDConfig"},
+            { Name: "DFCO Wrapper", IniName: "InjectionConfigWrapper_DFCOConfig"}
         ] } }
     ] },
 
@@ -323,33 +323,33 @@ var EngineControlServicesIni = {
 		{ Injectors: { Type: "uint8", Value: "//InjectorServices/Injectors", Hidden: true } },
 		{ InjectorTdc: { Type: "uint16", XResolution: "//InjectorServices/Injectors", Label: "Injector TDC", XLabel: "Injector", ZLabel: "TDC", XMin: 1, XMax: "//InjectorServices/Injectors", ZUnits: DegreeUnits, Dialog: true } },
         
-        { InjectionConfig: { ConfigName: "IInjectionConfig" } }
+        { InjectionConfig: { IniName: "IInjectionConfig" } }
     ] },
 
     IInjectionSchedulingService: { Variables: [
         { Selection: { Label: "Injection Scheduling Service", Selections: [
-            { Name: "None", ConfigName: "BlankConfig"},
-            { Name: "Schedule", ConfigName: "InjectionSchedulingService"}
+            { Name: "None", IniName: "BlankConfig"},
+            { Name: "Schedule", IniName: "InjectionSchedulingService"}
         ] } }
     ] },
 
     SensorServices: { Tabbed: true, Variables: [
-        { CrankReluctorConfig: { Label: "Crank Reluctor", ConfigName: "CrankReluctorConfig" } },
-        { CamReluctorConfig: { Label: "Cam Reluctor", ConfigName: "CamReluctorConfig" } },
-        { IntakeAirTemperatureConfig: { Label: "IAT", ConfigName: "IntakeAirTemperatureConfig" } },
-        { EngineCoolantTemperatureServiceConfig: { Label: "ECT", ConfigName: "EngineCoolantTemperatureServiceConfig" } },
-        { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", ConfigName: "ManifoldAbsolutePressureServiceConfig" } },
-        { VoltageConfig: { Label: "Voltage", ConfigName: "VoltageConfig" } },
-        { ThrottlePositionConfig: { Label: "TPS", ConfigName: "ThrottlePositionConfig" } },
-        { EthanolContentConfig: { Label: "Ethanol", ConfigName: "EthanolContentConfig" } },
-        { VehicleSpeedConfig: { Label: "VSS", ConfigName: "VehicleSpeedConfig" } },
+        { CrankReluctorConfig: { Label: "Crank Reluctor", IniName: "CrankReluctorConfig" } },
+        { CamReluctorConfig: { Label: "Cam Reluctor", IniName: "CamReluctorConfig" } },
+        { IntakeAirTemperatureConfig: { Label: "IAT", IniName: "IntakeAirTemperatureConfig" } },
+        { EngineCoolantTemperatureServiceConfig: { Label: "ECT", IniName: "EngineCoolantTemperatureServiceConfig" } },
+        { ManifoldAbsolutePressureServiceConfig: { Label: "MAP", IniName: "ManifoldAbsolutePressureServiceConfig" } },
+        { VoltageConfig: { Label: "Voltage", IniName: "VoltageConfig" } },
+        { ThrottlePositionConfig: { Label: "TPS", IniName: "ThrottlePositionConfig" } },
+        { EthanolContentConfig: { Label: "Ethanol", IniName: "EthanolContentConfig" } },
+        { VehicleSpeedConfig: { Label: "VSS", IniName: "VehicleSpeedConfig" } },
     ] },
 
     OutputServices: { Tabbed: true, Variables: [
-        { IgnitorServices: { Label: "Ignition Coils", ConfigName: "IgnitorServicesConfig"} },
-        { InjectorServices: { Label: "Injectors", ConfigName: "InjectorServicesConfig"} },
-        { IdleAirControlValveService: { Label: "IAC Valve", ConfigName: "IdleAirControlValveConfig"} },
-        { TachometerService: { Label: "Tach", ConfigName: "ITachometerServiceConfig"} }
+        { IgnitorServices: { Label: "Ignition Coils", IniName: "IgnitorServicesConfig"} },
+        { InjectorServices: { Label: "Injectors", IniName: "InjectorServicesConfig"} },
+        { IdleAirControlValveService: { Label: "IAC Valve", IniName: "IdleAirControlValveConfig"} },
+        { TachometerService: { Label: "Tach", IniName: "ITachometerServiceConfig"} }
     ] },
 
     EngineGeneral: { Size: 0, Variables: [
@@ -358,25 +358,25 @@ var EngineControlServicesIni = {
      ] },
 
     EngineServices: { Tabbed: true, Variables: [
-        { EngineGeneral: { Label: "General", ConfigName: "EngineGeneral"} },
-        { IdleControlService: { Label: "Idle", ConfigName: "IIdleControlServiceConfig"} },
-        { PrimeService: { Label: "Prime", ConfigName: "IPrimeServiceConfig"} },
-        { AfrService: { Label: "AFR", ConfigName: "IAfrServiceConfig"} },
-        { FuelTrimService: { Label: "Fuel Trim", ConfigName: "IFuelTrimServiceConfig"} },
-        { FuelPumpService: { Label: "Fuel Pump", ConfigName: "IFuelPumpServiceConfig"} },
-        { IgnitionSchedulingService: { Label: "Ignition", ConfigName: "IIgnitionSchedulingService"} },
-        { InjectionSchedulingService: { Label: "Injection", ConfigName: "IInjectionSchedulingService"} }
+        { EngineGeneral: { Label: "General", IniName: "EngineGeneral"} },
+        { IdleControlService: { Label: "Idle", IniName: "IIdleControlServiceConfig"} },
+        { PrimeService: { Label: "Prime", IniName: "IPrimeServiceConfig"} },
+        { AfrService: { Label: "AFR", IniName: "IAfrServiceConfig"} },
+        { FuelTrimService: { Label: "Fuel Trim", IniName: "IFuelTrimServiceConfig"} },
+        { FuelPumpService: { Label: "Fuel Pump", IniName: "IFuelPumpServiceConfig"} },
+        { IgnitionSchedulingService: { Label: "Ignition", IniName: "IIgnitionSchedulingService"} },
+        { InjectionSchedulingService: { Label: "Injection", IniName: "IInjectionSchedulingService"} }
     ] },
 
     EngineBuilderConfig: { Tabbed: true, Variables: [
-        { SensorServices: { Label: "Sensors", ConfigName: "SensorServices"} },
-        { OutputServices: { Label: "Outputs", ConfigName: "OutputServices"} },
-        { EngineServices: { Label: "Engine", ConfigName: "EngineServices"} },
+        { SensorServices: { Label: "Sensors", IniName: "SensorServices"} },
+        { OutputServices: { Label: "Outputs", IniName: "OutputServices"} },
+        { EngineServices: { Label: "Engine", IniName: "EngineServices"} },
         { EOF: { Type: "uint16", Value: 0, Hidden: true } }
     ] },
 
     Main: { Variables: [
-        { BuilderConfig: { ConfigName: "EngineBuilderConfig" } },
+        { BuilderConfig: { IniName: "EngineBuilderConfig" } },
     ] }
 };
 

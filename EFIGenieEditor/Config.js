@@ -1,39 +1,155 @@
-class Config {
-    constructor(ini, iniNamespace, parent) {
-        this.Parent = parent;
-        this.SetIni(ini, iniNamespace);
+class ConfigBase {
+    GetIni() {
+        return this.Ini;
     }
+    GetIniLocation() {
+        return this.IniLocation;
+    }
+    GetIniProperty() {
+        var property = {};
+        Object.assign(property, GetPropertyByLocation(this.Ini, this.IniLocation));
+        if(property.IniName) {
+            Object.assign(property, GetPropertyByLocation(this.Ini, property.IniName));
+        }
+        return property;
+    }
+    SetIni(ini, iniLocation) {
+        if(ini) {
+            this.Ini = ini;
+        }
+        if(!this.Ini) {
+            this.Ini = {};
+        }
+        if(iniLocation) {
+            this.IniLocation = iniLocation;
+        }
+        if(!this.IniLocation) {
+            this.IniLocation = "Main";
+        }
+
+        this.InitProperty();
+    }
+    GetObj() {
+        return this.Obj;
+    }
+    GetJSONSafeOBJ() {
+        return JSON.parse(JSON.stringify(this.Obj, function(key, value) {   
+            if(key.endsWith("EFJ") || key == "IniLocation")
+                return undefined;
+            
+            return value;
+        }));
+    }
+    GetObjLocation() {
+        return this.Obj;
+    }
+    GetObjProperty() {
+        var property = GetPropertyByLocation(this.Obj, this.ObjLocation);
+        if(property === undefined)
+        {
+            var parentObj = GetPropertyByLocation(this.Obj, this.ObjLocation.substring(0, this.ObjLocation.lastIndexOf("/")));
+            if(parentObj) {
+                parentObj[this.ObjLocation.substring(this.ObjLocation.lastIndexOf("/") + 1)] = {};
+            }
+
+            property = GetPropertyByLocation(this.Obj, this.ObjLocation);
+        }
+
+        return property;
+    }
+    SetObj(obj, objLocation) {
+        if(obj) {
+            if(obj !== this.Obj) {
+                AttachFunctionFromObjToObj(obj, "Update", this, "ObjUpdateEvent");
+            }
+
+            this.Obj = obj;
+        }
+        if(!this.Obj) {
+            this.Obj = {};
+        }
+        if(objLocation) {
+            this.ObjLocation = objLocation;
+        }
+        if(!this.ObjLocation) {
+            this.ObjLocation = "";
+        }
+
+        this.InitProperty();
+    }
+    ObjUpdateEvent() { }
+    InitProperty() {
+        if(!this.Obj || !this.Ini)
+            return false;
+        var objProperty = this.GetObjProperty();
+        objProperty.IniLocation = this.IniLocation;
+        return objProperty;
+    }
+
+    GetStep(){
+        var iniProperty = this.GetIniProperty();
+        var step;
+        if(iniProperty.Step !== undefined) {
+            step = GetValueByNumberOrReference(iniProperty.Step, this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
+        }
+        if(step === undefined) {
+            switch(iniProperty.Type) {
+                case "uint8":
+                case "uint16":
+                case "uint32":
+                case "uint64":
+                case "int8":
+                case "int16":
+                case "int32":
+                case "int64":
+                    step = Math.max(1 / this.GetValueMultiplier(), 0.01);
+                    break;
+                case "float":
+                case "variable":
+                case "formula":
+                    step = 0.01;
+                    break;
+                default:
+                    throw "Invalid Type " + iniProperty.Type;
+            }
+        }
+        return step;
+    }
+}
+
+class Config extends ConfigBase {
     GetArrayBuffer() {
+        var iniProperty =  this.GetIniProperty();
         var arrayBuffer;
-        if(this.Size !== undefined)
-            arrayBuffer = new ArrayBuffer(this.Size);
+        if(iniProperty.Size !== undefined)
+            arrayBuffer = new ArrayBuffer(iniProperty.Size);
         else
             arrayBuffer = new ArrayBuffer();
-        for(var variableRowIndex in this.Variables) {
-            var variableRow = this.Variables[variableRowIndex];
-            var variableRowKey = Object.keys(variableRow)[0];
-            var variableRowObj = this[variableRowKey];
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRowKey = Object.keys(iniProperty.Variables[variableRowIndex])[0];
+            var variableRowConfig = this[variableRowKey];
+            var variableRowIniProperty = variableRowConfig.GetIniProperty();
 
-            if(this.Size !== undefined) {// we are in a statically mapped area
-                if(this.Size === 0)
+            if(iniProperty.Size !== undefined) {// we are in a statically mapped area
+                if(iniProperty.Size === 0)
                     return arrayBuffer;
-                var offset = variableRowObj.Offset;
+                var offset = variableRowIniProperty.Offset;
                 if(offset === undefined) {
                     throw "Config No offset specified";
                 }
 
-                var subArrayBuffer = variableRowObj.GetArrayBuffer();
+                var subArrayBuffer = variableRowConfig.GetArrayBuffer();
 
-                if(variableRowObj.BitOffset || variableRowObj.BitSize) {
-                    var bitSize = variableRowObj.BitSize;
+                if(variableRowIniProperty.BitOffset || variableRowIniProperty.BitSize) {
+                    var bitSize = variableRowIniProperty.BitSize;
                     if(!bitSize) {
-                        if(variableRowObj instanceof ConfigBoolean)
+                        if(variableRowConfig instanceof ConfigBoolean)
                             bitSize = 1;
                         else
                             bitSize = subArrayBuffer.byteLength * 8;
                     }
                     
-                    var bitOffset = variableRowObj.BitOffset;
+                    var bitOffset = variableRowIniProperty.BitOffset;
                     if(!bitOffset)
                         bitOffset = 0;
 
@@ -56,40 +172,41 @@ class Config {
 
                 arrayBuffer = arrayBuffer.slice(0, offset).concatArray(subArrayBuffer).concatArray(arrayBuffer.slice(offset + subArrayBuffer.byteLength));
             } else {
-                arrayBuffer = arrayBuffer.concatArray(variableRowObj.GetArrayBuffer());
+                arrayBuffer = arrayBuffer.concatArray(variableRowConfig.GetArrayBuffer());
             }
         }
         return arrayBuffer;
     }
     SetArrayBuffer(arrayBuffer) {
+        var iniProperty =  this.GetIniProperty();
         var size = 0;
 
-        if(this.Size) {// we are in a statically mapped area
-            size = this.Size;
+        if(iniProperty.Size) {// we are in a statically mapped area
+            size = iniProperty.Size;
         }
 
-        for(var variableRowIndex in this.Variables) {
-            var variableRow = this.Variables[variableRowIndex];
-            var variableRowKey = Object.keys(variableRow)[0];
-            var variableRowObj = this[variableRowKey];
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRowKey = Object.keys(iniProperty.Variables[variableRowIndex])[0];
+            var variableRowConfig = this[variableRowKey];
+            var variableRowIniProperty = variableRowConfig.GetIniProperty();
 
-            if(this.Size) {// we are in a statically mapped area
-                var offset = variableRowObj.Offset;
+            if(iniProperty.Size) {// we are in a statically mapped area
+                var offset = variableRowIniProperty.Offset;
                 if(offset === undefined) {
                     throw "Config No offset specified";
                 }
                 
                 var subArrayBuffer = arrayBuffer.slice(offset);
 
-                if(variableRowObj.BitOffset || variableRowObj.BitSize) {
-                    var bitSize = variableRowObj.BitSize;
+                if(variableRowIniProperty.BitOffset || variableRowIniProperty.BitSize) {
+                    var bitSize = variableRowIniProperty.BitSize;
                     var byteSize = 1;
                     if(!bitSize) {
-                        if(variableRowObj instanceof ConfigBoolean)
+                        if(variableRowConfig instanceof ConfigBoolean)
                             bitSize = 1;
                         else {
-                            if(variableRowObj.Type) {
-                                switch(variableRowObj.Type) {
+                            if(variableRowIniProperty.Type) {
+                                switch(variableRowIniProperty.Type) {
                                     case "uint8":
                                     case "int8":
                                         bitSize = 8;
@@ -112,7 +229,7 @@ class Config {
                         }
                     }
                     
-                    var bitOffset = variableRowObj.BitOffset;
+                    var bitOffset = variableRowIniProperty.BitOffset;
                     if(!bitOffset)
                         bitOffset = 0;
 
@@ -133,190 +250,157 @@ class Config {
                     }                
                 }
 
-                variableRowObj.SetArrayBuffer(subArrayBuffer);
+                variableRowConfig.SetArrayBuffer(subArrayBuffer);
             } else {
-                size += variableRowObj.SetArrayBuffer(arrayBuffer.slice(size));
+                size += variableRowConfig.SetArrayBuffer(arrayBuffer.slice(size));
             }
         }
 
         return size;
     }
-    GetIni() {
-        var returnVariables = []
-        for(var variableRowIndex in this.Variables) {
-            var variableRow = this.Variables[variableRowIndex];
-            var variableRowKey = Object.keys(variableRow)[0];
-            var variableRowObj = this[variableRowKey];
-
-            if(!variableRowObj)
-                throw "Config not initialized";
-                
-            var variableRowValue = variableRowObj.GetIni();
-
-            var returnVariableRow = {};
-            returnVariableRow[variableRowKey] = variableRowValue;
+    SetIni(ini, iniLocation) {
+        super.SetIni(ini, iniLocation);
+        var iniProperty =  this.GetIniProperty();
             
-            returnVariables.push(returnVariableRow);
-        }
-        this.Variables = returnVariables;
-        
-        return JSON.parse(JSON.stringify(this, function(key, value) {   
-            if(key === "IniNamespace" || key === "Parent")
-                return undefined;         
-            for(var variableRowIndex in this.Variables) {
-                var variableRow = this.Variables[variableRowIndex];
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRow = iniProperty.Variables[variableRowIndex];
+            var variableRowKey = Object.keys(variableRow)[0];
 
-                if(key === Object.keys(variableRow)[0]) {
-                    return undefined;
+            if(variableRow[variableRowKey].XResolution) {
+                if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigNumberTable)) {
+                    this[variableRowKey] = new ConfigNumberTable();
                 }
-            }
-            if(key != "" && value.GetIni) 
-                return value.GetIni();  
-            
-            return value;
-        }));
-    }
-    SetIni(ini, iniNamespace) {
-        if(iniNamespace !== undefined)
-            this.IniNamespace = iniNamespace;
-        else if (this.IniNamespace === undefined)
-            throw "No IniNamespace defined for ConfigSelection";
-            
-        this.Ini = {};
-        if(ini && ini.ConfigName) {
-            Object.assign(this.Ini, this.IniNamespace[ini.ConfigName]);
-        } else {
-            Object.assign(this.Ini, this.IniNamespace["Main"]);
-        }
-        if(ini)
-            Object.assign(this.Ini, ini);
-            
-        for(var variableRowIndex in this.Ini.Variables) {
-            var variableRow = this.Ini.Variables[variableRowIndex];
-            var variableRowKey = Object.keys(variableRow)[0];
-            var variableRowObj = this[variableRowKey];
-
-            if(!variableRowObj) {
-                if(variableRow[variableRowKey].XResolution) {
-                    this[variableRowKey] = new ConfigNumberTable(variableRow[variableRowKey], this);
-                } else if(variableRow[variableRowKey].Type) {
-                    if(variableRow[variableRowKey].Type)
-                    {
-                        switch(variableRow[variableRowKey].Type) {
-                            case "uint8":
-                            case "uint16":
-                            case "uint32":
-                            case "uint64":
-                            case "int8":
-                            case "int16":
-                            case "int32":
-                            case "int64":
-                            case "float":
-                            case "variable":
-                                this[variableRowKey] = new ConfigNumber(variableRow[variableRowKey], this);
-                                break;
-                            case "formula":
-                                this[variableRowKey] = new ConfigFormula(variableRow[variableRowKey], this);
-                                break;
-                            case "bool":
-                                this[variableRowKey] = new ConfigBoolean(variableRow[variableRowKey], this);
-                                break;
+            } else if(variableRow[variableRowKey].Type) {
+                switch(variableRow[variableRowKey].Type) {
+                    case "uint8":
+                    case "uint16":
+                    case "uint32":
+                    case "uint64":
+                    case "int8":
+                    case "int16":
+                    case "int32":
+                    case "int64":
+                    case "float":
+                    case "variable":
+                        if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigNumber)) {
+                            this[variableRowKey] = new ConfigNumber();
                         }
-                    }
-                } else if (variableRow[variableRowKey].ConfigName || variableRow[variableRowKey].Variables) {
-                    if(!variableRow[variableRowKey].Array) {
-                        this[variableRowKey] = new Config(variableRow[variableRowKey], this.IniNamespace, this);
-                    } else {
-                        this[variableRowKey] = new ConfigArray(variableRow[variableRowKey], this.IniNamespace, this);
-                    }
-                } else if (variableRow[variableRowKey].Selections) {
-                    this[variableRowKey] = new ConfigSelection(variableRow[variableRowKey], this.IniNamespace, this);
+                        break;
+                    case "formula":
+                        if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigFormula)) {
+                            this[variableRowKey] = new ConfigFormula();
+                        }
+                        break;
+                    case "bool":
+                        if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigBoolean)) {
+                            this[variableRowKey] = new ConfigBoolean();
+                        }
+                        break;
                 }
-            } else {
-                variableRowObj.SetIni(variableRow[variableRowKey]);
+            } else if (variableRow[variableRowKey].IniName || variableRow[variableRowKey].Variables) {
+                if(!variableRow[variableRowKey].Array) {
+                    if(!this[variableRowKey] || !(this[variableRowKey] instanceof Config)) {
+                        this[variableRowKey] = new Config();
+                    }
+                } else {
+                    if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigArray)) {
+                        this[variableRowKey] = new ConfigArray();
+                    }
+                }
+            } else if (variableRow[variableRowKey].Selections) {
+                if(!this[variableRowKey] || !(this[variableRowKey] instanceof ConfigSelection)) {
+                    this[variableRowKey] = new ConfigSelection();
+                }
             }
+
+            var variableIniLocation = this.IniLocation + "/Variables/" + variableRowIndex + "/" + variableRowKey;
+            if(!GetPropertyByLocation(this.Ini, variableIniLocation)) {
+                if(iniProperty.IniName)
+                    variableIniLocation = iniProperty.IniName + "/Variables/" + variableRowIndex + "/" + variableRowKey;
+                else
+                    throw "Where did the variables come from?";
+            }
+            if(!GetPropertyByLocation(this.Ini, variableIniLocation))
+                throw "Can't find the ini location";
+            
+            if(this[variableRowKey])
+                this[variableRowKey].SetIni(this.Ini, variableIniLocation);
         }
+
+        this.InitProperty();
+    }
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+        
+        var iniProperty = this.GetIniProperty();
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRow = iniProperty.Variables[variableRowIndex];
+            var variableRowKey = Object.keys(variableRow)[0];
+
+            var variableLocation = this.ObjLocation;
+            if(variableLocation)
+                variableLocation += "/";
+
+            variableLocation += variableRowKey;
+
+            if(this[variableRowKey]) {
+                this[variableRowKey].SetObj(this.Obj, variableLocation);
+            } 
+        }
+        
+        return objProperty;
     }
 }
 
-class ConfigSelection {
-    constructor(ini, iniNamespace, parent) {
-        this.Parent = parent;
-        this.SetIni(ini, iniNamespace);
-    }
+class ConfigSelection extends ConfigBase {
     GetArrayBuffer() {
         return this.Value.GetArrayBuffer();
     }
     SetArrayBuffer(arrayBuffer) {
-        var thisClass = this;
-        var selectedConfig =  this.Value.Variables[0][Object.keys(this.Value.Variables[0])[0]];
-
-        if( !(selectedConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectedConfig.Value) &&
-            !(selectedConfig.Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectedConfig.Value)) {
-            $.each(this.Selections, function(selectionIndex, selectionValueObj) {
-                var selectionValue = new Config(selectionValueObj, thisClass.IniNamespace, thisClass);
-                var selectionConfig =  selectionValue.Variables[0][Object.keys(selectionValue.Variables[0])[0]];
-
-                if( (selectionConfig.Type === "uint8" && new Uint8Array(arrayBuffer.slice(0, 1))[0] === selectionConfig.Value) ||
-                    (selectionConfig.Type === "uint16" && new Uint16Array(arrayBuffer.slice(0, 16))[0] === selectionConfig.Value)) {
-                    thisClass.Index = selectionIndex;
-                    thisClass.Value = selectionValue;
-                }
-            });
-        }
-
         return this.Value.SetArrayBuffer(arrayBuffer);
     }
-    SetIni(ini, iniNamespace) {
-        if(iniNamespace !== undefined)
-            this.IniNamespace = iniNamespace;
-        else if (this.IniNamespace === undefined)
-            throw "No IniNamespace defined for ConfigSelection";
+    SetIni(ini, iniLocation) {
+        super.SetIni(ini, iniLocation);
+        if(this.Value)
+            this.Value.SetIni(ini);
+    }
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
 
-        this.Ini = ini
-        if(this.Index === undefined && this.Ini.Index !== undefined) {
-            this.Index = this.Ini.Index;
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Index === undefined && iniProperty.Index !== undefined) {
+            objProperty.Index = iniProperty.Index;
         }
-        if(this.Index === undefined) {
-            this.Index = 0;
+        if(objProperty.Index === undefined) {
+            objProperty.Index = 0;
         }
-        if(this.Value === undefined && this.Ini.Value !== undefined) {
-            this.Value = this.Ini.Value;
-        }
-        if(this.Value !== undefined) {
-            $.each(this.Ini.Selections, function(index, value) {
-                if(this.Value.ConfigName, value.ConfigName) {
-                    if(this.Value.Instance !== undefined) {
-                        if(this.Value.Instance == value.Instance) {
-                            this.Index = index;
-                        }
-                    } else {
-                        this.Index = index;
-                    }
-                }
-            });
+        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+            objProperty.Value = iniProperty.Value;
         }
         if(this.Value === undefined) {
-            this.Value = new Config(this.Ini.Selections[this.Index], this.IniNamespace, this);
+            this.Value = new Config();
         }
+        this.Value.SetIni(this.Ini, this.IniLocation + "/Selections/" + objProperty.Index)
+        this.Value.SetObj(this.Obj, this.ObjLocation + "/Value")
+        
+        return objProperty;
     }
 }
 
-class ConfigNumber {
-    constructor(ini, parent) {
-        this.Parent = parent;
-        this.SetIni(ini);
-    }
+class ConfigNumber extends ConfigBase {
+    GetValueMultiplier = GetIniPropertyPropertyGetFunction("ValueMultiplier", 1);
+    GetMin = GetIniPropertyMin;
+    GetMax = GetIniPropertyMax;
     GetArrayBuffer() {
-        var val = this.Value;
-        if(isNaN(parseFloat(val))){
-            var ref = GetReference(this.Parent, this.Value, {});
-            val = ref.Value;
-        }
+        var iniProperty = this.GetIniProperty();
+        var val = this.GetObjProperty().Value
+        var valMult = this.GetValueMultiplier();
 
-        valMult = GetIniValueMultiplier(this.Ini);
-
-        switch(this.Ini.Type) {
+        switch(iniProperty.Type) {
             case "uint8":
                 return new Uint8Array([val * valMult]).buffer;
             case "uint16":
@@ -336,10 +420,11 @@ class ConfigNumber {
         }
     }
     SetArrayBuffer(arrayBuffer) {
+        var iniProperty = this.GetIniProperty();
         var size = 0;
         var val;
-        valMult = GetIniValueMultiplier(this.Ini);
-        switch(this.Ini.Type) {
+        var valMult = this.GetValueMultiplier();
+        switch(iniProperty.Type) {
             case "uint8":
                 val = new Uint8Array(arrayBuffer.slice(0,1))[0] / valMult;
                 size = 1;
@@ -378,69 +463,77 @@ class ConfigNumber {
                 break;
         }
 
-        if(isNaN(parseFloat(this.Value))){
-            var ref = GetReference(this.Parent, this.Value, {});
-            ref.Value = val;
-        } else
-            this.Value = val;
-
+        this.GetObjProperty().Value = val;
         return size;
     }
-    SetIni(ini) {
-        this.Ini = ini
-        if(this.Value === undefined && this.Ini.Value !== undefined) {
-            this.Value = this.Ini.Value;
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+            objProperty.Value = iniProperty.Value;
         }
-        if(this.Value === undefined) {
-            this.Value = GetIniMin(this.Ini);
-            if(this.Value < 0)
-                this.Value = 0;
-            if(this.Value > GetIniMax(this.Ini))
-                this.Value = GetIniMax(this.Ini);
+        if(objProperty.Value === undefined) {
+            objProperty.Value = this.GetMin();
+            if(objProperty.Value < 0)
+                objProperty.Value = 0;
+            if(objProperty.Value > this.GetMax())
+                objProperty.Value = this.GetMax();
         }
+
+        return objProperty;
     }
 }
 
-class ConfigBoolean {
-    constructor(ini, parent) {
-        this.Parent = parent;
-        this.SetIni(ini);
-    }
+class ConfigBoolean extends ConfigBase {
     GetArrayBuffer() {
-        return new Uint8Array([this.Value & 0x01]).buffer;
+        return new Uint8Array([this.GetObjProperty().Value & 0x01]).buffer;
     }
     SetArrayBuffer(arrayBuffer) {
-        this.Value = new Uint8Array(arrayBuffer)[0] & 0x01;
+        this.GetObjProperty().Value = new Uint8Array(arrayBuffer)[0] & 0x01;
         return 1;
     }
-    SetIni(ini) {
-        this.Ini = ini
-        if(this.Value === undefined && this.Ini.Value !== undefined) {
-            this.Value = this.Ini.Value;
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+            objProperty.Value = iniProperty.Value;
         }
-        if(this.Value === undefined) {
-            this.Value = false;
+        if(objProperty.Value === undefined) {
+            objProperty.Value = false;
         }
+
+        return objProperty;
     }
 }
 
-class ConfigNumberTable {
-    constructor(ini, parent) {
-        this.Parent = parent;
-        this.SetIni(ini);
-    }
+class ConfigNumberTable extends ConfigBase {
+    GetValueMultiplier = GetIniPropertyPropertyGetFunction("ValueMultiplier", 1);
+    GetMin = GetIniPropertyMin;
+    GetMax = GetIniPropertyMax;
+    GetXResolution = GetIniPropertyPropertyGetFunction("XResolution", 1);
+    GetYResolution = GetIniPropertyPropertyGetFunction("YResolution", 1);
+
     GetTableArrayLength() {
-        return GetReferenceByNumberOrReference(this.Parent, GetIniXResolution(this.Ini), 1).Value * GetReferenceByNumberOrReference(this.Parent, GetIniYResolution(this.Ini), 1).Value;
+        return this.GetXResolution() * this.GetYResolution();
     }
     GetArrayBuffer() {
-        var value = Array.from(this.Value);
+        var iniProperty = this.GetIniProperty();
+        var val = this.GetObjProperty().Value
+        var valMult = this.GetValueMultiplier();
+        
+        var value = Array.from(val);
 
-        valMult = GetIniValueMultiplier(this.Ini);
         for(var i = 0; i < value.length; i++) {
             value[i] *= valMult;
         }
 
-        switch(this.Ini.Type) {
+        switch(iniProperty.Type) {
             case "bool":
             case "uint8":
                 return Uint8Array.from(value).buffer;
@@ -466,412 +559,433 @@ class ConfigNumberTable {
     }
     SetArrayBuffer(arrayBuffer) {
         var arrayLen = this.GetTableArrayLength();
+        var iniProperty = this.GetIniProperty();
+        var objProperty = this.GetObjProperty();
 
-        switch(this.Ini.Type) {
+        switch(iniProperty.Type) {
             case "bool":
             case "uint8":
-                this.Value = Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen)));
+                objProperty.Value = Array.from(new Uint8Array(arrayBuffer.slice(0, arrayLen)));
                 break;
             case "uint16":
-                this.Value = Array.from(new Uint16Array(arrayBuffer.slice(0, 2 * arrayLen)));
+                objProperty.Value = Array.from(new Uint16Array(arrayBuffer.slice(0, 2 * arrayLen)));
                 arrayLen = 2 * arrayLen;
                 break;
             case "uint32":
-                this.Value = Array.from(new Uint32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                objProperty.Value = Array.from(new Uint32Array(arrayBuffer.slice(0, 4 * arrayLen)));
                 arrayLen = 4 * arrayLen;
                 break;
             case "uint64":
-                this.Value = Array.from(new Uint64Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                objProperty.Value = Array.from(new Uint64Array(arrayBuffer.slice(0, 4 * arrayLen)));
                 arrayLen = 8 * arrayLen;
                 break;
             case "int8":
-                this.Value = Array.from(new Int8Array(arrayBuffer.slice(0, arrayLen)));
+                objProperty.Value = Array.from(new Int8Array(arrayBuffer.slice(0, arrayLen)));
                 arrayLen = arrayLen;
                 break;
             case "int16":
-                this.Value = Array.from(new Int16Array(arrayBuffer.slice(0, 2 * arrayLen)));
+                objProperty.Value = Array.from(new Int16Array(arrayBuffer.slice(0, 2 * arrayLen)));
                 arrayLen = 2 * arrayLen;
                 break;
             case "int32":
-                this.Value = Array.from(new Int32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                objProperty.Value = Array.from(new Int32Array(arrayBuffer.slice(0, 4 * arrayLen)));
                 arrayLen = 4 * arrayLen;
                 break;
             case "int64":
-                this.Value = Array.from(new Int64Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                objProperty.Value = Array.from(new Int64Array(arrayBuffer.slice(0, 4 * arrayLen)));
                 arrayLen = 8 * arrayLen;
                 break;
             case "float":
-                this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+                objProperty.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
                 arrayLen = 4 * arrayLen;
                 break;
             default: 
-        throw "ConfigNumberTable Type Invalid";
+                throw "ConfigNumberTable Type Invalid";
         }
 
-        valMult = GetIniValueMultiplier(this.Ini);
+        var valMult = this.GetValueMultiplier();
 
-        for(var i = 0; i < this.Value.length; i++) {
-            this.Value[i] /= valMultl;
+        for(var i = 0; i < objProperty.Value.length; i++) {
+            objProperty.Value[i] /= valMult;
         }
 
         return arrayLen;
     }
-    SetIni(ini) {
-        this.Ini = ini
-        if(this.Value === undefined && this.Ini.Value !== undefined) {
-            this.Value = this.Ini.Value;
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+            objProperty.Value = iniProperty.Value;
         }
-        if(this.Value === undefined) {
-            var val = GetIniMin(this.Ini);
+        if(objProperty.Value === undefined) {
+            var val = this.GetMin();
             if(val < 0)
                 val = 0;
-            if(val > GetIniMax(this.Ini))
-                val = GetIniMax(this.Ini);
-
-            this.Value = new Array(this.GetTableArrayLength());
-            var thisClass = this;
-            $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = val;
+            if(val > this.GetMax())
+                val = this.GetMax();
+            objProperty.Value = new Array(this.GetTableArrayLength());
+            $.each(objProperty.Value, function(index, value) {
+                objProperty.Value[index] = val;
             });
         }
+
+        return objProperty;
     }
 }
 
-class ConfigFormula {
-    constructor(ini, parent) {
-        this.Parent = parent;
-        this.SetIni(ini);
-    }
+class ConfigFormula extends ConfigBase {
+    GetValueMultiplier = GetIniPropertyPropertyGetFunction("ValueMultiplier", 1);
+    GetMin = GetIniPropertyMin;
+    GetMax = GetIniPropertyMax;
+    GetDegree = GetIniPropertyPropertyGetFunction("Degree", 0);
     GetTableArrayLength() {
-        return GetReferenceByNumberOrReference(this.Parent, GetIniDegree(this.Ini), 0).Value + 1;
+        return this.GetDegree() + 1;
     }
     GetArrayBuffer() {
-        var value = Array.from(this.Value);
+        var objProperty = this.GetObjProperty();
+        var valMult = this.GetValueMultiplier();
+        var value = Array.from(objProperty.Value);
 
         for(var i = 0; i < value.length; i++) {
-            value[i] *= this.ValueMultiplier
+            value[i] *= valMult;
         }
 
         return Float32Array.from(value);
     }
     SetArrayBuffer(arrayBuffer) {
+        var objProperty = this.GetObjProperty();
+        var valMult = this.GetValueMultiplier();
         var arrayLen = this.GetTableArrayLength();
-        this.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
+        objProperty.Value = Array.from(new Float32Array(arrayBuffer.slice(0, 4 * arrayLen)));
         
-        for(var i = 0; i < this.Value.length; i++) {
-            this.Value[i] /= this.ValueMultiplier
+        for(var i = 0; i < objProperty.length; i++) {
+            objProperty.Value[i] /= valMult;
         }
         
         return 4 * arrayLen;
     }
-    SetIni(ini) {
-        this.Ini = ini;
-        if(this.Value === undefined) {
-            var val = GetIniMin(this.Ini);
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+            
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+            objProperty.Value = iniProperty.Value;
+        }
+        if(objProperty.Value === undefined) {
+            var val = this.GetMin();
             if(val < 0)
                 val = 0;
-            if(val > GetIniMax(this.Ini))
-                val = GetIniMax(this.Ini);
+            if(val > this.GetMax())
+                val = this.GetMax();
 
-            this.Value = new Array(this.GetTableArrayLength());
-            var thisClass = this;
-            $.each(this.Value, function(index, value) {
-                thisClass.Value[index] = val;
+            objProperty.Value = new Array(this.GetTableArrayLength());
+            $.each(objProperty.Value, function(index, value) {
+                objProperty.Value[index] = val;
             });
         }
+
+        return objProperty;
     }
 }
 
-class ConfigArray {
-    constructor(obj, iniNamespace, parent) {
-        if(obj)
-            Object.assign(this, obj);
-        this.Parent = parent;
-        
-        this.IniNamespace = iniNamespace;
-
+class ConfigArray extends ConfigBase {
+    GetTableArrayLength = GetIniPropertyPropertyGetFunction("Array", 1);
+    ObjUpdateEvent() {
+        super.ObjUpdateEvent();
         var tableArrayLength = this.GetTableArrayLength()
 
-        if(!this.Value || this.Value.length < tableArrayLength) {
-            var prevValue = this.Value;
-            var prevValueLength = 0;
-            if(prevValue)
-                prevValueLength = prevValue.length;
-            this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
-    
-            for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
-                var subConfig = {};
-                Object.assign(subConfig, this);
-                delete subConfig.Array;
-                delete subConfig.Value;
-                delete subConfig.Labels;
-                if(this.Labels && i < this.Labels.length) {
-                    subConfig.Label = this.Labels[i];
-                } else {
-                    subConfig.Label = this.Label + "[" + i + "]";
-                }
-
-                if(i < prevValueLength)
-                    this.Value[i] = prevValue[i];
-                else
-                    this.Value[i] = new Config(subConfig, this.IniNamespace, this.Parent);
-            }
+        for(var i = this.Value.length; i < tableArrayLength; i++) {
+            this.Value.push(new Config());
+            this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
+            this.Value[i].SetIni(this.Ini, this.IniLocation);
         }
-    }
-    GetTableArrayLength() {
-        return GetReferenceByNumberOrReference(this.Parent, this.Array, 0).Value;
+
     }
     GetArrayBuffer() {
+        var objProperty = this.GetObjProperty();
         var arrayBuffer = new ArrayBuffer();
-        for(var ini in this.Value) {
-            arrayBuffer = arrayBuffer.concatArray(this.Value[ini].GetArrayBuffer());
+        for(var index in objProperty.Value) {
+            arrayBuffer = arrayBuffer.concatArray(objProperty.Value[index].GetArrayBuffer());
         }
         return arrayBuffer;
     }
     SetArrayBuffer(arrayBuffer) {
+        var objProperty = this.GetObjProperty();
         var size = 0;
 
         var tableArrayLength = this.GetTableArrayLength()
 
-        var prevValue = this.Value;
-        var prevValueLength = 0;
-        if(prevValue)
-            prevValueLength = prevValue.length;
-        this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
+        for(var i = this.Value.length; i < tableArrayLength; i++) {
+            this.Value.push(new Config());
+            this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
+            this.Value[i].SetIni(this.Ini, this.IniLocation);
+        }
 
-        for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
-            if(i < tableArrayLength) {
-                var subConfig = {};
-                Object.assign(subConfig, this);
-                delete subConfig.Array;
-                delete subConfig.Value;
-                delete subConfig.Labels;
-                if(this.Labels && i < this.Labels.length) {
-                    subConfig.Label = this.Labels[i];
-                } else {
-                    subConfig.Label = this.Label + "[" + i + "]";
-                }
-
-                this.Value[i] = new Config(subConfig, this.IniNamespace, this.Parent);
-                size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
-            } else {
-                this.Value[i] = prevValue[i];
-            }
+        for(var i = 0; i < tableArrayLength; i++) {
+            size += this.Value[i].SetArrayBuffer(arrayBuffer.slice(size));
         }
 
         return size;
     }
-}
-
-function GetReferenceByNumberOrReference(referenceObj, numberOrReference, defaultValue) {
-    var value = parseFloat(numberOrReference);
-    if(isNaN(value)) {
-        var ref = GetReference(referenceObj, numberOrReference, { Value: defaultValue });
-        if(isNaN(parseFloat(ref.Value)) && numberOrReference != undefined) {
-            return GetReferenceByNumberOrReference(referenceObj, ref.Value, defaultValue);
+    InitProperty() {
+        var objProperty = super.InitProperty();
+        if(!objProperty)
+            return false;
+        
+        var iniProperty = this.GetIniProperty();
+        if(objProperty.Value === undefined) {
+            objProperty.Value = new Array();
         }
-        return ref;
-    }
+        if(!this.Value)
+            this.Value = new Array();
+        
+        var tableArrayLength = this.GetTableArrayLength()
 
-    return { Value: value};
-}
-
-function GetReference(referenceObj, reference, defaultReference) {
-    if(!reference) 
-        return defaultReference;
-
-    if(reference.indexOf("/") === 0) {//go to top config
-        var topObj = referenceObj;
-        while(topObj.Parent !== undefined)
-            topObj = topObj.Parent;
-
-        if(reference.substring(1).indexOf("/") === 0) { //search all subconfigs for value
-            var containingObj;
-            var topReference = reference.substring(2);
-            if(topReference.indexOf("/") > 0)
-                topReference = topReference.substring(0, topReference.indexOf("/"));
-
-            function objGetReferenceFromAll(obj) {
-                for(subObj in obj){
-                    if(subObj === "IniNamespace" || subObj === "Parent" || subObj === "Variables")
-                        continue;
-                    if(subObj === topReference) {
-                        containingObj = obj;
-                        return;
-                    }
-
-                    if(typeof obj[subObj] === "object") {
-                        objGetReferenceFromAll(obj[subObj]);
-                        if(containingObj !== undefined)
-                            return;
-                    }
-                }
+        if(this.Value.length < tableArrayLength) {
+            for(var i = this.Value.length; i < tableArrayLength; i++) {
+                this.Value.push(new Config());
             }
-
-            objGetReferenceFromAll(topObj);
-
-            return GetReference(containingObj, reference.substring(2), defaultReference);
-
-        } else {
-            return GetReference(topObj, reference.substring(1), defaultReference)
+            for(var i = 0; i < tableArrayLength; i++) {
+                this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
+                this.Value[i].SetIni(this.Ini, this.IniLocation);
+            }
         }
-    } else if(reference.indexOf(".") === 0) { //go up 1            
-        if(reference.indexOf("/") === 1) { //go up until value exists
-            var ref = GetReference(referenceObj, reference.substring(2), undefined);
-            if(ref !== undefined)
-                return ref;
-            if(referenceObj.Parent === undefined)
-                return defaultReference;
-            return GetReference(referenceObj.Parent, reference, defaultReference);
-        } else {
-            if(referenceObj.Parent === undefined)
-                return defaultReference;
-            return GetReference(referenceObj.Parent, reference.substring(1), defaultReference);
-        }
-    } else if(reference.indexOf("/") > 0) {
-        var ref = referenceObj[reference.substring(0,reference.indexOf("/"))];
-        if(ref === undefined)
-            return defaultReference;
-        return GetReference(ref, reference.substring(reference.indexOf("/") + 1), defaultReference);
-    } else {
-        var ref = referenceObj[reference];
-        if(ref === undefined)
-            return defaultReference;
-        if(!isNaN(ref))
-            return { Value: ref };
-        return ref;
+        
+        return objProperty;
     }
 }
 
-function GetReferenceIfString(referenceObj, reference, defaultReference) {
-    if(typeof reference === "string")
-        return GetReference(referenceObj, reference, defaultReference);
-    return reference;
+function GetValueByNumberOrReference(val, obj, objLocation, ini, iniLocation) {
+    var num = parseFloat(val)
+    if(!isNaN(num))
+        return num;
+
+    var reference = GetReference(val, obj, objLocation, ini, iniLocation);
+    if(reference !== undefined) {
+        if(reference.Value !== undefined)
+            return reference.Value;
+        return reference;
+    }
 }
 
-function GetReferenceCount(referenceObj, reference) {
-    if(reference.indexOf("/") > -1 || reference.indexOf(".") > -1)
-        return 0;
-
-    var refernceCount = 0;
-    for(key in referenceObj) {
-        if(!referenceObj[key])
-            continue;
-
-        if(referenceObj[key].XResolution && referenceObj[key].XResolution === reference) {
-            refernceCount++;
-            continue;
+function GetReference(ref, obj, objLocation, ini, iniLocation) {
+    var objReference = GetPropertyByLocation(obj, objLocation + "/" + ref);
+    if(objReference !== undefined) {
+        return objReference;
+    }
+        
+    var iniReference = GetPropertyByLocation(ini, iniLocation + "/" + ref);
+    if(iniReference !== undefined) {
+        return iniReference;
+    }
+    
+    //some weird ini voodoo going on down here
+    if((objLocation + "/" + ref).indexOf("./") > -1) { //search up obj until exists
+        var ret = undefined;
+        var parentObjLocation = (objLocation + "/" + ref).substring(0, (objLocation + "/" + ref).indexOf("./"));
+        parentObjLocation = parentObjLocation.substring(0, parentObjLocation.lastIndexOf("/"));
+        var parentObj = GetPropertyByLocation(obj, parentObjLocation);
+        if(parentObj && parentObj.IniLocation) {
+            var parentIniLocation = parentObj.IniLocation;
+            while((ret = GetPropertyByLocation(ini, parentIniLocation + (objLocation + "/" + ref).substring((objLocation + "/" + ref).indexOf("./") + 1))) === undefined) {
+                if(!parentObjLocation)
+                    break;
+                parentObjLocation = parentObjLocation.substring(0, parentObjLocation.lastIndexOf("/"));
+                parentObj = GetPropertyByLocation(obj, parentObjLocation);
+                parentIniLocation = parentObj.IniLocation;
+            }
         }
+        return ret;
+    }
 
-        if(referenceObj[key].XAxis && referenceObj[key].XAxis === reference) {
-            refernceCount++;
-            continue;
+    if((objLocation + "/" + ref).indexOf(".") > -1) { //go up 1
+        var parentObjLocation = (objLocation + "/" + ref).substring(0, (objLocation + "/" + ref).indexOf("."));
+        parentObjLocation = parentObjLocation.substring(0, parentObjLocation.lastIndexOf("/"));
+        var parentObj = GetPropertyByLocation(obj, parentObjLocation);
+        if(parentObj && parentObj.IniLocation) {
+            var parentIniLocation = parentObj.IniLocation;
+            return GetPropertyByLocation(ini, parentIniLocation + "/" + (objLocation + "/" + ref).substring((objLocation + "/" + ref).indexOf(".") + 1));
         }
+    }
+}
 
-        if(referenceObj[key].XMin && referenceObj[key].XMin === reference) {
-            refernceCount++;
-            continue;
+function GetPropertyByLocation(obj, location) {
+    if(!location) { //this is the top obj
+        return obj;
+    }
+
+    // while(location.indexOf("///") > -1 || location.indexOf("//") == 0) { // search all of obj
+    //     //TODO
+    // }
+
+    if(location.indexOf("//") > -1) { // top of obj
+        return GetPropertyByLocation(obj, location.substring(location.indexOf("//") + 2));
+    }
+    if(location.indexOf("/") == 0) { // top of obj
+        return GetPropertyByLocation(obj, location.substring(1));
+    }
+
+    if(location.indexOf("./") > -1) { //search up obj until exists
+        var ret = undefined;
+        var parentLocation = location.substring(0, location.indexOf("./"));
+        parentLocation = parentLocation.substring(0, parentLocation.lastIndexOf("/"));
+        while((ret = GetPropertyByLocation(obj, parentLocation + location.substring(location.indexOf("./") + 1))) === undefined) {
+            if(!parentLocation)
+                break;
+            parentLocation = parentLocation.substring(0, parentLocation.lastIndexOf("/"));
         }
+        return ret;
+    }
 
-        if(referenceObj[key].XMax && referenceObj[key].XMax === reference) {
-            refernceCount++;
-            continue;
-        }
+    if(location.indexOf(".") > -1) { //go up 1
+        var parentLocation = location.substring(0, location.indexOf("."));
+        parentLocation = parentLocation.substring(0, parentLocation.lastIndexOf("/"));
+        parentLocation = parentLocation.substring(0, parentLocation.lastIndexOf("/"));
+        return GetPropertyByLocation(obj, parentLocation + "/" + location.substring(location.indexOf(".") + 1));
+    }
 
-        if(referenceObj[key].YResolution && referenceObj[key].YResolution === reference) {
-            refernceCount++;
-            continue;
-        }
+    var locationSplit = location.split("/")
+    var ret = obj;
+    for(var i = 0; i < locationSplit.length; i++) {
+        if(ret === undefined)
+            return undefined;
 
-        if(referenceObj[key].YAxis && referenceObj[key].YAxis === reference) {
-            refernceCount++;
-            continue;
-        }
+        ret = ret[locationSplit[i]];
+    }
+    
+    return ret;
+}
 
-        if(referenceObj[key].YMin && referenceObj[key].YMin === reference) {
-            refernceCount++;
-            continue;
-        }
+function GetIniPropertyDegree(iniProperty) {
+    if(iniProperty.Degree !== undefined)
+        return iniProperty.Degree;
+    return 1;
+}
 
-        if(referenceObj[key].YMax && referenceObj[key].YMax === reference) {
-            refernceCount++;
-            continue;
+function AttachFunctionFromObjToObj(obj, functionName, handleObj, handleFunctionName) {
+    if(!obj[functionName] || !obj[functionName + "HandlesEFJ"]){
+        obj[functionName + "HandlesEFJ"] = new Array();
+        obj[functionName] = function() {
+            $.each(obj[functionName + "HandlesEFJ"], function(index, handle) {
+                handle.Obj[handle.FunctionName]();
+            });
         }
     }
 
-    return refernceCount;
+    var handleAlreadyExists = false;
+    $.each(obj[functionName + "HandlesEFJ"], function(index, handle) {
+        if(handle.Obj === handleObj && handle.FunctionName === handleFunctionName) {
+            handleAlreadyExists = true;
+        }
+    });
+
+    if(!handleAlreadyExists)
+        obj[functionName + "HandlesEFJ"].push({ Obj: handleObj, FunctionName: handleFunctionName});
+}
+function CallObjFunctionIfExists(obj, functionName) {
+    if(obj[functionName]) {
+        obj[functionName]();
+    }
+}
+function GetIniPropertyPropertyGetFunction(propertyName, defaultValue) {
+    var f = function() {
+        var iniProperty = this.GetIniProperty();
+        var val = defaultValue;
+        if(iniProperty[propertyName] !== undefined) {
+            val = GetValueByNumberOrReference(iniProperty[propertyName], this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
+        }
+        if(val)
+            return val; 
+
+        return defaultValue;
+    }
+
+    return f;
 }
 
-function GetIniValueMultiplier(ini) {
-    if(ini.ValueMultiplier)
-        return ini.ValueMultiplier;
-    return 1;
-}
-function GetIniMin(ini) {
-    if(ini.Min !== undefined)
-        return ini.Min;
-    switch(ini.Type) {
-        case "uint8":
-        case "uint16":
-        case "uint32":
-        case "uint64":
-            return 0;
-        case "int8":
-            return -128 / GetIniValueMultiplier(ini);
-        case "int16":
-            return -32768 / GetIniValueMultiplier(ini);
-        case "int32":
-            return -2147483648 / GetIniValueMultiplier(ini);
-        case "int64":
-            return -9223372036854775808 / GetIniValueMultiplier(ini);
-        case "float":
-        case "formula":
-        case "variable":
-            return -340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
-        default:
-            throw "Invalid Type " + ini.Type;
+function GetIniPropertyMin() {
+    var iniProperty = this.GetIniProperty();
+    var min;
+    if(iniProperty.Min !== undefined) {
+        min = GetValueByNumberOrReference(iniProperty.Min, this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
     }
-}
-function GetIniMax(ini) {
-    if(ini.Max !== undefined)
-        return ini.Max;
-    switch(ini.Type) {
-        case "uint8":
-            return 255 / GetIniValueMultiplier(ini);
-        case "uint16":
-            return 65535 / GetIniValueMultiplier(ini);
-        case "uint32":
-            return 4294967295 / GetIniValueMultiplier(ini);
-        case "uint64":
-            return 18446744073709551615 / GetIniValueMultiplier(ini);
-        case "int8":
-            return 127 / GetIniValueMultiplier(ini);
-        case "int16":
-            return 32767 / GetIniValueMultiplier(ini);
-        case "int32":
-            return 2147483647 / GetIniValueMultiplier(ini);
-        case "int64":
-            return 9223372036854775807 / GetIniValueMultiplier(ini);
-        case "variable":
-        case "formula":
-        case "float":
-            return 340282300000000000000000000000000000000 / GetIniValueMultiplier(ini);
-        default:
-            throw "Invalid Type " + ini.Type;
+    if(min === undefined) {
+        switch(iniProperty.Type) {
+            case "uint8":
+            case "uint16":
+            case "uint32":
+            case "uint64":
+                min = 0;
+                break;
+            case "int8":
+                min = -128 / this.GetValueMultiplier();
+                break;
+            case "int16":
+                min = -32768 / this.GetValueMultiplier();
+                break;
+            case "int32":
+                min = -2147483648 / this.GetValueMultiplier();
+                break;
+            case "int64":
+                min = -9223372036854775808 / this.GetValueMultiplier();
+                break;
+            case "float":
+            case "formula":
+            case "variable":
+                min = -340282300000000000000000000000000000000 / this.GetValueMultiplier();
+                break;
+            default:
+                throw "Invalid Type " + iniProperty.Type;
+        }
     }
+    return min;
 }
-function GetIniXResolution(ini) {
-    if(ini.XResolution !== undefined)
-        return ini.XResolution;
-    return 1;
-}
-function GetIniYResolution(ini) {
-    if(ini.YResolution !== undefined)
-        return ini.YResolution;
-    return 1;
-}
-function GetIniDegree(ini) {
-    if(ini.Degree !== undefined)
-        return ini.Degree;
-    return 1;
+function GetIniPropertyMax() {
+    var iniProperty = this.GetIniProperty();
+    var max;
+    if(iniProperty.Max !== undefined) {
+        max = GetValueByNumberOrReference(iniProperty.Max, this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
+    }
+    if(max === undefined) {
+        switch(iniProperty.Type) {
+            case "uint8":
+                max = 255 / this.GetValueMultiplier();
+                break;
+            break;
+            case "uint16":
+                max = 65535 / this.GetValueMultiplier();
+                break;
+            case "uint32":
+                max = 4294967295 / this.GetValueMultiplier();
+                break;
+            case "uint64":
+                max = 18446744073709551615 / this.GetValueMultiplier();
+                break;
+            case "int8":
+                max = 127 / this.GetValueMultiplier();
+                break;
+            case "int16":
+                max = 32767 / this.GetValueMultiplier();
+                break;
+            case "int32":
+                max = 2147483647 / this.GetValueMultiplier();
+                break;
+            case "int64":
+                max = 9223372036854775807 / this.GetValueMultiplier();
+                break;
+            case "variable":
+            case "formula":
+            case "float":
+                max = 340282300000000000000000000000000000000 / this.GetValueMultiplier();
+                break;
+            default:
+                throw "Invalid Type " + iniProperty.Type;
+        }
+    }
+    return max;
 }
