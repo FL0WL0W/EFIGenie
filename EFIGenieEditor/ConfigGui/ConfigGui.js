@@ -986,42 +986,22 @@ class ConfigArrayGui extends ConfigArray {
     }
     
     ObjUpdateEvent() {
-        // super.ObjUpdateEvent();
-        // var tableArrayLength = this.GetTableArrayLength();
-        // if(!this.Value || this.CurrentTableArrayLength !== tableArrayLength) {
-        //     var prevValue = this.Value;
-        //     var prevValueLength = 0;
-        //     if(prevValue)
-        //         prevValueLength = prevValue.length;
-        //     this.Value = new Array(Math.max(prevValueLength, tableArrayLength));
-    
-        //     for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
-        //         var subIni = {};
-        //         Object.assign(subIni, this.Ini);
-        //         delete subIni.Array;
-        //         delete subIni.Value;
-        //         delete subIni.Labels;
-        //         if(this.Ini.Labels && i < this.Ini.Labels.length) {
-        //             subIni.Label = this.Ini.Labels[i];
-        //         } else {
-        //             subIni.Label = this.Ini.Label + "[" + i + "]";
-        //         }
-
-        //         if(i < prevValueLength) {
-        //             this.Value[i] = prevValue[i];
-        //             $("#span"+this.Value[i].GUID).show();
-        //             this.Value[i].UpdateReferences();
-        //         } else {
-        //             this.Value[i] = new ConfigGui(subIni, this.IniNamespace, this.Parent, this.CallBack);
-        //             $("#span"+this.GUID).append(this.Value[i].GetHtml());
-        //         }
-
-        //         if(i >= tableArrayLength) {
-        //             $("#span"+this.Value[i].GUID).hide();
-        //         }
-        //     }
-        // }
-        // this.CurrentTableArrayLength = tableArrayLength;
+        super.ObjUpdateEvent();
+        var tableArrayLength = this.GetTableArrayLength();
+        if(!this.Value || this.CurrentTableArrayLength !== tableArrayLength) {    
+            var prevValueLength = this.Value.length;
+            for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
+                if(i < prevValueLength) {
+                    $("#span"+this.Value[i].GUID).show();
+                } else {
+                    $("#span"+this.GUID).append(this.Value[i].GetHtml());
+                }
+                if(i >= tableArrayLength) {
+                    $("#span"+this.Value[i].GUID).hide();
+                }
+            }
+        }
+        this.CurrentTableArrayLength = tableArrayLength;
     }
 
     GetHtml() {
@@ -1032,7 +1012,6 @@ class ConfigArrayGui extends ConfigArray {
             return "";
 
         var template = "<span id=\"span"+this.GUID+"\">";
-
         $.each(this.Value, function(index, value) {
             template += value.GetHtml();
         });
@@ -1045,6 +1024,7 @@ class ConfigArrayGui extends ConfigArray {
         if(!objProperty)
             return false;
             
+        this.CurrentTableArrayLength = this.GetTableArrayLength();
         var thisClass = this;
         $.each(this.Value, function(index, value) {
             if(!(thisClass.Value[index] instanceof ConfigGui)) {
