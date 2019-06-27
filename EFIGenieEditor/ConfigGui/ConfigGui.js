@@ -989,11 +989,23 @@ class ConfigArrayGui extends ConfigArray {
         super.ObjUpdateEvent();
         var tableArrayLength = this.GetTableArrayLength();
         if(!this.Value || this.CurrentTableArrayLength !== tableArrayLength) {    
-            var prevValueLength = this.Value.length;
+            for(var i = this.Value.length; i < tableArrayLength; i++) {
+                this.Value.push(new Config());
+                this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
+                this.Value[i].SetIni(this.Ini, this.IniLocation);
+            }
+
+            var prevValueLength = this.CurrentTableArrayLength;
             for(var i = 0; i < Math.max(prevValueLength, tableArrayLength); i++) {
                 if(i < prevValueLength) {
                     $("#span"+this.Value[i].GUID).show();
                 } else {
+                    if(!(this.Value[i] instanceof ConfigGui)) {
+                        var prev = this.Value[i];
+                        this.Value[i] = new ConfigGui();
+                        this.Value[i].SetObj(prev.Obj, prev.ObjLocation);
+                        this.Value[i].SetIni(prev.Ini, prev.IniLocation);
+                    }
                     $("#span"+this.GUID).append(this.Value[i].GetHtml());
                 }
                 if(i >= tableArrayLength) {
