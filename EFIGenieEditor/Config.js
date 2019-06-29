@@ -37,6 +37,10 @@ class ConfigBase {
             if(key.endsWith("EFJ") || key == "IniLocation")
                 return undefined;
             
+            if(isEmpty(value, ["EFJ", "IniLocation"])) {
+                return undefined;
+            }
+
             return value;
         }));
     }
@@ -86,6 +90,17 @@ class ConfigBase {
         return objProperty;
     }
 
+    GetExcludeFromBin = GetIniPropertyPropertyGetFunction("ExcludeFromBin", false)
+    GetValue() {
+        var iniProperty = this.GetIniProperty();
+        var objProperty = this.GetObjProperty();
+        var val = objProperty.Value;
+        if(val === undefined && iniProperty.Value !== undefined) {
+            val = GetValueByNumberOrReference(iniProperty.Value, this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
+        }
+        
+        return val; 
+    }
     GetStep(){
         var iniProperty = this.GetIniProperty();
         var step;
@@ -395,9 +410,35 @@ class ConfigNumber extends ConfigBase {
     GetValueMultiplier = GetIniPropertyPropertyGetFunction("ValueMultiplier", 1);
     GetMin = GetIniPropertyMin;
     GetMax = GetIniPropertyMax;
-    GetArrayBuffer() {
+    ObjUpdateEvent() {
+        super.ObjUpdateEvent();
         var iniProperty = this.GetIniProperty();
-        var val = this.GetObjProperty().Value
+        if(!iniProperty.Static) {
+            var objProperty = this.GetObjProperty();
+
+            switch(iniProperty.Type) {
+                case "uint8":
+                case "uint16":
+                case "uint32":
+                    if(objProperty.Value < 0)
+                    objProperty.Value = 0;
+                case "int8":
+                case "int16":
+                case "int32":
+                objProperty.Value = Math.round(objProperty.Value * this.GetValueMultiplier()) / this.GetValueMultiplier();
+            }
+            if(objProperty.Value < this.GetMin())
+                objProperty.Value = this.GetMin();
+            if(objProperty.Value > this.GetMax())
+                objProperty.Value = this.GetMax();
+        }
+    }
+    GetArrayBuffer() {
+        if(this.GetExcludeFromBin()) {
+            return new ArrayBuffer(0);
+        }
+        var iniProperty = this.GetIniProperty();
+        var val = this.GetValue();
         var valMult = this.GetValueMultiplier();
 
         switch(iniProperty.Type) {
@@ -463,7 +504,9 @@ class ConfigNumber extends ConfigBase {
                 break;
         }
 
-        this.GetObjProperty().Value = val;
+        if(!iniProperty.Static) {
+            this.GetObjProperty().Value = val;
+        }
         return size;
     }
     InitProperty() {
@@ -472,15 +515,19 @@ class ConfigNumber extends ConfigBase {
             return false;
 
         var iniProperty = this.GetIniProperty();
-        if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
-            objProperty.Value = iniProperty.Value;
-        }
-        if(objProperty.Value === undefined) {
-            objProperty.Value = this.GetMin();
-            if(objProperty.Value < 0)
-                objProperty.Value = 0;
-            if(objProperty.Value > this.GetMax())
-                objProperty.Value = this.GetMax();
+        if(!iniProperty.Static) {
+            if(objProperty.Value === undefined && iniProperty.Value !== undefined) {
+                objProperty.Value = iniProperty.Value;
+            }
+            if(objProperty.Value === undefined) {
+                objProperty.Value = this.GetMin();
+                if(objProperty.Value < 0)
+                    objProperty.Value = 0;
+                if(objProperty.Value > this.GetMax())
+                    objProperty.Value = this.GetMax();
+            }
+        } else {
+            objProperty.Value = undefined;
         }
 
         return objProperty;
@@ -709,8 +756,9 @@ class ConfigArray extends ConfigBase {
     GetArrayBuffer() {
         var objProperty = this.GetObjProperty();
         var arrayBuffer = new ArrayBuffer();
-        for(var index in objProperty.Value) {
-            arrayBuffer = arrayBuffer.concatArray(objProperty.Value[index].GetArrayBuffer());
+        var tableArrayLength = this.GetTableArrayLength()
+        for(var index = 0; index < tableArrayLength; index++) {
+            arrayBuffer = arrayBuffer.concatArray(this.Value[index].GetArrayBuffer());
         }
         return arrayBuffer;
     }
@@ -750,10 +798,10 @@ class ConfigArray extends ConfigBase {
             for(var i = this.Value.length; i < tableArrayLength; i++) {
                 this.Value.push(new Config());
             }
-            for(var i = 0; i < tableArrayLength; i++) {
-                this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
-                this.Value[i].SetIni(this.Ini, this.IniLocation);
-            }
+        }
+        for(var i = 0; i < tableArrayLength; i++) {
+            this.Value[i].SetObj(this.Obj, this.ObjLocation + "/Value/" + i);
+            this.Value[i].SetIni(this.Ini, this.IniLocation);
         }
         
         return objProperty;
@@ -785,7 +833,7 @@ function GetReference(ref, obj, objLocation, ini, iniLocation) {
     }
     
     //some weird ini voodoo going on down here
-    if((objLocation + "/" + ref).indexOf("./") > -1) { //search up obj until exists
+    if((objLocation + "/" + ref).indexOf("./") > -1 && (objLocation + "/" + ref).indexOf(".") >= (objLocation + "/" + ref).indexOf("./")) { //search up obj until exists
         var ret = undefined;
         var parentObjLocation = (objLocation + "/" + ref).substring(0, (objLocation + "/" + ref).indexOf("./"));
         parentObjLocation = parentObjLocation.substring(0, parentObjLocation.lastIndexOf("/"));
@@ -819,9 +867,22 @@ function GetPropertyByLocation(obj, location) {
         return obj;
     }
 
-    // while(location.indexOf("///") > -1 || location.indexOf("//") == 0) { // search all of obj
-    //     //TODO
-    // }
+    if(location.indexOf("///") > -1 || location.indexOf("//") == 0) { // search all of obj
+        location = location.substring(location.lastIndexOf("//") + 2);
+        var val = GetPropertyByLocation(obj, location);
+        if(val !== undefined)
+            return val;
+        for(key in obj) {
+            if (obj[key] === undefined || typeof obj[key] !== "object" || key.endsWith("EFJ"))
+                continue;
+
+            val = GetPropertyByLocation(obj[key], "///" + location);
+            if(val !== undefined) {
+                return val;
+            }
+        }
+        return undefined;
+    }
 
     if(location.indexOf("//") > -1) { // top of obj
         return GetPropertyByLocation(obj, location.substring(location.indexOf("//") + 2));
@@ -830,7 +891,7 @@ function GetPropertyByLocation(obj, location) {
         return GetPropertyByLocation(obj, location.substring(1));
     }
 
-    if(location.indexOf("./") > -1) { //search up obj until exists
+    if(location.indexOf("./") > -1 && location.indexOf("./") >= location.indexOf(".")) { //search up obj until exists
         var ret = undefined;
         var parentLocation = location.substring(0, location.indexOf("./"));
         parentLocation = parentLocation.substring(0, parentLocation.lastIndexOf("/"));
@@ -852,7 +913,7 @@ function GetPropertyByLocation(obj, location) {
     var locationSplit = location.split("/")
     var ret = obj;
     for(var i = 0; i < locationSplit.length; i++) {
-        if(ret === undefined)
+        if(ret === undefined || ret == null)
             return undefined;
 
         ret = ret[locationSplit[i]];

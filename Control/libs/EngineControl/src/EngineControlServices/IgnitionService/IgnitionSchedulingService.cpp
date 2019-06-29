@@ -71,7 +71,7 @@ namespace EngineControlServices
 				schedulePosition = _crankReluctor->GetPosition();
 				scheduleTick = _timerService->GetTick();
 				scheduleTickPerDegree = _crankReluctor->GetTickPerDegree();
-				isSequential = true;
+				isSequential = false;
 			}
 		}
 		else if(_camReluctor != 0 && _camReluctor->IsSynced())

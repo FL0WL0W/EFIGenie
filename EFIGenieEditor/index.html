@@ -6,7 +6,7 @@
         <script src="Units.js"></script>
         <script src="SpeeduinoIni.js"></script>
         <script src="IOServicesConfig.js"></script>
-        <script src="SensorServicesConfig.js"></script>
+        <script src="ReluctorServicesConfig.js"></script>
         <script src="TransmissionControlServicesConfig.js"></script>
         <script src="EngineControlServicesConfig.js"></script>
         <script src="ConfigGui/ConfigGui.js"></script>
@@ -14,32 +14,6 @@
         <script type="text/javascript">
             var b = new ConfigGui();
             $(document).ready(function() {
-                var debugIni = {
-                    TestSel: { Variables: [
-                        { Test5: { Type: "uint16", Value: 4004, Hidden: true } },
-                        { Selection: { Label: "TestSel", Selections: [
-                            { Name: "Test", IniName: "Test"},
-                            { Name: "Testie", IniName: "Testie"}
-                        ] } }
-                    ] },
-                    Test: { Variables: [
-                        { Test1: { Type: "uint16", Value: 4001, Hidden: true } },
-                        { Test2: { Label: "Test2", Type: "uint8", Value: 1, ValueMultiplier: 2, Units: [ { Name:"Pulses/RPM", DisplayMultiplier: 1, DisplayOffset: 0} ] } },
-                        { Test6: { Type: "bool", Label: "Test6" } },
-                        { TestNumberSelection: { Offset: 15, Label: "TestNumberSelection", Type: "uint8", Value: 0, Selections: [ "Speeduino v0.1", "Speeduino v0.2", "Speeduino v0.3", "Speeduino v0.4", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "NA6 MX5 PNP", "Turtana PCB", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "Plazomat I/O 0.1", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "Daz V6 Shield 0.1", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "NO2C", "UA4C", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "dvjcodec Teensy RevA", "dvjcodec Teensy RevB", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID", "INVALID" ] } },
-                        { TestTable: { Type: "uint16", XResolution: "./Test2", Label: "TestTable", XLabel: "TestTableX", YLabel: "TestTableY", ZLabel: "TestTableZ", XMin: 1, XMax: 10, Dialog: false } },
-                        { TestFormula: { Type: "formula", Degree: 4, Label: "TestFormula" } },
-                    ] },
-                    Testie: { Variables: [
-                        { Test3: { Type: "uint16", Value: 4001, Hidden: true } },
-                        { Test4: { Label: "Test4", Type: "uint8", Value: 1, ValueMultiplier: 2, Units: [ { Name:"Pulses/RPM", DisplayMultiplier: 1, DisplayOffset: 0} ] } }
-                    ] },
-
-                    Main: { Variables: [
-                        { TestSel: { IniName: "TestSel" } },
-                    ] }
-                };
-
                 b.SetObj(undefined);
                 b.SetIni(EngineControlServicesIni);
                 $('#chkAdvanced').change(function(){

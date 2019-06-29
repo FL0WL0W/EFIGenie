@@ -34,7 +34,7 @@ class ConfigGui extends Config {
 
             var variableRowIniProperty = variableRowConfig.GetIniProperty();
 
-            if(iniProperty.Tabbed && !variableRowIniProperty.Hidden) {
+            if(iniProperty.Tabbed && !variableRowIniProperty.Hidden && !variableRowIniProperty.Static) {
                 var tabClasses = "tabLink";
                 if(i === 0)
                     tabClasses += " active";
@@ -67,11 +67,21 @@ class ConfigGui extends Config {
         else
             template = wrapInConfigDivGui(this.GUID, template);
 
-        if(!this.GetParentTabbed() && iniProperty.Label) {
+        if(!this.GetParentTabbed() && (iniProperty.Label || iniProperty.Labels)) {
+            var label = iniProperty.Label;
+            if(iniProperty.Array) {
+                var index = parseInt(this.ObjLocation.substring(this.ObjLocation.lastIndexOf("/") + 1));
+                if(!isNaN(index)) {
+                    if(iniProperty.Labels && iniProperty.Labels[index])
+                        label = iniProperty.Labels[index];
+                    else
+                        label += "[" + index + "]";
+                }
+            }
             if(iniProperty.SameLine) 
-                template = "<label for=\"" + this.GUID + "\" class=\"subConfigSameLineLabel\">" + iniProperty.Label + ":</label>" + template;
+                template = "<label for=\"" + this.GUID + "\" class=\"subConfigSameLineLabel\">" + label + ":</label>" + template;
             else
-                template = "<label for=\"" + this.GUID + "\" class=\"subConfigLabel\">" + iniProperty.Label + ":</label><span class=\"sameLineSpacer\"></span>" + template;
+                template = "<label for=\"" + this.GUID + "\" class=\"subConfigLabel\">" + label + ":</label><span class=\"sameLineSpacer\"></span>" + template;
         }
         return "<span id=\"span"+this.GUID+"\">" + template + "</span>";
     }
@@ -209,34 +219,22 @@ class ConfigNumberGui extends ConfigNumber {
 
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
-        var objProperty = this.GetObjProperty();
         var iniProperty = this.GetIniProperty();
 
-        var units = this.GetUnits();
-        var unit = units[objProperty.UnitIndex];
+        if(!iniProperty.Static) {
+            var objProperty = this.GetObjProperty();
 
-        switch(iniProperty.Type) {
-            case "uint8":
-            case "uint16":
-            case "uint32":
-                if(objProperty.Value < 0)
-                objProperty.Value = 0;
-            case "int8":
-            case "int16":
-            case "int32":
-            objProperty.Value = Math.round(objProperty.Value * this.GetValueMultiplier()) / this.GetValueMultiplier();
+            var units = this.GetUnits();
+            var unit = units[objProperty.UnitIndex];
+
+            $("#" + this.GUID).val(objProperty.Value * unit.DisplayMultiplier + unit.DisplayOffset);
         }
-        if(objProperty.Value < this.GetMin())
-            objProperty.Value = this.GetMin();
-        if(objProperty.Value > this.GetMax())
-            objProperty.Value = this.GetMax();
-        $("#" + this.GUID).val(objProperty.Value * unit.DisplayMultiplier + unit.DisplayOffset);
     }
     GetHtml() {
         var objProperty = this.GetObjProperty();
         var iniProperty = this.GetIniProperty();
 
-        if(iniProperty.Hidden)
+        if(iniProperty.Hidden || iniProperty.Static)
             return "";
 
         var template = "";
@@ -297,11 +295,13 @@ class ConfigNumberGui extends ConfigNumber {
             return false;
 
         var iniProperty = this.GetIniProperty();
-        if(objProperty.UnitIndex === undefined && iniProperty.UnitIndex !== undefined) {
-            objProperty.UnitIndex = iniProperty.UnitIndex;
-        }
-        if(objProperty.UnitIndex === undefined) {
-            objProperty.UnitIndex = 0;
+        if(!iniProperty.Static) {
+            if(objProperty.UnitIndex === undefined && iniProperty.UnitIndex !== undefined) {
+                objProperty.UnitIndex = iniProperty.UnitIndex;
+            }
+            if(objProperty.UnitIndex === undefined) {
+                objProperty.UnitIndex = 0;
+            }
         }
 
         return objProperty;
@@ -1005,8 +1005,10 @@ class ConfigArrayGui extends ConfigArray {
                         this.Value[i] = new ConfigGui();
                         this.Value[i].SetObj(prev.Obj, prev.ObjLocation);
                         this.Value[i].SetIni(prev.Ini, prev.IniLocation);
+                        $("#span"+this.GUID).append(this.Value[i].GetHtml());
+                    } else {
+                        $("#span"+this.Value[i].GUID).show();
                     }
-                    $("#span"+this.GUID).append(this.Value[i].GetHtml());
                 }
                 if(i >= tableArrayLength) {
                     $("#span"+this.Value[i].GUID).hide();
@@ -1024,9 +1026,9 @@ class ConfigArrayGui extends ConfigArray {
             return "";
 
         var template = "<span id=\"span"+this.GUID+"\">";
-        $.each(this.Value, function(index, value) {
-            template += value.GetHtml();
-        });
+        for(var i = 0; i < this.CurrentTableArrayLength; i++) {
+            template += this.Value[i].GetHtml();
+        }
 
         return template + "</span>";
     }
