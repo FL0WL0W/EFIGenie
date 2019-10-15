@@ -13,7 +13,7 @@ using namespace HardwareAbstraction;
 #define PWM_SERVICE_ID							4				// IPwmService
 #define TIMER_SERVICE_ID						5				// ITimerService
 
-#define TICK_CALL_BACK_GROUP					5001
+#define MAIN_LOOP_CALL_BACK_GROUP				5001
 
 namespace Service
 {

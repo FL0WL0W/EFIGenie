@@ -4,22 +4,34 @@
 #include "IOServices/StepperOutputService/StepperOutputService_HalfStepControl.h"
 #include "IOServices/StepperOutputService/StepperOutputService_StaticStepCalibrationWrapper.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
-#include "Service/ServiceBuilder.h"
+#include "Service/IOServicesServiceBuilderIds.h"
+#include "Service/IService.h"
+
+using namespace HardwareAbstraction;
+using namespace Service;
 
 #ifdef ISTEPPEROUTPUTSERVICE_H
 namespace IOServices
 {
-	void* IStepperOutputService::BuildStepperOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	void IStepperOutputService::BuildStepperOutputService(ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		uint8_t instanceId = IService::CastAndOffset<uint8_t>(config, sizeOut);
+
+		IStepperOutputService *outputService = CreateStepperOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
+
+		serviceLocator->RegisterIfNotNull(BUILDER_ISTEPPEROUTPUTSERVICE, instanceId, outputService);
+	}
+
+	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		return CreateStepperOutputService(serviceLocator->LocateAndCast<const HardwareAbstractionCollection>(HARDWARE_ABSTRACTION_COLLECTION_ID), config, sizeOut);
 	}
 	
 	IStepperOutputService* IStepperOutputService::CreateStepperOutputService(const HardwareAbstraction::HardwareAbstractionCollection *hardwareAbstractionCollection, const void *config, unsigned int &sizeOut)
-	{
-		sizeOut = 0;		
+	{	
 		IStepperOutputService *outputService = 0;
 		
-		switch (ServiceBuilder::CastAndOffset<uint8_t>(config, sizeOut))
+		switch (IService::CastAndOffset<uint8_t>(config, sizeOut))
 		{
 #ifdef STEPPEROUTPUTSERVICE_STEPDIRECTIONCONTROL_H
 		case 1:

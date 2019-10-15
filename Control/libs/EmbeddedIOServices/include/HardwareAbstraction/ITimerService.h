@@ -10,11 +10,6 @@ namespace HardwareAbstraction
 	{
 	public:
 		Task() {}
-		Task(void(*callBack)(void *), void *parameters, bool deleteOnExecution)
-		{
-			CallBackInstance = new CallBack(callBack, parameters);
-			DeleteOnExecution = deleteOnExecution;
-		}
 		Task(ICallBack *callBack, bool deleteOnExecution)
 		{
 			CallBackInstance = callBack;
@@ -52,7 +47,7 @@ namespace HardwareAbstraction
 		Task *FirstTask = 0;
 
 		void ReturnCallBack(void);
-		Task *ScheduleTask(void(*)(void *), void *, const uint32_t, const bool);
+		Task *ScheduleTask(ICallBack *callBack, const uint32_t, const bool);
 		const bool ScheduleTask(Task *, const uint32_t);
 		const bool UnScheduleTask(Task *);
 		
@@ -61,12 +56,12 @@ namespace HardwareAbstraction
 
 		constexpr static bool TickLessThanTick(const uint32_t i, const uint32_t j)
 		{
-			return i - j > 0x10000000;
+			return i - j > 0x80000000;
 		}
 
 		constexpr static bool TickLessThanEqualToTick(const uint32_t i, const uint32_t j)
 		{
-			return i - (j + 1) > 0x10000000;
+			return !TickLessThanTick(j, i);
 		}
 	};
 }

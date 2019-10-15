@@ -60,12 +60,6 @@ C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesM
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects/CMakeFiles/rebuild_cache.dir
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects/CMakeFiles/test.dir
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects/CMakeFiles/list_install_components.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/rebuild_cache.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/test.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/install/local.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/install.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/edit_cache.dir
-C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects/CMakeFiles/list_install_components.dir
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlMockedObjects/CMakeFiles/rebuild_cache.dir
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlMockedObjects/CMakeFiles/test.dir
 C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlMockedObjects/CMakeFiles/install/local.dir

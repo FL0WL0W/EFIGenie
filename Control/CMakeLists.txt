@@ -17,6 +17,5 @@ add_subdirectory (${LIBRARIES}/googletest)
 enable_testing()
 
 add_subdirectory (${LIBRARIES}/EmbeddedIOServicesMockedObjects)
-add_subdirectory (${LIBRARIES}/ReluctorMockedObjects)
 add_subdirectory (${LIBRARIES}/EngineControlMockedObjects)
 add_subdirectory (${LIBRARIES}/EngineControlUnitTests)

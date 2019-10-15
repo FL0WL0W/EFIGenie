@@ -1,7 +1,0 @@
-ConfigEditor ToDo
-views
-read TS ini
-write TS ini
-firmware upload/download
-logging
-autotune

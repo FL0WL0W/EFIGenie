@@ -11,10 +11,10 @@ namespace Service
 	protected:
 		std::map<uint16_t, void *> _services;
 	public:
-		void Register(uint16_t const &serviceId, void * const &service);
-		void RegisterIfNotNull(uint16_t const &serviceId, void * const &service);
-		void Register(uint16_t const &serviceId, uint32_t const &instanceId, void * const &service);
-		void RegisterIfNotNull(uint16_t const &serviceId, uint32_t const &instanceId, void * const &service);
+		bool Register(uint16_t const &serviceId, void * const &service);
+		bool RegisterIfNotNull(uint16_t const &serviceId, void * const &service);
+		bool Register(uint16_t const &serviceId, uint32_t const &instanceId, void * const &service);
+		bool RegisterIfNotNull(uint16_t const &serviceId, uint32_t const &instanceId, void * const &service);
 		void* Locate(uint16_t const &serviceId) const;
 		void* Locate(uint16_t const &serviceId, uint32_t const &instanceId) const;
 		template<typename K>

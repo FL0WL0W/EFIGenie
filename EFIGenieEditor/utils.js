@@ -9,6 +9,18 @@ ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same typ
     return tmp.buffer;
 }
 
+ArrayBuffer.prototype.equals = function(buf)
+{
+    if (this.byteLength != this.byteLength) return false;
+    var dv1 = new Int8Array(this);
+    var dv2 = new Int8Array(buf);
+    for (var i = 0 ; i != this.byteLength ; i++)
+    {
+        if (dv1[i] != dv2[i]) return false;
+    }
+    return true;
+}
+
 jQuery.expr[':'].parents = function(a,i,m){
     return jQuery(a).parents(m[3]).length < 1;
 };

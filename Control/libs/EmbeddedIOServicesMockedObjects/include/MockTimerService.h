@@ -11,6 +11,8 @@ namespace HardwareAbstraction
 		MOCK_METHOD1(ScheduleCallBack, void(uint32_t tick));
 		MOCK_METHOD0(GetTick, const uint32_t());
 		MOCK_METHOD0(GetTicksPerSecond, const uint32_t());
+		MOCK_METHOD0(DisableCallBack, void());
+		MOCK_METHOD0(EnableCallBack, void());
 	};
 }
 #endif

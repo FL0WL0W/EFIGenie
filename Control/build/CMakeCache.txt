@@ -284,13 +284,13 @@ EngineControl_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Contro
 INSTALL_GTEST:BOOL=ON
 
 //Path to a program.
-PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/.platformio/python27/python.exe
+PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/AppData/Local/Programs/Python/Python37/python.exe
 
 //Value Computed by CMake
-ReluctorMockedObjects_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/ReluctorMockedObjects
+ReluctorUnitTests_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctors/libs/ReluctorUnitTests
 
 //Value Computed by CMake
-ReluctorMockedObjects_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/ReluctorMockedObjects
+ReluctorUnitTests_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctors/libs/ReluctorUnitTests
 
 //Value Computed by CMake
 Reluctor_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctor
@@ -479,7 +479,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_RC_COMPILER
@@ -524,7 +524,7 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/Users/daniel/.platformio/python27/python.exe][v2.7.13()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/Users/daniel/AppData/Local/Programs/Python/Python37/python.exe][v3.7.4()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: PYTHON_EXECUTABLE

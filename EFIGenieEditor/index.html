@@ -4,17 +4,16 @@
         <script src="utils.js"></script>
         <script src="Config.js"></script>
         <script src="Units.js"></script>
-        <script src="SpeeduinoIni.js"></script>
-        <script src="IOServicesConfig.js"></script>
-        <script src="ReluctorServicesConfig.js"></script>
-        <script src="TransmissionControlServicesConfig.js"></script>
-        <script src="EngineControlServicesConfig.js"></script>
+        <script src="EmbeddedIOServicesIni.js"></script>
+        <script src="ReluctorServicesIni.js"></script>
+        <script src="EngineControlServicesIni.js"></script>
         <script src="ConfigGui/ConfigGui.js"></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
+            var test = {};
             var b = new ConfigGui();
             $(document).ready(function() {
-                b.SetObj(undefined);
+                b.SetObj(test);
                 b.SetIni(EngineControlServicesIni);
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
@@ -27,6 +26,7 @@
                     $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
                 });
                 $("#btnSaveBin").click(function(){
+                    AutoIncrement = {};
                     downloadBin(b.GetArrayBuffer(), "config.bin");
                 });
                 $("#btnLoadBin").change(function(evt){
@@ -75,8 +75,8 @@
         <label for="btnLoad" class="button">Open</label>
         <input id="btnLoad" type="file" style="display: none;">
         <input id="btnSaveBin" type="button" class="button" value="Save Bin">
-        <label for="btnLoadBin" class="button">Open Bin</label>
-        <input id="btnLoadBin" type="file" style="display: none;">
+        <!--<label for="btnLoadBin" class="button">Open Bin</label>
+        <input id="btnLoadBin" type="file" style="display: none;">-->
         <div id="workspace"></div>
     </body>
 </html>
