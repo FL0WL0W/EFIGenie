@@ -7,14 +7,14 @@ static void RegisterFactory();
 static void RegisterFactory(uint16_t id)                                        \
 {                                                           					\
     if(factoryLocator.Locate(id) == 0)                                       	\
-        factoryLocator.Register(id, Create); 									\
+        factoryLocator.Register(id, reinterpret_cast<void *>(Create));			\
 }                                                                               
 
 #define ISERVICE_REGISTERFACTORY_CPP(cl, id)              					    \
 void cl::RegisterFactory()                                         				\
 {                                                           					\
     if(factoryLocator.Locate(id) == 0)                                       	\
-        factoryLocator.Register(id, Create); 									\
+        factoryLocator.Register(id, reinterpret_cast<void *>(Create));			\
 }                                                           					
 
 #define ISERVICE_REGISTERSERVICEFACTORY_H                        				\
@@ -23,8 +23,8 @@ static void RegisterServiceFactory();                               			\
 #define ISERVICE_REGISTERSERVICEFACTORY_CPP(cl, id)              				\
 void cl::RegisterServiceFactory()                                   			\
 {                                                           					\
-    if(serviceFactoryLocator.Locate(id) == 0)                                  \
-        serviceFactoryLocator.Register(id, Build); 								\
+    if(serviceFactoryLocator.Locate(id) == 0)                                  	\
+        serviceFactoryLocator.Register(id, reinterpret_cast<void *>(Build));	\
 }
 
 #ifndef ISERVICE_H

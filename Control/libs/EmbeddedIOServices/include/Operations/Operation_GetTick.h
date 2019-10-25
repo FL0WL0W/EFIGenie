@@ -1,38 +1,35 @@
 #include "Operations/IOperation.h"
 #include "Service/IService.h"
 #include "Service/ServiceLocator.h"
-#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Packed.h"
 #include "Interpolation.h"
 #include "ScalarVariable.h"
+#include "HardwareAbstraction/ITimerService.h"
 
 /*
 To create this operator
 uint16									6001(BUILDER_OPERATION)
 uint16									xx(InstanceID of Operation)
-uint16									7(FactoryID)
-uint16 									pin
-uint16 									minFrequency
+uint16									16(FactoryID)
 
 To use this operator on a variable in the main loop
 uint16									7001(BUILDER_VARIABLE)
-uint16									7(FactoryID)
-uint16									xx(InstanceID of Variable)
+uint16									16(FactoryID)
+uint16									xx(InstanceID of Variable Result)
 uint16									xx(InstanceID of Operation)
 */
 
-#ifndef OPERATION_PULSEWIDTHPINREAD_H
-#define OPERATION_PULSEWIDTHPINREAD_H
+#ifndef OPERATION_GETTICK_H
+#define OPERATION_GETTICK_H
 namespace Operations
 {
-	class Operation_PulseWidthPinRead : public IOperation<ScalarVariable>
+	class Operation_GetTick : public IOperation<ScalarVariable>
 	{
 	protected:
-		HardwareAbstraction::IPwmService *_pwmService;
-		uint16_t _pin;
-		uint16_t _minFrequency;
+		static Operation_GetTick *_instance;
+		HardwareAbstraction::ITimerService *_timerService;
 	public:		
-        Operation_PulseWidthPinRead(HardwareAbstraction::IPwmService *pwmService, const uint16_t pin, const uint16_t minFrequency);
+        Operation_GetTick(HardwareAbstraction::ITimerService *timerService);
 
 		ScalarVariable Execute() override;
 

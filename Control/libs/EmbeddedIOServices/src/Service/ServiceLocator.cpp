@@ -1,4 +1,5 @@
 #include "Service/ServiceLocator.h"
+#include <cstring>
 
 #ifdef SERVICELOCATOR_H
 namespace Service
@@ -30,7 +31,7 @@ namespace Service
 
 		if(serviceArray == 0)
 		{
-			serviceArray = calloc((instanceId + 2) * sizeof(void *) + sizeof(uint32_t), (instanceId + 2) * sizeof(void *) + sizeof(uint32_t));
+			serviceArray = calloc(1, (instanceId + 2) * sizeof(void *) + sizeof(uint32_t));
 			*reinterpret_cast<uint32_t *>(serviceArray) = instanceId + 1;
 			registered = Register(serviceId, serviceArray);
 		}
@@ -40,7 +41,7 @@ namespace Service
 			if(instanceId + 1 > size)
 			{
 				void* oldServiceArray = serviceArray;
-				serviceArray = calloc((instanceId + 2) * sizeof(void *) + sizeof(uint32_t), (instanceId + 2) * sizeof(void *) + sizeof(uint32_t));
+				serviceArray = calloc(1, (instanceId + 2) * sizeof(void *) + sizeof(uint32_t));
 				memcpy(serviceArray, oldServiceArray, (size + 1) * sizeof(void *) + sizeof(uint32_t));
 				*reinterpret_cast<uint32_t *>(serviceArray) = instanceId + 1;
 				

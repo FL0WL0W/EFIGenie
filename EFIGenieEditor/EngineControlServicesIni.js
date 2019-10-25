@@ -4,13 +4,13 @@ EngineControlOperationSelections = [
 ];
 
 var EngineControlServicesIni = {
-    Operation_EnginePosition: { Output: "ScalarVariable", Inputs: [], Variables : [
+    Operation_EnginePosition: { Output: "ScalarVariable", Inputs: ["ReluctorResult", "ReluctorResult"], Variables : [
         { BUILDER_OPERATION: { Type: "uint16", Value: 6001, Static: true } },
         { InstanceID: { Type: "uint16", Value: "./iterator", Static: true } },
         { FactoryID: { Type: "uint16", Value: 2001, Static: true } },
         { CrankPriority: { Type: "bool", Label: "Crank Is Priority", Value: true } }
     ] },
-    Operation_EnginePositionPrediction: { Output: "ScalarVariable", Inputs: [], Variables : [
+    Operation_EnginePositionPrediction: { Output: "ScalarVariable", Inputs: ["ScalarVariable", "EnginePosition"], Variables : [
         { BUILDER_OPERATION: { Type: "uint16", Value: 6001, Static: true } },
         { InstanceID: { Type: "uint16", Value: "./iterator", Static: true } },
         { FactoryID: { Type: "uint16", Value: 2002, Static: true } }

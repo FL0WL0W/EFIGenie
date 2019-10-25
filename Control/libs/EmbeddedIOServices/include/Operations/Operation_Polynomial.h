@@ -21,14 +21,6 @@ uint16									1(FactoryID)
 uint16									xx(InstanceID of Variable Result)
 uint16									xx(InstanceID of Operation)
 uint16									xx(InstanceID of Variable Input)
-
-To create a CallBack to use this operator on a variable
-uint16									7002(BUILDER_VARIABLE_TRANSLATE_CALL_BACK)
-uint16									xx(InstanceID of CallBack)
-uint16									1(FactoryID)
-uint16									xx(InstanceID of Variable Result)
-uint16									xx(InstanceID of Operation)
-uint16									xx(InstanceID of Variable Input)
 */
 
 #ifndef OPERATION_POLYNOMIAL_H

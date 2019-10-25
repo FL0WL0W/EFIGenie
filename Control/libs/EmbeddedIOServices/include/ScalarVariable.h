@@ -3,6 +3,31 @@
 
 #ifndef SCALARVARIABLE_H
 #define SCALARVARIABLE_H
+struct ScalarVariable;
+
+template<typename K>
+K ScalarVariableTo(ScalarVariable *scalarVariable)
+{
+    switch(scalarVariable->Type)
+    {
+        case ScalarVariableType::UINT8: return static_cast<K>(*reinterpret_cast<uint8_t *>(&scalarVariable->Value));
+        case ScalarVariableType::UINT16: return static_cast<K>(*reinterpret_cast<uint16_t *>(&scalarVariable->Value));
+        case ScalarVariableType::UINT32: return static_cast<K>(*reinterpret_cast<uint32_t *>(&scalarVariable->Value));
+        case ScalarVariableType::TICK: return static_cast<K>(*reinterpret_cast<uint32_t *>(&scalarVariable->Value));
+        case ScalarVariableType::UINT64: return static_cast<K>(*reinterpret_cast<uint64_t *>(&scalarVariable->Value));
+        case ScalarVariableType::INT8: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int8_t *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int8_t *>(&scalarVariable->Value));
+        case ScalarVariableType::INT16: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int16_t *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int16_t *>(&scalarVariable->Value));
+        case ScalarVariableType::INT32: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int32_t *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int32_t *>(&scalarVariable->Value));
+        case ScalarVariableType::INT64: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int64_t *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int64_t *>(&scalarVariable->Value));
+        case ScalarVariableType::FLOAT: if(static_cast<K>(-1) > 0 && *reinterpret_cast<float *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<float *>(&scalarVariable->Value));
+        case ScalarVariableType::DOUBLE: if(static_cast<K>(-1) > 0 && *reinterpret_cast<double *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<double *>(&scalarVariable->Value));
+        case ScalarVariableType::BOOLEAN: return static_cast<K>(*reinterpret_cast<bool *>(&scalarVariable->Value));
+    }
+    return 0;
+}
+template<>
+bool ScalarVariableTo<bool>(ScalarVariable *scalarVariable);
+
 struct ScalarVariable
 {
     ScalarVariableType Type;
@@ -66,7 +91,7 @@ struct ScalarVariable
     ScalarVariable(bool variable)
     {
         Type = ScalarVariableType::BOOLEAN;
-        Value = *reinterpret_cast<uint64_t *>(&variable);
+        Value = variable;
     }
     static ScalarVariable FromTick(uint32_t tick)
     {
@@ -78,31 +103,7 @@ struct ScalarVariable
     template<typename K>
     K To()
     {
-        switch(Type)
-        {
-            case ScalarVariableType::UINT8: return static_cast<K>(*reinterpret_cast<uint8_t *>(&Value));
-            case ScalarVariableType::UINT16: return static_cast<K>(*reinterpret_cast<uint16_t *>(&Value));
-            case ScalarVariableType::UINT32: return static_cast<K>(*reinterpret_cast<uint32_t *>(&Value));
-            case ScalarVariableType::TICK: return static_cast<K>(*reinterpret_cast<uint32_t *>(&Value));
-            case ScalarVariableType::UINT64: return static_cast<K>(*reinterpret_cast<uint64_t *>(&Value));
-            case ScalarVariableType::INT8: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int8_t *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int8_t *>(&Value));
-            case ScalarVariableType::INT16: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int16_t *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int16_t *>(&Value));
-            case ScalarVariableType::INT32: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int32_t *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int32_t *>(&Value));
-            case ScalarVariableType::INT64: if(static_cast<K>(-1) > 0 && *reinterpret_cast<int64_t *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<int64_t *>(&Value));
-            case ScalarVariableType::FLOAT: if(static_cast<K>(-1) > 0 && *reinterpret_cast<float *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<float *>(&Value));
-            case ScalarVariableType::DOUBLE: if(static_cast<K>(-1) > 0 && *reinterpret_cast<double *>(&Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<double *>(&Value));
-            case ScalarVariableType::BOOLEAN: return static_cast<K>(*reinterpret_cast<bool *>(&Value));
-        }
-        return 0;
-    }
-    template<>
-    bool To<bool>()
-    {
-        switch(Type)
-        {
-            case ScalarVariableType::BOOLEAN: return *reinterpret_cast<bool *>(&Value);
-        }
-        return false;
+        return ScalarVariableTo<K>(this);
     }
 
     static ScalarVariable Int64ToScalarVariable(int64_t result, ScalarVariableType targetType)

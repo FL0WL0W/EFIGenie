@@ -16,21 +16,12 @@ uint8 									XResolution
 float 									MinYValue
 float 									MaxYValue
 uint8 									YResolution
-ScalarVariableType							TableType
+ScalarVariableType						TableType
 TableType[XResolution * YResolution]	Table
 
 To use this operator on a variable in the main loop
 uint16									7001(BUILDER_VARIABLE)
-uint16									5(FactoryID)
-uint16									xx(InstanceID of Variable Z/Result)
-uint16									xx(InstanceID of Operation)
-uint16									xx(InstanceID of Variable X)
-uint16									xx(InstanceID of Variable Y)
-
-To create a CallBack to use this operator on a variable
-uint16									7002(BUILDER_VARIABLE_TRANSLATE_CALL_BACK)
-uint16									xx(InstanceID of CallBack)
-uint16									5(FactoryID)
+uint16									3(FactoryID)
 uint16									xx(InstanceID of Variable Z/Result)
 uint16									xx(InstanceID of Operation)
 uint16									xx(InstanceID of Variable X)

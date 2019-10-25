@@ -10,20 +10,10 @@ To create this operator
 uint16									6001(BUILDER_OPERATION)
 uint16									xx(InstanceID of Operation)
 uint16									14(FactoryID)
-ScalarVariableType						ResultType
 MathOperation							Operation
 
 To use this operator on a variable in the main loop
 uint16									7001(BUILDER_VARIABLE)
-uint16									14(FactoryID)
-uint16									xx(InstanceID of Variable Result)
-uint16									xx(InstanceID of Operation)
-uint16									xx(InstanceID of Variable X)
-uint16									xx(InstanceID of Variable Y)
-
-To create a CallBack to use this operator on a variable
-uint16									7002(BUILDER_VARIABLE_TRANSLATE_CALL_BACK)
-uint16									xx(InstanceID of CallBack)
 uint16									14(FactoryID)
 uint16									xx(InstanceID of Variable Result)
 uint16									xx(InstanceID of Operation)
@@ -35,7 +25,7 @@ uint16									xx(InstanceID of Variable Y)
 #define OPERATION_MATH_H
 namespace Operations
 {
-	const enum MathOperation
+	enum MathOperation : uint8_t
 	{
 		ADD = 0,
 		SUBTRACT = 1,

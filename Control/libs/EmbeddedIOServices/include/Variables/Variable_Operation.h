@@ -45,16 +45,11 @@ namespace Variables
 		{
 			uint32_t variableId = Service::IService::CastAndOffset<uint16_t>(config, sizeOut);
 			
-			RET *variable = serviceLocator->LocateAndCast<RET>(BUILDER_VARIABLE, variableId);
-			if(variable == 0)
-			{
-				variable = (RET *)malloc(sizeof(RET));
-				serviceLocator->Register(BUILDER_VARIABLE, variableId, variable);
-			}
+			RET *variable = GetOrCreateVariable<RET>(serviceLocator, variableId);
 
 			Operations::IOperation<RET, PARAMS...> *operation = serviceLocator->LocateAndCast<Operations::IOperation<RET, PARAMS...>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
 			
-			return new Variable_Operation<RET, PARAMS...>(operation, variable, serviceLocator->LocateAndCast<PARAMS>(BUILDER_VARIABLE, Service::IService::CastAndOffset<uint16_t>(config, sizeOut))...);
+			return new Variable_Operation<RET, PARAMS...>(operation, variable, GetOrCreateVariable<PARAMS>(serviceLocator, Service::IService::CastAndOffset<uint16_t>(config, sizeOut))...);
 		}
 		ISERVICE_REGISTERFACTORY_H_TEMPLATE
 	};
@@ -87,7 +82,7 @@ namespace Variables
 		{
 			Operations::IOperation<void, PARAMS...> *operation = serviceLocator->LocateAndCast<Operations::IOperation<void, PARAMS...>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
 			
-			return new Variable_Operation<void, PARAMS...>(operation, serviceLocator->LocateAndCast<PARAMS>(BUILDER_VARIABLE, Service::IService::CastAndOffset<uint16_t>(config, sizeOut))...);
+			return new Variable_Operation<void, PARAMS...>(operation, GetOrCreateVariable<PARAMS>(serviceLocator, Service::IService::CastAndOffset<uint16_t>(config, sizeOut))...);
 		}
 		ISERVICE_REGISTERFACTORY_H_TEMPLATE
 	};

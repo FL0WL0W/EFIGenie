@@ -27,7 +27,7 @@ namespace HardwareAbstraction
 		{
 			Instance = instance;
 			Function = function;
-			_params = params;
+			_params = std::tuple<PARAMS*...>(params...);
 		}
 
 		void Execute() override

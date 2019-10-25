@@ -32,11 +32,10 @@ namespace Variables
 	struct Record
 	{
 		public:
-		Record(uint8_t length)
+		void Initialize(uint8_t length)
 		{
 			Length = length;
-			const uint32_t byteLength = sizeof(Frame) * length;
-			Frames = (Frame *)calloc(byteLength, byteLength);
+			Frames = (Frame *)calloc(length, sizeof(Frame));
 		}
 		static uint8_t Subtract(const uint8_t &val1, uint8_t val2, const uint8_t &length)
 		{
@@ -54,7 +53,7 @@ namespace Variables
 		}
 
 		uint8_t Length; //Don't modify this -_-
-		uint8_t Last = 0;
+		uint8_t Last;
 		Frame *Frames;
 	};
 
@@ -67,7 +66,7 @@ namespace Variables
 		bool _inverted;
 		Record *_record;
 	public:	
-        Variable_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted);
+        Variable_DigitalPinRecord(Record *record, HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted);
 		void TranslateValue() override;
 		void InterruptCallBack();
 

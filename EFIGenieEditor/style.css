@@ -121,39 +121,13 @@ select {
     border-top: none;
 }
 
-.namedListAdd {
+span .namedListOperation {
     background-color: inherit;
-    direction: rtl;
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 6px 10px;
-    margin: 0px;
+    display: inline;
 }
-.namedListRow:hover,
-.namedListAdd:hover {
+.namedListOperation:hover {
     background-color: #ddd;
-}
-.namedListOpen {
-    cursor: pointer;
-    padding: 0px 6px;
-}
-.namedListClose {
-    cursor: pointer;
-    padding: 0px 6px;
-}
-.namedListUp,
-.namedListDown,
-.namedListDelete {
-    cursor: pointer;
-    padding: 0px 6px;
-    float: right;
-}
-.namedListUp:hover,
-.namedListDown:hover,
-.namedListOpen:hover,
-.namedListClose:hover,
-.namedListDelete:hover,
-.namedListName:hover {
-    background-color: #bbb;
 }

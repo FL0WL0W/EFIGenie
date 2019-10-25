@@ -287,12 +287,6 @@ INSTALL_GTEST:BOOL=ON
 PYTHON_EXECUTABLE:FILEPATH=C:/Users/daniel/AppData/Local/Programs/Python/Python37/python.exe
 
 //Value Computed by CMake
-ReluctorUnitTests_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctors/libs/ReluctorUnitTests
-
-//Value Computed by CMake
-ReluctorUnitTests_SOURCE_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctors/libs/ReluctorUnitTests
-
-//Value Computed by CMake
 Reluctor_BINARY_DIR:STATIC=C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctor
 
 //Dependencies for the target

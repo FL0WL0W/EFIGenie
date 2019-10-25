@@ -9,7 +9,7 @@ namespace Operations
 
     void IOperationBase::Build(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
     {
-        uint8_t instanceId = IService::CastAndOffset<uint8_t>(config, sizeOut);
+        uint16_t instanceId = IService::CastAndOffset<uint16_t>(config, sizeOut);
 
         IOperationBase *operation = Create(serviceLocator, config, sizeOut);
 

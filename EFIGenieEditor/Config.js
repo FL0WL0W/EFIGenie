@@ -65,10 +65,6 @@ class ConfigBase {
     }
     SetObj(obj, objLocation) {
         if(obj) {
-            if(obj !== this.Obj) {
-                AttachFunctionFromObjToObj(obj, "Update", this, "ObjUpdateEvent");
-            }
-
             this.Obj = obj;
         }
         if(!this.Obj) {
@@ -82,6 +78,21 @@ class ConfigBase {
         }
 
         this.InitProperty();
+    }
+    AttachObjUpdateEvent() {
+        if(this.Obj)
+            AttachFunctionFromObjToObj(this.Obj, "Update", this, "ObjUpdateEvent");
+    }
+    DeAttachObjUpdateEvent() {
+        if(this.Obj)
+            RemoveFunctionFromObjToObj(this.Obj, "Update", this, "ObjUpdateEvent");
+    }
+    Attach(){
+        this.DeAttach();
+        this.AttachObjUpdateEvent();
+    }
+    DeAttach(){
+        this.DeAttachObjUpdateEvent();
     }
     ObjUpdateEvent() { }
     InitProperty() {
@@ -114,27 +125,27 @@ class ConfigBase {
             return val; 
         val = parseInt(val);
         switch(val){
-            case 0:
-                return "uint8";
             case 1:
-                return "uint16";
+                return "uint8";
             case 2:
-                return "uint32";
+                return "uint16";
             case 3:
-                return "uint64";
+                return "uint32";
             case 4:
-                return "int8";
+                return "uint64";
             case 5:
-                return "int16";
+                return "int8";
             case 6:
-                return "int32";
+                return "int16";
             case 7:
-                return "int64";
+                return "int32";
             case 8:
-                return "float";
+                return "int64";
             case 9:
-                return "double";
+                return "float";
             case 10:
+                return "double";
+            case 11:
                 return "bool";
             case 11:
                 return "uint32";
@@ -159,6 +170,7 @@ class ConfigBase {
                     step = Math.max(1 / this.GetValueMultiplier(), 0.01);
                     break;
                 case "float":
+                case "double":
                 case "variable":
                 case "formula":
                     step = 0.01;
@@ -407,6 +419,30 @@ class Config extends ConfigBase {
         
         return objProperty;
     }
+    Attach() {
+        super.Attach();
+        var iniProperty = this.GetIniProperty();
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRow = iniProperty.Variables[variableRowIndex];
+            var variableRowKey = Object.keys(variableRow)[0];
+
+            if(this[variableRowKey]) {
+                this[variableRowKey].Attach();
+            } 
+        }
+    }
+    DeAttach() {
+        super.DeAttach();
+        var iniProperty = this.GetIniProperty();
+        for(var variableRowIndex in iniProperty.Variables) {
+            var variableRow = iniProperty.Variables[variableRowIndex];
+            var variableRowKey = Object.keys(variableRow)[0];
+
+            if(this[variableRowKey]) {
+                this[variableRowKey].DeAttach();
+            } 
+        }
+    }
 }
 
 class ConfigSelection extends ConfigBase {
@@ -479,6 +515,14 @@ class ConfigSelection extends ConfigBase {
         
         return objProperty;
     }
+    Attach() {
+        super.Attach();
+        this.Value.Attach();
+    }
+    DeAttach() {
+        super.DeAttach();
+        this.Value.DeAttach();
+    }
 }
 
 class ConfigNumber extends ConfigBase {
@@ -492,7 +536,7 @@ class ConfigNumber extends ConfigBase {
         if(!this.GetStatic()) {
             var objProperty = this.GetObjProperty();
 
-            var val = parseInt(this.GetValue());
+            var val = parseFloat(this.GetValue());
             if(!isNaN(val)) {
                 switch(this.GetType()) {
                     case "uint8":
@@ -822,6 +866,18 @@ class ConfigFormula extends ConfigBase {
 
 class ConfigArray extends ConfigBase {
     GetTableArrayLength = GetIniPropertyPropertyGetFunction("Array", 0);
+    Attach() {
+        super.Attach();
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i].Attach();
+        }
+    }
+    DeAttach() {
+        super.DeAttach();
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i].DeAttach();
+        }
+    }
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
         var tableArrayLength = this.GetTableArrayLength()
@@ -890,6 +946,18 @@ class ConfigArray extends ConfigBase {
 
 class ConfigNamedList extends ConfigBase {
     GetTableArrayLength = GetObjPropertyPropertyGetFunction("Length", 0);
+    Attach() {
+        super.Attach();
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i].Attach();
+        }
+    }
+    DeAttach() {
+        super.DeAttach();
+        for(var i = 0; i < this.Value.length; i++) {
+            this.Value[i].DeAttach();
+        }
+    }
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
         var tableArrayLength = this.GetTableArrayLength()
@@ -1206,6 +1274,21 @@ function AttachFunctionFromObjToObj(obj, functionName, handleObj, handleFunction
     if(!handleAlreadyExists)
         obj[functionName + "HandlesEFJ"].push({ Obj: handleObj, FunctionName: handleFunctionName});
 }
+function RemoveFunctionFromObjToObj(obj, functionName, handleObj, handleFunctionName) {
+    if(!obj[functionName] || !obj[functionName + "HandlesEFJ"]){
+        return;
+    }
+
+    var handlePosition = -1;
+    $.each(obj[functionName + "HandlesEFJ"], function(index, handle) {
+        if(handle.Obj === handleObj && handle.FunctionName === handleFunctionName) {
+            handlePosition = index;
+        }
+    });
+
+    if(handlePosition > -1) 
+        obj[functionName + "HandlesEFJ"].splice(handlePosition, 1);
+}
 function CallObjFunctionIfExists(obj, functionName) {
     if(obj[functionName]) {
         obj[functionName]();
@@ -1270,6 +1353,7 @@ function GetIniPropertyMin() {
                 min = -9223372036854775808 / this.GetValueMultiplier();
                 break;
             case "float":
+            case "double":
             case "formula":
             case "variable":
                 min = -340282300000000000000000000000000000000 / this.GetValueMultiplier();
@@ -1314,6 +1398,7 @@ function GetIniPropertyMax() {
             case "int64":
                 max = 9223372036854775807 / this.GetValueMultiplier();
                 break;
+            case "double":
             case "variable":
             case "formula":
             case "float":

@@ -20,7 +20,7 @@ namespace Service
 	
 	void IService::CreateServiceAndOffset(void(*factory)(ServiceLocator * const &, const void *, unsigned int &), ServiceLocator * const &serviceLocator, const void *&config, unsigned int &totalSize)
 	{
-		unsigned int size;
+		unsigned int size = 0;
 		factory(serviceLocator, config, size);
 		OffsetConfig(config, totalSize, size);
 	}

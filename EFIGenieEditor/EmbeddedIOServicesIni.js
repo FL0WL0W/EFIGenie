@@ -23,7 +23,7 @@ var VariableSelections = [
 
 var EmbeddedIOServicesIni = {
     ScalarVariable: { Variables : [
-        { Type: { Label: "Type", Type: "uint8", Value: 0, Selections: [ "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
+        { Type: { Label: "Type", Type: "uint8", Value: 1, Selections: [ "INVALID", "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
         { Value: { Type: ".Type", Label: "Value" } }//fix this
     ] },
 
@@ -35,7 +35,7 @@ var EmbeddedIOServicesIni = {
     ] },
     Variable_DigitalPinRecord: {  Output: "ScalarVariable", Inputs: [], Variables : [
         { BUILDER_VARIABLE: { Type: "uint16", Value: 7001, Static: true } },
-        { FactoryID: { Type: "uint16", Value: 5, Static: true } },
+        { FactoryID: { Type: "uint16", Value: 12, Static: true } },
         { VariableID: { Type: "uint16", Value: "./iterator", Static: true } },
         { Length: { Type: "uint8", Label: "Record Length" } },
         { Pin: { Type: "uint16", Label: "Pin" } },
@@ -64,7 +64,7 @@ var EmbeddedIOServicesIni = {
         { MinYValue: { Type: "float", Label: "Min Y", Value: 1 } },
         { MaxYValue: { Type: "float", Label: "Max Y", Value: 4 } },
         { YResolution : { Label: "Y Resolution", Type: "uint8", Min: 1, Value: 4 } },
-        { Type: { Label: "Type", Type: "uint8", Value: 0, Selections: [ "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
+        { Type: { Label: "Type", Type: "uint8", Value: 1, Selections: [ "INVALID", "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
         { Table: { Type: ".Type", XResolution: ".XResolution", YResolution: ".YResolution", XLabel: "X", YLabel: "Y", ZLabel: "Z", Label: "Table", XMin: "./iterator", XMax: ".MaxXValue", YMin: ".MinYValue", YMax: ".MaxYValue", Dialog: true } }
     ] },
     Operation_AnalogPinRead: { Output: "ScalarVariable", Inputs: [], Variables : [
@@ -122,10 +122,10 @@ var EmbeddedIOServicesIni = {
         { MinXValue: { Type: "float", Label: "Min", Value: 1 } },
         { MaxXValue: { Type: "float", Label: "Max", Value: 4 } },
         { XResolution : { Label: "Resolution", Type: "uint8", Min: 1, Value: 4 } },
-        { Type: { Label: "Type", Type: "uint8", Value: 0, Selections: [ "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
+        { Type: { Label: "Type", Type: "uint8", Value: 1, Selections: [ "INVALID", "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
         { Table: { Type: ".Type", XResolution: ".XResolution", YResolution: 0, XLabel: "IN", YLabel: "OUT", ZLabel: "Z", Label: "Table", XMin: ".MinXValue", XMax: ".MaxXValue", Dialog: true } }
     ] },
-    Operation_Math: { Output: "ScalarVariable", Inputs: ["ScalarVariable"], Variables : [
+    Operation_Math: { Output: "ScalarVariable", Inputs: ["ScalarVariable", "ScalarVariable"], Variables : [
         { BUILDER_OPERATION: { Type: "uint16", Value: 6001, Static: true } },
         { InstanceID: { Type: "uint16", Value: "./iterator", Static: true } },
         { FactoryID: { Type: "uint16", Value: 14, Static: true } },

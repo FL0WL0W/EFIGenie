@@ -46,9 +46,11 @@ namespace Operations
 			}
 		}
 
-		float ticksPerDegree = enginePosition.PositionDot / _timerService->GetTicksPerSecond();
+		float ticksPerDegree = _timerService->GetTicksPerSecond() / enginePosition.PositionDot;
 
-		return ScalarVariable::FromTick(static_cast<uint32_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick);
+		uint32_t positionTick = static_cast<uint32_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick;
+
+		return ScalarVariable::FromTick(positionTick);
 	}
 
 	Operations::IOperationBase *Operation_EnginePositionPrediction::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)

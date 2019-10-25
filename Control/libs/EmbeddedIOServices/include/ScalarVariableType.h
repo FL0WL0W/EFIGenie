@@ -2,7 +2,7 @@
 
 #ifndef SCALARVARIABLETYPE_H
 #define SCALARVARIABLETYPE_H
-const enum ScalarVariableType
+enum ScalarVariableType : uint8_t
 {
     VOID = 0,
     UINT8 = 1,

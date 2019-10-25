@@ -11,6 +11,42 @@ class ConfigGui extends Config {
         
         return false;
     }
+    Attach() {
+        super.Attach();
+        var iniProperty = this.GetIniProperty();
+        if(iniProperty.Tabbed)
+        {
+            var thisClass = this;
+            var i = 0;
+            for(var variableRowIndex in iniProperty.Variables) {
+                var variableRowKey = Object.keys(iniProperty.Variables[variableRowIndex])[0];
+                var variableRowConfig = this[variableRowKey];
+                
+                if(!variableRowConfig)
+                    continue; //throw "ConfigGui not initialized";
+
+                var variableRowIniProperty = variableRowConfig.GetIniProperty();
+
+                if(!variableRowIniProperty.Hidden && !variableRowIniProperty.Static) {
+                    $(document).on("click."+this.GUID, "#tab" + this.GUID + "i" + i, function(){
+                        var index = $(this).data("index");
+                        var iniProperty = thisClass.GetIniProperty();
+                        for(var i = 0; i < iniProperty.Variables.length; i++) {
+                            $("#tab" + thisClass.GUID + "i" + i).removeClass("active");
+                            $("#span" + thisClass.GUID + "i" + i).hide();
+                        }
+                        $(this).addClass("active");
+                        $("#span" + thisClass.GUID + "i" + index).show()
+                    });
+                    i++;
+                }
+            }
+        }
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("click."+this.GUID);
+    }
     GetHtml() {
         var objProperty = this.GetObjProperty();
         var iniProperty = this.GetIniProperty();
@@ -18,13 +54,10 @@ class ConfigGui extends Config {
         if(iniProperty.Hidden)
             return "";
 
-        var thisClass = this;
-
         var template = "";
         var tabs = "";
         var i = 0;
 
-        $(document).off("click."+this.GUID);
         for(var variableRowIndex in iniProperty.Variables) {
             var variableRowKey = Object.keys(iniProperty.Variables[variableRowIndex])[0];
             var variableRowConfig = this[variableRowKey];
@@ -40,17 +73,6 @@ class ConfigGui extends Config {
                     tabClasses += " active";
                 var label = variableRowIniProperty.Label;
                 tabs += "<button class=\"" + tabClasses + "\" id=\"tab" + this.GUID + "i" + i + "\" data-index=\"" + i + "\">" + label + "</button>";
-
-                $(document).on("click."+this.GUID, "#tab" + thisClass.GUID + "i" + i, function(){
-                    var index = $(this).data("index");
-                    var iniProperty = thisClass.GetIniProperty();
-                    for(var i = 0; i < iniProperty.Variables.length; i++) {
-                        $("#tab" + thisClass.GUID + "i" + i).removeClass("active");
-                        $("#span" + thisClass.GUID + "i" + i).hide();
-                    }
-                    $(this).addClass("active");
-                    $("#span" + thisClass.GUID + "i" + index).show()
-                });
 
                 template += "<span id=\"span" + this.GUID + "i" + i + "\""  + ((i !== 0)? " style=\"display:none;\"" : "") + " class=\"tabContent\">" + variableRowConfig.GetHtml() + "</span>";
                 i++;
@@ -106,20 +128,28 @@ class ConfigGui extends Config {
                 || this[variableRowKey] instanceof ConfigFormulaGui) {
             }
             else if(this[variableRowKey] instanceof ConfigNumber && this[variableRowKey].GetIniProperty().Selections) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigNumberSelectionGui();
             } else if(this[variableRowKey] instanceof ConfigNumber) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigNumberGui();
             } else if(this[variableRowKey] instanceof Config) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigGui();
             } else if(this[variableRowKey] instanceof ConfigArray) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigArrayGui();
             } else if(this[variableRowKey] instanceof ConfigNamedList) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigNamedListGui();
             } else if(this[variableRowKey] instanceof ConfigSelection) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigSelectionGui();
             } else if(this[variableRowKey] instanceof ConfigNumberTable) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigNumberTableGui();
             } else if(this[variableRowKey] instanceof ConfigFormula) {
+                this[variableRowKey].DeAttach();
                 this[variableRowKey] = new ConfigFormulaGui();
             }
 
@@ -137,6 +167,33 @@ class ConfigSelectionGui extends ConfigSelection {
     constructor(){
         super();
         this.GUID = getGUID();
+    }
+    Attach() {
+        super.Attach();
+        var iniProperty = this.GetIniProperty();
+        if(iniProperty.Selections.length > 1) {
+            var thisClass = this;
+            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+                var selectionIndex = parseInt($(this).val());
+                    
+                thisClass.Value.SetIni(undefined, thisClass.IniLocation + "/Selections/" + selectionIndex);
+                thisClass.GetObjProperty().Index = selectionIndex;
+                $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            
+                CallObjFunctionIfExists(thisClass.Obj, "Update");
+            });
+
+            $(document).on("click."+this.GUID, "#" + this.GUID + "clear", function(){
+                thisClass.GetObjProperty().Value = {};
+                thisClass.Value.InitProperty();
+                CallObjFunctionIfExists(thisClass.Obj, "Update");
+            });
+        }
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
     }
 
     ObjUpdateEvent() {
@@ -170,25 +227,6 @@ class ConfigSelectionGui extends ConfigSelection {
                     selectionHtml += "<option value=\"" + selectionIndex + "\">" + selectionValue.Name + "</option>";
             });
             template = template.replace(/[$]selections[$]/g, selectionHtml);
-            
-            var thisClass = this;
-            $(document).off("change."+this.GUID);
-            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-                var selectionIndex = parseInt($(this).val());
-                    
-                thisClass.Value.SetIni(undefined, thisClass.IniLocation + "/Selections/" + selectionIndex);
-                thisClass.GetObjProperty().Index = selectionIndex;
-                $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
-                CallObjFunctionIfExists(thisClass.Obj, "Update");
-            });
-
-            $(document).off("click."+this.GUID);
-            $(document).on("click."+this.GUID, "#" + this.GUID + "clear", function(){
-                thisClass.GetObjProperty().Value = {};
-                thisClass.Value.initProperty();
-                CallObjFunctionIfExists(thisClass.Obj, "Update");
-            });
         }
 
         template += this.Value.GetHtml();
@@ -201,6 +239,7 @@ class ConfigSelectionGui extends ConfigSelection {
             return false;
             
         if(!(this.Value instanceof ConfigGui)) {
+            this.Value.DeAttach();
             var newVal = new ConfigGui();
             newVal.SetObj(this.Value.Obj, this.Value.ObjLocation);
             newVal.SetIni(this.Value.Ini, this.Value.IniLocation);
@@ -219,6 +258,37 @@ class ConfigNumberGui extends ConfigNumber {
 
     GetUnits = GetUnitsFunction("Units", BlankUnits);
 
+    Attach() {
+        super.Attach();
+        var iniProperty = this.GetIniProperty();
+        var thisClass = this;
+        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+            var type = thisClass.GetType();
+            if(type === "bool") {
+                thisClass.GetObjProperty().Value = this.checked;
+            } else {
+                var val = parseFloat($(this).val());
+                var objProperty = thisClass.GetObjProperty();
+    
+                var units = thisClass.GetUnits();
+                var unit = units[objProperty.UnitIndex];
+
+                val /= unit.DisplayMultiplier - unit.DisplayOffset;
+
+                thisClass.GetObjProperty().Value = val;
+            }
+            CallObjFunctionIfExists(thisClass.Obj, "Update");
+        });
+        $(document).on("focus."+this.GUID, "#" + this.GUID, function(){
+            $(this).select();
+        });
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
+        $(document).off("focus."+this.GUID);
+    }
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
         var iniProperty = this.GetIniProperty();
@@ -258,15 +328,6 @@ class ConfigNumberGui extends ConfigNumber {
                 template = template.replace(/[$]checked[$]/g, "checked");
             else
                 template = template.replace(/[$]checked[$]/g, "");
-        
-            var thisClass = this;
-
-            $(document).off("change."+this.GUID);
-            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-
-                thisClass.GetObjProperty().Value = this.checked;
-                CallObjFunctionIfExists(thisClass.Obj, "Update");
-            });
         } else {
             if(!numberConfigGuiTemplate) {
                 numberConfigGuiTemplate = getFileContents("ConfigGui/Number.html");
@@ -302,21 +363,6 @@ class ConfigNumberGui extends ConfigNumber {
             template = template.replace(/[$]min[$]/g, min);
             template = template.replace(/[$]max[$]/g, max);
             template = template.replace(/[$]step[$]/g, step);
-
-            var thisClass = this;
-
-            $(document).off("change."+this.GUID);
-            $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-                var val = parseFloat($(this).val());
-                val /= unit.DisplayMultiplier - unit.DisplayOffset;
-
-                thisClass.GetObjProperty().Value = val;
-                CallObjFunctionIfExists(thisClass.Obj, "Update");
-            });
-            $(document).off("focus."+this.GUID);
-            $(document).on("focus."+this.GUID, "#" + this.GUID, function(){
-                $(this).select();
-            });
         }
 
         return template;
@@ -346,7 +392,20 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         super();
         this.GUID = getGUID();
     }
-
+    Attach() {
+        super.DeAttach();
+        var thisClass = this;
+        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+            var objProperty = thisClass.GetObjProperty();
+            objProperty.Value = $(this).val();
+        
+            CallObjFunctionIfExists(thisClass.Obj, "Update");
+        });
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("change."+this.GUID);
+    }
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
             
@@ -367,7 +426,6 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]label[$]/g, iniProperty.Label);
         var selectionHtml = "";
-        var thisClass = this;
         $.each(selections, function(selectionValue, selectionName) {
             if(typeof selectionName !== "string")
             {
@@ -382,14 +440,6 @@ class ConfigNumberSelectionGui extends ConfigNumber {
             }
         });
         template = template.replace(/[$]selections[$]/g, selectionHtml);
-        
-        $(document).off("change."+this.GUID);
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            var objProperty = thisClass.GetObjProperty();
-            objProperty.Value = $(this).val();
-        
-            CallObjFunctionIfExists(thisClass.Obj, "Update");
-        });
 
         return template + "</span>";
     }
@@ -441,6 +491,16 @@ class ConfigNumberTableGui extends ConfigNumberTable {
         this.CurrentXMax = xMax;
         this.CurrentYMin = yMin;
         this.CurrentYMax = yMax;
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
+        $(document).off("mousedown."+this.GUID);
+        $(document).off("mouseup."+this.GUID);
+        $(document).off("mousemove."+this.GUID);
+        $(document).off("contextmenu."+this.GUID);
+        $(document).off("copy."+this.GUID);
     }
 
     ObjUpdateEvent() {
@@ -864,6 +924,10 @@ class ConfigFormulaGui extends ConfigFormula {
         }
         this.CurrentDegree = degree;
     }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("change."+this.GUID);
+    }
     GetHtml() {
         var objProperty = this.GetObjProperty();
         var iniProperty = this.GetIniProperty();
@@ -949,6 +1013,7 @@ class ConfigArrayGui extends ConfigArray {
         $.each(this.Value, function(index, value) {
             if(!(thisClass.Value[index] instanceof ConfigGui)) {
                 var prev = thisClass.Value[index];
+                thisClass.Value[index].DeAttach();
                 thisClass.Value[index] = new ConfigGui();
                 thisClass.Value[index].SetObj(prev.Obj, prev.ObjLocation);
                 thisClass.Value[index].SetIni(prev.Ini, prev.IniLocation);
@@ -966,6 +1031,7 @@ class ConfigArrayGui extends ConfigArray {
         for(var i = 0; i < tableArrayLength; i++) {
             if(!(this.Value[i] instanceof ConfigGui)) {
                 var prev = this.Value[i];
+                this.Value[i].DeAttach();
                 this.Value[i] = new ConfigGui();
                 this.Value[i].SetObj(prev.Obj, prev.ObjLocation);
                 this.Value[i].SetIni(prev.Ini, prev.IniLocation);
@@ -1003,6 +1069,7 @@ class ConfigArrayGui extends ConfigArray {
         $.each(this.Value, function(index, value) {
             if(!(thisClass.Value[index] instanceof ConfigGui)) {
                 var prev = thisClass.Value[index];
+                thisClass.Value[index].DeAttach();
                 thisClass.Value[index] = new ConfigGui();
                 thisClass.Value[index].SetObj(prev.Obj, prev.ObjLocation);
                 thisClass.Value[index].SetIni(prev.Ini, prev.IniLocation);
@@ -1020,18 +1087,12 @@ class ConfigNamedListGui extends ConfigNamedList {
     ObjUpdateEvent() {
         super.ObjUpdateEvent();
         var tableArrayLength = this.GetTableArrayLength();
-        if(this.CurrentTableArrayLength > tableArrayLength || this.moved)
-        {
-            $("#span" + this.GUID).replaceWith(this.GetHtml());
-        }
-        else
-        {
-            for(var i = 0; i < this.Value.length; i++) {
-                $("#span" + this.GUID + "-" + i).hide();
-            }
+        
+        if(this.CurrentTableArrayLength !== tableArrayLength) {
             for(var i = 0; i < tableArrayLength; i++) {
                 if(!(this.Value[i] instanceof ConfigGui)) {
                     var prev = this.Value[i];
+                    this.Value[i].DeAttach();
                     this.Value[i] = new ConfigGui();
                     this.Value[i].SetObj(prev.Obj, prev.ObjLocation);
                     this.Value[i].SetIni(prev.Ini, prev.IniLocation);
@@ -1045,34 +1106,62 @@ class ConfigNamedListGui extends ConfigNamedList {
                             valueObjProperty.Name = "I" + i;
                     }
                 }
-                if(!($("#span" + this.GUID + "-" + i).length))
-                {
-                    var valueObjProperty = this.Value[i].GetObjProperty();
-                    $("#span" + this.GUID + "container").append(this.GetRow(i));
-                }
-                else
-                    $("#span" + this.GUID + "-" + i).show();
+            }
+            
+            $("#left"+this.GUID).html(this.GetLeft());
+            var selected = parseInt($("#" + this.GUID + "-Selection").val());
+            $("#right"+this.GUID).html(this.GetRight(selected));
+        } else {
+            for(var i = 0; i < this.GetTableArrayLength(); i++) {
+                var valueObjProperty = this.Value[i].GetObjProperty();
+                $("#"+this.GUID+"-Selection" + i).text(valueObjProperty.Name);
+                $("#"+this.GUID+"-Work" + i + " #"+this.GUID+"-Name").val(valueObjProperty.Name);
             }
         }
-        this.moved = false;
+
         this.CurrentTableArrayLength = tableArrayLength;
     }
 
-    GetRow(i)
-    {
-        var valueObjProperty = this.Value[i].GetObjProperty();
-        return "<span id=\"span" + this.GUID + "-" + i + "\" class=\"namedListRow\">"+
-            "<span data-i=" + i + " class=\"namedListOpen\" style=\"display: inline-block;\">⮞</span>" + 
-            "<input data-i=" + i + " class=\"namedListName\" style=\"display: inline-block;\" type=\"textbox\" value=\"" + valueObjProperty.Name + "\"><span class=\"sameLineSpacer\"></span>" +
-            "<span data-i=" + i + " class=\"namedListDelete\" style=\"display: inline-block;\">-</span>" + 
-            "<span data-i=" + i + " class=\"namedListUp\" style=\"display: inline-block;\">🠕</span>" + 
-            "<span data-i=" + i + " class=\"namedListDown\" style=\"display: inline-block;\">🠗</span>" + 
-                "<span id=\"span" + this.GUID + "-" + i + "container\" style=\"display: none;\">" +
-                    "<span class=\"sameLineSpacer\"></span><span style=\"display: inline-block;\">" + this.Value[i].GetHtml() + "</span>"+
-                "</span>"+
-            "</span>";
+    GetLeft() {
+        //action bar
+        var template = "<span>";
+        template += "<span id=\""+this.GUID+"-Add\" class=\"namedListOperation\" style=\"padding: 3px 7px;\">+</span>";
+        template += "<span id=\""+this.GUID+"-Delete\" class=\"namedListOperation\" style=\"padding: 3px 8px;\">-</span>";
+        template += "<span id=\""+this.GUID+"-Up\" class=\"namedListOperation\" style=\"padding: 3px 4px;\">⮝</span>";
+        template += "<span id=\""+this.GUID+"-Down\" class=\"namedListOperation\" style=\"padding: 3px 4px;\">⮟</span>";
+        template += "</span>";
+
+        //select list
+        template += "<select id=\""+this.GUID+"-Selection\" size = 20 style=\"width: 150px;\">";
+        var selected = parseInt($("#" + this.GUID + "-Selection").val());
+        for(var i = 0; i < this.GetTableArrayLength(); i++) {
+            var valueObjProperty = this.Value[i].GetObjProperty();
+            template += "<option id=\""+this.GUID+"-Selection" + i + "\" " + (selected === i? "selected" : "") + " value=" + i + ">" + valueObjProperty.Name + "</option>";
+        }
+        template += "</select>";
+
+        return template;
     }
 
+    GetRight(selected) {
+        var template = "";
+        for(var i = 0; i < this.Value.length; i++) {
+            template += "<span id=\""+this.GUID+"-Work" + i + "\" " + (i===selected? "" : "style=\"display: none;\"") + ">";
+            var valueObjProperty = this.Value[i].GetObjProperty();
+            template += "<input id=\""+this.GUID+"-Name\" data-i=" + i + " type=\"textbox\" value=\"" + valueObjProperty.Name + "\">";
+            template += "<span class=\"configContainer\">";
+            template += this.Value[i].GetHtml();
+            template += "</span>";
+            template += "</span>";
+        }
+
+        return template;
+    }
+    DeAttach() {
+        super.DeAttach();
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
+    }
     GetHtml() {
         var objProperty = this.GetObjProperty();
         var iniProperty = this.GetIniProperty();
@@ -1082,84 +1171,77 @@ class ConfigNamedListGui extends ConfigNamedList {
 
         var template = "<span id=\"span"+this.GUID+"\">";
 
-        template += "<span id=\"span"+this.GUID+"container\">";
-        for(var i = 0; i < this.GetTableArrayLength(); i++) {
-            template += this.GetRow(i);
-        }
+        //left column
+        template += "<span id=\"left"+this.GUID+"\" style=\"display: inline-block; vertical-align:top;\">";
+            template += this.GetLeft();
         template += "</span>";
-
-        template += "<span id=\""+this.GUID+"Add\" class=\"namedListAdd\">+</span>";
+        //right column
+        var selected = parseInt($("#" + this.GUID + "-Selection option:selected").val());
+        template += "<span id=\"right"+this.GUID+"\" style=\"display: inline-block; vertical-align:top; padding: 10px; min-width: 500px;\">";
+            template += this.GetRight(selected);
+        template += "</span>";
 
         var thisClass = this;
         $(document).off("click."+this.GUID);
-        $(document).on("click."+this.GUID, "#" + this.GUID + "Add", function(){
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-Add", function(){
             thisClass.GetObjProperty().Length++;
             CallObjFunctionIfExists(thisClass.Obj, "Update");
         });
-        $(document).on("click."+this.GUID, "#span" + this.GUID + " .namedListOpen", function(){
-            var i = $(this).data("i");
-            $("#span" + thisClass.GUID + "-" + i + "container").show();
-            $(this).replaceWith("<span data-i=" + i + " class=\"namedListClose\"style=\"display: inline-block;\">⮟</span>")
-        });
-        $(document).on("click."+this.GUID, "#span" + this.GUID + " .namedListClose", function(){
-            var i = $(this).data("i");
-            $("#span" + thisClass.GUID + "-" + i + "container").hide();
-            $(this).replaceWith("<span data-i=" + i + " class=\"namedListOpen\"style=\"display: inline-block;\">⮞</span>")
-        });
-        $(document).on("click."+this.GUID, "#span" + this.GUID + " .namedListDelete", function(){
-            var i = $(this).data("i");
-            thisClass.Value.splice(i, 1);
-            thisClass.GetObjProperty().Length--;
-            CallObjFunctionIfExists(thisClass.Obj, "Update");
-        });
-        $(document).on("click."+this.GUID, "#span" + this.GUID + " .namedListUp", function(){
-            var i = $(this).data("i");
-            if(i===0)
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-Delete", function(){
+            var selected = parseInt($("#" + thisClass.GUID + "-Selection option:selected").val());
+            if(isNaN(selected))
                 return;
-            var temp = thisClass.Value[i-1];
-            thisClass.Value[i-1] = thisClass.Value[i];
-            thisClass.Value[i] = temp;
-            var objProperty = thisClass.GetObjProperty();
-            if(objProperty !== undefined && objProperty.Value !== undefined)
-                objProperty = objProperty.Value;
-            objProperty[i].iterator--;
-            objProperty[i-1].iterator++;
-            temp = objProperty[i-1];
-            objProperty[i-1] = objProperty[i];
-            objProperty[i] = temp;
-            var prevObj = thisClass.Value[i].Obj;
-            var prevObjLocation = thisClass.Value[i].ObjLocation;
-            thisClass.Value[i].SetObj(thisClass.Value[i-1].Obj, thisClass.Value[i-1].ObjLocation);
-            thisClass.Value[i-1].SetObj(prevObj, prevObjLocation);
-            thisClass.moved = true;
+
+            objProperty = thisClass.GetObjProperty();
+            objProperty.Value.splice(selected, 1);
+            objProperty.Length--;
+            thisClass.Value[objProperty.Length].DeAttach();
+            thisClass.Value.splice(objProperty.Length, 1);
             CallObjFunctionIfExists(thisClass.Obj, "Update");
         });
-        $(document).on("click."+this.GUID, "#span" + this.GUID + " .namedListDown", function(){
-            var i = $(this).data("i");
-            if(i===thisClass.Value.length-1)
-                return;
-            var temp = thisClass.Value[i+1];
-            thisClass.Value[i+1] = thisClass.Value[i];
-            thisClass.Value[i] = temp;
-            var objProperty = thisClass.GetObjProperty();
-            if(objProperty !== undefined && objProperty.Value !== undefined)
-                objProperty = objProperty.Value;
-            objProperty[i].iterator++;
-            objProperty[i+1].iterator--;
-            temp = objProperty[i+1];
-            objProperty[i+1] = objProperty[i];
-            objProperty[i] = temp;
-            var prevObj = thisClass.Value[i].Obj;
-            var prevObjLocation = thisClass.Value[i].ObjLocation;
-            thisClass.Value[i].SetObj(thisClass.Value[i+1].Obj, thisClass.Value[i+1].ObjLocation);
-            thisClass.Value[i+1].SetObj(prevObj, prevObjLocation);
-            thisClass.moved = true;
-            CallObjFunctionIfExists(thisClass.Obj, "Update");
-        });
+
         $(document).off("change."+this.GUID);
-        $(document).on("change."+this.GUID, "#span" + this.GUID + " .namedListName", function(){
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-Selection", function(){
+            $("#right"+thisClass.GUID).children().hide();
+            $("#"+thisClass.GUID+"-Work" + $(this).children("option:selected").val()).show();
+        });
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-Name", function(){
             var i = $(this).data("i");
-            thisClass.Value[i].GetObjProperty().Name = $(this).val();
+            var name = $(this).val();
+            thisClass.Value[i].GetObjProperty().Name = name;
+            $("#" + thisClass.GUID + "-Selection option[value=" + i + "]").text(name);
+            CallObjFunctionIfExists(thisClass.Obj, "Update");
+        });
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-Up", function(){
+            var selected = parseInt($("#" + thisClass.GUID + "-Selection option:selected").val());
+            if(isNaN(selected))
+                return;
+            if(selected===0)
+                return;
+
+            objProperty = thisClass.GetObjProperty();
+            var temp = objProperty.Value[selected];
+            objProperty.Value[selected] = objProperty.Value[selected - 1];
+            objProperty.Value[selected - 1] = temp;
+            $("#" + thisClass.GUID + "-Selection").val(selected - 1);
+            $("#right"+thisClass.GUID).children().hide();
+            $("#"+thisClass.GUID+"-Work" + (selected - 1)).show();
+            CallObjFunctionIfExists(thisClass.Obj, "Update");
+        });
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-Down", function(){
+            var selected = parseInt($("#" + thisClass.GUID + "-Selection option:selected").val());
+            if(isNaN(selected))
+                return;
+            if(selected===thisClass.Value.length-1)
+                return;
+
+            objProperty = thisClass.GetObjProperty();
+            var temp = objProperty.Value[selected];
+            objProperty.Value[selected] = objProperty.Value[selected + 1];
+            objProperty.Value[selected + 1] = temp;
+            $("#" + thisClass.GUID + "-Selection").val(selected + 1);
+            $("#right"+thisClass.GUID).children().hide();
+            $("#"+thisClass.GUID+"-Work" + (selected + 1)).show();
             CallObjFunctionIfExists(thisClass.Obj, "Update");
         });
 
@@ -1176,6 +1258,7 @@ class ConfigNamedListGui extends ConfigNamedList {
         $.each(this.Value, function(index, value) {
             if(!(thisClass.Value[index] instanceof ConfigGui)) {
                 var prev = thisClass.Value[index];
+                thisClass.Value[index].DeAttach();
                 thisClass.Value[index] = new ConfigGui();
                 thisClass.Value[index].SetObj(prev.Obj, prev.ObjLocation);
                 thisClass.Value[index].SetIni(prev.Ini, prev.IniLocation);

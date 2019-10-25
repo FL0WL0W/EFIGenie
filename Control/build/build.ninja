@@ -418,6 +418,13 @@ build libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorUni
   OBJECT_FILE_DIR = libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations
   TARGET_COMPILE_PDB = libs\Reluctor\CMakeFiles\Reluctor.dir\Reluctor.pdb
   TARGET_PDB = libs\Reluctor\Reluctor.pdb
+build libs\Reluctor\CMakeFiles\Reluctor.dir\src\Service\ReluctorOperationsRegister.cpp.obj: CXX_COMPILER__Reluctor ..\libs\Reluctor\src\Service\ReluctorOperationsRegister.cpp || cmake_object_order_depends_target_Reluctor
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -I..\libs\Reluctor\include -I..\libs\EmbeddedIOServices\include
+  OBJECT_DIR = libs\Reluctor\CMakeFiles\Reluctor.dir
+  OBJECT_FILE_DIR = libs\Reluctor\CMakeFiles\Reluctor.dir\src\Service
+  TARGET_COMPILE_PDB = libs\Reluctor\CMakeFiles\Reluctor.dir\Reluctor.pdb
+  TARGET_PDB = libs\Reluctor\Reluctor.pdb
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target Reluctor
@@ -426,7 +433,7 @@ build libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorUni
 #############################################
 # Link the static library libs\Reluctor\Reluctor.lib
 
-build libs\Reluctor\Reluctor.lib: CXX_STATIC_LIBRARY_LINKER__Reluctor libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorGM24x.cpp.obj libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorUniversal2x.cpp.obj || libs\EmbeddedIOServices\EmbeddedIOServices.lib
+build libs\Reluctor\Reluctor.lib: CXX_STATIC_LIBRARY_LINKER__Reluctor libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorGM24x.cpp.obj libs\Reluctor\CMakeFiles\Reluctor.dir\src\Operations\Operation_ReluctorUniversal2x.cpp.obj libs\Reluctor\CMakeFiles\Reluctor.dir\src\Service\ReluctorOperationsRegister.cpp.obj || libs\EmbeddedIOServices\EmbeddedIOServices.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = libs\Reluctor\CMakeFiles\Reluctor.dir
@@ -502,69 +509,6 @@ build libs\Reluctor\list_install_components: phony
 # Order-only phony target for EngineControl
 
 build cmake_object_order_depends_target_EngineControl: phony || cmake_object_order_depends_target_EmbeddedIOServices cmake_object_order_depends_target_Reluctor
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IIgnitionConfig.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IIgnitionConfig.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfigWrapper_HardRpmLimit.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IgnitionConfigWrapper_HardRpmLimit.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfigWrapper_SoftPidRpmLimit.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IgnitionConfigWrapper_SoftPidRpmLimit.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfig_Map_Ethanol.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IgnitionConfig_Map_Ethanol.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfig_Static.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IgnitionConfig_Static.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionSchedulingService.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\IgnitionService\IgnitionSchedulingService.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService\IPrimeService.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\PrimeService\IPrimeService.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService\PrimeService_StaticPulseWidth.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\PrimeService\PrimeService_StaticPulseWidth.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\TachometerService\TachometerService.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\EngineControl\TachometerService\TachometerService.cpp || cmake_object_order_depends_target_EngineControl
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
-  OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
-  OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\TachometerService
-  TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
-  TARGET_PDB = libs\EngineControl\EngineControl.pdb
 build libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_EnginePosition.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\Operations\Operation_EnginePosition.cpp || cmake_object_order_depends_target_EngineControl
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
@@ -579,7 +523,7 @@ build libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_E
   OBJECT_FILE_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations
   TARGET_COMPILE_PDB = libs\EngineControl\CMakeFiles\EngineControl.dir\EngineControl.pdb
   TARGET_PDB = libs\EngineControl\EngineControl.pdb
-build libs\EngineControl\CMakeFiles\EngineControl.dir\src\Service\EngineControlServicesServiceBuilderRegister.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\Service\EngineControlServicesServiceBuilderRegister.cpp || cmake_object_order_depends_target_EngineControl
+build libs\EngineControl\CMakeFiles\EngineControl.dir\src\Service\EngineOperationsRegister.cpp.obj: CXX_COMPILER__EngineControl ..\libs\EngineControl\src\Service\EngineOperationsRegister.cpp || cmake_object_order_depends_target_EngineControl
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   INCLUDES = -I..\libs\EngineControl\include -I..\libs\EmbeddedIOServices\include -I..\libs\Reluctor\include
   OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
@@ -594,7 +538,7 @@ build libs\EngineControl\CMakeFiles\EngineControl.dir\src\Service\EngineControlS
 #############################################
 # Link the static library libs\EngineControl\EngineControl.lib
 
-build libs\EngineControl\EngineControl.lib: CXX_STATIC_LIBRARY_LINKER__EngineControl libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IIgnitionConfig.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfigWrapper_HardRpmLimit.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfigWrapper_SoftPidRpmLimit.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfig_Map_Ethanol.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionConfig_Static.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\IgnitionService\IgnitionSchedulingService.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService\IPrimeService.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\PrimeService\PrimeService_StaticPulseWidth.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\EngineControl\TachometerService\TachometerService.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_EnginePosition.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_EnginePositionPrediction.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\Service\EngineControlServicesServiceBuilderRegister.cpp.obj || libs\EmbeddedIOServices\EmbeddedIOServices.lib libs\Reluctor\Reluctor.lib
+build libs\EngineControl\EngineControl.lib: CXX_STATIC_LIBRARY_LINKER__EngineControl libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_EnginePosition.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\Operations\Operation_EnginePositionPrediction.cpp.obj libs\EngineControl\CMakeFiles\EngineControl.dir\src\Service\EngineOperationsRegister.cpp.obj || libs\EmbeddedIOServices\EmbeddedIOServices.lib libs\Reluctor\Reluctor.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = libs\EngineControl\CMakeFiles\EngineControl.dir
