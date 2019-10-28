@@ -973,7 +973,8 @@ class ConfigNamedList extends ConfigBase {
             this.Value[i].SetIni(this.Ini, this.IniLocation);
             var valueObjProperty = this.Value[i].GetObjProperty();
             valueObjProperty.iterator = i;
-            valueObjProperty.Name = this.GetDefaultName() + i;
+            if(valueObjProperty.Name === undefined)
+                valueObjProperty.Name = this.GetDefaultName() + i;
         }
         
         return objProperty;
@@ -1019,7 +1020,7 @@ function GetValueByReference(ref, obj, objLocation, ini) {
             property = GetPropertyByLocation(ini, reference);
     }
     if(typeof(property) === "string" && property.indexOf("!") === 0) {
-        return !GetValueByReference(ref.substring(1), obj, objLocation, ini);
+        return !GetValueByReference(property.substring(1), obj, objLocation, ini);
     }
     return property;
 }

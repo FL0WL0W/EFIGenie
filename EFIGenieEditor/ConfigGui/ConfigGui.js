@@ -410,7 +410,7 @@ class ConfigNumberSelectionGui extends ConfigNumber {
                 selectionName = selectionName.Name;
                 selectionValue =  thisClass.GetIniProperty().Selections + "/" + selectionName;
             }
-            if((selectionValue + "") === ("" + thisClass.GetValue()))
+            if((selectionValue + "") === ("" + thisClass.GetObjProperty().Value))
                 selectionHtml += "<option selected value=\"" + selectionValue + "\">" + selectionName + "</option>";
             else {
                 if(selectionName !== "INVALID") 
@@ -1059,14 +1059,8 @@ class ConfigNamedListGui extends ConfigNamedList {
                     this.Value[i].Attach();
                     var valueObjProperty = this.Value[i].GetObjProperty();
                     valueObjProperty.iterator = i;
-                    var iniProperty = this.GetIniProperty();
-                    if(!valueObjProperty.Name)
-                    {
-                        if(iniProperty.Name)
-                            valueObjProperty.Name = iniProperty.Name + i;
-                        else
-                            valueObjProperty.Name = "I" + i;
-                    }
+                    if(valueObjProperty.Name === undefined)
+                        valueObjProperty.Name = this.GetDefaultName() + i;
                 }
             }
             
