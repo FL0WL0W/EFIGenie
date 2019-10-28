@@ -67,9 +67,6 @@ select {
     margin: 1px;
 }
 
-.configContainer .subConfigSameLineLabel {
-    width: 170px;
-}
 .configContainer .subConfigLabel {
     display: block;
     float: none;

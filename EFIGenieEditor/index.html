@@ -19,12 +19,12 @@
                 $('#chkAdvanced').change(function(){
                     ShowAdvanced = this.checked;
                                         
-                    $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                    $('#workspace').html(b.GetHtml());
                 });
-                $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                $('#workspace').html(b.GetHtml());
                 $("#btnNew").click(function(){
                     b.SetObj();
-                    $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                    $('#workspace').html(b.GetHtml());
                 });
                 $("#btnSaveBin").click(function(){
                     AutoIncrement = {};
@@ -41,7 +41,7 @@
                         }
 
                         b.SetArrayBuffer(evt.target.result);
-                        $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                        $('#workspace').html(b.GetHtml());
                         $("#btnLoad").val(undefined);
                     };
                     
@@ -61,7 +61,7 @@
                         }
 
                         b.SetObj(JSON.parse(evt.target.result));
-                        $('#workspace').html(wrapInConfigContainerGui("", b.GetHtml()));
+                        $('#workspace').html(b.GetHtml());
                         $("#btnLoadIni").val(undefined);
                     };
                     
@@ -71,13 +71,15 @@
         </script>
     </head>
     <body>
-        <input id="btnNew" type="button" class="button" value="New">
-        <input id="btnSave" type="button" class="button" value="Save">
-        <label for="btnLoad" class="button">Open</label>
-        <input id="btnLoad" type="file" style="display: none;">
-        <input id="btnSaveBin" type="button" class="button" value="Save Bin">
-        <!--<label for="btnLoadBin" class="button">Open Bin</label>
-        <input id="btnLoadBin" type="file" style="display: none;">-->
-        <div id="workspace"></div>
+        <div>
+            <input id="btnNew" type="button" class="button" value="New">
+            <input id="btnSave" type="button" class="button" value="Save">
+            <label for="btnLoad" class="button">Open</label>
+            <input id="btnLoad" type="file" style="display: none;">
+            <input id="btnSaveBin" type="button" class="button" value="Save Bin">
+            <!--<label for="btnLoadBin" class="button">Open Bin</label>
+            <input id="btnLoadBin" type="file" style="display: none;">-->
+        </div>
+        <div id="workspace" class="configContainer"></div>
     </body>
 </html>
