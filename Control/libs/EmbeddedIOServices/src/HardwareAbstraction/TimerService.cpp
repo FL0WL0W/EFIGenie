@@ -31,7 +31,7 @@ namespace HardwareAbstraction
 	void ITimerService::ReturnCallBack(void)
 	{
 		Task *next = FirstTask;
-		while(!next->Scheduled)
+		while(next != 0 && !next->Scheduled)
 			next = next->NextTask;
 
 		while (next != 0 && TickLessThanEqualToTick(next->Tick, GetTick() + TimerCallBackAdvance))
