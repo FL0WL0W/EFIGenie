@@ -30,25 +30,22 @@ namespace HardwareAbstraction
 	
 	void ITimerService::ReturnCallBack(void)
 	{
-		Task *next = 0;
-		int i = 0;
-		while (FirstTask != 0 && TickLessThanEqualToTick(FirstTask->Tick, GetTick() + TimerCallBackAdvance))
-		{
-			i++;
-			next = FirstTask->NextTask;
+		Task *next = FirstTask;
+		while(!next->Scheduled)
+			next = next->NextTask;
 
-			while(TickLessThanTick(GetTick(), FirstTask->Tick)) ;
+		while (next != 0 && TickLessThanEqualToTick(next->Tick, GetTick() + TimerCallBackAdvance))
+		{
+			while(TickLessThanTick(GetTick(), next->Tick)) ;
 			
-			FirstTask->Execute();
-			FirstTask->Scheduled = false;
-			if (FirstTask->DeleteOnExecution)
-				delete FirstTask;
+			next->Execute();
+			next->Scheduled = false;
 			
-			FirstTask = next;
+			next = next->NextTask;
 		}
 
-		if(FirstTask != 0)
-			ScheduleCallBack(FirstTask->Tick);
+		if(next != 0)
+			ScheduleCallBack(next->Tick);
 	}
 
 	Task *ITimerService::ScheduleTask(ICallBack *callBack, const uint32_t tick, const bool deleteOnExecution)
@@ -62,62 +59,66 @@ namespace HardwareAbstraction
 
 	const bool ITimerService::ScheduleTask(Task *task, const uint32_t tick)
 	{
-		//make this not static 1ms
-		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
-		if(FirstTask != 0 && TickLessThanTick(FirstTask->Tick, minTick))
-			return false;
-
-		task->Tick = tick;
-
-		//set to not scheduled
-		task->Scheduled = false;
-
-		//remove all FirstTasks where not scheduled
 		while(FirstTask != 0 && !FirstTask->Scheduled)
 		{
+			Task *del = FirstTask;
 			FirstTask = FirstTask->NextTask;
+
+			if(del->DeleteOnExecution)
+				delete del;
 		}
 
-		if(FirstTask != 0)
+		//make this not static 1ms
+		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
+		if(TickLessThanTick(tick, minTick) || (task->Scheduled && TickLessThanTick(task->Tick, minTick)))
+			return false;
+
+		if(FirstTask == task)
 		{
-			//task is somewhere in the task list
-			//remove task
+			FirstTask = FirstTask->NextTask;
+			task->Scheduled = false;
+		}
+		else if(FirstTask != 0)
+		{
 			Task *iterator = FirstTask;
 			while (iterator->NextTask != 0)
 			{
-				if(!iterator->NextTask->Scheduled)
+				if(iterator->NextTask == task)
 				{
 					//unschedule task
-					if(TickLessThanTick(iterator->Tick, minTick))
-						return false;
 					iterator->NextTask = iterator->NextTask->NextTask;
+					task->Scheduled = false;
+					break;
 				}
 				else
 				{
 					iterator = iterator->NextTask;
 				}
 			}
+		}
 
-			if(TickLessThanTick(task->Tick, FirstTask->Tick))
+		task->Tick = tick;
+		
+		if(FirstTask != 0)
+		{
+			if(TickLessThanTick(tick, FirstTask->Tick))
 			{
 				//task is FirstTask
-				if(TickLessThanTick(task->Tick, minTick))
-					return false;
-				task->Scheduled = true;
 				task->NextTask = FirstTask;
+				task->Scheduled = true;
 				FirstTask = task;
 			}
 			else
 			{
 				//insert task
-				iterator = FirstTask;
+				Task *iterator = FirstTask;
 				while (iterator->NextTask != 0 && !task->Scheduled)
 				{
 					//this is where our task is to be scheduled
-					if(TickLessThanTick(task->Tick, iterator->NextTask->Tick))
+					if(TickLessThanTick(tick, iterator->NextTask->Tick))
 					{
-						task->Scheduled = true;
 						task->NextTask = iterator->NextTask;
+						task->Scheduled = true;
 						iterator->NextTask = task;
 					}
 
@@ -126,8 +127,8 @@ namespace HardwareAbstraction
 
 				if(!task->Scheduled)
 				{
-					task->Scheduled = true;
 					task->NextTask = 0;
+					task->Scheduled = true;
 					iterator->NextTask = task;
 				}		
 			}
@@ -135,10 +136,8 @@ namespace HardwareAbstraction
 		else
 		{
 			//task is only task
-			if(TickLessThanTick(task->Tick, minTick))
-				return false;
-			task->Scheduled = true;
 			task->NextTask = 0;
+			task->Scheduled = true;
 			FirstTask = task;
 		}
 
@@ -149,43 +148,46 @@ namespace HardwareAbstraction
 
 	const bool ITimerService::UnScheduleTask(Task *task)
 	{
-		//make this not static 1ms
-		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
-		if(FirstTask != 0 && TickLessThanTick(FirstTask->Tick, minTick))
-			return false;
-
-		//if is next scheduled task
-		//set to not scheduled
-		task->Scheduled = false;
-
-		//remove all FirstTasks where not scheduled
 		while(FirstTask != 0 && !FirstTask->Scheduled)
 		{
+			Task *del = FirstTask;
 			FirstTask = FirstTask->NextTask;
+
+			if(del->DeleteOnExecution)
+				delete del;
 		}
-		
-		if(FirstTask != 0)
+
+		//make this not static 1ms
+		uint32_t minTick = GetTick() + GetTicksPerSecond() / 1000;
+		if(task->Scheduled && TickLessThanTick(task->Tick, minTick))
+			return false;
+			
+		if(FirstTask == task)
 		{
-			//task is somewhere in the task list
-			//remove task
+			FirstTask = FirstTask->NextTask;
+			task->Scheduled = false;
+		}
+		else if(FirstTask != 0)
+		{
 			Task *iterator = FirstTask;
 			while (iterator->NextTask != 0)
 			{
-				if(!iterator->NextTask->Scheduled)
+				if(iterator->NextTask == task)
 				{
 					//unschedule task
-					if(TickLessThanTick(iterator->Tick, minTick))
-						return false;
 					iterator->NextTask = iterator->NextTask->NextTask;
+					task->Scheduled = false;
+					break;
 				}
 				else
 				{
 					iterator = iterator->NextTask;
 				}
 			}
-
-			ScheduleCallBack(FirstTask->Tick);
 		}
+
+		if(FirstTask != 0)
+			ScheduleCallBack(FirstTask->Tick);
 
 		return true;
 	}

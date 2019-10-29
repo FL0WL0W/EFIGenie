@@ -167,7 +167,9 @@ class ConfigSelectionGui extends ConfigSelection {
             $(document).on("change."+this.GUID, "#" + this.GUID, function(){
                 var selectionIndex = parseInt($(this).val());
                     
+                thisClass.Value.DeAttach();
                 thisClass.Value.SetIni(undefined, thisClass.IniLocation + "/Selections/" + selectionIndex);
+                thisClass.Value.Attach();
                 thisClass.SetIndex(selectionIndex);
                 $("#span" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             
@@ -191,7 +193,9 @@ class ConfigSelectionGui extends ConfigSelection {
         super.ObjUpdateEvent();
         var selectionIndex = this.GetIndex();
         if(parseInt($("#" + this.GUID + " option:selected").val()) !== selectionIndex) {
+            this.Value.DeAttach();
             this.Value.SetIni(undefined, this.IniLocation + "/Selections/" + selectionIndex);
+            this.Value.Attach();
             $("#span" + this.GUID).replaceWith(this.GetHtml());
         }
     }
@@ -993,7 +997,7 @@ class ConfigArrayGui extends ConfigArray {
                 this.Value[i] = new ConfigGui();
                 this.Value[i].SetObj(prev.Obj, prev.ObjLocation);
                 this.Value[i].SetIni(prev.Ini, prev.IniLocation);
-                thisClass.Value[index].Attach();
+                this.Value[i].Attach();
             }
             if(!($("#span" + this.Value[i].GUID).length))
                 $("#span" + this.GUID).append(this.Value[i].GetHtml());
@@ -1058,7 +1062,6 @@ class ConfigNamedListGui extends ConfigNamedList {
                     this.Value[i].SetIni(prev.Ini, prev.IniLocation);
                     this.Value[i].Attach();
                     var valueObjProperty = this.Value[i].GetObjProperty();
-                    valueObjProperty.iterator = i;
                     if(valueObjProperty.Name === undefined)
                         valueObjProperty.Name = this.GetDefaultName() + i;
                 }
@@ -1073,6 +1076,10 @@ class ConfigNamedListGui extends ConfigNamedList {
                 $("#"+this.GUID+"-Selection" + i).text(valueObjProperty.Name);
                 $("#"+this.GUID+"-Work" + i + " #"+this.GUID+"-Name").val(valueObjProperty.Name);
             }
+        }
+        for(var i = 0; i < tableArrayLength; i++) {
+            var valueObjProperty = this.Value[i].GetObjProperty();
+            valueObjProperty.iterator = i;
         }
 
         this.CurrentTableArrayLength = tableArrayLength;

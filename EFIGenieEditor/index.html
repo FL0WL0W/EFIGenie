@@ -61,6 +61,7 @@
                         }
 
                         b.SetObj(JSON.parse(evt.target.result));
+                        b.Attach();
                         $('#workspace').html(b.GetHtml());
                         $("#btnLoadIni").val(undefined);
                     };

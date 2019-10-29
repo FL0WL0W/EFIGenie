@@ -24,7 +24,7 @@ namespace Operations
 				desiredPosition -= 720;
 			}
 			delta = desiredPosition - enginePosition.Position;
-			while(delta < 0)
+			while(delta < -90)
 			{
 				delta += 720;
 			}
@@ -40,7 +40,7 @@ namespace Operations
 				desiredPosition -= 360;
 			}
 			delta = desiredPosition - enginePosition.Position;
-			while(delta < 0)
+			while(delta < -90)
 			{
 				delta += 360;
 			}
@@ -48,7 +48,7 @@ namespace Operations
 
 		float ticksPerDegree = _timerService->GetTicksPerSecond() / enginePosition.PositionDot;
 
-		uint32_t positionTick = static_cast<uint32_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick;
+		uint32_t positionTick = static_cast<int64_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick;
 
 		return ScalarVariable::FromTick(positionTick);
 	}
