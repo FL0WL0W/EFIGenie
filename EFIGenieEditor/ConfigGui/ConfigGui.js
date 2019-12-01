@@ -376,6 +376,8 @@ class ConfigNumberSelectionGui extends ConfigNumber {
     }
     GetHidden = GetValueByReferenceFunction("Hidden", false);
     GetLabel = GetValueByReferenceFunction("Label", undefined);
+    GetFilter = GetValueByReferenceFunction("Filter", undefined);
+    GetFilterOn = GetValueByReferenceFunction("FilterOn", undefined);
     Attach() {
         super.Attach();
         var thisClass = this;
@@ -408,16 +410,22 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         template = template.replace(/[$]label[$]/g, this.GetLabel());
         var selectionHtml = "";
         var thisClass = this;
+        var filterOn = this.GetFilterOn();
+        var filter = this.GetFilter();
         $.each(selections, function(selectionValue, selectionName) {
+            var show = true;
             if(typeof selectionName !== "string")
             {
                 selectionName = selectionName.Name;
                 selectionValue =  thisClass.GetIniProperty().Selections + "/" + selectionName;
+                if(filterOn) {
+                    show = GetValueByReference(selectionValue + "/" + filterOn, thisClass.Obj, thisClass.ObjLocation, thisClass.Ini) === filter;
+                }
             }
             if((selectionValue + "") === ("" + thisClass.GetObjProperty().Value))
-                selectionHtml += "<option selected value=\"" + selectionValue + "\">" + selectionName + "</option>";
+                selectionHtml += "<option selected value=\"" + selectionValue + "\"" + (!show? "class=\"filteredOutButSelected\"" : "") + ">" + selectionName + "</option>";
             else {
-                if(selectionName !== "INVALID") 
+                if(selectionName !== "INVALID" && show) 
                     selectionHtml += "<option value=\"" + selectionValue + "\">" + selectionName + "</option>";
             }
         });
@@ -1092,10 +1100,11 @@ class ConfigNamedListGui extends ConfigNamedList {
         template += "<span id=\""+this.GUID+"-Delete\" class=\"namedListOperation\" style=\"padding: 3px 8px;\">-</span>";
         template += "<span id=\""+this.GUID+"-Up\" class=\"namedListOperation\" style=\"padding: 3px 4px;\">⮝</span>";
         template += "<span id=\""+this.GUID+"-Down\" class=\"namedListOperation\" style=\"padding: 3px 4px;\">⮟</span>";
+        template += "<span id=\""+this.GUID+"-Duplicate\" class=\"namedListOperation\" style=\"padding: 3px 7px;\">+</span>";
         template += "</span>";
 
         //select list
-        template += "<select id=\""+this.GUID+"-Selection\" size = 20 style=\"width: 150px;\">";
+        template += "<select id=\""+this.GUID+"-Selection\" size = 60 style=\"width: 150px;\">";
         var selected = parseInt($("#" + this.GUID + "-Selection").val());
         for(var i = 0; i < this.GetTableArrayLength(); i++) {
             var valueObjProperty = this.Value[i].GetObjProperty();
@@ -1144,8 +1153,12 @@ class ConfigNamedListGui extends ConfigNamedList {
         var thisClass = this;
         $(document).off("click."+this.GUID);
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Add", function(){
-            thisClass.GetObjProperty().Length++;
+            var objProperty = thisClass.GetObjProperty();
+            objProperty.Length++;
             CallObjFunctionIfExists(thisClass.Obj, "Update");
+            $("#" + thisClass.GUID + "-Selection").val(objProperty.Length-1);
+            $("#right"+thisClass.GUID).children().hide();
+            $("#"+thisClass.GUID+"-Work" + (objProperty.Length-1)).show();
         });
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Delete", function(){
             var selected = parseInt($("#" + thisClass.GUID + "-Selection option:selected").val());
@@ -1203,6 +1216,19 @@ class ConfigNamedListGui extends ConfigNamedList {
             $("#right"+thisClass.GUID).children().hide();
             $("#"+thisClass.GUID+"-Work" + (selected + 1)).show();
             CallObjFunctionIfExists(thisClass.Obj, "Update");
+        });
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-Duplicate", function(){
+            var selected = parseInt($("#" + thisClass.GUID + "-Selection option:selected").val());
+            if(isNaN(selected))
+                return;
+
+            var objProperty = thisClass.GetObjProperty();
+            objProperty.Length++;
+            objProperty.Value[objProperty.Length-1] = GetJSONSafeOBJ(objProperty.Value[selected]);
+            CallObjFunctionIfExists(thisClass.Obj, "Update");
+            $("#" + thisClass.GUID + "-Selection").val(objProperty.Length-1);
+            $("#right"+thisClass.GUID).children().hide();
+            $("#"+thisClass.GUID+"-Work" + (objProperty.Length-1)).show();
         });
 
         return template + "</span>";

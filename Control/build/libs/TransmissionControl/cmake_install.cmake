@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl
+# Install script for directory: C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/libs/TransmissionControl
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

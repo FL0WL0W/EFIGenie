@@ -4,6 +4,7 @@
 #ifdef OPERATION_ENGINEPOSITIONPREDICTION_H
 namespace Operations
 {
+	Operation_EnginePositionPrediction *Operation_EnginePositionPrediction::_instance = 0;
 	Operation_EnginePositionPrediction::Operation_EnginePositionPrediction(HardwareAbstraction::ITimerService *timerService)
 	{
 		_timerService = timerService;
@@ -24,7 +25,7 @@ namespace Operations
 				desiredPosition -= 720;
 			}
 			delta = desiredPosition - enginePosition.Position;
-			while(delta < -90)
+			while(delta < -360)
 			{
 				delta += 720;
 			}
@@ -40,7 +41,7 @@ namespace Operations
 				desiredPosition -= 360;
 			}
 			delta = desiredPosition - enginePosition.Position;
-			while(delta < -90)
+			while(delta < -180)
 			{
 				delta += 360;
 			}
@@ -55,7 +56,13 @@ namespace Operations
 
 	Operations::IOperationBase *Operation_EnginePositionPrediction::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
-		return new Operation_EnginePositionPrediction(serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID));
+		return Construct(serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID));
+	}
+	Operation_EnginePositionPrediction *Operation_EnginePositionPrediction::Construct(HardwareAbstraction::ITimerService *timerService)
+	{
+		if(_instance == 0)
+			_instance = new Operation_EnginePositionPrediction(timerService);
+		return _instance;
 	}
 
 	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePositionPrediction, 2002, ScalarVariable, ScalarVariable, EnginePosition)

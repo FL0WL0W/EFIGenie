@@ -32,16 +32,7 @@ class ConfigBase {
         return this.Obj;
     }
     GetJSONSafeOBJ() {
-        return JSON.parse(JSON.stringify(this.Obj, function(key, value) {   
-            if(key.endsWith("EFJ") || key == "IniLocation" || key == "iterator")
-                return undefined;
-            
-            if(isEmpty(value, ["EFJ", "IniLocation", "iterator"])) {
-                return undefined;
-            }
-
-            return value;
-        }));
+        return GetJSONSafeOBJ(this.Obj);
     }
     GetObjProperty() {
         var property = GetPropertyByLocation(this.Obj, this.ObjLocation);
@@ -1021,6 +1012,13 @@ function GetValueByReference(ref, obj, objLocation, ini) {
     }
     if(typeof(property) === "string" && property.indexOf("!") === 0) {
         return !GetValueByReference(property.substring(1), obj, objLocation, ini);
+    }
+    if(typeof(property) === "string" && property.indexOf("[]") !== -1) {
+        var i;
+        var left = objLocation;
+        while(isNaN(i = parseInt(left.substring(left.lastIndexOf("/")+1))))
+            left = left.substring(0, left.lastIndexOf("/"));
+        return GetValueByValueOrReference(property.replace("[]", "" + i), obj, objLocation, ini);
     }
     return property;
 }

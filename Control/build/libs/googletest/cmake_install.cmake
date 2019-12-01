@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/googletest
+# Install script for directory: C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/libs/googletest
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/googletest/googlemock/cmake_install.cmake")
+  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/googletest/googlemock/cmake_install.cmake")
 
 endif()
 

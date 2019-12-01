@@ -140,3 +140,16 @@ function isEmpty(obj, ignoreKeys) {
 
   return true;
 }
+
+function GetJSONSafeOBJ(obj) {
+    return JSON.parse(JSON.stringify(obj, function(key, value) {   
+        if(key.endsWith("EFJ") || key == "IniLocation" || key == "iterator")
+            return undefined;
+        
+        if(isEmpty(value, ["EFJ", "IniLocation", "iterator"])) {
+            return undefined;
+        }
+
+        return value;
+    }));
+}

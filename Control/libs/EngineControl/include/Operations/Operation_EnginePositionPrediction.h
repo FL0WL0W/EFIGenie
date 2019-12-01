@@ -14,6 +14,7 @@ namespace Operations
 	class Operation_EnginePositionPrediction : public Operations::IOperation<ScalarVariable, ScalarVariable, EnginePosition>
 	{
 	protected:
+		static Operation_EnginePositionPrediction *_instance;
 		HardwareAbstraction::ITimerService *_timerService;
 	public:		
         Operation_EnginePositionPrediction(HardwareAbstraction::ITimerService *timerService);
@@ -21,6 +22,7 @@ namespace Operations
 		ScalarVariable Execute(ScalarVariable desiredPosition, EnginePosition enginePosition) override;
 
 		static Operations::IOperationBase *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static Operation_EnginePositionPrediction *Construct(HardwareAbstraction::ITimerService *timerService);
 		ISERVICE_REGISTERFACTORY_H
 	};
 }
