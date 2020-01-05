@@ -13,7 +13,7 @@
 #define OPERATION_ENGINESCHEDULEIGNITION_H
 namespace Operations
 {
-	class Operation_EngineScheduleIgnition : public Operations::IOperation<std::tuple<uint32_t, uint32_t>, EnginePosition, ScalarVariable, ScalarVariable>
+	class Operation_EngineScheduleIgnition : public Operations::IOperation<std::tuple<ScalarVariable, ScalarVariable>, EnginePosition, ScalarVariable, ScalarVariable>
 	{
 	protected:
 		HardwareAbstraction::ITimerService *_timerService;
@@ -22,12 +22,12 @@ namespace Operations
 		IOperation<void, ScalarVariable> *_ignitionOutputOperation;
 		HardwareAbstraction::Task *_dwellTask;
 		HardwareAbstraction::Task *_igniteTask;
-		uint32_t _dwellingAtTick;
+		uint32_t _dwellingAtTick = 0;
 		ScalarVariable _ignitionAt;
 	public:		
         Operation_EngineScheduleIgnition(HardwareAbstraction::ITimerService *timerService, float tdc, IOperation<void, ScalarVariable> *ignitionOutputOperation);
 
-		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionPosition) override;
+		std::tuple<ScalarVariable, ScalarVariable> Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionAdvance) override;
 		void Dwell();
 		void Ignite();
 

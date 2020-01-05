@@ -14,7 +14,7 @@ namespace Operations
 		_igniteTask = new HardwareAbstraction::Task(new CallBack<Operation_EngineScheduleIgnition>(this, &Operation_EngineScheduleIgnition::Ignite), false);
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionPosition)
+	std::tuple<ScalarVariable, ScalarVariable> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionAdvance)
 	{
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
@@ -22,7 +22,7 @@ namespace Operations
 
 		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
 		if(!_dwellingAtTick)
-			_ignitionAt = ignitionPosition;
+			_ignitionAt = ScalarVariable(_tdc) - ignitionAdvance;
 
 		//but we do want to adjust the ignition tick so that it is spot on
 		ScalarVariable ignitionTick = _predictor->Execute(_ignitionAt, enginePosition);
@@ -33,8 +33,8 @@ namespace Operations
 		_timerService->ScheduleTask(_igniteTask, ignitionTick.To<uint32_t>());
 
 		//we also want to set the next dwell tick
-		ScalarVariable dwellTick = _predictor->Execute(ignitionPosition, enginePosition);
-		dwellTick = dwellTick - (ignitionDwell * ticksPerSecond);
+		ScalarVariable dwellTick = _predictor->Execute(ignitionAdvance, enginePosition);
+		dwellTick = dwellTick - ScalarVariable::FromTick(ignitionDwell.To<float>() * ticksPerSecond);
 		while(HardwareAbstraction::ITimerService::TickLessThanTick(dwellTick.To<uint32_t>(), enginePosition.CalculatedTick))
 			dwellTick = dwellTick + ticksPerCycle;
 
@@ -44,7 +44,7 @@ namespace Operations
 		_timerService->ScheduleTask(_dwellTask, ignitionTick.To<uint32_t>());
 
 		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(dwellTick.To<uint32_t>(), ignitionTick.To<uint32_t>());
+		return std::tuple<ScalarVariable, ScalarVariable>(dwellTick, ignitionTick);
 	}
 
 	void Operation_EngineScheduleIgnition::Dwell()

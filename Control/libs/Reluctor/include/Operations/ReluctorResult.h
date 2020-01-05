@@ -12,6 +12,11 @@ namespace Operations
         float PositionDot;
 		uint32_t CalculatedTick;
         bool Synced;
+        
+		constexpr float GetRPM()
+		{
+			return PositionDot / 60;
+		}
     });
 }
 #endif

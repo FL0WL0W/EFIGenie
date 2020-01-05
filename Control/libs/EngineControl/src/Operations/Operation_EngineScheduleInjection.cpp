@@ -14,13 +14,13 @@ namespace Operations
 		_closeTask = new HardwareAbstraction::Task(new CallBack<Operation_EngineScheduleInjection>(this, &Operation_EngineScheduleInjection::Close), false);
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition)
+	std::tuple<ScalarVariable, ScalarVariable> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition)
 	{
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
-		ScalarVariable injectEndAt = _predictor->Execute(injectionEndPosition, enginePosition);
+		ScalarVariable injectEndAt = _predictor->Execute(ScalarVariable(_tdc) - injectionEndPosition, enginePosition);
 		if(injectEndAt < enginePosition.CalculatedTick)
 			injectEndAt = injectEndAt + ticksPerCycle;
 
@@ -29,15 +29,15 @@ namespace Operations
 			_timerService->ScheduleTask(_closeTask, injectEndAt.To<uint32_t>());
 
 		//but we always want to schedule the opening time.
-		ScalarVariable injectAt = injectEndAt - injectionPulseWidth * ticksPerSecond;
+		ScalarVariable injectAt = injectEndAt - ScalarVariable::FromTick((injectionPulseWidth.To<float>() * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);
 
 		if(_open && injectAt < enginePosition.CalculatedTick)
 			injectAt = injectAt + ticksPerCycle;
 
 		_timerService->ScheduleTask(_openTask, injectAt.To<uint32_t>());
 
-		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(injectAt.To<uint32_t>(), injectEndAt.To<uint32_t>());
+		//return the ticks of the open and close. for debugging purposes
+		return std::tuple<ScalarVariable, ScalarVariable>(injectAt, injectEndAt);
 	}
 
 	void Operation_EngineScheduleInjection::Open()

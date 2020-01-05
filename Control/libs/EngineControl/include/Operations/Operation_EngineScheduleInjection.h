@@ -13,7 +13,7 @@
 #define OPERATION_ENGINESCHEDULEINJECTION_H
 namespace Operations
 {
-	class Operation_EngineScheduleInjection : public Operations::IOperation<std::tuple<uint32_t, uint32_t>, EnginePosition, ScalarVariable, ScalarVariable>
+	class Operation_EngineScheduleInjection : public Operations::IOperation<std::tuple<ScalarVariable, ScalarVariable>, EnginePosition, ScalarVariable, ScalarVariable>
 	{
 	protected:
 		HardwareAbstraction::ITimerService *_timerService;
@@ -22,11 +22,11 @@ namespace Operations
 		IOperation<void, ScalarVariable> *_injectionOutputOperation;
 		HardwareAbstraction::Task *_openTask;
 		HardwareAbstraction::Task *_closeTask;
-		bool _open;
+		bool _open = false;
 	public:		
         Operation_EngineScheduleInjection(HardwareAbstraction::ITimerService *timerService, float tdc, IOperation<void, ScalarVariable> *injectionOutputOperation);
 
-		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition) override;
+		std::tuple<ScalarVariable, ScalarVariable> Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition) override;
 		void Open();
 		void Close();
 

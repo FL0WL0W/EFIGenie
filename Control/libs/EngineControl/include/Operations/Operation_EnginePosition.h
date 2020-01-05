@@ -10,18 +10,9 @@
 #define OPERATION_ENGINEPOSITION_H
 namespace Operations
 {
-	PACK(struct EnginePosition
+	PACK(struct EnginePosition : public ReluctorResult
 	{
-        float Position;
-        float PositionDot;
-		uint32_t CalculatedTick;
-        bool Synced;
 		bool Sequential;
-
-		constexpr float GetRPM()
-		{
-			return PositionDot / 60;
-		}
 	});
 
 	class Operation_EnginePosition : public Operations::IOperation<EnginePosition, ReluctorResult, ReluctorResult>
