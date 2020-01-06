@@ -67,7 +67,6 @@ namespace Variables
 		}
 		
 		Variable_StaticScalar *variableService = new Variable_StaticScalar(variable, *staticValue);
-        serviceLocator->LocateAndCast<CallBackGroup>(MAIN_LOOP_CALL_BACK_GROUP)->Add(new CallBack<Variable_StaticScalar>(variableService, &Variable_StaticScalar::TranslateValue));
 
 		return variableService;
 	}

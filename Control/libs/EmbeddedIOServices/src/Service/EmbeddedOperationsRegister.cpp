@@ -15,6 +15,7 @@
 #include "Operations/Operation_ScheduleCallBack.h"
 #include "Operations/Operation_GetTick.h"
 #include "Operations/Operation_SecondsToTicks.h"
+#include "Operations/Operation_TicksToSeconds.h"
 
 #ifdef EMBEDDEDOPERATIONSREGISTER_H
 using namespace Operations;
@@ -42,6 +43,7 @@ namespace Service
         /*15    */Operation_ScheduleCallBack::RegisterFactory();
         /*16    */Operation_GetTick::RegisterFactory();
         /*17    */Operation_SecondsToTicks::RegisterFactory();
+        /*18    */Operation_TicksToSeconds::RegisterFactory();
     }
 }
 #endif

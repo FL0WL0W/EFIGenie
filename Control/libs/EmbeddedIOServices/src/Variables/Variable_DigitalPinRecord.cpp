@@ -23,12 +23,24 @@ namespace Variables
 
 	void Variable_DigitalPinRecord::TranslateValue()
 	{
+		const uint8_t last = _record->Last;
+		if(!_record->Frames[last].Valid)
+			return;
+
+		const uint32_t tick = _timerService->GetTick();
+		if(HardwareAbstraction::ITimerService::TickLessThanTick(tick, _record->Frames[last].Tick))
+		{
+			for(int i = 0; i < _record->Length; i++)
+			{
+				 _record->Frames[last].Valid = false;
+			}
+		}
 	}
 
 	void Variable_DigitalPinRecord::InterruptCallBack()
 	{
 		bool state = _digitalService->ReadPin(_pin);
-		uint32_t tick = _timerService->GetTick();
+		const uint32_t tick = _timerService->GetTick();
 		if(_inverted)
 			state = !state;
 		uint8_t last = _record->Last;

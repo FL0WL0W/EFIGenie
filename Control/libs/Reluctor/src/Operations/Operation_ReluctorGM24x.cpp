@@ -29,12 +29,26 @@ namespace Operations
 
 		uint8_t lastMinus8 =  Variables::Record::Subtract(last, 8, record->Length);
 		if(!record->Frames[lastMinus8].Valid)
-			return ret;;
+			return ret;
 
 		uint8_t lastMinus1 =  Variables::Record::Subtract(last, 1, record->Length);
 		uint8_t lastMinus2 =  Variables::Record::Subtract(last, 2, record->Length);
 		uint8_t lastMinus4 =  Variables::Record::Subtract(last, 4, record->Length);
 		uint8_t lastMinus6 =  Variables::Record::Subtract(last, 6, record->Length);
+		
+		uint8_t lastDown = last;
+		if(record->Frames[last].State)
+			lastDown = lastMinus1;
+		uint8_t lastDownMinus2 =  Variables::Record::Subtract(lastDown, 2, record->Length);
+		uint8_t lastDownMinus4 =  Variables::Record::Subtract(lastDown, 4, record->Length);
+		const float delta1 = static_cast<float>(_timerService->GetTick() - record->Frames[lastDown].Tick);
+		const float delta2 = static_cast<float>(record->Frames[last].Tick - record->Frames[lastDownMinus2].Tick);
+		if(delta1 * 0.5 > delta2)
+			return ret;
+		const float delta3 = static_cast<float>(record->Frames[lastDownMinus2].Tick - record->Frames[lastDownMinus4].Tick);
+		const float similarity = delta2 / delta3;
+		if(similarity < 0.5 || similarity > 2)
+			return ret;
 
 		uint16_t baseDegree = 0;
 		uint16_t pulseDegree = 0;

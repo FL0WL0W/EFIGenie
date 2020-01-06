@@ -16,6 +16,9 @@ namespace Operations
 
 	std::tuple<ScalarVariable, ScalarVariable> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition)
 	{
+		if(enginePosition.Synced == false)
+			return std::tuple<ScalarVariable, ScalarVariable>(ScalarVariable(false), ScalarVariable(false));
+			
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);

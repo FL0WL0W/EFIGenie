@@ -12,6 +12,8 @@ namespace Operations
 
 	ScalarVariable Operation_EnginePositionPrediction::Execute(ScalarVariable desiredPositionIn, EnginePosition enginePosition)
 	{
+		if(enginePosition.Synced == false)
+			return ScalarVariable(false);
 		float desiredPosition = desiredPositionIn.To<float>();
 		float delta = 0;
 		if(enginePosition.Sequential)

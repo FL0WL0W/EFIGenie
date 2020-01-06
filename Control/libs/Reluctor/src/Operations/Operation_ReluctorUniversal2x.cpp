@@ -30,6 +30,21 @@ namespace Operations
 		}
 
 		uint8_t lastMinus1 =  Variables::Record::Subtract(last, 1, record->Length);
+		uint8_t lastMinus2 =  Variables::Record::Subtract(last, 2, record->Length);
+		uint8_t lastMinus4 =  Variables::Record::Subtract(last, 4, record->Length);
+
+		if(!record->Frames[lastMinus2].Valid || !record->Frames[lastMinus4].Valid)
+			return ret;
+
+		//ensure stability
+		const float delta1 = static_cast<float>(_timerService->GetTick() - record->Frames[last].Tick);
+		const float delta2 = static_cast<float>(record->Frames[last].Tick - record->Frames[lastMinus2].Tick);
+		if(delta1 * 0.5 > delta2)
+			return ret;
+		const float delta3 = static_cast<float>(record->Frames[lastMinus2].Tick - record->Frames[lastMinus4].Tick);
+		const float similarity = delta2 / delta3;
+		if(similarity < 0.5 || similarity > 2)
+			return ret;
 
 		float deltaPosition = 0;
 		float basePosition = 0;

@@ -16,35 +16,35 @@ namespace Operations
 
 	std::tuple<ScalarVariable, ScalarVariable> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionAdvance)
 	{
+		if(enginePosition.Synced == false)
+			return std::tuple<ScalarVariable, ScalarVariable>(ScalarVariable(false), ScalarVariable(false));
+
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
+		//we want to set the next dwell tick
+		uint32_t dwellTick = _predictor->Execute(ignitionAdvance, enginePosition).To<uint32_t>();
+		dwellTick = dwellTick - static_cast<uint32_t>(ignitionDwell.To<float>() * ticksPerSecond);
+		while(HardwareAbstraction::ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
+			dwellTick = dwellTick + ticksPerCycle;
+
+		_timerService->ScheduleTask(_dwellTask, dwellTick);
+
 		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
-		if(!_dwellingAtTick)
+		if(_dwellingAtTick == 0)
 			_ignitionAt = ScalarVariable(_tdc) - ignitionAdvance;
 
 		//but we do want to adjust the ignition tick so that it is spot on
-		ScalarVariable ignitionTick = _predictor->Execute(_ignitionAt, enginePosition);
+		uint32_t ignitionTick = _predictor->Execute(_ignitionAt, enginePosition).To<uint32_t>();
 		//if the prediction is for a previous position. add for next position
-		if((!_dwellingAtTick && ignitionTick < enginePosition.CalculatedTick) || (_dwellingAtTick && ignitionTick < _dwellingAtTick))
+		while((_dwellingAtTick == 0 && HardwareAbstraction::ITimerService::TickLessThanTick(ignitionTick, enginePosition.CalculatedTick)) || (_dwellingAtTick != 0 && HardwareAbstraction::ITimerService::TickLessThanTick(ignitionTick, _dwellingAtTick)))
 			ignitionTick = ignitionTick + ticksPerCycle;
 
-		_timerService->ScheduleTask(_igniteTask, ignitionTick.To<uint32_t>());
-
-		//we also want to set the next dwell tick
-		ScalarVariable dwellTick = _predictor->Execute(ignitionAdvance, enginePosition);
-		dwellTick = dwellTick - ScalarVariable::FromTick(ignitionDwell.To<float>() * ticksPerSecond);
-		while(HardwareAbstraction::ITimerService::TickLessThanTick(dwellTick.To<uint32_t>(), enginePosition.CalculatedTick))
-			dwellTick = dwellTick + ticksPerCycle;
-
-		if(_dwellingAtTick && dwellTick < ignitionTick)
-			dwellTick = dwellTick + ticksPerCycle;
-
-		_timerService->ScheduleTask(_dwellTask, ignitionTick.To<uint32_t>());
+		_timerService->ScheduleTask(_igniteTask, ignitionTick);
 
 		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<ScalarVariable, ScalarVariable>(dwellTick, ignitionTick);
+		return std::tuple<ScalarVariable, ScalarVariable>(ScalarVariable::FromTick(dwellTick), ScalarVariable::FromTick(ignitionTick));
 	}
 
 	void Operation_EngineScheduleIgnition::Dwell()

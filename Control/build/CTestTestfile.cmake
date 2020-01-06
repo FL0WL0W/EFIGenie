@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
-# Source directory: C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control
-# Build directory: C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build
+# Source directory: C:/Users/daniel/Documents/GitHub/EFIGenie/Control
+# Build directory: C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

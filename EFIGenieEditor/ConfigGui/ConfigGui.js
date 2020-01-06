@@ -9,7 +9,7 @@ class ConfigGui extends Config {
     GetLabels = GetValueByReferenceFunction("Labels", undefined);
     GetArray = GetValueByReferenceFunction("Array", undefined);
     GetParentTabbed() {
-        var val = GetValueByValueOrReference("...Tabbed", this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
+        var val = GetReference("...Tabbed", this.Obj, this.ObjLocation, this.Ini, this.IniLocation);
     
         if(val)
             return val; 
@@ -383,9 +383,15 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.SetValue($(this).val());
-        
-            CallObjFunctionIfExists(thisClass.Obj, "Update");
+            var prevVal = "" + thisClass.GetObjProperty().Value;
+            var newVal = $(this).val();
+
+            if(newVal !== prevVal)
+            {
+                thisClass.SetValue(newVal);
+            
+                CallObjFunctionIfExists(thisClass.Obj, "Update");
+            }
         });
     }
     DeAttach() {
@@ -409,26 +415,40 @@ class ConfigNumberSelectionGui extends ConfigNumber {
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]label[$]/g, this.GetLabel());
         var selectionHtml = "";
-        var thisClass = this;
         var filterOn = this.GetFilterOn();
         var filter = this.GetFilter();
-        $.each(selections, function(selectionValue, selectionName) {
+        var firstValid = undefined;
+        var anySelected = false;
+        for(var i = 0; i < selections.length; i++)
+        {
+            var selectionValue = "" + i;
+            var selectionName = selections[i];
             var show = true;
             if(typeof selectionName !== "string")
             {
                 selectionName = selectionName.Name;
-                selectionValue =  thisClass.GetIniProperty().Selections + "/" + selectionName;
+                selectionValue =  this.GetIniProperty().Selections + "/" + selectionName;
                 if(filterOn) {
-                    show = GetValueByReference(selectionValue + "/" + filterOn, thisClass.Obj, thisClass.ObjLocation, thisClass.Ini) === filter;
+                    show = GetValueByReference(selectionValue + "/" + filterOn, this.Obj, this.ObjLocation, this.Ini) === filter;
                 }
             }
-            if((selectionValue + "") === ("" + thisClass.GetObjProperty().Value))
+            if(selectionValue === ("" + this.GetObjProperty().Value)) {
+                anySelected = true;
                 selectionHtml += "<option selected value=\"" + selectionValue + "\"" + (!show? "class=\"filteredOutButSelected\"" : "") + ">" + selectionName + "</option>";
-            else {
-                if(selectionName !== "INVALID" && show) 
-                    selectionHtml += "<option value=\"" + selectionValue + "\">" + selectionName + "</option>";
             }
-        });
+            else {
+                if(selectionName !== "INVALID" && show) {
+                    if(firstValid === undefined)
+                        firstValid = selectionValue;
+                    selectionHtml += "<option value=\"" + selectionValue + "\">" + selectionName + "</option>";
+                }
+            }
+        }
+        if(!anySelected && firstValid !== undefined) {
+            this.SetValue(firstValid);
+            CallObjFunctionIfExists(this.Obj, "Update");
+        }
+
         template = template.replace(/[$]selections[$]/g, selectionHtml);
 
         return template + "</span>";

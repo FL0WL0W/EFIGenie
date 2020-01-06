@@ -41,7 +41,7 @@ var EmbeddedIOServicesIni = {
         { Inverted: { Type: "bool", Label: "Inverted" } }
     ] },
     Variable_Operation: {  Output: "Operation/Output", Inputs: "Operation/Inputs", Variables : [
-        { FactoryID: { Type: "uint16", Value: ".Operation/Selection/FactoryID", Static: true } },
+        { FactoryID: { Type: "uint16", Value: ".Operation/FactoryID", Static: true } },
         { VariableOutputID: { Type: "uint16", Value: "[]", Static: true, ExcludeFromBin: "!.Output" } },
         { OperationImmediate: { Type: "bool", Value: false, Static: true } },
         { Operation: { Label: "Operation", Type: "uint16", Selections: "/OperationBus" } },
@@ -50,7 +50,7 @@ var EmbeddedIOServicesIni = {
         ] } }
     ] },
     Variable_OperationImmediate: {  Output: "Operation/Output", Inputs: "Operation/Inputs", Variables : [
-        { FactoryID: { Type: "uint16", Value: ".Operation/Selection/FactoryID", Static: true } },
+        { FactoryID: { Type: "uint16", Value: ".Operation/FactoryID", Static: true } },
         { VariableOutputID: { Type: "uint16", Value: "[]", Static: true, ExcludeFromBin: "!.Output" } },
         { OperationImmediate: { Type: "bool", Value: true, Static: true } },
         { Operation: { Label: "Operation", Selections: OperationSelections } },
@@ -106,7 +106,6 @@ var EmbeddedIOServicesIni = {
         { MinFrequency: { Type: "uint16", Label: "minFrequency" } }
     ] },
     Operation_GetTick: { Output: "ScalarVariable", Inputs: [], Variables : [
-        { InstanceID: { Type: "uint16", Value: "[]", Static: true } },
         { FactoryID: { Type: "uint16", Value: 16, Static: true } }
     ] },
     Operation_LookupTable: { Output: "ScalarVariable", Inputs: [{ Label: "IN", Type: "ScalarVariable"}], Variables : [

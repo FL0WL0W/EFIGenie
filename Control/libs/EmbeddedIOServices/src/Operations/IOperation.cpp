@@ -18,13 +18,16 @@ namespace Operations
 
     IOperationBase *IOperationBase::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
     {
-        const uint16_t factoryId = IService::CastAndOffset<uint16_t>(config, sizeOut);
-
-        IOperationBase*(*factory)(Service::ServiceLocator * const &, const void *, unsigned int &) = factoryLocator.LocateAndCast<IOperationBase*(Service::ServiceLocator * const &, const void *, unsigned int &)>(factoryId);
+        IOperationBase*(*factory)(Service::ServiceLocator * const &, const void *, unsigned int &) = GetFactory(IService::CastAndOffset<uint16_t>(config, sizeOut));
 
         if(factory == 0)
             return 0;
         return factory(serviceLocator, config, sizeOut);
+    }
+    
+    IOperationBase*(*IOperationBase::GetFactory(uint16_t factoryId))(Service::ServiceLocator * const &, const void *, unsigned int &)
+    {
+        return factoryLocator.LocateAndCast<IOperationBase*(Service::ServiceLocator * const &, const void *, unsigned int &)>(factoryId);
     }
     
     ISERVICE_REGISTERSERVICEFACTORY_CPP(IOperationBase, BUILDER_OPERATION)

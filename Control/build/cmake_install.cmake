@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control
+# Install script for directory: C:/Users/daniel/Documents/GitHub/EFIGenie/Control
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,24 +34,14 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServices/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/Reluctor/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/EngineControl/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/TransmissionControl/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/googletest/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlMockedObjects/cmake_install.cmake")
-  include("C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlUnitTests/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServices/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/Reluctor/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControl/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/TransmissionControl/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/googletest/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EmbeddedIOServicesMockedObjects/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlMockedObjects/cmake_install.cmake")
+  include("C:/Users/daniel/Documents/GitHub/EFIGenie/Control/build/libs/EngineControlUnitTests/cmake_install.cmake")
 
 endif()
 
-if(CMAKE_INSTALL_COMPONENT)
-  set(CMAKE_INSTALL_MANIFEST "install_manifest_${CMAKE_INSTALL_COMPONENT}.txt")
-else()
-  set(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
-endif()
-
-string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
-       "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/fl0wl0w/Documents/GitHub/EFIGenie/Control/build/${CMAKE_INSTALL_MANIFEST}"
-     "${CMAKE_INSTALL_MANIFEST_CONTENT}")

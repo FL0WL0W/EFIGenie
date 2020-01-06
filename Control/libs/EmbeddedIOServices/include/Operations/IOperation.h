@@ -22,6 +22,8 @@ namespace Operations
 
 		static IOperationBase *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
         
+        static IOperationBase*(*GetFactory(uint16_t factoryId))(Service::ServiceLocator * const &, const void *, unsigned int &);
+        
         ISERVICE_REGISTERSERVICEFACTORY_H
     };
 
