@@ -9,12 +9,12 @@
 
 /*
 To use this variable
-uint16									7001(BUILDER_VARIABLE)
-uint16									5(FactoryID)
+uint16									6001(BUILDER_OPERATION)
+uint16									12(FactoryID)
 uint16									xx(InstanceID of Variable)
-uint8 									length
 uint16 									pin
 bool 									inverted
+uint8 									length
 */
 
 #ifndef OPERATION_DIGITALPINRECORD_H
@@ -70,7 +70,7 @@ namespace Operations
 		bool _inverted;
 		Record _record;
 	public:	
-        Operation_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted);
+        Operation_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint16_t pin, bool inverted, uint8_t length);
 		Record Execute() override;
 		void InterruptCallBack();
 

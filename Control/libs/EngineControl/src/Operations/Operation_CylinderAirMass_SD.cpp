@@ -16,6 +16,11 @@ namespace Operations
 
 		return ScalarVariable(cylinderVolume * airDensity);
 	}
+	
+	Operations::IOperationBase *Operation_CylinderAirMass_SD::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
+		return new Operation_CylinderAirMass_SD(IService::CastAndOffset<float>(config, sizeOut));
+	}
 
 	IOPERATION_REGISTERFACTORY_CPP(Operation_CylinderAirMass_SD, 2007)
 }

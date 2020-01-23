@@ -3,7 +3,7 @@
 #ifdef OPERATION_DIGITALPINRECORD_H
 namespace Operations
 {
-	Operation_DigitalPinRecord::Operation_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted)
+	Operation_DigitalPinRecord::Operation_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint16_t pin, bool inverted, uint8_t length)
 	{
 		_digitalService = digitalService;
 		_timerService = timerService;
@@ -54,11 +54,11 @@ namespace Operations
 	IOperationBase *Operation_DigitalPinRecord::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
 		uint32_t variableId = Service::IService::CastAndOffset<uint16_t>(config, sizeOut);
-		uint32_t length = Service::IService::CastAndOffset<uint8_t>(config, sizeOut);
 		const uint16_t pin = IService::CastAndOffset<uint16_t>(config, sizeOut);
 		const bool inverted = IService::CastAndOffset<bool>(config, sizeOut);
+		uint32_t length = Service::IService::CastAndOffset<uint8_t>(config, sizeOut);
 					
-		Operation_DigitalPinRecord *operation = new Operation_DigitalPinRecord(serviceLocator->LocateAndCast<HardwareAbstraction::IDigitalService>(DIGITAL_SERVICE_ID), serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID), length, pin, inverted);
+		Operation_DigitalPinRecord *operation = new Operation_DigitalPinRecord(serviceLocator->LocateAndCast<HardwareAbstraction::IDigitalService>(DIGITAL_SERVICE_ID), serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID), pin, inverted, length);
 
 		return operation;
 	}
