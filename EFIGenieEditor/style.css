@@ -6,15 +6,36 @@
     margin: 2.5px;
     display: inline-block;
 }
-.configContainer span,
+.configDivider {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666666;
+    padding: 0px;
+    margin: 2.5px;
+    display: inline-block;
+}
+
 .configContainer div {
     display:block;
     font-weight:bold;
 }
-.configContainer .sameLineSpacer {
-    width: 40px;
-    display: inline-block;
+
+.configContainer select {
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-width: 65px;
+    border-color: #666666;
 }
+
+.configContainer label {
+    float: left;
+    width: 200px;
+    padding-right: 5px;
+    margin: 1px;
+}
+
 input {
     margin: 1px;
 }
@@ -25,57 +46,6 @@ input[type="checkbox"] {
 input[type="number"] {
     width: 65px;
 }
-select {
-    margin-left: 1px;
-    margin-right: 1px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    min-width: 65px;
-    border-color: #666666;
-}
-
-.configtable {
-    border-color: #666666;
-    border-spacing: 0px;
-    border: 1px;
-    display: inline-block;
-    border-style: solid;
-}
-.configtable th {
-    padding: 2px;
-    border: 1px;
-    border-color: #666666;
-    border-style: solid;
-    white-space: nowrap;
-}
-.configtable td {
-    padding: 0px;
-    border: 1px;
-    border-color: #666666;
-    border-style: solid;
-}
-.configtable select {
-    border-style: none;
-    margin: 0px;
-    line-height: 20px;
-}
-
-.configContainer label {
-    float: left;
-    width: 200px;
-    padding-right: 5px;
-    margin: 1px;
-}
-
-.configContainer .subConfigLabel {
-    display: block;
-    float: none;
-}
-
-.selected {
-    background-color:rgb(204, 204, 255);
-}
-
 .button {
     font: bold 11px Arial;
     text-decoration: none;
@@ -86,7 +56,18 @@ select {
     border-right: 1px solid #333333;
     border-bottom: 1px solid #333333;
     border-left: 1px solid #CCCCCC;
-  }
+}
+
+span .namedListOperation {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: inline;
+}
+.namedListOperation:hover {
+    background-color: #ddd;
+}
 
 .tab {
     overflow: hidden;
@@ -110,21 +91,9 @@ select {
     background-color: #ccc;
 }
 
-
 .tabcontent {
     display: none;
     padding: 6px 12px;
     border: 1px solid #ccc;
     border-top: none;
-}
-
-span .namedListOperation {
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    display: inline;
-}
-.namedListOperation:hover {
-    background-color: #ddd;
 }

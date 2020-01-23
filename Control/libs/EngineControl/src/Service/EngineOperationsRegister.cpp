@@ -5,6 +5,7 @@
 #include "Operations/Operation_EngineScheduleInjection.h"
 #include "Operations/Operation_EngineScheduleIgnitionArray.h"
 #include "Operations/Operation_EngineScheduleInjectionArray.h"
+#include "Operations/Operation_CylinderAirMass_SD.h"
 
 #ifdef ENGINEOPERATIONSREGISTER_H
 using namespace Operations;
@@ -19,6 +20,7 @@ namespace Service
         /*2004  */Operation_EngineScheduleInjection::RegisterFactory();
         /*2005  */Operation_EngineScheduleIgnitionArray::RegisterFactory();
         /*2006  */Operation_EngineScheduleInjectionArray::RegisterFactory();
+        /*2007  */Operation_CylinderAirMass_SD::RegisterFactory();
     }
 }
 #endif

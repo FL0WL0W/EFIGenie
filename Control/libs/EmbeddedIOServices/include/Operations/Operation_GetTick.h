@@ -1,3 +1,4 @@
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Operations/IOperation.h"
 #include "Service/IService.h"
 #include "Service/ServiceLocator.h"

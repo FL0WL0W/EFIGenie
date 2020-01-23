@@ -1,5 +1,4 @@
 #include "Operations/Operation_EngineScheduleIgnitionArray.h"
-#include "Variables/Variable_Operation.h"
 
 #ifdef OPERATION_ENGINESCHEDULEIGNITIONARRAY_H
 namespace Operations
@@ -46,6 +45,6 @@ namespace Operations
 		return new Operation_EngineScheduleIgnitionArray(timerService, length, tdc, ignitionOutputOperation);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleIgnitionArray, 2005, EngineScheduleIgnitionArray, EnginePosition, ScalarVariable, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleIgnitionArray, 2005)
 }
 #endif

@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_TicksToSeconds.h"
 
 #ifdef OPERATION_TICKSTOSECONDS_H
@@ -22,6 +21,6 @@ namespace Operations
 		return _instance;
 	}
 	
-	IOPERATION_REGISTERFACTORY_CPP(Operation_TicksToSeconds, 18, ScalarVariable, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_TicksToSeconds, 18)
 }
 #endif

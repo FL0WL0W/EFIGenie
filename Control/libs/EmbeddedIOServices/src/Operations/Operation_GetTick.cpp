@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_GetTick.h"
 
 #ifdef OPERATION_GETTICK_H
@@ -22,6 +21,6 @@ namespace Operations
 		return _instance;
 	}
 	
-	IOPERATION_REGISTERFACTORY_CPP(Operation_GetTick, 16, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_GetTick, 16)
 }
 #endif

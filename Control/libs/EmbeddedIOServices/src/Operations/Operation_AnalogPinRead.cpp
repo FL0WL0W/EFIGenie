@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_AnalogPinRead.h"
 
 #ifdef OPERATION_ANALOGPINREAD_H
@@ -22,6 +21,6 @@ namespace Operations
 		return new Operation_AnalogPinRead(serviceLocator->LocateAndCast<HardwareAbstraction::IAnalogService>(ANALOG_SERVICE_ID), IService::CastAndOffset<uint16_t>(config, sizeOut));
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_AnalogPinRead, 5, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_AnalogPinRead, 5)
 }
 #endif

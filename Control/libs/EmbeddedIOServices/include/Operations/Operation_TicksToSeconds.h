@@ -1,5 +1,6 @@
 #include "Operations/IOperation.h"
 #include "Service/IService.h"
+#include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/ServiceLocator.h"
 #include "Packed.h"
 #include "Interpolation.h"

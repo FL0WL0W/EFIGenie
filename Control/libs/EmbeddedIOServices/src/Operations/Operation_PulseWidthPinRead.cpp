@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_PulseWidthPinRead.h"
 
 #ifdef OPERATION_PULSEWIDTHPINREAD_H
@@ -25,6 +24,6 @@ namespace Operations
 		return new Operation_PulseWidthPinRead(serviceLocator->LocateAndCast<HardwareAbstraction::IPwmService>(PWM_SERVICE_ID), pin, minFrequency);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_PulseWidthPinRead, 7, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_PulseWidthPinRead, 7)
 }
 #endif

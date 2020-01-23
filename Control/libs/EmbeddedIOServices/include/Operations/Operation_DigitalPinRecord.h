@@ -1,7 +1,6 @@
 #include "Service/HardwareAbstractionServiceBuilder.h"
 #include "Service/EmbeddedOperationsRegister.h"
 #include "Service/EmbeddedVariablesRegister.h"
-#include "Variables/IVariable.h"
 #include "Operations/IOperation.h"
 #include "stdint.h"
 #include "Packed.h"
@@ -18,9 +17,9 @@ uint16 									pin
 bool 									inverted
 */
 
-#ifndef VARIABLE_DIGITALPINRECORD_H
-#define VARIABLE_DIGITALPINRECORD_H
-namespace Variables
+#ifndef OPERATION_DIGITALPINRECORD_H
+#define OPERATION_DIGITALPINRECORD_H
+namespace Operations
 {
 	PACK(struct Frame
 	{
@@ -62,20 +61,20 @@ namespace Variables
 		Frame *Frames;
 	};
 
-	class Variable_DigitalPinRecord : public IVariable
+	class Operation_DigitalPinRecord : public IOperation<Record>
 	{
 	protected:
 		HardwareAbstraction::IDigitalService *_digitalService;
 		HardwareAbstraction::ITimerService *_timerService;
 		uint16_t _pin;
 		bool _inverted;
-		Record *_record;
+		Record _record;
 	public:	
-        Variable_DigitalPinRecord(Record *record, HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted);
-		void TranslateValue() override;
+        Operation_DigitalPinRecord(HardwareAbstraction::IDigitalService *digitalService, HardwareAbstraction::ITimerService *timerService, uint8_t length, uint16_t pin, bool inverted);
+		Record Execute() override;
 		void InterruptCallBack();
 
-		static IVariable *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
+		static IOperationBase *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		ISERVICE_REGISTERFACTORY_H
 	};
 }

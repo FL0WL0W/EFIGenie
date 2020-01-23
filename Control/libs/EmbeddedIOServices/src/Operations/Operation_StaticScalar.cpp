@@ -1,29 +1,20 @@
-#include "Variables/Variable_StaticScalar.h"
-#include "Service/HardwareAbstractionServiceBuilder.h"
-#include "Service/EmbeddedVariablesRegister.h"
-#include "Service/IService.h"
+#include "Operations/Operation_StaticScalar.h"
 
-using namespace HardwareAbstraction;
-using namespace Service;
-
-#ifdef VARIABLE_STATICSCALAR_H
-namespace Variables
+#ifdef OPERATION_STATICSCALAR_H
+namespace Operations
 {
-	Variable_StaticScalar::Variable_StaticScalar(ScalarVariable *variable, const ScalarVariable &staticValue)
+	Operation_StaticScalar::Operation_StaticScalar(const ScalarVariable &staticValue)
 	{
 		_staticValue = staticValue;
-		_variable = variable;
-		*_variable = _staticValue;
-	}
-	
-	void Variable_StaticScalar::TranslateValue()
-	{
-		*_variable = _staticValue;
 	}
 
-	IVariable *Variable_StaticScalar::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	ScalarVariable Operation_StaticScalar::Execute()
 	{
-		ScalarVariable *variable = GetOrCreateVariable<ScalarVariable>(serviceLocator, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		return _staticValue;
+	}
+
+	IOperationBase * Operation_StaticScalar::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
+	{
 		const ScalarVariableType staticValueType = IService::CastAndOffset<ScalarVariableType>(config, sizeOut);
 		ScalarVariable *staticValue;
 		switch (staticValueType)
@@ -66,10 +57,11 @@ namespace Variables
 				break;
 		}
 		
-		Variable_StaticScalar *variableService = new Variable_StaticScalar(variable, *staticValue);
+		Operation_StaticScalar *variableService = new Operation_StaticScalar(*staticValue);
 
 		return variableService;
 	}
-	ISERVICE_REGISTERFACTORY_CPP(Variable_StaticScalar, 13)
+	
+	IOPERATION_REGISTERFACTORY_CPP(Operation_StaticScalar, 13)
 }
 #endif

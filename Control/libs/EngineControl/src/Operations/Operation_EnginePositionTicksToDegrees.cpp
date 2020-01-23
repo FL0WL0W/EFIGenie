@@ -1,5 +1,4 @@
 #include "Operations/Operation_EnginePositionTicksToDegrees.h"
-#include "Variables/Variable_Operation.h"
 
 #ifdef OPERATION_ENGINEPOSITIONTICKSTODEGREES_H
 namespace Operations
@@ -22,6 +21,6 @@ namespace Operations
 		return _instance;
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePositionTicksToDegrees, 2003, ScalarVariable, ScalarVariable, EnginePosition)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePositionTicksToDegrees, 2003)
 }
 #endif

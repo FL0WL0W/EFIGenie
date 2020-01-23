@@ -72,7 +72,7 @@ var EmbeddedIOServicesIni = {
         { MaxYValue: { Type: "float", Label: "Max Y", Value: 4 } },
         { YResolution : { Label: "Y Resolution", Type: "uint8", Min: 1, Value: 4 } },
         { Type: { Label: " Type", Type: "uint8", Value: 1, Selections: [ "INVALID", "UINT8", "UINT16", "UINT32", "UINT64", "INT8", "INT16", "INT32", "INT64", "FLOAT", "DOUBLE", "BOOLEAN", "TICK" ] } },
-        { Table: { Type: ".Type", XResolution: ".XResolution", YResolution: ".YResolution", XLabel: "X", YLabel: "Y", ZLabel: "Z", Label: "Table", XMin: "[]", XMax: ".MaxXValue", YMin: ".MinYValue", YMax: ".MaxYValue", Dialog: true } }
+        { Table: { Type: ".Type", XResolution: ".XResolution", YResolution: ".YResolution", XLabel: "X", YLabel: "Y", ZLabel: "Z", Label: "Table", XMin: ".MinXValue", XMax: ".MaxXValue", YMin: ".MinYValue", YMax: ".MaxYValue", Dialog: true } }
     ] },
     Operation_AnalogPinRead: { Output: "ScalarVariable", Inputs: [], Variables : [
         { FactoryID: { Type: "uint16", Value: 5, Static: true } },

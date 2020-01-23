@@ -85,6 +85,12 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Operations\\Operation_DigitalPinRecord.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Operations\\Operation_DigitalPinRecord.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Operations/Operation_DigitalPinRecord.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Operations\\Operation_DigitalPinWrite.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Operations\\Operation_DigitalPinWrite.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Operations/Operation_DigitalPinWrite.cpp"
 },
@@ -157,6 +163,18 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Operations\\Operation_StaticScalar.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Operations\\Operation_StaticScalar.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Operations/Operation_StaticScalar.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Operations\\Operation_TicksToSeconds.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Operations\\Operation_TicksToSeconds.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Operations/Operation_TicksToSeconds.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\ScalarVariable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\ScalarVariable.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/ScalarVariable.cpp"
 },
@@ -165,12 +183,6 @@
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\EmbeddedOperationsRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\EmbeddedOperationsRegister.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/EmbeddedOperationsRegister.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Service\\EmbeddedVariablesRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Service\\EmbeddedVariablesRegister.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Service/EmbeddedVariablesRegister.cpp"
 },
 
 {
@@ -193,24 +205,6 @@
 
 {
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Variables\\IVariable.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Variables\\IVariable.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Variables/IVariable.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Variables\\Variable_DigitalPinRecord.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Variables\\Variable_DigitalPinRecord.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Variables/Variable_DigitalPinRecord.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
-  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EmbeddedIOServices\\CMakeFiles\\EmbeddedIOServices.dir\\src\\Variables\\Variable_StaticScalar.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EmbeddedIOServices\\src\\Variables\\Variable_StaticScalar.cpp",
-  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EmbeddedIOServices/src/Variables/Variable_StaticScalar.cpp"
-},
-
-{
-  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Operations\\Operation_ReluctorGM24x.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Operations\\Operation_ReluctorGM24x.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Operations/Operation_ReluctorGM24x.cpp"
 },
@@ -225,6 +219,12 @@
   "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
   "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\Reluctor\\include -I..\\libs\\EmbeddedIOServices\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\Reluctor\\CMakeFiles\\Reluctor.dir\\src\\Service\\ReluctorOperationsRegister.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\Reluctor\\src\\Service\\ReluctorOperationsRegister.cpp",
   "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/Reluctor/src/Service/ReluctorOperationsRegister.cpp"
+},
+
+{
+  "directory": "c:/Users/daniel/Documents/GitHub/EFIGenie/Control/build",
+  "command": "C:\\PROGRA~2\\MICROS~1\\2017\\COMMUN~1\\VC\\Tools\\MSVC\\1416~1.270\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -I..\\libs\\EngineControl\\include -I..\\libs\\EmbeddedIOServices\\include -I..\\libs\\Reluctor\\include  /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /Folibs\\EngineControl\\CMakeFiles\\EngineControl.dir\\src\\Operations\\Operation_CylinderAirMass_SD.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\daniel\\Documents\\GitHub\\EFIGenie\\Control\\libs\\EngineControl\\src\\Operations\\Operation_CylinderAirMass_SD.cpp",
+  "file": "C:/Users/daniel/Documents/GitHub/EFIGenie/Control/libs/EngineControl/src/Operations/Operation_CylinderAirMass_SD.cpp"
 },
 
 {

@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_ReluctorUniversal2x.h"
 
 #ifdef OPERATION_RELUCTORUNIVERSAL2X_H
@@ -11,7 +10,7 @@ namespace Operations
 		_fallingPosition = fallingPosition;
 	}
 
-	ReluctorResult Operation_ReluctorUniversal2x::Execute(Variables::Record *record, ScalarVariable tickIn)
+	ReluctorResult Operation_ReluctorUniversal2x::Execute(Record *record, ScalarVariable tickIn)
 	{
 		ReluctorResult ret;
 		ret.CalculatedTick = tickIn.To<uint32_t>();
@@ -22,16 +21,16 @@ namespace Operations
 		const uint8_t startingLast = last;
 		while(ret.CalculatedTick - record->Frames[last].Tick > 0x80000000)
 		{
-			last = Variables::Record::Subtract(last, 1, record->Length);
+			last = Record::Subtract(last, 1, record->Length);
 			if(!record->Frames[last].Valid)
 				return ret;
 			if(startingLast == last)
 				return ret;
 		}
 
-		uint8_t lastMinus1 =  Variables::Record::Subtract(last, 1, record->Length);
-		uint8_t lastMinus2 =  Variables::Record::Subtract(last, 2, record->Length);
-		uint8_t lastMinus4 =  Variables::Record::Subtract(last, 4, record->Length);
+		uint8_t lastMinus1 =  Record::Subtract(last, 1, record->Length);
+		uint8_t lastMinus2 =  Record::Subtract(last, 2, record->Length);
+		uint8_t lastMinus4 =  Record::Subtract(last, 4, record->Length);
 
 		if(!record->Frames[lastMinus2].Valid || !record->Frames[lastMinus4].Valid)
 			return ret;
@@ -79,6 +78,6 @@ namespace Operations
 		return new Operation_ReluctorUniversal2x(serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID), IService::CastAndOffset<float>(config, sizeOut), IService::CastAndOffset<float>(config, sizeOut));
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_ReluctorUniversal2x, 1002, ReluctorResult, Variables::Record*, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_ReluctorUniversal2x, 1002)
 }
 #endif

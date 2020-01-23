@@ -10,7 +10,9 @@
 #include "Operations/Operation_LookupTable.h"
 #include "Operations/Operation_Polynomial.h"
 #include "Operations/Operation_PulseWidthPinRead.h"
+#include "Operations/Operation_StaticScalar.h"
 #include "Operations/Operation_PwmPinWrite.h"
+#include "Operations/Operation_DigitalPinRecord.h"
 #include "Operations/Operation_Math.h"
 #include "Operations/Operation_ScheduleCallBack.h"
 #include "Operations/Operation_GetTick.h"
@@ -24,7 +26,7 @@ namespace Service
 {
 	void EmbeddedOperationsRegister::Register()
     {
-        /*6001  */IOperationBase::RegisterServiceFactory();
+        /*6001 - 6002*/IOperationBase::RegisterServiceFactory();
 
         /*1     */Operation_Polynomial::RegisterFactory();
         /*2     */Operation_LookupTable::RegisterFactory();
@@ -37,8 +39,8 @@ namespace Service
         /*9     */Operation_FaultDetection::RegisterFactory();
         /*10    */Operation_DigitalPinWrite::RegisterFactory();
         /*11    */Operation_PwmPinWrite::RegisterFactory();
-        /*12    *///Variable_DigitalPinRecord::RegisterFactory();
-        /*13    *///Variable_StaticScalar::RegisterFactory();
+        /*12    */Operation_DigitalPinRecord::RegisterFactory();
+        /*13    */Operation_StaticScalar::RegisterFactory();
         /*14    */Operation_Math::RegisterFactory();
         /*15    */Operation_ScheduleCallBack::RegisterFactory();
         /*16    */Operation_GetTick::RegisterFactory();

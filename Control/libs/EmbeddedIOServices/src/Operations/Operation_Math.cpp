@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_Math.h"
 
 #ifdef OPERATION_MATH_H
@@ -44,6 +43,6 @@ namespace Operations
 		return new Operation_Math(IService::CastAndOffset<MathOperation>(config, sizeOut));
 	}
 	
-	IOPERATION_REGISTERFACTORY_CPP(Operation_Math, 14, ScalarVariable, ScalarVariable, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_Math, 14)
 }
 #endif

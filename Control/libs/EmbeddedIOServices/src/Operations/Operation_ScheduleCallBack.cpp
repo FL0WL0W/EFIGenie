@@ -1,6 +1,4 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_ScheduleCallBack.h"
-#include "Variables/IVariable.h"
 
 #ifdef OPERATION_SCHEDULECALLBACK_H
 namespace Operations
@@ -18,10 +16,10 @@ namespace Operations
 
 	IOperationBase *Operation_ScheduleCallBack::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
-        HardwareAbstraction::ICallBack * const callBack = new HardwareAbstraction::CallBack<Variables::IVariable>(Variables::IVariable::Create(serviceLocator, config, sizeOut), &Variables::IVariable::TranslateValue);
+        HardwareAbstraction::ICallBack * const callBack = reinterpret_cast<HardwareAbstraction::ICallBack *>(IOperationBase::CreateExecute(serviceLocator, config, sizeOut));
 		return new Operation_ScheduleCallBack(serviceLocator->LocateAndCast<HardwareAbstraction::ITimerService>(TIMER_SERVICE_ID), callBack);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_ScheduleCallBack, 15, void, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_ScheduleCallBack, 15)
 }
 #endif

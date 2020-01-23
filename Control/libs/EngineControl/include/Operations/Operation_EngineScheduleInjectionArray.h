@@ -17,7 +17,7 @@ namespace Operations
 	struct EngineScheduleInjectionArray
 	{
 		public:
-		EngineScheduleInjectionArray(uint8_t length)
+		void Initialize(uint8_t length)
 		{
 			Length = length;
 			OpenTick = reinterpret_cast<ScalarVariable*>(malloc(sizeof(ScalarVariable) * Length));
@@ -34,6 +34,7 @@ namespace Operations
 	protected:
 		uint8_t _length;
 		Operation_EngineScheduleInjection **_array;
+		EngineScheduleInjectionArray _ret;
 	public:		
         Operation_EngineScheduleInjectionArray(HardwareAbstraction::ITimerService *timerService, uint8_t length, const float* tdc, IOperation<void, ScalarVariable> **ignitionOutputOperation);
 

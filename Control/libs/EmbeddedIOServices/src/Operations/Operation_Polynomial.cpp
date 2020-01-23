@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_Polynomial.h"
 
 #ifdef OPERATION_POLYNOMIAL_H
@@ -30,6 +29,6 @@ namespace Operations
 		return new Operation_Polynomial(polynomialConfig);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_Polynomial, 1, ScalarVariable, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_Polynomial, 1)
 }
 #endif

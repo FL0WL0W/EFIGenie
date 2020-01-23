@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_DigitalPinRead.h"
 
 #ifdef OPERATION_DIGITALPINREAD_H
@@ -27,6 +26,6 @@ namespace Operations
 		return new Operation_DigitalPinRead(serviceLocator->LocateAndCast<HardwareAbstraction::IDigitalService>(DIGITAL_SERVICE_ID), pin, inverted);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_DigitalPinRead, 4, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_DigitalPinRead, 4)
 }
 #endif

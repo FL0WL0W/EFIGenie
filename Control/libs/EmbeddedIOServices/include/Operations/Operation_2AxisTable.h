@@ -7,8 +7,6 @@
 
 /*
 To create this operator
-uint16									6001(BUILDER_OPERATION)
-uint16									xx(InstanceID of Operation)
 uint16									3(FactoryID)
 float 									MinXValue
 float 									MaxXValue
@@ -18,14 +16,6 @@ float 									MaxYValue
 uint8 									YResolution
 ScalarVariableType						TableType
 TableType[XResolution * YResolution]	Table
-
-To use this operator on a variable in the main loop
-uint16									7001(BUILDER_VARIABLE)
-uint16									3(FactoryID)
-uint16									xx(InstanceID of Variable Z/Result)
-uint16									xx(InstanceID of Operation)
-uint16									xx(InstanceID of Variable X)
-uint16									xx(InstanceID of Variable Y)
 */
 
 #ifndef OPERATION_2AXISTABLE_H

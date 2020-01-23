@@ -3,28 +3,28 @@
 #define ISERVICE_REGISTERFACTORY_H                        					    \
 static void RegisterFactory();                                     				
 
-#define ISERVICE_REGISTERFACTORY_H_TEMPLATE             					    \
+#define ISERVICE_REGISTERFACTORY_H_TEMPLATE(func)          					    \
 static void RegisterFactory(uint16_t id)                                        \
 {                                                           					\
     if(factoryLocator.Locate(id) == 0)                                       	\
-        factoryLocator.Register(id, reinterpret_cast<void *>(Create));			\
+        factoryLocator.Register(id, reinterpret_cast<void *>(func));			\
 }                                                                               
 
-#define ISERVICE_REGISTERFACTORY_CPP(cl, id)              					    \
+#define ISERVICE_REGISTERFACTORY_CPP(cl, func, id)         					    \
 void cl::RegisterFactory()                                         				\
 {                                                           					\
     if(factoryLocator.Locate(id) == 0)                                       	\
-        factoryLocator.Register(id, reinterpret_cast<void *>(Create));			\
+        factoryLocator.Register(id, reinterpret_cast<void *>(func));			\
 }                                                           					
 
 #define ISERVICE_REGISTERSERVICEFACTORY_H                        				\
 static void RegisterServiceFactory();                               			\
 
-#define ISERVICE_REGISTERSERVICEFACTORY_CPP(cl, id)              				\
+#define ISERVICE_REGISTERSERVICEFACTORY_CPP(cl, func, id)              			\
 void cl::RegisterServiceFactory()                                   			\
 {                                                           					\
     if(serviceFactoryLocator.Locate(id) == 0)                                  	\
-        serviceFactoryLocator.Register(id, reinterpret_cast<void *>(Build));	\
+        serviceFactoryLocator.Register(id, reinterpret_cast<void *>(func));		\
 }
 
 #ifndef ISERVICE_H

@@ -1,4 +1,3 @@
-#include "Variables/Variable_Operation.h"
 #include "Operations/Operation_FaultDetection.h"
 
 #ifdef OPERATION_FAULTDETECTION_H
@@ -52,6 +51,6 @@ namespace Operations
 		return new Operation_FaultDetection(faultConfig);
 	}
 	
-	IOPERATION_REGISTERFACTORY_CPP(Operation_FaultDetection, 9, ScalarVariable, ScalarVariable)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_FaultDetection, 9)
 }
 #endif

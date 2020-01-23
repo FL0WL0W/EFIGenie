@@ -1,5 +1,4 @@
 #include "Operations/Operation_EnginePosition.h"
-#include "Variables/Variable_Operation.h"
 
 #ifdef OPERATION_ENGINEPOSITION_H
 namespace Operations
@@ -75,6 +74,6 @@ namespace Operations
 		return new Operation_EnginePosition(IService::CastAndOffset<bool>(config, sizeOut));
 	}
 	
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePosition, 2001, EnginePosition, ReluctorResult, ReluctorResult)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePosition, 2001)
 }
 #endif

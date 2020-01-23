@@ -1,5 +1,5 @@
 #include "Operations/IOperation.h"
-#include "Variables/Variable_DigitalPinRecord.h"
+#include "Operations/Operation_DigitalPinRecord.h"
 #include "Service/IService.h"
 #include "Service/ServiceLocator.h"
 #include "Service/HardwareAbstractionServiceBuilder.h"
@@ -12,7 +12,7 @@
 #define OPERATION_RELUCTORUNIVERSAL2X_H
 namespace Operations
 {
-	class Operation_ReluctorUniversal2x : public Operations::IOperation<ReluctorResult, Variables::Record*, ScalarVariable>
+	class Operation_ReluctorUniversal2x : public Operations::IOperation<ReluctorResult, Record*, ScalarVariable>
 	{
 	protected:
 		HardwareAbstraction::ITimerService *_timerService;
@@ -21,7 +21,7 @@ namespace Operations
 	public:		
         Operation_ReluctorUniversal2x(HardwareAbstraction::ITimerService *, float risingPostion, float fallingPosition);
 
-		ReluctorResult Execute(Variables::Record *, ScalarVariable) override;
+		ReluctorResult Execute(Record *, ScalarVariable) override;
 
 		static Operations::IOperationBase *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
 		ISERVICE_REGISTERFACTORY_H

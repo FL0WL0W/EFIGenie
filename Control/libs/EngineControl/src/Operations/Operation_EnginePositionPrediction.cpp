@@ -1,5 +1,4 @@
 #include "Operations/Operation_EnginePositionPrediction.h"
-#include "Variables/Variable_Operation.h"
 
 #ifdef OPERATION_ENGINEPOSITIONPREDICTION_H
 namespace Operations
@@ -67,6 +66,6 @@ namespace Operations
 		return _instance;
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePositionPrediction, 2002, ScalarVariable, ScalarVariable, EnginePosition)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EnginePositionPrediction, 2002)
 }
 #endif
