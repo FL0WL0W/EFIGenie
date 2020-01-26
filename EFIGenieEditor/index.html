@@ -3,6 +3,7 @@
         <script src="jquery-3.3.1.min.js"></script>
         <script src="utils.js"></script>
         <script src="Config.js"></script>
+        <script src="Units.js"></script>
         <script src="Config-Inputs.js"></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <script type="text/javascript">
@@ -32,6 +33,7 @@
                 });
                 $("#btnSaveBin").click(function(){
                     ResetIncrements();
+                    b.SetIncrements();
                     downloadBin(b.GetArrayBuffer(), "config.bin");
                 });
             });

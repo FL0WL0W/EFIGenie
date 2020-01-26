@@ -1,10 +1,63 @@
 <div id="$id$">
     <div class="tab">
         <button id="$id$-inputstab" class="tabLink$inputstabclassses$">Inputs</button>
+        <button id="$id$-enginetab" class="tabLink$enginetabclassses$">Engine</button>
         <button id="$id$-fueltab" class="tabLink$fueltabclassses$">Fuel</button>
         <button id="$id$-ignitiontab" class="tabLink$ignitiontabclassses$">Ignition</button>
     </div>
     <div id="$id$-inputs" class="tabcontent"$inputsstyle$>$inputs$</div>
+    <div id="$id$-engine" class="tabcontent"$enginestyle$>
+        <div>
+            <div>
+                <label for="$id$-iatselection">Intake Air Temperature Sensor:</label>
+                <select id="$id$-iatselection">
+                    $iatselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-tpsselection">Throttle Position Sensor:</label>
+                <select id="$id$-tpsselection">
+                    $tpsselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-mapselection">Manifold Absolute Pressure Sensor:</label>
+                <select id="$id$-mapselection">
+                    $mapselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-mafselection">Mass AirFlow Sensor:</label>
+                <select id="$id$-mafselection">
+                    $mafselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-ethanolselection">Ethanol Content Sensor:</label>
+                <select id="$id$-ethanolselection">
+                    $ethanolselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-ectselection">Engine Coolant Temperature Sensor:</label>
+                <select id="$id$-ectselection">
+                    $ectselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-crankselection">Crankshaft Position Sensor:</label>
+                <select id="$id$-crankselection">
+                    $crankselections$
+                </select>
+            </div>
+            <div>
+                <label for="$id$-camshaftselection">Camshaft Position Sensor:</label>
+                <select id="$id$-camshaftselection">
+                    $camselections$
+                </select>
+            </div>
+        </div>
+    </div id="$id$-inputs" class="tabcontent"$inputsstyle$>
     <div id="$id$-fuel" class="tabcontent"$fuelstyle$>$fuel$</div>
     <div id="$id$-ignition" class="tabcontent"$ignitionstyle$>$ignition$</div>
-</div>
+<//div>

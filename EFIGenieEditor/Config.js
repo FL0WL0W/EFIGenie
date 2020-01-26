@@ -1,8 +1,8 @@
+var Increments = {};
+
 function ResetIncrements()
 {
-    OperationIncrement = 0;
-    InputRawIncrement = 0;
-    InputTranslationIncrement = 0;
+    Increments = {};
 }
 
 var configEngineTemplate;
@@ -15,6 +15,15 @@ class ConfigEngine {
     Fuel = new ConfigFuel();
     Ignition = new ConfigIgnition();
 
+    IATSensorName = "";
+    TPSSensorName = "";
+    MAPSensorName = "";
+    MAFSensorName = "";
+    EthanolSensorName = "";
+    ECTSensorName = "";
+    CrankSensorName = "";
+    CamSensorName = "";
+    
     GetObj() {
         return { 
             Inputs: this.Inputs.GetObj(),
@@ -38,6 +47,7 @@ class ConfigEngine {
     }
 
     Detach() {
+        ResetIncrements();//this is top level object so reset increments. this is not elegant
         this.Inputs.Detach();
         this.Fuel.Detach();
         this.Ignition.Detach();
@@ -47,36 +57,114 @@ class ConfigEngine {
 
     Attach() {
         var thisClass = this;
+        this.SetIncrements();//this is top level object so set increments. this is not elegant
         this.Inputs.Attach();
         this.Fuel.Attach();
         this.Ignition.Attach();
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab", function(){
+            thisClass.Detach();
+
             $("#" + thisClass.GUID + "-inputs").show();
             $("#" + thisClass.GUID + "-inputstab").addClass("active");
+            $("#" + thisClass.GUID + "-engine").hide();
+            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
             $("#" + thisClass.GUID + "-fuel").hide();
             $("#" + thisClass.GUID + "-fueltab").removeClass("active");
             $("#" + thisClass.GUID + "-ignition").hide();
             $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
+
+            thisClass.Attach();
+        });
+
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-enginetab", function(){
+            thisClass.Detach();
+
+            $("#" + thisClass.GUID + "-inputs").hide();
+            $("#" + thisClass.GUID + "-inputstab").removeClass("active");
+            $("#" + thisClass.GUID + "-engine").show();
+            $("#" + thisClass.GUID + "-enginetab").addClass("active");
+            $("#" + thisClass.GUID + "-fuel").hide();
+            $("#" + thisClass.GUID + "-fueltab").removeClass("active");
+            $("#" + thisClass.GUID + "-ignition").hide();
+            $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
+
+            thisClass.Attach();
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-fueltab", function(){
+            thisClass.Detach();
+            
             $("#" + thisClass.GUID + "-inputs").hide();
             $("#" + thisClass.GUID + "-inputstab").removeClass("active");
+            $("#" + thisClass.GUID + "-engine").hide();
+            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
             $("#" + thisClass.GUID + "-fuel").show();
             $("#" + thisClass.GUID + "-fueltab").addClass("active");
             $("#" + thisClass.GUID + "-ignition").hide();
             $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
+
+            thisClass.Attach();
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-ignitiontab", function(){
+            thisClass.Detach();
+            
             $("#" + thisClass.GUID + "-inputs").hide();
             $("#" + thisClass.GUID + "-inputstab").removeClass("active");
+            $("#" + thisClass.GUID + "-engine").hide();
+            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
             $("#" + thisClass.GUID + "-fuel").hide();
             $("#" + thisClass.GUID + "-fueltab").removeClass("active");
             $("#" + thisClass.GUID + "-ignition").show();
             $("#" + thisClass.GUID + "-ignitiontab").addClass("active");
+
+            thisClass.Attach();
         });
+    }
+
+    GetIATSelections() {
+        var available = false;
+        var selections = "";
+        if(this.RawConfig)
+        {
+            var output = this.RawConfig.constructor.Output;
+            var translationSelected = false;
+            if(output !== undefined)
+            {
+                for(var i = 0; i < InputTranslationConfigs.length; i++)
+                {
+                    var inputs = InputTranslationConfigs[i].Inputs;
+                    if(inputs.length !== 1 || inputs[0] !== output)
+                        continue;
+
+                    var selected = false;
+                    if(this.TranslationConfig && this.TranslationConfig instanceof InputTranslationConfigs[i]){
+                        selected = true;
+                        translationSelected = true;
+                    }
+
+                    translationSelections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + InputTranslationConfigs[i].Name + "</option>"
+                    availableTranslation = true;
+                }
+            }
+
+            if(!translationSelected) {
+                this.TranslationConfig = undefined;
+                $("#" + this.GUID + "-translation").html("");
+            }
+
+            if(availableTranslation){
+                translationSelections = "<option value=\"-1\"" + (translationSelected? "" : " selected") + ">None</option>" + translationSelections;
+            } else {
+                translationSelections = "<option value=\"-1\" disabled selected>None</option>";
+            }
+        } else {
+            this.TranslationConfig = undefined;
+            $("#" + this.GUID + "-translation").html("");
+            translationSelections = "<option value=\"-1\">Select Raw First</option>"
+        }
+        return { Html : translationSelections, Available: availableTranslation };
     }
 
     GetHtml() {
@@ -94,11 +182,20 @@ class ConfigEngine {
         template = template.replace(/[$]fuelstyle[$]/g, " style=\"display: none;\"");
         template = template.replace(/[$]fueltabclassses[$]/g, "");
         
+        template = template.replace(/[$]enginestyle[$]/g, " style=\"display: none;\"");
+        template = template.replace(/[$]enginetabclassses[$]/g, "");
+        
         template = template.replace(/[$]ignition[$]/g, this.Ignition.GetHtml());
         template = template.replace(/[$]ignitionstyle[$]/g, " style=\"display: none;\"");
         template = template.replace(/[$]ignitiontabclassses[$]/g, "");
 
         return template;
+    }
+
+    SetIncrements() {
+        this.Inputs.SetIncrements();
+        //this.Fuel.SetIncrements();
+        //this.Ignition.SetIncrements();
     }
 
     GetArrayBuffer() {
@@ -129,7 +226,6 @@ class ConfigFuel {
     }
 
     Detach() {
-        this.Inputs.Detach();
     }
 
     Attach() {
@@ -172,7 +268,6 @@ class ConfigIgnition {
     }
 
     Detach() {
-        this.Inputs.Detach();
     }
 
     Attach() {
