@@ -16,11 +16,11 @@ namespace Operations
         _ret.Initialize(_length);
 	}
 
-	EngineScheduleInjectionArray Operation_EngineScheduleInjectionArray::Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionAdvance)
+	EngineScheduleInjectionArray Operation_EngineScheduleInjectionArray::Execute(EnginePosition enginePosition, ScalarVariable injectionPulseWidth, ScalarVariable injectionEndPosition)
 	{
         for(uint8_t i = 0; i < _length; i++)
         {
-            std::tuple<ScalarVariable, ScalarVariable> ex = _array[i]->Execute(enginePosition, ignitionDwell, ignitionAdvance);
+            std::tuple<ScalarVariable, ScalarVariable> ex = _array[i]->Execute(enginePosition, injectionPulseWidth, injectionEndPosition);
             //_ret.OpenTick[i] = std::get<0>(ex);
             //_ret.CloseTick[i] = std::get<1>(ex);
         }

@@ -10,8 +10,8 @@ var AngularSpeedUnits = [ { Name: "RPM", DisplayMultiplier: 1, DisplayOffset: 0 
 var SpeedUnits = [ { Name: "KPH", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "MPH", DisplayMultiplier: 1.61, DisplayOffset: 0 } ];
 var TemperatureUnits = [ { Name: "C", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "F", DisplayMultiplier: 1.8, DisplayOffset: 32 } ];
 var GasConstantUnits = [ { Name: "J/kg K", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "kJ/kg K", DisplayMultiplier: 0.1, DisplayOffset: 0 } ];
-var AirmassUnits = [ { Name: "forgot", DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var AfrUnits = [ { Name: ":1", DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var MassUnits = [ { Name: "g", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "kg", DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
+var Ratio = [ { Name: ":1", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var CycleUnits = [ { Name: "Cycles", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var LambdaUnits = [ { Name: "λ", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var VolumeUnits = [ { Name: "L", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mL", DisplayMultiplier: 1000, DisplayOffset: 0 } ];
@@ -29,9 +29,54 @@ var Measurements = {
     AngularSpeed: AngularSpeedUnits,
     Speed: SpeedUnits,
     Temperature: TemperatureUnits,
+    Mass: MassUnits,
     Volume: VolumeUnits,
     Lambda: LambdaUnits,
-    Flow: FlowUnits
+    Flow: FlowUnits,
+    Ratio: Ratio,
+}
+
+function GetMeasurementDisplay(measurement, index) {
+    var measurementString;
+    if(typeof measurement === "string") {
+        measurementString = measurement;
+        measurement = Measurements[measurement];
+    }
+
+    if(!measurement)
+        return "";
+    
+    if(!index)
+        index = 0;
+
+    if(index >= measurement.length)
+        return "";
+
+    if(measurementString){
+        if(measurement[index].Name !== "")
+            return measurementString + " [" + measurement[index].Name + "]";
+        else
+            return measurementString;
+    }
+
+    return measurement[index].Name;
+}
+
+function GetUnitDisplay(measurement, index) {
+    if(typeof measurement === "string") {
+        measurement = Measurements[measurement];
+    }
+
+    if(!measurement)
+        return "";
+    
+    if(!index)
+        index = 0;
+
+    if(index >= measurement.length)
+        return "";
+        
+    return measurement[index].Name;
 }
 
 function PerSecond(units)

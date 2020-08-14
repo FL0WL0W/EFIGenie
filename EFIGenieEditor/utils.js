@@ -153,3 +153,12 @@ function GetJSONSafeOBJ(obj) {
         return value;
     }));
 }
+
+function GetClassProperty(cl, prop) {
+    if(cl === undefined)
+        return undefined;
+    if(cl[prop] !== undefined)
+        return cl[prop];
+    else
+        return cl.constructor[prop];
+}

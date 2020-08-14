@@ -283,7 +283,7 @@ class ConfigInput {
             
             if(thisClass.RawConfig) {
                 $("#" + thisClass.GUID + "-raw").html(thisClass.RawConfig.GetHtml());
-                $("#" + thisClass.GUID + "-rawmeasurement").html(thisClass.RawConfig.constructor.Measurement);
+                $("#" + thisClass.GUID + "-rawmeasurement").html(GetMeasurementDisplay(GetClassProperty(thisClass.RawConfig, "Measurement")));
             } else {
                 $("#" + thisClass.GUID + "-raw").html("");
                 $("#" + thisClass.GUID + "-rawmeasurement").html("");
@@ -344,7 +344,7 @@ class ConfigInput {
             var measurements = Object.keys(Measurements);
             for(var i = 0; i < measurements.length; i++)
             {
-                selections += "<option value=\"" + measurements[i] + "\"" + (this.TranslationMeasurement === measurements[i]? " selected" : "") + ">" + measurements[i] + "</option>"
+                selections += "<option value=\"" + measurements[i] + "\"" + (this.TranslationMeasurement === measurements[i]? " selected" : "") + ">" + GetMeasurementDisplay(measurements[i]) + "</option>"
             }
 
             selections = selections + "</select>";
@@ -357,14 +357,22 @@ class ConfigInput {
         var translationSelections;
         if(this.RawConfig)
         {
-            var output = this.RawConfig.constructor.Output;
+            var output = GetClassProperty(this.RawConfig, "Output");
             var translationSelected = false;
             if(output !== undefined)
             {
                 for(var i = 0; i < InputTranslationConfigs.length; i++)
                 {
                     var inputs = InputTranslationConfigs[i].Inputs;
-                    if(inputs.length !== 1 || inputs[0] !== output)
+                    var validInputCnt = 0;
+                    for(var inp = 0; inp < inputs.length; inp++){
+                        if(inputs[inp] !== output && !(inputs[inp] === "CurrentTick")) { //setup like this for operations that require current tick as input
+                            validInputCnt = 0;
+                            break;
+                        }
+                        validInputCnt++;
+                    }
+                    if(validInputCnt !== 1)
                         continue;
 
                     var selected = false;
@@ -427,7 +435,7 @@ class ConfigInput {
         if(this.RawConfig) {
             template = template.replace(/[$]raw[$]/g, this.RawConfig.GetHtml());
             template = template.replace(/[$]rawvalue[$]/g, "");//this is for interactivity later
-            template = template.replace(/[$]rawmeasurement[$]/g, this.RawConfig.constructor.Measurement);
+            template = template.replace(/[$]rawmeasurement[$]/g, GetMeasurementDisplay(GetClassProperty(this.RawConfig, "Measurement")));
         } else {
             template = template.replace(/[$]raw[$]/g, "");
             template = template.replace(/[$]rawvalue[$]/g, "");
@@ -459,20 +467,24 @@ class ConfigInput {
             return;
 
         if(this.TranslationConfig) {
+            this.Channel = InputTranslationChannel;
             this.InputTranslationId = 0;
             if(Increments.InputTranslationIncrement === undefined)
                 Increments.InputTranslationIncrement = 0;
             else
                 this.InputTranslationId = ++Increments.InputTranslationIncrement;
                 
-            if(Increments.InputTranslations === undefined)
-                Increments.InputTranslations = [];
-            Increments.InputTranslations.push( { 
+            if(Increments.Inputs === undefined)
+                Increments.Inputs = [];
+            Increments.Inputs.push( { 
                 Name: this.Name, 
-                ID: this.InputTranslationId, 
-                Type: this.TranslationConfig.constructor.Output,
+                Channel: InputTranslationChannel,
+                Id: this.InputTranslationId, 
+                Type: GetClassProperty(this.TranslationConfig, "Output"),
                 Measurement: this.TranslationConfig.constructor.Measurement === "Selectable"? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement
             });
+        } else {
+            this.Channel = InputRawChannel;
         }
         
         this.InputRawId = 0;
@@ -481,23 +493,32 @@ class ConfigInput {
         else
             this.InputRawId = ++Increments.InputRawIncrement;
             
-        if(Increments.InputRaws === undefined)
-            Increments.InputRaws = [];
-        Increments.InputRaws.push( { 
+        if(Increments.Inputs === undefined)
+            Increments.Inputs = [];
+        Increments.Inputs.push( { 
             Name: this.Name, 
-            ID: this.InputRawId,
-            Type: this.RawConfig.constructor.Output,
-            Measurement: this.RawConfig.constructor.Measurement
+            Channel: InputRawChannel,
+            Id: this.InputRawId,
+            Type: GetClassProperty(this.RawConfig, "Output"),
+            Measurement: GetClassProperty(this.RawConfig, "Measurement")
         });
+
+        if(this.RawConfig && this.RawConfig.SetIncrements)
+            this.RawConfig.SetIncrements();
+        if(this.TranslationConfig && this.TranslationConfig.SetIncrements)
+            this.TranslationConfig.SetIncrements();
     }
 
     GetArrayBuffer() {
-        if(Increments.InputRawIncrement === undefined)
-            throw "Set Increments First";
-
+        var rawOutput = GetClassProperty(this.RawConfig, "Output");
+        var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
+        var translationInputIndex = 0;
         var arrayBuffer = new ArrayBuffer();
         if(!this.RawConfig) 
             return arrayBuffer;
+
+        if(Increments.InputRawIncrement === undefined)
+            throw "Set Increments First";
 
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
 
@@ -507,6 +528,13 @@ class ConfigInput {
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ InputTranslationChannel << 1 | 1 ]).buffer); //variable channel | immediate
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
             arrayBuffer = arrayBuffer.concatArray(this.TranslationConfig.GetArrayBuffer());
+            while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
+                //add universal inputs for translation
+                if(translationInputs[translationInputIndex] === "CurrentTick"){
+                    //TODO
+                }
+                translationInputIndex++;
+            }
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use operation for input parameter
         }
             
@@ -517,6 +545,14 @@ class ConfigInput {
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InputRawId ]).buffer); //sensorID
         arrayBuffer = arrayBuffer.concatArray(this.RawConfig.GetArrayBuffer());
         
+        while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
+            //add universal inputs for translation
+            if(translationInputs[translationInputIndex] === "CurrentTick"){
+                //TODO
+            }
+            translationInputIndex++;
+        }
+
         return arrayBuffer;
     }
 }
@@ -536,7 +572,7 @@ class ConfigOperation_AnalogPinRead {
 
     GetObj() {
         return {
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin
         };
     }
@@ -600,7 +636,7 @@ class ConfigOperation_DigitalPinRead {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
             Inverted: this.Inverted
         };
@@ -677,7 +713,7 @@ class ConfigOperation_DigitalPinRecord {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
             Inverted: this.Inverted,
             Length: this.Length
@@ -765,7 +801,7 @@ class ConfigOperation_DutyCyclePinRead {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
             MinFrequency: this.MinFrequency
         };
@@ -841,7 +877,7 @@ class ConfigOperation_FrequencyPinRead {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
             MinFrequency: this.MinFrequency
         };
@@ -919,7 +955,7 @@ class ConfigOperation_Polynomial {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             MinValue: this.MinValue,
             MaxValue: this.MaxValue,
             Degree: this.Degree,
@@ -1049,7 +1085,7 @@ class ConfigOperation_PulseWidthPinRead {
 
     GetObj() {
         return { 
-            Name: this.constructor.Name,
+            Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
             MinFrequency: this.MinFrequency
         };
