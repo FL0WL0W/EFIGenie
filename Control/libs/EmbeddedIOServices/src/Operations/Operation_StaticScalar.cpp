@@ -29,7 +29,9 @@ namespace Operations
 				staticValue = new ScalarVariable(IService::CastAndOffset<uint32_t>(config, sizeOut));
 				break;
 			case ScalarVariableType::TICK:
-				//staticValue = &ScalarVariable::FromTick(IService::CastAndOffset<uint32_t>(config, sizeOut));
+				staticValue = new ScalarVariable(IService::CastAndOffset<uint32_t>(config, sizeOut));
+				staticValue->Type = ScalarVariableType::TICK;
+				//this would be useless to create
 				break;
 			case ScalarVariableType::UINT64:
 				staticValue = new ScalarVariable(IService::CastAndOffset<uint64_t>(config, sizeOut));
@@ -54,6 +56,10 @@ namespace Operations
 				break;
 			case ScalarVariableType::BOOLEAN:
 				staticValue = new ScalarVariable(IService::CastAndOffset<bool>(config, sizeOut));
+				break;
+			case ScalarVariableType::VOID: 
+				staticValue = 0;
+				//this would be useless to create
 				break;
 		}
 		

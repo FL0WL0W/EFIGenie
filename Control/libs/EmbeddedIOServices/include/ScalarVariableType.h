@@ -34,6 +34,9 @@ constexpr uint8_t ScalarVariableTypeSizeOf(ScalarVariableType type)
         case ScalarVariableType::FLOAT: return sizeof(float);
         case ScalarVariableType::DOUBLE: return sizeof(double);
         case ScalarVariableType::BOOLEAN: return sizeof(bool);
+        case ScalarVariableType::VOID: 
+            break;
+            //this is bad 
     }
     return 0;
 }

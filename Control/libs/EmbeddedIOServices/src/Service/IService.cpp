@@ -24,5 +24,11 @@ namespace Service
 		factory(serviceLocator, config, size);
 		OffsetConfig(config, totalSize, size);
 	}
+	
+	void IService::OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset) 
+	{
+		config = reinterpret_cast<const void *>(reinterpret_cast<const uint8_t *>(config) + offset);
+		totalSize += offset;
+	}
 }
 #endif

@@ -30,7 +30,7 @@ rule CUSTOM_COMMAND
 
 rule CXX_COMPILER__EmbeddedIOServices
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -48,7 +48,7 @@ rule CXX_STATIC_LIBRARY_LINKER__EmbeddedIOServices
 
 rule CXX_COMPILER__Reluctor
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -66,7 +66,7 @@ rule CXX_STATIC_LIBRARY_LINKER__Reluctor
 
 rule CXX_COMPILER__EngineControl
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -84,7 +84,7 @@ rule CXX_STATIC_LIBRARY_LINKER__EngineControl
 
 rule CXX_COMPILER__TransmissionControl
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -102,7 +102,7 @@ rule CXX_STATIC_LIBRARY_LINKER__TransmissionControl
 
 rule CXX_COMPILER__gmock_main
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -120,7 +120,7 @@ rule CXX_STATIC_LIBRARY_LINKER__gmock_main
 
 rule CXX_COMPILER__gmock
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -138,7 +138,7 @@ rule CXX_STATIC_LIBRARY_LINKER__gmock
 
 rule CXX_COMPILER__gtest
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -156,7 +156,7 @@ rule CXX_STATIC_LIBRARY_LINKER__gtest
 
 rule CXX_COMPILER__gtest_main
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 
@@ -174,7 +174,7 @@ rule CXX_STATIC_LIBRARY_LINKER__gtest_main
 
 rule CXX_COMPILER__EngineControlUnitTests
   deps = msvc
-  command = C:\PROGRA~2\MICROS~1\2017\COMMUN~1\VC\Tools\MSVC\1416~1.270\bin\Hostx64\x64\cl.exe  /nologo /TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB /FS -c $in
+  command = C:\PROGRA~1\LLVM\bin\clang-cl.exe  /nologo -TP $DEFINES $INCLUDES $FLAGS /showIncludes /Fo$out /Fd$TARGET_COMPILE_PDB -c $in
   description = Building CXX object $out
 
 

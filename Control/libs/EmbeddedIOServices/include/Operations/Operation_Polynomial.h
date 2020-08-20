@@ -42,7 +42,7 @@ namespace Operations
 			return sizeof(Operation_PolynomialConfig) + sizeof(float) * (Degree + 1);
 		}
 
-		constexpr const float *A() const { return reinterpret_cast<const float *>(this + 1); }
+		const float *A() const { return reinterpret_cast<const float *>(this + 1); }
 
 		float MinValue;
 		float MaxValue;

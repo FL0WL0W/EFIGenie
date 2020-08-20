@@ -22,7 +22,10 @@ K ScalarVariableTo(ScalarVariable *scalarVariable)
         case ScalarVariableType::FLOAT: if(static_cast<K>(-1) > 0 && *reinterpret_cast<float *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<float *>(&scalarVariable->Value));
         case ScalarVariableType::DOUBLE: if(static_cast<K>(-1) > 0 && *reinterpret_cast<double *>(&scalarVariable->Value) < 0) return 0; return static_cast<K>(*reinterpret_cast<double *>(&scalarVariable->Value));
         case ScalarVariableType::BOOLEAN: return static_cast<K>(*reinterpret_cast<bool *>(&scalarVariable->Value));
-    }
+        case ScalarVariableType::VOID: 
+            break;
+            //this is bad 
+        }
     return 0;
 }
 template<>
@@ -168,8 +171,15 @@ struct ScalarVariable
                 if(result < 0)
                     return ScalarVariable(static_cast<int64_t>(result));
                 return ScalarVariable(static_cast<uint64_t>(result));
+            case INT64:
+                return ScalarVariable(result);
+            case VOID:
+            case FLOAT:
+            case DOUBLE:
+            case BOOLEAN:
+            case TICK:
+                return 0;//its bad if this happens
         }
-        return ScalarVariable(result);
     }
 
     ScalarVariable operator+(ScalarVariable a)
@@ -196,6 +206,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() + a.To<int64_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() + a.To<float>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() + a.To<double>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(a.Type == TICK)
@@ -213,6 +227,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<int64_t>() + a.To<uint32_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<float>() + a.To<uint32_t>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<double>() + a.To<uint32_t>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(Type == DOUBLE || a.Type == DOUBLE)
@@ -253,6 +271,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() - a.To<int64_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() - a.To<float>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() - a.To<double>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(a.Type == TICK)
@@ -270,6 +292,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<int64_t>() - a.To<uint32_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<float>() - a.To<uint32_t>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<double>() - a.To<uint32_t>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(Type == DOUBLE || a.Type == DOUBLE)
@@ -313,6 +339,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() * a.To<int64_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() * a.To<float>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() * a.To<double>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(a.Type == TICK)
@@ -330,6 +360,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<int64_t>() * a.To<uint32_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<float>() * a.To<uint32_t>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<double>() * a.To<uint32_t>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(Type == DOUBLE || a.Type == DOUBLE)
@@ -370,6 +404,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() / a.To<int64_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() / a.To<float>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<uint32_t>() / a.To<double>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(a.Type == TICK)
@@ -387,6 +425,10 @@ struct ScalarVariable
                 case ScalarVariableType::INT64: return ScalarVariable::FromTick(static_cast<uint32_t>(To<int64_t>() / a.To<uint32_t>()));
                 case ScalarVariableType::FLOAT: return ScalarVariable::FromTick(static_cast<uint32_t>(To<float>() / a.To<uint32_t>()));
                 case ScalarVariableType::DOUBLE: return ScalarVariable::FromTick(static_cast<uint32_t>(To<double>() / a.To<uint32_t>()));
+                case ScalarVariableType::VOID: 
+                case ScalarVariableType::BOOLEAN:
+                    break;
+                    //this is bad 
             }
         }
         if(Type == DOUBLE || a.Type == DOUBLE)

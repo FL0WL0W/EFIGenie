@@ -21,8 +21,8 @@ namespace Operations
         for(uint8_t i = 0; i < _length; i++)
         {
             std::tuple<ScalarVariable, ScalarVariable> ex = _array[i]->Execute(enginePosition, ignitionDwell, ignitionAdvance);
-            //_ret.DwellTick[i] = std::get<0>(ex);
-            //_ret.IgnitionTick[i] = std::get<1>(ex);
+            _ret.DwellTick[i] = std::get<0>(ex);
+            _ret.IgnitionTick[i] = std::get<1>(ex);
         }
 
         return _ret;
@@ -38,7 +38,7 @@ namespace Operations
         for(uint8_t i = 0; i < length; i++)
         {
 		    unsigned int size = 0;
-            ignitionOutputOperation[i] = reinterpret_cast<Operations::IOperation<void, ScalarVariable> *>(IOperationBase::Create(serviceLocator, config, size));
+            ignitionOutputOperation[i] = static_cast<Operations::IOperation<void, ScalarVariable> *>(IOperationBase::Create(serviceLocator, config, size));
 		    OffsetConfig(config, sizeOut, size);
         }
 

@@ -53,7 +53,6 @@ namespace Operations
 
 	IOperationBase *Operation_DigitalPinRecord::Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
 	{
-		uint32_t variableId = Service::IService::CastAndOffset<uint16_t>(config, sizeOut);
 		const uint16_t pin = IService::CastAndOffset<uint16_t>(config, sizeOut);
 		const bool inverted = IService::CastAndOffset<bool>(config, sizeOut);
 		uint32_t length = Service::IService::CastAndOffset<uint8_t>(config, sizeOut);

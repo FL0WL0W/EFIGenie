@@ -224,9 +224,9 @@ namespace Operations
         }
 
         IOperation<RET, PARAMS...> *operation;
-    	if((variableChannel & 0x00) == 0)
+    	if((variableChannel & 0x01) == 1)
     	{
-            operation = reinterpret_cast<IOperation<RET, PARAMS...> *>(Create(serviceLocator, config, sizeOut));
+            operation = static_cast<IOperation<RET, PARAMS...> *>(IOperationBase::Create(serviceLocator, config, sizeOut));
         }
         else
         {
@@ -235,15 +235,15 @@ namespace Operations
         Operation_Package<RET, PARAMS...> * const package = new Operation_Package<RET, PARAMS...>(operation, OperationOrVariable<PARAMS>::Create(serviceLocator, config, sizeOut)...);
 
         if(variable != 0)
-            return reinterpret_cast<IOperationBase *>(new Operation_StoreVariable<RET>(variable, package));
+            return static_cast<IOperationBase *>(new Operation_StoreVariable<RET>(variable, package));
 
-        return reinterpret_cast<IOperationBase *>(package);
+        return static_cast<IOperationBase *>(package);
     }
     
     template<typename RET, typename... PARAMS>
     IOperationBase * IOperation<RET, PARAMS...>::CreateExecute(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut)
     {
-        return reinterpret_cast<IOperationBase *>(new Operation_Execute<RET>(reinterpret_cast<Operation_Package<RET, PARAMS...> *>(CreatePackage(serviceLocator, config, sizeOut))));
+        return static_cast<IOperationBase *>(new Operation_Execute<RET>(static_cast<Operation_Package<RET, PARAMS...> *>(CreatePackage(serviceLocator, config, sizeOut))));
     }
     
     
@@ -252,16 +252,16 @@ namespace Operations
     {
         const uint8_t variableChannel = Service::IService::CastAndOffset<uint8_t>(config, sizeOut);
         IOperation<void, PARAMS...> *operation;
-        if((variableChannel & 0x00) == 0)
+        if((variableChannel & 0x01) == 1)
         {
-            operation = reinterpret_cast<IOperation<void, PARAMS...> *>(Create(serviceLocator, config, sizeOut));
+            operation = static_cast<IOperation<void, PARAMS...> *>(IOperationBase::Create(serviceLocator, config, sizeOut));
         }
         else
         {
             operation = serviceLocator->LocateAndCast<IOperation<void, PARAMS...>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
         }
 
-        return reinterpret_cast<IOperationBase *>(new Operation_Package<void, PARAMS...>(operation, OperationOrVariable<PARAMS>::Create(serviceLocator, config, sizeOut)...));
+        return static_cast<IOperationBase *>(new Operation_Package<void, PARAMS...>(operation, OperationOrVariable<PARAMS>::Create(serviceLocator, config, sizeOut)...));
     }
 
     template<typename... PARAMS>

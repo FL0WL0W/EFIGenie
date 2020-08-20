@@ -18,8 +18,9 @@ namespace Operations
 				return ScalarVariable(Interpolation::InterpolateTable1<uint16_t>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const uint16_t*>(_config->Table())));
 			case ScalarVariableType::UINT32:
 				return ScalarVariable(Interpolation::InterpolateTable1<uint16_t>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const uint16_t*>(_config->Table())));
-			// case ScalarVariableType::TICK:
-			// 	return ScalarVariable.FromTick(Interpolation::InterpolateTable1<uint16_t>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const uint16_t*>(_config->Table())));
+			case ScalarVariableType::TICK:
+			 	return ScalarVariable::FromTick(Interpolation::InterpolateTable1<uint16_t>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const uint16_t*>(_config->Table())));
+				//this would be useless to use
 			case ScalarVariableType::UINT64:
 				return ScalarVariable(Interpolation::InterpolateTable1<uint64_t>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const uint64_t*>(_config->Table())));
 			case ScalarVariableType::INT8:
@@ -36,6 +37,9 @@ namespace Operations
 				return ScalarVariable(Interpolation::InterpolateTable1<double>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const double*>(_config->Table())));
 			case ScalarVariableType::BOOLEAN:
 				return ScalarVariable(Interpolation::InterpolateTable1<bool>(x.To<float>(), _config->MaxXValue, _config->MinXValue, _config->XResolution, reinterpret_cast<const bool*>(_config->Table())));
+			case ScalarVariableType::VOID: 
+				return 0;
+				//this would be useless to use
 		}
 		return ScalarVariable(static_cast<uint8_t>(0));
 	}

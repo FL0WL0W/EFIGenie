@@ -21,8 +21,9 @@ namespace Operations
 					return ScalarVariable(static_cast<uint16_t>(_config->DefaultValue));
 				case UINT32:
 					return ScalarVariable(static_cast<uint32_t>(_config->DefaultValue));
-				// case TICK:
-				// 	return ScalarVariable.FromTick(static_cast<uint32_t>(_config->DefaultValue));
+				 case TICK:
+				 	return ScalarVariable::FromTick(static_cast<uint32_t>(_config->DefaultValue));
+					//this would be useless to use
 				case UINT64:
 					return ScalarVariable(static_cast<uint64_t>(_config->DefaultValue));
 				case INT8:
@@ -39,6 +40,9 @@ namespace Operations
 					return ScalarVariable(static_cast<double>(_config->DefaultValue));
 				case BOOLEAN:
 					return ScalarVariable(static_cast<bool>(_config->DefaultValue));
+				case ScalarVariableType::VOID: 
+					return 0;
+					//this would be useless to use
 			}
 		}
 		return x;

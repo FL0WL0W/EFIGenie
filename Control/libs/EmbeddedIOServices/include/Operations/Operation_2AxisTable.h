@@ -38,7 +38,7 @@ namespace Operations
 				(ScalarVariableTypeSizeOf(TableType) * XResolution * YResolution);
 		}
 
-		constexpr const void *Table() const { return this + 1; }
+		const void *Table() const { return this + 1; }
 		
 		float MinXValue;
 		float MaxXValue;

@@ -38,15 +38,10 @@ namespace Service
         static Service::ServiceLocator serviceFactoryLocator;
         public:
 		static void Build(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
-
-		static constexpr void OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset) 
-		{
-			config = reinterpret_cast<const void *>(reinterpret_cast<const uint8_t *>(config) + offset);
-			totalSize += offset;
-		}
+		static void OffsetConfig(const void *&config, unsigned int &totalSize, unsigned int offset);
 		
 		template<typename T>
-		static constexpr const T* CastConfigAndOffset(const void *&config, unsigned int &size)
+		static const T* CastConfigAndOffset(const void *&config, unsigned int &size)
 		{
 			const T *castedConfig = reinterpret_cast<const T *>(config);
 			OffsetConfig(config, size, castedConfig->Size());
@@ -55,7 +50,7 @@ namespace Service
 		}
 		
 		template<typename T>
-		static constexpr const T CastAndOffset(const void *&config, unsigned int &size)
+		static const T CastAndOffset(const void *&config, unsigned int &size)
 		{
 			const T casted = *reinterpret_cast<const T *>(config);
 			OffsetConfig(config, size, sizeof(T));
