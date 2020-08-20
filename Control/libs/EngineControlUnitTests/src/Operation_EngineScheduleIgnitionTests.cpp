@@ -30,8 +30,8 @@ namespace UnitTests
 	TEST_F(Operation_EngineScheduleIgnitionTests, WhenSchedulingIgnition_ThenIgnitionScheduledCorrectly)
 	{
         _enginePosition.CalculatedTick = 1000;
-        _enginePosition.Position = 100;
-        _enginePosition.PositionDot = 0;
+        _enginePosition.Position = 101;
+        _enginePosition.PositionDot = 1;
         _enginePosition.Sequential = true;
         _enginePosition.Synced = true;
         _operation->Execute(_enginePosition, 0.003, 10);

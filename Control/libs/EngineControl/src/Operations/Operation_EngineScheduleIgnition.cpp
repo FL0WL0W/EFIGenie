@@ -23,8 +23,9 @@ namespace Operations
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
 		//we want to set the next dwell tick
+		uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell.To<float>() * ticksPerSecond);
 		uint32_t dwellTick = _predictor->Execute(ignitionAdvance, enginePosition).To<uint32_t>();
-		dwellTick = dwellTick - static_cast<uint32_t>(ignitionDwell.To<float>() * ticksPerSecond);
+		dwellTick = dwellTick - dwellTicks;
 		while(HardwareAbstraction::ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
 			dwellTick = dwellTick + ticksPerCycle;
 

@@ -22,9 +22,10 @@ namespace Operations
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
+		uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth.To<float>() * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);
 		uint32_t injectEndAt = _predictor->Execute(ScalarVariable(_tdc) + injectionEndPosition, enginePosition).To<uint32_t>();;
 		//we always want to schedule the opening time.
-		uint32_t injectAt = injectEndAt - static_cast<uint32_t>((injectionPulseWidth.To<float>() * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);
+		uint32_t injectAt = injectEndAt - pulseTicks;
 		while(HardwareAbstraction::ITimerService::TickLessThanTick(injectAt, enginePosition.CalculatedTick))
 			injectAt = injectAt + ticksPerCycle;
 
@@ -33,9 +34,17 @@ namespace Operations
 		while(HardwareAbstraction::ITimerService::TickLessThanTick(injectEndAt, enginePosition.CalculatedTick))
 			injectEndAt = injectEndAt + ticksPerCycle;
 
+		//if we haven't opened since last revolution and the new schedule is next revolution. we need to open now
+		if(_lastOpenedAtTick != 0 && injectAt - _lastOpenedAtTick > (ticksPerCycle / 2) * 3 && !_open)
+		{
+			Open();
+			_timerService->ScheduleTask(_closeTask, _lastOpenedAtTick + pulseTicks);
+		}
 		//if we are not already open we want to reschedule the closing time
-		if(!_open)
+		else if(!_open)
+		{
 			_timerService->ScheduleTask(_closeTask, injectEndAt);
+		}
 
 		//return the ticks of the open and close. for debugging purposes
 		return std::tuple<ScalarVariable, ScalarVariable>(ScalarVariable::FromTick(injectAt), ScalarVariable::FromTick(injectEndAt));
@@ -44,6 +53,9 @@ namespace Operations
 	void Operation_EngineScheduleInjection::Open()
 	{
 		_injectionOutputOperation->Execute(true);
+		_lastOpenedAtTick = _timerService->GetTick();
+		if(_lastOpenedAtTick == 0)
+			_lastOpenedAtTick = 1;
 		_open = true;
 	}
 

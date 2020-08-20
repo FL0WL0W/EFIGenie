@@ -22,6 +22,7 @@ namespace Operations
 		IOperation<void, ScalarVariable> *_injectionOutputOperation;
 		HardwareAbstraction::Task *_openTask;
 		HardwareAbstraction::Task *_closeTask;
+		uint32_t _lastOpenedAtTick = 0;
 		bool _open = false;
 	public:		
         Operation_EngineScheduleInjection(HardwareAbstraction::ITimerService *timerService, float tdc, IOperation<void, ScalarVariable> *injectionOutputOperation);
