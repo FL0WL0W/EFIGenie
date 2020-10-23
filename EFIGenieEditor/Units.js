@@ -15,7 +15,7 @@ var Ratio = [ { Name: ":1", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var CycleUnits = [ { Name: "Cycles", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var LambdaUnits = [ { Name: "λ", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var VolumeUnits = [ { Name: "L", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mL", DisplayMultiplier: 1000, DisplayOffset: 0 } ];
-var FlowUnits = [ { Name: "g/min", DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var MassFlowUnits = [ { Name: "g/s", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "g/min", DisplayMultiplier: 60, DisplayOffset: 0 } ];
 
 var Measurements = {
     None: BlankUnits,
@@ -23,7 +23,7 @@ var Measurements = {
     PercentageAcceleration: PercentageAccelerationUnits,
     Time: TimeUnits,
     Frequency: FrequencyUnits,
-    Angle: AngularSpeedUnits,
+    Angle: AngleUnits,
     Voltage: VoltageUnits,
     Pressure: PressureUnits,
     AngularSpeed: AngularSpeedUnits,
@@ -32,7 +32,7 @@ var Measurements = {
     Mass: MassUnits,
     Volume: VolumeUnits,
     Lambda: LambdaUnits,
-    Flow: FlowUnits,
+    MassFlow: MassFlowUnits,
     Ratio: Ratio,
 }
 

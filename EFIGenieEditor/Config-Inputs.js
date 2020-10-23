@@ -4,6 +4,7 @@ var InputRawChannel = 2;
 var InputRawConfigs = [];
 var InputTranslationChannel = 3;
 var InputTranslationConfigs = [];
+InputTranslationConfigs.push(ConfigOperation_LookupTable);
 
 var configInputsTemplate;
 class ConfigInputs {
@@ -250,7 +251,7 @@ class ConfigInput {
             for(var i = 0; i < InputTranslationConfigs.length; i++)
             {
                 if(InputTranslationConfigs[i].Name === obj.TranslationConfig.Name) {
-                    this.TranslationConfig = new InputTranslationConfigs[i]();
+                    this.TranslationConfig = new InputTranslationConfigs[i](true);
                     this.TranslationConfig.SetObj(obj.TranslationConfig);
                     break;
                 }
@@ -308,7 +309,7 @@ class ConfigInput {
             if(val === "-1")
                 thisClass.TranslationConfig = undefined;
             else
-                thisClass.TranslationConfig = new InputTranslationConfigs[val]();
+                thisClass.TranslationConfig = new InputTranslationConfigs[val](true);
             
             if(thisClass.TranslationConfig)
                 $("#" + thisClass.GUID + "-translation").html(thisClass.TranslationConfig.GetHtml());
@@ -366,7 +367,9 @@ class ConfigInput {
                     var inputs = InputTranslationConfigs[i].Inputs;
                     var validInputCnt = 0;
                     for(var inp = 0; inp < inputs.length; inp++){
-                        if(inputs[inp] !== output && !(inputs[inp] === "CurrentTick")) { //setup like this for operations that require current tick as input
+                        if(inputs[inp] === "CurrentTick") //setup like this for operations that require current tick as input
+                            continue;
+                        if(inputs[inp] !== output) {
                             validInputCnt = 0;
                             break;
                         }
@@ -519,6 +522,8 @@ class ConfigInput {
 
         if(Increments.InputRawIncrement === undefined)
             throw "Set Increments First";
+
+        var output = GetClassProperty(this.RawConfig, "Output");
 
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
 
@@ -937,6 +942,82 @@ class ConfigOperation_FrequencyPinRead {
 }
 InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
 
+var configOperation_PulseWidthPinReadTemplate;
+class ConfigOperation_PulseWidthPinRead {
+    static Name = "Pulse Width Pin";
+    static Output = "float";
+    static Inputs = [];
+    static Measurement = "Time";
+
+    constructor(){
+        this.GUID = getGUID();
+    }
+    
+    Pin = 0;
+    MinFrequency = 1000;
+
+    GetObj() {
+        return { 
+            Name: GetClassProperty(this, "Name"),
+            Pin: this.Pin,
+            MinFrequency: this.MinFrequency
+        };
+    }
+
+    SetObj(obj) {
+        this.Pin = obj.Pin;
+        this.MinFrequency = obj.MinFrequency;
+        $("#" + this.GUID).replaceWith(this.GetHtml());
+    }
+
+    Detach() {
+        $(document).off("change."+this.GUID);
+    }
+
+    Attach() {
+        var thisClass = this;
+
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
+            thisClass.Detach();
+
+            thisClass.Pin = parseInt($(this).val());
+
+            thisClass.Attach();
+        });
+
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
+            thisClass.Detach();
+
+            thisClass.MinFrequency = parseInt($(this).val());
+
+            thisClass.Attach();
+        });
+    }
+
+    GetHtml() {
+        if(!configOperation_PulseWidthPinReadTemplate)
+            configOperation_PulseWidthPinReadTemplate = getFileContents("ConfigGui/Operation_PulseWidthPinRead.html");
+        var template = configOperation_PulseWidthPinReadTemplate;
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+        template = template.replace(/[$]pin[$]/g, this.Pin);
+        template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
+
+        return template;
+    }
+
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([7]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
+        
+        return arrayBuffer;
+    }
+}
+InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
+
 var configOperation_PolynomialTemplate;
 class ConfigOperation_Polynomial {
     static Name = "Polynomial";
@@ -1069,31 +1150,73 @@ class ConfigOperation_Polynomial {
 }
 InputTranslationConfigs.push(ConfigOperation_Polynomial);
 
-var configOperation_PulseWidthPinReadTemplate;
-class ConfigOperation_PulseWidthPinRead {
-    static Name = "Pulse Width Pin";
-    static Output = "float";
-    static Inputs = [];
-    static Measurement = "Time";
+
+class ConfigOperation_ReluctorGM24x {
+    static Name = "Reluctor GM 24X";
+    static Output = "ReluctorResult";
+    static Inputs = ["Record", "CurrentTick"];
+    static Measurement = "ReluctorResult";
 
     constructor(){
         this.GUID = getGUID();
     }
     
-    Pin = 0;
-    MinFrequency = 1000;
 
     GetObj() {
         return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            MinFrequency: this.MinFrequency
+            Name: GetClassProperty(this, "Name")
         };
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.MinFrequency = obj.MinFrequency;
+    }
+
+    Detach() {
+    }
+
+    Attach() {
+    }
+
+    GetHtml() {
+        return "";
+    }
+
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([1001]).buffer); //factory ID
+        
+        return arrayBuffer;
+    }
+}
+InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
+
+var configOperation_ReluctorUniversal2xTemplate;
+class ConfigOperation_ReluctorUniversal2x {
+    static Name = "Reluctor Universal 2X";
+    static Output = "ReluctorResult";
+    static Inputs = ["Record", "CurrentTick"];
+    static Measurement = "ReluctorResult";
+
+    constructor(){
+        this.GUID = getGUID();
+    }
+    
+    
+    RisingPosition = 0;
+    FallingPosition = 180;
+
+    GetObj() {
+        return { 
+            Name: GetClassProperty(this, "Name"),
+            RisingPosition: this.RisingPosition,
+            FallingPosition: this.FallingPosition
+        };
+    }
+
+    SetObj(obj) {
+        this.RisingPosition = obj.RisingPosition;
+        this.FallingPosition = obj.FallingPosition;
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -1104,31 +1227,31 @@ class ConfigOperation_PulseWidthPinRead {
     Attach() {
         var thisClass = this;
 
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-rising", function(){
             thisClass.Detach();
 
-            thisClass.Pin = parseInt($(this).val());
+            thisClass.RisingPosition = parseFloat($(this).val());
 
             thisClass.Attach();
         });
 
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-falling", function(){
             thisClass.Detach();
 
-            thisClass.MinFrequency = parseInt($(this).val());
+            thisClass.FallingPosition = parseFloat($(this).val());
 
             thisClass.Attach();
         });
     }
 
     GetHtml() {
-        if(!configOperation_PulseWidthPinReadTemplate)
-            configOperation_PulseWidthPinReadTemplate = getFileContents("ConfigGui/Operation_PulseWidthPinRead.html");
-        var template = configOperation_PulseWidthPinReadTemplate;
+        if(!configOperation_ReluctorUniversal2xTemplate)
+            configOperation_ReluctorUniversal2xTemplate = getFileContents("ConfigGui/Operation_ReluctorUniversal2x.html");
+        var template = configOperation_ReluctorUniversal2xTemplate;
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, this.Pin);
-        template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
+        template = template.replace(/[$]rising[$]/g, this.RisingPosition);
+        template = template.replace(/[$]falling[$]/g, this.FallingPosition);
 
         return template;
     }
@@ -1136,11 +1259,11 @@ class ConfigOperation_PulseWidthPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([7]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([1002]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.RisingPosition]).buffer); //MinValue
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.FallingPosition]).buffer); //MaxValue
         
         return arrayBuffer;
     }
 }
-InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
+InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal2x);

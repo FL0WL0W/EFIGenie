@@ -136,16 +136,19 @@ class ConfigOperation_LookupTable {
     static ValueLabel = "Value";
     static ValueMeasurement = "None";
 
+    NoInputSelect = false;
     InputSelection = undefined;
     Type = "number";
     Table;
 
-    constructor(){
+    constructor(noInputSelect){
         this.GUID = getGUID();
         this.Table = new Table();
         this.Table.YResolutionModifiable = false;
         this.Table.SetXResolution(10);
         this.Table.SetYResolution(1);
+        if(noInputSelect)
+            this.NoInputSelect = true;
     }
 
 
@@ -157,7 +160,7 @@ class ConfigOperation_LookupTable {
             MinX: this.Table.MinX,
             MaxX: this.Table.MaxX,
             Resolution: this.Table.XResolution,
-            InputSelection: this.InputSelection
+            InputSelection: this.NoInputSelect? undefined : this.InputSelection
         };
     }
 
@@ -167,22 +170,25 @@ class ConfigOperation_LookupTable {
         this.Table.MaxX = obj.MaxX;
         this.Table.SetXResolution(obj.Resolution);
         this.Table.Value = obj.Value;
-        this.InputSelection = obj.InputSelection;
+        if(!this.NoInputSelect)
+            this.InputSelection = obj.InputSelection;
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
     Attach() {
         var thisClass = this;
 
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-inputselection", function(){
-            thisClass.Detach();
+        if(!this.NoInputSelect) {
+            $(document).on("change."+this.GUID, "#" + this.GUID + "-inputselection", function(){
+                thisClass.Detach();
 
-            var val = $(this).val();
-            thisClass.InputSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
-            thisClass.Attach();
-        });
+                var val = $(this).val();
+                thisClass.InputSelection = {reference: $('option:selected', this).attr('reference'), value: val};
+                $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+                
+                thisClass.Attach();
+            });
+        }
         
         this.Table.Attach();
     }
@@ -198,7 +204,7 @@ class ConfigOperation_LookupTable {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
-        this.Table.XLabel = "<select style=\"width: 100%;\" id=\"" + this.GUID + "-inputselection\">" + GetSelections(this.InputSelection) + "</select>";
+        this.Table.XLabel = this.NoInputSelect? "Input" : "<select style=\"width: 100%;\" id=\"" + this.GUID + "-inputselection\">" + GetSelections(this.InputSelection) + "</select>";
         this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
@@ -209,14 +215,17 @@ class ConfigOperation_LookupTable {
     }
     
     UpdateSelections() {
-        $("#" + this.GUID + "-inputselection").html(GetSelections(this.InputSelection));
+        if(!this.NoInputSelect)
+            $("#" + this.GUID + "-inputselection").html(GetSelections(this.InputSelection));
     }
 
     SetIncrements() {
-        var thisClass = this;
-        if(!Increments.PostEvent)
-            Increments.PostEvent = [];
-        Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+        if(!this.NoInputSelect) {
+            var thisClass = this;
+            if(!Increments.PostEvent)
+                Increments.PostEvent = [];
+            Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+        }
     }
 
     GetArrayBuffer() {
@@ -310,9 +319,11 @@ class ConfigOperation_LookupTable {
                 break;
         }
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Channel ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Id ]).buffer);
-                
+        if(!NoInputSelect) {
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Channel ]).buffer);
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Id ]).buffer);
+        }
+
         return arrayBuffer;
     }
 }
@@ -571,6 +582,12 @@ class Table {
     Detach() {
         $(document).off("change."+this.GUID);
         $(document).off("click."+this.GUID);
+        $(document).off("mousedown."+this.GUID);
+        $(document).off("mouseup."+this.GUID);
+        $(document).off("mousemove."+this.GUID);
+        $(document).off("copy."+this.GUID);
+        $(document).off("paste."+this.GUID);
+        $(document).off("contextmenu."+this.GUID);
     }
 
     Attach() {
@@ -602,8 +619,11 @@ class Table {
                     $("#" + thisClass.GUID + " input[data-x='"+i+"'][data-y='-1']").val(parseFloat(parseFloat(((thisClass.MaxX - thisClass.MinX) * i / (thisClass.XResolution-1) + thisClass.MinX).toFixed(6)).toPrecision(7)));
                 }
             } else {
-                var index = x + y * thisClass.XResolution;
-                thisClass.Value[index] = value;
+                $.each($("#" + thisClass.GUID + " input.selected"), function(index, cell) {
+                    var index = parseInt($(cell).data("x")) + parseInt($(cell).data("y")) * thisClass.XResolution;
+                    $(cell).val(value);
+                    thisClass.Value[index] = value;
+                });
             }
 
             thisClass.Attach();
@@ -648,6 +668,115 @@ class Table {
 
             thisClass.Attach();
         });
+
+        var selecting = false;
+        var pointX;
+        var pointY;
+
+        $(document).on("mousedown."+this.GUID, "#" + this.GUID + " input", function(e){
+            $("#" + thisClass.GUID + " input").removeClass("selected");
+            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
+                return;
+
+            pointX =  $(this).offset().left - $(this).closest("table").offset().left;
+            pointY =  $(this).offset().top - $(this).closest("table").offset().top;
+            $(this).addClass("selected");
+            selecting = true;
+        });
+        
+        $(document).on("mouseup."+this.GUID, function(e){
+            $("#" + thisClass.GUID + " input:focus").select();
+            selecting = false;
+        });
+        
+        $(document).on("mousemove."+this.GUID, function(e){
+            if(!selecting)
+                return;
+
+            $.each($("#" + thisClass.GUID + " input"), function(index, cell) {
+                var cellElement = $(cell);
+                if(cellElement.data("x") === undefined || parseInt(cellElement.data("x")) < 0 || cellElement.data("y") === undefined || parseInt(cellElement.data("y")) < 0)
+                    return;
+    
+                var tableElement = cellElement.closest("table")
+                var relX = e.pageX - tableElement.offset().left;
+                var elX = cellElement.offset().left - tableElement.offset().left + (cellElement.width() / 2);
+                var relY = e.pageY - tableElement.offset().top;
+                var elY = cellElement.offset().top - tableElement.offset().top + (cellElement.height() / 2);
+                if(((elX <= relX && elX >= pointX) || (elX >= relX && elX <= pointX) || (pointX == cellElement.offset().left - tableElement.offset().left)) &&
+                    ((elY <= relY && elY >= pointY) || (elY >= relY && elY <= pointY) || (pointY == cellElement.offset().top - tableElement.offset().top))) {
+                    cellElement.addClass("selected");
+                } else {
+                    cellElement.removeClass("selected");
+                }
+            });
+        });
+        
+        $(document).on("copy."+this.GUID, "#" + this.GUID + " input", function(e){
+            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
+                return;
+
+            var copyData = "";
+
+            for(var y = 0; y < thisClass.YResolution; y++){
+                var rowSelected = false
+                    for(var x = 0; x < thisClass.XResolution; x++){
+                    if($("#" + thisClass.GUID + " input[data-x='" + x + "'][data-y='" + y + "']").hasClass("selected")){
+                        if(rowSelected){
+                            copyData += "\t";
+                        }
+                        copyData += thisClass.Value[x + y * thisClass.XResolution];
+                        rowSelected = true;
+                    }
+                }
+                if(rowSelected){
+                    copyData += "\n";
+                }
+            }
+
+            if(copyData.length > 0){
+                copyData = copyData.substring(0, copyData.length -1);//remove last new line
+            }
+
+            e.originalEvent.clipboardData.setData('text/plain', copyData);
+            e.preventDefault();
+        });
+
+        $(document).on("paste."+this.GUID, "#" + this.GUID + " input", function(e){
+            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
+                return;
+                
+            var val = e.originalEvent.clipboardData.getData('text/plain');
+
+            var selectedCell = $("#" + thisClass.GUID + " input:focus")
+            var x = selectedCell.data("x");
+            var y = selectedCell.data("y");
+            if(x < 0 || y < 0)
+                return;
+
+            $.each(val.split("\n"), function(yIndex, val) {
+                var yPos = y + yIndex;
+                if(yPos > thisClass.YResolution - 1)
+                    return;
+                $.each(val.split("\t"), function(xIndex, val) {
+                    var xPos = x + xIndex;
+                    if(xPos > thisClass.XResolution - 1)
+                        return;
+
+                    var v = parseFloat(val);
+                    thisClass.Value[xPos + yPos * thisClass.XResolution] = v;
+                    var cell = $("#" + thisClass.GUID + " input[data-x='" + xPos + "'][data-y='" + yPos + "']");
+                    cell.val(v);
+                    cell.addClass("selected");
+                });
+            });
+
+            e.preventDefault();
+        });
+        
+        $(document).on("contextmenu."+thisClass.GUID, "#" + this.GUID + " input", function(){
+            event.preventDefault();
+        });
     }
 
     GetHtml() {
@@ -671,7 +800,7 @@ class Table {
                         // - - - - -
                         // - - - - -
                         // - - - - -
-                        row += "<th colspan=\"2\" rowspan=\"2\" style=\"border-right-style: sold; border-right-width:5px; border-bottom-style: sold; border-bottom-width:5px;\">" + this.ZLabel + "</th>";
+                        row += "<th colspan=\"2\" rowspan=\"2\" style=\"padding-left: 30px; vertical-align: bottom; border-right-style: sold; border-right-width:5px; border-bottom-style: sold; border-bottom-width:5px;\">" + this.ZLabel + "</th>";
                     } else if(x === 0){
                         // - - X---X
                         // - - - - -
@@ -767,5 +896,246 @@ class Table {
         table = table + "</table>"
 
         return "<span id=\"" + this.GUID + "\">"+table+"</span>";
+    }
+}
+
+function GetSelections(selection, measurement, configs) {
+    var selections = "";
+    var configSelected = false;
+    if(configs) {
+        for(var i = 0; i < configs.length; i++) {
+            var selected = false;
+            if(selection && !selection.reference && selection.value instanceof configs[i]){
+                selected = true;
+                configSelected = true;
+            }
+
+            selections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + configs[i].Name + "</option>"
+        }
+        if(selections) 
+            selections = "<optgroup label=\"Calculations\">" + selections + "</optgroup>";
+    }
+    
+    for(var property in Increments){
+        if(!Array.isArray(Increments[property]))
+            continue;
+        if(property === "PostEvent")
+            continue;
+
+        var arr = Increments[property];
+        
+        var arrSelections = "";
+
+        for(var i = 0; i < arr.length; i++) {
+            if(!measurement || arr[i].Measurement === measurement) {
+                var selected = false;
+                if(selection && selection.reference === property && selection.value === arr[i].Name){
+                    selected = true;
+                    configSelected = true;
+                }
+    
+                arrSelections += "<option reference=\"" + property + "\" value=\"" + arr[i].Name + "\"" + (selected? " selected" : "") + ">" + arr[i].Name + (!measurement? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : "") + "</option>"
+            }
+        }
+        if(arrSelections) 
+            arrSelections = "<optgroup label=\"" + property + "\">" + arrSelections + "</optgroup>";
+
+        selections += arrSelections;
+    }
+
+    selections = "<option value=\"-1\" disabled" + (configSelected? "" : " selected") + ">Select</option>" + selections;
+
+    return selections;
+}
+
+document.addEventListener("dragstart", function(e){
+    if($(e.target).hasClass("selected"))
+        e.preventDefault();
+});//disable dragging of selected items
+var configOrVariableSelectionTemplate;
+class ConfigOrVariableSelection {
+    constructor(configs, valueLabel, valueMeasurement, incrementName, incrementListName, channel){
+        this.GUID = getGUID();
+        this.Configs = configs;
+        this.ValueLabel = valueLabel;
+        this.ValueMeasurement = valueMeasurement;
+        this.IncrementName = incrementName;
+        this.IncrementListName = incrementListName;
+        this.Channel = channel;
+    }
+
+    Configs = undefined;
+    ValueLabel = undefined;
+    ValueMeasurement = undefined;
+    IncrementName = undefined;
+    IncrementListName = undefined;
+    Channel = undefined;
+    Selection = undefined;
+
+    GetObj() {
+        var gs = function(s) { return s? { reference: s.reference, value: s.reference? s.value : s.value.GetObj() } : undefined; };
+        return { 
+            Selection: gs(this.Selection),
+        };
+    }
+
+    SetObj(obj) {
+        this.Detach();
+
+        this.Selection = obj.Selection;
+        if(this.Selection && !this.Selection.reference)
+        {
+            for(var i = 0; i < this.Configs.length; i++)
+            {
+                if(this.Configs[i].Name === this.Selection.value.Name) {
+                    var c = this.Selection.value;
+                    this.Selection.value = new this.Configs[i]();
+                    this.Selection.value.ValueLabel = this.ValueLabel;
+                    this.Selection.value.ValueMeasurement = this.ValueMeasurement;
+                    this.Selection.value.SetObj(c);
+                    break;
+                }
+            }
+        }
+
+        $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
+    }
+    
+    Detach() {
+        $(document).off("change."+this.GUID);            
+        if(this.Selection && !this.Selection.reference) 
+            this.Selection.value.Detach();
+    }
+    
+    Attach() {
+        var thisClass = this;
+
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-selection", function(){
+            thisClass.Detach();
+
+            var val = $(this).val();
+            if($('option:selected', this).attr('reference') === undefined)
+            {
+                if(val === "-1")
+                    thisClass.Selection = undefined;
+                else {
+                    thisClass.Selection = {value: new thisClass.Configs[val]()}
+                    thisClass.Selection.value.ValueLabel = thisClass.ValueLabel;
+                    thisClass.Selection.value.ValueMeasurement = thisClass.ValueMeasurement;
+                }
+            } else {
+                thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val};
+            }
+            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            
+            thisClass.Attach();
+        });
+
+        if(this.Selection && !this.Selection.reference) 
+            this.Selection.value.Attach();
+    }
+
+    GetHtml() {
+        if(!configOrVariableSelectionTemplate)
+        configOrVariableSelectionTemplate = getFileContents("ConfigGui/ConfigOrVariableSelection.html");
+        var template = configOrVariableSelectionTemplate;
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+        
+        $("#" + this.GUID + "-selection").html(GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
+        template = template.replace(/[$]selections[$]/g, GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
+        if(this.Selection && !this.Selection.reference) {
+            template = template.replace(/[$]config[$]/g, this.Selection.value.GetHtml());
+        } else {
+            template = template.replace(/[$]config[$]/g, "");
+        }
+        template = template.replace(/[$]valuelabel[$]/g, this.ValueLabel);
+        template = template.replace(/[$]value[$]/g, "");//this is for interactivity later
+        template = template.replace(/[$]measurement[$]/g, GetMeasurementDisplay(this.ValueMeasurement));
+
+        return template;
+    }
+    
+    UpdateSelections() {
+        $("#" + this.GUID + "-selection").html(GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
+    }
+    
+    GetCellByName(array, name) {
+        if(!array)
+            return undefined;
+        for(var i = 0; i < array.length; i++) {
+            if(name && name === array[i].Name)
+                return array[i];
+        }
+        return undefined;
+    }
+
+    Id = -1;
+    SetIncrements() {
+        var thisClass = this;
+        if(!Increments.PostEvent)
+            Increments.PostEvent = [];
+        Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+
+        if(this.Selection) {
+            if(Increments[this.IncrementListName] === undefined)
+                Increments[this.IncrementListName] = [];
+
+            if(!this.Selection.reference) {
+                this.Id = 0;
+                if(Increments[this.IncrementName] === undefined)
+                    Increments[this.IncrementName] = 0;
+                else
+                    this.Id = ++Increments[this.IncrementName];
+
+                if(this.Selection.value.SetIncrements)
+                    this.Selection.value.SetIncrements();
+                    
+                Increments[this.IncrementListName].push({ 
+                    Name: this.ValueLabel, 
+                    Channel: this.Channel,
+                    Id: this.Id,
+                    Type: "float",
+                    Measurement: this.ValueMeasurement
+                });
+            } else {
+                var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
+                if(cell) {
+                    Increments[this.IncrementListName].push({ 
+                        Name: this.ValueLabel, 
+                        Channel: cell.Channel,
+                        Id: cell.Id,
+                        Type: "float",
+                        Measurement: this.ValueMeasurement
+                    });
+                }
+            }
+        }
+    }
+    
+    GetArrayBuffer(variable, operation) {
+        var arrayBuffer = new ArrayBuffer();
+
+        if(this.Selection && !this.Selection.reference) {            
+            if(variable || !operation){
+                if(Increments[this.IncrementName] === undefined)
+                    throw "Set Increments First";
+                if(this.Id === -1)
+                    throw "Set Increments First";
+                    
+                if(!variable)//if it is a variable we do not want to execute in main loop
+                    arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
+                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Channel << 1 | 1 ]).buffer); //variable channel | immediate
+                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Id ]).buffer); //Id
+            }
+            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBuffer());
+        } else if (variable) {//if it is a variable we want to return the variable reference
+            var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ cell.Channel << 1 ]).buffer); //variable channel
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ cell.Id ]).buffer); //Id
+        }
+        
+        return arrayBuffer;
     }
 }

@@ -22,7 +22,7 @@ namespace Operations
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
-		uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth.To<float>() * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);
+		uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth.To<float>() * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);//this is not going to work. need to do something different for non sequential
 		uint32_t injectEndAt = _predictor->Execute(ScalarVariable(_tdc) + injectionEndPosition, enginePosition).To<uint32_t>();;
 		//we always want to schedule the opening time.
 		uint32_t injectAt = injectEndAt - pulseTicks;
@@ -74,6 +74,6 @@ namespace Operations
 		return new Operation_EngineScheduleInjection(timerService, tdc, injectionOutputOperation);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleInjection, 2004)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleInjection, 2007)
 }
 #endif

@@ -1,14 +1,19 @@
 var EngineChannel = 4;
 var FuelChannel = 5;
+var IgnitionChannel = 6;
 var Increments = {};
 var AFRConfigs = [];
 AFRConfigs.push(ConfigOperation_StaticScalar);
 AFRConfigs.push(ConfigOperation_LookupTable);
 AFRConfigs.push(ConfigOperation_2AxisTable);
-var AdvanceConfigs = [];
-AdvanceConfigs.push(ConfigOperation_StaticScalar);
-AdvanceConfigs.push(ConfigOperation_LookupTable);
-AdvanceConfigs.push(ConfigOperation_2AxisTable);
+var InjectorPulseWidthConfigs = [];
+// InjectorPulseWidthConfigs.push(ConfigOperation_StaticScalar);
+// InjectorPulseWidthConfigs.push(ConfigOperation_LookupTable);
+// InjectorPulseWidthConfigs.push(ConfigOperation_2AxisTable);
+var IgnitionAdvanceConfigs = [];
+IgnitionAdvanceConfigs.push(ConfigOperation_StaticScalar);
+IgnitionAdvanceConfigs.push(ConfigOperation_LookupTable);
+IgnitionAdvanceConfigs.push(ConfigOperation_2AxisTable);
 var CylinderAirmassConfigs = [];
 CylinderAirmassConfigs.push(ConfigOperation_StaticScalar);
 var CylinderAirTemperatureConfigs = [];
@@ -19,55 +24,6 @@ var VolumetricEfficiencyConfigs = [];
 VolumetricEfficiencyConfigs.push(ConfigOperation_StaticScalar);
 VolumetricEfficiencyConfigs.push(ConfigOperation_LookupTable);
 VolumetricEfficiencyConfigs.push(ConfigOperation_2AxisTable);
-
-function GetSelections(selection, measurement, configs) {
-    var selections = "";
-    var configSelected = false;
-    if(configs) {
-        for(var i = 0; i < configs.length; i++) {
-            var selected = false;
-            if(selection && !selection.reference && selection.value instanceof configs[i]){
-                selected = true;
-                configSelected = true;
-            }
-
-            selections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + configs[i].Name + "</option>"
-        }
-        if(selections) 
-            selections = "<optgroup label=\"Calculations\">" + selections + "</optgroup>";
-    }
-    
-    for(var property in Increments){
-        if(!Array.isArray(Increments[property]))
-            continue;
-        if(property === "PostEvent")
-            continue;
-
-        var arr = Increments[property];
-        
-        var arrSelections = "";
-
-        for(var i = 0; i < arr.length; i++) {
-            if(!measurement || arr[i].Measurement === measurement) {
-                var selected = false;
-                if(selection && selection.reference === property && selection.value === arr[i].Name){
-                    selected = true;
-                    configSelected = true;
-                }
-    
-                arrSelections += "<option reference=\"" + property + "\" value=\"" + arr[i].Name + "\"" + (selected? " selected" : "") + ">" + arr[i].Name + (!measurement? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : "") + "</option>"
-            }
-        }
-        if(arrSelections) 
-            arrSelections = "<optgroup label=\"" + property + "\">" + arrSelections + "</optgroup>";
-
-        selections += arrSelections;
-    }
-
-    selections = "<option value=\"-1\" disabled" + (configSelected? "" : " selected") + ">Select</option>" + selections;
-
-    return selections;
-}
 
 function ResetIncrements()
 {
@@ -268,7 +224,7 @@ class ConfigTop {
         this.Inputs.SetIncrements();
         this.Engine.SetIncrements();
         this.Fuel.SetIncrements();
-        //this.Ignition.SetIncrements();
+        this.Ignition.SetIncrements();
     }
 
     GetArrayBuffer() {
@@ -287,33 +243,49 @@ var configFuelTemplate;
 class ConfigFuel {
     constructor(){
         this.GUID = getGUID();
+        this.AFRConfigOrVariableSelection = new ConfigOrVariableSelection(
+            AFRConfigs,
+            "Air Fuel Ratio",
+            "Ratio",
+            "FuelIncrement",
+            "FuelParameters",
+            FuelChannel);
+        this.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection(
+            InjectorPulseWidthConfigs,
+            "Injector Pulse Width",
+            "Time",
+            "FuelIncrement",
+            "FuelParameters",
+            FuelChannel);
     }
 
-    AFR = new ConfigAFR();
+    AFRConfigOrVariableSelection = undefined;
+    InjectorPulseWidthConfigOrVariableSelection = undefined;
 
     GetObj() {
         return {
-            AFR: this.AFR.GetObj()
+            AFRConfigOrVariableSelection: this.AFRConfigOrVariableSelection.GetObj(),
+            InjectorPulseWidthConfigOrVariableSelection: this.InjectorPulseWidthConfigOrVariableSelection.GetObj()
         };
     }
 
     SetObj(obj) {
         this.Detach();
-        this.AFR = new ConfigAFR();
-
-        this.AFR.SetObj(obj.AFR);
+        this.AFRConfigOrVariableSelection.SetObj(obj.AFRConfigOrVariableSelection);
+        this.InjectorPulseWidthConfigOrVariableSelection.SetObj(obj.InjectorPulseWidthConfigOrVariableSelection);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
 
     Detach() {
-        this.AFR.Detach();
+        this.AFRConfigOrVariableSelection.Detach();
+        this.InjectorPulseWidthConfigOrVariableSelection.Detach();
     }
 
     Attach() {
-        var thisClass = this;
-        this.AFR.Attach();
+        this.AFRConfigOrVariableSelection.Attach();
+        this.InjectorPulseWidthConfigOrVariableSelection.Attach();
     }
 
     GetHtml() {
@@ -322,166 +294,57 @@ class ConfigFuel {
         var template = configFuelTemplate;
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]afr[$]/g, this.AFR.GetHtml());
+        template = template.replace(/[$]afr[$]/g, this.AFRConfigOrVariableSelection.GetHtml());
+        template = template.replace(/[$]injectorpulsewidth[$]/g, this.InjectorPulseWidthConfigOrVariableSelection.GetHtml());
 
         return template;
     }
 
+    InjectorGramsId = -1;
     SetIncrements() {
-        this.AFR.SetIncrements();
-    }
+        this.AFRConfigOrVariableSelection.SetIncrements();
 
-    GetArrayBuffer() {
-        var arrayBuffer = new ArrayBuffer();
+        this.InjectorGramsId = -1;
+        if(Increments.FuelParameters === undefined)
+            Increments.FuelParameters = [];
 
-        arrayBuffer = arrayBuffer.concatArray(this.AFR.GetArrayBuffer())
-
-        return arrayBuffer;
-    }
-}
-
-var configAFRTemplate;
-class ConfigAFR {
-    constructor(){
-        this.GUID = getGUID();
-    }
-
-    Config = undefined;
-
-    GetObj() {
-        return { 
-            Name: this.Name,
-            Config: this.Config? this.Config.GetObj() : undefined
-        };
-    }
-
-    SetObj(obj) {
-        this.Detach();
-        this.Name = obj.Name;
-        this.Config = undefined;
-        if(obj.Config){
-            for(var i = 0; i < AFRConfigs.length; i++)
-            {
-                if(AFRConfigs[i].Name === obj.Config.Name) {
-                    this.Config = new AFRConfigs[i]();
-                    this.Config.ValueLabel = "AFR";
-                    this.Config.ValueMeasurement = "Ratio";
-                    this.Config.SetObj(obj.Config);
-                    break;
-                }
-            }
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-        if(this.Config) 
-            this.Config.Detach();
-    }
-
-    Attach() {
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-selection", function(){
-            thisClass.Detach();
-
-            var val = $(this).val();
-            if(val === "-1") {
-                thisClass.Config = undefined;
-            } else {
-                thisClass.Config = new AFRConfigs[val]();
-                thisClass.Config.ValueLabel = "AFR";
-                thisClass.Config.ValueMeasurement = "Ratio";
-            }
-            
-            if(thisClass.Config) {
-                $("#" + thisClass.GUID + "-config").html(thisClass.Config.GetHtml());
-            } else {
-                $("#" + thisClass.GUID + "-config").html("");
-            }
-            
-            thisClass.Attach();
-        });
-
-        if(this.Config) 
-            this.Config.Attach();
-    }
-
-    GetHtml() {
-        if(!configAFRTemplate)
-        configAFRTemplate = getFileContents("ConfigGui/Fuel_AFR.html");
-        var template = configAFRTemplate;
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        
-        var selections;
-        var configSelected = false;
-        for(var i = 0; i < AFRConfigs.length; i++)
-        {
-            var selected = false;
-            if(this.Config && this.Config instanceof AFRConfigs[i]){
-                selected = true;
-                configSelected = true;
-            }
-
-            selections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + AFRConfigs[i].Name + "</option>"
-        }
-        if(!configSelected)
-            this.Config = undefined;
-        selections = "<option value=\"-1\" disabled" + (selected? "" : " selected") + ">Select</option>" + selections;
-        template = template.replace(/[$]selections[$]/g, selections);
-        
-        if(this.Config) {
-            template = template.replace(/[$]config[$]/g, this.Config.GetHtml());
-        } else {
-            template = template.replace(/[$]config[$]/g, "");
-        }
-        template = template.replace(/[$]value[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]measurement[$]/g, GetMeasurementDisplay("Ratio"));
-
-        return template;
-    }
-
-    Id = -1;
-    SetIncrements() {
-        this.Id = -1;
-
-        if(!this.Config) 
-            return;
-        
-        this.Channel = FuelChannel;
-        this.Id = 0;
+        this.InjectorGramsId = 0;
         if(Increments.FuelIncrement === undefined)
             Increments.FuelIncrement = 0;
         else
-            this.Id = ++Increments.FuelIncrement;
+            this.InjectorGramsId = ++Increments.FuelIncrement;
+        Increments.FuelParameters.push({ 
+            Name: "Injector Grams", 
+            Channel: FuelChannel,
+            Id: this.InjectorGramsId,
+            Type: "float",
+            Measurement: "Mass"
+        });
 
-        Increments.AFR = { 
-            Name: this.Name, 
-            Id: this.InputRawId
-        }
-
-        if(this.Config.SetIncrements)
-            this.Config.SetIncrements();
+        this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
     }
 
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
-        if(!this.Config) 
-            return arrayBuffer;
 
-        if(Increments.FuelIncrement === undefined)
-            throw "Set Increments First";
-        if(this.Id === -1)
-            throw "Set Increments First";
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Channel << 1 | 1 ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Id ]).buffer); //AFRID
-        arrayBuffer = arrayBuffer.concatArray(this.Config.GetArrayBuffer());
+        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBuffer());
         
+        if(Increments.FuelIncrement === undefined)
+        throw "Set Increments First";
+        if(this.InjectorGramsId === -1)
+            throw "Set Increments First";
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ FuelChannel << 1 | 1 ]).buffer); //variable channel | immediate
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InjectorGramsId ]).buffer); //EngineRPMId
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 14 ]).buffer); //factory ID for math
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Channel << 1]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Channel << 1]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Id ]).buffer);
+
+        arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBuffer());
+
         return arrayBuffer;
     }
 }
@@ -490,25 +353,37 @@ var configIgnitionTemplate;
 class ConfigIgnition {
     constructor(){
         this.GUID = getGUID();
+        this.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection(
+            IgnitionAdvanceConfigs,
+            "Ignition Advance",
+            "Angle",
+            "IgnitinoIncrement",
+            "IgnitionParameters",
+            IgnitionChannel);
     }
+
+    IgnitionAdvanceConfigOrVariableSelection = undefined;
 
     GetObj() {
         return {
+            IgnitionAdvanceConfigOrVariableSelection: this.IgnitionAdvanceConfigOrVariableSelection.GetObj()
         };
     }
 
     SetObj(obj) {
         this.Detach();
+        this.IgnitionAdvanceConfigOrVariableSelection.SetObj(obj.IgnitionAdvanceConfigOrVariableSelection);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
 
     Detach() {
+        this.IgnitionAdvanceConfigOrVariableSelection.Detach();
     }
 
     Attach() {
-        var thisClass = this;
+        this.IgnitionAdvanceConfigOrVariableSelection.Attach();
     }
 
     GetHtml() {
@@ -518,12 +393,20 @@ class ConfigIgnition {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
+        template = template.replace(/[$]ignitionadvance[$]/g, this.IgnitionAdvanceConfigOrVariableSelection.GetHtml());
+
         return template;
+    }
+
+    SetIncrements() {
+        this.IgnitionAdvanceConfigOrVariableSelection.SetIncrements();
     }
 
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
+        arrayBuffer = arrayBuffer.concatArray(this.IgnitionAdvanceConfigOrVariableSelection.GetArrayBuffer())
+        
         return arrayBuffer;
     }
 }
@@ -532,197 +415,109 @@ var configEngineTemplate;
 class ConfigEngine {
     constructor(){
         this.GUID = getGUID();
+        this.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
+            undefined,
+            "Crank Position",
+            "ReluctorResult",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
+        this.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
+            undefined,
+            "Cam Position",
+            "ReluctorResult",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
+        this.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection(
+            CylinderAirmassConfigs,
+            "Cylinder Air Mass",
+            "Mass",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
+        this.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection(
+            CylinderAirTemperatureConfigs,
+            "Cylinder Air Temperature",
+            "Temperature",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
+        this.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection(
+            ManifoldAbsolutePressureConfigs,
+            "Manifold Absolute Pressure",
+            "Pressure",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
+        this.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection(
+            VolumetricEfficiencyConfigs,
+            "Volumetric Efficiency",
+            "Percentage",
+            "EngineIncrement",
+            "EngineParameters",
+            EngineChannel);
     }
 
-    CylinderAirmassSelection = undefined;
-    CylinderAirTemperatureSelection = undefined;
-    ManifoldAbsolutePressureSelection = undefined;
-    VolumetricEfficiencySelection = undefined;
+    CrankPriority = 1;//static set this for now
+    CrankPositionConfigOrVariableSelection = undefined;
+    CamPositionConfigOrVariableSelection = undefined;
+    CylinderAirmassConfigOrVariableSelection = undefined;
+    CylinderAirTemperatureConfigOrVariableSelection = undefined;
+    ManifoldAbsolutePressureConfigOrVariableSelection = undefined;
+    VolumetricEfficiencyConfigOrVariableSelection = undefined;
 
     GetObj() {
-        var gs = function(s) { return s? { reference: s.reference, value: s.reference? s.value : s.value.GetObj() } : undefined; };
         return { 
-            CylinderAirmassSelection: gs(this.CylinderAirmassSelection),
-            CylinderAirTemperatureSelection : gs(this.CylinderAirTemperatureSelection),
-            ManifoldAbsolutePressureSelection : gs(this.ManifoldAbsolutePressureSelection),
-            VolumetricEfficiencySelection: gs(this.VolumetricEfficiencySelection)
+            CrankPositionConfigOrVariableSelection: this.CrankPositionConfigOrVariableSelection.GetObj(),
+            CamPositionConfigOrVariableSelection: this.CamPositionConfigOrVariableSelection.GetObj(),
+            CylinderAirmassConfigOrVariableSelection: this.CylinderAirmassConfigOrVariableSelection.GetObj(),
+            CylinderAirTemperatureConfigOrVariableSelection :this.CylinderAirTemperatureConfigOrVariableSelection.GetObj(),
+            ManifoldAbsolutePressureConfigOrVariableSelection :this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObj(),
+            VolumetricEfficiencyConfigOrVariableSelection :this.VolumetricEfficiencyConfigOrVariableSelection.GetObj()
         };
     }
 
     SetObj(obj) {
         this.Detach();
-        this.CylinderAirmassSelection = obj.CylinderAirmassSelection;
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference)
-        {
-            for(var i = 0; i < CylinderAirmassConfigs.length; i++)
-            {
-                if(CylinderAirmassConfigs[i].Name === this.CylinderAirmassSelection.value.Name) {
-                    var c = this.CylinderAirmassSelection.value;
-                    this.CylinderAirmassSelection.value = new CylinderAirmassConfigs[i]();
-                    this.CylinderAirmassSelection.value.ValueLabel = "Cylinder Air Mass";
-                    this.CylinderAirmassSelection.value.ValueMeasurement = "Mass";
-                    this.CylinderAirmassSelection.value.SetObj(c);
-                    break;
-                }
-            }
-        }
-        this.CylinderAirTemperatureSelection = obj.CylinderAirTemperatureSelection;
-        if(this.CylinderAirTemperatureSelection && !this.CylinderAirTemperatureSelection.reference)
-        {
-            for(var i = 0; i < CylinderAirTemperatureConfigs.length; i++)
-            {
-                if(CylinderAirTemperatureConfigs[i].Name === this.CylinderAirTemperatureSelection.value.Name) {
-                    var c = this.CylinderAirTemperatureSelection.value;
-                    this.CylinderAirTemperatureSelection.value = new CylinderAirTemperatureConfigs[i]();
-                    this.CylinderAirTemperatureSelection.value.ValueLabel = "Cylinder Air Temperature";
-                    this.CylinderAirTemperatureSelection.value.ValueMeasurement = "Temperature";
-                    this.CylinderAirTemperatureSelection.value.SetObj(c);
-                    break;
-                }
-            }
-        }
-        this.ManifoldAbsolutePressureSelection = obj.ManifoldAbsolutePressureSelection;
-        if(this.ManifoldAbsolutePressureSelection && !this.ManifoldAbsolutePressureSelection.reference)
-        {
-            for(var i = 0; i < ManifoldAbsolutePressureConfigs.length; i++)
-            {
-                if(ManifoldAbsolutePressureConfigs[i].Name === this.ManifoldAbsolutePressureSelection.value.Name) {
-                    var c = this.ManifoldAbsolutePressureSelection.value;
-                    this.ManifoldAbsolutePressureSelection.value = new ManifoldAbsolutePressureConfigs[i]();
-                    this.ManifoldAbsolutePressureSelection.value.ValueLabel = "Manifold Absolute Pressure";
-                    this.ManifoldAbsolutePressureSelection.value.ValueMeasurement = "Pressure";
-                    this.ManifoldAbsolutePressureSelection.value.SetObj(c);
-                    break;
-                }
-            }
-        }
-        this.VolumetricEfficiencySelection = obj.VolumetricEfficiencySelection;
-        if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference)
-        {
-            for(var i = 0; i < VolumetricEfficiencyConfigs.length; i++)
-            {
-                if(VolumetricEfficiencyConfigs[i].Name === this.VolumetricEfficiencySelection.value.Name) {
-                    var c = this.VolumetricEfficiencySelection.value;
-                    this.VolumetricEfficiencySelection.value = new VolumetricEfficiencyConfigs[i]();
-                    this.VolumetricEfficiencySelection.value.ValueLabel = "Volumetric Efficiency";
-                    this.VolumetricEfficiencySelection.value.ValueMeasurement = "Percentage";
-                    this.VolumetricEfficiencySelection.value.SetObj(c);
-                    break;
-                }
-            }
-        }
+        this.CrankPositionConfigOrVariableSelection.SetObj(obj.CrankPositionConfigOrVariableSelection);
+        this.CamPositionConfigOrVariableSelection.SetObj(obj.CamPositionConfigOrVariableSelection);
+        this.CylinderAirmassConfigOrVariableSelection.SetObj(obj.CylinderAirmassConfigOrVariableSelection);
+        this.CylinderAirTemperatureConfigOrVariableSelection.SetObj(obj.CylinderAirTemperatureConfigOrVariableSelection);
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.SetObj(obj.ManifoldAbsolutePressureConfigOrVariableSelection);
+        this.VolumetricEfficiencyConfigOrVariableSelection.SetObj(obj.VolumetricEfficiencyConfigOrVariableSelection);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);            
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) 
-            this.CylinderAirmassSelection.value.Detach();
-        if(this.CylinderAirTemperatureSelection && !this.CylinderAirTemperatureSelection.reference) 
-            this.CylinderAirTemperatureSelection.value.Detach();
-        if(this.ManifoldAbsolutePressureSelection && !this.ManifoldAbsolutePressureSelection.reference) 
-            this.ManifoldAbsolutePressureSelection.value.Detach();
-        if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference) 
-            this.VolumetricEfficiencySelection.value.Detach();
+        $(document).off("change."+this.GUID);      
+        this.CrankPositionConfigOrVariableSelection.Detach();
+        this.CamPositionConfigOrVariableSelection.Detach();
+        this.CylinderAirmassConfigOrVariableSelection.Detach();
+        this.CylinderAirTemperatureConfigOrVariableSelection.Detach();
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.Detach();
+        this.VolumetricEfficiencyConfigOrVariableSelection.Detach();
     }
 
     Attach() {
+        this.CrankPositionConfigOrVariableSelection.Attach();
+        this.CamPositionConfigOrVariableSelection.Attach();
+        this.CylinderAirmassConfigOrVariableSelection.Attach();
+        this.CylinderAirTemperatureConfigOrVariableSelection.Attach();
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.Attach();
+        this.VolumetricEfficiencyConfigOrVariableSelection.Attach();
+
         var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-cylinderairmassselection", function(){
+        $(document).on("change."+this.GUID, "#" + this.CylinderAirmassConfigOrVariableSelection.GUID + "-selection", function(){
             thisClass.Detach();
 
-            var val = $(this).val();
-            if($('option:selected', this).attr('reference') === undefined)
-            {
-                if(val === "-1")
-                    thisClass.CylinderAirmassSelection = undefined;
-                else {
-                    thisClass.CylinderAirmassSelection = {value: new CylinderAirmassConfigs[val]()}
-                    thisClass.CylinderAirmassSelection.value.ValueLabel = "Cylinder Air Mass";
-                    thisClass.CylinderAirmassSelection.value.ValueMeasurement = "Mass";
-                }
-            } else {
-                thisClass.CylinderAirmassSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            }
+            //There might be a better way to repopulate requirements. this is quick and easy for now.
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             
             thisClass.Attach();
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-cylinderairtemperatureselection", function(){
-            thisClass.Detach();
-
-            var val = $(this).val();
-            if($('option:selected', this).attr('reference') === undefined)
-            {
-                if(val === "-1")
-                    thisClass.CylinderAirTemperatureSelection = undefined;
-                else {
-                    thisClass.CylinderAirTemperatureSelection = {value: new CylinderAirTemperatureConfigs[val]()}
-                    thisClass.CylinderAirTemperatureSelection.value.ValueLabel = "Cylinder Air Temperature";
-                    thisClass.CylinderAirTemperatureSelection.value.ValueMeasurement = "Temperature";
-                }
-            } else {
-                thisClass.CylinderAirTemperatureSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            }
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
-            thisClass.Attach();
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-manifoldabsolutepressureselection", function(){
-            thisClass.Detach();
-            
-            var val = $(this).val();
-            if($('option:selected', this).attr('reference') === undefined)
-            {
-                if(val === "-1")
-                    thisClass.ManifoldAbsolutePressureSelection = undefined;
-                else {
-                    thisClass.ManifoldAbsolutePressureSelection = {value: new ManifoldAbsolutePressureConfigs[val]()}
-                    thisClass.ManifoldAbsolutePressureSelection.value.ValueLabel = "Manifold Absolue Pressure";
-                    thisClass.ManifoldAbsolutePressureSelection.value.ValueMeasurement = "Pressure";
-                }
-            } else {
-                thisClass.ManifoldAbsolutePressureSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            }
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
-            thisClass.Attach();
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-volumetricefficiencyelection", function(){
-            thisClass.Detach();
-            
-            var val = $(this).val();
-            if($('option:selected', this).attr('reference') === undefined)
-            {
-                if(val === "-1")
-                    thisClass.VolumetricEfficiencySelection = undefined;
-                else {
-                    thisClass.VolumetricEfficiencySelection = {value: new VolumetricEfficiencyConfigs[val]()}
-                    thisClass.VolumetricEfficiencySelection.value.ValueLabel = "Volumetric Efficiency";
-                    thisClass.VolumetricEfficiencySelection.value.ValueMeasurement = "Percentage";
-                }
-            } else {
-                thisClass.VolumetricEfficiencySelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            }
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
-            thisClass.Attach();
-        });
-
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) 
-            this.CylinderAirmassSelection.value.Attach();
-        if(this.CylinderAirTemperatureSelection && !this.CylinderAirTemperatureSelection.reference) 
-            this.CylinderAirTemperatureSelection.value.Attach();
-        if(this.ManifoldAbsolutePressureSelection && !this.ManifoldAbsolutePressureSelection.reference) 
-            this.ManifoldAbsolutePressureSelection.value.Attach();
-        if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference) 
-            this.VolumetricEfficiencySelection.value.Attach();
     }
 
     GetHtml() {
@@ -734,225 +529,110 @@ class ConfigEngine {
         
         var requirements = [];
 
-        template = template.replace(/[$]cylinderairmassselections[$]/g, GetSelections(this.CylinderAirmassSelection, "Mass", CylinderAirmassConfigs));
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) {
-            template = template.replace(/[$]cylinderairmassconfig[$]/g, this.CylinderAirmassSelection.value.GetHtml());
-            requirements = GetClassProperty(this.CylinderAirmassSelection.value, "Requirements");
-        } else {
-            template = template.replace(/[$]cylinderairmassconfig[$]/g, "");
+        if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
+            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
         }
-        template = template.replace(/[$]cylinderairmassvalue[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]cylinderairmassmeasurement[$]/g, GetMeasurementDisplay("Mass"));
         
-        template = template.replace(/[$]cylinderairtemperatureselections[$]/g, GetSelections(this.CylinderAirTemperatureSelection, "Temperature", CylinderAirTemperatureConfigs));
-        template = template.replace(/[$]cylinderairtemperaturedivstyle[$]/g, 
-            requirements && requirements.indexOf("Cylinder Air Temperature") > -1? "" : "style=\"display:none;\"");
-        if(this.CylinderAirTemperatureSelection && !this.CylinderAirTemperatureSelection.reference) {
-            template = template.replace(/[$]cylinderairtemperatureconfig[$]/g, this.CylinderAirTemperatureSelection.value.GetHtml());
-        } else {
-            template = template.replace(/[$]cylinderairtemperatureconfig[$]/g, "");
-        }
-        template = template.replace(/[$]cylinderairtemperaturevalue[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]cylinderairtemperaturemeasurement[$]/g, GetMeasurementDisplay("Temperature"));
+        template = template.replace(/[$]crankposition[$]/g, 
+            this.CrankPositionConfigOrVariableSelection.GetHtml());
 
-        template = template.replace(/[$]manifoldabsolutepressureselections[$]/g, GetSelections(this.ManifoldAbsolutePressureSelection, "Pressure", ManifoldAbsolutePressureConfigs));
-        template = template.replace(/[$]manifoldabsolutepressuredivstyle[$]/g, 
-            requirements && requirements.indexOf("Manifold Absolute Pressure") > -1? "" : "style=\"display:none;\"");
-        if(this.ManifoldAbsolutePressureSelection && !this.ManifoldAbsolutePressureSelection.reference) {
-            template = template.replace(/[$]manifoldabsolutepressureconfig[$]/g, this.ManifoldAbsolutePressureSelection.value.GetHtml());
-        } else {
-            template = template.replace(/[$]manifoldabsolutepressureconfig[$]/g, "");
-        }
-        template = template.replace(/[$]manifoldabsolutepressurevalue[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]manifoldabsolutepressuremeasurement[$]/g, GetMeasurementDisplay("Pressure"));
+        template = template.replace(/[$]camposition[$]/g, 
+            this.CamPositionConfigOrVariableSelection.GetHtml());
+
+        template = template.replace(/[$]cylinderairmass[$]/g, 
+            this.CylinderAirmassConfigOrVariableSelection.GetHtml());
         
-        template = template.replace(/[$]volumetricefficiencyelections[$]/g, GetSelections(this.VolumetricEfficiencySelection, "Percentage", VolumetricEfficiencyConfigs));
-        template = template.replace(/[$]volumetricefficiencydivstyle[$]/g, 
-            requirements && requirements.indexOf("Volumetric Efficiency") > -1? "" : "style=\"display:none;\"");
-        if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference) {
-            template = template.replace(/[$]volumetricefficiencyconfig[$]/g, this.VolumetricEfficiencySelection.value.GetHtml());
-        } else {
-            template = template.replace(/[$]volumetricefficiencyconfig[$]/g, "");
-        }
-        template = template.replace(/[$]volumetricefficiencyvalue[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]volumetricefficiencymeasurement[$]/g, GetMeasurementDisplay("Percentage"));
+        template = template.replace(/[$]cylinderairtemperature[$]/g, 
+            requirements && requirements.indexOf("Cylinder Air Temperature") > -1? 
+            this.CylinderAirTemperatureConfigOrVariableSelection.GetHtml() : "");
+        
+        template = template.replace(/[$]manifoldabsolutepressure[$]/g, 
+            requirements && requirements.indexOf("Manifold Absolute Pressure") > -1? 
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.GetHtml() : "");
+
+        template = template.replace(/[$]volumetricefficiency[$]/g, 
+            requirements && requirements.indexOf("Volumetric Efficiency") > -1? 
+            this.VolumetricEfficiencyConfigOrVariableSelection.GetHtml() : "");
 
 
         return template;
     }
 
-    GetCellByName(array, name) {
-        if(!array)
-            return undefined;
-        for(var i = 0; i < array.length; i++) {
-            if(name && name === array[i].Name)
-                return array[i];
-        }
-        return undefined;
-    }
-
-    UpdateSelections() {
-        $("#" + this.GUID + "-cylinderairmassselection").html(GetSelections(this.CylinderAirmassSelection, "Mass", CylinderAirmassConfigs));
-        $("#" + this.GUID + "-cylinderairtemperatureselection").html(GetSelections(this.CylinderAirTemperatureSelection, "Temperature", CylinderAirTemperatureConfigs));
-        $("#" + this.GUID + "-manifoldabsolutepressureselection").html(GetSelections(this.ManifoldAbsolutePressureSelection, "Pressure", ManifoldAbsolutePressureConfigs));
-        $("#" + this.GUID + "-volumetricefficiencyelection").html(GetSelections(this.VolumetricEfficiencySelection, "Percentage", VolumetricEfficiencyConfigs));
-    }
-
+    EnginePositionId = -1;
+    EngineRPMId = -1;
     CylinderAirmassId = -1;
-    CylinderAirTemperatureId = -1;
-    ManifoldAbsolutePressureId = -1;
-    VolumetricEfficiencyId = -1;
     SetIncrements() {
-        var thisClass = this;
-        if(!Increments.PostEvent)
-            Increments.PostEvent = [];
-        Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+        this.CrankPositionConfigOrVariableSelection.SetIncrements();
+        this.CamPositionConfigOrVariableSelection.SetIncrements();
 
+        this.EnginePositionId = -1;
+        this.EngineRPMId = -1;
         this.CylinderAirmassId = -1;
-        this.CylinderAirTemperatureId = -1;
-        this.ManifoldAbsolutePressureId = -1;
-        this.VolumetricEfficiencyId = -1;
 
         if(Increments.EngineParameters === undefined)
         Increments.EngineParameters = [];
 
+        this.EnginePositionId = 0;
+        if(Increments.EngineIncrement === undefined)
+            Increments.EngineIncrement = 0;
+        else
+            this.EnginePositionId = ++Increments.EngineIncrement;
+        this.EngineRPMId = ++Increments.EngineIncrement;
+        Increments.EnginePositionId = this.EnginePositionId;
+        Increments.EngineParameters.push({ 
+            Name: "Engine RPM", 
+            Channel: EngineChannel,
+            Id: this.EngineRPMId,
+            Type: "float",
+            Measurement: "AngularSpeed"
+        });
+
         var requirements = [];
 
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) {
-            requirements = GetClassProperty(this.CylinderAirmassSelection.value, "Requirements");
+        if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
+            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
         }
 
-        if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1 && this.ManifoldAbsolutePressureSelection) {
-            if(!this.ManifoldAbsolutePressureSelection.reference) {
-                this.ManifoldAbsolutePressureId = 0;
-                if(Increments.EngineIncrement === undefined)
-                    Increments.EngineIncrement = 0;
-                else
-                    this.ManifoldAbsolutePressureId = ++Increments.EngineIncrement;
-
-                if(this.ManifoldAbsolutePressureSelection.value.SetIncrements)
-                    this.ManifoldAbsolutePressureSelection.value.SetIncrements();
-
-                Increments.EngineParameters.push({ 
-                    Name: "Manifold Absolute Pressure", 
-                    Channel: EngineChannel,
-                    Id: this.ManifoldAbsolutePressureId,
-                    Type: "float",
-                    Measurement: "Pressure"
-                });
-            } else {
-                var cell = this.GetCellByName(Increments[this.ManifoldAbsolutePressureSelection.reference], this.ManifoldAbsolutePressureSelection.value);
-                if(cell) {
-                    Increments.EngineParameters.push({ 
-                        Name: "Manifold Absolute Pressure", 
-                        Channel: cell.Channel,
-                        Id: cell.Id,
-                        Type: "float",
-                        Measurement: "Pressure"
-                    });
-                }
-            } 
-        }
-
-        if(requirements && requirements.indexOf("Cylinder Air Temperature") > -1 && this.CylinderAirTemperatureSelection) {
-            if(!this.CylinderAirTemperatureSelection.reference) {
-                this.CylinderAirTemperatureId = 0;
-                if(Increments.EngineIncrement === undefined)
-                    Increments.EngineIncrement = 0;
-                else
-                    this.CylinderAirTemperatureId = ++Increments.EngineIncrement;
-
-                if(this.CylinderAirTemperatureSelection.value.SetIncrements)
-                this.CylinderAirTemperatureSelection.value.SetIncrements();
-                    
-                Increments.EngineParameters.push({ 
-                    Name: "Cylinder Air Temperature", 
-                    Channel: EngineChannel,
-                    Id: this.CylinderAirTemperatureId,
-                    Type: "float",
-                    Measurement: "Temperature"
-                });
-            } else {
-                var cell = this.GetCellByName(Increments[this.CylinderAirTemperatureSelection.reference], this.CylinderAirTemperatureSelection.value);
-                if(cell) {
-                    Increments.EngineParameters.push({ 
-                        Name: "Cylinder Air Temperature", 
-                        Channel: cell.Channel,
-                        Id: cell.Id,
-                        Type: "float",
-                        Measurement: "Temperature"
-                    });
-                }
-            }
-        }
-
-        if(requirements && requirements.indexOf("Volumetric Efficiency") > -1 && this.VolumetricEfficiencySelection) {
-            if(!this.VolumetricEfficiencySelection.reference) {
-                this.VolumetricEfficiencyId = 0;
-                if(Increments.EngineIncrement === undefined)
-                    Increments.EngineIncrement = 0;
-                else
-                    this.VolumetricEfficiencyId = ++Increments.EngineIncrement;
-
-                if(this.VolumetricEfficiencySelection.value.SetIncrements)
-                    this.VolumetricEfficiencySelection.value.SetIncrements();
-                    
-                Increments.EngineParameters.push({ 
-                    Name: "Volumetric Efficiency", 
-                    Channel: EngineChannel,
-                    Id: this.VolumetricEfficiencyId,
-                    Type: "float",
-                    Measurement: "Percentage"
-                });
-            } else {
-                var cell = this.GetCellByName(Increments[this.VolumetricEfficiencySelection.reference], this.VolumetricEfficiencySelection.value);
-                if(cell) {
-                    Increments.EngineParameters.push({ 
-                        Name: "Volumetric Efficiency", 
-                        Channel: cell.Channel,
-                        Id: cell.Id,
-                        Type: "float",
-                        Measurement: "Percentage"
-                    });
-                }
-            }
+        if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1) {
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.SetIncrements();
         }
         
-        if(this.CylinderAirmassSelection) {
-            if(!this.CylinderAirmassSelection.reference) {
-                this.CylinderAirmassId = 0;
-                if(Increments.EngineIncrement === undefined)
-                    Increments.EngineIncrement = 0;
-                else
-                    this.CylinderAirmassId = ++Increments.EngineIncrement;
-
-                if(this.CylinderAirmassSelection.value.SetIncrements)
-                    this.CylinderAirmassSelection.value.SetIncrements();
-
-                Increments.EngineParameters.push({ 
-                    Name: "Cylinder Air Mass", 
-                    Channel: EngineChannel,
-                    Id: this.CylinderAirmassId,
-                    Type: "float",
-                    Measurement: "Mass"
-                });
-            } else {
-                var cell = this.GetCellByName(Increments[this.CylinderAirmassSelection.reference], this.CylinderAirmassSelection.value);
-                if(cell) {
-                    Increments.EngineParameters.push({ 
-                        Name: "Cylinder Air Mass", 
-                        Channel: cell.Channel,
-                        Id: cell.Id,
-                        Type: "float",
-                        Measurement: "Mass"
-                    });
-                }
-            }
+        if(requirements && requirements.indexOf("Cylinder Air Temperature") > -1) {
+            this.CylinderAirTemperatureConfigOrVariableSelection.SetIncrements();
         }
+
+        if(requirements && requirements.indexOf("Volumetric Efficiency") > -1) {
+            this.VolumetricEfficiencyConfigOrVariableSelection.SetIncrements();
+        }
+        
+        this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
     }
 
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
+
+        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBuffer());
+
+        if(Increments.EngineIncrement === undefined)
+        throw "Set Increments First";
+        if(this.EngineRPMId === -1)
+            throw "Set Increments First";
+        if(this.EnginePositionId === -1)
+            throw "Set Increments First";
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.EngineRPMId ]).buffer); //EngineRPMId
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2004 ]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use operation for engine position parameter
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.EnginePositionId ]).buffer); //EnginePositionId
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2001 ]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CrankPriority? 1 : 0 ]).buffer); //CrankPriority
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Channel << 1 ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Channel << 1]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Id ]).buffer);
+        
 
         var requirements = [];
         if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) {
@@ -960,65 +640,25 @@ class ConfigEngine {
         }
 
         if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1) {
-            if(this.ManifoldAbsolutePressureSelection && !this.ManifoldAbsolutePressureSelection.reference) {
-                if(Increments.EngineIncrement === undefined)
-                    throw "Set Increments First";
-                if(this.ManifoldAbsolutePressureId === -1)
-                    throw "Set Increments First";
-                    
-                arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.ManifoldAbsolutePressureId ]).buffer); //ManifoldAbsolutePressureId
-                arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureSelection.value.GetArrayBuffer());
-            }
+            arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetArrayBuffer());
         }
 
         if(requirements && requirements.indexOf("Cylinder Air Temperature") > -1) {
-            if(this.CylinderAirTemperatureSelection && !this.CylinderAirTemperatureSelection.reference) {
-                if(Increments.EngineIncrement === undefined)
-                    throw "Set Increments First";
-                if(this.CylinderAirTemperatureId === -1)
-                    throw "Set Increments First";
-                    
-                arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CylinderAirTemperatureId ]).buffer); //VolumetricEfficiencyId
-                arrayBuffer = arrayBuffer.concatArray(this.CylinderAirTemperatureSelection.value.GetArrayBuffer());
-            }
+            arrayBuffer = arrayBuffer.concatArray(this.CylinderAirTemperatureConfigOrVariableSelection.GetArrayBuffer());
         }
-
+        
         if(requirements && requirements.indexOf("Volumetric Efficiency") > -1) {
-            if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference) {
-                if(Increments.EngineIncrement === undefined)
-                    throw "Set Increments First";
-                if(this.VolumetricEfficiencyId === -1)
-                    throw "Set Increments First";
-                    
-                arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.VolumetricEfficiencyId ]).buffer); //VolumetricEfficiencyId
-                arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencySelection.value.GetArrayBuffer());
-            }
+            arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencyConfigOrVariableSelection.GetArrayBuffer());
         }
         
-        if(this.VolumetricEfficiencySelection && !this.VolumetricEfficiencySelection.reference) {
-            if(Increments.EngineIncrement === undefined)
-                throw "Set Increments First";
-            if(this.CylinderAirmassId === -1)
-                throw "Set Increments First";
-                
-            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CylinderAirmassId ]).buffer); //CylinderAirmassID
-            arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencySelection.value.GetArrayBuffer());
-        }
-        
+        arrayBuffer = arrayBuffer.concatArray(this.CylinderAirmassConfigOrVariableSelection.GetArrayBuffer());
+
         return arrayBuffer;
     }
 }
 
-var configCylinderAirmass_SpeedDensityTemplate;
-class ConfigCylinderAirmass_SpeedDensity {
+var ConfigOperationCylinderAirmass_SpeedDensityTemplate;
+class ConfigOperationCylinderAirmass_SpeedDensity {
     static Name = "Speed Density";
     static Measurement = "";
     static Requirements = ["Cylinder Air Temperature", "Manifold Absolute Pressure", "Volumetric Efficiency"];
@@ -1064,9 +704,9 @@ class ConfigCylinderAirmass_SpeedDensity {
     }
 
     GetHtml() {
-        if(!configCylinderAirmass_SpeedDensityTemplate)
-            configCylinderAirmass_SpeedDensityTemplate = getFileContents("ConfigGui/Engine_CylinderAirmass_SpeedDensity.html");
-        var template = configCylinderAirmass_SpeedDensityTemplate;
+        if(!ConfigOperationCylinderAirmass_SpeedDensityTemplate)
+            ConfigOperationCylinderAirmass_SpeedDensityTemplate = getFileContents("ConfigGui/Engine_CylinderAirmass_SpeedDensity.html");
+        var template = ConfigOperationCylinderAirmass_SpeedDensityTemplate;
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]cylindervolume[$]/g, this.CylinderVolume);
@@ -1080,14 +720,203 @@ class ConfigCylinderAirmass_SpeedDensity {
 
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2007]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.CylinderVolume]).buffer); //CylinderVolume
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Channel ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Channel << 1]).buffer);
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Channel ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Channel << 1]).buffer);
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Channel ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Channel << 1]).buffer);
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id ]).buffer);
                 
         return arrayBuffer;
     }
 }
-CylinderAirmassConfigs.push(ConfigCylinderAirmass_SpeedDensity);
+CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
+
+var configInjectorPulseWidth_DeadTimeTemplate;
+class ConfigInjectorPulseWidth_DeadTime {
+    static Name = "Dead Time";
+    static Measurement = "Time";
+
+    constructor(){
+        this.GUID = getGUID();
+        this.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection(
+            GenericConfigs,
+            "Injector Flow Rate",
+            "MassFlow",
+            "FuelIncrement",
+            "FuelParameters",
+            FuelChannel);
+        this.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection(
+            GenericConfigs,
+            "Injector Dead Time",
+            "Time",
+            "FuelIncrement",
+            "FuelParameters",
+            FuelChannel);
+    }
+
+    FlowRateConfigOrVariableSelection = undefined;
+    DeadTimeConfigOrVariableSelection = undefined;
+
+    GetObj() {
+        return {
+            Name: GetClassProperty(this, "Name"),
+            FlowRateConfigOrVariableSelection: this.FlowRateConfigOrVariableSelection.GetObj(),
+            DeadTimeConfigOrVariableSelection: this.DeadTimeConfigOrVariableSelection.GetObj(),
+        };
+    }
+
+    SetObj(obj) {
+        this.Detach();
+        this.FlowRateConfigOrVariableSelection.SetObj(obj.FlowRateConfigOrVariableSelection);
+        this.DeadTimeConfigOrVariableSelection.SetObj(obj.DeadTimeConfigOrVariableSelection);
+
+        $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
+    }
+
+    Detach() {
+        this.FlowRateConfigOrVariableSelection.Detach();
+        this.DeadTimeConfigOrVariableSelection.Detach();
+    }
+
+    Attach() {
+        this.FlowRateConfigOrVariableSelection.Attach();
+        this.DeadTimeConfigOrVariableSelection.Attach();
+    }
+
+    GetHtml() {
+        if(!configInjectorPulseWidth_DeadTimeTemplate)
+            configInjectorPulseWidth_DeadTimeTemplate = getFileContents("ConfigGui/Fuel_InjectorPulseWidth_DeadTime.html");
+        var template = configInjectorPulseWidth_DeadTimeTemplate;
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+
+        template = template.replace(/[$]flowrate[$]/g, 
+            this.FlowRateConfigOrVariableSelection.GetHtml());
+
+        template = template.replace(/[$]deadtime[$]/g, 
+            this.DeadTimeConfigOrVariableSelection.GetHtml());
+
+        return template;
+    }
+
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+        
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([14]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
+        //add parameter 1
+        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBuffer(true));
+        //add parameter 2
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //immediate with no stored variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([14]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //Divide
+        //divide parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Channel << 1]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        //divide parameter 2
+        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBuffer(true));
+                
+        return arrayBuffer;
+    }
+}
+InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
+
+var configInjectorOutputsTemplate;
+class ConfigInjectorOutputs {
+    static Name = "Injector Outputs";
+
+    constructor(){
+        this.GUID = getGUID();
+        this.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
+            GenericConfigs,
+            "Injector End Position(ATDC)",
+            "Angle",
+            "FuelIncrement",
+            "FuelParameters",
+            FuelChannel);
+        this.TDCTable = new Table();
+        this.TDCTable.YResolutionModifiable = false;
+        this.TDCTable.XResolutionModifiable = false;
+        this.TDCTable.SetXResolution(this.NumberOfOutputs);
+        this.TDCTable.SetYResolution(1);
+        this.TDCTable.XLabel = "Injector";
+        this.TDCTable.ZLabel = "TDC";
+    }
+
+    InjectorEndPositionConfigOrVariableSelection = undefined
+    NumberOfOutputs = 8;
+    TDCTable = undefined;
+
+    GetObj() {
+        return {
+            Name: GetClassProperty(this, "Name"),
+            InjectorEndPositionConfigOrVariableSelection: this.InjectorEndPositionConfigOrVariableSelection.GetObj(),
+            NumberOfOutputs: this.NumberOfOutputs
+        };
+    }
+
+    SetObj(obj) {
+        this.Detach();
+        this.InjectorEndPositionConfigOrVariableSelection.SetObj(obj.InjectorEndPositionConfigOrVariableSelection);
+        this.NumberOfOutputs = obj.NumberOfOutputs;
+
+        $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
+    }
+
+    Detach() {
+        $(document).off("change."+this.GUID);
+        this.InjectorEndPositionConfigOrVariableSelection.Detach();
+    }
+
+    Attach() {
+        var thisClass = this;
+
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-numberofoutputs", function(){
+            thisClass.Detach();
+
+            thisClass.NumberOfOutputs = parseInt($(this).val());
+            thisClass.TDCTable.SetXResolution(this.NumberOfOutputs);
+
+            thisClass.Attach();
+        });
+
+        this.InjectorEndPositionConfigOrVariableSelection.Attach();
+    }
+
+    GetHtml() {
+        if(!configInjectorOutputsTemplate)
+            configInjectorOutputsTemplate = getFileContents("ConfigGui/Fuel_InjectorOutputs.html");
+        var template = configInjectorOutputsTemplate;
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+
+        template = template.replace(/[$]injectorendat[$]/g, 
+            this.InjectorEndPositionConfigOrVariableSelection.GetHtml());
+
+        template = template.replace(/[$]numberofoutputs[$]/g, this.NumberOfOutputs);
+
+        template = template.replace(/[$]tdctable[$]/g, this.TDCTable.GetHtml());
+
+        return template;
+    }
+
+    GetArrayBuffer() {
+        var arrayBuffer = new ArrayBuffer();
+        
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2006]).buffer); //Injector Array
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.NumberOfOutputs]).buffer); //Number of outputs
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array(this.TDCTable.Value).buffer); //output TDCs
+        //output operations
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EnginePositionId ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Channel << 1 ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(this.InjectorEndPositionConfigOrVariableSelection.GetArrayBuffer(true));
+
+        return arrayBuffer;
+    }
+}

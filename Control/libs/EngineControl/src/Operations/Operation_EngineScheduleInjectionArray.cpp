@@ -45,6 +45,6 @@ namespace Operations
 		return new Operation_EngineScheduleInjectionArray(timerService, length, tdc, ignitionOutputOperation);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleInjectionArray, 2006)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleInjectionArray, 2008)
 }
 #endif

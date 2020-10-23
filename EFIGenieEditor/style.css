@@ -124,3 +124,7 @@ span .namedListOperation {
     border-color: #666666;
     border-style: solid;
 }
+
+.selected {
+    background-color:rgb(204, 204, 255);
+}

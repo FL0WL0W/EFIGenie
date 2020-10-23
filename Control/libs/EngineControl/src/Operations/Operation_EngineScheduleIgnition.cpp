@@ -70,6 +70,6 @@ namespace Operations
 		return new Operation_EngineScheduleIgnition(timerService, tdc, ignitionOutputOperation);
 	}
 
-	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleIgnition, 2003)
+	IOPERATION_REGISTERFACTORY_CPP(Operation_EngineScheduleIgnition, 2005)
 }
 #endif
