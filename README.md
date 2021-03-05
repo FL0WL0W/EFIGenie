@@ -15,7 +15,7 @@ Features<br>
   <li>Flexible Crank Cam Decoder</li>
     <ul>
       <li>GM 24x (Cam + Crank and Crank Only)</li>
-      <li>--More to come</li>
+      <li>--More to come </li>
     </ul>
   <li>Individual injector trims</li>
   <li>Injector offset voltage and MAP</li>
