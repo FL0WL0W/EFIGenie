@@ -14,6 +14,7 @@ namespace OperationArchitecture
 		uint32_t Execute(float desiredPosition, EnginePosition enginePosition) override;
 
 		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
+		static Operation_EnginePositionPrediction *Construct();
 	};
 }
 #endif

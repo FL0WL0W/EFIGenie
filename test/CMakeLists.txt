@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-set(TARGET		EngineControlUnitTests)
+set(TARGET		EFIGenieUnitTests)
 
 project(${TARGET} CXX)
 
@@ -19,11 +19,12 @@ file(GLOB_RECURSE SRCS ${SRCS_DIR}/*.cpp)
 add_executable(${TARGET} ${SRCS})
 
 # link static libraries
+target_link_libraries(${TARGET} OperationArchitecture)
 target_link_libraries(${TARGET} EmbeddedIOServices)
 target_link_libraries(${TARGET} EmbeddedIOServicesMockedObjects)
-target_link_libraries(${TARGET} Reluctor)
-target_link_libraries(${TARGET} EngineControl)
-target_link_libraries(${TARGET} EngineControlMockedObjects)
+target_link_libraries(${TARGET} EmbeddedIOOperations)
+target_link_libraries(${TARGET} ReluctorOperations)
+target_link_libraries(${TARGET} EFIGenie)
 target_link_libraries(${TARGET} gtest gtest_main gmock)
 
 add_test(ALLTESTS ${TARGET})

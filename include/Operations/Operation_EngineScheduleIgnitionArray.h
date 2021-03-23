@@ -1,47 +1,37 @@
-// #include "Operations/IOperation.h"
-// #include "Service/IService.h"
-// #include "Service/ServiceLocator.h"
-// #include "Service/HardwareAbstractionServiceBuilder.h"
-// #include "Packed.h"
-// #include "Interpolation.h"
-// #include "Operations/Operation_EngineScheduleIgnition.h"
-// #include "Operations/Operation_EnginePositionPrediction.h"
-// #include "Operations/Operation_ScheduleCallBack.h"
-// #include "ScalarVariable.h"
-// #include <tuple>
+#include "Operations/IOperation.h"
+#include "Operations/Operation_EngineScheduleIgnition.h"
 
-// #ifndef OPERATION_ENGINESCHEDULEIGNITIONARRAY_H
-// #define OPERATION_ENGINESCHEDULEIGNITIONARRAY_H
-// namespace OperationArchitecture
-// {
-// 	struct EngineScheduleIgnitionArray
-// 	{
-// 		public:
-// 		void Initialize(uint8_t length)
-// 		{
-// 			Length = length;
-// 			DwellTick = reinterpret_cast<ScalarVariable*>(malloc(sizeof(ScalarVariable) * Length));
-// 			IgnitionTick = reinterpret_cast<ScalarVariable*>(malloc(sizeof(ScalarVariable) * Length));
-// 		}
+#ifndef OPERATION_ENGINESCHEDULEIGNITIONARRAY_H
+#define OPERATION_ENGINESCHEDULEIGNITIONARRAY_H
+namespace OperationArchitecture
+{
+	struct EngineScheduleIgnitionArray
+	{
+		public:
+		void Initialize(uint8_t length)
+		{
+			Length = length;
+			DwellTick = reinterpret_cast<uint32_t*>(malloc(sizeof(uint32_t) * Length));
+			IgnitionTick = reinterpret_cast<uint32_t*>(malloc(sizeof(uint32_t) * Length));
+		}
 
-// 		uint8_t Length;
-// 		ScalarVariable* DwellTick;
-// 		ScalarVariable* IgnitionTick;
-// 	};
+		uint8_t Length;
+		uint32_t* DwellTick;
+		uint32_t* IgnitionTick;
+	};
 
-// 	class Operation_EngineScheduleIgnitionArray : public IOperation<EngineScheduleIgnitionArray, EnginePosition, ScalarVariable, ScalarVariable>
-// 	{
-// 	protected:
-// 		uint8_t _length;
-// 		Operation_EngineScheduleIgnition **_array;
-// 		EngineScheduleIgnitionArray _ret;
-// 	public:		
-//         Operation_EngineScheduleIgnitionArray(EmbeddedIOServices::ITimerService *timerService, uint8_t length, const float* tdc, IOperation<void, ScalarVariable> **ignitionOutputOperation);
+	class Operation_EngineScheduleIgnitionArray : public IOperation<EngineScheduleIgnitionArray, EnginePosition, float, float>
+	{
+	protected:
+		uint8_t _length;
+		Operation_EngineScheduleIgnition **_array;
+		EngineScheduleIgnitionArray _ret;
+	public:		
+        Operation_EngineScheduleIgnitionArray(EmbeddedIOServices::ITimerService *timerService, uint8_t length, const float* tdc, IOperation<void, bool> **ignitionOutputOperation);
 
-// 		EngineScheduleIgnitionArray Execute(EnginePosition enginePosition, ScalarVariable ignitionDwell, ScalarVariable ignitionAdvance) override;
+		EngineScheduleIgnitionArray Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance) override;
 
-// 		static IOperationBase *Create(Service::ServiceLocator * const &serviceLocator, const void *config, unsigned int &sizeOut);
-// 		ISERVICE_REGISTERFACTORY_H
-// 	};
-// }
-// #endif
+		static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut);
+	};
+}
+#endif

@@ -3,11 +3,10 @@
 #include "Operations/Operation_EngineScheduleIgnition.h"
 #include "MockTimerService.h"
 #include "MockOutputOperation.h"
-using ::testing::AtLeast;
-using ::testing::Return;
+using namespace testing;
 
-using namespace HardwareAbstraction;
-using namespace Operations;
+using namespace EmbeddedIOServices;
+using namespace OperationArchitecture;
 
 namespace UnitTests
 {

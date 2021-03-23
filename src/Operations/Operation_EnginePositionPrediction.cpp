@@ -52,6 +52,11 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EnginePositionPrediction::Create(const void *config, unsigned int &sizeOut)
 	{
+		return Construct();
+	}
+
+	Operation_EnginePositionPrediction *Operation_EnginePositionPrediction::Construct()
+	{
 		if(_instance == 0)
 			_instance = new Operation_EnginePositionPrediction();
 		return _instance;

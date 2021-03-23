@@ -46,5 +46,5 @@ if(EFIGenie_build_tests)
         add_subdirectory (${LIBRARIES}/googletest)
     endif()
     #include test
-    #add_subdirectory(test)
+    add_subdirectory(test)
 endif()

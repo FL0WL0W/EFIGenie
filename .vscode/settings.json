@@ -24,5 +24,9 @@
     "liveServer.settings.port": 5501,
     "files.associations": {
         "tuple": "cpp"
-    }
+    },
+    "gtest-adapter.debugConfig": [
+        "(gdb) Launch"
+    ],
+    "gtest-adapter.supportLocation": true
 }
