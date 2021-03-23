@@ -1,5 +1,6 @@
 #include "Operations/IOperation.h"
 #include "Operations/Operation_EnginePositionPrediction.h"
+#include "ICallBack.h"
 #include <tuple>
 
 #ifndef OPERATION_ENGINESCHEDULEIGNITION_H
@@ -12,13 +13,14 @@ namespace OperationArchitecture
 		EmbeddedIOServices::ITimerService *_timerService;
 		float _tdc;
 		Operation_EnginePositionPrediction *_predictor;
-		IOperation<void, bool> *_ignitionOutputOperation;
+		EmbeddedIOServices::ICallBack *_dwellCallBack;
+		EmbeddedIOServices::ICallBack *_igniteCallBack;
 		EmbeddedIOServices::Task *_dwellTask;
 		EmbeddedIOServices::Task *_igniteTask;
 		uint32_t _dwellingAtTick = 0;
 		float _ignitionAt;
 	public:		
-        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService *timerService, float tdc, IOperation<void, bool> *ignitionOutputOperation);
+        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, EmbeddedIOServices::ICallBack *dwellCallBack, EmbeddedIOServices::ICallBack *igniteCallBack);
 
 		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance) override;
 		void Dwell();

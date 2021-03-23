@@ -5,12 +5,13 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, float tdc, IOperation<void, bool> *injectionOutputOperation)
+	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, ICallBack *openCallBack, ICallBack *closeCallBack)
 	{
 		_timerService = timerService;
 		_tdc = tdc;
-		_predictor = Operation_EnginePositionPrediction::Construct();
-		_injectionOutputOperation = injectionOutputOperation;
+		_predictor = predictor;
+		_openCallBack = openCallBack;
+		_closeCallBack = closeCallBack;
 		_openTask = new Task(new CallBack<Operation_EngineScheduleInjection>(this, &Operation_EngineScheduleInjection::Open), false);
 		_closeTask = new Task(new CallBack<Operation_EngineScheduleInjection>(this, &Operation_EngineScheduleInjection::Close), false);
 	}
@@ -54,7 +55,7 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleInjection::Open()
 	{
-		_injectionOutputOperation->Execute(true);
+		_openCallBack->Execute();
 		_lastOpenedAtTick = _timerService->GetTick();
 		if(_lastOpenedAtTick == 0)
 			_lastOpenedAtTick = 1;
@@ -63,16 +64,18 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleInjection::Close()
 	{
-		_injectionOutputOperation->Execute(false);
+		_closeCallBack->Execute();
 		_open = false;
 	}
 
 	static IOperationBase *Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		IOperation<void, bool> * const injectionOutputOperation = 0;//serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		//serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		ICallBack * const openCallBack = 0;
+		ICallBack * const closeCallBack = 0;
 
-		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, tdc, injectionOutputOperation);
+		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, openCallBack, closeCallBack);
 	}
 }
 #endif

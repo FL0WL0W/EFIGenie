@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "Operations/Operation_EngineScheduleIgnition.h"
 #include "MockTimerService.h"
-#include "MockOutputOperation.h"
+#include "MockCallBack.h"
 using namespace testing;
 
 using namespace EmbeddedIOServices;
@@ -14,7 +14,8 @@ namespace UnitTests
 	{
 		protected:
 		MockTimerService _timerService;
-        MockOutputOperation _output;
+        MockCallBack _dwell;
+        MockCallBack _ignite;
         Operation_EngineScheduleIgnition *_operation;
         EnginePosition _enginePosition;
 
@@ -22,7 +23,7 @@ namespace UnitTests
 		{
 			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 
-            _operation = new Operation_EngineScheduleIgnition(&_timerService, 0, &_output);
+            _operation = new Operation_EngineScheduleIgnition(&_timerService, new Operation_EnginePositionPrediction(&_timerService), 0, &_dwell, &_ignite);
 		}
 	};
 

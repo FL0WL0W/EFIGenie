@@ -9,12 +9,13 @@ namespace OperationArchitecture
 	class Operation_EnginePositionPrediction : public IOperation<uint32_t, float, EnginePosition>
 	{
 	protected:
-		static Operation_EnginePositionPrediction *_instance;
+		EmbeddedIOServices::ITimerService *_timerService;
 	public:		
+		Operation_EnginePositionPrediction(EmbeddedIOServices::ITimerService *timerService);
+
 		uint32_t Execute(float desiredPosition, EnginePosition enginePosition) override;
 
-		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
-		static Operation_EnginePositionPrediction *Construct();
+		static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut);
 	};
 }
 #endif

@@ -27,7 +27,7 @@ namespace OperationArchitecture
 		Operation_EngineScheduleIgnition **_array;
 		EngineScheduleIgnitionArray _ret;
 	public:		
-        Operation_EngineScheduleIgnitionArray(EmbeddedIOServices::ITimerService *timerService, uint8_t length, const float* tdc, IOperation<void, bool> **ignitionOutputOperation);
+        Operation_EngineScheduleIgnitionArray(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, uint8_t length, const float* tdc, EmbeddedIOServices::ICallBack **dwellCallBacks, EmbeddedIOServices::ICallBack **igniteCallBacks);
 
 		EngineScheduleIgnitionArray Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance) override;
 

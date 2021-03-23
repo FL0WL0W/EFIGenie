@@ -60,24 +60,6 @@ TODO LIST<br>
   <li>*Tuner Studio (Interface ECU)</li>
   <li>*Speeduino Service Builder</li>
   <li>*Create unit tests</li>
-    <ul>
-     <li>Idle Air Control Valve Stepper</li>
-      <li>AfrService_Static</li>
-      <li>FuelPumpService_Analog</li>
-      <li>FuelTrimService_InterpolatedTable</li>
-      <li>FuelTrimServiceWrapper_MultiChannel</li>
-      <li>IdleControlService_Pd</li>
-      <li>PrimeService_StaticPulseWidth</li>
-      <li>TachometerService</li>
-      <li>PistonEngineIgnitionConfig_Map_Ethanol</li>
-      <li>PistonEngineIgnitionConfigWrapper_HardRpmLimit</li>
-      <li>PistonEngineIgnitionConfigWrapper_SoftRpmLimit</li>
-      <li>PistonEngineInjectionConfig_SD</li>
-      <li>PistonEngineInjectionConfigWrapper_DFCO</li>
-      <li>IgnitionSchedulingService</li>
-      <li>InjectionSchedulingService</li>
-      <li>ServiceBuilder</li>
-    </ul>
   <li>Transmission Control (line pressure control)</li>
   <li>Transmission Control (automatic gear shifts)</li>
   <li>Customizable injection and iginition degree references</li>

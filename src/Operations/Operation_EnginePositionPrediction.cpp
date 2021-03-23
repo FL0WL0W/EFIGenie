@@ -1,9 +1,13 @@
 #include "Operations/Operation_EnginePositionPrediction.h"
+using namespace EmbeddedIOServices;
 
 #ifdef OPERATION_ENGINEPOSITIONPREDICTION_H
 namespace OperationArchitecture
 {
-	Operation_EnginePositionPrediction *Operation_EnginePositionPrediction::_instance = 0;
+	Operation_EnginePositionPrediction::Operation_EnginePositionPrediction(ITimerService *timerService)
+	{
+		_timerService = timerService;
+	}
 
 	uint32_t Operation_EnginePositionPrediction::Execute(float desiredPosition, EnginePosition enginePosition)
 	{
@@ -43,23 +47,16 @@ namespace OperationArchitecture
 			}
 		}
 
-		float ticksPerDegree = enginePosition.TicksPerSecond / enginePosition.PositionDot;
+		float ticksPerDegree = _timerService->GetTicksPerSecond() / enginePosition.PositionDot;
 
 		uint32_t positionTick = static_cast<int64_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick;
 
 		return positionTick == 0? 1 : positionTick;
 	}
 
-	IOperationBase *Operation_EnginePositionPrediction::Create(const void *config, unsigned int &sizeOut)
+	static IOperationBase *Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
-		return Construct();
-	}
-
-	Operation_EnginePositionPrediction *Operation_EnginePositionPrediction::Construct()
-	{
-		if(_instance == 0)
-			_instance = new Operation_EnginePositionPrediction();
-		return _instance;
+		return new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService);
 	}
 }
 #endif

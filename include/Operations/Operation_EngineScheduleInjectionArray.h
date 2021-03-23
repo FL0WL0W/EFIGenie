@@ -27,7 +27,7 @@ namespace OperationArchitecture
 		Operation_EngineScheduleInjection **_array;
 		EngineScheduleInjectionArray _ret;
 	public:		
-        Operation_EngineScheduleInjectionArray(EmbeddedIOServices::ITimerService *timerService, uint8_t length, const float* tdc, IOperation<void, bool> **ignitionOutputOperation);
+        Operation_EngineScheduleInjectionArray(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, uint8_t length, const float* tdc, EmbeddedIOServices::ICallBack **openCallBacks, EmbeddedIOServices::ICallBack **closeCallBacks);
 
 		EngineScheduleInjectionArray Execute(EnginePosition enginePosition, float injectionPulseWidth, float injectionEndPosition) override;
 

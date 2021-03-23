@@ -5,12 +5,13 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, float tdc, IOperation<void, bool> *ignitionOutputOperation)
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, ICallBack *dwellCallBack, ICallBack *igniteCallBack)
 	{
 		_timerService = timerService;
 		_tdc = tdc;
-		_predictor = Operation_EnginePositionPrediction::Construct();
-		_ignitionOutputOperation = ignitionOutputOperation;
+		_predictor = predictor;
+		_dwellCallBack = dwellCallBack;
+		_igniteCallBack = igniteCallBack;
 		_dwellTask = new Task(new CallBack<Operation_EngineScheduleIgnition>(this, &Operation_EngineScheduleIgnition::Dwell), false);
 		_igniteTask = new Task(new CallBack<Operation_EngineScheduleIgnition>(this, &Operation_EngineScheduleIgnition::Ignite), false);
 	}
@@ -51,7 +52,7 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
-		_ignitionOutputOperation->Execute(true);
+		_dwellCallBack->Execute();
 		_dwellingAtTick = _timerService->GetTick();
 		if(_dwellingAtTick == 0)
 			_dwellingAtTick = 1;
@@ -59,16 +60,18 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleIgnition::Ignite()
 	{
-		_ignitionOutputOperation->Execute(false);
+		_igniteCallBack->Execute();
 		_dwellingAtTick = 0;
 	}
 
 	static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		IOperation<void, bool> * const ignitionOutputOperation = 0;// = serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
-
-		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, ignitionOutputOperation);
+		// = serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		ICallBack * const dwellCallBack = 0;
+		ICallBack * const igniteCallBack = 0;
+		
+		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, dwellCallBack, igniteCallBack);
 	}
 }
 #endif
