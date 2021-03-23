@@ -7,12 +7,13 @@ namespace OperationArchitecture
 {
 	class Operation_EngineRpm : public IOperation<float, EnginePosition>
 	{
+	protected:
+		static Operation_EngineRpm *_instance;
 	public:		
-        Operation_EngineRpm();
-
 		float Execute(EnginePosition enginePosition) override;
 
 		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
+		static Operation_EngineRpm *Construct();
 	};
 }
 #endif

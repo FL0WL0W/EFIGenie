@@ -14,6 +14,8 @@ namespace OperationArchitecture
 	class Operation_EnginePosition : public IOperation<EnginePosition, ReluctorResult, ReluctorResult>
 	{
 	protected:
+		static Operation_EnginePosition *_instanceTrue;
+		static Operation_EnginePosition *_instanceFalse;
 		EnginePosition _previousPreviousReluctorResult;
 		EnginePosition _previousReluctorResult;
 		bool _crankPriority;
@@ -23,6 +25,7 @@ namespace OperationArchitecture
 		EnginePosition Execute(ReluctorResult crankPosition, ReluctorResult camPosition) override;
 
 		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
+		static Operation_EnginePosition *Construct(bool crankPriority);
 	};
 }
 #endif
