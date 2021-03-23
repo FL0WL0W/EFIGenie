@@ -2,7 +2,7 @@
 
 #ifndef MOCKOUTPUTOPERATION_H
 #define MOCKOUTPUTOPERATION_H
-namespace Operations
+namespace OperationArchitecture
 {
 	class MockOutputOperation : public IOperation<void, ScalarVariable>
 	{
