@@ -71,7 +71,10 @@ namespace OperationArchitecture
 	IOperationBase *Operation_EngineScheduleInjection::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		//serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		const uint32_t openOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+		const uint32_t closeOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+		// ICallBack * const openCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
+		// ICallBack * const closeCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
 		ICallBack * const openCallBack = 0;
 		ICallBack * const closeCallBack = 0;
 

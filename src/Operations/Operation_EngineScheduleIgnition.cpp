@@ -80,7 +80,10 @@ namespace OperationArchitecture
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		// = serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));
+		const uint32_t dwellOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+		const uint32_t igniteOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+		// ICallBack * const dwellCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
+		// ICallBack * const igniteCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
 		ICallBack * const dwellCallBack = 0;
 		ICallBack * const igniteCallBack = 0;
 		
