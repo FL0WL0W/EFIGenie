@@ -39,11 +39,10 @@ namespace OperationArchitecture
         ICallBack **igniteCallBacks = new ICallBack*[length];
         for(uint8_t i = 0; i < length; i++)
         {
-		    unsigned int size = 0;
-            //static_cast<IOperation<void, bool> *>(IOperationBase::Create(serviceLocator, config, size));
-            dwellCallBacks[i] = 0;
-            igniteCallBacks[i] = 0;
-		    Config::OffsetConfig(config, sizeOut, size);
+		    const uint32_t dwellOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+		    const uint32_t igniteOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+            // dwellCallBacks[i] = new CallBack<IOperationBase>(, &IOperationBase::Execute);
+            // igniteCallBacks[i] = new CallBack<IOperationBase>(, &IOperationBase::Execute);
         }
 
 		return new Operation_EngineScheduleIgnitionArray(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), length, tdc, dwellCallBacks, igniteCallBacks);

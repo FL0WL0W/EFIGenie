@@ -39,11 +39,10 @@ namespace OperationArchitecture
         ICallBack **closeCallBacks = new ICallBack*[length];
         for(uint8_t i = 0; i < length; i++)
         {
-		    unsigned int size = 0;
-            //static_cast<IOperation<void, bool> *>(IOperationBase::Create(serviceLocator, config, size));
-            openCallBacks[i] = 0;
-            closeCallBacks[i] = 0;
-		    Config::OffsetConfig(config, sizeOut, size);
+            const uint32_t openOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+            const uint32_t closeOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
+            // openCallBacks[i] = new CallBack<IOperationBase>(, &IOperationBase::Execute);
+            // closeCallBacks[i] = new CallBack<IOperationBase>(, &IOperationBase::Execute);
         }
 
 		return new Operation_EngineScheduleInjectionArray(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), length, tdc, openCallBacks, closeCallBacks);
