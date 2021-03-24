@@ -8,7 +8,7 @@ namespace OperationArchitecture
 	Operation_EngineScheduleIgnitionArray::Operation_EngineScheduleIgnitionArray(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, uint8_t length, const float *tdc, ICallBack **dwellCallBacks, ICallBack **igniteCallBacks)
 	{
         _length = length;
-        _array = reinterpret_cast<Operation_EngineScheduleIgnition **>(malloc(sizeof(Operation_EngineScheduleIgnition *) * _length));
+        _array = new Operation_EngineScheduleIgnition *[_length];
 
         for(uint8_t i = 0; i < _length; i++)
         {
@@ -30,7 +30,7 @@ namespace OperationArchitecture
         return _ret;
 	}
 
-	static IOperationBase *Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EngineScheduleIgnitionArray::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const uint8_t length = Config::CastAndOffset<uint8_t>(config, sizeOut);
 		const float *tdc = reinterpret_cast<const float *>(config);

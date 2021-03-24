@@ -25,14 +25,27 @@ namespace OperationArchitecture
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
-		//we want to set the next dwell tick
-		uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
-		uint32_t dwellTick = _predictor->Execute(ignitionAdvance, enginePosition);
-		dwellTick = dwellTick - dwellTicks;
-		while(ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
-			dwellTick = dwellTick + ticksPerCycle;
+		//we want to set the next dwell tick if ignitionDwell is > 0
+		uint32_t dwellTick = 0;
+		if(ignitionDwell > 0)
+		{
+			uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
+			dwellTick = _predictor->Execute(ignitionAdvance, enginePosition);
+			dwellTick = dwellTick - dwellTicks;
+			while(ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
+				dwellTick = dwellTick + ticksPerCycle;
 
-		_timerService->ScheduleTask(_dwellTask, dwellTick);
+			_timerService->ScheduleTask(_dwellTask, dwellTick);
+			dwellTick = dwellTick == 0? 1 : dwellTick;
+		}
+		//otherwise we want to unschedule the dwell
+		else
+		{
+			if(_dwellTask->Scheduled)
+			{
+				_timerService->UnScheduleTask(_dwellTask);
+			}
+		}
 
 		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
 		if(_dwellingAtTick == 0)
@@ -47,7 +60,7 @@ namespace OperationArchitecture
 		_timerService->ScheduleTask(_igniteTask, ignitionTick);
 
 		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(dwellTick == 0? 1 : dwellTick, ignitionTick == 0? 1 : ignitionTick);
+		return std::tuple<uint32_t, uint32_t>(dwellTick, ignitionTick == 0? 1 : ignitionTick);
 	}
 
 	void Operation_EngineScheduleIgnition::Dwell()
@@ -64,7 +77,7 @@ namespace OperationArchitecture
 		_dwellingAtTick = 0;
 	}
 
-	static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EngineScheduleIgnition::Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		// = serviceLocator->LocateAndCast<IOperation<void, bool>>(BUILDER_OPERATION, Service::IService::CastAndOffset<uint16_t>(config, sizeOut));

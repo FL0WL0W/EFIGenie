@@ -54,7 +54,7 @@ namespace OperationArchitecture
 		return positionTick == 0? 1 : positionTick;
 	}
 
-	static IOperationBase *Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EnginePositionPrediction::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
 		return new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService);
 	}
