@@ -25,6 +25,20 @@ VolumetricEfficiencyConfigs.push(ConfigOperation_StaticScalar);
 VolumetricEfficiencyConfigs.push(ConfigOperation_LookupTable);
 VolumetricEfficiencyConfigs.push(ConfigOperation_2AxisTable);
 
+EngineFactoryIDs = {
+    Offset : 40000,
+    CylinderAirMass_SD: 1,
+    InjectorPrime: 2,
+    InjectorPrimeArray: 3,
+    Position: 4,
+    PositionPrediction: 5,
+    RPM: 6,
+    ScheduleIgnition: 7,
+    ScheduleIgnitionArray: 8,
+    ScheduleInjection: 9,
+    ScheduleInjectionArray: 10
+}
+
 function ResetIncrements()
 {
     Increments = {};

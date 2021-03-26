@@ -6,6 +6,32 @@ var InputTranslationChannel = 3;
 var InputTranslationConfigs = [];
 InputTranslationConfigs.push(ConfigOperation_LookupTable);
 
+OperationArchitectureFactoryIDs = {
+    Offset : 10000,
+    Table : 1,
+    Lookup: 2,
+    Polynomial: 3,
+    Math: 4,
+    Static: 5,
+    FaultDetection: 6
+}
+
+EmbeddedOperationsFactoryIDs = {
+    Offset: 20000,
+    AnalogInput: 1,
+    DigitalPinRecord: 2,
+    DigitalPinRecord: 3,
+    DutyCyclePinRead: 4,
+    FrequencyPinRead: 5,
+    PulseWidthPinRead: 6
+};
+
+ReluctorFactoryIDs = {
+    Offset: 30000,
+    GM24X: 1,
+    Universal2X: 2
+};
+
 var configInputsTemplate;
 class ConfigInputs {
     constructor(){
@@ -525,14 +551,14 @@ class ConfigInput {
 
         var output = GetClassProperty(this.RawConfig, "Output");
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-
         if(this.TranslationConfig) {
             if(this.InputTranslationId === -1)
                 throw "Set Increments First";
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ InputTranslationChannel << 1 | 1 ]).buffer); //variable channel | immediate
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
+
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
             arrayBuffer = arrayBuffer.concatArray(this.TranslationConfig.GetArrayBuffer());
+            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ InputTranslationChannel]).buffer); //variable channel
+            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
             while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
                 //add universal inputs for translation
                 if(translationInputs[translationInputIndex] === "CurrentTick"){
@@ -540,15 +566,16 @@ class ConfigInput {
                 }
                 translationInputIndex++;
             }
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use operation for input parameter
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation return as input parameter
         }
             
         if(this.InputRawId === -1)
             throw "Set Increments First";
         
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ InputRawChannel << 1 | 1 ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InputRawId ]).buffer); //sensorID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x07 ]).buffer); //immediate store and return variables
         arrayBuffer = arrayBuffer.concatArray(this.RawConfig.GetArrayBuffer());
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ InputRawChannel ]).buffer); //variable channel | immediate
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.InputRawId ]).buffer); //sensorID
         
         while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
             //add universal inputs for translation
@@ -617,7 +644,7 @@ class ConfigOperation_AnalogPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([5]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         
         return arrayBuffer;
@@ -692,7 +719,7 @@ class ConfigOperation_DigitalPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([4]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPin]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted]).buffer); //inverted
         
@@ -780,7 +807,7 @@ class ConfigOperation_DigitalPinRecord {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([12]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted]).buffer); //inverted
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Length]).buffer); //length
@@ -857,7 +884,7 @@ class ConfigOperation_DutyCyclePinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([8]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -933,7 +960,7 @@ class ConfigOperation_FrequencyPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([6]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -1009,7 +1036,7 @@ class ConfigOperation_PulseWidthPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([7]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -1139,7 +1166,7 @@ class ConfigOperation_Polynomial {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([1]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MinValue]).buffer); //MinValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MaxValue]).buffer); //MaxValue
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Degree]).buffer); //Degree
@@ -1184,7 +1211,7 @@ class ConfigOperation_ReluctorGM24x {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([1001]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X]).buffer); //factory ID
         
         return arrayBuffer;
     }
@@ -1259,7 +1286,7 @@ class ConfigOperation_ReluctorUniversal2x {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([1002]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal2X]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.RisingPosition]).buffer); //MinValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.FallingPosition]).buffer); //MaxValue
         
