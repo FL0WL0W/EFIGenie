@@ -1,4 +1,5 @@
 #include "Operations/Operation_EnginePositionPrediction.h"
+#include "Config.h"
 using namespace EmbeddedIOServices;
 
 #ifdef OPERATION_ENGINEPOSITIONPREDICTION_H
@@ -56,6 +57,7 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EnginePositionPrediction::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
+		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		return new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService);
 	}
 }

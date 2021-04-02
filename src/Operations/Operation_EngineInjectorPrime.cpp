@@ -20,6 +20,7 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineInjectorPrime::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
+		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const uint32_t openOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
 		const uint32_t closeOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
 		// ICallBack * const openCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);

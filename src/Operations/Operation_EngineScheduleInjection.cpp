@@ -70,6 +70,7 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineScheduleInjection::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
+		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		const uint32_t openOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
 		const uint32_t closeOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);

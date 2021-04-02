@@ -79,6 +79,7 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
+		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		const uint32_t dwellOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
 		const uint32_t igniteOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);

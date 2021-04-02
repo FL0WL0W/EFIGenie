@@ -32,6 +32,7 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineScheduleInjectionArray::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
 	{
+		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const uint8_t length = Config::CastAndOffset<uint8_t>(config, sizeOut);
 		const float *tdc = reinterpret_cast<const float *>(config);
         Config::OffsetConfig(config, sizeOut, sizeof(float) * length);

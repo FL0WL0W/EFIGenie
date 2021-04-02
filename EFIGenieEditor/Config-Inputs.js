@@ -19,7 +19,7 @@ OperationArchitectureFactoryIDs = {
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
     AnalogInput: 1,
-    DigitalPinRecord: 2,
+    DigitalInput: 2,
     DigitalPinRecord: 3,
     DutyCyclePinRead: 4,
     FrequencyPinRead: 5,
@@ -719,7 +719,7 @@ class ConfigOperation_DigitalPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPin]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted]).buffer); //inverted
         
