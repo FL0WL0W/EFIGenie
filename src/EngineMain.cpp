@@ -1,6 +1,8 @@
 #include "EngineMain.h"
 #include "Operations/OperationFactoryRegister.h"
 #include "Operations/EmbeddedIOOperationFactoryRegister.h"
+#include "Operations/ReluctorOperationFactoryRegister.h"
+#include "Operations/EngineOperationFactoryRegister.h"
 #include "Operations/OperationPackager.h"
 #include "Config.h"
 
@@ -10,17 +12,15 @@ namespace Engine
 {
     void EngineMain::Start(EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
     {
-        OperationFactory *operationFactory = new OperationFactory(10000);
-        OperationFactoryRegister::Register(operationFactory);
-
-        EmbeddedIOOperationFactory *embeddedIOOperationFactory = new EmbeddedIOOperationFactory(embeddedIOServiceCollection, 20000);
-        EmbeddedIOOperationFactoryRegister::Register(embeddedIOOperationFactory);
-        operationFactory->RegisterSubFactory(embeddedIOOperationFactory);
-
-
+        OperationFactory *operationFactory = new OperationFactory();
         SystemBus *systemBus = new SystemBus();
         OperationPackager *packager = new OperationPackager(operationFactory, systemBus);
-        
+
+        OperationFactoryRegister::Register(0, operationFactory);
+        EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
+        ReluctorOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection);
+        EngineOperationFactoryRegister::Register(60000, operationFactory, embeddedIOServiceCollection, packager);
+
         unsigned int size = 0;
         do
         {

@@ -68,7 +68,7 @@ namespace OperationArchitecture
 		_open = false;
 	}
 
-	IOperationBase *Operation_EngineScheduleInjection::Create(const EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);

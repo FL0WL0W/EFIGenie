@@ -1,5 +1,6 @@
 #include "Operations/IOperation.h"
 #include "EmbeddedIOServiceCollection.h"
+#include "Operations/OperationPackager.h"
 #include "ICallBack.h"
 
 #ifndef OPERATION_ENGINEINJECTORPRIME_H
@@ -17,7 +18,7 @@ namespace OperationArchitecture
 
 		void Execute(float time) override;
 
-		static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut);
+		static IOperationBase *Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager);
 	};
 }
 #endif

@@ -1,5 +1,6 @@
 #include "Operations/IOperation.h"
 #include "Operations/Operation_EnginePositionPrediction.h"
+#include "Operations/OperationPackager.h"
 #include <tuple>
 
 #ifndef OPERATION_ENGINESCHEDULEINJECTION_H
@@ -25,7 +26,7 @@ namespace OperationArchitecture
 		void Open();
 		void Close();
 
-		static IOperationBase *Create(const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut);
+		static IOperationBase *Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager);
 	};
 }
 #endif
