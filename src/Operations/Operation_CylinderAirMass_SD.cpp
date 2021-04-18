@@ -20,7 +20,6 @@ namespace OperationArchitecture
 	
 	IOperationBase *Operation_CylinderAirMass_SD::Create(const void *config, unsigned int &sizeOut)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		return new Operation_CylinderAirMass_SD(Config::CastAndOffset<float>(config, sizeOut));
 	}
 }

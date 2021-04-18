@@ -79,14 +79,27 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		const uint32_t dwellOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
-		const uint32_t igniteOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
-		// ICallBack * const dwellCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
-		// ICallBack * const igniteCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
-		ICallBack * const dwellCallBack = 0;
-		ICallBack * const igniteCallBack = 0;
+		ICallBack * dwellCallBack = 0;
+		ICallBack * igniteCallBack = 0;
+
+		unsigned int size = 0;
+		IOperationBase *operation = packager->Package(config, size);
+		Config::OffsetConfig(config, sizeOut, size);
+		if(operation->NumberOfParameters == 1)
+		{
+			dwellCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, 1);
+			igniteCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, false);
+		}
+		else
+		{
+			dwellCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+
+			size = 0;
+			IOperationBase *operation = packager->Package(config, size);
+			Config::OffsetConfig(config, sizeOut, size);
+			igniteCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+		}
 		
 		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, dwellCallBack, igniteCallBack);
 	}

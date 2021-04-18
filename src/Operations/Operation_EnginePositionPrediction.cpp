@@ -57,7 +57,6 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EnginePositionPrediction::Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		return new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService);
 	}
 }

@@ -13,7 +13,6 @@ namespace OperationArchitecture
 	
 	IOperationBase *Operation_EngineRpm::Create(const void *config, unsigned int &sizeOut)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		return new Operation_EngineRpm();
 	}
 	

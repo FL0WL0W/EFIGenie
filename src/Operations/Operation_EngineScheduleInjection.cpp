@@ -70,14 +70,27 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		const uint32_t openOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
-		const uint32_t closeOperationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
-		// ICallBack * const openCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
-		// ICallBack * const closeCallBack = new CallBack<IOperationBase>(, &IOperationBase::Execute);
-		ICallBack * const openCallBack = 0;
-		ICallBack * const closeCallBack = 0;
+		ICallBack * openCallBack = 0;
+		ICallBack * closeCallBack = 0;
+
+		unsigned int size = 0;
+		IOperationBase *operation = packager->Package(config, size);
+		Config::OffsetConfig(config, sizeOut, size);
+		if(operation->NumberOfParameters == 1)
+		{
+			openCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, 1);
+			closeCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, false);
+		}
+		else
+		{
+			openCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+
+			size = 0;
+			IOperationBase *operation = packager->Package(config, size);
+			Config::OffsetConfig(config, sizeOut, size);
+			closeCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+		}
 
 		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, openCallBack, closeCallBack);
 	}

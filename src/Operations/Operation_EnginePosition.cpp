@@ -75,7 +75,6 @@ namespace OperationArchitecture
 	
 	IOperationBase *Operation_EnginePosition::Create(const void *config, unsigned int &sizeOut)
 	{
-		Config::OffsetConfig(config, sizeOut, sizeof(uint32_t)); //skip over FactoryID
 		return Construct(Config::CastAndOffset<bool>(config, sizeOut));
 	}
 
