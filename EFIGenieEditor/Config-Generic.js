@@ -1,5 +1,15 @@
 var GenericConfigs = [];
 
+OperationArchitectureFactoryIDs = {
+    Offset : 10000,
+    Table : 1,
+    LookupTable: 2,
+    Polynomial: 3,
+    Math: 4,
+    Static: 5,
+    FaultDetection: 6
+}
+
 var configOperation_StaticScalarTemplate;
 class ConfigOperation_StaticScalar {
     static Name = "Static";
@@ -36,7 +46,7 @@ class ConfigOperation_StaticScalar {
 
     Attach() {
         var thisClass = this;
-
+        
         $(document).on("change."+this.GUID, "#" + this.GUID + "-type", function(){
             thisClass.Detach();
 
@@ -74,7 +84,7 @@ class ConfigOperation_StaticScalar {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([13]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //factory ID
         switch(this.Type)
         {
             case "number":
@@ -183,8 +193,8 @@ class ConfigOperation_LookupTable {
                 thisClass.Detach();
 
                 var val = $(this).val();
-                thisClass.InputSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-                $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+                thisClass.InputSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
+                thisClass.UpdateTable();
                 
                 thisClass.Attach();
             });
@@ -204,8 +214,7 @@ class ConfigOperation_LookupTable {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
-        this.Table.XLabel = this.NoInputSelect? "Input" : "<select style=\"width: 100%;\" id=\"" + this.GUID + "-inputselection\">" + GetSelections(this.InputSelection) + "</select>";
-        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.UpdateTable();
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -213,8 +222,12 @@ class ConfigOperation_LookupTable {
 
         return template;
     }
-    
-    UpdateSelections() {
+
+    UpdateTable() {
+        this.Table.XLabel = this.NoInputSelect? "Input" : "<select style=\"width: 100%;\" id=\"" + this.GUID + "-inputselection\">" + GetSelections(this.InputSelection) + "</select>";
+        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.Table.Label = GetClassProperty(this, "ValueLabel");
+
         if(!this.NoInputSelect)
             $("#" + this.GUID + "-inputselection").html(GetSelections(this.InputSelection));
     }
@@ -224,7 +237,7 @@ class ConfigOperation_LookupTable {
             var thisClass = this;
             if(!Increments.PostEvent)
                 Increments.PostEvent = [];
-            Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+            Increments.PostEvent.push(function() { thisClass.UpdateTable(); });
         }
     }
 
@@ -272,7 +285,7 @@ class ConfigOperation_LookupTable {
 
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.XResolution]).buffer); //XResolution
@@ -320,8 +333,7 @@ class ConfigOperation_LookupTable {
         }
 
         if(!NoInputSelect) {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Channel ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value).Id ]).buffer);
+            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value && a.Measurement === this.InputSelection.measurement).Id ]).buffer);
         }
 
         return arrayBuffer;
@@ -388,8 +400,8 @@ class ConfigOperation_2AxisTable {
             thisClass.Detach();
 
             var val = $(this).val();
-            thisClass.XSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.XSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
+            thisClass.UpdateTable();
             
             thisClass.Attach();
         });
@@ -398,8 +410,8 @@ class ConfigOperation_2AxisTable {
             thisClass.Detach();
 
             var val = $(this).val();
-            thisClass.YSelection = {reference: $('option:selected', this).attr('reference'), value: val};
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.YSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
+            thisClass.UpdateTable();
             
             thisClass.Attach();
         });
@@ -418,9 +430,7 @@ class ConfigOperation_2AxisTable {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
-        this.Table.XLabel = "<select style=\"width: 100%;\" id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
-        this.Table.YLabel = "<select style=\"width: $height$px;\" id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
-        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.UpdateTable();
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -429,7 +439,12 @@ class ConfigOperation_2AxisTable {
         return template;
     }
 
-    UpdateSelections() {
+    UpdateTable() {
+        this.Table.XLabel = "<select style=\"width: 100%;\" id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
+        this.Table.YLabel = "<select style=\"width: $height$px;\" id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
+        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.Table.Label = GetClassProperty(this, "ValueLabel");
+        
         $("#" + this.GUID + "-xselection").html(GetSelections(this.XSelection));
         $("#" + this.GUID + "-yselection").html(GetSelections(this.YSelection));
     }
@@ -485,7 +500,7 @@ class ConfigOperation_2AxisTable {
 
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([3]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.XResolution]).buffer); //XResolution
@@ -535,10 +550,8 @@ class ConfigOperation_2AxisTable {
                 break;
         }
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value).Channel ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value).Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value).Channel ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value).Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id ]).buffer);
                 
         return arrayBuffer;
     }
@@ -568,15 +581,46 @@ class Table {
     }
 
     SetXResolution(xRes){
-        //TODO interpolate
+        this.MaxX = parseFloat((this.MaxX - this.MinX) * (xRes-1) / (this.XResolution-1) + this.MinX);
+        var newValue = new Array(Math.max(1, xRes) * Math.max(1, this.YResolution));
+        for(var x=0; x<xRes; x++){
+            for(var y=0; y<this.YResolution; y++){
+                var oldValuesIndex = x + this.XResolution * y;
+                var newValuesIndex = x + xRes * y;
+                if(x >= this.XResolution){
+                    var newValuesIndexMinus1 = (x-1) + xRes * y;
+                    var newValuesIndexMinus2 = (x-2) + xRes * y;
+                    if(x>1){
+                        newValue[newValuesIndex] = newValue[newValuesIndexMinus1] + (newValue[newValuesIndexMinus1] - newValue[newValuesIndexMinus2]);
+                    }
+                } else {
+                    newValue[newValuesIndex] = this.Value[oldValuesIndex];
+                }
+            }
+        }
         this.XResolution = xRes;
-        this.Value = new Array(Math.max(1, this.XResolution) * Math.max(1, this.YResolution));
+        this.Value = newValue;
     }
 
     SetYResolution(yRes){
-        //TODO interpolate
+        this.MaxY = parseFloat((this.MaxY - this.MinY) * (yRes-1) / (this.YResolution-1) + this.MinY);
+        var newValue = new Array(Math.max(1, this.XResolution) * Math.max(1, yRes));
+        for(var x=0; x<this.XResolution; x++){
+            for(var y=0; y<yRes; y++){
+                var valuesIndex = x + this.XResolution * y;
+                if(y >= this.YResolution){
+                    var valuesIndexMinus1 = x + this.XResolution * (y-1);
+                    var valuesIndexMinus2 = x + this.XResolution * (y-2);
+                    if(y>1){
+                        newValue[valuesIndex] = newValue[valuesIndexMinus1] + (newValue[valuesIndexMinus1] - newValue[valuesIndexMinus2]);
+                    }
+                } else {
+                    newValue[valuesIndex] = this.Value[valuesIndex];
+                }
+            }
+        }
         this.YResolution = yRes;
-        this.Value = new Array(Math.max(1, this.XResolution) * Math.max(1, this.YResolution));
+        this.Value = newValue;
     }
 
     Detach() {
@@ -593,33 +637,40 @@ class Table {
     Attach() {
         var thisClass = this;
 
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(e){
-            thisClass.Detach();
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
+            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true });
+        });
 
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-table", function(e){
+            thisClass.Detach();
             var x = $(e.target).data("x");
             var y = $(e.target).data("y");
             var value = parseFloat($(e.target).val());
             
             if(x === -1) {
                 if(y === 0){
+                    //TODO interpolate
                     thisClass.MinY = value;
                 } else if (y === thisClass.YResolution - 1){
+                    //TODO interpolate
                     thisClass.MaxY = value;
                 }
                 for(var i = 1; i < thisClass.YResolution - 1; i++) {
-                    $("#" + thisClass.GUID + " input[data-x='-1'][data-y='" + i + "']").val(parseFloat(parseFloat(((thisClass.MaxY - thisClass.MinY) * i / (thisClass.YResolution-1) + thisClass.MinY).toFixed(6)).toPrecision(7)));
+                    $("#" + thisClass.GUID + "-table input[data-x='-1'][data-y='" + i + "']").val(parseFloat(parseFloat(((thisClass.MaxY - thisClass.MinY) * i / (thisClass.YResolution-1) + thisClass.MinY).toFixed(6)).toPrecision(7)));
                 }
             } else if(y === -1) {
                 if(x === 0){
+                    //TODO interpolate
                     thisClass.MinX = value;
                 } else if (x === thisClass.XResolution - 1){
+                    //TODO interpolate
                     thisClass.MaxX = value;
                 }
                 for(var i = 1; i < thisClass.XResolution - 1; i++) {
-                    $("#" + thisClass.GUID + " input[data-x='"+i+"'][data-y='-1']").val(parseFloat(parseFloat(((thisClass.MaxX - thisClass.MinX) * i / (thisClass.XResolution-1) + thisClass.MinX).toFixed(6)).toPrecision(7)));
+                    $("#" + thisClass.GUID + "-table input[data-x='"+i+"'][data-y='-1']").val(parseFloat(parseFloat(((thisClass.MaxX - thisClass.MinX) * i / (thisClass.XResolution-1) + thisClass.MinX).toFixed(6)).toPrecision(7)));
                 }
             } else {
-                $.each($("#" + thisClass.GUID + " input.selected"), function(index, cell) {
+                $.each($("#" + thisClass.GUID + "-table input.selected"), function(index, cell) {
                     var index = parseInt($(cell).data("x")) + parseInt($(cell).data("y")) * thisClass.XResolution;
                     $(cell).val(value);
                     thisClass.Value[index] = value;
@@ -634,7 +685,7 @@ class Table {
 
             thisClass.SetXResolution(thisClass.XResolution + 1);
 
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.UpdateTable();
 
             thisClass.Attach();
         });
@@ -644,7 +695,7 @@ class Table {
             
             thisClass.SetXResolution(thisClass.XResolution - 1);
 
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.UpdateTable();
 
             thisClass.Attach();
         });
@@ -654,7 +705,7 @@ class Table {
             
             thisClass.SetYResolution(thisClass.YResolution + 1);
 
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.UpdateTable();
 
             thisClass.Attach();
         });
@@ -664,7 +715,7 @@ class Table {
             
             thisClass.SetYResolution(thisClass.YResolution - 1);
 
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.UpdateTable();
 
             thisClass.Attach();
         });
@@ -673,8 +724,8 @@ class Table {
         var pointX;
         var pointY;
 
-        $(document).on("mousedown."+this.GUID, "#" + this.GUID + " input", function(e){
-            $("#" + thisClass.GUID + " input").removeClass("selected");
+        $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            $("#" + thisClass.GUID + "-table input").removeClass("selected");
             if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
                 return;
 
@@ -685,7 +736,7 @@ class Table {
         });
         
         $(document).on("mouseup."+this.GUID, function(e){
-            $("#" + thisClass.GUID + " input:focus").select();
+            $("#" + thisClass.GUID + "-table input:focus").select();
             selecting = false;
         });
         
@@ -693,7 +744,7 @@ class Table {
             if(!selecting)
                 return;
 
-            $.each($("#" + thisClass.GUID + " input"), function(index, cell) {
+            $.each($("#" + thisClass.GUID + "-table input"), function(index, cell) {
                 var cellElement = $(cell);
                 if(cellElement.data("x") === undefined || parseInt(cellElement.data("x")) < 0 || cellElement.data("y") === undefined || parseInt(cellElement.data("y")) < 0)
                     return;
@@ -712,7 +763,7 @@ class Table {
             });
         });
         
-        $(document).on("copy."+this.GUID, "#" + this.GUID + " input", function(e){
+        $(document).on("copy."+this.GUID, "#" + this.GUID + "-table input", function(e){
             if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
                 return;
 
@@ -721,7 +772,7 @@ class Table {
             for(var y = 0; y < thisClass.YResolution; y++){
                 var rowSelected = false
                     for(var x = 0; x < thisClass.XResolution; x++){
-                    if($("#" + thisClass.GUID + " input[data-x='" + x + "'][data-y='" + y + "']").hasClass("selected")){
+                    if($("#" + thisClass.GUID + "-table input[data-x='" + x + "'][data-y='" + y + "']").hasClass("selected")){
                         if(rowSelected){
                             copyData += "\t";
                         }
@@ -742,13 +793,13 @@ class Table {
             e.preventDefault();
         });
 
-        $(document).on("paste."+this.GUID, "#" + this.GUID + " input", function(e){
+        $(document).on("paste."+this.GUID, "#" + this.GUID + "-table input", function(e){
             if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
                 return;
                 
             var val = e.originalEvent.clipboardData.getData('text/plain');
 
-            var selectedCell = $("#" + thisClass.GUID + " input:focus")
+            var selectedCell = $("#" + thisClass.GUID + "-table input:focus")
             var x = selectedCell.data("x");
             var y = selectedCell.data("y");
             if(x < 0 || y < 0)
@@ -765,7 +816,7 @@ class Table {
 
                     var v = parseFloat(val);
                     thisClass.Value[xPos + yPos * thisClass.XResolution] = v;
-                    var cell = $("#" + thisClass.GUID + " input[data-x='" + xPos + "'][data-y='" + yPos + "']");
+                    var cell = $("#" + thisClass.GUID + "-table input[data-x='" + xPos + "'][data-y='" + yPos + "']");
                     cell.val(v);
                     cell.addClass("selected");
                 });
@@ -773,15 +824,22 @@ class Table {
 
             e.preventDefault();
         });
-        
-        $(document).on("contextmenu."+thisClass.GUID, "#" + this.GUID + " input", function(){
-            event.preventDefault();
-        });
     }
 
     GetHtml() {
+        return "<div id=\"" + this.GUID + "\">" + 
+                    "<label for=\"" + this.GUID + "-edit\">" + this.Label + ":</label><input id=\"" + this.GUID + "-edit\" type=\"button\" class=\"button\" value=\"Edit Table\"></input>" + 
+                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\">" + this.GetTable() + "</div>"
+                "</div>";
+    }
+
+    UpdateTable() {
+        $("#" + this.GUID + "-table").replaceWith(this.GetTable());
+    }
+
+    GetTable() {
         var row = "";
-        var table = "<table class=\"configtable\">";
+        var table = "<table id=\"" + this.GUID + "-table\" class=\"configtable\">";
 
         var xstart = -1;
         var ystart = -1;
@@ -834,7 +892,7 @@ class Table {
                         if(this.XResolution === 1) {
                             row += "<th style=\"border-bottom-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
                         } else {
-                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((x === 0 && this.MinXModifiable) || (x === this.XResolution - 1 && this.MaxXModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxX - this.MinX) * x / (this.XResolution-1) + this.MinX).toFixed(6)).toPrecision(7))) + "\"/></td>";
+                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((x === 0 && this.MinXModifiable) || (x === this.XResolution - 1 && this.MaxXModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxX - this.MinX) * x / (this.XResolution-1) + this.MinX).toFixed(6)).toPrecision(7))) + "\"/></td>";
                         }
                     } else {
                         if(xstart === -1 && this.XResolutionModifiable)
@@ -859,7 +917,7 @@ class Table {
                         if(this.YResolution === 1) {
                             row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
                         } else {
-                            row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((y === 0 && this.MinYModifiable) || (y === this.YResolution - 1 && this.MaxYModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxY - this.MinY) * y / (this.YResolution-1) + this.MinY).toFixed(6)).toPrecision(7))) + "\"/></td>";
+                            row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((y === 0 && this.MinYModifiable) || (y === this.YResolution - 1 && this.MaxYModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxY - this.MinY) * y / (this.YResolution-1) + this.MinY).toFixed(6)).toPrecision(7))) + "\"/></td>";
                         }
                     } else if(x < this.XResolution) {
                         // - - - - -
@@ -874,10 +932,10 @@ class Table {
                             rowClass = " class =\"" + rowClass + "\"";
                         else
                             rowClass = "";
-                        row += "<td><input id=\"" + inputId + "\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" value=\"" + this.Value[valuesIndex] + "\""+rowClass+"/></td>";
+                        row += "<td><input oncontextmenu=\"return false;\" id=\"" + inputId + "\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" value=\"" + this.Value[valuesIndex] + "\""+rowClass+"/></td>";
                     } else {
                         if(y === 0 && this.XResolutionModifiable) {
-                            row += "<td style=\"vertical-align: text-top;\" rowspan=\"" + this.YResolution + "\"><input id=\"" + this.GUID + "-addX\" style=\"width:24px\" type=\"button\" value=\"+\"><br><input id=\"" + this.GUID + "-subX\" style=\"width:24px\" type=\"button\" value=\"-\"></td>";
+                            row += "<td style=\"vertical-align: text-top;\" rowspan=\"" + this.YResolution + "\"><input oncontextmenu=\"return false;\" id=\"" + this.GUID + "-addX\" style=\"width:24px\" type=\"button\" value=\"+\"><br><input oncontextmenu=\"return false;\" id=\"" + this.GUID + "-subX\" style=\"width:24px\" type=\"button\" value=\"-\"></td>";
                         }
                     }
                 } else {
@@ -885,7 +943,7 @@ class Table {
                         row += "<td colspan=\"" + (-xstart) + "\"></td>";
                     }
                     else if(x === 0 && this.YResolutionModifiable) {
-                        row += "<td colspan=\"" + this.XResolution + "\"><input id=\"" + this.GUID + "-addY\" style=\"width:24px\" type=\"button\" value=\"+\"><input id=\"" + this.GUID + "-subY\" style=\"width:24px\" type=\"button\" value=\"-\"></td>";
+                        row += "<td colspan=\"" + this.XResolution + "\"><input oncontextmenu=\"return false;\" id=\"" + this.GUID + "-addY\" style=\"width:24px\" type=\"button\" value=\"+\"><input oncontextmenu=\"return false;\" id=\"" + this.GUID + "-subY\" style=\"width:24px\" type=\"button\" value=\"-\"></td>";
                     }
                 }
             }
@@ -893,9 +951,7 @@ class Table {
             table += row;
         }
 
-        table = table + "</table>"
-
-        return "<span id=\"" + this.GUID + "\">"+table+"</span>";
+        return table + "</table>";
     }
 }
 
@@ -929,12 +985,12 @@ function GetSelections(selection, measurement, configs) {
         for(var i = 0; i < arr.length; i++) {
             if(!measurement || arr[i].Measurement === measurement) {
                 var selected = false;
-                if(selection && selection.reference === property && selection.value === arr[i].Name){
+                if(selection && selection.reference === property && selection.value === arr[i].Name && selection.measurement === arr[i].Measurement){
                     selected = true;
                     configSelected = true;
                 }
     
-                arrSelections += "<option reference=\"" + property + "\" value=\"" + arr[i].Name + "\"" + (selected? " selected" : "") + ">" + arr[i].Name + (!measurement? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : "") + "</option>"
+                arrSelections += "<option reference=\"" + property + "\" value=\"" + arr[i].Name + "\" measurement=\"" + arr[i].Measurement + "\"" + (selected? " selected" : "") + ">" + arr[i].Name + (!measurement? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : "") + "</option>"
             }
         }
         if(arrSelections) 
@@ -954,22 +1010,18 @@ document.addEventListener("dragstart", function(e){
 });//disable dragging of selected items
 var configOrVariableSelectionTemplate;
 class ConfigOrVariableSelection {
-    constructor(configs, valueLabel, valueMeasurement, incrementName, incrementListName, channel){
+    constructor(configs, valueLabel, valueMeasurement, variableListName){
         this.GUID = getGUID();
         this.Configs = configs;
         this.ValueLabel = valueLabel;
         this.ValueMeasurement = valueMeasurement;
-        this.IncrementName = incrementName;
-        this.IncrementListName = incrementListName;
-        this.Channel = channel;
+        this.VariableListName = variableListName;
     }
 
     Configs = undefined;
     ValueLabel = undefined;
     ValueMeasurement = undefined;
-    IncrementName = undefined;
-    IncrementListName = undefined;
-    Channel = undefined;
+    VariableListName = undefined;
     Selection = undefined;
 
     GetObj() {
@@ -1065,7 +1117,7 @@ class ConfigOrVariableSelection {
         if(!array)
             return undefined;
         for(var i = 0; i < array.length; i++) {
-            if(name && name === array[i].Name)
+            if(name && name === array[i].Name && this.ValueMeasurement === array[i].Measurement)
                 return array[i];
         }
         return undefined;
@@ -1079,22 +1131,21 @@ class ConfigOrVariableSelection {
         Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
 
         if(this.Selection) {
-            if(Increments[this.IncrementListName] === undefined)
-                Increments[this.IncrementListName] = [];
+            if(Increments[this.VariableListName] === undefined)
+                Increments[this.VariableListName] = [];
 
             if(!this.Selection.reference) {
                 this.Id = 0;
-                if(Increments[this.IncrementName] === undefined)
-                    Increments[this.IncrementName] = 0;
+                if(Increments.VariableIncrement === undefined)
+                    Increments.VariableIncrement = 0;
                 else
-                    this.Id = ++Increments[this.IncrementName];
+                    this.Id = ++Increments.VariableIncrement;
 
                 if(this.Selection.value.SetIncrements)
                     this.Selection.value.SetIncrements();
                     
-                Increments[this.IncrementListName].push({ 
+                Increments[this.VariableListName].push({ 
                     Name: this.ValueLabel, 
-                    Channel: this.Channel,
                     Id: this.Id,
                     Type: "float",
                     Measurement: this.ValueMeasurement
@@ -1102,9 +1153,8 @@ class ConfigOrVariableSelection {
             } else {
                 var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
                 if(cell) {
-                    Increments[this.IncrementListName].push({ 
+                    Increments[this.VariableListName].push({ 
                         Name: this.ValueLabel, 
-                        Channel: cell.Channel,
                         Id: cell.Id,
                         Type: "float",
                         Measurement: this.ValueMeasurement
@@ -1119,21 +1169,19 @@ class ConfigOrVariableSelection {
 
         if(this.Selection && !this.Selection.reference) {            
             if(variable || !operation){
-                if(Increments[this.IncrementName] === undefined)
+                if(Increments.VariableIncrement === undefined)
                     throw "Set Increments First";
                 if(this.Id === -1)
                     throw "Set Increments First";
                     
                 if(!variable)//if it is a variable we do not want to execute in main loop
                     arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Channel << 1 | 1 ]).buffer); //variable channel | immediate
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.Id ]).buffer); //Id
+                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer); //Id
             }
             arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBuffer());
         } else if (variable) {//if it is a variable we want to return the variable reference
             var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ cell.Channel << 1 ]).buffer); //variable channel
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ cell.Id ]).buffer); //Id
+            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ cell.Id ]).buffer); //Id
         }
         
         return arrayBuffer;

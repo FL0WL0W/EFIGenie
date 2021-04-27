@@ -34,6 +34,10 @@ namespace Engine
         while(size > 0);
 
         size = 0;
+        IOperationBase *inputsExecute = packager->Package(config, size);
+        Config::OffsetConfig(config, sizeOut, size);
+
+        size = 0;
         IOperationBase *preSyncExecute = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
@@ -45,10 +49,13 @@ namespace Engine
         IOperationBase *mainLoopExecute = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
+
+        inputsExecute->Execute();
         preSyncExecute->Execute();
 
         while(true)
         {
+            inputsExecute->Execute();
             while(syncCondition->Execute<bool>())
             {
                 mainLoopExecute->Execute();

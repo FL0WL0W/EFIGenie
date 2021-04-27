@@ -1,6 +1,3 @@
-var EngineChannel = 4;
-var FuelChannel = 5;
-var IgnitionChannel = 6;
 var Increments = {};
 var AFRConfigs = [];
 AFRConfigs.push(ConfigOperation_StaticScalar);
@@ -244,7 +241,24 @@ class ConfigTop {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
+        //operations
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ 0 ]).buffer); //signal last operation
+        
+        //inputs
         arrayBuffer = arrayBuffer.concatArray(this.Inputs.GetArrayBuffer());
+
+        //preSync
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 0 ]).buffer); //number of operations
+
+        //sync condition
+        //static true for now
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //bool
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([true]).buffer); //value
+
+        //main loop execute
         arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBuffer());
         arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBuffer());
         arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBuffer());
@@ -261,16 +275,12 @@ class ConfigFuel {
             AFRConfigs,
             "Air Fuel Ratio",
             "Ratio",
-            "FuelIncrement",
-            "FuelParameters",
-            FuelChannel);
+            "FuelParameters");
         this.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection(
             InjectorPulseWidthConfigs,
             "Injector Pulse Width",
             "Time",
-            "FuelIncrement",
-            "FuelParameters",
-            FuelChannel);
+            "FuelParameters");
     }
 
     AFRConfigOrVariableSelection = undefined;
@@ -323,13 +333,12 @@ class ConfigFuel {
             Increments.FuelParameters = [];
 
         this.InjectorGramsId = 0;
-        if(Increments.FuelIncrement === undefined)
-            Increments.FuelIncrement = 0;
+        if(Increments.VariableIncrement === undefined)
+            Increments.VariableIncrement = 0;
         else
-            this.InjectorGramsId = ++Increments.FuelIncrement;
+            this.InjectorGramsId = ++Increments.VariableIncrement;
         Increments.FuelParameters.push({ 
             Name: "Injector Grams", 
-            Channel: FuelChannel,
             Id: this.InjectorGramsId,
             Type: "float",
             Measurement: "Mass"
@@ -343,19 +352,16 @@ class ConfigFuel {
 
         arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBuffer());
         
-        if(Increments.FuelIncrement === undefined)
+        if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
         if(this.InjectorGramsId === -1)
             throw "Set Increments First";
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ FuelChannel << 1 | 1 ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.InjectorGramsId ]).buffer); //EngineRPMId
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorGramsId ]).buffer); //EngineRPMId
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 14 ]).buffer); //factory ID for math
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Id ]).buffer);
 
         arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBuffer());
 
@@ -371,9 +377,7 @@ class ConfigIgnition {
             IgnitionAdvanceConfigs,
             "Ignition Advance",
             "Angle",
-            "IgnitinoIncrement",
-            "IgnitionParameters",
-            IgnitionChannel);
+            "IgnitionParameters");
     }
 
     IgnitionAdvanceConfigOrVariableSelection = undefined;
@@ -433,44 +437,32 @@ class ConfigEngine {
             undefined,
             "Crank Position",
             "ReluctorResult",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
         this.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
             undefined,
             "Cam Position",
             "ReluctorResult",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
         this.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection(
             CylinderAirmassConfigs,
             "Cylinder Air Mass",
             "Mass",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
         this.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection(
             CylinderAirTemperatureConfigs,
             "Cylinder Air Temperature",
             "Temperature",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection(
             ManifoldAbsolutePressureConfigs,
             "Manifold Absolute Pressure",
             "Pressure",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
         this.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection(
             VolumetricEfficiencyConfigs,
             "Volumetric Efficiency",
             "Percentage",
-            "EngineIncrement",
-            "EngineParameters",
-            EngineChannel);
+            "EngineParameters");
     }
 
     CrankPriority = 1;//static set this for now
@@ -587,15 +579,14 @@ class ConfigEngine {
         Increments.EngineParameters = [];
 
         this.EnginePositionId = 0;
-        if(Increments.EngineIncrement === undefined)
-            Increments.EngineIncrement = 0;
+        if(Increments.VariableIncrement === undefined)
+            Increments.VariableIncrement = 0;
         else
-            this.EnginePositionId = ++Increments.EngineIncrement;
-        this.EngineRPMId = ++Increments.EngineIncrement;
+            this.EnginePositionId = ++Increments.VariableIncrement;
+        this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EnginePositionId = this.EnginePositionId;
         Increments.EngineParameters.push({ 
             Name: "Engine RPM", 
-            Channel: EngineChannel,
             Id: this.EngineRPMId,
             Type: "float",
             Measurement: "AngularSpeed"
@@ -625,27 +616,28 @@ class ConfigEngine {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBuffer());
-
-        if(Increments.EngineIncrement === undefined)
+        if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
         if(this.EngineRPMId === -1)
             throw "Set Increments First";
         if(this.EnginePositionId === -1)
             throw "Set Increments First";
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.EngineRPMId ]).buffer); //EngineRPMId
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ x ]).buffer); //number of operations
+
+        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBuffer());
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ x ]).buffer); //factory id
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineRPMId ]).buffer); //EngineRPMId
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2004 ]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use operation for engine position parameter
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 | 1 ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.EnginePositionId ]).buffer); //EnginePositionId
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionId
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2001 ]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CrankPriority? 1 : 0 ]).buffer); //CrankPriority
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Channel << 1 ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Id ]).buffer);
         
 
         var requirements = [];
@@ -734,12 +726,9 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
 
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2007]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.CylinderVolume]).buffer); //CylinderVolume
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id ]).buffer);
                 
         return arrayBuffer;
     }
@@ -757,16 +746,12 @@ class ConfigInjectorPulseWidth_DeadTime {
             GenericConfigs,
             "Injector Flow Rate",
             "MassFlow",
-            "FuelIncrement",
-            "FuelParameters",
-            FuelChannel);
+            "FuelParameters");
         this.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection(
             GenericConfigs,
             "Injector Dead Time",
             "Time",
-            "FuelIncrement",
-            "FuelParameters",
-            FuelChannel);
+            "FuelParameters");
     }
 
     FlowRateConfigOrVariableSelection = undefined;
@@ -827,8 +812,7 @@ class ConfigInjectorPulseWidth_DeadTime {
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([14]).buffer); //Math factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //Divide
         //divide parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Channel << 1]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
         //divide parameter 2
         arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBuffer(true));
                 
@@ -847,9 +831,7 @@ class ConfigInjectorOutputs {
             GenericConfigs,
             "Injector End Position(ATDC)",
             "Angle",
-            "FuelIncrement",
-            "FuelParameters",
-            FuelChannel);
+            "FuelParameters");
         this.TDCTable = new Table();
         this.TDCTable.YResolutionModifiable = false;
         this.TDCTable.XResolutionModifiable = false;
@@ -925,9 +907,7 @@ class ConfigInjectorOutputs {
         arrayBuffer = arrayBuffer.concatArray(new Float32Array(this.TDCTable.Value).buffer); //output TDCs
         //output operations
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ EngineChannel << 1 ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.EnginePositionId ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Channel << 1 ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id ]).buffer);
         arrayBuffer = arrayBuffer.concatArray(this.InjectorEndPositionConfigOrVariableSelection.GetArrayBuffer(true));
 

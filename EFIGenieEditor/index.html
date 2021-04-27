@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="jquery-3.3.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src="utils.js"></script>
         <script src="Config-Generic.js"></script>
         <script src="Config-Inputs.js"></script>
@@ -8,6 +9,7 @@
         <script src="Config.js"></script>
         <script src="Units.js"></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
+        <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
         <script type="text/javascript">
             var b = new ConfigTop();
             $(document).on('change', function() { ResetIncrements(), b.SetIncrements()});//this is a hack but oh well

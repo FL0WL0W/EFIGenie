@@ -1,20 +1,7 @@
-var SystemChannel = 1
 var CurrentTickVariableID = 0;
-var InputRawChannel = 2;
 var InputRawConfigs = [];
-var InputTranslationChannel = 3;
 var InputTranslationConfigs = [];
 InputTranslationConfigs.push(ConfigOperation_LookupTable);
-
-OperationArchitectureFactoryIDs = {
-    Offset : 10000,
-    Table : 1,
-    Lookup: 2,
-    Polynomial: 3,
-    Math: 4,
-    Static: 5,
-    FaultDetection: 6
-}
 
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -230,6 +217,8 @@ class ConfigInputs {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.Inputs.length ]).buffer); //number of operations
         for(var i = 0; i < this.Inputs.length; i++){
             arrayBuffer = arrayBuffer.concatArray(this.Inputs[i].GetArrayBuffer())
         }
@@ -496,37 +485,32 @@ class ConfigInput {
             return;
 
         if(this.TranslationConfig) {
-            this.Channel = InputTranslationChannel;
             this.InputTranslationId = 0;
-            if(Increments.InputTranslationIncrement === undefined)
-                Increments.InputTranslationIncrement = 0;
+            if(Increments.VariableIncrement === undefined)
+                Increments.VariableIncrement = 0;
             else
-                this.InputTranslationId = ++Increments.InputTranslationIncrement;
+                this.InputTranslationId = ++Increments.VariableIncrement;
                 
             if(Increments.Inputs === undefined)
                 Increments.Inputs = [];
             Increments.Inputs.push( { 
                 Name: this.Name, 
-                Channel: InputTranslationChannel,
                 Id: this.InputTranslationId, 
                 Type: GetClassProperty(this.TranslationConfig, "Output"),
                 Measurement: this.TranslationConfig.constructor.Measurement === "Selectable"? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement
             });
-        } else {
-            this.Channel = InputRawChannel;
         }
         
         this.InputRawId = 0;
-        if(Increments.InputRawIncrement === undefined)
-            Increments.InputRawIncrement = 0;
+        if(Increments.VariableIncrement === undefined)
+            Increments.VariableIncrement = 0;
         else
-            this.InputRawId = ++Increments.InputRawIncrement;
+            this.InputRawId = ++Increments.VariableIncrement;
             
         if(Increments.Inputs === undefined)
             Increments.Inputs = [];
         Increments.Inputs.push( { 
             Name: this.Name, 
-            Channel: InputRawChannel,
             Id: this.InputRawId,
             Type: GetClassProperty(this.RawConfig, "Output"),
             Measurement: GetClassProperty(this.RawConfig, "Measurement")
@@ -546,7 +530,7 @@ class ConfigInput {
         if(!this.RawConfig) 
             return arrayBuffer;
 
-        if(Increments.InputRawIncrement === undefined)
+        if(Increments.VariableIncrement === undefined)
             throw "Set Increments First";
 
         var output = GetClassProperty(this.RawConfig, "Output");
@@ -557,30 +541,32 @@ class ConfigInput {
 
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
             arrayBuffer = arrayBuffer.concatArray(this.TranslationConfig.GetArrayBuffer());
-            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ InputTranslationChannel]).buffer); //variable channel
-            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
+            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
             while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
                 //add universal inputs for translation
                 if(translationInputs[translationInputIndex] === "CurrentTick"){
+                    arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+                    arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
                     //TODO
                 }
                 translationInputIndex++;
             }
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation return as input parameter
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use 1st return from operation
         }
             
         if(this.InputRawId === -1)
             throw "Set Increments First";
         
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x07 ]).buffer); //immediate store and return variables
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | this.TranslationConfig? 0x04 : 0x00 ]).buffer); //immediate and store variables, return if TranslationConfig
         arrayBuffer = arrayBuffer.concatArray(this.RawConfig.GetArrayBuffer());
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ InputRawChannel ]).buffer); //variable channel | immediate
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.InputRawId ]).buffer); //sensorID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputRawId ]).buffer); //sensorID
         
         while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
             //add universal inputs for translation
             if(translationInputs[translationInputIndex] === "CurrentTick"){
-                //TODO
+                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
             }
             translationInputIndex++;
         }
@@ -884,7 +870,7 @@ class ConfigOperation_DutyCyclePinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -960,7 +946,7 @@ class ConfigOperation_FrequencyPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -1036,7 +1022,7 @@ class ConfigOperation_PulseWidthPinRead {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
         
@@ -1166,7 +1152,7 @@ class ConfigOperation_Polynomial {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MinValue]).buffer); //MinValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MaxValue]).buffer); //MaxValue
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Degree]).buffer); //Degree
@@ -1211,7 +1197,7 @@ class ConfigOperation_ReluctorGM24x {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X]).buffer); //factory ID
         
         return arrayBuffer;
     }
@@ -1286,7 +1272,7 @@ class ConfigOperation_ReluctorUniversal2x {
     GetArrayBuffer() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal2X]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal2X]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.RisingPosition]).buffer); //MinValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.FallingPosition]).buffer); //MaxValue
         
