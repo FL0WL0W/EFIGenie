@@ -263,7 +263,7 @@ class ConfigTop {
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 3 ]).buffer); //number of operations
         arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBufferPackage());
         arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBufferPackage());
-        //arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBufferPackage());
+        arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBufferPackage());
 
         return arrayBuffer;
     }
@@ -375,6 +375,8 @@ class ConfigFuel {
 
         arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBufferPackage());
 
+        //TODO schedule and configure outputs
+
         return arrayBuffer;
     }
 }
@@ -430,11 +432,20 @@ class ConfigIgnition {
         this.IgnitionAdvanceConfigOrVariableSelection.SetIncrements();
     }
 
-    GetArrayBuffer() {
+    GetArrayBufferPackage() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(this.IgnitionAdvanceConfigOrVariableSelection.GetArrayBuffer())
+        var numberOfOperations = 0;
+        if(this.IgnitionAdvanceConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
+
+        arrayBuffer = arrayBuffer.concatArray(this.IgnitionAdvanceConfigOrVariableSelection.GetArrayBufferPackage())
         
+        //TODO schedule and configure outputs
+
         return arrayBuffer;
     }
 }
