@@ -238,14 +238,14 @@ class ConfigTop {
         this.Ignition.SetIncrements();
     }
 
-    GetArrayBuffer() {
+    GetArrayBufferPackage() {
         var arrayBuffer = new ArrayBuffer();
 
         //operations
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ 0 ]).buffer); //signal last operation
         
         //inputs
-        arrayBuffer = arrayBuffer.concatArray(this.Inputs.GetArrayBuffer());
+        arrayBuffer = arrayBuffer.concatArray(this.Inputs.GetArrayBufferPackage());
 
         //preSync
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
@@ -259,9 +259,11 @@ class ConfigTop {
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([true]).buffer); //value
 
         //main loop execute
-        arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBuffer());
-        arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBuffer());
-        arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBuffer());
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 3 ]).buffer); //number of operations
+        arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBufferPackage());
+        arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBufferPackage());
+        //arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBufferPackage());
 
         return arrayBuffer;
     }
@@ -347,23 +349,31 @@ class ConfigFuel {
         this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
     }
 
-    GetArrayBuffer() {
+    GetArrayBufferPackage() {
         var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBuffer());
         
         if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
         if(this.InjectorGramsId === -1)
             throw "Set Increments First";
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorGramsId ]).buffer); //EngineRPMId
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 14 ]).buffer); //factory ID for math
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Air Fuel Ratio").Id ]).buffer);
 
-        arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBuffer());
+        var numberOfOperations = 1;
+        if(this.InjectorPulseWidthConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorGramsId ]).buffer); //Injector Grams ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBufferAsParameter(1));
+        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBufferPackage(true));
+
+        arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBufferPackage());
 
         return arrayBuffer;
     }
@@ -466,6 +476,7 @@ class ConfigEngine {
     }
 
     CrankPriority = 1;//static set this for now
+
     CrankPositionConfigOrVariableSelection = undefined;
     CamPositionConfigOrVariableSelection = undefined;
     CylinderAirmassConfigOrVariableSelection = undefined;
@@ -560,7 +571,6 @@ class ConfigEngine {
             requirements && requirements.indexOf("Volumetric Efficiency") > -1? 
             this.VolumetricEfficiencyConfigOrVariableSelection.GetHtml() : "");
 
-
         return template;
     }
 
@@ -613,7 +623,7 @@ class ConfigEngine {
         this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
     }
 
-    GetArrayBuffer() {
+    GetArrayBufferPackage() {
         var arrayBuffer = new ArrayBuffer();
 
         if(Increments.VariableIncrement === undefined)
@@ -623,41 +633,62 @@ class ConfigEngine {
         if(this.EnginePositionId === -1)
             throw "Set Increments First";
 
+        var mapRequired = false;
+        var catRequired = false;
+        var veRequired  = false;
+        if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
+            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
+            mapRequired = requirements && requirements.indexOf("Manifold Absolute Pressure") > -1;
+            catRequired = requirements && requirements.indexOf("Cylinder Air Temperature") > -1
+            veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
+        }
+
+        var numberOfOperations = 1;
+        if(mapRequired && this.ManifoldAbsolutePressureConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+        if(catRequired && this.CylinderAirTemperatureConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+        if(veRequired && this.VolumetricEfficiencyConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+        if(this.CylinderAirmassConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ x ]).buffer); //number of operations
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
 
-        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBuffer());
-
+        //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ x ]).buffer); //factory id
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.RPM ]).buffer); //factory id
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineRPMId ]).buffer); //EngineRPMId
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2004 ]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use operation for engine position parameter
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionId
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2001 ]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer);//use 1st sub operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use 1st return from sub operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x07 ]).buffer); //immediate store and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Position ]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CrankPriority? 1 : 0 ]).buffer); //CrankPriority
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Crank Position").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cam Position").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionId
+        var subOperations = 0;
+        if(this.CrankPositionConfigOrVariableSelection.IsImmediateOperation()) 
+            subOperations++;
+        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferAsParameter(subOperations));
+        if(this.CamPositionConfigOrVariableSelection.IsImmediateOperation()) 
+            subOperations++;
+        arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferAsParameter(subOperations));
+        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
+        arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
         
-
-        var requirements = [];
-        if(this.CylinderAirmassSelection && !this.CylinderAirmassSelection.reference) {
-            requirements = GetClassProperty(this.CylinderAirmassSelection.value, "Requirements");
+        if(mapRequired) {
+            arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetArrayBufferPackage());
         }
 
-        if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1) {
-            arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetArrayBuffer());
-        }
-
-        if(requirements && requirements.indexOf("Cylinder Air Temperature") > -1) {
-            arrayBuffer = arrayBuffer.concatArray(this.CylinderAirTemperatureConfigOrVariableSelection.GetArrayBuffer());
-        }
-        
-        if(requirements && requirements.indexOf("Volumetric Efficiency") > -1) {
-            arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencyConfigOrVariableSelection.GetArrayBuffer());
+        if(catRequired) {
+            arrayBuffer = arrayBuffer.concatArray(this.CylinderAirTemperatureConfigOrVariableSelection.GetArrayBufferPackage());
         }
         
-        arrayBuffer = arrayBuffer.concatArray(this.CylinderAirmassConfigOrVariableSelection.GetArrayBuffer());
+        if(veRequired) {
+            arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencyConfigOrVariableSelection.GetArrayBufferPackage());
+        }
+        
+        arrayBuffer = arrayBuffer.concatArray(this.CylinderAirmassConfigOrVariableSelection.GetArrayBufferPackage());
 
         return arrayBuffer;
     }
@@ -720,14 +751,23 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
         return template;
     }
 
-    GetArrayBuffer() {
-        var thisClass = this;
+    GetArrayBufferOperation() {
         var arrayBuffer = new ArrayBuffer();
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2007]).buffer); //factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.CylinderVolume]).buffer); //CylinderVolume
+                
+        return arrayBuffer;
+    }
+
+    GetArrayBufferParameters() {
+        var arrayBuffer = new ArrayBuffer();
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id ]).buffer);
                 
         return arrayBuffer;
@@ -800,23 +840,46 @@ class ConfigInjectorPulseWidth_DeadTime {
         return template;
     }
 
-    GetArrayBuffer() {
+    SetIncrements() {
+        this.DeadTimeConfigOrVariableSelection.SetIncrements();
+        this.FlowRateConfigOrVariableSelection.SetIncrements();
+    }
+
+    GetArrayBufferOperation() {
         var arrayBuffer = new ArrayBuffer();
         
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([14]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
+        
+        return arrayBuffer;
+    }
+
+    GetArrayBufferParameters(){
+        var arrayBuffer = new ArrayBuffer();
+        
         //add parameter 1
-        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBuffer(true));
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
         //add parameter 2
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //immediate with no stored variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([14]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBufferAsParameter(2));
+
+        //add parameter 1 subOperation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //Divide
         //divide parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
         //divide parameter 2
-        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBuffer(true));
+        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBufferAsParameter(1));
+        //divide parameter 2 subOperation
+        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBufferPackage(true));
+
+        //add parameter 2 subOperation
+        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBufferPackage(true));
                 
         return arrayBuffer;
+
     }
 }
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);

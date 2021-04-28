@@ -81,7 +81,7 @@ class ConfigOperation_StaticScalar {
         return template;
     }
 
-    GetArrayBuffer() {
+    GetArrayBufferOperation() {
         var arrayBuffer = new ArrayBuffer();
 
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //factory ID
@@ -133,6 +133,12 @@ class ConfigOperation_StaticScalar {
         
         return arrayBuffer;
     }
+
+    GetArrayBufferParameters() {
+        var arrayBuffer = new ArrayBuffer();
+
+        return arrayBuffer;
+    }
 }
 
 GenericConfigs.push(ConfigOperation_StaticScalar);
@@ -160,7 +166,6 @@ class ConfigOperation_LookupTable {
         if(noInputSelect)
             this.NoInputSelect = true;
     }
-
 
     GetObj() {
         return {
@@ -241,22 +246,23 @@ class ConfigOperation_LookupTable {
         }
     }
 
-    GetArrayBuffer() {
-        var table = this.Table.Value;
+    GetArrayBufferOperation() {
+        var table = this.Table;
+        var tableValue = this.Table.Value;
         var type;
         var min;
         var max;
 
-        for(var i = 0; i < table.length; i++) {
-            if(table[i] % 1 != 0){
+        for(var i = 0; i < tableValue.length; i++) {
+            if(tableValue[i] % 1 != 0){
                 type = "float";
                 break;
             }
-            if(min === undefined || table[i] < min){
-                min = table[i];
+            if(min === undefined || tableValue[i] < min){
+                min = tableValue[i];
             }
-            if(max === undefined || table[i] < max){
-                max = table[i];
+            if(max === undefined || tableValue[i] < max){
+                max = tableValue[i];
             }
         }
         if(!type){
@@ -288,51 +294,58 @@ class ConfigOperation_LookupTable {
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.XResolution]).buffer); //XResolution
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.XResolution]).buffer); //XResolution
         switch(this.Type)
         {
             case "number":
                 switch(type){
                     case "float": 
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(tableValue).buffer); //value
                     break;
                     case "int8":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(tableValue).buffer); //value
                     break;
                     case "int16":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(tableValue).buffer); //value
                     break;
                     case "int32":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([7]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(tableValue).buffer); //value
                     break;
                     case "uint8":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
                     break;
                     case "uint16":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(tableValue).buffer); //value
                     break;
                     case "uint32":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
                 }
                 break;
             case "bool":
                 arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(table).buffer); //value
+                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
                 break;
             case "tick":
                 arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(table).buffer); //value
+                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
                 break;
         }
 
-        if(!NoInputSelect) {
+        return arrayBuffer;
+    }
+
+    GetArrayBufferParameters() {
+        var arrayBuffer = new ArrayBuffer();
+
+        if(!this.NoInputSelect) {
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
             arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.InputSelection.reference].find(a => a.Name === this.InputSelection.value && a.Measurement === this.InputSelection.measurement).Id ]).buffer);
         }
 
@@ -453,25 +466,26 @@ class ConfigOperation_2AxisTable {
         var thisClass = this;
         if(!Increments.PostEvent)
             Increments.PostEvent = [];
-        Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+        Increments.PostEvent.push(function() { thisClass.UpdateTable(); });
     }
 
-    GetArrayBuffer() {
-        var table = this.Table.Value;
+    GetArrayBufferOperation() {
+        var table = this.Table;
+        var tableValue = this.Table.Value;
         var type;
         var min;
         var max;
 
-        for(var i = 0; i < table.length; i++) {
-            if(table[i] % 1 != 0){
+        for(var i = 0; i < tableValue.length; i++) {
+            if(tableValue[i] % 1 != 0){
                 type = "float";
                 break;
             }
-            if(min === undefined || table[i] < min){
-                min = table[i];
+            if(min === undefined || tableValue[i] < min){
+                min = tableValue[i];
             }
-            if(max === undefined || table[i] < max){
-                max = table[i];
+            if(max === undefined || tableValue[i] < max){
+                max = tableValue[i];
             }
         }
         if(!type){
@@ -503,56 +517,64 @@ class ConfigOperation_2AxisTable {
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.XResolution]).buffer); //XResolution
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.XResolution]).buffer); //XResolution
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinY]).buffer); //MinYValue
         arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxY]).buffer); //MaxYValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.YResolution]).buffer); //YResolution
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.YResolution]).buffer); //YResolution
         switch(this.Type)
         {
             case "number":
                 switch(type){
                     case "float": 
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(tableValue).buffer); //value
                     break;
                     case "int8":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(tableValue).buffer); //value
                     break;
                     case "int16":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(tableValue).buffer); //value
                     break;
                     case "int32":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([7]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(tableValue).buffer); //value
                     break;
                     case "uint8":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
                     break;
                     case "uint16":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(tableValue).buffer); //value
                     break;
                     case "uint32":
                         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(table).buffer); //value
+                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
                 }
                 break;
             case "bool":
                 arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(table).buffer); //value
+                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
                 break;
             case "tick":
                 arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(table).buffer); //value
+                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
                 break;
         }
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id ]).buffer);
                 
+        return arrayBuffer;
+    }
+
+    GetArrayBufferParameters() {
+        var arrayBuffer = new ArrayBuffer();
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id ]).buffer);
+    
         return arrayBuffer;
     }
 }
@@ -725,6 +747,7 @@ class Table {
         var pointY;
 
         $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            $(this).focus();
             $("#" + thisClass.GUID + "-table input").removeClass("selected");
             if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
                 return;
@@ -829,7 +852,7 @@ class Table {
     GetHtml() {
         return "<div id=\"" + this.GUID + "\">" + 
                     "<label for=\"" + this.GUID + "-edit\">" + this.Label + ":</label><input id=\"" + this.GUID + "-edit\" type=\"button\" class=\"button\" value=\"Edit Table\"></input>" + 
-                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\">" + this.GetTable() + "</div>"
+                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\">" + this.GetTable() + "</div>" +
                 "</div>";
     }
 
@@ -1025,7 +1048,7 @@ class ConfigOrVariableSelection {
     Selection = undefined;
 
     GetObj() {
-        var gs = function(s) { return s? { reference: s.reference, value: s.reference? s.value : s.value.GetObj() } : undefined; };
+        var gs = function(s) { return s? { reference: s.reference, value: s.reference? s.value : s.value.GetObj(), measurement: s.measurement } : undefined; };
         return { 
             Selection: gs(this.Selection),
         };
@@ -1077,7 +1100,7 @@ class ConfigOrVariableSelection {
                     thisClass.Selection.value.ValueMeasurement = thisClass.ValueMeasurement;
                 }
             } else {
-                thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val};
+                thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
             }
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             
@@ -1164,26 +1187,71 @@ class ConfigOrVariableSelection {
         }
     }
     
-    GetArrayBuffer(variable, operation) {
+    IsImmediateOperation() {
+        return this.Selection && !this.Selection.reference;
+    }
+
+    GetArrayBufferAsParameter(subOperationId) {
         var arrayBuffer = new ArrayBuffer();
 
-        if(this.Selection && !this.Selection.reference) {            
-            if(variable || !operation){
-                if(Increments.VariableIncrement === undefined)
-                    throw "Set Increments First";
-                if(this.Id === -1)
-                    throw "Set Increments First";
-                    
-                if(!variable)//if it is a variable we do not want to execute in main loop
-                    arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 6003 ]).buffer); //Execute in main loop
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer); //Id
-            }
-            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBuffer());
-        } else if (variable) {//if it is a variable we want to return the variable reference
+        //if immediate operation
+        if(this.IsImmediateOperation()) {            
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ subOperationId ]).buffer); //use subOperation
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return from operation
+        } else {
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
             var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
             arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ cell.Id ]).buffer); //Id
         }
         
+        return arrayBuffer;
+    }
+    
+    GetArrayBufferOperation() {
+        var arrayBuffer = new ArrayBuffer();
+
+        //if immediate operation
+        if(this.IsImmediateOperation()) {      
+            if(Increments.VariableIncrement === undefined)
+                throw "Set Increments First";
+            if(this.Id === -1)
+                throw "Set Increments First";
+            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBufferOperation());    
+        }
+        
+        return arrayBuffer;
+    }
+
+    GetArrayBufferParameters() {
+        var arrayBuffer = new ArrayBuffer();
+
+        //if immediate operation
+        if(this.IsImmediateOperation()) {      
+            if(Increments.VariableIncrement === undefined)
+                throw "Set Increments First";
+            if(this.Id === -1)
+                throw "Set Increments First";
+            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBufferParameters());    
+        }
+                
+        return arrayBuffer;
+    }
+
+    GetArrayBufferPackage(subOperation){
+        var arrayBuffer = new ArrayBuffer();
+
+        //if immediate operation
+        if(this.IsImmediateOperation()) {      
+            if(Increments.VariableIncrement === undefined)
+                throw "Set Increments First";
+            if(this.Id === -1)
+                throw "Set Increments First";
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (subOperation? 0x4 : 0) ]).buffer); //immediate and store variable, return if subOperation
+            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferOperation(subOperation));  
+            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer);
+            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferParameters());  
+        }  
+                
         return arrayBuffer;
     }
 }
