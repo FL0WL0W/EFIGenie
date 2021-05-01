@@ -1,24 +1,24 @@
 var Increments = {};
 var AFRConfigs = [];
-AFRConfigs.push(ConfigOperation_StaticScalar);
+AFRConfigs.push(ConfigOperation_Static);
 AFRConfigs.push(ConfigOperation_LookupTable);
 AFRConfigs.push(ConfigOperation_2AxisTable);
 var InjectorPulseWidthConfigs = [];
-// InjectorPulseWidthConfigs.push(ConfigOperation_StaticScalar);
+// InjectorPulseWidthConfigs.push(ConfigOperation_Static);
 // InjectorPulseWidthConfigs.push(ConfigOperation_LookupTable);
 // InjectorPulseWidthConfigs.push(ConfigOperation_2AxisTable);
 var IgnitionAdvanceConfigs = [];
-IgnitionAdvanceConfigs.push(ConfigOperation_StaticScalar);
+IgnitionAdvanceConfigs.push(ConfigOperation_Static);
 IgnitionAdvanceConfigs.push(ConfigOperation_LookupTable);
 IgnitionAdvanceConfigs.push(ConfigOperation_2AxisTable);
 var CylinderAirmassConfigs = [];
-CylinderAirmassConfigs.push(ConfigOperation_StaticScalar);
+CylinderAirmassConfigs.push(ConfigOperation_Static);
 var CylinderAirTemperatureConfigs = [];
-CylinderAirTemperatureConfigs.push(ConfigOperation_StaticScalar);
+CylinderAirTemperatureConfigs.push(ConfigOperation_Static);
 var ManifoldAbsolutePressureConfigs = [];
-ManifoldAbsolutePressureConfigs.push(ConfigOperation_StaticScalar);
+ManifoldAbsolutePressureConfigs.push(ConfigOperation_Static);
 var VolumetricEfficiencyConfigs = [];
-VolumetricEfficiencyConfigs.push(ConfigOperation_StaticScalar);
+VolumetricEfficiencyConfigs.push(ConfigOperation_Static);
 VolumetricEfficiencyConfigs.push(ConfigOperation_LookupTable);
 VolumetricEfficiencyConfigs.push(ConfigOperation_2AxisTable);
 
@@ -41,8 +41,9 @@ function ResetIncrements()
     Increments = {};
 }
 
-var configTopTemplate;
 class ConfigTop {
+    static Template = getFileContents("ConfigGui/Top.html");
+
     constructor(){
         this.GUID = getGUID();
     }
@@ -68,10 +69,10 @@ class ConfigTop {
         this.Fuel = new ConfigFuel();
         this.Ignition = new ConfigIgnition();
 
-        this.Inputs.SetObj(obj.Inputs);
-        this.Engine.SetObj(obj.Engine);
-        this.Fuel.SetObj(obj.Fuel);
-        this.Ignition.SetObj(obj.Ignition);
+        this.Inputs.SetObj(!obj? undefined : obj.Inputs);
+        this.Engine.SetObj(!obj? undefined : obj.Engine);
+        this.Fuel.SetObj(!obj? undefined : obj.Fuel);
+        this.Ignition.SetObj(!obj? undefined : obj.Ignition);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -206,9 +207,7 @@ class ConfigTop {
     }
 
     GetHtml() {
-        if(!configTopTemplate)
-            configTopTemplate = getFileContents("ConfigGui/Top.html");
-        var template = configTopTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
@@ -245,7 +244,10 @@ class ConfigTop {
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ 0 ]).buffer); //signal last operation
         
         //inputs
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2 ]).buffer); //number of operations
         arrayBuffer = arrayBuffer.concatArray(this.Inputs.GetArrayBufferPackage());
+        arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBufferPackage());
 
         //preSync
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
@@ -260,8 +262,7 @@ class ConfigTop {
 
         //main loop execute
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 3 ]).buffer); //number of operations
-        arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBufferPackage());
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2 ]).buffer); //number of operations
         arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBufferPackage());
         arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBufferPackage());
 
@@ -269,8 +270,9 @@ class ConfigTop {
     }
 }
 
-var configFuelTemplate;
 class ConfigFuel {
+    static Template = getFileContents("ConfigGui/Fuel.html");
+
     constructor(){
         this.GUID = getGUID();
         this.AFRConfigOrVariableSelection = new ConfigOrVariableSelection(
@@ -283,22 +285,29 @@ class ConfigFuel {
             "Injector Pulse Width",
             "Time",
             "FuelParameters");
+        this.ConfigInjectorOutputs = new ConfigInjectorOutputs();
     }
 
     AFRConfigOrVariableSelection = undefined;
     InjectorPulseWidthConfigOrVariableSelection = undefined;
+    ConfigInjectorOutputs = undefined
 
     GetObj() {
         return {
             AFRConfigOrVariableSelection: this.AFRConfigOrVariableSelection.GetObj(),
-            InjectorPulseWidthConfigOrVariableSelection: this.InjectorPulseWidthConfigOrVariableSelection.GetObj()
+            InjectorPulseWidthConfigOrVariableSelection: this.InjectorPulseWidthConfigOrVariableSelection.GetObj(),
+            ConfigInjectorOutputs: this.ConfigInjectorOutputs.GetObj()
         };
     }
 
     SetObj(obj) {
         this.Detach();
-        this.AFRConfigOrVariableSelection.SetObj(obj.AFRConfigOrVariableSelection);
-        this.InjectorPulseWidthConfigOrVariableSelection.SetObj(obj.InjectorPulseWidthConfigOrVariableSelection);
+
+        if(obj) {
+            this.AFRConfigOrVariableSelection.SetObj(!obj? undefined : obj.AFRConfigOrVariableSelection);
+            this.InjectorPulseWidthConfigOrVariableSelection.SetObj(!obj? undefined : obj.InjectorPulseWidthConfigOrVariableSelection);
+            this.ConfigInjectorOutputs.SetObj(!obj? undefined : obj.ConfigInjectorOutputs);
+        }
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -307,22 +316,23 @@ class ConfigFuel {
     Detach() {
         this.AFRConfigOrVariableSelection.Detach();
         this.InjectorPulseWidthConfigOrVariableSelection.Detach();
+        this.ConfigInjectorOutputs.Detach();
     }
 
     Attach() {
         this.AFRConfigOrVariableSelection.Attach();
         this.InjectorPulseWidthConfigOrVariableSelection.Attach();
+        this.ConfigInjectorOutputs.Attach();
     }
 
     GetHtml() {
-        if(!configFuelTemplate)
-            configFuelTemplate = getFileContents("ConfigGui/Fuel.html");
-        var template = configFuelTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]afr[$]/g, this.AFRConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]injectorpulsewidth[$]/g, this.InjectorPulseWidthConfigOrVariableSelection.GetHtml());
-
+        template = template.replace(/[$]injectoroutputs[$]/g, this.ConfigInjectorOutputs.GetHtml());
+        
         return template;
     }
 
@@ -347,6 +357,7 @@ class ConfigFuel {
         });
 
         this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
+        this.ConfigInjectorOutputs.SetIncrements();
     }
 
     GetArrayBufferPackage() {
@@ -357,7 +368,7 @@ class ConfigFuel {
         if(this.InjectorGramsId === -1)
             throw "Set Increments First";
 
-        var numberOfOperations = 1;
+        var numberOfOperations = 2;
         if(this.InjectorPulseWidthConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
 
@@ -375,14 +386,15 @@ class ConfigFuel {
 
         arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBufferPackage());
 
-        //TODO schedule and configure outputs
+        arrayBuffer = arrayBuffer.concatArray(this.ConfigInjectorOutputs.GetArrayBufferPackage());
 
         return arrayBuffer;
     }
 }
 
-var configIgnitionTemplate;
 class ConfigIgnition {
+    static Template = getFileContents("ConfigGui/Ignition.html");
+
     constructor(){
         this.GUID = getGUID();
         this.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection(
@@ -390,19 +402,44 @@ class ConfigIgnition {
             "Ignition Advance",
             "Angle",
             "IgnitionParameters");
+        this.Outputs[0] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 1", "No Measurement");
+        this.Outputs[1] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 2", "No Measurement");
+        this.Outputs[2] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 3", "No Measurement");
+        this.Outputs[3] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 4", "No Measurement");
+        this.Outputs[4] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 5", "No Measurement");
+        this.Outputs[5] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 6", "No Measurement");
+        this.Outputs[6] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 7", "No Measurement");
+        this.Outputs[7] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 8", "No Measurement");
     }
 
     IgnitionAdvanceConfigOrVariableSelection = undefined;
+    Outputs = [];
 
     GetObj() {
+        var outputObj = [];
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputObj[i] = this.Outputs[i].GetObj();
+        };
         return {
-            IgnitionAdvanceConfigOrVariableSelection: this.IgnitionAdvanceConfigOrVariableSelection.GetObj()
+            IgnitionAdvanceConfigOrVariableSelection: this.IgnitionAdvanceConfigOrVariableSelection.GetObj(),
+            Outputs: outputObj
         };
     }
 
     SetObj(obj) {
         this.Detach();
-        this.IgnitionAdvanceConfigOrVariableSelection.SetObj(obj.IgnitionAdvanceConfigOrVariableSelection);
+        this.IgnitionAdvanceConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionAdvanceConfigOrVariableSelection);
+        if(obj)
+        {
+            for(var i = 0; i < obj.Outputs.length; i++){
+                if(!this.Outputs[i])
+                    this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition " + (i+1), "No Measurement")
+                this.Outputs[i].SetObj(obj.Outputs[i])
+            }
+            for(var i = obj.Outputs.length; i < this.Outputs.length; i++){
+                this.Outputs[i] = undefined;
+            }
+        }
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -410,26 +447,45 @@ class ConfigIgnition {
 
     Detach() {
         this.IgnitionAdvanceConfigOrVariableSelection.Detach();
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Detach();
+        };
     }
 
     Attach() {
         this.IgnitionAdvanceConfigOrVariableSelection.Attach();
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Attach();
+        };
+
     }
 
     GetHtml() {
-        if(!configIgnitionTemplate)
-            configIgnitionTemplate = getFileContents("ConfigGui/Ignition.html");
-        var template = configIgnitionTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
         template = template.replace(/[$]ignitionadvance[$]/g, this.IgnitionAdvanceConfigOrVariableSelection.GetHtml());
+
+        var outputsHTML = "";
+        
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputsHTML += this.Outputs[i].GetHtml();
+        };
+        
+        template = template.replace(/[$]ignitionoutputs[$]/g, outputsHTML);
 
         return template;
     }
 
     SetIncrements() {
         this.IgnitionAdvanceConfigOrVariableSelection.SetIncrements();
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].SetIncrements();
+        };
     }
 
     GetArrayBufferPackage() {
@@ -450,8 +506,9 @@ class ConfigIgnition {
     }
 }
 
-var configEngineTemplate;
 class ConfigEngine {
+    static Template = getFileContents("ConfigGui/Engine.html");
+
     constructor(){
         this.GUID = getGUID();
         this.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
@@ -508,12 +565,12 @@ class ConfigEngine {
 
     SetObj(obj) {
         this.Detach();
-        this.CrankPositionConfigOrVariableSelection.SetObj(obj.CrankPositionConfigOrVariableSelection);
-        this.CamPositionConfigOrVariableSelection.SetObj(obj.CamPositionConfigOrVariableSelection);
-        this.CylinderAirmassConfigOrVariableSelection.SetObj(obj.CylinderAirmassConfigOrVariableSelection);
-        this.CylinderAirTemperatureConfigOrVariableSelection.SetObj(obj.CylinderAirTemperatureConfigOrVariableSelection);
-        this.ManifoldAbsolutePressureConfigOrVariableSelection.SetObj(obj.ManifoldAbsolutePressureConfigOrVariableSelection);
-        this.VolumetricEfficiencyConfigOrVariableSelection.SetObj(obj.VolumetricEfficiencyConfigOrVariableSelection);
+        this.CrankPositionConfigOrVariableSelection.SetObj(!obj? undefined : obj.CrankPositionConfigOrVariableSelection);
+        this.CamPositionConfigOrVariableSelection.SetObj(!obj? undefined : obj.CamPositionConfigOrVariableSelection);
+        this.CylinderAirmassConfigOrVariableSelection.SetObj(!obj? undefined : obj.CylinderAirmassConfigOrVariableSelection);
+        this.CylinderAirTemperatureConfigOrVariableSelection.SetObj(!obj? undefined : obj.CylinderAirTemperatureConfigOrVariableSelection);
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.SetObj(!obj? undefined : obj.ManifoldAbsolutePressureConfigOrVariableSelection);
+        this.VolumetricEfficiencyConfigOrVariableSelection.SetObj(!obj? undefined : obj.VolumetricEfficiencyConfigOrVariableSelection);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -549,9 +606,7 @@ class ConfigEngine {
     }
 
     GetHtml() {
-        if(!configEngineTemplate)
-        configEngineTemplate = getFileContents("ConfigGui/Engine.html");
-        var template = configEngineTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         
@@ -705,11 +760,11 @@ class ConfigEngine {
     }
 }
 
-var ConfigOperationCylinderAirmass_SpeedDensityTemplate;
 class ConfigOperationCylinderAirmass_SpeedDensity {
     static Name = "Speed Density";
     static Measurement = "";
     static Requirements = ["Cylinder Air Temperature", "Manifold Absolute Pressure", "Volumetric Efficiency"];
+    static Template = getFileContents("ConfigGui/Engine_CylinderAirmass_SpeedDensity.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -727,7 +782,8 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
 
     SetObj(obj) {
         this.Detach();
-        this.CylinderVolume = obj.CylinderVolume;
+        if(obj)
+            this.CylinderVolume = obj.CylinderVolume;
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -752,9 +808,7 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
     }
 
     GetHtml() {
-        if(!ConfigOperationCylinderAirmass_SpeedDensityTemplate)
-            ConfigOperationCylinderAirmass_SpeedDensityTemplate = getFileContents("ConfigGui/Engine_CylinderAirmass_SpeedDensity.html");
-        var template = ConfigOperationCylinderAirmass_SpeedDensityTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]cylindervolume[$]/g, this.CylinderVolume);
@@ -786,10 +840,10 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
 }
 CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
 
-var configInjectorPulseWidth_DeadTimeTemplate;
 class ConfigInjectorPulseWidth_DeadTime {
     static Name = "Dead Time";
     static Measurement = "Time";
+    static Template = getFileContents("ConfigGui/Fuel_InjectorPulseWidth_DeadTime.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -818,8 +872,8 @@ class ConfigInjectorPulseWidth_DeadTime {
 
     SetObj(obj) {
         this.Detach();
-        this.FlowRateConfigOrVariableSelection.SetObj(obj.FlowRateConfigOrVariableSelection);
-        this.DeadTimeConfigOrVariableSelection.SetObj(obj.DeadTimeConfigOrVariableSelection);
+        this.FlowRateConfigOrVariableSelection.SetObj(!obj? undefined : obj.FlowRateConfigOrVariableSelection);
+        this.DeadTimeConfigOrVariableSelection.SetObj(!obj? undefined : obj.DeadTimeConfigOrVariableSelection);
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -836,9 +890,7 @@ class ConfigInjectorPulseWidth_DeadTime {
     }
 
     GetHtml() {
-        if(!configInjectorPulseWidth_DeadTimeTemplate)
-            configInjectorPulseWidth_DeadTimeTemplate = getFileContents("ConfigGui/Fuel_InjectorPulseWidth_DeadTime.html");
-        var template = configInjectorPulseWidth_DeadTimeTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
@@ -895,9 +947,9 @@ class ConfigInjectorPulseWidth_DeadTime {
 }
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
 
-var configInjectorOutputsTemplate;
 class ConfigInjectorOutputs {
     static Name = "Injector Outputs";
+    static Template = getFileContents("ConfigGui/Fuel_InjectorOutputs.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -906,85 +958,156 @@ class ConfigInjectorOutputs {
             "Injector End Position(ATDC)",
             "Angle",
             "FuelParameters");
-        this.TDCTable = new Table();
-        this.TDCTable.YResolutionModifiable = false;
-        this.TDCTable.XResolutionModifiable = false;
-        this.TDCTable.SetXResolution(this.NumberOfOutputs);
-        this.TDCTable.SetYResolution(1);
-        this.TDCTable.XLabel = "Injector";
-        this.TDCTable.ZLabel = "TDC";
+        this.Outputs[0] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 1", "No Measurement");
+        this.Outputs[1] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 2", "No Measurement");
+        this.Outputs[2] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 3", "No Measurement");
+        this.Outputs[3] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 4", "No Measurement");
+        this.Outputs[4] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 5", "No Measurement");
+        this.Outputs[5] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 6", "No Measurement");
+        this.Outputs[6] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 7", "No Measurement");
+        this.Outputs[7] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 8", "No Measurement");
     }
 
     InjectorEndPositionConfigOrVariableSelection = undefined
-    NumberOfOutputs = 8;
+    Outputs = [];
     TDCTable = undefined;
 
     GetObj() {
+        var outputObj = [];
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputObj[i] = this.Outputs[i].GetObj();
+        };
         return {
             Name: GetClassProperty(this, "Name"),
             InjectorEndPositionConfigOrVariableSelection: this.InjectorEndPositionConfigOrVariableSelection.GetObj(),
-            NumberOfOutputs: this.NumberOfOutputs
+            Outputs: outputObj
         };
     }
 
     SetObj(obj) {
         this.Detach();
-        this.InjectorEndPositionConfigOrVariableSelection.SetObj(obj.InjectorEndPositionConfigOrVariableSelection);
-        this.NumberOfOutputs = obj.NumberOfOutputs;
+        this.InjectorEndPositionConfigOrVariableSelection.SetObj(!obj? undefined : obj.InjectorEndPositionConfigOrVariableSelection);
+        if(obj)
+        {
+            for(var i = 0; i < obj.Outputs.length; i++){
+                if(!this.Outputs[i])
+                    this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector " + (i+1), "No Measurement")
+                this.Outputs[i].SetObj(obj.Outputs[i])
+            }
+            for(var i = obj.Outputs.length; i < this.Outputs.length; i++){
+                this.Outputs[i] = undefined;
+            }
+        }
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);
         this.InjectorEndPositionConfigOrVariableSelection.Detach();
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Detach();
+        };
     }
 
     Attach() {
         var thisClass = this;
 
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-numberofoutputs", function(){
-            thisClass.Detach();
-
-            thisClass.NumberOfOutputs = parseInt($(this).val());
-            thisClass.TDCTable.SetXResolution(this.NumberOfOutputs);
-
-            thisClass.Attach();
-        });
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Attach();
+        };
 
         this.InjectorEndPositionConfigOrVariableSelection.Attach();
     }
 
     GetHtml() {
-        if(!configInjectorOutputsTemplate)
-            configInjectorOutputsTemplate = getFileContents("ConfigGui/Fuel_InjectorOutputs.html");
-        var template = configInjectorOutputsTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
         template = template.replace(/[$]injectorendat[$]/g, 
             this.InjectorEndPositionConfigOrVariableSelection.GetHtml());
 
-        template = template.replace(/[$]numberofoutputs[$]/g, this.NumberOfOutputs);
-
-        template = template.replace(/[$]tdctable[$]/g, this.TDCTable.GetHtml());
+        var outputsHTML = "";
+        
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputsHTML += this.Outputs[i].GetHtml();
+        };
+        
+        template = template.replace(/[$]injectoroutputs[$]/g, outputsHTML);
 
         return template;
     }
 
-    GetArrayBuffer() {
+    SetIncrements() {
+        this.InjectorEndPositionConfigOrVariableSelection.SetIncrements();
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].SetIncrements();
+        };
+    }
+
+    GetArrayBufferPackage() {
         var arrayBuffer = new ArrayBuffer();
         
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2006]).buffer); //Injector Array
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.NumberOfOutputs]).buffer); //Number of outputs
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array(this.TDCTable.Value).buffer); //output TDCs
-        //output operations
+        // arrayBuffer = arrayBuffer.concatArray(new Uint16Array([2006]).buffer); //Injector Array
+        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.NumberOfOutputs]).buffer); //Number of outputs
+        // arrayBuffer = arrayBuffer.concatArray(new Float32Array(this.TDCTable.Value).buffer); //output TDCs
+        // //output operations
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(this.InjectorEndPositionConfigOrVariableSelection.GetArrayBuffer(true));
+        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
+        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id ]).buffer);
+        // arrayBuffer = arrayBuffer.concatArray(this.InjectorEndPositionConfigOrVariableSelection.GetArrayBuffer(true));
 
         return arrayBuffer;
     }
+}
+
+class ConfigTDCOutput extends ConfigOrVariableSelection {
+    static Template = getFileContents("ConfigGui/TDCOutput.html");
+    // static Name = "Injector Output";
+
+    // constructor(){
+    //     this.GUID = getGUID();
+    // }
+
+    // GetObj() {
+    //     return {
+    //         Name: GetClassProperty(this, "Name")
+    //     };
+    // }
+
+    // SetObj(obj) {
+    //     this.Detach();
+
+    //     $("#" + this.GUID).replaceWith(this.GetHtml());
+    //     this.Attach();
+    // }
+
+    // Detach() {
+    // }
+
+    // Attach() {
+    // }
+
+    // GetHtml() {
+    //     if(!configTDCOutputTemplate)
+    //         configTDCOutputTemplate = getFileContents("ConfigGui/TDCOutput.html");
+    //     var template = configTDCOutputTemplate;
+
+    //     template = template.replace(/[$]id[$]/g, this.GUID);
+
+    //     return template;
+    // }
+
+    // SetIncrements() {
+    // }
+
+    // GetArrayBufferPackage() {
+    //     var arrayBuffer = new ArrayBuffer();
+        
+
+    //     return arrayBuffer;
+    // }
 }

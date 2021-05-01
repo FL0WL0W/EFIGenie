@@ -19,8 +19,9 @@ ReluctorFactoryIDs = {
     Universal2X: 2
 };
 
-var configInputsTemplate;
 class ConfigInputs {
+    static Template = getFileContents("ConfigGui/Inputs.html");
+
     constructor(){
         this.GUID = getGUID();
     }
@@ -41,9 +42,11 @@ class ConfigInputs {
         this.Detach();
         this.Inputs = [];
 
-        for(var i = 0; i < obj.length; i++){
-            this.Inputs.push(new ConfigInput());
-            this.Inputs[i].SetObj(obj[i]);
+        if(obj) {
+            for(var i = 0; i < obj.length; i++){
+                this.Inputs.push(new ConfigInput());
+                this.Inputs[i].SetObj(obj[i]);
+            }
         }
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
@@ -178,9 +181,7 @@ class ConfigInputs {
     }
 
     GetHtml() {
-        if(!configInputsTemplate)
-            configInputsTemplate = getFileContents("ConfigGui/Inputs.html");
-        var template = configInputsTemplate;
+        var template = GetClassProperty(this, "Template");
         
         var selected = parseInt($("#" + this.GUID + "-Selection").val());
         if(isNaN(selected))
@@ -227,8 +228,9 @@ class ConfigInputs {
     }
 }
 
-var configInputTemplate;
 class ConfigInput {
+    static Template = getFileContents("ConfigGui/Input.html");
+
     constructor(){
         this.GUID = getGUID();
     }
@@ -249,30 +251,33 @@ class ConfigInput {
 
     SetObj(obj) {
         this.Detach();
-        this.Name = obj.Name;
-        this.RawConfig = undefined;
-        if(obj.RawConfig){
-            for(var i = 0; i < InputRawConfigs.length; i++)
-            {
-                if(InputRawConfigs[i].Name === obj.RawConfig.Name) {
-                    this.RawConfig = new InputRawConfigs[i]();
-                    this.RawConfig.SetObj(obj.RawConfig);
-                    break;
+        if(obj) {
+            this.Name = obj.Name;
+            this.RawConfig = undefined;
+            if(obj.RawConfig){
+                for(var i = 0; i < InputRawConfigs.length; i++)
+                {
+                    if(InputRawConfigs[i].Name === obj.RawConfig.Name) {
+                        this.RawConfig = new InputRawConfigs[i]();
+                        this.RawConfig.SetObj(obj.RawConfig);
+                        break;
+                    }
                 }
             }
-        }
-        this.TranslationConfig = undefined;
-        if(obj.TranslationConfig){
-            for(var i = 0; i < InputTranslationConfigs.length; i++)
-            {
-                if(InputTranslationConfigs[i].Name === obj.TranslationConfig.Name) {
-                    this.TranslationConfig = new InputTranslationConfigs[i](true);
-                    this.TranslationConfig.SetObj(obj.TranslationConfig);
-                    break;
+            this.TranslationConfig = undefined;
+            if(obj.TranslationConfig){
+                for(var i = 0; i < InputTranslationConfigs.length; i++)
+                {
+                    if(InputTranslationConfigs[i].Name === obj.TranslationConfig.Name) {
+                        this.TranslationConfig = new InputTranslationConfigs[i](true);
+                        this.TranslationConfig.XLabel = "Raw Input";
+                        this.TranslationConfig.SetObj(obj.TranslationConfig);
+                        break;
+                    }
                 }
             }
+            this.TranslationMeasurement = obj.TranslationMeasurement;
         }
-        this.TranslationMeasurement = obj.TranslationMeasurement;
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
@@ -324,7 +329,10 @@ class ConfigInput {
             if(val === "-1")
                 thisClass.TranslationConfig = undefined;
             else
+            {
                 thisClass.TranslationConfig = new InputTranslationConfigs[val](true);
+                thisClass.TranslationConfig.XLabel = "Raw Input";
+            }
             
             if(thisClass.TranslationConfig)
                 $("#" + thisClass.GUID + "-translation").html(thisClass.TranslationConfig.GetHtml());
@@ -423,9 +431,7 @@ class ConfigInput {
     }
 
     GetHtml() {
-        if(!configInputTemplate)
-            configInputTemplate = getFileContents("ConfigGui/Input.html");
-        var template = configInputTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         
@@ -575,12 +581,12 @@ class ConfigInput {
     }
 }
 
-var configOperation_AnalogPinReadTemplate;
 class ConfigOperation_AnalogPinRead {
     static Name = "Analog Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Voltage";
+    static Template = getFileContents("ConfigGui/Operation_AnalogPinRead.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -596,7 +602,8 @@ class ConfigOperation_AnalogPinRead {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
+        if(obj)
+            this.Pin = obj.Pin;
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -617,9 +624,7 @@ class ConfigOperation_AnalogPinRead {
     }
 
     GetHtml() {
-        if(!configOperation_AnalogPinReadTemplate)
-            configOperation_AnalogPinReadTemplate = getFileContents("ConfigGui/Operation_AnalogPinRead.html");
-        var template = configOperation_AnalogPinReadTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -638,12 +643,12 @@ class ConfigOperation_AnalogPinRead {
 }
 InputRawConfigs.push(ConfigOperation_AnalogPinRead);
 
-var configOperation_DigitalPinReadTemplate;
 class ConfigOperation_DigitalPinRead {
     static Name = "Digital Pin";
     static Output = "bool";
     static Inputs = [];
     static Measurement = "";
+    static Template = getFileContents("ConfigGui/Operation_DigitalPinRead.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -661,8 +666,10 @@ class ConfigOperation_DigitalPinRead {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.Inverted = obj.Inverted;
+        if(obj) {
+            this.Pin = obj.Pin;
+            this.Inverted = obj.Inverted;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -691,9 +698,7 @@ class ConfigOperation_DigitalPinRead {
     }
 
     GetHtml() {
-        if(!configOperation_DigitalPinReadTemplate)
-            configOperation_DigitalPinReadTemplate = getFileContents("ConfigGui/Operation_DigitalPinRead.html");
-        var template = configOperation_DigitalPinReadTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -714,12 +719,12 @@ class ConfigOperation_DigitalPinRead {
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRead);
 
-var configOperation_DigitalPinRecordTemplate;
 class ConfigOperation_DigitalPinRecord {
     static Name = "Digital Pin (Record)";
     static Output = "Record";
     static Inputs = [];
     static Measurement = "";
+    static Template = getFileContents("ConfigGui/Operation_DigitalPinRecord.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -739,9 +744,11 @@ class ConfigOperation_DigitalPinRecord {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.Inverted = obj.Inverted;
-        this.Length = obj.Length;
+        if(obj) {
+            this.Pin = obj.Pin;
+            this.Inverted = obj.Inverted;
+            this.Length = obj.Length;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -778,9 +785,7 @@ class ConfigOperation_DigitalPinRecord {
     }
 
     GetHtml() {
-        if(!configOperation_DigitalPinRecordTemplate)
-            configOperation_DigitalPinRecordTemplate = getFileContents("ConfigGui/Operation_DigitalPinRecord.html");
-        var template = configOperation_DigitalPinRecordTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -803,12 +808,12 @@ class ConfigOperation_DigitalPinRecord {
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRecord);
 
-var configOperation_DutyCyclePinReadTemplate;
 class ConfigOperation_DutyCyclePinRead {
     static Name = "Duty Cycle Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Percentage";
+    static Template = getFileContents("ConfigGui/Operation_DutyCyclePinRead.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -826,8 +831,10 @@ class ConfigOperation_DutyCyclePinRead {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.MinFrequency = obj.MinFrequency;
+        if(obj) {
+            this.Pin = obj.Pin;
+            this.MinFrequency = obj.MinFrequency;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -856,9 +863,7 @@ class ConfigOperation_DutyCyclePinRead {
     }
 
     GetHtml() {
-        if(!configOperation_DutyCyclePinReadTemplate)
-            configOperation_DutyCyclePinReadTemplate = getFileContents("ConfigGui/Operation_DutyCyclePinRead.html");
-        var template = configOperation_DutyCyclePinReadTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -879,12 +884,12 @@ class ConfigOperation_DutyCyclePinRead {
 }
 InputRawConfigs.push(ConfigOperation_DutyCyclePinRead);
 
-var configOperation_FrequencyPinReadTemplate;
 class ConfigOperation_FrequencyPinRead {
     static Name = "Frequency Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Frequency";
+    static Template = getFileContents("ConfigGui/Operation_FrequencyPinRead.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -902,8 +907,10 @@ class ConfigOperation_FrequencyPinRead {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.MinFrequency = obj.MinFrequency;
+        if(obj) {
+            this.Pin = obj.Pin;
+            this.MinFrequency = obj.MinFrequency;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -932,9 +939,7 @@ class ConfigOperation_FrequencyPinRead {
     }
 
     GetHtml() {
-        if(!configOperation_FrequencyPinReadTemplate)
-            configOperation_FrequencyPinReadTemplate = getFileContents("ConfigGui/Operation_FrequencyPinRead.html");
-        var template = configOperation_FrequencyPinReadTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -955,12 +960,12 @@ class ConfigOperation_FrequencyPinRead {
 }
 InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
 
-var configOperation_PulseWidthPinReadTemplate;
 class ConfigOperation_PulseWidthPinRead {
     static Name = "Pulse Width Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Time";
+    static Template = getFileContents("ConfigGui/Operation_PulseWidthPinRead.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -978,8 +983,10 @@ class ConfigOperation_PulseWidthPinRead {
     }
 
     SetObj(obj) {
-        this.Pin = obj.Pin;
-        this.MinFrequency = obj.MinFrequency;
+        if(obj) {
+            this.Pin = obj.Pin;
+            this.MinFrequency = obj.MinFrequency;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -1008,9 +1015,7 @@ class ConfigOperation_PulseWidthPinRead {
     }
 
     GetHtml() {
-        if(!configOperation_PulseWidthPinReadTemplate)
-            configOperation_PulseWidthPinReadTemplate = getFileContents("ConfigGui/Operation_PulseWidthPinRead.html");
-        var template = configOperation_PulseWidthPinReadTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]pin[$]/g, this.Pin);
@@ -1031,12 +1036,12 @@ class ConfigOperation_PulseWidthPinRead {
 }
 InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
 
-var configOperation_PolynomialTemplate;
 class ConfigOperation_Polynomial {
     static Name = "Polynomial";
     static Output = "float";
     static Inputs = ["float"];
     static Measurement = "Selectable";
+    static Template = getFileContents("ConfigGui/Operation_Polynomial.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -1058,10 +1063,12 @@ class ConfigOperation_Polynomial {
     }
 
     SetObj(obj) {
-        this.MinValue = obj.MinValue;
-        this.MaxValue = obj.MaxValue;
-        this.Degree = obj.Degree;
-        this.A = obj.A.slice();
+        if(obj) {
+            this.MinValue = obj.MinValue;
+            this.MaxValue = obj.MaxValue;
+            this.Degree = obj.Degree;
+            this.A = obj.A.slice();
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -1135,9 +1142,7 @@ class ConfigOperation_Polynomial {
     }
 
     GetHtml() {
-        if(!configOperation_PolynomialTemplate)
-            configOperation_PolynomialTemplate = getFileContents("ConfigGui/Operation_Polynomial.html");
-        var template = configOperation_PolynomialTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]min[$]/g, this.MinValue);
@@ -1204,12 +1209,12 @@ class ConfigOperation_ReluctorGM24x {
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
 
-var configOperation_ReluctorUniversal2xTemplate;
 class ConfigOperation_ReluctorUniversal2x {
     static Name = "Reluctor Universal 2X";
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
     static Measurement = "ReluctorResult";
+    static Template = getFileContents("ConfigGui/Operation_ReluctorUniversal2x.html");
 
     constructor(){
         this.GUID = getGUID();
@@ -1228,8 +1233,10 @@ class ConfigOperation_ReluctorUniversal2x {
     }
 
     SetObj(obj) {
-        this.RisingPosition = obj.RisingPosition;
-        this.FallingPosition = obj.FallingPosition;
+        if(obj) {
+            this.RisingPosition = obj.RisingPosition;
+            this.FallingPosition = obj.FallingPosition;
+        }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }
 
@@ -1258,9 +1265,7 @@ class ConfigOperation_ReluctorUniversal2x {
     }
 
     GetHtml() {
-        if(!configOperation_ReluctorUniversal2xTemplate)
-            configOperation_ReluctorUniversal2xTemplate = getFileContents("ConfigGui/Operation_ReluctorUniversal2x.html");
-        var template = configOperation_ReluctorUniversal2xTemplate;
+        var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]rising[$]/g, this.RisingPosition);

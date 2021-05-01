@@ -7,6 +7,7 @@
         <script src="Config-Inputs.js"></script>
         <script src="Config-Outputs.js"></script>
         <script src="Config.js"></script>
+        <script src="lzjs.js"></script>
         <script src="Units.js"></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
@@ -17,7 +18,7 @@
                 $('#workspace').html(b.GetHtml());
                 b.Attach();
                 $("#btnSave").click(function(){
-                    downloadObject(b.GetObj(), "config.json");
+                    downloadObject(b.GetObj(), "config.jsonlz");
                 });
                 $("#btnLoad").change(function(evt){
                     var test = new FileReader();
@@ -29,7 +30,7 @@
                             return;
                         }
 
-                        b.SetObj(JSON.parse(evt.target.result));
+                        b.SetObj(loadObject(evt.target.result));
                         $('#workspace').html(b.GetHtml());
                         $("#btnLoad").val(undefined);
                     };
