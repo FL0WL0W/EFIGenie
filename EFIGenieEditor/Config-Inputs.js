@@ -10,7 +10,12 @@ EmbeddedOperationsFactoryIDs = {
     DigitalPinRecord: 3,
     DutyCyclePinRead: 4,
     FrequencyPinRead: 5,
-    PulseWidthPinRead: 6
+    PulseWidthPinRead: 6,
+    DigitalOutput: 7,
+    PulseWidthPinWrite: 8,
+    GetTick: 9,
+    SecondsToTick: 10,
+    TickToSeconds: 11
 };
 
 ReluctorFactoryIDs = {
@@ -210,6 +215,12 @@ class ConfigInputs {
     }
 
     SetIncrements() {
+        Increments.CurrentTickId = 0;
+        if(Increments.VariableIncrement === undefined)
+            Increments.VariableIncrement = 0;
+        else
+            Increments.CurrentTickId = ++Increments.VariableIncrement;
+
         for(var i = 0; i < this.Inputs.length; i++){
             this.Inputs[i].SetIncrements();
         }
@@ -219,7 +230,12 @@ class ConfigInputs {
         var arrayBuffer = new ArrayBuffer();
 
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.Inputs.length ]).buffer); //number of operations
+        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.Inputs.length + 1 ]).buffer); //number of operations
+        
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick ]).buffer); //GetTick factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //CurrentTickId
+
         for(var i = 0; i < this.Inputs.length; i++){
             arrayBuffer = arrayBuffer.concatArray(this.Inputs[i].GetArrayBufferPackage())
         }
@@ -531,7 +547,6 @@ class ConfigInput {
     GetArrayBufferPackage() {
         var rawOutput = GetClassProperty(this.RawConfig, "Output");
         var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
-        var translationInputIndex = 0;
         var arrayBuffer = new ArrayBuffer();
         if(!this.RawConfig) 
             return arrayBuffer;
@@ -548,17 +563,18 @@ class ConfigInput {
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
             arrayBuffer = arrayBuffer.concatArray(this.TranslationConfig.GetArrayBufferOperation());
             arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
-            while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
-                //add universal inputs for translation
-                if(translationInputs[translationInputIndex] === "CurrentTick"){
-                    arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-                    arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
-                    //TODO
+            if(translationInputs) {
+                for(var i = 0; i < translationInputs.length; i++){
+                    //add universal inputs for translation
+                    if(translationInputs[i] === "CurrentTick"){
+                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
+                    } else if (translationInputs[i] === output) {
+                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation
+                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use 1st return from operation
+                    }
                 }
-                translationInputIndex++;
             }
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use 1st return from operation
         }
             
         if(this.InputRawId === -1)
@@ -567,15 +583,6 @@ class ConfigInput {
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (this.TranslationConfig? 0x04 : 0x00) ]).buffer); //immediate and store variables, return if TranslationConfig
         arrayBuffer = arrayBuffer.concatArray(this.RawConfig.GetArrayBufferOperation());
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputRawId ]).buffer); //sensorID
-        
-        while(translationInputs && translationInputIndex < translationInputs.length && translationInputs[translationInputIndex] !== output){
-            //add universal inputs for translation
-            if(translationInputs[translationInputIndex] === "CurrentTick"){
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
-            }
-            translationInputIndex++;
-        }
 
         return arrayBuffer;
     }

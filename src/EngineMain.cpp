@@ -16,10 +16,10 @@ namespace Engine
         SystemBus *systemBus = new SystemBus();
         OperationPackager *packager = new OperationPackager(operationFactory, systemBus);
 
-        OperationFactoryRegister::Register(0, operationFactory);
+        OperationFactoryRegister::Register(10000, operationFactory);
         EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
-        ReluctorOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection);
-        EngineOperationFactoryRegister::Register(60000, operationFactory, embeddedIOServiceCollection, packager);
+        ReluctorOperationFactoryRegister::Register(30000, operationFactory);
+        EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection, packager);
 
         unsigned int size = 0;
         do

@@ -13,12 +13,13 @@
         <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
         <script type="text/javascript">
             var b = new ConfigTop();
+            var configJsonName = "tune.jsonlz"
             $(document).on('change', function() { ResetIncrements(), b.SetIncrements()});//this is a hack but oh well
             $(document).ready(function() {
                 $('#workspace').html(b.GetHtml());
                 b.Attach();
                 $("#btnSave").click(function(){
-                    downloadObject(b.GetObj(), "config.jsonlz");
+                    downloadObject(b.GetObj(), configJsonName);
                 });
                 $("#btnLoad").change(function(evt){
                     var test = new FileReader();
@@ -36,11 +37,12 @@
                     };
                     
                     test.readAsText(evt.target.files[0]);
+                    configJsonName = evt.target.files[0].name;
                 });
                 $("#btnSaveBin").click(function(){
                     ResetIncrements();
                     b.SetIncrements();
-                    downloadBin(b.GetArrayBufferPackage(), "config.bin");
+                    downloadBin(b.GetArrayBufferPackage(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
             });
         </script>

@@ -184,9 +184,9 @@ class ConfigOperation_LookupTable {
     SetObj(obj) {
         if(obj) {
             this.Type = obj.Type;
+            this.Table.SetXResolution(obj.Resolution);
             this.Table.MinX = obj.MinX;
             this.Table.MaxX = obj.MaxX;
-            this.Table.SetXResolution(obj.Resolution);
             this.Table.Value = obj.Value;
             if(!this.NoParamaterSelection)
                 this.ParameterSelection = obj.ParameterSelection;
@@ -402,12 +402,12 @@ class ConfigOperation_2AxisTable {
     SetObj(obj) {
         if(obj) {
             this.Type = obj.Type;
+            this.Table.SetXResolution(obj.XResolution);
+            this.Table.SetYResolution(obj.YResolution);
             this.Table.MinX = obj.MinX;
             this.Table.MaxX = obj.MaxX;
             this.Table.MinY = obj.MinY;
             this.Table.MaxY = obj.MaxY;
-            this.Table.SetXResolution(obj.XResolution);
-            this.Table.SetYResolution(obj.YResolution);
             this.Table.Value = obj.Value;
             if(!this.NoParamaterSelection)
                 this.XSelection = obj.XSelection;
@@ -674,7 +674,7 @@ class Table {
         var thisClass = this;
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
-            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true });
+            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true, title: thisClass.ZLabel });
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-table", function(e){
@@ -1173,7 +1173,7 @@ class ConfigOrVariableSelection {
             if(Increments[this.VariableListName] === undefined)
                 Increments[this.VariableListName] = [];
 
-            if(!this.Selection.reference) {
+            if(!this.Selection.reference && GetClassProperty(this.Selection.value, "Output")) {
                 this.Id = 0;
                 if(Increments.VariableIncrement === undefined)
                     Increments.VariableIncrement = 0;
@@ -1238,11 +1238,7 @@ class ConfigOrVariableSelection {
         var arrayBuffer = new ArrayBuffer();
 
         //if immediate operation
-        if(this.IsImmediateOperation()) {      
-            if(Increments.VariableIncrement === undefined)
-                throw "Set Increments First";
-            if(this.Id === -1)
-                throw "Set Increments First";
+        if(this.IsImmediateOperation()) {
             arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBufferParameters());    
         }
                 
@@ -1254,13 +1250,14 @@ class ConfigOrVariableSelection {
 
         //if immediate operation
         if(this.IsImmediateOperation()) {      
-            if(Increments.VariableIncrement === undefined)
+            if(Increments.VariableIncrement === undefined && GetClassProperty(this.Selection.value, "Output"))
                 throw "Set Increments First";
-            if(this.Id === -1)
+            if(this.Id === -1 && GetClassProperty(this.Selection.value, "Output"))
                 throw "Set Increments First";
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (subOperation? 0x4 : 0) ]).buffer); //immediate and store variable, return if subOperation
-            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferOperation(subOperation));  
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer);
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (subOperation && GetClassProperty(this.Selection.value, "Output")? 0x4 : 0) ]).buffer); //immediate and store variable, return if subOperation
+            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferOperation());  
+            if(GetClassProperty(this.Selection.value, "Output"))
+                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer);
             arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferParameters());  
         }  
                 

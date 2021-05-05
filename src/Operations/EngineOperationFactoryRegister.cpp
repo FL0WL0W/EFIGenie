@@ -13,7 +13,7 @@ using namespace EmbeddedIOServices;
 
 namespace OperationArchitecture
 {
-    void Register(uint32_t idOffset, OperationFactory *factory, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
+    void EngineOperationFactoryRegister::Register(uint32_t idOffset, OperationFactory *factory, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
     {
         factory->Register(idOffset + 1, Operation_CylinderAirMass_SD::Create);
         factory->Register(idOffset + 2, new CreateWithParameters<const EmbeddedIOServiceCollection *, OperationPackager *>(Operation_EngineInjectorPrime::Create, embeddedIOServiceCollection, packager));

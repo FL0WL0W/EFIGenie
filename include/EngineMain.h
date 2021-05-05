@@ -6,6 +6,7 @@ namespace Engine
 {
 	class EngineMain
 	{
+		public:
 		static void Start(EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut);
 	};
 }
