@@ -3,18 +3,18 @@
 #include "Operations/EmbeddedIOOperationFactoryRegister.h"
 #include "Operations/ReluctorOperationFactoryRegister.h"
 #include "Operations/EngineOperationFactoryRegister.h"
-#include "Operations/OperationPackager.h"
 #include "Config.h"
 
 using namespace OperationArchitecture;
 
 namespace Engine
 {
-    void EngineMain::Start(EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, const void *config, unsigned int &sizeOut)
+    EngineMain::EngineMain(const void *config, unsigned int &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
+        _systemBus = new SystemBus();
+
         OperationFactory *operationFactory = new OperationFactory();
-        SystemBus *systemBus = new SystemBus();
-        OperationPackager *packager = new OperationPackager(operationFactory, systemBus);
+        OperationPackager *packager = new OperationPackager(operationFactory, _systemBus);
 
         OperationFactoryRegister::Register(10000, operationFactory);
         EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
@@ -28,38 +28,43 @@ namespace Engine
             const uint32_t operationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
             if(operationId == 0)
                 break;
-            systemBus->Operations.insert(std::pair<uint32_t, IOperationBase*>(operationId, packager->Package(config, size)));
+            _systemBus->Operations.insert(std::pair<uint32_t, IOperationBase*>(operationId, packager->Package(config, size)));
             Config::OffsetConfig(config, sizeOut, size);
         }
         while(size > 0);
 
         size = 0;
-        IOperationBase *inputsExecute = packager->Package(config, size);
+        _inputsExecute = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        IOperationBase *preSyncExecute = packager->Package(config, size);
+        _preSyncExecute = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        IOperationBase *syncCondition = packager->Package(config, size);
+        _syncCondition = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        IOperationBase *mainLoopExecute = packager->Package(config, size);
+        _mainLoopExecute = packager->Package(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
+        delete packager;
+        delete operationFactory;
+    }
 
-        inputsExecute->Execute();
-        preSyncExecute->Execute();
+    void EngineMain::Setup()
+    {
+        _inputsExecute->Execute();
+        _preSyncExecute->Execute();
+    }
 
-        while(true)
+    void EngineMain::Loop()
+    {
+        _inputsExecute->Execute();
+        if(_syncCondition->Execute<bool>())
         {
-            inputsExecute->Execute();
-            while(syncCondition->Execute<bool>())
-            {
-                mainLoopExecute->Execute();
-            }
+            _mainLoopExecute->Execute();
         }
     }
 }

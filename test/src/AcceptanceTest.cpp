@@ -23,6 +23,7 @@ namespace UnitTests
 		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
 		void *_config;
 		unsigned int _sizeOut = 0;
+		EngineMain *_engineMain;
 
 		AcceptanceTest()
 		{
@@ -38,13 +39,12 @@ namespace UnitTests
 			_config = malloc(size);
 			if (file.read(reinterpret_cast<char *>(_config), size))
 			{
-				EngineMain::Start(&_embeddedIOServiceCollection, _config, _sizeOut);
+				_engineMain = new EngineMain(_config, _sizeOut, &_embeddedIOServiceCollection);
 			}
-			//EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 		}
 	};
 
-	TEST_F(AcceptanceTest, AcceptanceTest1)
+	TEST_F(AcceptanceTest, ParsingConfigDidNotBreak)
 	{
 	}
 }
