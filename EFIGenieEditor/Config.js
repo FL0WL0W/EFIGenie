@@ -538,9 +538,9 @@ class ConfigIgnition {
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
             arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
             arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
             arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id ]).buffer);
+            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id ]).buffer);
         }
 
         return arrayBuffer;

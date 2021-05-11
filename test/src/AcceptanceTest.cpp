@@ -24,6 +24,8 @@ namespace UnitTests
 		void *_config;
 		unsigned int _sizeOut = 0;
 		EngineMain *_engineMain;
+		ICallBack *_crankTriggerCallback;
+		ICallBack *_camTriggerCallback;
 
 		AcceptanceTest()
 		{
@@ -31,6 +33,10 @@ namespace UnitTests
 			_embeddedIOServiceCollection.DigitalService = &_digitalService;
 			_embeddedIOServiceCollection.PwmService = &_pwmService;
 			_embeddedIOServiceCollection.TimerService = &_timerService;
+
+			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
+			EXPECT_CALL(_digitalService, ScheduleRecurringInterrupt(11, _)).WillOnce(SaveArg<1>(&_crankTriggerCallback));
+			EXPECT_CALL(_digitalService, ScheduleRecurringInterrupt(18, _)).WillOnce(SaveArg<1>(&_camTriggerCallback));
 
 			std::ifstream file("tune.bin", std::ios::binary | std::ios::ate);
 			std::streamsize size = file.tellg();
