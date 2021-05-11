@@ -8,7 +8,7 @@ namespace OperationArchitecture
 {
 	PACK(struct EnginePosition : public ReluctorResult
 	{
-		bool Sequential;
+		bool Sequential : 1;
 	});
 
 	class Operation_EnginePosition : public IOperation<EnginePosition, ReluctorResult, ReluctorResult>
