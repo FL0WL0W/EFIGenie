@@ -453,13 +453,11 @@ class ConfigIgnition {
         this.IgnitionDwellConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionDwellConfigOrVariableSelection);
         if(obj && obj.Outputs)
         {
+            this.Outputs = [];
             for(var i = 0; i < obj.Outputs.length; i++){
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition " + (i+1), "No Measurement")
                 this.Outputs[i].SetObj(obj.Outputs[i])
-            }
-            for(var i = obj.Outputs.length; i < this.Outputs.length; i++){
-                this.Outputs[i] = undefined;
             }
         }
 
@@ -1023,13 +1021,11 @@ class ConfigInjectorOutputs {
         this.Detach();
         if(obj && obj.Outputs)
         {
+            this.Outputs = [];
             for(var i = 0; i < obj.Outputs.length; i++){
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector " + (i+1), "No Measurement")
                 this.Outputs[i].SetObj(obj.Outputs[i])
-            }
-            for(var i = obj.Outputs.length; i < this.Outputs.length; i++){
-                this.Outputs[i] = undefined;
             }
         }
 
