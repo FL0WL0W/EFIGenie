@@ -30,7 +30,7 @@ namespace OperationArchitecture
 		if(ignitionDwell > 0)
 		{
 			uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
-			dwellTick = _predictor->Execute(ignitionAdvance, enginePosition);
+			dwellTick = _predictor->Execute(_tdc - ignitionAdvance, enginePosition);
 			dwellTick = dwellTick - dwellTicks;
 			while(ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
 				dwellTick = dwellTick + ticksPerCycle;
