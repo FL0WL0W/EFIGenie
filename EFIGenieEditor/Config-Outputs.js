@@ -79,7 +79,7 @@ class ConfigOperation_DigitalPinWrite {
 
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput]).buffer); //factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted & (this.HighZ? 0x02 : 0x00)]).buffer); //inverted, high z
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted | (this.HighZ? 0x02 : 0x00)]).buffer); //inverted, high z
         
         return arrayBuffer;
     }
