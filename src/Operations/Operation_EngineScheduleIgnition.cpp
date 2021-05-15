@@ -66,7 +66,7 @@ namespace OperationArchitecture
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
 		_dwellCallBack->Execute();
-		_dwellingAtTick = _timerService->GetTick();
+		_dwellingAtTick = _dwellTask->Tick;
 		if(_dwellingAtTick == 0)
 			_dwellingAtTick = 1;
 	}

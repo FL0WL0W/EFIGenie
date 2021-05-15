@@ -25,38 +25,37 @@ namespace OperationArchitecture
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
-		uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);//this is not going to work. need to do something different for non sequential
-		uint32_t injectEndAt = _predictor->Execute(_tdc + injectionEndPosition, enginePosition);;
+		const uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);//this is not going to work. need to do something different for non sequential
 		//we always want to schedule the opening time.
-		uint32_t injectAt = injectEndAt - pulseTicks;
+		uint32_t injectAt = _predictor->Execute(_tdc + injectionEndPosition, enginePosition) - pulseTicks;
 		while(ITimerService::TickLessThanTick(injectAt, enginePosition.CalculatedTick))
+			injectAt = injectAt + ticksPerCycle;
+
+		//if we have already opened this cycle, schedule for next cycle
+		if(_lastOpenedAtTick != 0 && ITimerService::TickLessThanTick(injectAt - _lastOpenedAtTick, ticksPerCycle / 2))
 			injectAt = injectAt + ticksPerCycle;
 
 		_timerService->ScheduleTask(_openTask, injectAt);
 
-		while(ITimerService::TickLessThanTick(injectEndAt, enginePosition.CalculatedTick))
-			injectEndAt = injectEndAt + ticksPerCycle;
-
-		//if we haven't opened since last revolution and the new schedule is next revolution. we need to open now
-		if(_lastOpenedAtTick != 0 && injectAt - _lastOpenedAtTick > (ticksPerCycle / 2) * 3 && !_open)
+		// if we are open. schedule close based on when it was opened
+		if(_open)
 		{
-			Open();
 			_timerService->ScheduleTask(_closeTask, _lastOpenedAtTick + pulseTicks);
 		}
-		//if we are not already open we want to reschedule the closing time
-		else if(!_open)
+		//otherwise schedule based on the _openTask->Tick
+		else
 		{
-			_timerService->ScheduleTask(_closeTask, injectEndAt);
+			_timerService->ScheduleTask(_closeTask, _openTask->Tick + pulseTicks);
 		}
 
 		//return the ticks of the open and close. for debugging purposes
-		return std::tuple<float, float>(injectAt == 0? 1 : injectAt, injectEndAt == 0? 1 : injectEndAt);
+		return std::tuple<float, float>(_openTask->Tick, _closeTask->Tick);
 	}
 
 	void Operation_EngineScheduleInjection::Open()
 	{
 		_openCallBack->Execute();
-		_lastOpenedAtTick = _timerService->GetTick();
+		_lastOpenedAtTick = _openTask->Tick;
 		if(_lastOpenedAtTick == 0)
 			_lastOpenedAtTick = 1;
 		_open = true;
