@@ -953,7 +953,7 @@ class ConfigInjectorPulseWidth_DeadTime {
         var arrayBuffer = new ArrayBuffer();
         
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
         
         return arrayBuffer;
     }
@@ -961,6 +961,34 @@ class ConfigInjectorPulseWidth_DeadTime {
     GetArrayBufferParameters(){
         var arrayBuffer = new ArrayBuffer();
         
+        //multiply parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+        //multiply parameter 2
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+
+        //suboperation 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //GreaterThan
+        //GreaterThan parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        //GreaterThan parameter 2
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+
+        //suboperation 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array([0]).buffer); //value
+
+        //suboperation 2
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
         //add parameter 1
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
