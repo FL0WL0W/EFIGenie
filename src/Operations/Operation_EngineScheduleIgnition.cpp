@@ -49,7 +49,10 @@ namespace OperationArchitecture
 
 		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
 		if(_dwellingAtTick == 0)
+		{
 			_ignitionAt = _tdc - ignitionAdvance;
+			_ignitionDwell = ignitionDwell;
+		}
 
 		//but we do want to adjust the ignition tick so that it is spot on
 		uint32_t ignitionTick = _predictor->Execute(_ignitionAt, enginePosition);
@@ -57,7 +60,13 @@ namespace OperationArchitecture
 		while((_dwellingAtTick == 0 && ITimerService::TickLessThanTick(ignitionTick, enginePosition.CalculatedTick)) || (_dwellingAtTick != 0 && ITimerService::TickLessThanTick(ignitionTick, _dwellingAtTick)))
 			ignitionTick = ignitionTick + ticksPerCycle;
 
-		_timerService->ScheduleTask(_igniteTask, ignitionTick);
+		if(_dwellingAtTick == 0)
+			_timerService->ScheduleTask(_igniteTask, ignitionTick);
+		else
+		{
+			const uint32_t currDwellTicks = _ignitionDwell * ticksPerSecond;
+			_timerService->ScheduleTask(_igniteTask, ignitionTick - _dwellingAtTick > currDwellTicks * 2 / 3?  _dwellingAtTick + currDwellTicks : ignitionTick);
+		}
 
 		//return the ticks of the dwell and ignition. for debugging purposes
 		return std::tuple<uint32_t, uint32_t>(dwellTick, ignitionTick == 0? 1 : ignitionTick);

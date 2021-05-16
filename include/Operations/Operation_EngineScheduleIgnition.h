@@ -20,6 +20,7 @@ namespace OperationArchitecture
 		EmbeddedIOServices::Task *_igniteTask;
 		uint32_t _dwellingAtTick = 0;
 		float _ignitionAt;
+		float _ignitionDwell;
 	public:		
         Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, EmbeddedIOServices::ICallBack *dwellCallBack, EmbeddedIOServices::ICallBack *igniteCallBack);
 
