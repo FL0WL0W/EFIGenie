@@ -32,10 +32,9 @@ EngineFactoryIDs = {
     InjectorPrime: 2,
     Position: 3,
     PositionPrediction: 4,
-    RPM: 5,
+    EngineParameters: 5,
     ScheduleIgnition: 6,
-    ScheduleInjection: 7,
-    Sequential: 8
+    ScheduleInjection: 7
 }
 
 function ResetIncrements()
@@ -751,7 +750,7 @@ class ConfigEngine {
             veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
         }
 
-        var numberOfOperations = 2;
+        var numberOfOperations = 1;
         if(mapRequired && this.ManifoldAbsolutePressureConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
         if(catRequired && this.CylinderAirTemperatureConfigOrVariableSelection.IsImmediateOperation())
@@ -766,8 +765,9 @@ class ConfigEngine {
 
         //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.RPM ]).buffer); //factory id
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters ]).buffer); //factory id
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineRPMId ]).buffer); //EngineRPMId
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer);//use 1st sub operation
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use 1st return from sub operation
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x07 ]).buffer); //immediate store and return
@@ -784,11 +784,11 @@ class ConfigEngine {
         arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
         arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Sequential ]).buffer); //factory id
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionID
+        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
+        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Sequential ]).buffer); //factory id
+        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
+        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use variable
+        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionID
 
         
         if(mapRequired) {
