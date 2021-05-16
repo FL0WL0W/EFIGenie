@@ -11,10 +11,10 @@ namespace Engine
 {
     EngineMain::EngineMain(const void *config, unsigned int &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
-        _systemBus = new SystemBus();
+        SystemBus = new OperationArchitecture::SystemBus();
 
         OperationFactory *operationFactory = new OperationFactory();
-        OperationPackager *packager = new OperationPackager(operationFactory, _systemBus);
+        OperationPackager *packager = new OperationPackager(operationFactory, SystemBus);
 
         OperationFactoryRegister::Register(10000, operationFactory);
         EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
@@ -28,7 +28,7 @@ namespace Engine
             const uint32_t operationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
             if(operationId == 0)
                 break;
-            _systemBus->Operations.insert(std::pair<uint32_t, IOperationBase*>(operationId, packager->Package(config, size)));
+            SystemBus->Operations.insert(std::pair<uint32_t, IOperationBase*>(operationId, packager->Package(config, size)));
             Config::OffsetConfig(config, sizeOut, size);
         }
         while(size > 0);
