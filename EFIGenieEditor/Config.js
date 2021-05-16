@@ -35,6 +35,7 @@ EngineFactoryIDs = {
     RPM: 5,
     ScheduleIgnition: 6,
     ScheduleInjection: 7,
+    Sequential: 8
 }
 
 function ResetIncrements()
@@ -346,22 +347,22 @@ class ConfigFuel {
         return template;
     }
 
-    InjectorGramsId = -1;
+    InjectorMassId = -1;
     SetIncrements() {
         this.AFRConfigOrVariableSelection.SetIncrements();
 
-        this.InjectorGramsId = -1;
+        this.InjectorMassId = -1;
         if(Increments.FuelParameters === undefined)
             Increments.FuelParameters = [];
 
-        this.InjectorGramsId = 1;
+        this.InjectorMassId = 1;
         if(Increments.VariableIncrement === undefined)
             Increments.VariableIncrement = 1;
         else
-            this.InjectorGramsId = ++Increments.VariableIncrement;
+            this.InjectorMassId = ++Increments.VariableIncrement;
         Increments.FuelParameters.push({ 
-            Name: "Injector Grams", 
-            Id: this.InjectorGramsId,
+            Name: "Injector Mass", 
+            Id: this.InjectorMassId,
             Type: "float",
             Measurement: "Mass"
         });
@@ -376,7 +377,7 @@ class ConfigFuel {
         
         if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
-        if(this.InjectorGramsId === -1)
+        if(this.InjectorMassId === -1)
             throw "Set Increments First";
 
         var numberOfOperations = 2;
@@ -391,7 +392,7 @@ class ConfigFuel {
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorGramsId ]).buffer); //Injector Grams ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorMassId ]).buffer); //Injector Mass ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
         arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBufferAsParameter(1));
@@ -698,8 +699,10 @@ class ConfigEngine {
             Increments.VariableIncrement = 1;
         else
             this.EnginePositionId = ++Increments.VariableIncrement;
-        this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EnginePositionId = this.EnginePositionId;
+        this.EngineSequentialId = ++Increments.VariableIncrement;
+        Increments.EngineSequentialId = this.EngineSequentialId;
+        this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EngineParameters.push({ 
             Name: "Engine RPM", 
             Id: this.EngineRPMId,
@@ -748,7 +751,7 @@ class ConfigEngine {
             veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
         }
 
-        var numberOfOperations = 1;
+        var numberOfOperations = 2;
         if(mapRequired && this.ManifoldAbsolutePressureConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
         if(catRequired && this.CylinderAirTemperatureConfigOrVariableSelection.IsImmediateOperation())
@@ -780,6 +783,13 @@ class ConfigEngine {
         arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferAsParameter(subOperations));
         arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
         arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
+
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Sequential ]).buffer); //factory id
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionID
+
         
         if(mapRequired) {
             arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetArrayBufferPackage());
@@ -974,7 +984,7 @@ class ConfigInjectorPulseWidth_DeadTime {
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //GreaterThan
         //GreaterThan parameter 1
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id ]).buffer);
         //GreaterThan parameter 2
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
@@ -998,10 +1008,55 @@ class ConfigInjectorPulseWidth_DeadTime {
         //add parameter 1 subOperation
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
         arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
+        //multiply parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+        //multiply parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+
+        //multiply parameter 1 subOperation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
+        //multiply parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+        //multiply parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+
+        //suboperation 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array([0.5]).buffer); //value
+
+        //suboperation 2
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
+        //add parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+        //add parameter 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineSequentialId ]).buffer);
+
+        //suboperation 1
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
+        arrayBuffer = arrayBuffer.concatArray(new Float32Array([1]).buffer); //value
+
+        //multiply parameter 2 subOperation
+        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //Divide
         //divide parameter 1
         arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Grams").Id ]).buffer);
+        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id ]).buffer);
         //divide parameter 2
         arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBufferAsParameter(1));
         //divide parameter 2 subOperation

@@ -25,7 +25,7 @@ namespace OperationArchitecture
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
 
-		const uint32_t pulseTicks = static_cast<uint32_t>((injectionPulseWidth * (enginePosition.Sequential? 1 : 0.5f)) * ticksPerSecond);//this is not going to work. need to do something different for non sequential
+		const uint32_t pulseTicks = static_cast<uint32_t>(injectionPulseWidth * ticksPerSecond);
 		//we always want to schedule the opening time.
 		uint32_t injectAt = _predictor->Execute(_tdc + injectionEndPosition, enginePosition) - pulseTicks;
 		while(ITimerService::TickLessThanTick(injectAt, enginePosition.CalculatedTick))
