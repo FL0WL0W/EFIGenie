@@ -6,6 +6,7 @@
 #include "Operations/Operation_EngineRpm.h"
 #include "Operations/Operation_EngineScheduleIgnition.h"
 #include "Operations/Operation_EngineScheduleInjection.h"
+#include "Operations/Operation_EngineIsSequential.h"
 
 using namespace EmbeddedIOServices;
 
@@ -22,6 +23,7 @@ namespace OperationArchitecture
         factory->Register(idOffset + 5, Operation_EngineRpm::Create);
         factory->Register(idOffset + 6, new CreateWithParameters<const EmbeddedIOServiceCollection *, OperationPackager *>(Operation_EngineScheduleIgnition::Create, embeddedIOServiceCollection, packager));
         factory->Register(idOffset + 7, new CreateWithParameters<const EmbeddedIOServiceCollection *, OperationPackager *>(Operation_EngineScheduleInjection::Create, embeddedIOServiceCollection, packager));
+        factory->Register(idOffset + 8, Operation_EngineIsSequential::Create);
     }
 }
 
