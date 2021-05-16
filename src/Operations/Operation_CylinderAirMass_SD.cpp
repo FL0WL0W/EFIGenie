@@ -15,7 +15,7 @@ namespace OperationArchitecture
 		
 		float airDensity = (manifoldAbsolutePresssure * 101.325f) / (287 /*GasConstant*/ * (cylinderAirTemperature + 273.15f)); // kg/m^3
 
-		return cylinderVolume * airDensity * 1000;
+		return cylinderVolume * airDensity;
 	}
 	
 	IOperationBase *Operation_CylinderAirMass_SD::Create(const void *config, unsigned int &sizeOut)
