@@ -1174,9 +1174,9 @@ class ConfigOrVariableSelection {
                 Increments[this.VariableListName] = [];
 
             if(!this.Selection.reference && GetClassProperty(this.Selection.value, "Output")) {
-                this.Id = 0;
+                this.Id = 1;
                 if(Increments.VariableIncrement === undefined)
-                    Increments.VariableIncrement = 0;
+                    Increments.VariableIncrement = 1;
                 else
                     this.Id = ++Increments.VariableIncrement;
 

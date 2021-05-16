@@ -215,9 +215,9 @@ class ConfigInputs {
     }
 
     SetIncrements() {
-        Increments.CurrentTickId = 0;
+        Increments.CurrentTickId = 1;
         if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 0;
+            Increments.VariableIncrement = 1;
         else
             Increments.CurrentTickId = ++Increments.VariableIncrement;
 
@@ -507,9 +507,9 @@ class ConfigInput {
             return;
 
         if(this.TranslationConfig) {
-            this.InputTranslationId = 0;
+            this.InputTranslationId = 1;
             if(Increments.VariableIncrement === undefined)
-                Increments.VariableIncrement = 0;
+                Increments.VariableIncrement = 1;
             else
                 this.InputTranslationId = ++Increments.VariableIncrement;
                 
@@ -523,9 +523,9 @@ class ConfigInput {
             });
         }
         
-        this.InputRawId = 0;
+        this.InputRawId = 1;
         if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 0;
+            Increments.VariableIncrement = 1;
         else
             this.InputRawId = ++Increments.VariableIncrement;
             

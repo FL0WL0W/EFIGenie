@@ -354,9 +354,9 @@ class ConfigFuel {
         if(Increments.FuelParameters === undefined)
             Increments.FuelParameters = [];
 
-        this.InjectorGramsId = 0;
+        this.InjectorGramsId = 1;
         if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 0;
+            Increments.VariableIncrement = 1;
         else
             this.InjectorGramsId = ++Increments.VariableIncrement;
         Increments.FuelParameters.push({ 
@@ -693,9 +693,9 @@ class ConfigEngine {
         if(Increments.EngineParameters === undefined)
         Increments.EngineParameters = [];
 
-        this.EnginePositionId = 0;
+        this.EnginePositionId = 1;
         if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 0;
+            Increments.VariableIncrement = 1;
         else
             this.EnginePositionId = ++Increments.VariableIncrement;
         this.EngineRPMId = ++Increments.VariableIncrement;
