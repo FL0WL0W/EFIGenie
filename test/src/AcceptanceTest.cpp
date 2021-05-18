@@ -22,7 +22,7 @@ namespace UnitTests
 		MockTimerService _timerService;
 		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
 		void *_config;
-		unsigned int _sizeOut = 0;
+		size_t _sizeOut = 0;
 		EngineMain *_engineMain;
 		ICallBack *_crankTriggerCallback;
 		ICallBack *_camTriggerCallback;

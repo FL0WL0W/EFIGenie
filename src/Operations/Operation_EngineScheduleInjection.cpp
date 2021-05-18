@@ -67,13 +67,13 @@ namespace OperationArchitecture
 		_open = false;
 	}
 
-	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, unsigned int &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
+	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		ICallBack * openCallBack = 0;
 		ICallBack * closeCallBack = 0;
 
-		unsigned int size = 0;
+		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)

@@ -73,7 +73,7 @@ namespace OperationArchitecture
 		return ret;
 	}
 	
-	IOperationBase *Operation_EnginePosition::Create(const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EnginePosition::Create(const void *config, size_t &sizeOut)
 	{
 		return Construct(Config::CastAndOffset<bool>(config, sizeOut));
 	}

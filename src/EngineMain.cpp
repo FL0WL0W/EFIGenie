@@ -9,7 +9,7 @@ using namespace OperationArchitecture;
 
 namespace Engine
 {
-    EngineMain::EngineMain(const void *config, unsigned int &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection)
+    EngineMain::EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
         SystemBus = new OperationArchitecture::SystemBus();
 
@@ -21,7 +21,7 @@ namespace Engine
         ReluctorOperationFactoryRegister::Register(30000, operationFactory);
         EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection, packager);
 
-        unsigned int size = 0;
+        size_t size = 0;
         do
         {
             size = 0;

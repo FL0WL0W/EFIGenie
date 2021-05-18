@@ -12,7 +12,7 @@ namespace OperationArchitecture
 		return std::tuple<float, bool>(enginePosition.GetRPM(), sequential);
 	}
 	
-	IOperationBase *Operation_EngineParameters::Create(const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_EngineParameters::Create(const void *config, size_t &sizeOut)
 	{
 		return new Operation_EngineParameters();
 	}

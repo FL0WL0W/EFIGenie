@@ -13,7 +13,7 @@ namespace OperationArchitecture
 	public:		
 		std::tuple<float, bool> Execute(EnginePosition enginePosition) override;
 
-		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
+		static IOperationBase *Create(const void *config, size_t &sizeOut);
 		static Operation_EngineParameters *Construct();
 	};
 }

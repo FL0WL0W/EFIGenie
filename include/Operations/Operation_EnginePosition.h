@@ -1,15 +1,14 @@
 #include "Operations/IOperation.h"
-#include "Packed.h"
 #include "ReluctorResult.h"
 
 #ifndef OPERATION_ENGINEPOSITION_H
 #define OPERATION_ENGINEPOSITION_H
 namespace OperationArchitecture
 {
-	PACK(struct EnginePosition : public ReluctorResult
+	struct EnginePosition : public ReluctorResult
 	{
 		bool Sequential : 1;
-	});
+	};
 
 	class Operation_EnginePosition : public IOperation<EnginePosition, ReluctorResult, ReluctorResult>
 	{
@@ -24,7 +23,7 @@ namespace OperationArchitecture
 
 		EnginePosition Execute(ReluctorResult crankPosition, ReluctorResult camPosition) override;
 
-		static IOperationBase *Create(const void *config, unsigned int &sizeOut);
+		static IOperationBase *Create(const void *config, size_t &sizeOut);
 		static Operation_EnginePosition *Construct(bool crankPriority);
 	};
 }

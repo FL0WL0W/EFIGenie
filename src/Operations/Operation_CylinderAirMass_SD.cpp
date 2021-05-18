@@ -18,7 +18,7 @@ namespace OperationArchitecture
 		return cylinderVolume * airDensity;
 	}
 	
-	IOperationBase *Operation_CylinderAirMass_SD::Create(const void *config, unsigned int &sizeOut)
+	IOperationBase *Operation_CylinderAirMass_SD::Create(const void *config, size_t &sizeOut)
 	{
 		return new Operation_CylinderAirMass_SD(Config::CastAndOffset<float>(config, sizeOut));
 	}
