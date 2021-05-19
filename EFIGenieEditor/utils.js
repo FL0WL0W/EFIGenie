@@ -4,9 +4,80 @@ Uint8Array.prototype.toHex = function() { // buffer is an ArrayBuffer
 
 ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same type
     var tmp = new Uint8Array(this.byteLength + b.byteLength);
-    tmp.set(new Uint8Array(this), 0);
+    if(this.byteLength > 0)
+        tmp.set(new Uint8Array(this), 0);
     tmp.set(new Uint8Array(b), this.byteLength);
     return tmp.buffer;
+}
+
+ArrayBuffer.prototype.pad = function(bytes, padByte) {
+    if(padByte === undefined){
+        padByte = 0xFF;   
+    }
+    var array = [];
+    for(var i = 0; i < bytes; i++){
+        array[i] = padByte;
+    }
+    return this.concatArray(new Uint8Array(array).buffer);
+}
+
+ArrayBuffer.prototype.align = function(align, padByte) {
+    if(this.byteLength % align > 0){
+        return this.pad(align - (this.byteLength % align), padByte);
+    }
+    return this;
+}
+
+ArrayBuffer.prototype.build = function(obj) {
+    var buffer = this;
+    for(var index in obj.value){
+        var typeInfo = obj.types.find(x => x.type === obj.value[index].type);
+
+        //align
+        var align = obj.value[index].align;
+        if(align === undefined && typeInfo !== undefined){
+            align = typeInfo.align;
+        }
+        if(align) {
+            buffer = buffer.align(align);
+        }
+
+        var toArrayBuffer = obj.value[index].toArrayBuffer;
+        if(toArrayBuffer === undefined && typeInfo !== undefined){
+            toArrayBuffer = typeInfo.toArrayBuffer;
+        }
+        if(toArrayBuffer !== undefined){
+            buffer = buffer.concatArray(toArrayBuffer(obj.value[index].value));
+        } else {
+            var objobj = obj.value[index].obj;
+            if(objobj === undefined && typeInfo !== undefined){
+                objobj = typeInfo.objobj;
+            }
+            if(objobj === undefined){
+                var toObj
+                var toObj = obj.value[index].toObj;
+                if(toObj === undefined && typeInfo !== undefined){
+                    toObj = typeInfo.toObj;
+                }
+                if(toObj) {
+                    objobj = toObj(obj.value[index].value);
+                }
+            }
+            if(objobj !== undefined){
+                if(objobj.types === undefined) {
+                    objobj.types = [];
+                }
+                for(var typeIndex in obj.types){
+                    var typetypeInfo = objobj.types.find(x => x.type === obj.types[typeIndex].type);
+                    if(typetypeInfo === undefined){
+                        objobj.types.push(obj.types[typeIndex]);
+                    }
+                }
+                buffer = buffer.build(objobj);
+            }
+        }
+    }
+    return buffer;
 }
 
 ArrayBuffer.prototype.equals = function(buf)
@@ -20,6 +91,8 @@ ArrayBuffer.prototype.equals = function(buf)
     }
     return true;
 }
+
+
 
 jQuery.expr[':'].parents = function(a,i,m){
     return jQuery(a).parents(m[3]).length < 1;

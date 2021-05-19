@@ -74,14 +74,12 @@ class ConfigOperation_DigitalPinWrite {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted | (this.HighZ? 0x02 : 0x00)]).buffer); //inverted, high z
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
+            { type: "UINT16", value: this.Pin },
+            { type: "UINT8", value: this.Inverted | (this.HighZ? 0x02 : 0x00) }
+        ]};
     }
 }
 BooleanOutputConfigs.push(ConfigOperation_DigitalPinWrite);

@@ -37,6 +37,119 @@ EngineFactoryIDs = {
     ScheduleInjection: 7
 }
 
+STM32TypeAlignment = [
+    { type: "INT8", align: 1 }, 
+    { type: "INT16", align: 2 },
+    { type: "INT32", align: 4 },
+    { type: "INT64", align: 8 },
+    { type: "BOOL", align: 1 }, 
+    { type: "UINT8", align: 1 },
+    { type: "UINT16", align: 2 },
+    { type: "UINT32", align: 4 },
+    { type: "UINT64", align: 8 },
+    { type: "FLOAT", align: 4 },
+    { type: "DOUBLE", align: 8 },
+]
+
+x86TypeAlignment = [
+    { type: "INT8", align: 1 }, 
+    { type: "INT16", align: 2 },
+    { type: "INT32", align: 4 },
+    { type: "INT64", align: 8 },
+    { type: "BOOL", align: 1 }, 
+    { type: "UINT8", align: 1 },
+    { type: "UINT16", align: 2 },
+    { type: "UINT32", align: 4 },
+    { type: "UINT64", align: 8 },
+    { type: "FLOAT", align: 4 },
+    { type: "DOUBLE", align: 8 },
+]
+
+types = [
+    { type: "INT8", toArrayBuffer: function(val) { return new Int8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "INT16", toArrayBuffer: function(val) { return new Int16Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "INT32", toArrayBuffer: function(val) { return new Int32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "INT64", toArrayBuffer: function(val) { return new BigInt64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "BOOL", toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "UINT8", toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "UINT16", toArrayBuffer: function(val) { return new Uint16Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "UINT32", toArrayBuffer: function(val) { return new Uint32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "UINT64", toArrayBuffer: function(val) { return new BigUint64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "FLOAT", toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "DOUBLE", toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: "PackageOptions", toObj(val) {
+        if(val.Group !== undefined)
+            return { value: [
+                { type: "UINT8", value: 0x08}, //group
+                { type: "UINT16", value: val.Group}, //number of operations
+            ]};
+        
+        return { value: [{ type: "UINT8", value: (val.DoNotPackage? 0x10 : 0x00) | (val.Return? 0x04 : 0x00) | (val.Store? 0x02 : 0x00) | (val.Immediate? 0x01 : 0x00)}]};
+    }},
+    { type: "Operation_StaticVariable", toObj(val) {
+        obj = { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static} //number of operations
+        ]};
+
+        if(typeof val === "boolean"){
+            obj.value.push({ type: "UINT8", value: 11 }); //type
+            obj.value.push({ type: "BOOL", value: val }); //type
+        } else if(val % 1 != 0){
+            obj.value.push({ type: "UINT8", value: 9 }); //type
+            obj.value.push({ type: "FLOAT", value: val }); //type
+        } else {
+            if(val < 0) {
+                if(val < 128 && val > -129) {
+                    obj.value.push({ type: "UINT8", value: 5 }); //type
+                    obj.value.push({ type: "INT8", value: val }); //type
+                } else if(val < 32768 && val > -32759) {
+                    obj.value.push({ type: "UINT8", value: 6 }); //type
+                    obj.value.push({ type: "INT16", value: val }); //type
+                } else if(val < 2147483648 && val > -2147483649) {
+                    obj.value.push({ type: "UINT8", value: 7 }); //type
+                    obj.value.push({ type: "INT32", value: val }); //type
+                } else if(val < 9223372036854775807 && val > -9223372036854775808){
+                    obj.value.push({ type: "UINT8", value: 8 }); //type
+                    obj.value.push({ type: "INT64", value: val }); //type
+                } else {
+                    throw "number too big";
+                }
+            } else {
+                if(val < 256) {
+                    obj.value.push({ type: "UINT8", value: 1 }); //type
+                    obj.value.push({ type: "INT8", value: val }); //type
+                } else if(val < 65536) {
+                    obj.value.push({ type: "UINT8", value: 2 }); //type
+                    obj.value.push({ type: "UINT16", value: val }); //type
+                } else if(val < 4294967295) {
+                    obj.value.push({ type: "UINT8", value: 3 }); //type
+                    obj.value.push({ type: "UINT32", value: val }); //type
+                } else if(val < 18446744073709551615) {
+                    obj.value.push({ type: "UINT8", value: 4 }); //type
+                    obj.value.push({ type: "UINT64", value: val }); //type
+                } else {
+                    throw "number too big";
+                }
+            }
+        }
+
+        return obj;
+    }},
+    { type: "Operation_Math", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math}, //number of operations
+            { type: "UINT8", value: val } //operator
+        ]};
+    }},
+]
+
+for(var index in x86TypeAlignment) {
+    var type = types.find(x => x.type == x86TypeAlignment[index].type);
+    if(type){
+        type.align = x86TypeAlignment[index].align
+    }
+}
+
 function ResetIncrements()
 {
     Increments = {};
@@ -239,35 +352,31 @@ class ConfigTop {
     }
 
     GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
+        return (new ArrayBuffer()).build({ types: types, value: [{obj: this.GetObjPackage()}]});
+    }
 
-        //operations
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ 0 ]).buffer); //signal last operation
-        
-        //inputs
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2 ]).buffer); //number of operations
-        arrayBuffer = arrayBuffer.concatArray(this.Inputs.GetArrayBufferPackage());
-        arrayBuffer = arrayBuffer.concatArray(this.Engine.GetArrayBufferPackage());
+    GetObjPackage() {
+        return { value: [
+            { type: "UINT32", value: 0}, //signal last operation
 
-        //preSync
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 0 ]).buffer); //number of operations
+            //inputs
+            { type: "PackageOptions", value: { Group: 2 }}, //group
+            { obj: this.Inputs.GetObjPackage()}, 
+            { obj: this.Engine.GetObjPackage()}, 
 
-        //sync condition
-        //static true for now
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //bool
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([true]).buffer); //value
+            //preSync
+            { type: "PackageOptions", value: { Group: 0 }}, //group
 
-        //main loop execute
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ 2 ]).buffer); //number of operations
-        arrayBuffer = arrayBuffer.concatArray(this.Fuel.GetArrayBufferPackage());
-        arrayBuffer = arrayBuffer.concatArray(this.Ignition.GetArrayBufferPackage());
-
-        return arrayBuffer;
+            //sync condition
+            //static true for now
+            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
+            { type: "Operation_StaticVariable", value: true}, //bool
+            
+            //main loop execute
+            { type: "PackageOptions", value: { Group: 2 }}, //group
+            { obj: this.Fuel.GetObjPackage()}, 
+            { obj: this.Ignition.GetObjPackage()}, 
+        ]};
     }
 }
 
@@ -371,9 +480,7 @@ class ConfigFuel {
         this.ConfigInjectorOutputs.SetIncrements();
     }
 
-    GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
-        
+    GetObjPackage() {
         if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
         if(this.InjectorMassId === -1)
@@ -385,24 +492,22 @@ class ConfigFuel {
         if(this.InjectorEndPositionConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
+        return { value: [
+            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 3 ]).buffer); //Divide operator
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InjectorMassId ]).buffer); //Injector Mass ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBufferAsParameter(1));
-        arrayBuffer = arrayBuffer.concatArray(this.AFRConfigOrVariableSelection.GetArrayBufferPackage(true));
+            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "Operation_Math", value: 3}, //Divide
+            { type: "UINT32", value: this.InjectorMassId }, //Injector Mass ID
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id },
+            { obj: this.AFRConfigOrVariableSelection.GetObjAsParameter(1)}, 
+            { obj: this.AFRConfigOrVariableSelection.GetObjPackage(true)}, 
 
-        arrayBuffer = arrayBuffer.concatArray(this.InjectorPulseWidthConfigOrVariableSelection.GetArrayBufferPackage());
-        arrayBuffer = arrayBuffer.concatArray(this.InjectorEndPositionConfigOrVariableSelection.GetArrayBufferPackage());
+            { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjPackage()}, 
+            { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjPackage()}, 
 
-        arrayBuffer = arrayBuffer.concatArray(this.ConfigInjectorOutputs.GetArrayBufferPackage());
-
-        return arrayBuffer;
+            { obj: this.ConfigInjectorOutputs.GetObjPackage()}, 
+        ]};
     }
 }
 
@@ -512,36 +617,42 @@ class ConfigIgnition {
         };
     }
 
-    GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjPackage() {
         var numberOfOperations = this.Outputs.length;
         if(this.IgnitionAdvanceConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
         if(this.IgnitionDwellConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
+        var obj  = { 
+        types : [
+            { type: "Operation_EngineScheduleIgnition", toObj(val) {
+                return { value: [
+                    { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                    { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
+                    { type: "FLOAT", value: val.TDC }, //tdc
+                    { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
+                    { obj: val.GetObjOperation()}, 
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.EnginePositionId },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id },
+                ]};
+            }}],
+        value: [
+            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
-        arrayBuffer = arrayBuffer.concatArray(this.IgnitionAdvanceConfigOrVariableSelection.GetArrayBufferPackage())
-        arrayBuffer = arrayBuffer.concatArray(this.IgnitionDwellConfigOrVariableSelection.GetArrayBufferPackage())
-        
+            { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjPackage()}, 
+            { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjPackage()}, 
+        ]};
+
         for(var i = 0; i < this.Outputs.length; i++) {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x01 ]).buffer); //immediate and do not package
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition ]).buffer); //factory id
-            arrayBuffer = arrayBuffer.concatArray(new Float32Array([ this.Outputs[i].TDC ]).buffer); //tdc
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x11 ]).buffer); //immediate and do not package
-            arrayBuffer = arrayBuffer.concatArray(this.Outputs[i].GetArrayBufferOperation());
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id ]).buffer);
+            obj.value.push({ type: "Operation_EngineScheduleIgnition", value: this.Outputs[i] });
         }
 
-        return arrayBuffer;
+        return obj;
     }
 }
 
@@ -730,9 +841,7 @@ class ConfigEngine {
         this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
     }
 
-    GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjPackage() {
         if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
         if(this.EngineRPMId === -1)
@@ -760,52 +869,51 @@ class ConfigEngine {
         if(this.CylinderAirmassConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
 
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ numberOfOperations ]).buffer); //number of operations
 
-        //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters ]).buffer); //factory id
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineRPMId ]).buffer); //EngineRPMId
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer);//use 1st sub operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use 1st return from sub operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x07 ]).buffer); //immediate store and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Position ]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ this.CrankPriority? 1 : 0 ]).buffer); //CrankPriority
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionId
+
+        var obj = { value: [
+            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
+
+            //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
+            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
+            { type: "UINT32", value: this.EngineRPMId },  //EngineRPMId
+            { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
+            { type: "UINT8", value: 1 }, //use 1st sub operation
+            { type: "UINT8", value: 0 }, //use 1st return from sub operation
+            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position },  //factory id
+            { type: "UINT8", value: this.CrankPriority? 1 : 0 }, //CrankPriority
+            { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
+        ]};
+
+
         var subOperations = 0;
         if(this.CrankPositionConfigOrVariableSelection.IsImmediateOperation()) 
             subOperations++;
-        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferAsParameter(subOperations));
+        obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
         if(this.CamPositionConfigOrVariableSelection.IsImmediateOperation()) 
             subOperations++;
-        arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferAsParameter(subOperations));
-        arrayBuffer = arrayBuffer.concatArray(this.CrankPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
-        arrayBuffer = arrayBuffer.concatArray(this.CamPositionConfigOrVariableSelection.GetArrayBufferPackage(true));
-
-        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate store
-        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.Sequential ]).buffer); //factory id
-        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EngineSequentialId ]).buffer); //EngineSequentialId
-        // arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer);//use variable
-        // arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.EnginePositionId ]).buffer); //EnginePositionID
-
+        obj.value.push({ obj: this.CamPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
+        obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjPackage(true) });
+        obj.value.push({ obj: this.CamPositionConfigOrVariableSelection.GetObjPackage(true) });
         
         if(mapRequired) {
-            arrayBuffer = arrayBuffer.concatArray(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetArrayBufferPackage());
+            obj.value.push({ obj: this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjPackage() });
         }
 
         if(catRequired) {
-            arrayBuffer = arrayBuffer.concatArray(this.CylinderAirTemperatureConfigOrVariableSelection.GetArrayBufferPackage());
+            obj.value.push({ obj: this.CylinderAirTemperatureConfigOrVariableSelection.GetObjPackage() });
         }
         
         if(veRequired) {
-            arrayBuffer = arrayBuffer.concatArray(this.VolumetricEfficiencyConfigOrVariableSelection.GetArrayBufferPackage());
+            obj.value.push({ obj: this.VolumetricEfficiencyConfigOrVariableSelection.GetObjPackage() });
         }
         
-        arrayBuffer = arrayBuffer.concatArray(this.CylinderAirmassConfigOrVariableSelection.GetArrayBufferPackage());
+        var test = this.CylinderAirmassConfigOrVariableSelection.GetObjPackage();
+        obj.value.push({ obj: test });
 
-        return arrayBuffer;
+        return obj;
     }
 }
 
@@ -866,26 +974,22 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.CylinderVolume]).buffer); //CylinderVolume
-                
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD }, //factory ID
+            { type: "FLOAT", value: this.CylinderVolume }, //Cylinder Volume
+        ]};
     }
 
-    GetArrayBufferParameters() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id ]).buffer);
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id ]).buffer);
-                
-        return arrayBuffer;
+    GetObjParameters() {
+        return { value: [
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id },
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id },
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id },
+        ]};
     }
 }
 CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
@@ -959,114 +1063,90 @@ class ConfigInjectorPulseWidth_DeadTime {
         this.FlowRateConfigOrVariableSelection.SetIncrements();
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-        
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
-        
-        return arrayBuffer;
+    GetObjOperation() {
+
+        return { value: [
+            { type: "Operation_Math", value: 2}, //Multiply
+        ]};
     }
 
-    GetArrayBufferParameters(){
-        var arrayBuffer = new ArrayBuffer();
-        
-        //multiply parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-        //multiply parameter 2
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
+    GetObjParameters(){
+        return { value: [
+            { type: "UINT8", value: 1 }, //use first suboperation
+            { type: "UINT8", value: 0 }, //use first return
+            { type: "UINT8", value: 2 }, //use second suboperation
+            { type: "UINT8", value: 0 }, //use first return
+            //first suboperation
+            { obj: { value: [ 
+                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                { type: "Operation_Math", value: 6 }, //GreaterThan
+                { type: "UINT8", value: 0 }, //use variable
+                { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id }, //Injector Mass ID
+                { type: "UINT8", value: 1 }, //use first suboperation
+                { type: "UINT8", value: 0 }, //use first return
+                //first suboperation
+                { obj: { value: [ 
+                    { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                    { type: "Operation_StaticVariable", value: 0 }
+                ]}},
+            ]}},
 
-        //suboperation 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //GreaterThan
-        //GreaterThan parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id ]).buffer);
-        //GreaterThan parameter 2
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-
-        //suboperation 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([0]).buffer); //value
-
-        //suboperation 2
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
-        //add parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-        //add parameter 2
-        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBufferAsParameter(2));
-
-        //add parameter 1 subOperation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
-        //multiply parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-        //multiply parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-
-        //multiply parameter 1 subOperation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //Multiply
-        //multiply parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-        //multiply parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 2 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-
-        //suboperation 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([0.5]).buffer); //value
-
-        //suboperation 2
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //Add
-        //add parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use immediate operation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return
-        //add parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EngineSequentialId ]).buffer);
-
-        //suboperation 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //static value
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //float
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([1]).buffer); //value
-
-        //multiply parameter 2 subOperation
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x05 ]).buffer); //immediate and return
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math]).buffer); //Math factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //Divide
-        //divide parameter 1
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id ]).buffer);
-        //divide parameter 2
-        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBufferAsParameter(1));
-        //divide parameter 2 subOperation
-        arrayBuffer = arrayBuffer.concatArray(this.FlowRateConfigOrVariableSelection.GetArrayBufferPackage(true));
-
-        //add parameter 2 subOperation
-        arrayBuffer = arrayBuffer.concatArray(this.DeadTimeConfigOrVariableSelection.GetArrayBufferPackage(true));
-                
-        return arrayBuffer;
-
+            //second suboperation
+            { obj: { value: [ 
+                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                { type: "Operation_Math", value: 0 }, //Add
+                { type: "UINT8", value: 1 }, //use first suboperation
+                { type: "UINT8", value: 0 }, //use first return
+                { obj: this.DeadTimeConfigOrVariableSelection.GetObjAsParameter(2)},
+                //first suboperation
+                { obj: { value: [ 
+                    { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                    { type: "Operation_Math", value: 2 }, //Multiply
+                    { type: "UINT8", value: 1 }, //use first suboperation
+                    { type: "UINT8", value: 0 }, //use first return
+                    { type: "UINT8", value: 2 }, //use second suboperation
+                    { type: "UINT8", value: 0 }, //use first return
+                    //first suboperation
+                    { obj: { value: [ 
+                        { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                        { type: "Operation_Math", value: 2 }, //Multiply
+                        { type: "UINT8", value: 1 }, //use first suboperation
+                        { type: "UINT8", value: 0 }, //use first return
+                        { type: "UINT8", value: 2 }, //use second suboperation
+                        { type: "UINT8", value: 0 }, //use first return
+                        //first suboperation
+                        { obj: { value: [ 
+                            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                            { type: "Operation_StaticVariable", value: 0.5 }
+                        ]}},
+                        //second suboperation
+                        { obj: { value: [ 
+                            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                            { type: "Operation_Math", value: 0 }, //Add
+                            { type: "UINT8", value: 1 }, //use first suboperation
+                            { type: "UINT8", value: 0 }, //use first return
+                            { type: "UINT8", value: 0 }, //use variable
+                            { type: "UINT32", value: Increments.EngineSequentialId },
+                            //first suboperation
+                            { obj: { value: [ 
+                                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                                { type: "Operation_StaticVariable", value: 1 }
+                            ]}},
+                        ]}},
+                    ]}},
+                    //second suboperation
+                    { obj: { value: [ 
+                        { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
+                        { type: "Operation_Math", value: 3 }, //Divide
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id },
+                        { obj: this.FlowRateConfigOrVariableSelection.GetObjAsParameter(1)},
+                        { obj: this.FlowRateConfigOrVariableSelection.GetObjPackage(true)},
+                    ]}},
+                ]}},
+                { obj: this.DeadTimeConfigOrVariableSelection.GetObjPackage(true)},
+            ]}}
+        ]};
     }
 }
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
@@ -1152,27 +1232,34 @@ class ConfigInjectorOutputs {
         };
     }
 
-    GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
-        
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.Outputs.length ]).buffer); //number of operations
+    GetObjPackage() {
 
+        var obj  = { 
+            types : [
+                { type: "Operation_EngineScheduleInjection", toObj(val) {
+                    return { value: [
+                        { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                        { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
+                        { type: "FLOAT", value: val.TDC }, //tdc
+                        { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
+                        { obj: val.GetObjOperation()}, 
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.EnginePositionId },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(ATDC)").Id },
+                    ]};
+                }}],
+            value: [
+                { type: "PackageOptions", value: { Group: this.Outputs.length }}, //group
+            ]};
+    
         for(var i = 0; i < this.Outputs.length; i++) {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x01 ]).buffer); //immediate and do not package
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection ]).buffer); //factory id
-            arrayBuffer = arrayBuffer.concatArray(new Float32Array([ this.Outputs[i].TDC ]).buffer); //tdc
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x11 ]).buffer); //immediate and do not package
-            arrayBuffer = arrayBuffer.concatArray(this.Outputs[i].GetArrayBufferOperation());
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.EnginePositionId ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.FuelParameters.find(a => a.Name === "Injector End Position(ATDC)").Id ]).buffer);
+            obj.value.push({ type: "Operation_EngineScheduleInjection", value: this.Outputs[i] });
         }
 
-        return arrayBuffer;
+        return obj;
     }
 }
 
@@ -1221,14 +1308,4 @@ class ConfigTDCOutput extends ConfigOrVariableSelection {
 
         return template;
     }
-
-    // SetIncrements() {
-    // }
-
-    // GetArrayBufferPackage() {
-    //     var arrayBuffer = new ArrayBuffer();
-        
-
-    //     return arrayBuffer;
-    // }
 }

@@ -82,63 +82,12 @@ class ConfigOperation_Static {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static]).buffer); //factory ID
-        switch(this.Type)
-        {
-            case "number":
-                if(this.Value % 1 != 0){
-                    arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //type
-                    arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.Value]).buffer); //value
-                } else {
-                    if(this.Value < 0) {
-                        if(this.Value < 128 && this.Value > -129) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Int8Array([this.Value]).buffer); //value
-                        } else if(this.Value < 32768 && this.Value > -32759) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Int16Array([this.Value]).buffer); //value
-                        } else if(this.Value < 2147483648 && this.Value > -2147483649) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([7]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Int32Array([this.Value]).buffer); //value
-                        } else {
-                            throw "number too big";
-                        }
-                    } else {
-                        if(this.Value < 256) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Value]).buffer); //value
-                        } else if(this.Value < 65536) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Value]).buffer); //value
-                        } else if(this.Value < 4294967295) {
-                            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //type
-                            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([this.Value]).buffer); //value
-                        } else {
-                            throw "number too big";
-                        }
-                    }
-                }
-                break;
-            case "bool":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Value]).buffer); //value
-                break;
-            case "tick":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([this.Value]).buffer); //value
-                break;
-        }
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [{ type: "Operation_StaticVariable", value: this.Value }]};
     }
 
-    GetArrayBufferParameters() {
-        var arrayBuffer = new ArrayBuffer();
-
-        return arrayBuffer;
+    GetObjParameters() {
+        return { value: []};
     }
 }
 
@@ -248,16 +197,18 @@ class ConfigOperation_LookupTable {
         }
     }
 
-    GetArrayBufferOperation() {
+    GetObjOperation() {
         var table = this.Table;
         var tableValue = this.Table.Value;
         var type;
+        var typeId;
         var min;
         var max;
 
         for(var i = 0; i < tableValue.length; i++) {
             if(tableValue[i] % 1 != 0){
-                type = "float";
+                type = "FLOAT";
+                typeId = 9;
                 break;
             }
             if(min === undefined || tableValue[i] < min){
@@ -270,88 +221,58 @@ class ConfigOperation_LookupTable {
         if(!type){
             if(min < 0) {
                 if(max < 128 && min > -129) {
-                    type = "int8"
+                    typeId = 5;
+                    type = "INT8";
                 } else if(max < 32768 && min > -32759) {
-                    type = "int16"
+                    typeId = 6;
+                    type = "INT16";
                 } else if(max < 2147483648 && min > -2147483649) {
-                    type = "int32"
+                    typeId = 7;
+                    type = "INT32";
+                } else if(val < 9223372036854775807 && val > -9223372036854775808){
+                    typeId = 8;
+                    type = "INT64";
                 } else {
                     throw "number too big";
                 }
             } else {
                 if(max < 256) {
-                    type = "uint8"
+                    type = "UINT8";
+                    typeId = 1;
                 } else if(max < 65536) {
-                    type = "uint16"
+                    type = "UINT16";
+                    typeId = 2;
                 } else if(max < 4294967295) {
-                    type = "uint32"
+                    type = "UINT32";
+                    typeId = 3;
+                } else if(val < 18446744073709551615) {
+                    type = "UINT64";
+                    typeId = 4;
                 } else {
                     throw "number too big";
                 }
             }
         }
 
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.XResolution]).buffer); //XResolution
-        switch(this.Type)
-        {
-            case "number":
-                switch(type){
-                    case "float": 
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(tableValue).buffer); //value
-                    break;
-                    case "int8":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(tableValue).buffer); //value
-                    break;
-                    case "int16":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(tableValue).buffer); //value
-                    break;
-                    case "int32":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([7]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(tableValue).buffer); //value
-                    break;
-                    case "uint8":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
-                    break;
-                    case "uint16":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(tableValue).buffer); //value
-                    break;
-                    case "uint32":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
-                }
-                break;
-            case "bool":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
-                break;
-            case "tick":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
-                break;
-        }
-
-        return arrayBuffer;
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
+            { type: "FLOAT", value: table.MinX }, //MinXValue
+            { type: "FLOAT", value: table.MaxX }, //MaxXValue
+            { type: "UINT8", value: table.XResolution }, //XResolution
+            { type: "UINT8", value: typeId }, //Type
+            { type: type, value: tableValue }, //Table
+        ]};
     }
 
-    GetArrayBufferParameters() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjParameters() {
         if(!this.NoParamaterSelection) {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.ParameterSelection.reference].find(a => a.Name === this.ParameterSelection.value && a.Measurement === this.ParameterSelection.measurement).Id ]).buffer);
+            return { value: [
+                { type: "UINT8", value: 0 }, //variable
+                { type: "UINT32", value: Increments[this.ParameterSelection.reference].find(a => a.Name === this.ParameterSelection.value && a.Measurement === this.ParameterSelection.measurement).Id }
+            ]};
         }
 
-        return arrayBuffer;
+        return { value: []};
     }
 }
 GenericConfigs.push(ConfigOperation_LookupTable);
@@ -482,16 +403,18 @@ class ConfigOperation_2AxisTable {
         }
     }
 
-    GetArrayBufferOperation() {
+    GetObjOperation() {
         var table = this.Table;
         var tableValue = this.Table.Value;
         var type;
+        var typeId;
         var min;
         var max;
 
         for(var i = 0; i < tableValue.length; i++) {
             if(tableValue[i] % 1 != 0){
-                type = "float";
+                type = "FLOAT";
+                typeId = 9;
                 break;
             }
             if(min === undefined || tableValue[i] < min){
@@ -504,92 +427,62 @@ class ConfigOperation_2AxisTable {
         if(!type){
             if(min < 0) {
                 if(max < 128 && min > -129) {
-                    type = "int8"
+                    typeId = 5;
+                    type = "INT8";
                 } else if(max < 32768 && min > -32759) {
-                    type = "int16"
+                    typeId = 6;
+                    type = "INT16";
                 } else if(max < 2147483648 && min > -2147483649) {
-                    type = "int32"
+                    typeId = 7;
+                    type = "INT32";
+                } else if(val < 9223372036854775807 && val > -9223372036854775808){
+                    typeId = 8;
+                    type = "INT64";
                 } else {
                     throw "number too big";
                 }
             } else {
                 if(max < 256) {
-                    type = "uint8"
+                    type = "UINT8";
+                    typeId = 1;
                 } else if(max < 65536) {
-                    type = "uint16"
+                    type = "UINT16";
+                    typeId = 2;
                 } else if(max < 4294967295) {
-                    type = "uint32"
+                    type = "UINT32";
+                    typeId = 3;
+                } else if(val < 18446744073709551615) {
+                    type = "UINT64";
+                    typeId = 4;
                 } else {
                     throw "number too big";
                 }
             }
         }
 
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinX]).buffer); //MinXValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxX]).buffer); //MaxXValue
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.XResolution]).buffer); //XResolution
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MinY]).buffer); //MinYValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([table.MaxY]).buffer); //MaxYValue
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([table.YResolution]).buffer); //YResolution
-        switch(this.Type)
-        {
-            case "number":
-                switch(type){
-                    case "float": 
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([9]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Float32Array(tableValue).buffer); //value
-                    break;
-                    case "int8":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int8Array(tableValue).buffer); //value
-                    break;
-                    case "int16":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([6]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int16Array(tableValue).buffer); //value
-                    break;
-                    case "int32":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([7]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Int32Array(tableValue).buffer); //value
-                    break;
-                    case "uint8":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([1]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
-                    break;
-                    case "uint16":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([2]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint16Array(tableValue).buffer); //value
-                    break;
-                    case "uint32":
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([3]).buffer); //type
-                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
-                }
-                break;
-            case "bool":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([11]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array(tableValue).buffer); //value
-                break;
-            case "tick":
-                arrayBuffer = arrayBuffer.concatArray(new Uint8Array([5]).buffer); //type
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array(tableValue).buffer); //value
-                break;
-        }
-                
-        return arrayBuffer;
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
+            { type: "FLOAT", value: table.MinX }, //MinXValue
+            { type: "FLOAT", value: table.MaxX }, //MaxXValue
+            { type: "FLOAT", value: table.MinY }, //MinYValue
+            { type: "FLOAT", value: table.MaxY }, //MaxYValue
+            { type: "UINT8", value: table.XResolution }, //XResolution
+            { type: "UINT8", value: table.YResolution }, //YResolution
+            { type: "UINT8", value: typeId }, //Type
+            { type: type, value: tableValue }, //Table
+        ]};
     }
 
-    GetArrayBufferParameters() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjParameters() {
         if(!this.NoParamaterSelection) {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([0]).buffer); //variable
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id ]).buffer);
+            return { value: [
+                { type: "UINT8", value: 0 }, //variable
+                { type: "UINT32", value: Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id },
+                { type: "UINT8", value: 0 }, //variable
+                { type: "UINT32", value: Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id }
+            ]};
         }
-        return arrayBuffer;
+        return { value: []};
     }
 }
 GenericConfigs.push(ConfigOperation_2AxisTable);
@@ -1207,60 +1100,62 @@ class ConfigOrVariableSelection {
         return this.Selection && !this.Selection.reference;
     }
 
-    GetArrayBufferAsParameter(subOperationId) {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjAsParameter(subOperationId) {
         //if immediate operation
-        if(this.IsImmediateOperation()) {            
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ subOperationId ]).buffer); //use subOperation
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use first return from operation
-        } else {
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-            var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ cell.Id ]).buffer); //Id
+        if(this.IsImmediateOperation()) {     
+            return { value: [
+                { type: "UINT8", value: subOperationId }, //use subOperation
+                { type: "UINT8", value: 0 }, //use first return from operation
+            ]};
         }
-        
-        return arrayBuffer;
+
+        var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
+        return { value: [
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: cell.Id }, //ID
+        ]};
     }
     
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjOperation() {
         //if immediate operation
         if(this.IsImmediateOperation()) {
-            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBufferOperation());    
+            return { value: [{ obj: this.Selection.value.GetObjOperation() }]};
         }
-        
-        return arrayBuffer;
+
+        return { value: []};
     }
 
-    GetArrayBufferParameters() {
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjParameters() {
         //if immediate operation
         if(this.IsImmediateOperation()) {
-            arrayBuffer = arrayBuffer.concatArray(this.Selection.value.GetArrayBufferParameters());    
+            return { value: [{ obj: this.Selection.value.GetObjParameters() }]};
         }
-                
-        return arrayBuffer;
+
+        return { value: []};
     }
 
-    GetArrayBufferPackage(subOperation){
-        var arrayBuffer = new ArrayBuffer();
-
+    GetObjPackage(subOperation){
         //if immediate operation
         if(this.IsImmediateOperation()) {      
             if(Increments.VariableIncrement === undefined && GetClassProperty(this.Selection.value, "Output"))
                 throw "Set Increments First";
             if(this.Id === -1 && GetClassProperty(this.Selection.value, "Output"))
                 throw "Set Increments First";
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (subOperation && GetClassProperty(this.Selection.value, "Output")? 0x4 : 0) ]).buffer); //immediate and store variable, return if subOperation
-            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferOperation());  
+
+
+            var obj  = {value: [
+                    { type: "PackageOptions", value: { Immediate: true, Store: true, return: subOperation && GetClassProperty(this.Selection.value, "Output") }}, //immediate and store variable, return if subOperation
+                    { obj: this.Selection.value.GetObjOperation() }
+                ]};
+            
             if(GetClassProperty(this.Selection.value, "Output"))
-                arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.Id ]).buffer);
-            arrayBuffer = arrayBuffer.concatArray(this.GetArrayBufferParameters());  
+                obj.value.push({ type: "UINT32", value: this.Id });
+
+            obj.value.push({ obj: this.Selection.value.GetObjParameters() });
+
+            return obj;
         }  
                 
-        return arrayBuffer;
+        return { value: []};
     }
 }

@@ -226,21 +226,20 @@ class ConfigInputs {
         }
     }
 
-    GetArrayBufferPackage() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x09 ]).buffer); //immediate group
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([ this.Inputs.length + 1 ]).buffer); //number of operations
-        
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick ]).buffer); //GetTick factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //CurrentTickId
+    GetObjPackage() {
+        var obj = { value: [
+            { type: "PackageOptions", value: { Group: this.Inputs.length + 1 }}, //group
+            
+            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }, //GetTick factory ID
+            { type: "UINT32", value: Increments.CurrentTickId }
+        ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
-            arrayBuffer = arrayBuffer.concatArray(this.Inputs[i].GetArrayBufferPackage())
+            obj.value.push({ obj: this.Inputs[i].GetObjPackage()});
         }
 
-        return arrayBuffer;
+        return obj;
     }
 }
 
@@ -544,10 +543,9 @@ class ConfigInput {
             this.TranslationConfig.SetIncrements();
     }
 
-    GetArrayBufferPackage() {
+    GetObjPackage() {
         var rawOutput = GetClassProperty(this.RawConfig, "Output");
         var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
-        var arrayBuffer = new ArrayBuffer();
         if(!this.RawConfig) 
             return arrayBuffer;
 
@@ -556,22 +554,24 @@ class ConfigInput {
 
         var output = GetClassProperty(this.RawConfig, "Output");
 
+        var obj = { value: []};
+
         if(this.TranslationConfig) {
             if(this.InputTranslationId === -1)
                 throw "Set Increments First";
 
-            arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 ]).buffer); //immediate and store variables
-            arrayBuffer = arrayBuffer.concatArray(this.TranslationConfig.GetArrayBufferOperation());
-            arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputTranslationId ]).buffer); //sensorTranslationID
+            obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true }});
+            obj.value.push({ obj: this.TranslationConfig.GetObjOperation()});
+            obj.value.push({ type: "UINT32", value: this.InputTranslationId });//sensorTranslationID
             if(translationInputs) {
                 for(var i = 0; i < translationInputs.length; i++){
                     //add universal inputs for translation
                     if(translationInputs[i] === "CurrentTick"){
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use variable
-                        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ Increments.CurrentTickId ]).buffer); //use CurrentTick variable
+                        obj.value.push({ type: "UINT8", value: 0 }); //use variable
+                        obj.value.push({ type: "UINT32", value: Increments.CurrentTickId }); //use CurrentTick variable
                     } else if (translationInputs[i] === output) {
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 1 ]).buffer); //use 1st operation
-                        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0 ]).buffer); //use 1st return from operation
+                        obj.value.push({ type: "UINT8", value: 1 }); //use 1st operation
+                        obj.value.push({ type: "UINT8", value: 0 }); //use 1st return from operation
                     }
                 }
             }
@@ -580,11 +580,11 @@ class ConfigInput {
         if(this.InputRawId === -1)
             throw "Set Increments First";
         
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([ 0x03 | (this.TranslationConfig? 0x04 : 0x00) ]).buffer); //immediate and store variables, return if TranslationConfig
-        arrayBuffer = arrayBuffer.concatArray(this.RawConfig.GetArrayBufferOperation());
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ this.InputRawId ]).buffer); //sensorID
+        obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true, Return: this.TranslationConfig !== undefined }}); //immediate and store variables, return if TranslationConfig
+        obj.value.push({ obj: this.RawConfig.GetObjOperation()});
+        obj.value.push({ type: "UINT32", value: this.InputRawId });//sensorID
 
-        return arrayBuffer;
+        return obj;
     }
 }
 
@@ -639,13 +639,11 @@ class ConfigOperation_AnalogPinRead {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_AnalogPinRead);
@@ -714,14 +712,12 @@ class ConfigOperation_DigitalPinRead {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted]).buffer); //inverted
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+            { type: "BOOL", value: this.Inverted}, //inverted
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRead);
@@ -802,15 +798,13 @@ class ConfigOperation_DigitalPinRecord {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Inverted]).buffer); //inverted
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Length]).buffer); //length
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+            { type: "BOOL", value: this.Inverted}, //inverted
+            { type: "UINT16", value: this.Length}, //length
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRecord);
@@ -879,14 +873,12 @@ class ConfigOperation_DutyCyclePinRead {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DutyCyclePinRead);
@@ -955,14 +947,12 @@ class ConfigOperation_FrequencyPinRead {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
@@ -1031,14 +1021,12 @@ class ConfigOperation_PulseWidthPinRead {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.Pin]).buffer); //pin
-        arrayBuffer = arrayBuffer.concatArray(new Uint16Array([this.MinFrequency]).buffer); //minFrequency
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
+            { type: "UINT16", value: this.Pin}, //pin
+            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+        ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
@@ -1161,16 +1149,14 @@ class ConfigOperation_Polynomial {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MinValue]).buffer); //MinValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.MaxValue]).buffer); //MaxValue
-        arrayBuffer = arrayBuffer.concatArray(new Uint8Array([this.Degree]).buffer); //Degree
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array(this.A).buffer); //coefficients
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
+            { type: "FLOAT", value: this.MinValue}, //MinValue
+            { type: "FLOAT", value: this.MaxValue}, //MaxValue
+            { type: "UINT8", value: this.Degree}, //Degree
+            { type: "FLOAT", value: this.A}, //coefficients
+        ]};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_Polynomial);
@@ -1206,12 +1192,10 @@ class ConfigOperation_ReluctorGM24x {
         return "";
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X]).buffer); //factory ID
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
+        ]};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
@@ -1281,14 +1265,12 @@ class ConfigOperation_ReluctorUniversal2x {
         return template;
     }
 
-    GetArrayBufferOperation() {
-        var arrayBuffer = new ArrayBuffer();
-
-        arrayBuffer = arrayBuffer.concatArray(new Uint32Array([ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal2X]).buffer); //factory ID
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.RisingPosition]).buffer); //MinValue
-        arrayBuffer = arrayBuffer.concatArray(new Float32Array([this.FallingPosition]).buffer); //MaxValue
-        
-        return arrayBuffer;
+    GetObjOperation() {
+        return { value: [
+            { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal2X}, //factory ID
+            { type: "FLOAT", value: this.RisingPosition}, //RisingPosition
+            { type: "FLOAT", value: this.FallingPosition}, //FallingPosition
+        ]};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal2x);
