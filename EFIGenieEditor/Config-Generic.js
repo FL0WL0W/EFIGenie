@@ -1144,7 +1144,7 @@ class ConfigOrVariableSelection {
 
 
             var obj  = {value: [
-                    { type: "PackageOptions", value: { Immediate: true, Store: true, return: subOperation && GetClassProperty(this.Selection.value, "Output") }}, //immediate and store variable, return if subOperation
+                    { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(this.Selection.value, "Output") }}, //immediate and store variable, return if subOperation
                     { obj: this.Selection.value.GetObjOperation() }
                 ]};
             
