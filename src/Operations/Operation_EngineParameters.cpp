@@ -8,8 +8,8 @@ namespace OperationArchitecture
 	
 	std::tuple<float, bool> Operation_EngineParameters::Execute(EnginePosition enginePosition)
 	{
-		bool sequential = enginePosition.Sequential; //this might not work
-		return std::tuple<float, bool>(enginePosition.GetRPM(), sequential);
+		_sequential = enginePosition.Sequential;
+		return std::tuple<float, bool>(enginePosition.GetRPM(), _sequential);
 	}
 	
 	IOperationBase *Operation_EngineParameters::Create(const void *config, size_t &sizeOut)
