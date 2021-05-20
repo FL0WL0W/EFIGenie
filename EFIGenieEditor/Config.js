@@ -37,6 +37,20 @@ EngineFactoryIDs = {
     ScheduleInjection: 7
 }
 
+PackedTypeAlignment = [
+    { type: "INT8", align: 1 }, 
+    { type: "INT16", align: 1 },
+    { type: "INT32", align: 1 },
+    { type: "INT64", align: 1 },
+    { type: "BOOL", align: 1 }, 
+    { type: "UINT8", align: 1 },
+    { type: "UINT16", align: 1 },
+    { type: "UINT32", align: 1 },
+    { type: "UINT64", align: 1 },
+    { type: "FLOAT", align: 1 },
+    { type: "DOUBLE", align: 1 },
+]
+
 STM32TypeAlignment = [
     { type: "INT8", align: 1 }, 
     { type: "INT16", align: 2 },
@@ -368,9 +382,15 @@ class ConfigTop {
             { type: "PackageOptions", value: { Group: 0 }}, //group
 
             //sync condition
-            //static true for now
             { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
-            { type: "Operation_StaticVariable", value: true}, //bool
+            //no function to just use a variable so do an OR with a static false.
+            { type: "Operation_Math", value: 5}, //OR
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: Increments.EngineSequentialId }, //bool
+            { type: "UINT8", value: 1 }, //use first operation
+            { type: "UINT8", value: 0 }, //use first return
+            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
+            { type: "Operation_StaticVariable", value: false}, //bool
             
             //main loop execute
             { type: "PackageOptions", value: { Group: 2 }}, //group
