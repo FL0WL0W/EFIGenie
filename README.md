@@ -14,60 +14,49 @@ Features<br>
     </ul>
   <li>Flexible Crank Cam Decoder</li>
     <ul>
-      <li>GM 24x (Cam + Crank and Crank Only)</li>
+      <li>GM 24x (Cam + Crank, Crank Only, or Cam only)</li>
       <li>--More to come</li>
     </ul>
-  <li>Individual injector trims</li>
-  <li>Injector offset voltage and MAP</li>
-  <li>Injector short pulse adder</li>
-  <li>TPS and MAP acceleration enrichment</li>
-  <li>Temperature Bias between ECT and IAT</li>
-  <li>After Start Enrichment</li>
-  <li>Warm Up Enrichment</li>
-  <li>Fuel Prime</li>
-  <li>Fuel Pump (On/Off)</li>
-  <li>Fuel Pump (PWM Open Loop TPS or Map tables)</li>
-  <li>Deceleration fuel cut off (DFCO)</li>
-  <li>Flex fuel</li>
-  <li>Rev Limiting (Hard and Soft Spark)</li>
-  <li>Launch control (Hard and Soft Spark)</li>
-  <li>Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)</li>
-  <li>Tach Output</li>
+  <li>Injector Flow Rate and Dead Time</li>
   <li>Vehicle Speed Sensor</li>
-  <li>Idle control (PWM and Stepper - PD control loop)</li>
-  <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
-  <li>Transmission Control (Paddle shift transmission solenoid)</li>
   <li>Firmware features</li>
     <ul>
-      <li>Ability to comment out header files in the service builder to disable features to minimize size</li>
       <li>Unit Tests to ensure everything works</li>
-      <li>Service Oriented Architecture</li>
+      <li>Operation Architecture</li>
       <li>Easily add new sensors</li>
     </ul>
 </ul>
 <br>
 TODO LIST<br>
 <ul>
-  <li>*Idle Control Ignition Wrapper</li>
-  <li>*Alpha-N</li>
   <li>*Logging</li>
   <li>*EFIGenie Editor</li>
     <ul>
-      <li>Create and edit configs</li>
-      <li>Output tuner studio configs</li>
+      <li>Value Verification and GUI tweaking</li>
       <li>Interface with ECU (UART, USB, WiFi, Bluetooth, and STLink)</li>
     </ul>
-  <li>*Tuner Studio (Interface ECU)</li>
-  <li>*Speeduino Service Builder</li>
+  <li>*Idle Control</li>
+  <li>*Alpha-N</li>
   <li>*Create unit tests</li>
+  <li>Prime</li>
+  <li>After Start Enrichment</li>
+  <li>Warm Up Enrichment</li>
+  <li>Flex fuel</li>
+  <li>Rev Limiting (Hard and Soft Spark)</li>
+  <li>Launch control (Hard and Soft Spark)</li>
+  <li>Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table</li>
+  <li>Deceleration fuel cut off (DFCO)</li>
+  <li>Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)</li>
+  <li>Tach Output</li>
+  <li>Temperature Bias between ECT and IAT</li>
+  <li>TPS and MAP acceleration enrichment</li>
+  <li>Individual injector trims</li>
+  <li>Transmission Control (Paddle shift transmission solenoid)</li>
   <li>Transmission Control (line pressure control)</li>
   <li>Transmission Control (automatic gear shifts)</li>
-  <li>Customizable injection and iginition degree references</li>
-  <li>*Config Verification</li>
   <li>Create odd cylinder banks code</li>
-  <li>Create Throttle Body Injection code</li>
   <li>Electric Fan Control</li>
-  <li>Fuel Pump (PWM PID Control Loop)</li>
+  <li>Fuel Pump (On/Off, PWM Open loop or PID Control Loop)</li>
   <li>VVT control (PWM - Open loop or PID control loop)</li>
   <li>Boost control (PWM - Open loop or PID control loop)</li>
   <li>CAN Bus/OBD2</li>
