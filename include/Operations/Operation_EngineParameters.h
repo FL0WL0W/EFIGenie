@@ -10,6 +10,7 @@ namespace OperationArchitecture
 	{
 	protected:
 		static Operation_EngineParameters *_instance;
+		volatile bool _sequential;
 	public:		
 		std::tuple<float, bool> Execute(EnginePosition enginePosition) override;
 
