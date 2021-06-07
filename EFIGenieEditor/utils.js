@@ -119,10 +119,12 @@ function getGUID(){
 }
 
 var downloadObject = function(obj, fileName) {
-    downloadstring(lzjs.compress(JSON.stringify(obj)), fileName);
+    downloadstring(JSON.stringify(obj), fileName);
+    //downloadstring(lzjs.compress(JSON.stringify(obj)), fileName);
 }
 
 var loadObject = function(s) {
+    return JSON.parse(s);
     return JSON.parse(lzjs.decompress(s));
 }
 
