@@ -13,14 +13,14 @@ namespace OperationArchitecture
 		EmbeddedIOServices::ITimerService *_timerService;
 		float _tdc;
 		Operation_EnginePositionPrediction *_predictor;
-		EmbeddedIOServices::ICallBack *_openCallBack;
-		EmbeddedIOServices::ICallBack *_closeCallBack;
+		std::function<void()> _openCallBack;
+		std::function<void()> _closeCallBack;
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
 		uint32_t _lastOpenedAtTick = 0;
 		bool _open = false;
 	public:		
-        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, EmbeddedIOServices::ICallBack *openCallBack, EmbeddedIOServices::ICallBack *closeCallBack);
+        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> openCallBack, std::function<void()> closeCallBack);
 
 		std::tuple<float, float> Execute(EnginePosition enginePosition, float injectionPulseWidth, float injectionEndPosition) override;
 		void Open();

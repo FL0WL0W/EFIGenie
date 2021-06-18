@@ -6,10 +6,11 @@
 #include "Config.h"
 
 using namespace OperationArchitecture;
+using namespace EmbeddedIOServices;
 
 namespace Engine
 {
-    EngineMain::EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection)
+    EngineMain::EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
         SystemBus = new OperationArchitecture::SystemBus();
 

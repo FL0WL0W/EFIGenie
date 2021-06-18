@@ -1,7 +1,6 @@
 #include "Operations/IOperation.h"
 #include "EmbeddedIOServiceCollection.h"
 #include "Operations/OperationPackager.h"
-#include "ICallBack.h"
 
 #ifndef OPERATION_ENGINEINJECTORPRIME_H
 #define OPERATION_ENGINEINJECTORPRIME_H
@@ -11,10 +10,10 @@ namespace OperationArchitecture
 	{
 	protected:
 		EmbeddedIOServices::ITimerService *_timerService;
-		EmbeddedIOServices::ICallBack *_openCallBack;
+		std::function<void()> _openCallBack;
 		EmbeddedIOServices::Task *_closeTask;
 	public:		
-        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, EmbeddedIOServices::ICallBack *openCallBack, EmbeddedIOServices::ICallBack *closeCallBack);
+        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack);
 
 		void Execute(float time) override;
 

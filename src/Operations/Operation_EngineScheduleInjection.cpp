@@ -5,15 +5,15 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, ICallBack *openCallBack, ICallBack *closeCallBack)
+	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> openCallBack, std::function<void()> closeCallBack)
 	{
 		_timerService = timerService;
 		_tdc = tdc;
 		_predictor = predictor;
 		_openCallBack = openCallBack;
 		_closeCallBack = closeCallBack;
-		_openTask = new Task(new CallBack<Operation_EngineScheduleInjection>(this, &Operation_EngineScheduleInjection::Open), false);
-		_closeTask = new Task(new CallBack<Operation_EngineScheduleInjection>(this, &Operation_EngineScheduleInjection::Close), false);
+		_openTask = new Task([this]() { this->Open(); });
+		_closeTask = new Task([this]() { this->Close(); });
 	}
 
 	std::tuple<float, float> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, float injectionPulseWidth, float injectionEndPosition)
@@ -54,7 +54,7 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleInjection::Open()
 	{
-		_openCallBack->Execute();
+		_openCallBack();
 		_lastOpenedAtTick = _openTask->Tick;
 		if(_lastOpenedAtTick == 0)
 			_lastOpenedAtTick = 1;
@@ -63,32 +63,32 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleInjection::Close()
 	{
-		_closeCallBack->Execute();
+		_closeCallBack();
 		_open = false;
 	}
 
 	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		ICallBack * openCallBack = 0;
-		ICallBack * closeCallBack = 0;
+		std::function<void()> openCallBack = 0;
+		std::function<void()> closeCallBack = 0;
 
 		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
-			openCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, 1);
-			closeCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, false);
+			openCallBack = [operation]() { operation->Execute(true); };
+			closeCallBack = [operation]() { operation->Execute(false); };
 		}
 		else
 		{
-			openCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+			openCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
 			IOperationBase *operation = packager->Package(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
-			closeCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+			closeCallBack = [operation]() { operation->Execute(); };
 		}
 
 		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, openCallBack, closeCallBack);

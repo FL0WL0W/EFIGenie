@@ -5,15 +5,16 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, ICallBack *dwellCallBack, ICallBack *igniteCallBack)
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack)
 	{
 		_timerService = timerService;
 		_tdc = tdc;
 		_predictor = predictor;
 		_dwellCallBack = dwellCallBack;
 		_igniteCallBack = igniteCallBack;
-		_dwellTask = new Task(new CallBack<Operation_EngineScheduleIgnition>(this, &Operation_EngineScheduleIgnition::Dwell), false);
-		_igniteTask = new Task(new CallBack<Operation_EngineScheduleIgnition>(this, &Operation_EngineScheduleIgnition::Ignite), false);
+		//_dwellTask = new Task([this]() { this->Dwell(); }, false);
+		_dwellTask = new Task([this]() { this->Dwell(); });
+		_igniteTask = new Task([this]() { this->Ignite(); });
 	}
 
 	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance)
@@ -74,7 +75,7 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
-		_dwellCallBack->Execute();
+		_dwellCallBack();
 		_dwellingAtTick = _dwellTask->Tick;
 		if(_dwellingAtTick == 0)
 			_dwellingAtTick = 1;
@@ -82,32 +83,32 @@ namespace OperationArchitecture
 
 	void Operation_EngineScheduleIgnition::Ignite()
 	{
-		_igniteCallBack->Execute();
+		_igniteCallBack();
 		_dwellingAtTick = 0;
 	}
 
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		ICallBack * dwellCallBack = 0;
-		ICallBack * igniteCallBack = 0;
+		std::function<void()> dwellCallBack = 0;
+		std::function<void()> igniteCallBack = 0;
 
 		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
-			dwellCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, 1);
-			igniteCallBack = new CallBackWithParameters<IOperationBase, bool>(operation, &IOperationBase::Execute<bool>, false);
+			dwellCallBack = [operation]() { operation->Execute(true); };
+			igniteCallBack = [operation]() { operation->Execute(false); };
 		}
 		else
 		{
-			dwellCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+			dwellCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
 			IOperationBase *operation = packager->Package(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
-			igniteCallBack = new CallBack<IOperationBase>(operation, &IOperationBase::Execute);
+			igniteCallBack = [operation]() { operation->Execute(); };
 		}
 		
 		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, dwellCallBack, igniteCallBack);
