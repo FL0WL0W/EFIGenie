@@ -25,6 +25,12 @@ namespace OperationArchitecture
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
+		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
+		if(_dwellingAtTick == 0)
+		{
+			_ignitionAt = _tdc - ignitionAdvance;
+			_ignitionDwell = ignitionDwell;
+		}
 
 		//we want to set the next dwell tick if ignitionDwell is > 0
 		uint32_t dwellTick = 0;
@@ -46,13 +52,6 @@ namespace OperationArchitecture
 			{
 				_timerService->UnScheduleTask(_dwellTask);
 			}
-		}
-
-		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
-		if(_dwellingAtTick == 0)
-		{
-			_ignitionAt = _tdc - ignitionAdvance;
-			_ignitionDwell = ignitionDwell;
 		}
 
 		//but we do want to adjust the ignition tick so that it is spot on
