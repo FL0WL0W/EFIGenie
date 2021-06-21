@@ -901,7 +901,7 @@ class ConfigEngine {
             { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
             { type: "UINT8", value: 1 }, //use 1st sub operation
             { type: "UINT8", value: 0 }, //use 1st return from sub operation
-            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "PackageOptions", value: { Immediate: true, Store: true, Return: true }}, //immediate store
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position },  //factory id
             { type: "UINT8", value: this.CrankPriority? 1 : 0 }, //CrankPriority
             { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
