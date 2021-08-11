@@ -1,5 +1,6 @@
 #include "Operations/IOperation.h"
-#include "Operations/Operation_EnginePositionPrediction.h"
+#include "Operation_EnginePosition.h"
+#include "EmbeddedIOServiceCollection.h"
 #include "Operations/OperationPackager.h"
 #include <tuple>
 
@@ -7,22 +8,22 @@
 #define OPERATION_ENGINESCHEDULEINJECTION_H
 namespace OperationArchitecture
 {
-	class Operation_EngineScheduleInjection : public IOperation<std::tuple<float, float>, EnginePosition, float, float>
+	class Operation_EngineScheduleInjection : public IOperation<std::tuple<uint32_t, uint32_t>, EnginePosition, bool, float, float>
 	{
 	protected:
-		EmbeddedIOServices::ITimerService *_timerService;
-		float _tdc;
-		Operation_EnginePositionPrediction *_predictor;
-		std::function<void()> _openCallBack;
-		std::function<void()> _closeCallBack;
+		EmbeddedIOServices::ITimerService * const _timerService;
+		const float _tdc;
+		const std::function<void()> _openCallBack;
+		const std::function<void()> _closeCallBack;
+
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
 		uint32_t _lastOpenedAtTick = 0;
 		bool _open = false;
 	public:		
-        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> openCallBack, std::function<void()> closeCallBack);
+        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const std::function<void()> openCallBack, const std::function<void()> closeCallBack);
 
-		std::tuple<float, float> Execute(EnginePosition enginePosition, float injectionPulseWidth, float injectionEndPosition) override;
+		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition) override;
 		void Open();
 		void Close();
 

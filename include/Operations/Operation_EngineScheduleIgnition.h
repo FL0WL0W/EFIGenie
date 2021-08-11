@@ -1,29 +1,30 @@
 #include "Operations/IOperation.h"
-#include "Operations/Operation_EnginePositionPrediction.h"
 #include "Operations/OperationPackager.h"
+#include "Operation_EnginePosition.h"
+#include "EmbeddedIOServiceCollection.h"
 #include <tuple>
 
 #ifndef OPERATION_ENGINESCHEDULEIGNITION_H
 #define OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	class Operation_EngineScheduleIgnition : public IOperation<std::tuple<uint32_t, uint32_t>, EnginePosition, float, float>
+	class Operation_EngineScheduleIgnition : public IOperation<std::tuple<uint32_t, uint32_t>, EnginePosition, bool, float, float>
 	{
 	protected:
-		EmbeddedIOServices::ITimerService *_timerService;
-		float _tdc;
-		Operation_EnginePositionPrediction *_predictor;
-		std::function<void()> _dwellCallBack;
-		std::function<void()> _igniteCallBack;
+		EmbeddedIOServices::ITimerService * const _timerService;
+		const float _tdc;
+		const float _ignitionDwellMaxDeviation;
+		const std::function<void()> _dwellCallBack;
+		const std::function<void()> _igniteCallBack;
+
 		EmbeddedIOServices::Task *_dwellTask;
 		EmbeddedIOServices::Task *_igniteTask;
-		uint32_t _dwellingAtTick = 0;
-		float _ignitionAt;
-		float _ignitionDwell;
+		uint32_t _lastDwellTick = 0;
+		bool _dwelling : 1;
 	public:		
-        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack);
+        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, const float tdc, const float ignitionDwellMaxDeviation, const std::function<void()> dwellCallBack, const std::function<void()> igniteCallBack);
 
-		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance) override;
+		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance) override;
 		void Dwell();
 		void Ignite();
 

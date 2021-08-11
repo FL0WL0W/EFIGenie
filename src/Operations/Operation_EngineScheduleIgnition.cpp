@@ -5,90 +5,122 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, Operation_EnginePositionPrediction *predictor, float tdc, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack)
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, const float ignitionDwellMaxDeviation, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack) :
+		_timerService(timerService),
+		_tdc(tdc), 
+		_ignitionDwellMaxDeviation(ignitionDwellMaxDeviation),
+		_dwellCallBack(dwellCallBack),
+		_igniteCallBack(igniteCallBack)
 	{
-		_timerService = timerService;
-		_tdc = tdc;
-		_predictor = predictor;
-		_dwellCallBack = dwellCallBack;
-		_igniteCallBack = igniteCallBack;
-		//_dwellTask = new Task([this]() { this->Dwell(); }, false);
 		_dwellTask = new Task([this]() { this->Dwell(); });
 		_igniteTask = new Task([this]() { this->Ignite(); });
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, float ignitionDwell, float ignitionAdvance)
+	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance)
 	{
 		if(enginePosition.Synced == false)
 			return std::tuple<uint32_t, uint32_t>(0, 0);
 
+		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
 		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
-		const uint32_t ticksPerCycle = static_cast<uint32_t>((enginePosition.Sequential? 720 : 360) * ticksPerDegree);
-		//we only want to change the timing when we are not dwelling. otherwise our dwell could be too short or too long.
-		if(_dwellingAtTick == 0)
-		{
-			_ignitionAt = _tdc - ignitionAdvance;
-			_ignitionDwell = ignitionDwell;
-		}
+		const uint32_t ticksPerCycle = static_cast<uint32_t>(cycleDegrees * ticksPerDegree);
+		const uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
+		const uint32_t maxDwellDeviationTicks = _ignitionDwellMaxDeviation * ticksPerSecond;
 
-		//we want to set the next dwell tick if ignitionDwell is > 0
-		uint32_t dwellTick = 0;
-		if(ignitionDwell > 0)
-		{
-			uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
-			dwellTick = _predictor->Execute(_tdc - ignitionAdvance, enginePosition);
-			dwellTick = dwellTick - dwellTicks;
-			while(ITimerService::TickLessThanTick(dwellTick, enginePosition.CalculatedTick))
-				dwellTick = dwellTick + ticksPerCycle;
+		float delta = _tdc - ignitionAdvance - enginePosition.Position;
+		delta -= (static_cast<uint16_t>(delta) / cycleDegrees) * cycleDegrees;
+		if(delta < 0)
+			delta += cycleDegrees;
+		uint32_t igniteAt = static_cast<int64_t>(ticksPerDegree * (delta - cycleDegrees)) + enginePosition.CalculatedTick;		
+		uint32_t dwellAt = igniteAt - dwellTicks;
 
-			_timerService->ScheduleTask(_dwellTask, dwellTick);
-			dwellTick = dwellTick == 0? 1 : dwellTick;
+		//if dwelling, then _lastDwellTick is accurate, adjust igniteAt to allow for sufficiently long dwell
+		if(_dwelling)
+		{
+			while(ITimerService::TickLessThanTick(igniteAt + (ticksPerCycle / 2), _lastDwellTick + dwellTicks))
+				igniteAt += ticksPerCycle;
+			
+			//assume plenty of time to schedule next dwell. if not then dwell is saturated.
+			dwellAt = igniteAt - dwellTicks + ticksPerCycle;
+			//schedule dwell
+			if(enable)
+				_timerService->ScheduleTask(_dwellTask, dwellAt);
+			
+			const uint32_t minIgniteAt = _lastDwellTick + dwellTicks - maxDwellDeviationTicks;
+			const uint32_t maxIgniteAt = _lastDwellTick + dwellTicks + maxDwellDeviationTicks;
+			if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
+				igniteAt = minIgniteAt;
+			else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))
+				igniteAt = maxIgniteAt;
+
+			//schedule ignition
+			_timerService->ScheduleTask(_igniteTask, igniteAt);
+
 		}
-		//otherwise we want to unschedule the dwell
 		else
 		{
-			if(_dwellTask->Scheduled)
+			//if we aren't dwelling, check _lastDwellTick is not too old
+			if(ITimerService::TickLessThanTick(_lastDwellTick + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)))
 			{
-				_timerService->UnScheduleTask(_dwellTask);
+				//if it is too old, schedule next ignition event by first available cycle
+				while(ITimerService::TickLessThanTick(dwellAt, _timerService->GetTick()))
+					dwellAt += ticksPerCycle;
+				igniteAt = dwellAt + dwellTicks;
+
+				//schedule dwell
+				if(enable)
+					_timerService->ScheduleTask(_dwellTask, dwellAt);
+
+				//schedule ignition
+				_timerService->ScheduleTask(_igniteTask, igniteAt);
+			}
+			else
+			{
+				while(ITimerService::TickLessThanTick(igniteAt - (ticksPerCycle / 2), _lastDwellTick + dwellTicks))
+					igniteAt += ticksPerCycle;
+				dwellAt = igniteAt - dwellTicks;
+
+				//schedule dwell
+				if(enable)
+				{
+					_timerService->ScheduleTask(_dwellTask, dwellAt);
+					dwellAt = _dwellTask->Tick;
+				}
+
+				const uint32_t minIgniteAt = dwellAt + dwellTicks - maxDwellDeviationTicks;
+				const uint32_t maxIgniteAt = dwellAt + dwellTicks + maxDwellDeviationTicks;
+				if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
+					igniteAt = minIgniteAt;
+				else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))
+					igniteAt = maxIgniteAt;
+
+				//schedule ignition
+				_timerService->ScheduleTask(_igniteTask, igniteAt);
 			}
 		}
 
-		//but we do want to adjust the ignition tick so that it is spot on
-		uint32_t ignitionTick = _predictor->Execute(_ignitionAt, enginePosition);
-		//if the prediction is for a previous position. add for next position
-		while((_dwellingAtTick == 0 && ITimerService::TickLessThanTick(ignitionTick, enginePosition.CalculatedTick)) || (_dwellingAtTick != 0 && ITimerService::TickLessThanTick(ignitionTick, _dwellingAtTick)))
-			ignitionTick = ignitionTick + ticksPerCycle;
-
-		if(_dwellingAtTick == 0)
-			_timerService->ScheduleTask(_igniteTask, ignitionTick);
-		else
-		{
-			const uint32_t currDwellTicks = _ignitionDwell * ticksPerSecond;
-			_timerService->ScheduleTask(_igniteTask, ignitionTick - _dwellingAtTick > currDwellTicks * 2 / 3?  _dwellingAtTick + currDwellTicks : ignitionTick);
-		}
-
 		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(dwellTick, ignitionTick == 0? 1 : ignitionTick);
+		return std::tuple<uint32_t, uint32_t>(dwellAt, igniteAt);
 	}
 
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
 		_dwellCallBack();
-		_dwellingAtTick = _dwellTask->Tick;
-		if(_dwellingAtTick == 0)
-			_dwellingAtTick = 1;
+		_lastDwellTick = _dwellTask->Tick;
+		_dwelling = true;
 	}
 
 	void Operation_EngineScheduleIgnition::Ignite()
 	{
 		_igniteCallBack();
-		_dwellingAtTick = 0;
+		_dwelling = false;
 	}
 
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
+		const float ignitionDwellMaxDeviation = Config::CastAndOffset<float>(config, sizeOut);
 		std::function<void()> dwellCallBack = 0;
 		std::function<void()> igniteCallBack = 0;
 
@@ -110,7 +142,7 @@ namespace OperationArchitecture
 			igniteCallBack = [operation]() { operation->Execute(); };
 		}
 		
-		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, new Operation_EnginePositionPrediction(embeddedIOServiceCollection->TimerService), tdc, dwellCallBack, igniteCallBack);
+		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, ignitionDwellMaxDeviation, dwellCallBack, igniteCallBack);
 	}
 }
 #endif
