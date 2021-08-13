@@ -23,6 +23,7 @@ namespace OperationArchitecture
 		bool _dwelling : 1;
 	public:		
         Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, const float tdc, const float ignitionDwellMaxDeviation, const std::function<void()> dwellCallBack, const std::function<void()> igniteCallBack);
+		~Operation_EngineScheduleIgnition();
 
 		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance) override;
 		void Dwell();

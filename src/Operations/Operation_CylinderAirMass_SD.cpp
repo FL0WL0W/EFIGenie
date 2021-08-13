@@ -4,10 +4,7 @@
 #ifdef OPERATION_CYLINDERAIRMASS_SD
 namespace OperationArchitecture
 {
-	Operation_CylinderAirMass_SD::Operation_CylinderAirMass_SD(const float cylinderVolume)
-	{		
-		_cylinderVolume = cylinderVolume;
-	}
+	Operation_CylinderAirMass_SD::Operation_CylinderAirMass_SD(const float cylinderVolume) : _cylinderVolume(cylinderVolume) { }
 	
 	float Operation_CylinderAirMass_SD::Execute(float cylinderAirTemperature, float manifoldAbsolutePresssure, float volumetricEfficieny)
 	{				

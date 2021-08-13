@@ -16,8 +16,9 @@ namespace OperationArchitecture
     {
         factory->Register(idOffset + 1, Operation_CylinderAirMass_SD::Create);
         factory->Register(idOffset + 2, [embeddedIOServiceCollection, packager](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, embeddedIOServiceCollection, packager); });
-        factory->Register(idOffset + 3, Operation_EnginePosition::Create);
-        factory->Register(idOffset + 5, Operation_EngineParameters::Create);
+        factory->Register(idOffset + 3, &Operation_EnginePosition::InstanceCrankPriority);
+        factory->Register(idOffset + 4, &Operation_EnginePosition::InstanceCamPriority);
+        factory->Register(idOffset + 5, &Operation_EngineParameters::Instance);
         factory->Register(idOffset + 6, [embeddedIOServiceCollection, packager](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, embeddedIOServiceCollection, packager); });
         factory->Register(idOffset + 7, [embeddedIOServiceCollection, packager](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, embeddedIOServiceCollection, packager); });
     }

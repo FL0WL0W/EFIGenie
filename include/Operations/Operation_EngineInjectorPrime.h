@@ -14,6 +14,7 @@ namespace OperationArchitecture
 		EmbeddedIOServices::Task *_closeTask;
 	public:		
         Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack);
+		~Operation_EngineInjectorPrime();
 
 		void Execute(float time) override;
 

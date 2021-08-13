@@ -22,6 +22,7 @@ namespace OperationArchitecture
 		bool _open = false;
 	public:		
         Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const std::function<void()> openCallBack, const std::function<void()> closeCallBack);
+		~Operation_EngineScheduleInjection();
 
 		std::tuple<uint32_t, uint32_t> Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition) override;
 		void Open();

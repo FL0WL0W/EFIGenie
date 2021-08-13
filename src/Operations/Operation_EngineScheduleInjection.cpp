@@ -9,11 +9,19 @@ namespace OperationArchitecture
 		_timerService(timerService),
 		_tdc(tdc),
 		_openCallBack(openCallBack),
-		_closeCallBack(closeCallBack)
+		_closeCallBack(closeCallBack),
+		_openTask(new Task([this]() { this->Open(); })),
+		_closeTask(new Task([this]() { this->Close(); }))
 		
+	{ }
+
+	Operation_EngineScheduleInjection::~Operation_EngineScheduleInjection()
 	{
-		_openTask = new Task([this]() { this->Open(); });
-		_closeTask = new Task([this]() { this->Close(); });
+		_timerService->UnScheduleTask(_openTask);
+		_timerService->UnScheduleTask(_closeTask);
+		_closeCallBack();
+		delete _openTask;
+		delete _closeTask;
 	}
 
 	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition)

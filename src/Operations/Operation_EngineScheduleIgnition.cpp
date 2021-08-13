@@ -10,10 +10,18 @@ namespace OperationArchitecture
 		_tdc(tdc), 
 		_ignitionDwellMaxDeviation(ignitionDwellMaxDeviation),
 		_dwellCallBack(dwellCallBack),
-		_igniteCallBack(igniteCallBack)
+		_igniteCallBack(igniteCallBack),
+		_dwellTask(new Task([this]() { this->Dwell(); })),
+		_igniteTask(new Task([this]() { this->Ignite(); }))
+	{ }
+
+	Operation_EngineScheduleIgnition::~Operation_EngineScheduleIgnition()
 	{
-		_dwellTask = new Task([this]() { this->Dwell(); });
-		_igniteTask = new Task([this]() { this->Ignite(); });
+		_timerService->UnScheduleTask(_dwellTask);
+		_timerService->UnScheduleTask(_igniteTask);
+		_igniteCallBack();
+		delete _dwellTask;
+		delete _igniteTask;
 	}
 
 	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance)

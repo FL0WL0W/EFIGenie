@@ -4,9 +4,6 @@
 #ifdef OPERATION_ENGINEPOSITION_H
 namespace OperationArchitecture
 {
-	Operation_EnginePosition *Operation_EnginePosition::_instanceTrue = 0;
-	Operation_EnginePosition *Operation_EnginePosition::_instanceFalse = 0;
-
 	Operation_EnginePosition::Operation_EnginePosition(bool crankPriority)
 	{
 		_crankPriority = crankPriority;
@@ -72,26 +69,8 @@ namespace OperationArchitecture
 		_previousReluctorResult = ret;
 		return ret;
 	}
-	
-	IOperationBase *Operation_EnginePosition::Create(const void *config, size_t &sizeOut)
-	{
-		return Construct(Config::CastAndOffset<bool>(config, sizeOut));
-	}
 
-	Operation_EnginePosition *Operation_EnginePosition::Construct(bool crankPriority)
-	{
-		if(crankPriority)
-		{
-			if(_instanceTrue == 0)
-				_instanceTrue = new Operation_EnginePosition(true);
-			return _instanceTrue;
-		}
-		else
-		{
-			if(_instanceFalse == 0)
-				_instanceFalse = new Operation_EnginePosition(false);
-			return _instanceFalse;
-		}
-	}
+	Operation_EnginePosition Operation_EnginePosition::InstanceCrankPriority = Operation_EnginePosition(true);
+	Operation_EnginePosition Operation_EnginePosition::InstanceCamPriority = Operation_EnginePosition(false);
 }
 #endif

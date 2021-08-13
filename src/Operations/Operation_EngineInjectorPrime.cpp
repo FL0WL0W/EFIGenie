@@ -5,11 +5,16 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINEINJECTORPRIME_H
 namespace OperationArchitecture
 {
-	Operation_EngineInjectorPrime::Operation_EngineInjectorPrime(ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack)
+	Operation_EngineInjectorPrime::Operation_EngineInjectorPrime(ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack) :
+		_timerService(timerService),
+		_openCallBack(openCallBack),
+		_closeTask(new Task(closeCallBack))
+	{ }
+
+	Operation_EngineInjectorPrime::~Operation_EngineInjectorPrime()
 	{
-		_timerService = timerService;
-		_openCallBack = openCallBack;
-		_closeTask = new Task(closeCallBack);
+		_timerService->UnScheduleTask(_closeTask);
+		delete _closeTask;
 	}
 
 	void Operation_EngineInjectorPrime::Execute(float time)
