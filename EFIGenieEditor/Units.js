@@ -16,6 +16,7 @@ var CycleUnits = [ { Name: "Cycles", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var LambdaUnits = [ { Name: "λ", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var VolumeUnits = [ { Name: "L", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mL", DisplayMultiplier: 1000, DisplayOffset: 0 } ];
 var MassFlowUnits = [ { Name: "g/s", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "g/min", DisplayMultiplier: 60, DisplayOffset: 0 } ];
+var Bool = [ { Name: "", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 
 var Measurements = {
     None: BlankUnits,
@@ -34,6 +35,7 @@ var Measurements = {
     Lambda: LambdaUnits,
     MassFlow: MassFlowUnits,
     Ratio: Ratio,
+    Bool: Bool
 }
 
 function GetMeasurementDisplay(measurement, index) {

@@ -3,6 +3,10 @@ var AFRConfigs = [];
 AFRConfigs.push(ConfigOperation_Static);
 AFRConfigs.push(ConfigOperation_LookupTable);
 AFRConfigs.push(ConfigOperation_2AxisTable);
+var InjectorEnableConfigs = [];
+InjectorEnableConfigs.push(ConfigOperation_Static);
+InjectorEnableConfigs.push(ConfigOperation_LookupTable);
+InjectorEnableConfigs.push(ConfigOperation_2AxisTable);
 var InjectorPulseWidthConfigs = [];
 // InjectorPulseWidthConfigs.push(ConfigOperation_Static);
 // InjectorPulseWidthConfigs.push(ConfigOperation_LookupTable);
@@ -11,6 +15,10 @@ var IgnitionAdvanceConfigs = [];
 IgnitionAdvanceConfigs.push(ConfigOperation_Static);
 IgnitionAdvanceConfigs.push(ConfigOperation_LookupTable);
 IgnitionAdvanceConfigs.push(ConfigOperation_2AxisTable);
+var IgnitionEnableConfigs = [];
+IgnitionEnableConfigs.push(ConfigOperation_Static);
+IgnitionEnableConfigs.push(ConfigOperation_LookupTable);
+IgnitionEnableConfigs.push(ConfigOperation_2AxisTable);
 var IgnitionDwellConfigs = [];
 IgnitionDwellConfigs.push(ConfigOperation_Static);
 IgnitionDwellConfigs.push(ConfigOperation_LookupTable);
@@ -149,10 +157,59 @@ types = [
 
         return obj;
     }},
-    { type: "Operation_Math", toObj(val) {
+    { type: "Operation_Add", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Math}, //number of operations
-            { type: "UINT8", value: val } //operator
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add},
+        ]};
+    }},
+    { type: "Operation_Subtract", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract},
+        ]};
+    }},
+    { type: "Operation_Multiply", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply},
+        ]};
+    }},
+    { type: "Operation_Divide", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide},
+        ]};
+    }},
+    { type: "Operation_And", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And},
+        ]};
+    }},
+    { type: "Operation_Or", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or},
+        ]};
+    }},
+    { type: "Operation_GreaterThan", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan},
+        ]};
+    }},
+    { type: "Operation_LessThan", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan},
+        ]};
+    }},
+    { type: "Operation_Equal", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal},
+        ]};
+    }},
+    { type: "Operation_GreaterThanOrEqual", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual},
+        ]};
+    }},
+    { type: "Operation_LessThanOrEqual", toObj(val) {
+        return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual},
         ]};
     }},
 ]
@@ -384,7 +441,7 @@ class ConfigTop {
             //sync condition
             { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
             //no function to just use a variable so do an OR with a static false.
-            { type: "Operation_Math", value: 5}, //OR
+            { type: "Operation_Or"}, //OR
             { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineSequentialId }, //bool
             { type: "UINT8", value: 1 }, //use first operation
@@ -410,6 +467,11 @@ class ConfigFuel {
             "Air Fuel Ratio",
             "Ratio",
             "FuelParameters");
+        this.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection(
+            InjectorEnableConfigs,
+            "Injector Enable",
+            "Bool",
+            "FuelParameters");
         this.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection(
             InjectorPulseWidthConfigs,
             "Injector Pulse Width",
@@ -424,6 +486,7 @@ class ConfigFuel {
     }
 
     AFRConfigOrVariableSelection = undefined;
+    InjectorEnableConfigOrVariableSelection = undefined;
     InjectorPulseWidthConfigOrVariableSelection = undefined;
     InjectorEndPositionConfigOrVariableSelection = undefined
     ConfigInjectorOutputs = undefined
@@ -431,6 +494,7 @@ class ConfigFuel {
     GetObj() {
         return {
             AFRConfigOrVariableSelection: this.AFRConfigOrVariableSelection.GetObj(),
+            InjectorEnableConfigOrVariableSelection: this.InjectorEnableConfigOrVariableSelection.GetObj(),
             InjectorPulseWidthConfigOrVariableSelection: this.InjectorPulseWidthConfigOrVariableSelection.GetObj(),
             InjectorEndPositionConfigOrVariableSelection: this.InjectorEndPositionConfigOrVariableSelection.GetObj(),
             ConfigInjectorOutputs: this.ConfigInjectorOutputs.GetObj()
@@ -441,6 +505,7 @@ class ConfigFuel {
         this.Detach();
 
         this.AFRConfigOrVariableSelection.SetObj(!obj? undefined : obj.AFRConfigOrVariableSelection);
+        this.InjectorEnableConfigOrVariableSelection.SetObj(!obj? undefined : obj.InjectorEnableConfigOrVariableSelection);
         this.InjectorPulseWidthConfigOrVariableSelection.SetObj(!obj? undefined : obj.InjectorPulseWidthConfigOrVariableSelection);
         this.InjectorEndPositionConfigOrVariableSelection.SetObj(!obj? undefined : obj.InjectorEndPositionConfigOrVariableSelection);
         this.ConfigInjectorOutputs.SetObj(!obj? undefined : obj.ConfigInjectorOutputs);
@@ -451,6 +516,7 @@ class ConfigFuel {
 
     Detach() {
         this.AFRConfigOrVariableSelection.Detach();
+        this.InjectorEnableConfigOrVariableSelection.Detach();
         this.InjectorPulseWidthConfigOrVariableSelection.Detach();
         this.InjectorEndPositionConfigOrVariableSelection.Detach();
         this.ConfigInjectorOutputs.Detach();
@@ -458,6 +524,7 @@ class ConfigFuel {
 
     Attach() {
         this.AFRConfigOrVariableSelection.Attach();
+        this.InjectorEnableConfigOrVariableSelection.Attach();
         this.InjectorPulseWidthConfigOrVariableSelection.Attach();
         this.InjectorEndPositionConfigOrVariableSelection.Attach();
         this.ConfigInjectorOutputs.Attach();
@@ -468,6 +535,7 @@ class ConfigFuel {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]afr[$]/g, this.AFRConfigOrVariableSelection.GetHtml());
+        template = template.replace(/[$]injectorenable[$]/g, this.InjectorEnableConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]injectorpulsewidth[$]/g, this.InjectorPulseWidthConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]injectorendat[$]/g, this.InjectorEndPositionConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]injectoroutputs[$]/g, this.ConfigInjectorOutputs.GetHtml());
@@ -495,6 +563,7 @@ class ConfigFuel {
             Measurement: "Mass"
         });
 
+        this.InjectorEnableConfigOrVariableSelection.SetIncrements();
         this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
         this.InjectorEndPositionConfigOrVariableSelection.SetIncrements();
         this.ConfigInjectorOutputs.SetIncrements();
@@ -507,6 +576,8 @@ class ConfigFuel {
             throw "Set Increments First";
 
         var numberOfOperations = 2;
+        if(this.InjectorEnableConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
         if(this.InjectorPulseWidthConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
         if(this.InjectorEndPositionConfigOrVariableSelection.IsImmediateOperation())
@@ -516,13 +587,14 @@ class ConfigFuel {
             { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
             { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
-            { type: "Operation_Math", value: 3}, //Divide
+            { type: "Operation_Divide"}, //Divide
             { type: "UINT32", value: this.InjectorMassId }, //Injector Mass ID
             { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id },
             { obj: this.AFRConfigOrVariableSelection.GetObjAsParameter(1)}, 
             { obj: this.AFRConfigOrVariableSelection.GetObjPackage(true)}, 
 
+            { obj: this.InjectorEnableConfigOrVariableSelection.GetObjPackage()}, 
             { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjPackage()}, 
             { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjPackage()}, 
 
@@ -536,6 +608,11 @@ class ConfigIgnition {
 
     constructor(){
         this.GUID = getGUID();
+        this.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection(
+            IgnitionEnableConfigs,
+            "Ignition Enable",
+            "Bool",
+            "IgnitionParameters");
         this.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection(
             IgnitionAdvanceConfigs,
             "Ignition Advance",
@@ -544,6 +621,11 @@ class ConfigIgnition {
         this.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection(
             IgnitionDwellConfigs,
             "Ignition Dwell",
+            "Time",
+            "IgnitionParameters");
+        this.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection(
+            IgnitionDwellConfigs,
+            "Ignition Dwell Deviation",
             "Time",
             "IgnitionParameters");
         this.Outputs[0] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 1", "No Measurement");
@@ -556,8 +638,10 @@ class ConfigIgnition {
         this.Outputs[7] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 8", "No Measurement");
     }
 
+    IgnitionEnableConfigOrVariableSelection = undefined;
     IgnitionAdvanceConfigOrVariableSelection = undefined;
     IgnitionDwellConfigOrVariableSelection = undefined;
+    IgnitionDwellDeviationConfigOrVariableSelection = undefined;
     Outputs = [];
 
     GetObj() {
@@ -566,16 +650,20 @@ class ConfigIgnition {
             outputObj[i] = this.Outputs[i].GetObj();
         };
         return {
+            IgnitionEnableConfigOrVariableSelection: this.IgnitionEnableConfigOrVariableSelection.GetObj(),
             IgnitionAdvanceConfigOrVariableSelection: this.IgnitionAdvanceConfigOrVariableSelection.GetObj(),
             IgnitionDwellConfigOrVariableSelection: this.IgnitionDwellConfigOrVariableSelection.GetObj(),
+            IgnitionDwellDeviationConfigOrVariableSelection: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObj(),
             Outputs: outputObj
         };
     }
 
     SetObj(obj) {
         this.Detach();
+        this.IgnitionEnableConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionEnableConfigOrVariableSelection);
         this.IgnitionAdvanceConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionAdvanceConfigOrVariableSelection);
         this.IgnitionDwellConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionDwellConfigOrVariableSelection);
+        this.IgnitionDwellDeviationConfigOrVariableSelection.SetObj(!obj? undefined : obj.IgnitionDwellDeviationConfigOrVariableSelection);
         if(obj && obj.Outputs)
         {
             this.Outputs = [];
@@ -591,8 +679,10 @@ class ConfigIgnition {
     }
 
     Detach() {
+        this.IgnitionEnableConfigOrVariableSelection.Detach();
         this.IgnitionAdvanceConfigOrVariableSelection.Detach();
         this.IgnitionDwellConfigOrVariableSelection.Detach();
+        this.IgnitionDwellDeviationConfigOrVariableSelection.Detach();
 
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].Detach();
@@ -600,8 +690,10 @@ class ConfigIgnition {
     }
 
     Attach() {
+        this.IgnitionEnableConfigOrVariableSelection.Attach();
         this.IgnitionAdvanceConfigOrVariableSelection.Attach();
         this.IgnitionDwellConfigOrVariableSelection.Attach();
+        this.IgnitionDwellDeviationConfigOrVariableSelection.Attach();
 
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].Attach();
@@ -614,8 +706,10 @@ class ConfigIgnition {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
 
+        template = template.replace(/[$]ignitionenable[$]/g, this.IgnitionEnableConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]ignitionadvance[$]/g, this.IgnitionAdvanceConfigOrVariableSelection.GetHtml());
         template = template.replace(/[$]ignitiondwell[$]/g, this.IgnitionDwellConfigOrVariableSelection.GetHtml());
+        template = template.replace(/[$]ignitiondwelldeviation[$]/g, this.IgnitionDwellDeviationConfigOrVariableSelection.GetHtml());
 
         var outputsHTML = "";
         
@@ -629,8 +723,10 @@ class ConfigIgnition {
     }
 
     SetIncrements() {
+        this.IgnitionEnableConfigOrVariableSelection.SetIncrements();
         this.IgnitionAdvanceConfigOrVariableSelection.SetIncrements();
         this.IgnitionDwellConfigOrVariableSelection.SetIncrements();
+        this.IgnitionDwellDeviationConfigOrVariableSelection.SetIncrements();
 
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].SetIncrements();
@@ -639,9 +735,13 @@ class ConfigIgnition {
 
     GetObjPackage() {
         var numberOfOperations = this.Outputs.length;
+        if(this.IgnitionEnableConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
         if(this.IgnitionAdvanceConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
         if(this.IgnitionDwellConfigOrVariableSelection.IsImmediateOperation())
+            ++numberOfOperations;
+        if(this.IgnitionDwellDeviationConfigOrVariableSelection.IsImmediateOperation())
             ++numberOfOperations;
 
         var obj  = { 
@@ -656,16 +756,22 @@ class ConfigIgnition {
                     { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.EnginePositionId },
                     { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Enable").Id },
+                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id },
                     { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell Deviation").Id },
                 ]};
             }}],
         value: [
             { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
+            { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjPackage()}, 
             { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjPackage()}, 
             { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjPackage()}, 
+            { obj: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjPackage()}, 
         ]};
 
         for(var i = 0; i < this.Outputs.length; i++) {
@@ -902,8 +1008,7 @@ class ConfigEngine {
             { type: "UINT8", value: 1 }, //use 1st sub operation
             { type: "UINT8", value: 0 }, //use 1st return from sub operation
             { type: "PackageOptions", value: { Immediate: true, Store: true, Return: true }}, //immediate store
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position },  //factory id
-            { type: "UINT8", value: this.CrankPriority? 1 : 0 }, //CrankPriority
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 1 : 0) },  //factory id
             { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
         ]};
 
@@ -1086,7 +1191,7 @@ class ConfigInjectorPulseWidth_DeadTime {
     GetObjOperation() {
 
         return { value: [
-            { type: "Operation_Math", value: 2}, //Multiply
+            { type: "Operation_Multiply" }, //Multiply
         ]};
     }
 
@@ -1099,7 +1204,7 @@ class ConfigInjectorPulseWidth_DeadTime {
             //first suboperation
             { obj: { value: [ 
                 { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                { type: "Operation_Math", value: 6 }, //GreaterThan
+                { type: "Operation_GreaterThan" }, //GreaterThan
                 { type: "UINT8", value: 0 }, //use variable
                 { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id }, //Injector Mass ID
                 { type: "UINT8", value: 1 }, //use first suboperation
@@ -1114,14 +1219,14 @@ class ConfigInjectorPulseWidth_DeadTime {
             //second suboperation
             { obj: { value: [ 
                 { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                { type: "Operation_Math", value: 0 }, //Add
+                { type: "Operation_Add" }, //Add
                 { type: "UINT8", value: 1 }, //use first suboperation
                 { type: "UINT8", value: 0 }, //use first return
                 { obj: this.DeadTimeConfigOrVariableSelection.GetObjAsParameter(2)},
                 //first suboperation
                 { obj: { value: [ 
                     { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                    { type: "Operation_Math", value: 2 }, //Multiply
+                    { type: "Operation_Multiply" }, //Multiply
                     { type: "UINT8", value: 1 }, //use first suboperation
                     { type: "UINT8", value: 0 }, //use first return
                     { type: "UINT8", value: 2 }, //use second suboperation
@@ -1129,7 +1234,7 @@ class ConfigInjectorPulseWidth_DeadTime {
                     //first suboperation
                     { obj: { value: [ 
                         { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                        { type: "Operation_Math", value: 2 }, //Multiply
+                        { type: "Operation_Multiply" }, //Multiply
                         { type: "UINT8", value: 1 }, //use first suboperation
                         { type: "UINT8", value: 0 }, //use first return
                         { type: "UINT8", value: 2 }, //use second suboperation
@@ -1142,7 +1247,7 @@ class ConfigInjectorPulseWidth_DeadTime {
                         //second suboperation
                         { obj: { value: [ 
                             { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                            { type: "Operation_Math", value: 0 }, //Add
+                            { type: "Operation_Add" }, //Add
                             { type: "UINT8", value: 1 }, //use first suboperation
                             { type: "UINT8", value: 0 }, //use first return
                             { type: "UINT8", value: 0 }, //use variable
@@ -1157,7 +1262,7 @@ class ConfigInjectorPulseWidth_DeadTime {
                     //second suboperation
                     { obj: { value: [ 
                         { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                        { type: "Operation_Math", value: 3 }, //Divide
+                        { type: "Operation_Divide" }, //Divide
                         { type: "UINT8", value: 0 }, //use variable
                         { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id },
                         { obj: this.FlowRateConfigOrVariableSelection.GetObjAsParameter(1)},
@@ -1265,6 +1370,8 @@ class ConfigInjectorOutputs {
                         { obj: val.GetObjOperation()}, 
                         { type: "UINT8", value: 0 }, //use variable
                         { type: "UINT32", value: Increments.EnginePositionId },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
                         { type: "UINT8", value: 0 }, //use variable
                         { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
                         { type: "UINT8", value: 0 }, //use variable

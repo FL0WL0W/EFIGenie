@@ -1,13 +1,23 @@
 var GenericConfigs = [];
 
 OperationArchitectureFactoryIDs = {
-    Offset : 10000,
-    Table : 1,
-    LookupTable: 2,
-    Polynomial: 3,
-    Math: 4,
-    Static: 5,
-    FaultDetection: 6
+    Offset :            10000   ,
+    Table :             1       ,
+    LookupTable:        2       ,
+    Polynomial:         3       ,
+    Static:             5       ,
+    FaultDetection:     6       ,
+    Add:                10      ,
+    Subtract:           11      ,
+    Multiply:           12      ,
+    Divide:             13      ,
+    And:                14      ,
+    Or:                 15      ,
+    GreaterThan:        16      ,
+    LessThan:           17      ,
+    Equal:              18      ,
+    GreaterThanOrEqual: 19      ,
+    LessThanOrEqual:    20
 }
 
 var configOperation_StaticTemplate;
@@ -978,6 +988,10 @@ class ConfigOrVariableSelection {
                     this.Selection.value = new this.Configs[i]();
                     this.Selection.value.ValueLabel = this.ValueLabel;
                     this.Selection.value.ValueMeasurement = this.ValueMeasurement;
+                    if(this.Selection.value.ValueMeasurement == "Bool")
+                        this.Selection.Type = "number";
+                    else
+                        this.Selection.Type = "bool";
                     this.Selection.value.SetObj(c);
                     break;
                 }
