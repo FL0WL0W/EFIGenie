@@ -22,7 +22,7 @@ namespace UnitTests
 		{
 			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 
-            _operation = new Operation_EngineScheduleIgnition(&_timerService, 0, 0.0005, _dwell, _ignite);
+            _operation = new Operation_EngineScheduleIgnition(&_timerService, 0, _dwell, _ignite);
 		}
 	};
 
@@ -33,6 +33,6 @@ namespace UnitTests
         _enginePosition.PositionDot = 1;
         _enginePosition.Sequential = true;
         _enginePosition.Synced = true;
-        _operation->Execute(_enginePosition, true, 0.003, 10);
+        _operation->Execute(_enginePosition, true, 0.003, 10, 0.0005);
 	}
 }
