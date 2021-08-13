@@ -5,10 +5,9 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, const float ignitionDwellMaxDeviation, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack) :
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack) :
 		_timerService(timerService),
 		_tdc(tdc), 
-		_ignitionDwellMaxDeviation(ignitionDwellMaxDeviation),
 		_dwellCallBack(dwellCallBack),
 		_igniteCallBack(igniteCallBack),
 		_dwellTask(new Task([this]() { this->Dwell(); })),
@@ -24,7 +23,7 @@ namespace OperationArchitecture
 		delete _igniteTask;
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance)
+	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation)
 	{
 		if(enginePosition.Synced == false)
 			return std::tuple<uint32_t, uint32_t>(0, 0);
@@ -34,7 +33,7 @@ namespace OperationArchitecture
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const uint32_t ticksPerCycle = static_cast<uint32_t>(cycleDegrees * ticksPerDegree);
 		const uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
-		const uint32_t maxDwellDeviationTicks = _ignitionDwellMaxDeviation * ticksPerSecond;
+		const uint32_t maxDwellDeviationTicks = ignitionDwellMaxDeviation * ticksPerSecond;
 
 		float delta = _tdc - ignitionAdvance - enginePosition.Position;
 		delta -= (static_cast<uint16_t>(delta) / cycleDegrees) * cycleDegrees;
@@ -128,7 +127,6 @@ namespace OperationArchitecture
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		const float ignitionDwellMaxDeviation = Config::CastAndOffset<float>(config, sizeOut);
 		std::function<void()> dwellCallBack = 0;
 		std::function<void()> igniteCallBack = 0;
 
@@ -150,7 +148,7 @@ namespace OperationArchitecture
 			igniteCallBack = [operation]() { operation->Execute(); };
 		}
 		
-		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, ignitionDwellMaxDeviation, dwellCallBack, igniteCallBack);
+		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, dwellCallBack, igniteCallBack);
 	}
 }
 #endif
