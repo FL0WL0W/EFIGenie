@@ -3,10 +3,9 @@
         <label for="$id$-type" style="display: none;">Type:</label>
         <select id="$id$-type" value=$type$ style="display: none;">
             <option value="number"$numberselected$>Number</option>
-            <option value="bool"$boolselected$ disabled>Boolean</option>
-            <option value="tick"$tickselected$ disabled>Tick</option>
+            <option value="checkbox"$boolselected$ disabled>Boolean</option>
         </select>
         <label for="$id$-value">$valuelabel$:</label>
-        <input id="$id$-value" type="number" value="$value$"/><span id="$id$-valuemeasurement">$valuemeasurement$</span>
+        <input id="$id$-value" type="$type$" $value$/><span id="$id$-valuemeasurement">$valuemeasurement$</span>
     </div>
 </div>

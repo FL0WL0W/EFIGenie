@@ -65,13 +65,23 @@ class ConfigOperation_Static {
 
             thisClass.Type =$(this).val();
 
+            $("#" + thisClass.GUID + "-value").type = thisClass.Type;
+            if(thisClass.Type == "checkbox")
+                $("#" + this.GUID + "-value").prop('checked', thisClass.Value = thisClass.Value !== 0);
+            else
+                $("#" + this.GUID + "-value").val(thisClass.Value = thisClass.Value? 1 : 0);
+
+
             thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-value", function(){
             thisClass.Detach();
 
-            thisClass.Value = parseFloat($(this).val());
+            if(thisClass.Type == "checkbox")
+                thisClass.Value = $(this).prop('checked');
+            else
+                thisClass.Value = parseFloat($(this).val());
 
             thisClass.Attach();
         });
@@ -82,12 +92,11 @@ class ConfigOperation_Static {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
-        template = template.replace(/[$]value[$]/g, this.Value);
+        template = template.replace(/[$]value[$]/g, this.Type==="checkbox" ? (this.Value? "checked" : "") : "value=\"" + this.Value + "\"");
         template = template.replace(/[$]valuelabel[$]/g, GetClassProperty(this, "ValueLabel"));
         template = template.replace(/[$]valuemeasurement[$]/g, GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]));
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
-        template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
-        template = template.replace(/[$]tickselected[$]/g, this.Type==="tick" ? " selected" : "");
+        template = template.replace(/[$]boolselected[$]/g, this.Type==="checkbox" ? " selected" : "");
 
         return template;
     }
@@ -988,11 +997,11 @@ class ConfigOrVariableSelection {
                     this.Selection.value = new this.Configs[i]();
                     this.Selection.value.ValueLabel = this.ValueLabel;
                     this.Selection.value.ValueMeasurement = this.ValueMeasurement;
-                    if(this.Selection.value.ValueMeasurement == "Bool")
-                        this.Selection.Type = "number";
-                    else
-                        this.Selection.Type = "bool";
                     this.Selection.value.SetObj(c);
+                    if(this.ValueMeasurement === "Bool")
+                        this.Selection.value.Type = "checkbox";
+                    else
+                        this.Selection.value.Type = "number";
                     break;
                 }
             }
@@ -1023,6 +1032,10 @@ class ConfigOrVariableSelection {
                     thisClass.Selection = {value: new thisClass.Configs[val]()}
                     thisClass.Selection.value.ValueLabel = thisClass.ValueLabel;
                     thisClass.Selection.value.ValueMeasurement = thisClass.ValueMeasurement;
+                    if(thisClass.ValueMeasurement === "Bool")
+                        thisClass.Selection.value.Type = "checkbox";
+                    else
+                        thisClass.Selection.value.Type = "number";
                 }
             } else {
                 thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
