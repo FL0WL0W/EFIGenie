@@ -443,7 +443,7 @@ class ConfigTop {
             //no function to just use a variable so do an OR with a static false.
             { type: "Operation_Or"}, //OR
             { type: "UINT8", value: 0 }, //use variable
-            { type: "UINT32", value: Increments.EngineSequentialId }, //bool
+            { type: "UINT32", value: Increments.EngineSyncedId }, //bool
             { type: "UINT8", value: 1 }, //use first operation
             { type: "UINT8", value: 0 }, //use first return
             { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
@@ -938,6 +938,8 @@ class ConfigEngine {
         Increments.EnginePositionId = this.EnginePositionId;
         this.EngineSequentialId = ++Increments.VariableIncrement;
         Increments.EngineSequentialId = this.EngineSequentialId;
+        this.EngineSyncedId = ++Increments.VariableIncrement;
+        Increments.EngineSyncedId = this.EngineSyncedId;
         this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EngineParameters.push({ 
             Name: "Engine RPM", 
@@ -1005,10 +1007,11 @@ class ConfigEngine {
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
             { type: "UINT32", value: this.EngineRPMId },  //EngineRPMId
             { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
+            { type: "UINT32", value: this.EngineSyncedId },  //EngineSyncedId
             { type: "UINT8", value: 1 }, //use 1st sub operation
             { type: "UINT8", value: 0 }, //use 1st return from sub operation
             { type: "PackageOptions", value: { Immediate: true, Store: true, Return: true }}, //immediate store
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 1 : 0) },  //factory id
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
             { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
         ]};
 

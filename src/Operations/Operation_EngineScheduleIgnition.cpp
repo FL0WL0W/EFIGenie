@@ -63,7 +63,6 @@ namespace OperationArchitecture
 
 			//schedule ignition
 			_timerService->ScheduleTask(_igniteTask, igniteAt);
-
 		}
 		else
 		{
