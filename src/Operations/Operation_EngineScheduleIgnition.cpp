@@ -43,6 +43,7 @@ namespace OperationArchitecture
 		uint32_t dwellAt = igniteAt - dwellTicks;
 
 		//if dwelling, then _lastDwellTick is accurate, adjust igniteAt to allow for sufficiently long dwell
+		const uint32_t lastDwellTickCapturedBeforeDwellingCheck = _lastDwellTick;
 		if(_dwelling)
 		{
 			while(ITimerService::TickLessThanTick(igniteAt + (ticksPerCycle / 2), _lastDwellTick + dwellTicks))
@@ -62,14 +63,16 @@ namespace OperationArchitecture
 				igniteAt = maxIgniteAt;
 
 			//schedule ignition
-			_timerService->ScheduleTask(_igniteTask, igniteAt);
+			//if(ITimerService::TickLessThanTick(_timerService->GetTick(), minIgniteAt))
+				_timerService->ScheduleTask(_igniteTask, igniteAt);
 		}
 		else
 		{
-			//if we aren't dwelling, check _lastDwellTick is not too old
-			if(ITimerService::TickLessThanTick(_lastDwellTick + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)))
+			//if we aren't dwelling, check _lastDwellTick is within range
+			if( ITimerService::TickLessThanTick(lastDwellTickCapturedBeforeDwellingCheck + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
+				ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), lastDwellTickCapturedBeforeDwellingCheck))
 			{
-				//if it is too old, schedule next ignition event by first available cycle
+				//if it is not within range, schedule next ignition event by first available cycle
 				while(ITimerService::TickLessThanTick(dwellAt, _timerService->GetTick()))
 					dwellAt += ticksPerCycle;
 				igniteAt = dwellAt + dwellTicks;
@@ -83,7 +86,7 @@ namespace OperationArchitecture
 			}
 			else
 			{
-				while(ITimerService::TickLessThanTick(igniteAt - (ticksPerCycle / 2), _lastDwellTick + dwellTicks))
+				while(ITimerService::TickLessThanTick(igniteAt - (ticksPerCycle / 2), lastDwellTickCapturedBeforeDwellingCheck + dwellTicks))
 					igniteAt += ticksPerCycle;
 				dwellAt = igniteAt - dwellTicks;
 

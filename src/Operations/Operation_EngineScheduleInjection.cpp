@@ -43,6 +43,7 @@ namespace OperationArchitecture
 		uint32_t openAt = closeAt - pulseTicks;
 
 		// if we are open. schedule close based on when it was opened
+		const uint32_t lastOpenedAtTickCapturedBeforeOpenCheck = _lastOpenedAtTick;
 		if(_open)
 		{
 			while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), _lastOpenedAtTick + pulseTicks))
@@ -60,10 +61,11 @@ namespace OperationArchitecture
 		//otherwise schedule based on the _openTask->Tick
 		else
 		{
-			//if we aren't open, check _lastOpenedAtTick is not too old
-			if(ITimerService::TickLessThanTick(_lastOpenedAtTick + pulseTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)))
+			//if we aren't open, check _lastOpenedAtTick is within range
+			if(	ITimerService::TickLessThanTick(lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
+				ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), lastOpenedAtTickCapturedBeforeOpenCheck))
 			{
-				//if it is too old, schedule next pulse by first available cycle
+				//if it is not within range, schedule next pulse by first available cycle
 				while(ITimerService::TickLessThanTick(openAt, _timerService->GetTick()))
 					openAt += ticksPerCycle;
 				closeAt = openAt + pulseTicks;
@@ -77,7 +79,7 @@ namespace OperationArchitecture
 			}
 			else
 			{
-				while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), _lastOpenedAtTick + pulseTicks))
+				while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks))
 					closeAt += ticksPerCycle;
 				openAt = closeAt - pulseTicks;
 
