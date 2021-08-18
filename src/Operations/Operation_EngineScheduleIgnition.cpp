@@ -23,27 +23,27 @@ namespace OperationArchitecture
 		delete _igniteTask;
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation)
+	std::tuple<tick_t, tick_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation)
 	{
 		if(enginePosition.Synced == false)
-			return std::tuple<uint32_t, uint32_t>(0, 0);
+			return std::tuple<tick_t, tick_t>(0, 0);
 
 		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
-		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
+		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
-		const uint32_t ticksPerCycle = static_cast<uint32_t>(cycleDegrees * ticksPerDegree);
-		const uint32_t dwellTicks = static_cast<uint32_t>(ignitionDwell * ticksPerSecond);
-		const uint32_t maxDwellDeviationTicks = ignitionDwellMaxDeviation * ticksPerSecond;
+		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
+		const tick_t dwellTicks = static_cast<tick_t>(ignitionDwell * ticksPerSecond);
+		const tick_t maxDwellDeviationTicks = ignitionDwellMaxDeviation * ticksPerSecond;
 
 		float delta = _tdc - ignitionAdvance - enginePosition.Position;
 		delta -= (static_cast<uint16_t>(delta) / cycleDegrees) * cycleDegrees;
 		if(delta < 0)
 			delta += cycleDegrees;
-		uint32_t igniteAt = static_cast<int64_t>(ticksPerDegree * (delta - cycleDegrees)) + enginePosition.CalculatedTick;		
-		uint32_t dwellAt = igniteAt - dwellTicks;
+		tick_t igniteAt = static_cast<int64_t>(ticksPerDegree * (delta - cycleDegrees)) + enginePosition.CalculatedTick;		
+		tick_t dwellAt = igniteAt - dwellTicks;
 
 		//if dwelling, then _lastDwellTick is accurate, adjust igniteAt to allow for sufficiently long dwell
-		const uint32_t lastDwellTickCapturedBeforeDwellingCheck = _lastDwellTick;
+		tick_t lastDwellTickCapturedBeforeDwellingCheck = _lastDwellTick;
 		if(_dwelling)
 		{
 			while(ITimerService::TickLessThanTick(igniteAt + (ticksPerCycle / 2), _lastDwellTick + dwellTicks))
@@ -55,16 +55,14 @@ namespace OperationArchitecture
 			if(enable)
 				_timerService->ScheduleTask(_dwellTask, dwellAt);
 			
-			const uint32_t minIgniteAt = _lastDwellTick + dwellTicks - maxDwellDeviationTicks;
-			const uint32_t maxIgniteAt = _lastDwellTick + dwellTicks + maxDwellDeviationTicks;
+			const tick_t minIgniteAt = _lastDwellTick + dwellTicks - maxDwellDeviationTicks;
+			const tick_t maxIgniteAt = _lastDwellTick + dwellTicks + maxDwellDeviationTicks;
 			if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
 				igniteAt = minIgniteAt;
 			else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))
 				igniteAt = maxIgniteAt;
 
-			//schedule ignition
-			//if(ITimerService::TickLessThanTick(_timerService->GetTick(), minIgniteAt))
-				_timerService->ScheduleTask(_igniteTask, igniteAt);
+			_timerService->ScheduleTask(_igniteTask, igniteAt);
 		}
 		else
 		{
@@ -72,51 +70,42 @@ namespace OperationArchitecture
 			if( ITimerService::TickLessThanTick(lastDwellTickCapturedBeforeDwellingCheck + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
 				ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), lastDwellTickCapturedBeforeDwellingCheck))
 			{
-				//if it is not within range, schedule next ignition event by first available cycle
-				while(ITimerService::TickLessThanTick(dwellAt, _timerService->GetTick()))
-					dwellAt += ticksPerCycle;
-				igniteAt = dwellAt + dwellTicks;
-
-				//schedule dwell
-				if(enable)
-					_timerService->ScheduleTask(_dwellTask, dwellAt);
-
-				//schedule ignition
-				_timerService->ScheduleTask(_igniteTask, igniteAt);
+				//if it is not within range, set it to what would have been the last cycle
+				lastDwellTickCapturedBeforeDwellingCheck = dwellAt - ticksPerCycle;
+				while(ITimerService::TickLessThanTick(lastDwellTickCapturedBeforeDwellingCheck, _timerService->GetTick() - ticksPerCycle))
+					lastDwellTickCapturedBeforeDwellingCheck += ticksPerCycle;
 			}
-			else
+
+			while(ITimerService::TickLessThanTick(igniteAt - (ticksPerCycle / 2), lastDwellTickCapturedBeforeDwellingCheck + dwellTicks))
+				igniteAt += ticksPerCycle;
+			dwellAt = igniteAt - dwellTicks;
+
+			//schedule dwell
+			if(enable)
 			{
-				while(ITimerService::TickLessThanTick(igniteAt - (ticksPerCycle / 2), lastDwellTickCapturedBeforeDwellingCheck + dwellTicks))
-					igniteAt += ticksPerCycle;
-				dwellAt = igniteAt - dwellTicks;
-
-				//schedule dwell
-				if(enable)
-				{
-					_timerService->ScheduleTask(_dwellTask, dwellAt);
-					dwellAt = _dwellTask->Tick;
-				}
-
-				const uint32_t minIgniteAt = dwellAt + dwellTicks - maxDwellDeviationTicks;
-				const uint32_t maxIgniteAt = dwellAt + dwellTicks + maxDwellDeviationTicks;
-				if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
-					igniteAt = minIgniteAt;
-				else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))
-					igniteAt = maxIgniteAt;
-
-				//schedule ignition
-				_timerService->ScheduleTask(_igniteTask, igniteAt);
+				_timerService->ScheduleTask(_dwellTask, dwellAt);
+				dwellAt = _dwellTask->Tick;
 			}
+
+			const tick_t minIgniteAt = dwellAt + dwellTicks - maxDwellDeviationTicks;
+			const tick_t maxIgniteAt = dwellAt + dwellTicks + maxDwellDeviationTicks;
+			if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
+				igniteAt = minIgniteAt;
+			else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))
+				igniteAt = maxIgniteAt;
+
+			_timerService->ScheduleTask(_igniteTask, igniteAt);
 		}
 
 		//return the ticks of the dwell and ignition. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(dwellAt, igniteAt);
+		return std::tuple<tick_t, tick_t>(dwellAt, igniteAt);
 	}
 
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
 		_dwellCallBack();
-		_lastDwellTick = _dwellTask->Tick;
+		if(!_dwelling)
+			_lastDwellTick = _dwellTask->Tick;
 		_dwelling = true;
 	}
 

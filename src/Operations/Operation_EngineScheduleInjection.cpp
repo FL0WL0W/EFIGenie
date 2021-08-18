@@ -24,26 +24,26 @@ namespace OperationArchitecture
 		delete _closeTask;
 	}
 
-	std::tuple<uint32_t, uint32_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition)
+	std::tuple<tick_t, tick_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition)
 	{
 		if(enginePosition.Synced == false)
-			return std::tuple<uint32_t, uint32_t>(0, 0);
+			return std::tuple<tick_t, tick_t>(0, 0);
 
 		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
-		const uint32_t ticksPerSecond = _timerService->GetTicksPerSecond();
+		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
-		const uint32_t ticksPerCycle = static_cast<uint32_t>(cycleDegrees * ticksPerDegree);
-		const uint32_t pulseTicks = static_cast<uint32_t>(injectionPulseWidth * ticksPerSecond);
+		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
+		const tick_t pulseTicks = static_cast<tick_t>(injectionPulseWidth * ticksPerSecond);
 
 		float delta = _tdc - injectionEndPosition - enginePosition.Position;
 		delta -= (static_cast<uint16_t>(delta) / cycleDegrees) * cycleDegrees;
 		if(delta < 0)
 			delta += cycleDegrees;
-		uint32_t closeAt = static_cast<int64_t>(ticksPerDegree * (delta - cycleDegrees)) + enginePosition.CalculatedTick;		
-		uint32_t openAt = closeAt - pulseTicks;
+		tick_t closeAt = static_cast<int64_t>(ticksPerDegree * (delta - cycleDegrees)) + enginePosition.CalculatedTick;		
+		tick_t openAt = closeAt - pulseTicks;
 
 		// if we are open. schedule close based on when it was opened
-		const uint32_t lastOpenedAtTickCapturedBeforeOpenCheck = _lastOpenedAtTick;
+		tick_t lastOpenedAtTickCapturedBeforeOpenCheck = _lastOpenedAtTick;
 		if(_open)
 		{
 			while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), _lastOpenedAtTick + pulseTicks))
@@ -56,49 +56,42 @@ namespace OperationArchitecture
 				_timerService->ScheduleTask(_openTask, openAt);
 
 			closeAt = _lastOpenedAtTick + pulseTicks;
+
+			//schedule close
 			_timerService->ScheduleTask(_closeTask, closeAt);
 		}
 		//otherwise schedule based on the _openTask->Tick
 		else
 		{
 			//if we aren't open, check _lastOpenedAtTick is within range
-			if(	ITimerService::TickLessThanTick(lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
+			if( ITimerService::TickLessThanTick(lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
 				ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), lastOpenedAtTickCapturedBeforeOpenCheck))
 			{
-				//if it is not within range, schedule next pulse by first available cycle
-				while(ITimerService::TickLessThanTick(openAt, _timerService->GetTick()))
-					openAt += ticksPerCycle;
-				closeAt = openAt + pulseTicks;
-
-				//schedule open
-				if(enable)
-					_timerService->ScheduleTask(_openTask, openAt);
-
-				//schedule close
-				_timerService->ScheduleTask(_closeTask, closeAt);
+				//if it is not within range, set it to what would have been the last cycle
+				lastOpenedAtTickCapturedBeforeOpenCheck = openAt - ticksPerCycle;
+				while(ITimerService::TickLessThanTick(lastOpenedAtTickCapturedBeforeOpenCheck, _timerService->GetTick() - ticksPerCycle))
+					lastOpenedAtTickCapturedBeforeOpenCheck += ticksPerCycle;
 			}
-			else
+
+			while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks))
+				closeAt += ticksPerCycle;
+			openAt = closeAt - pulseTicks;
+
+			//schedule open
+			if(enable)
 			{
-				while(ITimerService::TickLessThanTick(closeAt - (ticksPerCycle / 2), lastOpenedAtTickCapturedBeforeOpenCheck + pulseTicks))
-					closeAt += ticksPerCycle;
-				openAt = closeAt - pulseTicks;
-
-				//schedule open
-				if(enable)
-				{
-					_timerService->ScheduleTask(_openTask, openAt);
-					openAt = _openTask->Tick;
-				}
-
-				closeAt = openAt + pulseTicks;
-
-				//schedule close
-				_timerService->ScheduleTask(_closeTask, closeAt);
+				_timerService->ScheduleTask(_openTask, openAt);
+				openAt = _openTask->Tick;
 			}
+
+			closeAt = openAt + pulseTicks;
+
+			//schedule close
+			_timerService->ScheduleTask(_closeTask, closeAt);
 		}
 
 		//return the ticks of the open and close. for debugging purposes
-		return std::tuple<uint32_t, uint32_t>(openAt, closeAt);
+		return std::tuple<tick_t, tick_t>(openAt, closeAt);
 	}
 
 	void Operation_EngineScheduleInjection::Open()
