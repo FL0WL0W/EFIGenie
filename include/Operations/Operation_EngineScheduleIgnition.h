@@ -19,7 +19,7 @@ namespace OperationArchitecture
 		EmbeddedIOServices::Task *_dwellTask;
 		EmbeddedIOServices::Task *_igniteTask;
 		EmbeddedIOServices::tick_t _lastDwellTick = 0;
-		bool _dwelling : 1;
+		bool _dwelling = false;
 	public:		
         Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, const float tdc, const std::function<void()> dwellCallBack, const std::function<void()> igniteCallBack);
 		~Operation_EngineScheduleIgnition();

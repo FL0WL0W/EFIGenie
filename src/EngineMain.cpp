@@ -63,7 +63,9 @@ namespace Engine
     void EngineMain::Loop()
     {
         _inputsExecute->Execute();
-        if(_syncCondition->Execute<bool>())
+        if(!_syncedOnce)
+            _syncedOnce = _syncCondition->Execute<bool>();
+        if(_syncedOnce)
         {
             _mainLoopExecute->Execute();
         }

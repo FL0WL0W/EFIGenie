@@ -347,50 +347,6 @@ class ConfigTop {
         });
     }
 
-    GetIATSelections() {
-        var available = false;
-        var selections = "";
-        if(this.RawConfig)
-        {
-            var output = this.RawConfig.constructor.Output;
-            var translationSelected = false;
-            if(output !== undefined)
-            {
-                for(var i = 0; i < InputTranslationConfigs.length; i++)
-                {
-                    var inputs = InputTranslationConfigs[i].Inputs;
-                    if(inputs.length !== 1 || inputs[0] !== output)
-                        continue;
-
-                    var selected = false;
-                    if(this.TranslationConfig && this.TranslationConfig instanceof InputTranslationConfigs[i]){
-                        selected = true;
-                        translationSelected = true;
-                    }
-
-                    translationSelections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + InputTranslationConfigs[i].Name + "</option>"
-                    availableTranslation = true;
-                }
-            }
-
-            if(!translationSelected) {
-                this.TranslationConfig = undefined;
-                $("#" + this.GUID + "-translation").html("");
-            }
-
-            if(availableTranslation){
-                translationSelections = "<option value=\"-1\"" + (translationSelected? "" : " selected") + ">None</option>" + translationSelections;
-            } else {
-                translationSelections = "<option value=\"-1\" disabled selected>None</option>";
-            }
-        } else {
-            this.TranslationConfig = undefined;
-            $("#" + this.GUID + "-translation").html("");
-            translationSelections = "<option value=\"-1\">Select Raw First</option>"
-        }
-        return { Html : translationSelections, Available: availableTranslation };
-    }
-
     GetHtml() {
         var template = GetClassProperty(this, "Template");
 

@@ -12,6 +12,7 @@ namespace Engine
 		OperationArchitecture::IOperationBase *_preSyncExecute;
 		OperationArchitecture::IOperationBase *_syncCondition;
 		OperationArchitecture::IOperationBase *_mainLoopExecute;
+		bool _syncedOnce = false;
 
 		public:
 		OperationArchitecture::SystemBus *SystemBus;
