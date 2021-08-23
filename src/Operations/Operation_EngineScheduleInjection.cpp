@@ -115,7 +115,7 @@ namespace OperationArchitecture
 	{
 		_openCallBack();
 		if(!_open)
-			_lastOpenTick = _openTask->Tick == 0? 1 : _openTask->Tick;
+			_lastOpenTick = _openTask->ExecutedTick == 0? 1 : _openTask->ExecutedTick;
 		_open = true;
 	}
 

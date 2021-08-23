@@ -125,7 +125,7 @@ namespace OperationArchitecture
 	{
 		_dwellCallBack();
 		if(!_dwelling)
-			_lastDwellTick = _dwellTask->Tick == 0? 1 : _dwellTask->Tick;
+			_lastDwellTick = _dwellTask->ExecutedTick == 0? 1 : _dwellTask->ExecutedTick;
 		_dwelling = true;
 	}
 
