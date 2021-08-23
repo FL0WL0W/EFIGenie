@@ -435,7 +435,7 @@ class ConfigFuel {
             "FuelParameters");
         this.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection(
             GenericConfigs,
-            "Injector End Position(ATDC)",
+            "Injector End Position(BTDC)",
             "Angle",
             "FuelParameters");
         this.ConfigInjectorOutputs = new ConfigInjectorOutputs();
@@ -1334,7 +1334,7 @@ class ConfigInjectorOutputs {
                         { type: "UINT8", value: 0 }, //use variable
                         { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
                         { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(ATDC)").Id },
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
                     ]};
                 }}],
             value: [

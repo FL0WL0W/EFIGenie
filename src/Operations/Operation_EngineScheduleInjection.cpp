@@ -99,7 +99,6 @@ namespace OperationArchitecture
 				_timerService->ScheduleTask(_openTask, openAt);
 			else
 				_timerService->UnScheduleTask(_openTask);
-
 		}
 		//if we are not open, just use the previously calculated close tick.
 		else

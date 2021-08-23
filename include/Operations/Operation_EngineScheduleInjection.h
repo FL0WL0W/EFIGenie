@@ -18,7 +18,7 @@ namespace OperationArchitecture
 
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
-		EmbeddedIOServices::tick_t _lastOpenTick = 0;
+		volatile EmbeddedIOServices::tick_t _lastOpenTick = 0;
 		bool _open = false;
 	public:		
         Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const std::function<void()> openCallBack, const std::function<void()> closeCallBack);
