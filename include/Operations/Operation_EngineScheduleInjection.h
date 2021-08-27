@@ -13,15 +13,15 @@ namespace OperationArchitecture
 	protected:
 		EmbeddedIOServices::ITimerService * const _timerService;
 		const float _tdc;
-		const std::function<void()> _openCallBack;
-		const std::function<void()> _closeCallBack;
+		const EmbeddedIOServices::callback_t _openCallBack;
+		const EmbeddedIOServices::callback_t _closeCallBack;
 
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
 		volatile EmbeddedIOServices::tick_t _lastOpenTick = 0;
 		bool _open = false;
 	public:		
-        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const std::function<void()> openCallBack, const std::function<void()> closeCallBack);
+        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const EmbeddedIOServices::callback_t openCallBack, const EmbeddedIOServices::callback_t closeCallBack);
 		~Operation_EngineScheduleInjection();
 
 		std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t> Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition) override;

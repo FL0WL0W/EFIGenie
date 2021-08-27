@@ -24,8 +24,8 @@ namespace UnitTests
 		void *_config;
 		size_t _sizeOut = 0;
 		EngineMain *_engineMain;
-		std::function<void()> _crankTriggerCallback;
-		std::function<void()> _camTriggerCallback;
+		callback_t _crankTriggerCallback;
+		callback_t _camTriggerCallback;
 
 		AcceptanceTest()
 		{

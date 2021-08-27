@@ -13,8 +13,8 @@ namespace UnitTests
 	{
 		protected:
 		MockTimerService _timerService;
-        std::function<void()> _dwell;
-        std::function<void()> _ignite;
+        callback_t _dwell;
+        callback_t _ignite;
         Operation_EngineScheduleIgnition *_operation;
         EnginePosition _enginePosition;
 

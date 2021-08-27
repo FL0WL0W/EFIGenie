@@ -10,10 +10,10 @@ namespace OperationArchitecture
 	{
 	protected:
 		EmbeddedIOServices::ITimerService *_timerService;
-		std::function<void()> _openCallBack;
+		const EmbeddedIOServices::callback_t _openCallBack;
 		EmbeddedIOServices::Task *_closeTask;
 	public:		
-        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack);
+        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, const EmbeddedIOServices::callback_t openCallBack, const EmbeddedIOServices::callback_t closeCallBack);
 		~Operation_EngineInjectorPrime();
 
 		void Execute(float time) override;

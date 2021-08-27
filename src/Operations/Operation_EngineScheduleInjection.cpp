@@ -5,7 +5,7 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, float tdc, std::function<void()> openCallBack, std::function<void()> closeCallBack) : 
+	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, float tdc, callback_t openCallBack, callback_t closeCallBack) : 
 		_timerService(timerService),
 		_tdc(tdc),
 		_openCallBack(openCallBack),
@@ -127,8 +127,8 @@ namespace OperationArchitecture
 	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		std::function<void()> openCallBack = 0;
-		std::function<void()> closeCallBack = 0;
+		callback_t openCallBack = 0;
+		callback_t closeCallBack = 0;
 
 		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);

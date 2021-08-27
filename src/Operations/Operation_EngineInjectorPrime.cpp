@@ -5,7 +5,7 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINEINJECTORPRIME_H
 namespace OperationArchitecture
 {
-	Operation_EngineInjectorPrime::Operation_EngineInjectorPrime(ITimerService *timerService, std::function<void()> openCallBack, std::function<void()> closeCallBack) :
+	Operation_EngineInjectorPrime::Operation_EngineInjectorPrime(ITimerService *timerService, callback_t openCallBack, callback_t closeCallBack) :
 		_timerService(timerService),
 		_openCallBack(openCallBack),
 		_closeTask(new Task(closeCallBack))
@@ -25,8 +25,8 @@ namespace OperationArchitecture
 
 	IOperationBase *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
-		std::function<void()> openCallBack = 0;
-		std::function<void()> closeCallBack = 0;
+		callback_t openCallBack = 0;
+		callback_t closeCallBack = 0;
 
 		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);

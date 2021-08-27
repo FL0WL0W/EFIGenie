@@ -5,7 +5,7 @@ using namespace EmbeddedIOServices;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace OperationArchitecture
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, std::function<void()> dwellCallBack, std::function<void()> igniteCallBack) :
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, callback_t dwellCallBack, callback_t igniteCallBack) :
 		_timerService(timerService),
 		_tdc(tdc), 
 		_dwellCallBack(dwellCallBack),
@@ -138,8 +138,8 @@ namespace OperationArchitecture
 	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
-		std::function<void()> dwellCallBack = 0;
-		std::function<void()> igniteCallBack = 0;
+		callback_t dwellCallBack = 0;
+		callback_t igniteCallBack = 0;
 
 		size_t size = 0;
 		IOperationBase *operation = packager->Package(config, size);
