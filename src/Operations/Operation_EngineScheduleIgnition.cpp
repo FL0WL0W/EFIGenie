@@ -44,9 +44,6 @@ namespace OperationArchitecture
 			return std::tuple<tick_t, tick_t>(0, 0);
 		}
 
-		if(enginePosition.Synced == false)
-			return std::tuple<tick_t, tick_t>(0, 0);
-
 		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
