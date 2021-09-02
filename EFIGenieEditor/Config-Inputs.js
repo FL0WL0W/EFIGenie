@@ -1372,7 +1372,6 @@ class ConfigOperation_ReluctorUniversalMissingTeeth {
             { type: "FLOAT", value: this.ToothWidth}, //ToothWidth
             { type: "UINT8", value: this.NumberOfTeeth}, //NumberOfTeeth
             { type: "UINT8", value: this.NumberOfTeethMissing}, //NumberOfTeethMissing
-            { type: "BOOL", value: true}, //NumberOfTeethMissing
         ]};
     }
 }
