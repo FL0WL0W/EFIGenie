@@ -151,9 +151,9 @@ namespace OperationArchitecture
 			dwellCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
-			IOperationBase *operation = packager->Package(config, size);
+			IOperationBase *operationIgnite = packager->Package(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
-			igniteCallBack = [operation]() { operation->Execute(); };
+			igniteCallBack = [operationIgnite]() { operationIgnite->Execute(); };
 		}
 		
 		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, dwellCallBack, igniteCallBack);

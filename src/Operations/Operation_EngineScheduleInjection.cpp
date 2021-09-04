@@ -143,9 +143,9 @@ namespace OperationArchitecture
 			openCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
-			IOperationBase *operation = packager->Package(config, size);
+			IOperationBase *operationClose = packager->Package(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
-			closeCallBack = [operation]() { operation->Execute(); };
+			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}
 
 		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, tdc, openCallBack, closeCallBack);
