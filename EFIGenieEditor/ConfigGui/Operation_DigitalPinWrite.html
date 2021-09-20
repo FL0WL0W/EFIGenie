@@ -1,6 +1,8 @@
 <div id="$id$">
     <div>
         <label for="$id$-pin">Pin:</label>
-        <input id="$id$-pin" type="number" min="0" max="65535" step="1" value="$pin$"/><input id="$id$-inverted" type="checkbox" $inverted$/> Inverted <input id="$id$-highz" type="checkbox" $highz$/> High Z
+        <select id="$id$-pin" class="pinselect digital">
+            $pin$
+        </select><input id="$id$-inverted" type="checkbox" $inverted$/> Inverted <input id="$id$-highz" type="checkbox" $highz$/> High Z
     </div>
 </div>

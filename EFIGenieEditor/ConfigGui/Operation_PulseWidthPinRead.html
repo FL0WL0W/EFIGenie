@@ -1,7 +1,9 @@
 <div id="$id$">
     <div>
         <label for="$id$-pin">Pin:</label>
-        <input id="$id$-pin" type="number" min="0" max="65535" step="1" value="$pin$"/>
+        <select id="$id$-pin" class="pinselect pwm">
+            $pin$
+        </select>
     </div>
     <div>
         <label for="$id$-minFrequency">Minimum Frequency:</label>
