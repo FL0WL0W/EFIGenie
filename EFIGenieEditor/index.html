@@ -44,6 +44,18 @@
                     b.SetIncrements();
                     downloadBin(b.GetArrayBufferPackage(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
+
+                $("#selectTarget").change(function(evt){
+                    b.Inputs.TargetDevice = $(this).val();
+                    PinOut = PinOuts[b.Inputs.TargetDevice];
+                    UpdatePinout();
+                });
+                var targets = "";
+                Object.entries(PinOuts).forEach(entry => {
+                    const [key, value] = entry;
+                    targets += "<option value=\"" + key + "\">" + value.Name + "</option>"
+                });
+                $("#selectTarget").html(targets);
             });
         </script>
     </head>
@@ -53,6 +65,8 @@
             <label for="btnLoad" class="button">Open</label>
             <input id="btnLoad" type="file" style="display: none;">
             <input id="btnSaveBin" type="button" class="button" value="Save Bin">
+            <select id="selectTarget">
+            </select>
         </div>
         <div id="workspace" class="configContainer"></div>
     </body>
