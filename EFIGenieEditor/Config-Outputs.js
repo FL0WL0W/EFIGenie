@@ -9,7 +9,7 @@ class ConfigOperation_DigitalPinWrite {
         this.GUID = getGUID();
     }
     
-    Pin = 0;
+    Pin = 0xFFFF;
     Inverted = 0;
     HighZ = 0;
 
@@ -42,6 +42,7 @@ class ConfigOperation_DigitalPinWrite {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -67,7 +68,7 @@ class ConfigOperation_DigitalPinWrite {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, this.Pin);
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, true, false, false));
         template = template.replace(/[$]inverted[$]/g, (this.Inverted === 1? "checked": ""));
         template = template.replace(/[$]highz[$]/g, (this.HighZ === 1? "checked": ""));
 

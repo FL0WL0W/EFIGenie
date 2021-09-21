@@ -1395,3 +1395,109 @@ class ConfigTDCOutput extends ConfigOrVariableSelection {
         return template;
     }
 }
+
+class TemplatedConfig {
+    static Name = "Injector Outputs";
+    static Template = getFileContents("ConfigGui/Fuel_InjectorOutputs.html");
+
+    constructor(){
+        this.GUID = getGUID();
+    }
+
+    Outputs = [];
+
+    GetObj() {
+        var outputObj = [];
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputObj[i] = this.Outputs[i].GetObj();
+        };
+        return {
+            Name: GetClassProperty(this, "Name"),
+            Outputs: outputObj
+        };
+    }
+
+    SetObj(obj) {
+        this.Detach();
+        if(obj && obj.Outputs)
+        {
+            this.Outputs = [];
+            for(var i = 0; i < obj.Outputs.length; i++){
+                if(!this.Outputs[i])
+                    this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector " + (i+1), "No Measurement")
+                this.Outputs[i].SetObj(obj.Outputs[i])
+            }
+        }
+
+        $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
+    }
+
+    Detach() {
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Detach();
+        };
+    }
+
+    Attach() {
+        var thisClass = this;
+
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].Attach();
+        };
+    }
+
+    GetHtml() {
+        var template = GetClassProperty(this, "Template");
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+
+        var outputsHTML = "";
+        
+        for(var i = 0; i < this.Outputs.length; i++){
+            outputsHTML += this.Outputs[i].GetHtml();
+        };
+        
+        template = template.replace(/[$]injectoroutputs[$]/g, outputsHTML);
+
+        return template;
+    }
+
+    SetIncrements() {
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].SetIncrements();
+        };
+    }
+
+    GetObjPackage() {
+
+        var obj  = { 
+            types : [
+                { type: "Operation_EngineScheduleInjection", toObj(val) {
+                    return { value: [
+                        { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                        { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
+                        { type: "FLOAT", value: val.TDC }, //tdc
+                        { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
+                        { obj: val.GetObjOperation()}, 
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.EnginePositionId },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
+                        { type: "UINT8", value: 0 }, //use variable
+                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
+                    ]};
+                }}],
+            value: [
+                { type: "PackageOptions", value: { Group: this.Outputs.length }}, //group
+            ]};
+    
+        for(var i = 0; i < this.Outputs.length; i++) {
+            obj.value.push({ type: "Operation_EngineScheduleInjection", value: this.Outputs[i] });
+        }
+
+        return obj;
+    }
+}

@@ -5,71 +5,172 @@ InputTranslationConfigs.push(ConfigOperation_LookupTable);
 
 var STM32F103C8_PinOut = { 
     Name: "Blue pill: STM32F103C8",
-    Overlay: "GPIOOverlays/STM32F103C8_Overlay.png",
-    OverlayTextSize: 10,
+    Overlay: "images/STM32F103C8_Overlay.png",
+    OverlayWidth: 844,
+    OverlayElementHeight: 24,
     Pins: [
-        { Name: "PC_13", Value: (16*2 + 13), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PC_14", Value: (16*2 + 14), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PC_15", Value: (16*2 + 15), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PA_0",  Value: (16*0 + 0 ), Digital: true , Analog: true , PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PA_1",  Value: (16*0 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_2",  Value: (16*0 + 2 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_3",  Value: (16*0 + 3 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_4",  Value: (16*0 + 4 ), Digital: true , Analog: true , PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PA_5",  Value: (16*0 + 5 ), Digital: true , Analog: true , PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PA_6",  Value: (16*0 + 6 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_7",  Value: (16*0 + 7 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_0",  Value: (16*1 + 0 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_1",  Value: (16*1 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_10", Value: (16*1 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_11", Value: (16*1 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_9 ", Value: (16*1 + 9 ), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PB_8 ", Value: (16*1 + 8 ), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PB_7 ", Value: (16*1 + 7 ), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PB_6 ", Value: (16*1 + 6 ), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PB_5 ", Value: (16*1 + 5 ), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_4 ", Value: (16*1 + 4 ), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_3 ", Value: (16*1 + 3 ), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_15", Value: (16*0 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_12", Value: (16*0 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
-        { Name: "PA_11", Value: (16*0 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_10", Value: (16*0 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_9 ", Value: (16*0 + 9 ), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PA_8 ", Value: (16*0 + 8 ), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_15", Value: (16*1 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_14", Value: (16*1 + 14), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_13", Value: (16*1 + 13), Digital: true , Analog: false, PWM: true , OverlayX: 0, OverlayY: 0},
-        { Name: "PB_12", Value: (16*1 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 0, OverlayY: 0},
+        { Name: "PC_13", Value: (16*2 + 13), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 174, Align: "right"},
+        { Name: "PC_14", Value: (16*2 + 14), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 200, Align: "right"},
+        { Name: "PC_15", Value: (16*2 + 15), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 226, Align: "right"},
+        { Name: "PA_0",  Value: (16*0 + 0 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 252, Align: "right"},
+        { Name: "PA_1",  Value: (16*0 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 278, Align: "right"},
+        { Name: "PA_2",  Value: (16*0 + 2 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 304, Align: "right"},
+        { Name: "PA_3",  Value: (16*0 + 3 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 330, Align: "right"},
+        { Name: "PA_4",  Value: (16*0 + 4 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 356, Align: "right"},
+        { Name: "PA_5",  Value: (16*0 + 5 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 382, Align: "right"},
+        { Name: "PA_6",  Value: (16*0 + 6 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 408, Align: "right"},
+        { Name: "PA_7",  Value: (16*0 + 7 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 434, Align: "right"},
+        { Name: "PB_0",  Value: (16*1 + 0 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 460, Align: "right"},
+        { Name: "PB_1",  Value: (16*1 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 486, Align: "right"},
+        { Name: "PB_10", Value: (16*1 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 512, Align: "right"},
+        { Name: "PB_11", Value: (16*1 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 538, Align: "right"},
+        { Name: "PB_9 ", Value: (16*1 + 9 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 226, Align: "left"},
+        { Name: "PB_8 ", Value: (16*1 + 8 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 252, Align: "left"},
+        { Name: "PB_7 ", Value: (16*1 + 7 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 278, Align: "left"},
+        { Name: "PB_6 ", Value: (16*1 + 6 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 304, Align: "left"},
+        { Name: "PB_5 ", Value: (16*1 + 5 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 330, Align: "left"},
+        { Name: "PB_4 ", Value: (16*1 + 4 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 356, Align: "left"},
+        { Name: "PB_3 ", Value: (16*1 + 3 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 382, Align: "left"},
+        { Name: "PA_15", Value: (16*0 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 408, Align: "left"},
+        { Name: "PA_12", Value: (16*0 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 434, Align: "left"},
+        { Name: "PA_11", Value: (16*0 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 460, Align: "left"},
+        { Name: "PA_10", Value: (16*0 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 486, Align: "left"},
+        { Name: "PA_9 ", Value: (16*0 + 9 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 512, Align: "left"},
+        { Name: "PA_8 ", Value: (16*0 + 8 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 538, Align: "left"},
+        { Name: "PB_15", Value: (16*1 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 564, Align: "left"},
+        { Name: "PB_14", Value: (16*1 + 14), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 590, Align: "left"},
+        { Name: "PB_13", Value: (16*1 + 13), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 616, Align: "left"},
+        { Name: "PB_12", Value: (16*1 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 642, Align: "left"},
     ]
 };
 
 var PinOut = STM32F103C8_PinOut;
 
-function UpdatePinout() {
-    //grab all allocated pins and type allocated
-
-    //mark all pins that have more than one type allocation
-
-    //add to overlay
+function ParsePinSelectElements(pinSelectElements){
+    var elements = [];
+    if(pinSelectElements) {
+        for(var i=0; i<pinSelectElements.length; i++) {
+            elements.push({
+                name: GetNameFromPinSelectElement(pinSelectElements[i]),
+                digital: pinSelectElements[i].classList.contains("digital"),
+                analog: pinSelectElements[i].classList.contains("analog"),
+                pwm: pinSelectElements[i].classList.contains("pwm"),
+                pin: $(pinSelectElements[i]).val()
+            });
+        }
+    }
+    return elements;
 }
 
-function GeneratePinList(pin, digital, analog, pwm) {
-    var ret = "<option value=\"65535\" disabled " + (pin === 0xFFFF? "selected" : "")+ ">select</option>";
-    var endret = "";
+function GetNameFromPinSelectElement(element){
+    var inputName = $($($(element).parent().parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
+    if(inputName)
+        return inputName;
+
+    var outputName = $($($(element).parent().parent().parent().parent().children()[0]).children()[0]).text();
+    if(outputName)
+        return outputName;
+
+    return "unknown";
+}
+
+function GenerateOverlay() {
+    var pinSelectElements = ParsePinSelectElements($(".pinselect"));
+    var ret = "<div style=\"width: " + PinOut.OverlayWidth + "; margin: auto; position: relative;\"><img src=\"" + PinOut.Overlay + "\"></img>";
+    for(var i = 0; i < PinOut.Pins.length; i++) {
+        var selectCount = 0;
+        var sel = "";
+        var endsel = "";
+        for(var s=0; s<pinSelectElements.length; s++) {
+            var selected = false;
+            if(pinSelectElements[s].pin == PinOut.Pins[i].Value) {
+                selectCount++;
+                selected = true;
+            }
+            if( (pinSelectElements[s].digital && !PinOut.Pins[i].Digital) ||
+                (pinSelectElements[s].analog && !PinOut.Pins[i].Analog) ||
+                (pinSelectElements[s].pwm && !PinOut.Pins[i].PWM)) {
+                endsel += "<option value=\"" + pinSelectElements[s].name + "\"" + (selected? " class=\"incompatible\" selected" : "") + " disabled>" + pinSelectElements[s].name + "</option>";  
+            } else {
+                sel += "<option value=\"" + pinSelectElements[s].name + "\"" + (selected? " selected" : "")+ ">" + pinSelectElements[s].name + "</option>";            
+            }
+                
+        }
+        if(selectCount > 1)
+        {
+            sel = sel.replaceAll("selected", "class=\"pinconflict\"");
+            endsel = endsel.replaceAll("\" selected", " pinconflict\"");
+        }
+        sel += endsel;
+        sel = "<select class=\"gpiooverlayselect" + (selectCount > 1? " pinconflict" : "") + "\" data-pin=\"" + PinOut.Pins[i].Value + "\" style=\"position: absolute; margin: 0"+
+            "; height: " + PinOut.OverlayElementHeight + 
+            "; top: " + (PinOut.Pins[i].OverlayY - PinOut.OverlayElementHeight / 2) + 
+            "; " + PinOut.Pins[i].Align + ": " + PinOut.Pins[i].OverlayX + ";\">" +
+            "<option value=\"\" disabled " + (selectCount != 1? "selected" : "")+ ">select</option>" + sel + "</select>";
+
+        ret += sel;
+    }
+    return ret + "</div>";
+}
+
+function UpdatePinout(callingGUID, callingPin) {
+    var pinSelectElements = $(".pinselect");
+    if(pinSelectElements) {
+        for(var i=0; i<pinSelectElements.length; i++) {
+            var je = $(pinSelectElements[i]);
+            var id = je.attr('id');
+            var GUID = id.substring(0, id.length - 4);
+            var pin = parseInt(je.val());
+            if(GUID === callingGUID)
+                pin = callingPin;
+            je.replaceWith(GeneratePinList(GUID, pin, pinSelectElements[i].classList.contains("digital"), pinSelectElements[i].classList.contains("analog"), pinSelectElements[i].classList.contains("pwm")));
+        }
+    }
+
+    //replace overlay
+    $(".gpiooverlay").html(GenerateOverlay());
+}
+
+function GeneratePinList(GUID, pin, digital, analog, pwm) {
+
+    var sel = "<option value=\"65535\" disabled " + (pin === 0xFFFF? "selected" : "")+ ">select</option>";
+    var endsel = "";
+    var pinConflict = false;
+    var pinSelectElements = ParsePinSelectElements($(".pinselect").not("#" + GUID + "-pin"));
     for(var i = 0; i < PinOut.Pins.length; i++) {
         var selected = false;
         if(pin === PinOut.Pins[i].Value) {
             selected = true;
         }
+        var name = "";
+        for(var s=0; s<pinSelectElements.length; s++) {
+            if(pin == pinSelectElements[s].pin){
+                pinConflict  = true;
+            }
+            if(PinOut.Pins[i].Value == pinSelectElements[s].pin){
+                name += ", " + pinSelectElements[s].name;
+            }
+        }
+        name = PinOut.Pins[i].Name + (name != ""? ("(" + name.substring(2) + ")") : "");
         if( (digital && !PinOut.Pins[i].Digital) ||
             (analog && !PinOut.Pins[i].Analog) ||
             (pwm && !PinOut.Pins[i].PWM)) {
-            endret += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? " class=\"incompatible\" selected" : "") + " disabled>" + PinOut.Pins[i].Name + "</option>";
+            endsel += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? (" class=\"incompatible\"" + " selected") : "") + " disabled>" + name + "</option>";
         } else {
-            ret += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? " selected" : "")+ ">" + PinOut.Pins[i].Name + "</option>";
+            sel += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? " selected" : "")+ ">" + name + "</option>";
         }
     }
-    return ret + endret;
+    sel += endsel;
+
+    var ret = "<select id=\"" + GUID + "-pin\" class=\"pinselect ";
+    if(analog)
+        ret += "analog";
+    else if(digital)
+        ret += "digital";
+    else if(pwm)
+        ret += "pwm";
+    ret += (pinConflict? " pinconflict" : "") + "\">" + sel + "</select>";
+    return ret
 }
 
 EmbeddedOperationsFactoryIDs = {
@@ -143,20 +244,39 @@ class ConfigInputs {
         for(var i = 0; i < this.Inputs.Length; i++){
             this.Inputs[i].Attach();
         }
+
+        $(document).on("change."+this.GUID, ".gpiooverlayselect", function(){
+            thisClass.Detach();
+
+            var selected = $(this).val();
+
+            var pinSelectElements = $(".pinselect");
+            if(pinSelectElements) {
+                for(var i=0; i<pinSelectElements.length; i++) {
+                    var name = GetNameFromPinSelectElement(pinSelectElements[i]);
+                    if(selected == name)
+                    {
+                        $(pinSelectElements[i]).val($(this).data("pin"));
+                        $(pinSelectElements[i]).trigger("change");
+                    }
+                }
+            }
+
+            thisClass.Attach();
+        });
         
         $(document).on("change."+this.GUID, "#" + this.GUID + "-Selection", function(){
             thisClass.Detach();
 
+            $("#"+ thisClass.GUID + " .inputconfig").hide();
+
             var selected = parseInt($(this).val());
             if(isNaN(selected)) {
-                $("#"+ thisClass.GUID + "-name").hide();
                 thisClass.Attach();
                 return;
             }
 
-            $("#"+ thisClass.GUID + "-inputconfig").html(thisClass.Inputs[selected].GetHtml());
-            $("#"+ thisClass.GUID + "-name").show();
-            $("#"+ thisClass.GUID + "-name").val(thisClass.Inputs[selected].Name);
+            $("#"+ thisClass.GUID + "-" + selected).show();
 
             thisClass.Attach();
         });
@@ -270,16 +390,20 @@ class ConfigInputs {
         }
         template = template.replace(/[$]inputlist[$]/g, inputlist);
 
-        var inputconfig = "";
-        if(selected < this.Inputs.length) {
-           inputconfig = this.Inputs[selected].GetHtml();
-           template = template.replace(/[$]name[$]/g, this.Inputs[selected].Name);
-           template = template.replace(/[$]namedivstyle[$]/g, "");
-        } else {
-           template = template.replace(/[$]name[$]/g, "");
-           template = template.replace(/[$]namedivstyle[$]/g, " display: none;");
+        var configs = "";
+        for(var i = 0; i < this.Inputs.length; i++)
+        {
+            configs += "<div id=\""+this.GUID+"-"+i+"\" class=\"inputconfig\" " + (i===selected? "" : "style=\"display: none;\"") + "><div style=\"margin-left: 5px;\">" +
+            "    <label for=\""+this.GUID+"-name\">Name:</label>" +
+            "    <input id=\""+this.GUID+"-name\" type=\"text\" value=\"" + this.Inputs[i].Name + "\"/>" +
+            "</div>" +
+            "   <div style=\"display: inline-block; vertical-align:top; min-width: 650px;\" class=\"configContainer\">" + 
+            this.Inputs[i].GetHtml() +
+            "</div></div>";
         }
-        template = template.replace(/[$]inputconfig[$]/g, inputconfig);
+
+        template = template.replace(/[$]inputconfig[$]/g, configs);
+        template = template.replace(/[$]overlay[$]/g, GenerateOverlay());
 
         return template;
     }
@@ -695,7 +819,7 @@ class ConfigOperation_AnalogPinRead {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -705,7 +829,7 @@ class ConfigOperation_AnalogPinRead {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, false, true, false));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, true, false));
 
         return template;
     }
@@ -760,7 +884,7 @@ class ConfigOperation_DigitalPinRead {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -778,7 +902,7 @@ class ConfigOperation_DigitalPinRead {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, true, false, false));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, true, false, false));
         template = template.replace(/[$]inverted[$]/g, (this.Inverted === 1? "checked": ""));
 
         return template;
@@ -838,7 +962,7 @@ class ConfigOperation_DigitalPinRecord {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -864,7 +988,7 @@ class ConfigOperation_DigitalPinRecord {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, true, false, false));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, true, false, false));
         template = template.replace(/[$]inverted[$]/g, (this.Inverted === 1? "checked": ""));
         template = template.replace(/[$]length[$]/g, this.Length);
 
@@ -923,7 +1047,7 @@ class ConfigOperation_DutyCyclePinRead {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -941,7 +1065,7 @@ class ConfigOperation_DutyCyclePinRead {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, false, false, true));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
         template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
 
         return template;
@@ -998,7 +1122,7 @@ class ConfigOperation_FrequencyPinRead {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -1016,7 +1140,7 @@ class ConfigOperation_FrequencyPinRead {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, false, false, true));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
         template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
 
         return template;
@@ -1073,7 +1197,7 @@ class ConfigOperation_PulseWidthPinRead {
             thisClass.Detach();
 
             thisClass.Pin = parseInt($(this).val());
-            UpdatePinout();
+            UpdatePinout(thisClass.GUID, thisClass.Pin);
 
             thisClass.Attach();
         });
@@ -1091,7 +1215,7 @@ class ConfigOperation_PulseWidthPinRead {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.Pin, false, false, true));
+        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
         template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
 
         return template;

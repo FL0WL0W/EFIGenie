@@ -128,3 +128,11 @@ span .namedListOperation {
 .selected {
     background-color:rgb(204, 204, 255);
 }
+
+select .pinconflict{
+    background-color:rgb(255, 0, 0);
+}
+
+.pinconflict{
+    background-color:rgb(255, 128, 128);
+}
