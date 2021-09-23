@@ -166,7 +166,7 @@ function GenerateOverlay() {
             endsel = endsel.replaceAll("\" selected", " pinconflict\"");
         }
         sel += endsel;
-        sel = "<select class=\"gpiooverlayselect" + (selectCount > 1? " pinconflict" : "") + "\" data-pin=\"" + PinOut.Pins[i].Value + "\" style=\"position: absolute; margin: 0"+
+        sel = "<select class=\"gpiooverlayselect" + (selectCount > 1? " pinconflict" : "") + "\" data-pin=\"" + PinOut.Pins[i].Value + "\" style=\""+
             "; height: " + PinOut.OverlayElementHeight + 
             "; top: " + (PinOut.Pins[i].OverlayY - PinOut.OverlayElementHeight / 2) + 
             "; " + PinOut.Pins[i].Align + ": " + PinOut.Pins[i].OverlayX + ";\">" +
@@ -442,11 +442,11 @@ class ConfigInputs {
         var configs = "";
         for(var i = 0; i < this.Inputs.length; i++)
         {
-            configs += "<div id=\""+this.GUID+"-"+i+"\" class=\"inputconfig\" " + (i===selected? "" : "style=\"display: none;\"") + "><div style=\"margin-left: 5px;\">" +
+            configs += "<div id=\""+this.GUID+"-"+i+"\" class=\"inputconfig\" " + (i===selected? "" : "style=\"display: none;\"") + "><div  class=\"configContainer\" style=\"border-style: none;\">" +
             "    <label for=\""+this.GUID+"-name\">Name:</label>" +
             "    <input id=\""+this.GUID+"-name\" type=\"text\" value=\"" + this.Inputs[i].Name + "\"/>" +
             "</div>" +
-            "   <div style=\"display: inline-block; vertical-align:top; min-width: 650px;\" class=\"configContainer\">" + 
+            "   <div class=\"configContainer\">" + 
             this.Inputs[i].GetHtml() +
             "</div></div>";
         }

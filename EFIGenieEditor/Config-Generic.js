@@ -814,7 +814,7 @@ class Table {
         }
 
         for(var y = ystart; y < this.YResolution + 1; y++) {
-            var row = "<tr>";
+            var row = "<tr" + (y!==this.YResolution? " style=\"height: 26px;\">" : ">");
             for(var x = xstart; x < this.XResolution + 1; x++) {
                 if(y === -2){
                     if(x === -2) {
@@ -871,7 +871,7 @@ class Table {
                             // X - - - -
                             // | - - - -
                             // X - - - -
-                            row += "<th rowspan=\""+this.YResolution+"\" style=\"width: 26px;\"><div style=\"text-align: center; width: 26px; transform: rotate(-90deg) translateX(" + (-26 * this.YResolution + 26) + "px);\">" + this.YLabel.replace(/[$]height[$]/g, "" + (26 * this.YResolution)); + "</div></th>";
+                            row += "<th rowspan=\""+this.YResolution+"\" style=\"width: 26px;\"><div style=\"text-align: center; width: 26px; transform: rotate(-90deg) translateX(" + (-28.4 * this.YResolution + 30.4) + "px);\">" + this.YLabel.replace(/[$]height[$]/g, "" + (28.4 * this.YResolution - 7)); + "</div></th>";
                         }
                     } else if(x === -1) {
                         // - - - - -

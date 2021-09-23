@@ -1,4 +1,12 @@
+body {
+    background-color: #222528;
+    color: #fff;
+}
+
 .configContainer {
+    vertical-align:top; 
+    min-width: 650px;
+    border-radius: 6px;
     border-style: solid;
     border-width: 1px;
     border-color: #666666;
@@ -37,49 +45,80 @@
 }
 
 input {
+    background-color: #505962;
+    border-radius: 6px;
+    border: 2px solid #1A1A20;
+    color: #dfdfdf;
     margin: 1px;
+}
+input:hover {
+    background-color: #555;
+    border-color: #3590d0;
 }
 input[type="checkbox"] {
     margin: 5px;
+    border-radius: 6px;
     border-color: #666666;
 }
+input[type="checkbox"]:hover {
+    background-color: #555;
+    border-color: #3590d0;
+}
 input[type="number"] {
+    background-color: #505962;
+    border-radius: 6px;
+    border: 2px solid #1A1A20;
+    color: #dfdfdf;
     width: 80px;
 }
+input.selected {
+    background-color:#3590d0;
+}
+input[type="number"]:hover {
+    background-color: #555;
+    border-color: #3590d0;
+}
 .button {
-    font: bold 11px Arial;
+    font: bold 12px Arial;
     text-decoration: none;
-    background-color: #EEEEEE;
-    color: #333333;
+    background-color: #2f3439;
+    color: #ddd;
     padding: 2px 6px 2px 6px;
-    border-top: 1px solid #CCCCCC;
-    border-right: 1px solid #333333;
-    border-bottom: 1px solid #333333;
-    border-left: 1px solid #CCCCCC;
+    border-radius: 6px;
+    border: 2px solid #1A1A20;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: #555;
+    border-color: #3590d0;
 }
 
 span {
     vertical-align: text-top;
 }
 
-span .namedListOperation {
-    background-color: inherit;
-    border: none;
-    outline: none;
+.namedListOperation {
+    background-color: #2f3439;
+    border-radius: 6px;
+    border: 2px solid #1A1A20;
     cursor: pointer;
     display: inline;
 }
 .namedListOperation:hover {
-    background-color: #ddd;
+    background-color: #555;
+    border-color: #3590d0;
 }
 
 .tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border: 2px solid #666666;
+    background-color: #222629;
+    color: #ddd;
     padding: 0px;
 }
-.tab button {
+.tab div {
     background-color: inherit;
     float: left;
     border: none;
@@ -88,22 +127,25 @@ span .namedListOperation {
     padding: 14px 16px;
     margin: 0px;
 }
-.tab button:hover {
-    background-color: #ddd;
+.tab div:hover {
+    background-color: #323639;
 }
-.tab button.active {
-    background-color: #ccc;
+.tab div.active {
+    background-color: #126ec3;
 }
 
 .tabcontent {
     display: none;
     padding: 6px 12px;
-    border: 1px solid #ccc;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border: 2px solid #666666;
     border-top: none;
 }
 
 .configtable {
     border-color: #666666;
+    background-color: #222528;
     border-spacing: 0px;
     border: 1px;
     display: inline-block;
@@ -125,8 +167,20 @@ span .namedListOperation {
     border-style: solid;
 }
 
-.selected {
-    background-color:rgb(204, 204, 255);
+.gpiooverlayselect {
+    position: absolute; 
+    margin: 0;
+}
+
+select {
+    background-color: #505962;
+    border-radius: 6px;
+    border: 2px solid #1A1A20;
+    color: #dfdfdf;
+}
+select:hover {
+    background-color: #555;
+    border-color: #3590d0;
 }
 
 select .pinconflict{
@@ -138,7 +192,8 @@ select .pinconflict{
 }
 
 .row_expand {
-    height:5px; cursor: ns-resize;
+    height:5px; 
+    cursor: ns-resize;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -148,7 +203,8 @@ select .pinconflict{
 }
 
 .col_expand {
-    width:3px; cursor: ew-resize;
+    width:3px; 
+    cursor: ew-resize;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -158,7 +214,9 @@ select .pinconflict{
 }
 
 .rowcol_expand {
-    height:5px; width:3px; cursor: nwse-resize;
+    height:5px; 
+    width:3px; 
+    cursor: nwse-resize;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
