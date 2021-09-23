@@ -186,7 +186,10 @@ span {
     vertical-align: bottom; 
 }
 .configtable td.xylabel {
-    border-bottom-style: sold; border-bottom-width:5px;
+    border-right-style: sold; 
+    border-right-width:5px; 
+    border-bottom-style: sold; 
+    border-bottom-width:5px;
 }
 .configtable td.yaxis {
     border-right-style: sold; 
