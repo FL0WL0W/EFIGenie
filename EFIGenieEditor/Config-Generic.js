@@ -199,7 +199,7 @@ class ConfigOperation_LookupTable {
     }
 
     UpdateTable() {
-        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select style=\"width: 100%;\" id=\"" + this.GUID + "-parameterselection\">" + GetSelections(this.ParameterSelection) + "</select>";
+        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-parameterselection\">" + GetSelections(this.ParameterSelection) + "</select>";
         this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
         this.Table.Label = GetClassProperty(this, "ValueLabel");
 
@@ -404,8 +404,8 @@ class ConfigOperation_2AxisTable {
     }
 
     UpdateTable() {
-        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select style=\"width: 100%;\" id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
-        this.Table.YLabel = this.NoParamaterSelection? this.YLabel : "<select style=\"width: $height$px;\" id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
+        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
+        this.Table.YLabel = this.NoParamaterSelection? this.YLabel : "<select id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
         this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
         this.Table.Label = GetClassProperty(this, "ValueLabel");
         
@@ -814,7 +814,7 @@ class Table {
         }
 
         for(var y = ystart; y < this.YResolution + 1; y++) {
-            var row = "<tr" + (y!==this.YResolution? " style=\"height: 26px;\">" : ">");
+            var row = "<tr>";
             for(var x = xstart; x < this.XResolution + 1; x++) {
                 if(y === -2){
                     if(x === -2) {
@@ -823,14 +823,14 @@ class Table {
                         // - - - - -
                         // - - - - -
                         // - - - - -
-                        row += "<th colspan=\"2\" rowspan=\"2\" style=\"padding-left: 30px; vertical-align: bottom; border-right-style: sold; border-right-width:5px; border-bottom-style: sold; border-bottom-width:5px;\">" + this.ZLabel + "</th>";
+                        row += "<td colspan=\"2\" rowspan=\"2\" class=\"zlabel\">" + this.ZLabel + "</th>";
                     } else if(x === 0){
                         // - - X---X
                         // - - - - -
                         // - - - - -
                         // - - - - -
                         // - - - - -
-                        row += "<th colspan=\""+this.XResolution+"\">" + this.XLabel + "</th>"
+                        row += "<td colspan=\""+this.XResolution+"\" class=\"xaxislabel\"><div>" + this.XLabel + "</div></th>"
                     } else if (x === this.XResolution) {
                         if(xstart === -2 && this.XResolutionModifiable) 
                             row += "<td class=\"col_expand\" rowspan=\"" + (this.YResolution + 2) + "\"></td>";
@@ -843,9 +843,9 @@ class Table {
                         // - - - - -
                         // - - - - -
                         if(this.YResolution === 1) {
-                            row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.XLabel + "</th>";
+                            row += "<td class=\"xylabel\">" + this.XLabel + "</th>";
                         } else if(this.XResolution === 1) {
-                            row += "<th style=\"border-bottom-style: sold; border-bottom-width:5px;\">" + this.YLabel + "</th>";
+                            row += "<td class=\"xylabel\">" + this.YLabel + "</th>";
                         }
                     } else if(x === -2) {
                     } else if(x < this.XResolution) {
@@ -855,9 +855,9 @@ class Table {
                         // - - - - -
                         // - - - - -
                         if(this.XResolution === 1) {
-                            row += "<th style=\"border-bottom-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
+                            row += "<td class=\"xaxis\">" + this.ZLabel + "</th>";
                         } else {
-                            row += "<td style=\"border-bottom-style: sold; border-bottom-width:5px;\"><input id=\"" + this.GUID + "-" + x + "-axis\" oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((x === 0 && this.MinXModifiable) || (x === this.XResolution - 1 && this.MaxXModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxX - this.MinX) * x / (this.XResolution-1) + this.MinX).toFixed(6)).toPrecision(7))) + "\"/></td>";
+                            row += "<td class=\"xaxis\"><input id=\"" + this.GUID + "-" + x + "-axis\" oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((x === 0 && this.MinXModifiable) || (x === this.XResolution - 1 && this.MaxXModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxX - this.MinX) * x / (this.XResolution-1) + this.MinX).toFixed(6)).toPrecision(7))) + "\"/></td>";
                         }
                     } else {
                         if(xstart === -1 && this.XResolutionModifiable)
@@ -871,7 +871,7 @@ class Table {
                             // X - - - -
                             // | - - - -
                             // X - - - -
-                            row += "<th rowspan=\""+this.YResolution+"\" style=\"width: 26px;\"><div style=\"text-align: center; width: 26px; transform: rotate(-90deg) translateX(" + (-28.4 * this.YResolution + 30.4) + "px);\">" + this.YLabel.replace(/[$]height[$]/g, "" + (28.4 * this.YResolution - 7)); + "</div></th>";
+                            row += "<td rowspan=\""+this.YResolution+"\" class=\"yaxislabel\"><div>" + this.YLabel; + "</div></th>";
                         }
                     } else if(x === -1) {
                         // - - - - -
@@ -880,9 +880,9 @@ class Table {
                         // - X - - -
                         // - X - - -
                         if(this.YResolution === 1) {
-                            row += "<th style=\"border-right-style: sold; border-right-width:5px;\">" + this.ZLabel + "</th>";
+                            row += "<td class=\"yaxis\">" + this.ZLabel + "</th>";
                         } else {
-                            row += "<td style=\"border-right-style: sold; border-right-width:5px;\"><input id=\"" + this.GUID + "-axis-" + y + "\" oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((y === 0 && this.MinYModifiable) || (y === this.YResolution - 1 && this.MaxYModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxY - this.MinY) * y / (this.YResolution-1) + this.MinY).toFixed(6)).toPrecision(7))) + "\"/></td>";
+                            row += "<td class=\"yaxis\"><input id=\"" + this.GUID + "-axis-" + y + "\" oncontextmenu=\"return false;\" data-x=\"" + x + "\" data-y=\"" + y + "\" type=\"number\" " + ((y === 0 && this.MinYModifiable) || (y === this.YResolution - 1 && this.MaxYModifiable)? "" : "disabled") + " value=\"" + (parseFloat(parseFloat(((this.MaxY - this.MinY) * y / (this.YResolution-1) + this.MinY).toFixed(6)).toPrecision(7))) + "\"/></td>";
                         }
                     } else if(x < this.XResolution) {
                         // - - - - -

@@ -71,9 +71,6 @@ input[type="number"] {
     color: #dfdfdf;
     width: 80px;
 }
-input.selected {
-    background-color:#3590d0;
-}
 input[type="number"]:hover {
     background-color: #555;
     border-color: #3590d0;
@@ -143,6 +140,20 @@ span {
     border-top: none;
 }
 
+.configtable input[type="number"] {
+    margin: 0px;
+    border-radius: 0px;
+    border: 0px;
+    font-size: 20px;
+}
+.configtable input.selected {
+    background-color:#3590d0;
+}
+.configtable select {
+    margin: 0px;
+    border-radius: 0px;
+    border: 0px;
+}
 .configtable {
     border-color: #666666;
     background-color: #222528;
@@ -165,6 +176,47 @@ span {
     border: 1px;
     border-color: #666666;
     border-style: solid;
+}
+.configtable td.zlabel {
+    border-right-style: sold; 
+    border-right-width:5px; 
+    border-bottom-style: sold; 
+    border-bottom-width:5px;
+    padding-left: 30px; 
+    vertical-align: bottom; 
+}
+.configtable td.xylabel {
+    border-bottom-style: sold; border-bottom-width:5px;
+}
+.configtable td.yaxis {
+    border-right-style: sold; 
+    border-right-width:5px;
+}
+.configtable td.xaxis {
+    border-bottom-style: sold; 
+    border-bottom-width:5px;
+}
+.configtable td.yaxis input {
+    width: 100%;
+}
+.configtable td.xaxislabel {
+    text-align: center;
+    white-space: nowrap;
+}
+.configtable td.yaxislabel {
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    width: 1.5em;
+}
+.configtable td.yaxislabel div {
+        -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
+        -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
+        -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
+            filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
+        -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
+        margin-left: -10em;
+        margin-right: -10em;
 }
 
 .gpiooverlayselect {
