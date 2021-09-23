@@ -634,6 +634,13 @@ class Table {
         var pointX;
         var pointY;
 
+        $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table .rowcol_expand", function(e){
+            dragY = true;
+            dragX = true;
+            $("#overlay").addClass("rowcol_expand");
+            $("#overlay").show();
+        });
+
         $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table .col_expand", function(e){
             dragX = true;
             $("#overlay").addClass("col_expand");
@@ -667,6 +674,7 @@ class Table {
             dragY = false;
             $("#overlay").removeClass("col_expand");
             $("#overlay").removeClass("row_expand");
+            $("#overlay").removeClass("rowcol_expand");
             $("#overlay").hide();
         });
         
@@ -853,7 +861,7 @@ class Table {
                         }
                     } else {
                         if(xstart === -1 && this.XResolutionModifiable)
-                            row += "<td></td>";
+                            row += "<td class=\"col_expand\" rowspan=\"" + (this.YResolution + 2) + "\"></td>";
                     }
                 } else if(y < this.YResolution) {
                     if(x === -2) {
@@ -894,6 +902,7 @@ class Table {
                 } else {
                     if(this.YResolutionModifiable && x == xstart) {
                         row += "<td class=\"row_expand\" colspan=\"" + (this.XResolution - xstart) + "\"></td>";
+                        row += "<td class=\"rowcol_expand\"></td>";
                     }
                 }
             }
