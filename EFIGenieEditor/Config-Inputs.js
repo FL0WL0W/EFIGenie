@@ -246,6 +246,7 @@ class ConfigInputs {
 
     Inputs = [new ConfigInput()];
     TargetDevice = "STM32F401C";
+    Selected = 0;
 
     GetObj() {
         var obj  = { Inputs: [], TargetDevice: this.TargetDevice };
@@ -314,18 +315,25 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-Selection", function(){
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputs a", function(){
             thisClass.Detach();
 
-            $("#"+ thisClass.GUID + " .inputconfig").hide();
 
-            var selected = parseInt($(this).val());
+            var selected = parseInt($(this).data("index"));
             if(isNaN(selected)) {
                 thisClass.Attach();
                 return;
             }
+            thisClass.Selected = selected;
 
-            $("#"+ thisClass.GUID + "-" + selected).show();
+            $("#"+ thisClass.GUID + " .inputconfig").hide();
+            $("#"+ thisClass.GUID + "-" + thisClass.Selected).show();
+
+            //this doesn't work for some reason
+            // $("#" + this.GUID + "-inputs a").removeClass("active");
+            // $(this).addClass("active");
+            //so nuking it instead
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
 
             thisClass.Attach();
         });
@@ -333,14 +341,13 @@ class ConfigInputs {
         $(document).on("change."+this.GUID, "#" + this.GUID + "-name", function(){
             thisClass.Detach();
 
-            var selected = parseInt($("#" + thisClass.GUID + "-Selection").val());
-            if(isNaN(selected)) {
+            if(isNaN(thisClass.Selected)) {
                 thisClass.Attach();
                 return;
             }
 
-            thisClass.Inputs[selected].Name = $(this).val();
-            $("#"+ thisClass.GUID).html(thisClass.GetHtml());
+            thisClass.Inputs[thisClass.Selected].Name = $(this).val();
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
 
             thisClass.Attach();
         });
@@ -349,6 +356,7 @@ class ConfigInputs {
             thisClass.Detach();
                     
             thisClass.Inputs.push(new ConfigInput());
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
 
             thisClass.Attach();
@@ -357,13 +365,13 @@ class ConfigInputs {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Delete", function(){
             thisClass.Detach();
                     
-            var selected = parseInt($("#" + thisClass.GUID + "-Selection").val());
-            if(isNaN(selected)) {
+            if(isNaN(thisClass.Selected)) {
                 thisClass.Attach();
                 return;
             }
             
-            thisClass.Inputs.splice(selected, 1);
+            thisClass.Inputs.splice(thisClass.Selected, 1);
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
 
             thisClass.Attach();
@@ -372,16 +380,16 @@ class ConfigInputs {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Up", function(){
             thisClass.Detach();
                     
-            var selected = parseInt($("#" + thisClass.GUID + "-Selection").val());
-            if(isNaN(selected) || selected === 0) {
+            if(isNaN(thisClass.Selected) || thisClass.Selected === 0) {
                 thisClass.Attach();
                 return;
             }
             
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected - 1];
-            thisClass.Inputs[selected - 1] = temp;
-            $("#" + thisClass.GUID + "-Selection").val(selected - 1);
+            var temp = thisClass.Inputs[thisClass.Selected];
+            thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected - 1];
+            thisClass.Inputs[thisClass.Selected - 1] = temp;
+            thisClass.Selected -= 1;
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
 
             thisClass.Attach();
@@ -390,16 +398,16 @@ class ConfigInputs {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Down", function(){
             thisClass.Detach();
                     
-            var selected = parseInt($("#" + thisClass.GUID + "-Selection").val());
-            if(isNaN(selected) || selected === thisClass.Inputs.length-1) {
+            if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1) {
                 thisClass.Attach();
                 return;
             }
             
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected + 1];
-            thisClass.Inputs[selected + 1] = temp;
-            $("#" + thisClass.GUID + "-Selection").val(selected + 1);
+            var temp = thisClass.Inputs[thisClass.Selected];
+            thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected + 1];
+            thisClass.Inputs[thisClass.Selected + 1] = temp;
+            thisClass.Selected += 1;
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
 
             thisClass.Attach();
@@ -408,41 +416,52 @@ class ConfigInputs {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Duplicate", function(){
             thisClass.Detach();
                     
-            var selected = parseInt($("#" + thisClass.GUID + "-Selection").val());
-            if(isNaN(selected)) {
+            if(isNaN(thisClass.Selected)) {
                 thisClass.Attach();
                 return;
             }
             
             thisClass.Inputs.push(new ConfigInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[selected].GetObj());
-            $("#" + thisClass.GUID + "-Selection").append("<option value=\"" + (thisClass.Inputs.length-1) + "\"></option>")
-            $("#" + thisClass.GUID + "-Selection").val(thisClass.Inputs.length-1);
+            thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[thisClass.Selected].GetObj());
+            thisClass.Selected = thisClass.Inputs.length-1;
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
 
             thisClass.Attach();
         });
     }
 
+    GetInputsHtml() {
+        if(isNaN(this.Selected))
+            this.Selected = 0;
+
+        var inputlist = "";
+        for(var i = 0; i < this.Inputs.length; i++){
+            inputlist += "<a href=\"#\" data-index=\"" + i + "\" class=\"w3-bar-subitem w3-button" + (this.Selected === i? " active" : "") + "\">" + this.Inputs[i].Name + "</a>";
+        }
+        return "<div id=\"" + this.GUID + "-inputs\">" + inputlist + "</div>";
+    }
+
+    GetControlsHtml() {
+        return  "<span id=\"" + this.GUID + "-Add\" style=\"padding: 3px 7px;\">+</span>" +
+                "<span id=\"" + this.GUID + "-Delete\" style=\"padding: 3px 8px;\">-</span>" +
+                "<span id=\"" + this.GUID + "-Up\" style=\"padding: 3px 4px;\">↑</span>" +
+                "<span id=\"" + this.GUID + "-Down\" style=\"padding: 3px 4px;\">↓</span>" +
+                "<span id=\"" + this.GUID + "-Duplicate\" style=\"padding: 3px 7px;\">+</span>";
+    }
+
     GetHtml() {
         var template = GetClassProperty(this, "Template");
-        
-        var selected = parseInt($("#" + this.GUID + "-Selection").val());
-        if(isNaN(selected))
-            selected = 0;
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         
-        var inputlist = "";
-        for(var i = 0; i < this.Inputs.length; i++){
-            inputlist += "<option value=\"" + i + "\" " + (selected === i? "selected" : "") + ">" + this.Inputs[i].Name + "</option>";
-        }
-        template = template.replace(/[$]inputlist[$]/g, inputlist);
+        if(isNaN(this.Selected))
+            this.Selected = 0;
 
         var configs = "";
         for(var i = 0; i < this.Inputs.length; i++)
         {
-            configs += "<div id=\""+this.GUID+"-"+i+"\" class=\"inputconfig\" " + (i===selected? "" : "style=\"display: none;\"") + "><div  class=\"configContainer\" style=\"border-style: none;\">" +
+            configs += "<div id=\""+this.GUID+"-"+i+"\" class=\"inputconfig\" " + (i===this.Selected? "" : "style=\"display: none;\"") + "><div  class=\"configContainer\" style=\"border-style: none;\">" +
             "    <label for=\""+this.GUID+"-name\">Name:</label>" +
             "    <input id=\""+this.GUID+"-name\" type=\"text\" value=\"" + this.Inputs[i].Name + "\"/>" +
             "</div>" +

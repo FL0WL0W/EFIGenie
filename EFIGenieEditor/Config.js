@@ -286,64 +286,81 @@ class ConfigTop {
         this.Fuel.Attach();
         this.Ignition.Attach();
 
+        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-openclose", function(){
+            var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
+            var containerSelector = $("#" + thisClass.GUID + "-container");
+            var width = sidebarSelector.width();
+            var moveamount = 0.005 * width / 0.1;
+            var left = containerSelector.position().left;
+            if(!sidebarSelector.is(":visible")) {
+                sidebarSelector.show();
+                sidebarSelector.css("left", (left-width) + "px");
+                var intervalId = setInterval(function() {
+                    if (left >= width) {
+                        clearInterval(intervalId);
+                    } else {
+                        left += moveamount;
+                        containerSelector.css("left", left + "px");
+                        containerSelector.css("margin-right", left + "px");
+                        sidebarSelector.css("left", (left-width) + "px");
+                        sidebarSelector.css('opacity', left / width);
+                    }
+                }, 5);
+            } else {
+                sidebarSelector.css("left", (left-width) + "px");
+                var intervalId = setInterval(function() {
+                    if (left <= 0) {
+                        clearInterval(intervalId);
+                        sidebarSelector.hide();
+                    } else {
+                        left -= moveamount;
+                        containerSelector.css("left", left + "px");
+                        containerSelector.css("margin-right", left + "px");
+                        sidebarSelector.css("left", (left-width) + "px");
+                        sidebarSelector.css('opacity', left / width);
+                    }
+                }, 5);
+            }
+        });
+
         $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab", function(){
-            thisClass.Detach();
-
+            $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-inputs").show();
+            $("#" + thisClass.GUID + "-inputstablist").show();
+            $("#" + thisClass.GUID + "-inputstab .w3-right").show();
+            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-inputstab").addClass("active");
-            $("#" + thisClass.GUID + "-engine").hide();
-            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
-            $("#" + thisClass.GUID + "-fuel").hide();
-            $("#" + thisClass.GUID + "-fueltab").removeClass("active");
-            $("#" + thisClass.GUID + "-ignition").hide();
-            $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
-
-            thisClass.Attach();
+            $("#" + thisClass.GUID + "-title").html("Inputs");
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-enginetab", function(){
-            thisClass.Detach();
-
-            $("#" + thisClass.GUID + "-inputs").hide();
-            $("#" + thisClass.GUID + "-inputstab").removeClass("active");
+            $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-engine").show();
+            $("#" + thisClass.GUID + "-inputstablist").hide();
+            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
+            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-enginetab").addClass("active");
-            $("#" + thisClass.GUID + "-fuel").hide();
-            $("#" + thisClass.GUID + "-fueltab").removeClass("active");
-            $("#" + thisClass.GUID + "-ignition").hide();
-            $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
-
-            thisClass.Attach();
+            $("#" + thisClass.GUID + "-title").html("Engine");
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-fueltab", function(){
-            thisClass.Detach();
-            
-            $("#" + thisClass.GUID + "-inputs").hide();
-            $("#" + thisClass.GUID + "-inputstab").removeClass("active");
-            $("#" + thisClass.GUID + "-engine").hide();
-            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
+            $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-fuel").show();
+            $("#" + thisClass.GUID + "-inputstablist").hide();
+            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
+            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-fueltab").addClass("active");
-            $("#" + thisClass.GUID + "-ignition").hide();
-            $("#" + thisClass.GUID + "-ignitiontab").removeClass("active");
-
-            thisClass.Attach();
+            $("#" + thisClass.GUID + "-title").html("Fuel");
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-ignitiontab", function(){
-            thisClass.Detach();
-            
-            $("#" + thisClass.GUID + "-inputs").hide();
-            $("#" + thisClass.GUID + "-inputstab").removeClass("active");
-            $("#" + thisClass.GUID + "-engine").hide();
-            $("#" + thisClass.GUID + "-enginetab").removeClass("active");
-            $("#" + thisClass.GUID + "-fuel").hide();
-            $("#" + thisClass.GUID + "-fueltab").removeClass("active");
+            $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-ignition").show();
+            $("#" + thisClass.GUID + "-inputstablist").hide();
+            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
+            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-ignitiontab").addClass("active");
-
-            thisClass.Attach();
+            $("#" + thisClass.GUID + "-title").html("Ignition");
         });
     }
 
@@ -353,20 +370,18 @@ class ConfigTop {
         template = template.replace(/[$]id[$]/g, this.GUID);
 
         template = template.replace(/[$]inputs[$]/g, this.Inputs.GetHtml());
+        template = template.replace(/[$]inputstablist[$]/g, this.Inputs.GetInputsHtml());
+        template = template.replace(/[$]inputstabcontrols[$]/g, this.Inputs.GetControlsHtml());
         template = template.replace(/[$]inputsstyle[$]/g, "");
-        template = template.replace(/[$]inputstabclassses[$]/g, " active");
         
         template = template.replace(/[$]fuel[$]/g, this.Fuel.GetHtml());
         template = template.replace(/[$]fuelstyle[$]/g, " style=\"display: none;\"");
-        template = template.replace(/[$]fueltabclassses[$]/g, "");
         
         template = template.replace(/[$]engine[$]/g, this.Engine.GetHtml());
         template = template.replace(/[$]enginestyle[$]/g, " style=\"display: none;\"");
-        template = template.replace(/[$]enginetabclassses[$]/g, "");
         
         template = template.replace(/[$]ignition[$]/g, this.Ignition.GetHtml());
         template = template.replace(/[$]ignitionstyle[$]/g, " style=\"display: none;\"");
-        template = template.replace(/[$]ignitiontabclassses[$]/g, "");
 
         return template;
     }

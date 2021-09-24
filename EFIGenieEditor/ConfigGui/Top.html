@@ -1,13 +1,27 @@
 <div id="$id$">
-    <div id="$id$">
-    <div class="tab">
-        <div id="$id$-inputstab" class="tabLink$inputstabclassses$">Inputs</div>
-        <div id="$id$-enginetab" class="tabLink$enginetabclassses$">Engine</div>
-        <div id="$id$-fueltab" class="tabLink$fueltabclassses$">Fuel</div>
-        <div id="$id$-ignitiontab" class="tabLink$ignitiontabclassses$">Ignition</div>
+    <div id="$id$-sidebar" class="w3-sidebar" style="display: none;">
+        <div class="w3-bar">
+            <span class="w3-bar-item w3-padding-16">EFIGenie</span>
+        </div>
+        <div class="w3-bar-block">
+            <a href="#" id="$id$-inputstab" class="w3-bar-item w3-button active">Inputs <div class="w3-right">$inputstabcontrols$</div></a>
+            <div class="w3-bar-block" id="$id$-inputstablist">
+                $inputstablist$
+            </div>
+            <a href="#" id="$id$-enginetab" class="w3-bar-item w3-button">Engine</a>
+            <a href="#" id="$id$-fueltab" class="w3-bar-item w3-button">Fuel</a>
+            <a href="#" id="$id$-ignitiontab" class="w3-bar-item w3-button">Ignition</a>
+        </div>
     </div>
-    <div id="$id$-inputs" class="tabcontent"$inputsstyle$>$inputs$</div>
-    <div id="$id$-engine" class="tabcontent"$enginestyle$>$engine$</div>
-    <div id="$id$-fuel" class="tabcontent"$fuelstyle$>$fuel$</div>
-    <div id="$id$-ignition" class="tabcontent"$ignitionstyle$>$ignition$</div>
+    <div id="$id$-container" class="w3-container w3-display-container">
+        <span>
+            <button id="$id$-sidebar-openclose" class="w3-button w3-padding-16" title="Toggle Sidebar">☰</button> 
+            <span id="$id$-title">Inputs</span>
+        </span>
+        <hr style="margin: 0px 0px 5px 0px;">
+        <div id="$id$-inputs" class="$id$-content" $inputsstyle$>$inputs$</div>
+        <div id="$id$-engine" class="$id$-content" $enginestyle$>$engine$</div>
+        <div id="$id$-fuel" class="$id$-content" $fuelstyle$>$fuel$</div>
+        <div id="$id$-ignition" class="$id$-content" $ignitionstyle$>$ignition$</div>
+    </div>
 </div>

@@ -61,14 +61,14 @@
     </head>
     <body>
         <div id="overlay"></div>
-        <div>
-            <input id="btnSave" type="button" class="button" value="Save">
-            <label for="btnLoad" class="button">Open</label>
-            <input id="btnLoad" type="file" style="display: none;">
-            <input id="btnSaveBin" type="button" class="button" value="Save Bin">
+        <div style="position:absolute; right:0; z-index: 1;">
             <select id="selectTarget">
             </select>
+            <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
+            <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
+            <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
+            <input id="btnLoad" type="file" style="display: none;">
         </div>
-        <div id="workspace" class="configContainer"></div>
+        <div id="workspace"></div>
     </body>
 </html>
