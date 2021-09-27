@@ -63,13 +63,13 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-bar{width:100%;overflow:hidden}.w3-center .w3-bar{display:inline-block;width:auto}
 .w3-bar .w3-bar-item{padding:8px 16px;float:left;width:auto;border:none;display:block;outline:0}
 .w3-bar .w3-bar-item.active{background-color: #126ec3; color: #fff;}
-.w3-bar .w3-bar-subitem{padding:8px 16px 8px 32px;float:left;width:auto;border:none;display:block;outline:0}
+.w3-bar .w3-bar-subitem{padding:8px 16px;float:left;width:auto;border:none;display:block;outline:0}
 .w3-bar .w3-bar-subitem.active{background-color: #323639; color: #fff;}
 .w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
 .w3-bar .w3-button{white-space:normal}
 .w3-bar-block .w3-bar-item{width:100%;display:block;padding:8px 16px;text-align:left;border:none;white-space:normal;float:none;outline:0}
 .w3-bar-block .w3-bar-item.active{background-color: #126ec3; color: #fff;}
-.w3-bar-block .w3-bar-subitem{width:100%;display:block;padding:8px 16px 8px 32px;text-align:left;border:none;white-space:normal;float:none;outline:0}
+.w3-bar-block .w3-bar-subitem{width:100%;display:block;padding:8px 16px;text-align:left;border:none;white-space:normal;float:none;outline:0}
 .w3-bar-block .w3-bar-subitem.active{background-color: #323639; color: #fff;}
 .w3-bar-block.w3-center .w3-bar-item{text-align:center}.w3-block{display:block;width:100%}
 .w3-bar-block.w3-center .w3-bar-subitem{text-align:center}.w3-block{display:block;width:100%}
@@ -477,4 +477,8 @@ select .pinconflict{
     bottom: 0;
     background-color: rgba(0,0,0,0); /* Black background with opacity */
     z-index: 200; /* Specify a stack order in case you're using a different order for other elements */
+  }
+
+  .monospace {
+    font-family: 'Courier New', monospace;
   }

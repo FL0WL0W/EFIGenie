@@ -327,10 +327,10 @@ class ConfigTop {
             if($(e.target).hasClass("expand")) {
                 console.log("expand");
                 if( $("#" + thisClass.GUID + "-inputstablist").is(":visible")) {
-                    $(e.target).html("►");
+                    $(e.target).html("►&nbsp;");
                     $("#" + thisClass.GUID + "-inputstablist").hide();
                 } else {
-                    $(e.target).html("▼");
+                    $(e.target).html("▼&nbsp;");
                     $("#" + thisClass.GUID + "-inputstablist").show();
                 }
             } else {
