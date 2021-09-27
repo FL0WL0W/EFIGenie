@@ -323,20 +323,29 @@ class ConfigTop {
             }
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab", function(){
-            $("." + thisClass.GUID + "-content").hide();
-            $("#" + thisClass.GUID + "-inputs").show();
-            $("#" + thisClass.GUID + "-inputstablist").show();
-            $("#" + thisClass.GUID + "-inputstab .w3-right").show();
-            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
-            $("#" + thisClass.GUID + "-inputstab").addClass("active");
-            $("#" + thisClass.GUID + "-title").html("Inputs");
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab, #" + this.GUID + "-inputstablist", function(e){
+            if($(e.target).hasClass("expand")) {
+                console.log("expand");
+                if( $("#" + thisClass.GUID + "-inputstablist").is(":visible")) {
+                    $(e.target).html("►");
+                    $("#" + thisClass.GUID + "-inputstablist").hide();
+                } else {
+                    $(e.target).html("▼");
+                    $("#" + thisClass.GUID + "-inputstablist").show();
+                }
+            } else {
+                $("." + thisClass.GUID + "-content").hide();
+                $("#" + thisClass.GUID + "-inputs").show();
+                $("#" + thisClass.GUID + "-inputstab .w3-right").show();
+                $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
+                $("#" + thisClass.GUID + "-inputstab").addClass("active");
+                $("#" + thisClass.GUID + "-title").html("Inputs");
+            }
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-enginetab", function(){
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-engine").show();
-            $("#" + thisClass.GUID + "-inputstablist").hide();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
             $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-enginetab").addClass("active");
@@ -346,7 +355,6 @@ class ConfigTop {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-fueltab", function(){
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-fuel").show();
-            $("#" + thisClass.GUID + "-inputstablist").hide();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
             $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-fueltab").addClass("active");
@@ -356,7 +364,6 @@ class ConfigTop {
         $(document).on("click."+this.GUID, "#" + this.GUID + "-ignitiontab", function(){
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-ignition").show();
-            $("#" + thisClass.GUID + "-inputstablist").hide();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
             $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-ignitiontab").addClass("active");
