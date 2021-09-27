@@ -925,12 +925,12 @@ function GetSelections(selection, measurement, configs) {
     if(configs) {
         for(var i = 0; i < configs.length; i++) {
             var selected = false;
-            if(selection && !selection.reference && selection.value instanceof configs[i]){
+            if(selection && !selection.reference && selection.value === configs[i].Name){
                 selected = true;
                 configSelected = true;
             }
 
-            selections += "<option value=\"" + i + "\"" + (selected? " selected" : "") + ">" + configs[i].Name + "</option>"
+            selections += "<option value=\"" + configs[i].Name + "\"" + (selected? " selected" : "") + ">" + configs[i].Name + "</option>"
         }
         if(selections) 
             selections = "<optgroup label=\"Calculations\">" + selections + "</optgroup>";
@@ -977,19 +977,51 @@ class ConfigOrVariableSelection {
         this.ValueLabel = valueLabel;
         this.ValueMeasurement = valueMeasurement;
         this.VariableListName = variableListName;
+
+        if(this.Configs)
+        {
+            this.ConfigValues = [];
+            for(var i = 0; i < this.Configs.length; i++)
+            {
+                this.ConfigValues[i] = new this.Configs[i]();
+                this.ConfigValues[i].ValueLabel = this.ValueLabel;
+                this.ConfigValues[i].ValueMeasurement = this.ValueMeasurement;
+                if(this.ValueMeasurement === "Bool")
+                    this.ConfigValues[i].Type = "checkbox";
+                else
+                    this.ConfigValues[i].Type = "number";
+            }
+        }
     }
 
     Configs = undefined;
+    ConfigValues = undefined;
     ValueLabel = undefined;
     ValueMeasurement = undefined;
     VariableListName = undefined;
     Selection = undefined;
 
+    GetSubConfig() {
+        for(var i = 0; i < this.Configs.length; i++) {
+            if(GetClassProperty(this.ConfigValues[i], "Name") === this.Selection.value) {
+                return this.ConfigValues[i];
+            }
+        }
+    }
+
     GetObj() {
-        var gs = function(s) { return s? { reference: s.reference, value: s.reference? s.value : s.value.GetObj(), measurement: s.measurement } : undefined; };
-        return { 
-            Selection: gs(this.Selection),
+        var obj = { 
+            Selection: this.Selection
         };
+
+        if(this.ConfigValues) { 
+            obj.Values = [];
+            for(var i = 0; i < this.ConfigValues.length; i++){
+                obj.Values.push(this.ConfigValues[i].GetObj());
+            }
+        }
+
+        return obj;
     }
 
     SetObj(obj) {
@@ -997,22 +1029,15 @@ class ConfigOrVariableSelection {
 
         if(obj)
             this.Selection = obj.Selection;
+
             
-        if(this.Selection && !this.Selection.reference)
-        {
-            for(var i = 0; i < this.Configs.length; i++)
-            {
-                if(this.Configs[i].Name === this.Selection.value.Name) {
-                    var c = this.Selection.value;
-                    this.Selection.value = new this.Configs[i]();
-                    this.Selection.value.ValueLabel = this.ValueLabel;
-                    this.Selection.value.ValueMeasurement = this.ValueMeasurement;
-                    this.Selection.value.SetObj(c);
-                    if(this.ValueMeasurement === "Bool")
-                        this.Selection.value.Type = "checkbox";
-                    else
-                        this.Selection.value.Type = "number";
-                    break;
+        if(this.Selection && !this.Selection.reference) {
+            for(var i = 0; i < obj.Values.length; i++) {
+                for(var t = 0; t < this.ConfigValues.length; t++) {
+                    if(GetClassProperty(this.ConfigValues[t], "Name") === obj.Values[i].Name) {
+                        this.ConfigValues[t].SetObj(obj.Values[i]);
+                        break;
+                    }
                 }
             }
         }
@@ -1024,7 +1049,7 @@ class ConfigOrVariableSelection {
     Detach() {
         $(document).off("change."+this.GUID);            
         if(this.Selection && !this.Selection.reference) 
-            this.Selection.value.Detach();
+            this.GetSubConfig().Detach();
     }
     
     Attach() {
@@ -1034,19 +1059,11 @@ class ConfigOrVariableSelection {
             thisClass.Detach();
 
             var val = $(this).val();
-            if($('option:selected', this).attr('reference') === undefined)
-            {
+            if($('option:selected', this).attr('reference') === undefined) {
                 if(val === "-1")
                     thisClass.Selection = undefined;
-                else {
-                    thisClass.Selection = {value: new thisClass.Configs[val]()}
-                    thisClass.Selection.value.ValueLabel = thisClass.ValueLabel;
-                    thisClass.Selection.value.ValueMeasurement = thisClass.ValueMeasurement;
-                    if(thisClass.ValueMeasurement === "Bool")
-                        thisClass.Selection.value.Type = "checkbox";
-                    else
-                        thisClass.Selection.value.Type = "number";
-                }
+                else 
+                    thisClass.Selection = { value: val };
             } else {
                 thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
             }
@@ -1056,7 +1073,7 @@ class ConfigOrVariableSelection {
         });
 
         if(this.Selection && !this.Selection.reference) 
-            this.Selection.value.Attach();
+            this.GetSubConfig().Attach();
     }
 
     GetHtml() {
@@ -1067,7 +1084,7 @@ class ConfigOrVariableSelection {
         $("#" + this.GUID + "-selection").html(GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
         template = template.replace(/[$]selections[$]/g, GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
         if(this.Selection && !this.Selection.reference) {
-            template = template.replace(/[$]config[$]/g, this.Selection.value.GetHtml());
+            template = template.replace(/[$]config[$]/g, this.GetSubConfig().GetHtml());
         } else {
             template = template.replace(/[$]config[$]/g, "");
         }
@@ -1103,22 +1120,25 @@ class ConfigOrVariableSelection {
             if(Increments[this.VariableListName] === undefined)
                 Increments[this.VariableListName] = [];
 
-            if(!this.Selection.reference && GetClassProperty(this.Selection.value, "Output")) {
-                this.Id = 1;
-                if(Increments.VariableIncrement === undefined)
-                    Increments.VariableIncrement = 1;
-                else
-                    this.Id = ++Increments.VariableIncrement;
+            if(!this.Selection.reference) {
+                var subConfig = this.GetSubConfig();
+                if(GetClassProperty(subConfig, "Output")) {
+                    this.Id = 1;
+                    if(Increments.VariableIncrement === undefined)
+                        Increments.VariableIncrement = 1;
+                    else
+                        this.Id = ++Increments.VariableIncrement;
 
-                if(this.Selection.value.SetIncrements)
-                    this.Selection.value.SetIncrements();
-                    
-                Increments[this.VariableListName].push({ 
-                    Name: this.ValueLabel, 
-                    Id: this.Id,
-                    Type: GetClassProperty(thisClass.Selection.value, "Output"),
-                    Measurement: this.ValueMeasurement
-                });
+                    if(subConfig.SetIncrements)
+                        subConfig.SetIncrements();
+                        
+                    Increments[this.VariableListName].push({ 
+                        Name: this.ValueLabel, 
+                        Id: this.Id,
+                        Type: GetClassProperty(subConfig, "Output"),
+                        Measurement: this.ValueMeasurement
+                    });
+                }
             } else {
                 var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
                 if(cell) {
@@ -1156,7 +1176,7 @@ class ConfigOrVariableSelection {
     GetObjOperation() {
         //if immediate operation
         if(this.IsImmediateOperation()) {
-            return { value: [{ obj: this.Selection.value.GetObjOperation() }]};
+            return { value: [{ obj: this.GetSubConfig().GetObjOperation() }]};
         }
 
         return { value: []};
@@ -1165,7 +1185,7 @@ class ConfigOrVariableSelection {
     GetObjParameters() {
         //if immediate operation
         if(this.IsImmediateOperation()) {
-            return { value: [{ obj: this.Selection.value.GetObjParameters() }]};
+            return { value: [{ obj: this.GetSubConfig().GetObjParameters() }]};
         }
 
         return { value: []};
@@ -1174,21 +1194,22 @@ class ConfigOrVariableSelection {
     GetObjPackage(subOperation){
         //if immediate operation
         if(this.IsImmediateOperation()) {      
-            if(Increments.VariableIncrement === undefined && GetClassProperty(this.Selection.value, "Output"))
+            var subConfig = this.GetSubConfig();
+            if(Increments.VariableIncrement === undefined && GetClassProperty(subConfig, "Output"))
                 throw "Set Increments First";
-            if(this.Id === -1 && GetClassProperty(this.Selection.value, "Output"))
+            if(this.Id === -1 && GetClassProperty(subConfig, "Output"))
                 throw "Set Increments First";
 
 
             var obj  = {value: [
-                    { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(this.Selection.value, "Output") }}, //immediate and store variable, return if subOperation
-                    { obj: this.Selection.value.GetObjOperation() }
+                    { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(subConfig, "Output") }}, //immediate and store variable, return if subOperation
+                    { obj: subConfig.GetObjOperation() }
                 ]};
             
-            if(GetClassProperty(this.Selection.value, "Output"))
+            if(GetClassProperty(subConfig, "Output"))
                 obj.value.push({ type: "UINT32", value: this.Id });
 
-            obj.value.push({ obj: this.Selection.value.GetObjParameters() });
+            obj.value.push({ obj: subConfig.GetObjParameters() });
 
             return obj;
         }  

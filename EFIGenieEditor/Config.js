@@ -860,7 +860,7 @@ class ConfigEngine {
         var requirements = [];
 
         if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
-            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
+            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), "Requirements");
         }
         
         template = template.replace(/[$]crankposition[$]/g, 
@@ -922,7 +922,7 @@ class ConfigEngine {
         var requirements = [];
 
         if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
-            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
+            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), "Requirements");
         }
 
         if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1) {
@@ -952,7 +952,7 @@ class ConfigEngine {
         var catRequired = false;
         var veRequired  = false;
         if(this.CylinderAirmassConfigOrVariableSelection.Selection && !this.CylinderAirmassConfigOrVariableSelection.Selection.reference) {
-            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.Selection.value, "Requirements");
+            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), "Requirements");
             mapRequired = requirements && requirements.indexOf("Manifold Absolute Pressure") > -1;
             catRequired = requirements && requirements.indexOf("Cylinder Air Temperature") > -1
             veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
@@ -1395,9 +1395,6 @@ class ConfigTDCOutput extends ConfigOrVariableSelection {
             
             thisClass.Attach();
         });
-
-        if(this.Selection && !this.Selection.reference) 
-            this.Selection.value.Attach();
 
         super.Attach();
     }
