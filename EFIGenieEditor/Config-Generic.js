@@ -562,6 +562,9 @@ class Table {
         $(document).off("copy."+this.GUID);
         $(document).off("paste."+this.GUID);
         $(document).off("contextmenu."+this.GUID);
+        $(document).off("touchstart."+this.GUID);
+        $(document).off("touchend."+this.GUID);
+        $(document).off("touchmove."+this.GUID);
     }
 
     Attach() {
@@ -658,12 +661,10 @@ class Table {
             $("#overlay").show();
         });
 
-        $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table input", function(e){
-            if(e.which !== 1)
-                return;
-                
+        function down() {
             $(this).focus();
             $("#" + thisClass.GUID + "-table input").removeClass("selected");
+            $("#" + thisClass.GUID + "-table input").removeClass("origselect");
 
             if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
                 return;
@@ -671,12 +672,14 @@ class Table {
             pointX =  $(this).offset().left - $(this).closest("table").offset().left;
             pointY =  $(this).offset().top - $(this).closest("table").offset().top;
 
+            console.log("X:" + pointX + " Y:" + pointY)
+
             $(this).addClass("selected");
+            $(this).addClass("origselect");
             selecting = true;
-        });
-        
-        $(document).on("mouseup."+this.GUID, function(e){
-            $("#" + thisClass.GUID + "-table input:focus").select();
+        }
+
+        function up() {
             selecting = false;
             dragX = false;
             dragY = false;
@@ -684,13 +687,14 @@ class Table {
             $("#overlay").removeClass("row_expand");
             $("#overlay").removeClass("rowcol_expand");
             $("#overlay").hide();
-        });
-        
-        $(document).on("mousemove."+this.GUID, function(e){
+        }
+
+        var selectOnMove = false;
+        function move(pageX, pageY) {
             var tableElement = $("#" + thisClass.GUID + "-table");
             if(dragX) {
                 var cellElement = $("#" + thisClass.GUID + "-" + (thisClass.XResolution - 1) + "-axis");
-                var relX = e.pageX - tableElement.offset().left;
+                var relX = pageX - tableElement.offset().left;
                 var elX = cellElement.offset().left - tableElement.offset().left;
                 var comp = relX - elX;
                 if(comp > (cellElement.width() * 3/2)){
@@ -704,7 +708,7 @@ class Table {
             }
             if(dragY) {
                 var cellElement = $("#" + thisClass.GUID + "-axis-" + (thisClass.YResolution - 1));
-                var relY = e.pageY - tableElement.offset().top;
+                var relY = pageY - tableElement.offset().top;
                 var elY = cellElement.offset().top - tableElement.offset().top;
                 var comp = relY - elY;
                 if(comp > (cellElement.height() * 3/2)){
@@ -716,24 +720,88 @@ class Table {
                     thisClass.UpdateTable();
                 }
             }
-            if(selecting){
+            if(selecting || selectOnMove){
                 $.each($("#" + thisClass.GUID + "-table input"), function(index, cell) {
                     var cellElement = $(cell);
                     if(cellElement.data("x") === undefined || parseInt(cellElement.data("x")) < 0 || cellElement.data("y") === undefined || parseInt(cellElement.data("y")) < 0)
                         return;
         
-                    var relX = e.pageX - tableElement.offset().left;
+                    var relX = pageX - tableElement.offset().left;
                     var elX = cellElement.offset().left - tableElement.offset().left;
-                    var relY = e.pageY - tableElement.offset().top;
+                    var relY = pageY - tableElement.offset().top;
                     var elY = cellElement.offset().top - tableElement.offset().top;
                     if(((elX <= relX && elX >= pointX) || (elX >= (relX - cellElement.width()) && elX <= pointX) || (pointX == cellElement.offset().left - tableElement.offset().left)) &&
                         ((elY <= relY && elY >= pointY) || (elY >= (relY - cellElement.height()) && elY <= pointY) || (pointY == cellElement.offset().top - tableElement.offset().top))) {
-                        cellElement.addClass("selected");
-                    } else {
+                        if(selecting)
+                            cellElement.addClass("selected");
+                        else if (selectOnMove && !cellElement.hasClass("origselect")) {
+                            selectOnMove = false;
+                            selecting = true;
+                        }
+                    } else if(selecting) {
                         cellElement.removeClass("selected");
                     }
                 });
             }
+        }
+
+        //lame stuff we have to do so the touchend call to contextmenu doesn't invalidate the select
+        var touchEnd = false;
+        var touchEndHandle;
+        function touchEndHandler() { touchEnd=false; }
+        function resetTouchEnd() { clearTimeout(touchEndHandle); touchEnd = true; touchEndHandle = setTimeout(touchEndHandler, 100); }
+
+        //lame stuff we have to do to fix context menu when using mouse
+        var leftClick = false;
+        var leftClickHandle;
+        function leftClickHandler() { leftClick=false; }
+        function resetLeftClick() { clearTimeout(leftClickHandle); leftClick = true; leftClickHandle = setTimeout(leftClickHandler, 100); }
+
+        $(document).on("contextmenu."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            if(!leftClick) {
+                if(!touchEnd) {
+                    if(!$(this).hasClass("origselect"))
+                        down.call(this);
+                    else
+                        selectOnMove = true;
+                }
+            } else if (!$(this).hasClass("selected")) {
+                $(this).select();
+                down.call(this);
+                selecting = false;
+            } else if (!$(this).hasClass("origselect")) {
+                e.preventDefault();
+            }
+        });
+        $(document).on("touchend."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            selectOnMove = false;
+            if($(this).hasClass("origselect"))
+                e.preventDefault();
+        });
+        $(document).on("mousedown."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            if(e.which === 3)
+                resetLeftClick();
+            if(e.which !== 1)
+                return;
+            
+            down.call(this);
+        });
+        
+        $(document).on("touchend."+this.GUID, function(e){
+            up.call(this);
+            resetTouchEnd();
+        });
+        $(document).on("mouseup."+this.GUID, function(e){
+            $("#" + thisClass.GUID + "-table input.origselect").select();
+            up.call(this);
+        });
+        
+        $(document).on("touchmove."+this.GUID, function(e){
+            var touch = e.touches[e.touches.length - 1];
+            move(touch.pageX, touch.pageY);
+        });
+        $(document).on("mousemove."+this.GUID, function(e){
+            move(e.pageX, e.pageY);
         });
 
         function getCopyData() {
