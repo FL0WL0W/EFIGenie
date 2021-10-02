@@ -265,6 +265,7 @@ class ConfigTop {
 
     Detach() {
         ResetIncrements();//this is top level object so reset increments. this is not elegant
+        DetachPasteOptions();
         this.Inputs.Detach();
         this.Engine.Detach();
         this.Fuel.Detach();
@@ -274,6 +275,8 @@ class ConfigTop {
     }
 
     Attach() {
+        this.Detach();
+        AttachPasteOptions();
         var thisClass = this;
         this.SetIncrements();//this is top level object so set increments. this is not elegant
         if(Increments.PostEvent){
@@ -337,7 +340,7 @@ class ConfigTop {
                 $("." + thisClass.GUID + "-content").hide();
                 $("#" + thisClass.GUID + "-inputs").show();
                 $("#" + thisClass.GUID + "-inputstab .w3-right").show();
-                $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
+                $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
                 $("#" + thisClass.GUID + "-inputstab").addClass("active");
                 $("#" + thisClass.GUID + "-title").html("Inputs");
             }
@@ -347,7 +350,7 @@ class ConfigTop {
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-engine").show();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
+            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-enginetab").addClass("active");
             $("#" + thisClass.GUID + "-title").html("Engine");
         });
@@ -356,7 +359,7 @@ class ConfigTop {
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-fuel").show();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
+            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-fueltab").addClass("active");
             $("#" + thisClass.GUID + "-title").html("Fuel");
         });
@@ -365,7 +368,7 @@ class ConfigTop {
             $("." + thisClass.GUID + "-content").hide();
             $("#" + thisClass.GUID + "-ignition").show();
             $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + " .w3-bar-item").removeClass("active");
+            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
             $("#" + thisClass.GUID + "-ignitiontab").addClass("active");
             $("#" + thisClass.GUID + "-title").html("Ignition");
         });
@@ -501,6 +504,7 @@ class ConfigFuel {
     }
 
     Attach() {
+        this.Detach();
         this.AFRConfigOrVariableSelection.Attach();
         this.InjectorEnableConfigOrVariableSelection.Attach();
         this.InjectorPulseWidthConfigOrVariableSelection.Attach();
@@ -668,6 +672,7 @@ class ConfigIgnition {
     }
 
     Attach() {
+        this.Detach();
         this.IgnitionEnableConfigOrVariableSelection.Attach();
         this.IgnitionAdvanceConfigOrVariableSelection.Attach();
         this.IgnitionDwellConfigOrVariableSelection.Attach();
@@ -841,6 +846,7 @@ class ConfigEngine {
     }
 
     Attach() {
+        this.Detach();
         this.CrankPositionConfigOrVariableSelection.Attach();
         this.CamPositionConfigOrVariableSelection.Attach();
         this.CylinderAirmassConfigOrVariableSelection.Attach();
@@ -854,7 +860,7 @@ class ConfigEngine {
 
             //There might be a better way to repopulate requirements. this is quick and easy for now.
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
+
             thisClass.Attach();
         });
     }
@@ -1058,14 +1064,11 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-cylindervolume", function(){
-            thisClass.Detach();
-
             thisClass.CylinderVolume = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
 
@@ -1146,6 +1149,7 @@ class ConfigInjectorPulseWidth_DeadTime {
     }
 
     Attach() {
+        this.Detach();
         this.FlowRateConfigOrVariableSelection.Attach();
         this.DeadTimeConfigOrVariableSelection.Attach();
     }
@@ -1309,7 +1313,7 @@ class ConfigInjectorOutputs {
     }
 
     Attach() {
-        var thisClass = this;
+        this.Detach();
 
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].Attach();
@@ -1393,14 +1397,11 @@ class ConfigTDCOutput extends ConfigOrVariableSelection {
     }
     
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-tdc", function(){
-            thisClass.Detach();
-
             thisClass.TDC = $(this).val();
-            
-            thisClass.Attach();
         });
 
         super.Attach();
@@ -1459,7 +1460,7 @@ class TemplatedConfig {
     }
 
     Attach() {
-        var thisClass = this;
+        this.Detach();
 
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].Attach();

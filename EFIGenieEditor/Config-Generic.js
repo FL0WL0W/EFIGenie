@@ -58,11 +58,10 @@ class ConfigOperation_Static {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID + "-type", function(){
-            thisClass.Detach();
-
             thisClass.Type =$(this).val();
 
             $("#" + thisClass.GUID + "-value").type = thisClass.Type;
@@ -70,20 +69,13 @@ class ConfigOperation_Static {
                 $("#" + this.GUID + "-value").prop('checked', thisClass.Value = thisClass.Value !== 0);
             else
                 $("#" + this.GUID + "-value").val(thisClass.Value = thisClass.Value? 1 : 0);
-
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-value", function(){
-            thisClass.Detach();
-
             if(thisClass.Type == "checkbox")
                 thisClass.Value = $(this).prop('checked');
             else
                 thisClass.Value = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -163,17 +155,14 @@ class ConfigOperation_LookupTable {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         if(!this.NoParamaterSelection) {
             $(document).on("change."+this.GUID, "#" + this.GUID + "-parameterselection", function(){
-                thisClass.Detach();
-
                 var val = $(this).val();
                 thisClass.ParameterSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
-                
-                thisClass.Attach();
             });
         }
         
@@ -358,27 +347,20 @@ class ConfigOperation_2AxisTable {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         if(!this.NoParamaterSelection) {
             $(document).on("change."+this.GUID, "#" + this.GUID + "-xselection", function(){
-                thisClass.Detach();
-
                 var val = $(this).val();
                 thisClass.XSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
-                
-                thisClass.Attach();
             });
 
             $(document).on("change."+this.GUID, "#" + this.GUID + "-yselection", function(){
-                thisClass.Detach();
-
                 var val = $(this).val();
                 thisClass.YSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
-                
-                thisClass.Attach();
             });
         }
         
@@ -583,6 +565,7 @@ class Table {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
@@ -590,7 +573,6 @@ class Table {
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-table", function(e){
-            thisClass.Detach();
             var x = $(e.target).data("x");
             var y = $(e.target).data("y");
             var value = parseFloat($(e.target).val());
@@ -624,8 +606,6 @@ class Table {
                     thisClass.Value[index] = value;
                 });
             }
-
-            thisClass.Attach();
         });
 
         var selecting = false;
@@ -730,11 +710,8 @@ class Table {
                 });
             }
         });
-        
-        $(document).on("copy."+this.GUID, "#" + this.GUID + "-table input", function(e){
-            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
-                return;
 
+        function getCopyData() {
             var copyData = "";
 
             for(var y = 0; y < thisClass.YResolution; y++){
@@ -757,24 +734,11 @@ class Table {
                 copyData = copyData.substring(0, copyData.length -1);//remove last new line
             }
 
-            selecting = false;
-            e.originalEvent.clipboardData.setData('text/plain', copyData);
-            e.preventDefault();
-        });
+            return copyData;
+        }
 
-        $(document).on("paste."+this.GUID, "#" + this.GUID + "-table input", function(e){
-            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
-                return;
-                
-            var val = e.originalEvent.clipboardData.getData('text/plain');
-
-            var selectedCell = $("#" + thisClass.GUID + "-table input:focus")
-            var x = selectedCell.data("x");
-            var y = selectedCell.data("y");
-            if(x < 0 || y < 0)
-                return;
-
-            $.each(val.split("\n"), function(yIndex, val) {
+        function pasteData(x,y,data,special) {
+            $.each(data.split("\n"), function(yIndex, val) {
                 var yPos = y + yIndex;
                 if(yPos > thisClass.YResolution - 1)
                     return;
@@ -784,12 +748,61 @@ class Table {
                         return;
 
                     var v = parseFloat(val);
-                    thisClass.Value[xPos + yPos * thisClass.XResolution] = v;
+
+                    switch(special)
+                    {
+                        case "add":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] += v;
+                            break;
+                        case "subtract":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] -= v;
+                            break;
+                        case "multiply":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] *= v;
+                            break;
+                        case "multiply%":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] *= 1 + (v/100);
+                            break;
+                        case "multiply%/2":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] *= 1 + (v/200);
+                            break;
+                        case "average":
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] += v;
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] /= 2;
+                            break;
+                        default:
+                            thisClass.Value[xPos + yPos * thisClass.XResolution] = v;
+                            break;
+                    }
                     var cell = $("#" + thisClass.GUID + "-table input[data-x='" + xPos + "'][data-y='" + yPos + "']");
-                    cell.val(v);
+                    cell.val(thisClass.Value[xPos + yPos * thisClass.XResolution]);
                     cell.addClass("selected");
                 });
             });
+        }
+
+        $(document).on("copy."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
+                return;
+
+            selecting = false;
+            e.originalEvent.clipboardData.setData('text/plain', getCopyData());
+            e.preventDefault();
+        });
+
+        $(document).on("paste."+this.GUID, "#" + this.GUID + "-table input", function(e){
+            if($(this).data("x") === undefined || parseInt($(this).data("x")) < 0 || $(this).data("y") === undefined || parseInt($(this).data("y")) < 0)
+                return;
+            var val = e.originalEvent.clipboardData.getData('text/plain');
+
+            var selectedCell = $("#" + thisClass.GUID + "-table input:focus")
+            var x = selectedCell.data("x");
+            var y = selectedCell.data("y");
+            if(x < 0 || y < 0)
+                return;
+
+            pasteData(x,y,val,pastetype);
+            console.log(thisClass.GUID);
 
             selecting = false;
             e.preventDefault();
@@ -799,7 +812,7 @@ class Table {
     GetHtml() {
         return "<div id=\"" + this.GUID + "\">" + 
                     "<label for=\"" + this.GUID + "-edit\">" + this.Label + ":</label><input id=\"" + this.GUID + "-edit\" type=\"button\" class=\"button\" value=\"Edit Table\"></input>" + 
-                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\">" + this.GetTable() + "</div>" +
+                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\">" + GetPasteOptions() + " " + this.GetTable() + "</div>" +
                 "</div>";
     }
 
@@ -917,6 +930,34 @@ class Table {
 
         return table + "</table>";
     }
+}
+
+var pastetype = "equal";
+
+function AttachPasteOptions() {
+    DetachPasteOptions();
+    $(document).on("click.pasteoptions", "#pasteoptions .w3-button", function(){
+        pastetype = $(this).data("pastetype");
+        $("#pasteoptions div").removeClass("active");
+        $("#pasteoptions div[data-pastetype=\"" + pastetype + "\"").addClass("active");
+    });
+}
+
+function DetachPasteOptions() {
+    $(document).off("click.pasteoptions");
+}
+
+function GetPasteOptions() {
+    var ret = "<div id=\"pasteoptions\" class=\"configContainer\"><div style=\"position: absolute; top: 0; left: 32px;z-index:1\">Paste Options</div>";
+    ret += "<div data-pastetype=\"equal\"       class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="equal"? " active" : "") +         "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">=</span></div>";
+    ret += "<div data-pastetype=\"add\"         class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="add"? " active" : "") +           "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">+</span></div>";
+    ret += "<div data-pastetype=\"subtract\"    class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="subtract"? " active" : "") +      "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">-</span></div>";
+    ret += "<div data-pastetype=\"multiply\"    class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="multiply"? " active" : "") +      "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">x</span></div>";
+    ret += "<div data-pastetype=\"multiply%\"   class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="multiply%"? " active" : "") +     "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">%</span></div>";
+    ret += "<div data-pastetype=\"multiply%/2\" class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="multiply%/2"? " active" : "") +   "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\"><sup>%</sup>&frasl;<sub>2</sub></span></div>";
+    ret += "</div>"
+
+    return ret;
 }
 
 document.addEventListener("dragstart", function(e){
@@ -1058,6 +1099,7 @@ class ConfigOrVariableSelection {
     }
     
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-selection", function(){
@@ -1073,7 +1115,7 @@ class ConfigOrVariableSelection {
                 thisClass.Selection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
             }
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            
+
             thisClass.Attach();
         });
 

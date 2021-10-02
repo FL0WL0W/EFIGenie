@@ -902,19 +902,19 @@ body .ui-tooltip {
 .ui-widget-content {
 	border: 1px solid #666666;
 	background: #222528EE;
-	color: #333333;
+	color: #eee;
 }
 .ui-widget-content a {
-	color: #333333;
+	color: #eee;
 }
 .ui-widget-header {
 	border: 1px solid #666666;
-	background: #126ec3;
-	color: #333333;
+	background: #3590d0;
+	color: #fff;
 	font-weight: bold;
 }
 .ui-widget-header a {
-	color: #333333;
+	color: #fff;
 }
 
 /* Interaction states

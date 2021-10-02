@@ -280,7 +280,7 @@ class ConfigInputs {
     }
 
     Detach() {
-        for(var i = 0; i < this.Inputs.Length; i++){
+        for(var i = 0; i < this.Inputs.length; i++){
             this.Inputs[i].Detach();
         }
 
@@ -289,15 +289,14 @@ class ConfigInputs {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
         
-        for(var i = 0; i < this.Inputs.Length; i++){
+        for(var i = 0; i < this.Inputs.length; i++){
             this.Inputs[i].Attach();
         }
 
         $(document).on("change."+this.GUID, ".gpiooverlayselect", function(){
-            thisClass.Detach();
-
             var selected = $(this).val();
 
             var pinSelectElements = $(".pinselect");
@@ -311,19 +310,13 @@ class ConfigInputs {
                     }
                 }
             }
-
-            thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-inputs a", function(){
-            thisClass.Detach();
-
-
             var selected = parseInt($(this).data("index"));
-            if(isNaN(selected)) {
-                thisClass.Attach();
+            if(isNaN(selected))
                 return;
-            }
+
             thisClass.Selected = selected;
 
             $("#"+ thisClass.GUID + " .inputconfig").hide();
@@ -334,56 +327,36 @@ class ConfigInputs {
             // $(this).addClass("active");
             //so nuking it instead
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
-
-            thisClass.Attach();
         });
         
         $(document).on("change."+this.GUID, "#" + this.GUID + "-name", function(){
-            thisClass.Detach();
-
-            if(isNaN(thisClass.Selected)) {
-                thisClass.Attach();
+            if(isNaN(thisClass.Selected))
                 return;
-            }
 
             thisClass.Inputs[thisClass.Selected].Name = $(this).val();
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
-
-            thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Add", function(){
-            thisClass.Detach();
-                    
             thisClass.Inputs.push(new ConfigInput());
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
             thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Delete", function(){
-            thisClass.Detach();
-                    
-            if(isNaN(thisClass.Selected)) {
-                thisClass.Attach();
+            if(isNaN(thisClass.Selected))
                 return;
-            }
             
             thisClass.Inputs.splice(thisClass.Selected, 1);
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
             thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Up", function(){
-            thisClass.Detach();
-                    
-            if(isNaN(thisClass.Selected) || thisClass.Selected === 0) {
-                thisClass.Attach();
+            if(isNaN(thisClass.Selected) || thisClass.Selected === 0)
                 return;
-            }
             
             var temp = thisClass.Inputs[thisClass.Selected];
             thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected - 1];
@@ -391,17 +364,12 @@ class ConfigInputs {
             thisClass.Selected -= 1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
             thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Down", function(){
-            thisClass.Detach();
-                    
-            if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1) {
-                thisClass.Attach();
+            if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1)
                 return;
-            }
             
             var temp = thisClass.Inputs[thisClass.Selected];
             thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected + 1];
@@ -409,24 +377,18 @@ class ConfigInputs {
             thisClass.Selected += 1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
             thisClass.Attach();
         });
         
         $(document).on("click."+this.GUID, "#" + this.GUID + "-Duplicate", function(){
-            thisClass.Detach();
-                    
-            if(isNaN(thisClass.Selected)) {
-                thisClass.Attach();
+            if(isNaN(thisClass.Selected))
                 return;
-            }
             
             thisClass.Inputs.push(new ConfigInput());
             thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[thisClass.Selected].GetObj());
             thisClass.Selected = thisClass.Inputs.length-1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-
             thisClass.Attach();
         });
     }
@@ -568,6 +530,7 @@ class ConfigInput {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-rawselection", function(){
@@ -596,7 +559,7 @@ class ConfigInput {
                 $("#" + thisClass.GUID + "-translationselection").prop( "disabled", true );
                 $("#" + thisClass.GUID + "-translationmeasurement").html("");
             }
-            
+
             thisClass.Attach();
         });
         $(document).on("change."+this.GUID, "#" + this.GUID + "-translationselection", function(){
@@ -621,11 +584,7 @@ class ConfigInput {
             thisClass.Attach();
         });
         $(document).on("change."+this.GUID, "#" + this.GUID + "-translationmeasurementselection", function(){
-            thisClass.Detach();
-
             thisClass.TranslationMeasurement = $(this).val();
-
-            thisClass.Attach();
         });
 
         if(this.RawConfig) 
@@ -752,9 +711,6 @@ class ConfigInput {
             template = template.replace(/[$]translationvalue[$]/g, "");
         }
 
-        this.Detach();
-        this.Attach();
-
         return template;
     }
 
@@ -874,6 +830,7 @@ class ConfigOperation_AnalogPinRead {
         if(obj)
             this.Pin = obj.Pin;
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -881,15 +838,12 @@ class ConfigOperation_AnalogPinRead {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
     }
 
@@ -939,6 +893,7 @@ class ConfigOperation_DigitalPinRead {
             this.Inverted = obj.Inverted;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -946,23 +901,16 @@ class ConfigOperation_DigitalPinRead {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-inverted", function(){
-            thisClass.Detach();
-
             thisClass.Inverted = this.checked? 1 : 0;
-
-            thisClass.Attach();
         });
     }
 
@@ -1017,6 +965,7 @@ class ConfigOperation_DigitalPinRecord {
             this.Length = obj.Length;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1024,31 +973,20 @@ class ConfigOperation_DigitalPinRecord {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-inverted", function(){
-            thisClass.Detach();
-
             thisClass.Inverted = this.checked? 1 : 0;
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-length", function(){
-            thisClass.Detach();
-
             thisClass.Length = parseInt($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -1102,6 +1040,7 @@ class ConfigOperation_DutyCyclePinRead {
             this.MinFrequency = obj.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1109,23 +1048,16 @@ class ConfigOperation_DutyCyclePinRead {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.Detach();
-
             thisClass.MinFrequency = parseInt($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -1177,6 +1109,7 @@ class ConfigOperation_FrequencyPinRead {
             this.MinFrequency = obj.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1184,23 +1117,16 @@ class ConfigOperation_FrequencyPinRead {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.Detach();
-
             thisClass.MinFrequency = parseInt($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -1252,6 +1178,7 @@ class ConfigOperation_PulseWidthPinRead {
             this.MinFrequency = obj.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1259,23 +1186,16 @@ class ConfigOperation_PulseWidthPinRead {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.Detach();
-
             thisClass.MinFrequency = parseInt($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -1333,6 +1253,7 @@ class ConfigOperation_Polynomial {
             this.A = obj.A.slice();
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1340,27 +1261,18 @@ class ConfigOperation_Polynomial {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-min", function(){
-            thisClass.Detach();
-
             thisClass.MinValue = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-max", function(){
-            thisClass.Detach();
-
             thisClass.MaxValue = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-degree", function(){
-            thisClass.Detach();
-
             thisClass.Degree = parseInt($(this).val());
 
             var oldA = thisClass.A;
@@ -1373,19 +1285,13 @@ class ConfigOperation_Polynomial {
                     thisClass.A[i] = 0;
             }
             $("#" + thisClass.GUID + "-coefficients").html(thisClass.GetCoefficientsHtml());
-            
-            thisClass.Attach();
         });
         
         $(document).on("change."+this.GUID, "#" + this.GUID + "-A", function(){
-            thisClass.Detach();
-
             var index = $(this).data("index");
             var val = parseFloat($(this).val());
 
             thisClass.A[index] = val;
-            
-            thisClass.Attach();
         });
     }
 
@@ -1497,6 +1403,7 @@ class ConfigOperation_ReluctorUniversal1x {
             this.FallingPosition = obj.FallingPosition;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1504,22 +1411,15 @@ class ConfigOperation_ReluctorUniversal1x {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-rising", function(){
-            thisClass.Detach();
-
             thisClass.RisingPosition = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-falling", function(){
-            thisClass.Detach();
-
             thisClass.FallingPosition = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
     }
 
@@ -1578,6 +1478,7 @@ class ConfigOperation_ReluctorUniversalMissingTeeth {
             this.NumberOfTeethMissing = obj.NumberOfTeethMissing;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
+        this.Attach();
     }
 
     Detach() {
@@ -1585,38 +1486,23 @@ class ConfigOperation_ReluctorUniversalMissingTeeth {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-firstToothPosition", function(){
-            thisClass.Detach();
-
             thisClass.FirstToothPosition = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-toothWidth", function(){
-            thisClass.Detach();
-
             thisClass.ToothWidth = parseFloat($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-numberOfTeeth", function(){
-            thisClass.Detach();
-
             thisClass.NumberOfTeeth = parseInt($(this).val());
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-numberOfTeethMissing", function(){
-            thisClass.Detach();
-
             thisClass.NumberOfTeethMissing = parseInt($(this).val());
-
-            thisClass.Attach();
         });
     }
 

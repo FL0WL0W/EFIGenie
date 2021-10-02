@@ -36,31 +36,20 @@ class ConfigOperation_DigitalPinWrite {
     }
 
     Attach() {
+        this.Detach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Detach();
-
             thisClass.Pin = parseInt($(this).val());
             UpdatePinout(thisClass.GUID, thisClass.Pin);
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-inverted", function(){
-            thisClass.Detach();
-
             thisClass.Inverted = this.checked? 1 : 0;
-
-            thisClass.Attach();
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-highz", function(){
-            thisClass.Detach();
-
             thisClass.HighZ = this.checked? 1 : 0;
-
-            thisClass.Attach();
         });
     }
 
