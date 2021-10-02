@@ -933,7 +933,7 @@ class ConfigEngine {
         Increments.EngineSyncedId = this.EngineSyncedId;
         this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EngineParameters.push({ 
-            Name: "Engine RPM", 
+            Name: "Engine Speed", 
             Id: this.EngineRPMId,
             Type: "float",
             Measurement: "AngularSpeed"
