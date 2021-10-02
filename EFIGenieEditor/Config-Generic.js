@@ -837,7 +837,7 @@ class Table {
     GetHtml() {
         return "<div id=\"" + this.GUID + "\">" + 
                     "<label for=\"" + this.GUID + "-edit\">" + this.Label + ":</label><input id=\"" + this.GUID + "-edit\" type=\"button\" class=\"button\" value=\"Edit Table\"></input>" + 
-                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\"><div style=\"display:block;\">" + GetPasteOptions() + "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 10000; position: absolute; top: -10; left: 32px;z-index:1\">Modify</div><div class=\"configContainer\">" + 
+                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\"><div style=\"display:block;\">" + GetPasteOptions() + "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 100; position: absolute; top: -10; left: 32px;z-index:1\">Modify</div><div class=\"configContainer\">" + 
                     "<div id=\""+this.GUID + "-equal\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;=&nbsp;</h3></div>" +
                     "<div id=\""+this.GUID + "-add\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;+&nbsp;</h3></div>" +
                     "<div id=\""+this.GUID + "-multiply\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;x&nbsp;</h3></div>" +
@@ -978,7 +978,7 @@ function DetachPasteOptions() {
 }
 
 function GetPasteOptions() {
-    var ret = "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 10000; position: absolute; top: -10; left: 32px;z-index:1\">Paste Options</div><div id=\"pasteoptions\" class=\"configContainer\">";
+    var ret = "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 150; position: absolute; top: -10; left: 32px;z-index:1\">Paste Options</div><div id=\"pasteoptions\" class=\"configContainer\">";
     ret += "<div data-pastetype=\"equal\"       class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="equal"? " active" : "") +         "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">=</span></div>";
     ret += "<div data-pastetype=\"add\"         class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="add"? " active" : "") +           "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">+</span></div>";
     ret += "<div data-pastetype=\"subtract\"    class=\"w3-padding-tiny w3-bar-item w3-button" + (pastetype=="subtract"? " active" : "") +      "\" style=\"position: relative;\"><h3 style=\"padding:0px; margin:0px;\">📋</h3><span style=\"padding:0px; margin:0px; color: #d03333; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">-</span></div>";
