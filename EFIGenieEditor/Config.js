@@ -289,41 +289,48 @@ class ConfigTop {
         this.Fuel.Attach();
         this.Ignition.Attach();
 
-        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-openclose", function(){
+        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-open", function(){
             var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
             var containerSelector = $("#" + thisClass.GUID + "-container");
             var width = sidebarSelector.width();
             var moveamount = 0.005 * width / 0.1;
             var left = containerSelector.position().left;
-            if(!sidebarSelector.is(":visible")) {
-                sidebarSelector.show();
-                sidebarSelector.css("left", (left-width) + "px");
-                var intervalId = setInterval(function() {
-                    if (left >= width) {
-                        clearInterval(intervalId);
-                    } else {
-                        left += moveamount;
-                        containerSelector.css("left", left + "px");
-                        containerSelector.css("margin-right", left + "px");
-                        sidebarSelector.css("left", (left-width) + "px");
-                        sidebarSelector.css('opacity', left / width);
-                    }
-                }, 5);
-            } else {
-                sidebarSelector.css("left", (left-width) + "px");
-                var intervalId = setInterval(function() {
-                    if (left <= 0) {
-                        clearInterval(intervalId);
-                        sidebarSelector.hide();
-                    } else {
-                        left -= moveamount;
-                        containerSelector.css("left", left + "px");
-                        containerSelector.css("margin-right", left + "px");
-                        sidebarSelector.css("left", (left-width) + "px");
-                        sidebarSelector.css('opacity', left / width);
-                    }
-                }, 5);
-            }
+            sidebarSelector.show();
+            sidebarSelector.css("left", (left-width) + "px");
+            var intervalId = setInterval(function() {
+                if (left >= width) {
+                    clearInterval(intervalId);
+                } else {
+                    left += moveamount;
+                    containerSelector.css("left", left + "px");
+                    containerSelector.css("margin-right", left + "px");
+                    sidebarSelector.css("left", (left-width) + "px");
+                    sidebarSelector.css('opacity', left / width);
+                }
+            }, 5);
+            $("#" + thisClass.GUID + "-sidebar-open").hide();
+        });
+
+        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-close", function(){
+            var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
+            var containerSelector = $("#" + thisClass.GUID + "-container");
+            var width = sidebarSelector.width();
+            var moveamount = 0.005 * width / 0.1;
+            var left = containerSelector.position().left;
+            sidebarSelector.css("left", (left-width) + "px");
+            var intervalId = setInterval(function() {
+                if (left <= 0) {
+                    clearInterval(intervalId);
+                    sidebarSelector.hide();
+                } else {
+                    left -= moveamount;
+                    containerSelector.css("left", left + "px");
+                    containerSelector.css("margin-right", left + "px");
+                    sidebarSelector.css("left", (left-width) + "px");
+                    sidebarSelector.css('opacity', left / width);
+                }
+            }, 5);
+            $("#" + thisClass.GUID + "-sidebar-open").show();
         });
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab, #" + this.GUID + "-inputstablist", function(e){

@@ -58,17 +58,18 @@
                 $("#selectTarget").html(targets);
             });
         </script>
+        <meta name="viewport" content="width=600, initial-scale=1">
     </head>
     <body>
-        <div id="overlay"></div>
-        <div style="position:absolute; right:0; z-index: 1;">
+        <div>
+            <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
+            <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
+            <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
+            <input id="btnLoad" type="file" style="display: none;">
             <select id="selectTarget">
             </select>
-            <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
-            <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
-            <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
-            <input id="btnLoad" type="file" style="display: none;">
         </div>
+        <div id="overlay"></div>
         <div id="workspace"></div>
     </body>
 </html>

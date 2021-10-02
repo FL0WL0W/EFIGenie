@@ -2,6 +2,7 @@
     <div id="$id$-sidebar" class="w3-sidebar" style="display: none;">
         <div class="w3-bar">
             <span class="w3-bar-item w3-padding-16">EFIGenie</span>
+            <button id="$id$-sidebar-close" class="w3-button w3-padding-16 w3-right" title="Toggle Sidebar">☰</button> 
         </div>
         <div class="w3-bar-block">
             <a href="#" id="$id$-inputstab" class="w3-bar-item w3-button active"><div class="w3-left monospace expand">▼&nbsp;</div>Inputs <div class="w3-right">$inputstabcontrols$</div></a>
@@ -15,8 +16,8 @@
     </div>
     <div id="$id$-container" class="w3-container w3-display-container">
         <span>
-            <button id="$id$-sidebar-openclose" class="w3-button w3-padding-16" title="Toggle Sidebar">☰</button> 
-            <span id="$id$-title">Inputs</span>
+            <button id="$id$-sidebar-open" class="w3-button w3-padding-16" title="Toggle Sidebar">☰</button> 
+            <span id="$id$-title" class="w3-padding-16" style="display:inline-block; margin:3px;">Inputs</span>
         </span>
         <hr style="margin: 0px 0px 5px 0px;">
         <div id="$id$-inputs" class="$id$-content" $inputsstyle$>$inputs$</div>
