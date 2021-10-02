@@ -106,10 +106,6 @@ class Table {
             });
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
-            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true, title: thisClass.ZLabel });
-        });
-
         $(document).on("change."+this.GUID, "#" + this.GUID + "-table", function(e){
             var x = $(e.target).data("x");
             var y = $(e.target).data("y");
@@ -412,13 +408,12 @@ class Table {
 
     GetHtml() {
         return "<div id=\"" + this.GUID + "\">" + 
-                    "<label for=\"" + this.GUID + "-edit\">" + this.Label + ":</label><input id=\"" + this.GUID + "-edit\" type=\"button\" class=\"button\" value=\"Edit Table\"></input>" + 
-                    "<div id=\""+this.GUID + "-dialog\" style=\"display: none;\"><div style=\"display:block;\">" + GetPasteOptions() + "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 100; position: absolute; top: -10; left: 32px;z-index:1\">Modify</div><div class=\"configContainer\">" + 
+                    "<div style=\"display:block;\">" + GetPasteOptions() + "<div style=\"display:inline-block; position: relative;\"><div style=\"width: 100; position: absolute; top: -10; left: 32px;z-index:1\">Modify</div><div class=\"configContainer\">" + 
                     "<div id=\""+this.GUID + "-equal\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;=&nbsp;</h3></div>" +
                     "<div id=\""+this.GUID + "-add\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;+&nbsp;</h3></div>" +
                     "<div id=\""+this.GUID + "-multiply\" class=\"w3-padding-tiny w3-bar-item w3-button\"><h3 style=\"padding:0px; margin:0px;\">&nbsp;x&nbsp;</h3></div>" +
                     "<input id=\""+this.GUID + "-modifyvalue\" type=\"number\"></input>" +
-                    "</div></div></div>" + this.GetTable() + "</div>" +
+                    "</div></div></div>" + this.GetTable() + 
                 "</div>";
     }
 

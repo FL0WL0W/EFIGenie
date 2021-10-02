@@ -158,6 +158,10 @@ class ConfigOperation_LookupTable {
         this.Detach();
         var thisClass = this;
 
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
+            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true, title: thisClass.ZLabel });
+        });
+        
         if(!this.NoParamaterSelection) {
             $(document).on("change."+this.GUID, "#" + this.GUID + "-parameterselection", function(){
                 var val = $(this).val();
@@ -170,6 +174,8 @@ class ConfigOperation_LookupTable {
     }
 
     Detach() {
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
         this.Table.Detach();
     }
 
@@ -179,6 +185,7 @@ class ConfigOperation_LookupTable {
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
         this.UpdateTable();
+        template = template.replace(/[$]label[$]/g, GetClassProperty(this, "ValueLabel"));
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -190,7 +197,6 @@ class ConfigOperation_LookupTable {
     UpdateTable() {
         this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-parameterselection\">" + GetSelections(this.ParameterSelection) + "</select>";
         this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
-        this.Table.Label = GetClassProperty(this, "ValueLabel");
 
         if(!this.NoParamaterSelection)
             $("#" + this.GUID + "-parameterselection").html(GetSelections(this.ParameterSelection));
@@ -350,6 +356,10 @@ class ConfigOperation_2AxisTable {
         this.Detach();
         var thisClass = this;
 
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-edit", function(){
+            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true, title: thisClass.ZLabel });
+        });
+
         if(!this.NoParamaterSelection) {
             $(document).on("change."+this.GUID, "#" + this.GUID + "-xselection", function(){
                 var val = $(this).val();
@@ -368,6 +378,8 @@ class ConfigOperation_2AxisTable {
     }
 
     Detach() {
+        $(document).off("click."+this.GUID);
+        $(document).off("change."+this.GUID);
         this.Table.Detach();
     }
 
@@ -377,6 +389,7 @@ class ConfigOperation_2AxisTable {
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
         this.UpdateTable();
+        template = template.replace(/[$]label[$]/g, GetClassProperty(this, "ValueLabel"));
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -389,7 +402,6 @@ class ConfigOperation_2AxisTable {
         this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
         this.Table.YLabel = this.NoParamaterSelection? this.YLabel : "<select id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
         this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
-        this.Table.Label = GetClassProperty(this, "ValueLabel");
         
         $("#" + this.GUID + "-xselection").html(GetSelections(this.XSelection));
         $("#" + this.GUID + "-yselection").html(GetSelections(this.YSelection));
