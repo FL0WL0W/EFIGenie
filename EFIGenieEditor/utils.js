@@ -163,12 +163,6 @@ var downloadURL = function(data, fileName) {
     a.remove();
   };
 
-var currentMousePos = { x: -1, y: -1 };
-$(document).mousemove(function(event) {
-    currentMousePos.x = event.pageX;
-    currentMousePos.y = event.pageY;
-});
-
 $(document).blur(function(event) {
     console.log("focus " + event.target.id);
 })
