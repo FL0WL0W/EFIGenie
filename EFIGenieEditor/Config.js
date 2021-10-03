@@ -335,7 +335,6 @@ class ConfigTop {
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab, #" + this.GUID + "-inputstablist", function(e){
             if($(e.target).hasClass("expand")) {
-                console.log("expand");
                 if( $("#" + thisClass.GUID + "-inputstablist").is(":visible")) {
                     $(e.target).html("►&nbsp;");
                     $("#" + thisClass.GUID + "-inputstablist").hide();

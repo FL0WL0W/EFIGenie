@@ -1,14 +1,6 @@
-<div id="$id$">
-    <div>
-        <label for="$id$-type" style="display: none;">Type:</label>
-        <select id="$id$-type" value=$type$ style="display: none;">
-            <option value="number"$numberselected$>Number</option>
-            <option value="bool"$boolselected$ disabled>Boolean</option>
-            <option value="tick"$tickselected$ disabled>Tick</option>
-        </select>
-        <label for="$id$-edit">$label$:</label><input id="$id$-edit" type="button" class="button" value="Edit Table" style="width: 100px;"></input> 
-        <div id="$id$-dialog" style="display: none;">
-            $table$
-        </div>
+<div id="$id$" style="display: inline;">
+    <input id="$id$-edit" type="button" class="button" value="Edit Table" style="width: 100px;"></input> 
+    <div id="$id$-dialog" style="display: none;">
+        $table$
     </div>
 </div>

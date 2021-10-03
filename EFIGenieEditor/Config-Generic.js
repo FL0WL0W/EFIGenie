@@ -50,7 +50,7 @@ class ConfigOperation_Static {
             this.Type = obj.Type;
             this.Value = obj.Value;
         }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
+        $("#" + this.GUID).replaceWith(this.GetElementHtml());
     }
 
     Detach() {
@@ -78,15 +78,18 @@ class ConfigOperation_Static {
                 thisClass.Value = parseFloat($(this).val());
         });
     }
-
+    
     GetHtml() {
+        return "<label for=\"" + this.GUID + "-value\">" + GetClassProperty(this, "ValueLabel") + ":</label>" + this.GetElementHtml();
+    }
+
+    GetElementHtml() {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
         template = template.replace(/[$]value[$]/g, this.Type==="checkbox" ? (this.Value? "checked" : "") : "value=\"" + this.Value + "\"");
-        template = template.replace(/[$]valuelabel[$]/g, GetClassProperty(this, "ValueLabel"));
-        template = template.replace(/[$]valuemeasurement[$]/g, GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]));
+        template = template.replace(/[$]valuemeasurement[$]/g, GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]));
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="checkbox" ? " selected" : "");
 
@@ -152,7 +155,7 @@ class ConfigOperation_LookupTable {
             if(!this.NoParamaterSelection)
                 this.ParameterSelection = obj.ParameterSelection;
         }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
+        $("#" + this.GUID).replaceWith(this.GetElementHtml());
     }
 
     Attach() {
@@ -181,12 +184,15 @@ class ConfigOperation_LookupTable {
     }
 
     GetHtml() {
+        return "<label for=\"" + this.GUID + "-edit\">" + GetClassProperty(this, "ValueLabel") + ":</label>" + this.GetElementHtml();
+    }
+
+    GetElementHtml() {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
         this.UpdateTable();
-        template = template.replace(/[$]label[$]/g, GetClassProperty(this, "ValueLabel"));
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -196,8 +202,8 @@ class ConfigOperation_LookupTable {
     }
 
     UpdateTable() {
-        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-parameterselection\">" + GetSelections(this.ParameterSelection) + "</select>";
-        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-parameterselection\" style=\"width: auto;\">" + GetSelections(this.ParameterSelection) + "</select>";
+        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
 
         if(!this.NoParamaterSelection)
             $("#" + this.GUID + "-parameterselection").html(GetSelections(this.ParameterSelection));
@@ -351,7 +357,7 @@ class ConfigOperation_2AxisTable {
             if(!this.NoParamaterSelection)
                 this.YSelection = obj.YSelection;
         }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
+        $("#" + this.GUID).replaceWith(this.GetElementHtml());
     }
 
     Attach() {
@@ -386,12 +392,15 @@ class ConfigOperation_2AxisTable {
     }
 
     GetHtml() {
+        return "<label for=\"" + this.GUID + "-edit\">" + GetClassProperty(this, "ValueLabel") + ":</label>" + this.GetElementHtml();
+    }
+
+    GetElementHtml() {
         var template = GetClassProperty(this, "Template");
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]type[$]/g, this.Type);
         this.UpdateTable();
-        template = template.replace(/[$]label[$]/g, GetClassProperty(this, "ValueLabel"));
         template = template.replace(/[$]table[$]/g, this.Table.GetHtml());
         template = template.replace(/[$]numberselected[$]/g, this.Type==="number" ? " selected" : "");
         template = template.replace(/[$]boolselected[$]/g, this.Type==="bool" ? " selected" : "");
@@ -401,9 +410,9 @@ class ConfigOperation_2AxisTable {
     }
 
     UpdateTable() {
-        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-xselection\">" + GetSelections(this.XSelection) + "</select>";
-        this.Table.YLabel = this.NoParamaterSelection? this.YLabel : "<select id=\"" + this.GUID + "-yselection\">" + GetSelections(this.YSelection) + "</select>";
-        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetMeasurementDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
+        this.Table.XLabel = this.NoParamaterSelection? this.XLabel : "<select id=\"" + this.GUID + "-xselection\" style=\"width: auto;\">" + GetSelections(this.XSelection) + "</select>";
+        this.Table.YLabel = this.NoParamaterSelection? this.YLabel : "<select id=\"" + this.GUID + "-yselection\" style=\"width: auto;\">" + GetSelections(this.YSelection) + "</select>";
+        this.Table.ZLabel = GetClassProperty(this, "ValueLabel") + " " + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]);
         
         $("#" + this.GUID + "-xselection").html(GetSelections(this.XSelection));
         $("#" + this.GUID + "-yselection").html(GetSelections(this.YSelection));
@@ -668,13 +677,23 @@ class ConfigOrVariableSelection {
         $("#" + this.GUID + "-selection").html(GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
         template = template.replace(/[$]selections[$]/g, GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
         if(this.Selection && !this.Selection.reference) {
-            template = template.replace(/[$]config[$]/g, this.GetSubConfig().GetHtml());
+            if(this.GetSubConfig().GetElementHtml) {
+                template = template.replace(/[$]singleelementconfig[$]/g, this.GetSubConfig().GetElementHtml());
+                template = template.replace(/[$]config[$]/g, "");
+            } else {
+                if(this.GetSubConfig().GetHtml)
+                    template = template.replace(/[$]config[$]/g, this.GetSubConfig().GetHtml());
+                else
+                    template = template.replace(/[$]config[$]/g, "");
+                template = template.replace(/[$]singleelementconfig[$]/g, "");
+            }
         } else {
             template = template.replace(/[$]config[$]/g, "");
+            template = template.replace(/[$]singleelementconfig[$]/g, "");
         }
         template = template.replace(/[$]valuelabel[$]/g, this.ValueLabel);
         template = template.replace(/[$]value[$]/g, "");//this is for interactivity later
-        template = template.replace(/[$]measurement[$]/g, GetMeasurementDisplay(this.ValueMeasurement));
+        template = template.replace(/[$]measurement[$]/g, GetUnitDisplay(this.ValueMeasurement));
 
         return template;
     }

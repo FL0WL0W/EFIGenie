@@ -70,7 +70,7 @@ PinOuts = {
         Name: "Black pill: STM32F401C/STM32F411C",
         Overlay: "images/STM32F401C_Overlay.png",
         OverlayWidth: 577,
-        OverlayElementHeight: 20,
+        OverlayElementHeight: 22,
         Pins: [
             { Name: "PC_13", Value: (16*2 + 13), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 132, Align: "right"},
             { Name: "PC_14", Value: (16*2 + 14), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 154, Align: "right"},
@@ -131,7 +131,7 @@ function GetNameFromPinSelectElement(element){
     if(inputName)
         return inputName;
 
-    var outputName = $($($(element).parent().parent().parent().parent().children()[0]).children()[0]).text();
+    var outputName = $($($($(element).parent().parent().parent().parent().children()[0]).children()[0]).children()[0]).text();
     if(outputName)
         return outputName;
 

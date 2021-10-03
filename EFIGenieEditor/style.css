@@ -279,6 +279,7 @@ input {
     border: 2px solid #1A1A20;
     color: #dfdfdf;
     margin: 1px;
+    padding: 1px 2px;
 }
 input:hover {
     background-color: #666;
@@ -318,6 +319,8 @@ select {
     border: 2px solid #1A1A20;
     color: #dfdfdf;
     width: 200px;
+    margin: 1px;
+    padding: 1px 2px;
 }
 select:hover {
     background-color: #666;
@@ -328,7 +331,6 @@ select:hover {
     text-decoration: none;
     background-color: #505962;
     color: #dfdfdf;
-    padding: 2px 6px 2px 6px;
     border-radius: 6px;
     border: 2px solid #1A1A20;
     cursor: pointer;
@@ -355,6 +357,11 @@ select:hover {
 .gpiooverlayselect {
     position: absolute; 
     margin: 0;
+}
+select.gpiooverlayselect {
+    margin: 0;
+    padding: 0;
+    width: auto;
 }
 select .pinconflict{
     background-color:rgb(255, 0, 0);
