@@ -369,6 +369,9 @@ select .pinconflict{
 .pinconflict{
     background-color:rgb(255, 128, 128);
 }
+.livevalue {
+    color: #55AA55;
+}
 
 .monospace {
 font-family: 'Courier New', monospace;

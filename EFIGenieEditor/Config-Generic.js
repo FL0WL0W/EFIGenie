@@ -697,6 +697,33 @@ class ConfigOrVariableSelection {
 
         return template;
     }
+
+    LiveUpdate(variables) {
+        //static value doesn't need live updates
+        if(this.Selection && this.Selection.value === "Static")
+            return;
+
+        //get value
+        var variable;
+        if(this.Selection && this.VariableListName) {
+            if(!this.Selection.reference) {
+                var subConfig = this.GetSubConfig();
+                if(GetClassProperty(subConfig, "Output"))
+                    variable = variables[this.Id];
+                //propogate to subconfig
+                if(subConfig.LiveUpdate) 
+                    subConfig.LiveUpdate(variables, variable);
+            } else {
+                var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
+                if(cell) 
+                    variable = variables[cell.Id];
+            }
+        }
+
+        //update value
+        if(variable !== undefined)
+            $("#" + this.GUID + "-value").html(variable);
+    }
     
     UpdateSelections() {
         $("#" + this.GUID + "-selection").html(GetSelections(this.Selection, this.ValueMeasurement, this.Configs));
@@ -718,6 +745,10 @@ class ConfigOrVariableSelection {
         if(!Increments.PostEvent)
             Increments.PostEvent = [];
         Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+
+        if(!Increments.LiveUpdate)
+            Increments.LiveUpdate = [];
+        Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
 
         if(this.Selection && this.VariableListName) {
             if(Increments[this.VariableListName] === undefined)

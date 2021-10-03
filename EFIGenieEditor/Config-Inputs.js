@@ -544,7 +544,7 @@ class ConfigInput {
             
             if(thisClass.RawConfig) {
                 $("#" + thisClass.GUID + "-raw").html(thisClass.RawConfig.GetHtml());
-                $("#" + thisClass.GUID + "-rawmeasurement").html(GetMeasurementDisplay(GetClassProperty(thisClass.RawConfig, "Measurement")));
+                $("#" + thisClass.GUID + "-rawmeasurement").html(GetUnitDisplay(GetClassProperty(thisClass.RawConfig, "Measurement")));
             } else {
                 $("#" + thisClass.GUID + "-raw").html("");
                 $("#" + thisClass.GUID + "-rawmeasurement").html("");
@@ -610,6 +610,7 @@ class ConfigInput {
             selections = selections + "</select>";
             return selections;
         }
+        return GetUnitDisplay(translationMeasurement);
     }
 
     GetTranslationSelections() {
@@ -695,7 +696,7 @@ class ConfigInput {
         if(this.RawConfig) {
             template = template.replace(/[$]raw[$]/g, this.RawConfig.GetHtml());
             template = template.replace(/[$]rawvalue[$]/g, "");//this is for interactivity later
-            template = template.replace(/[$]rawmeasurement[$]/g, GetMeasurementDisplay(GetClassProperty(this.RawConfig, "Measurement")));
+            template = template.replace(/[$]rawmeasurement[$]/g, GetUnitDisplay(GetClassProperty(this.RawConfig, "Measurement")));
         } else {
             template = template.replace(/[$]raw[$]/g, "");
             template = template.replace(/[$]rawvalue[$]/g, "");
@@ -714,6 +715,26 @@ class ConfigInput {
         return template;
     }
 
+    LiveUpdate(variables) {
+        if(this.TranslationConfig){
+            //update value
+            if(variables[this.InputTranslationId] !== undefined)
+                $("#" + this.GUID + "-translationvalue").html(variables[this.InputTranslationId]);
+            //propogate to translation config
+            if(this.TranslationConfig.LiveUpdate)
+                this.TranslationConfig.LiveUpdate(variables, variables[this.InputTranslationId]);
+        }
+
+        if(this.RawConfig) {
+            //update value
+            if(variables[this.InputRawId] !== undefined)
+                $("#" + this.GUID + "-rawvalue").html(variables[this.InputRawId]);
+            //propogate to raw config
+            if(this.RawConfig.LiveUpdate)
+                this.RawConfig.LiveUpdate(variables, variables[this.InputRawId]);
+        }
+    }
+
     InputTranslationId = -1;
     InputRawId = -1;
     SetIncrements() {
@@ -722,6 +743,11 @@ class ConfigInput {
 
         if(!this.RawConfig) 
             return;
+
+        var thisClass = this;
+        if(!Increments.LiveUpdate)
+            Increments.LiveUpdate = [];
+        Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
 
         if(this.TranslationConfig) {
             this.InputTranslationId = 1;
