@@ -294,13 +294,16 @@ input[type="checkbox"]:hover {
     background-color: #666;
     border-color: #3590d0;
 }
+input[type="text"] {
+    width: 200px;
+}
 input[type="number"] {
     font: bold 16px Arial;
     background-color: #505962;
     border-radius: 6px;
     border: 2px solid #1A1A20;
     color: #dfdfdf;
-    width: 80px;
+    width: 100px;
 }
 input[type="number"]:hover {
     background-color: #666;
@@ -314,6 +317,7 @@ select {
     border-radius: 6px;
     border: 2px solid #1A1A20;
     color: #dfdfdf;
+    width: 200px;
 }
 select:hover {
     background-color: #666;
