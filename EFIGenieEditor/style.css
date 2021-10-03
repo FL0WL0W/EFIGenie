@@ -149,7 +149,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-padding-top-64{padding-top:64px!important}.w3-padding-top-48{padding-top:48px!important}
 .w3-padding-top-32{padding-top:32px!important}.w3-padding-top-24{padding-top:24px!important}
 .w3-left{float:left!important}.w3-right{float:right!important}
-.w3-button:hover{background-color: #555!important; border-color: #3590d0!important;}
+.w3-button:hover{background-color: #666!important; border-color: #3590d0!important;}
 .w3-bar-item.active{background-color: #3590d0; color: #fff;}
 .w3-bar-subitem.active{background-color: #323639; color: #fff;}
 .w3-transparent,.w3-hover-none:hover{background-color:transparent!important}
@@ -247,14 +247,14 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-radius: 6px;
     border-style: solid;
     border-width: 1px;
-    border-color: #666666;
+    border-color: #666;
     padding: 2.5px;
     margin: 2.5px;
 }
 .configDivider {
     border-style: solid;
     border-width: 1px;
-    border-color: #666666;
+    border-color: #666;
     padding: 0px;
     margin: 2.5px;
     display: inline-block;
@@ -281,17 +281,17 @@ input {
     margin: 1px;
 }
 input:hover {
-    background-color: #555;
+    background-color: #666;
     border-color: #3590d0;
 }
 input[type="checkbox"] {
     font: bold 16px Arial;
     margin: 5px;
     border-radius: 6px;
-    border-color: #666666;
+    border-color: #666;
 }
 input[type="checkbox"]:hover {
-    background-color: #555;
+    background-color: #666;
     border-color: #3590d0;
 }
 input[type="number"] {
@@ -303,7 +303,7 @@ input[type="number"] {
     width: 80px;
 }
 input[type="number"]:hover {
-    background-color: #555;
+    background-color: #666;
     border-color: #3590d0;
 }
 select:not(.gpiooverlayselect) {
@@ -316,7 +316,7 @@ select {
     color: #dfdfdf;
 }
 select:hover {
-    background-color: #555;
+    background-color: #666;
     border-color: #3590d0;
 }
 .button {
@@ -330,136 +330,8 @@ select:hover {
     cursor: pointer;
 }
 .button:hover {
-    background-color: #555;
+    background-color: #666;
     border-color: #3590d0;
-}
-
-.configtable input[type="number"] {
-    margin: 0px;
-    border-radius: 0px;
-    border: 0px;
-    font-size: 20px;
-}
-.configtable input.selected {
-    background-color:#3590d0;
-}
-.configtable select {
-    margin: 0px;
-    border-radius: 0px;
-    border: 0px;
-}
-.configtable {
-    border-color: #666666;
-    background-color: #222528;
-    border-spacing: 0px;
-    border: 1px;
-    display: inline-block;
-    border-style: solid;
-}
-.configtable th {
-    vertical-align: text-top;
-    padding: 2px;
-    border: 1px;
-    border-color: #666666;
-    border-style: solid;
-    white-space: nowrap;
-}
-.configtable td {
-    vertical-align: text-top;
-    padding: 0px;
-    border: 1px;
-    border-color: #666666;
-    border-style: solid;
-}
-.configtable td.zlabel {
-    border-right-style: sold; 
-    border-right-width:5px; 
-    border-bottom-style: sold; 
-    border-bottom-width:5px;
-    padding-left: 30px; 
-    vertical-align: bottom; 
-}
-.configtable td.xylabel {
-    border-right-style: sold; 
-    border-right-width:5px; 
-    border-bottom-style: sold; 
-    border-bottom-width:5px;
-}
-.configtable td.yaxis {
-    border-right-style: sold; 
-    border-right-width:5px;
-}
-.configtable td.xaxis {
-    border-bottom-style: sold; 
-    border-bottom-width:5px;
-}
-.configtable td.yaxis input {
-    width: 100%;
-}
-.configtable td.xaxislabel {
-    text-align: center;
-    white-space: nowrap;
-}
-.configtable td.yaxislabel {
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    width: 1.5em;
-}
-
-.configtable td.yaxislabel div {
-        -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
-        -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
-        -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
-            filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
-        -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
-        margin-left: -10em;
-        margin-right: -10em;
-}
-
-.gpiooverlayselect {
-    position: absolute; 
-    margin: 0;
-}
-select .pinconflict{
-    background-color:rgb(255, 0, 0);
-}
-.pinconflict{
-    background-color:rgb(255, 128, 128);
-}
-
-.row_expand {
-    height:5px; 
-    cursor: ns-resize;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.col_expand {
-    width:3px; 
-    cursor: ew-resize;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.rowcol_expand {
-    height:5px; 
-    width:3px; 
-    cursor: nwse-resize;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 #overlay {
@@ -475,6 +347,18 @@ select .pinconflict{
     z-index: 200; /* Specify a stack order in case you're using a different order for other elements */
   }
 
-  .monospace {
-    font-family: 'Courier New', monospace;
-  }
+
+.gpiooverlayselect {
+    position: absolute; 
+    margin: 0;
+}
+select .pinconflict{
+    background-color:rgb(255, 0, 0);
+}
+.pinconflict{
+    background-color:rgb(255, 128, 128);
+}
+
+.monospace {
+font-family: 'Courier New', monospace;
+}

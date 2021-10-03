@@ -121,10 +121,11 @@ class ConfigOperation_LookupTable {
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
-        this.Table = new Table();
-        this.Table.YResolutionModifiable = false;
-        this.Table.SetXResolution(10);
-        this.Table.SetYResolution(1);
+        this.Table = new Table({
+            YResolution: 1,
+            YResolutionModifiable: false,
+            XResolution: 10
+        });
         if(noParamaterSelection)
             this.NoParamaterSelection = true;
     }
@@ -310,9 +311,10 @@ class ConfigOperation_2AxisTable {
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
-        this.Table = new Table();
-        this.Table.SetXResolution(10);
-        this.Table.SetYResolution(10);
+        this.Table = new Table({
+            YResolution: 10,
+            XResolution: 10
+        });
         if(noParamaterSelection)
             this.NoParamaterSelection = true;
     }
