@@ -209,12 +209,23 @@ class ConfigOperation_LookupTable {
             $("#" + this.GUID + "-parameterselection").html(GetSelections(this.ParameterSelection));
     }
 
+    LiveUpdate(variables, variable) {
+        this.Table.Trail(
+            variables[Increments[this.ParameterSelection.reference].find(a => a.Name === this.ParameterSelection.value && a.Measurement === this.ParameterSelection.measurement).Id], 
+            undefined, 
+            variable);
+    }
+
     SetIncrements() {
         if(!this.NoParamaterSelection) {
             var thisClass = this;
             if(!Increments.PostEvent)
                 Increments.PostEvent = [];
             Increments.PostEvent.push(function() { thisClass.UpdateTable(); });
+
+            if(!Increments.LiveUpdate)
+                Increments.LiveUpdate = [];
+            Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
         }
     }
 
@@ -418,12 +429,23 @@ class ConfigOperation_2AxisTable {
         $("#" + this.GUID + "-yselection").html(GetSelections(this.YSelection));
     }
 
+    LiveUpdate(variables, variable) {
+        this.Table.Trail(
+            variables[Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id], 
+            variables[Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id],
+            variable);
+    }
+
     SetIncrements() {
         if(!this.NoParamaterSelection) {
             var thisClass = this;
             if(!Increments.PostEvent)
                 Increments.PostEvent = [];
             Increments.PostEvent.push(function() { thisClass.UpdateTable(); });
+
+            if(!Increments.LiveUpdate)
+                Increments.LiveUpdate = [];
+            Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
         }
     }
 
