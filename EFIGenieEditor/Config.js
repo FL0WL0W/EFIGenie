@@ -1085,7 +1085,7 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         template = template.replace(/[$]cylindervolume[$]/g, this.CylinderVolume);
-        template = template.replace(/[$]cylindervolumemeasurement[$]/g, GetMeasurementDisplay(Measurements["Volume"]));
+        template = template.replace(/[$]cylindervolumemeasurement[$]/g, GetUnitDisplay("Volume"));
         return template;
     }
 

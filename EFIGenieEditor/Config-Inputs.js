@@ -604,7 +604,7 @@ class ConfigInput {
             var measurements = Object.keys(Measurements);
             for(var i = 0; i < measurements.length; i++)
             {
-                selections += "<option value=\"" + measurements[i] + "\"" + (this.TranslationMeasurement === measurements[i]? " selected" : "") + ">" + GetMeasurementDisplay(measurements[i]) + "</option>"
+                selections += "<option value=\"" + measurements[i] + "\"" + (this.TranslationMeasurement === measurements[i]? " selected" : "") + ">" + GetMeasurementDisplay(measurements[i], 0) + "</option>"
             }
 
             selections = selections + "</select>";
@@ -695,7 +695,7 @@ class ConfigInput {
         
         if(this.RawConfig) {
             template = template.replace(/[$]raw[$]/g, this.RawConfig.GetHtml());
-            template = template.replace(/[$]rawvalue[$]/g, "");//this is for interactivity later
+            template = template.replace(/[$]rawvalue[$]/g, GetMeasurementDisplay(GetClassProperty(this.RawConfig, "Measurement")));
             template = template.replace(/[$]rawmeasurement[$]/g, GetUnitDisplay(GetClassProperty(this.RawConfig, "Measurement")));
         } else {
             template = template.replace(/[$]raw[$]/g, "");
@@ -718,20 +718,18 @@ class ConfigInput {
     LiveUpdate(variables) {
         if(this.TranslationConfig){
             //update value
-            if(variables[this.InputTranslationId] !== undefined)
+            if(variables[this.InputTranslationId] !== undefined) {
                 $("#" + this.GUID + "-translationvalue").html(variables[this.InputTranslationId]);
-            //propogate to translation config
-            if(this.TranslationConfig.LiveUpdate)
-                this.TranslationConfig.LiveUpdate(variables, variables[this.InputTranslationId]);
+                $("#" + this.GUID + "-translationvalue").addClass("liveValue");
+            }
         }
 
         if(this.RawConfig) {
             //update value
-            if(variables[this.InputRawId] !== undefined)
+            if(variables[this.InputRawId] !== undefined) {
                 $("#" + this.GUID + "-rawvalue").html(variables[this.InputRawId]);
-            //propogate to raw config
-            if(this.RawConfig.LiveUpdate)
-                this.RawConfig.LiveUpdate(variables, variables[this.InputRawId]);
+                $("#" + this.GUID + "-rawvalue").addClass("liveValue");
+            }
         }
     }
 

@@ -47,15 +47,12 @@ function GetMeasurementDisplay(measurement, index) {
 
     if(!measurement)
         return "";
-    
-    if(!index)
-        index = 0;
 
-    if(index >= measurement.length)
+    if(index !== undefined && index >= measurement.length)
         return "";
 
     if(measurementString){
-        if(measurement[index].Name !== "")
+        if(index !== undefined && measurement[index].Name !== "")
             return measurementString + " [" + measurement[index].Name + "]";
         else
             return measurementString;

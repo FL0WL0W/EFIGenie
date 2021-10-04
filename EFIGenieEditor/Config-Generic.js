@@ -692,7 +692,7 @@ class ConfigOrVariableSelection {
             template = template.replace(/[$]singleelementconfig[$]/g, "");
         }
         template = template.replace(/[$]valuelabel[$]/g, this.ValueLabel);
-        template = template.replace(/[$]value[$]/g, "");//this is for interactivity later
+        template = template.replace(/[$]value[$]/g, GetMeasurementDisplay(this.ValueMeasurement));
         template = template.replace(/[$]measurement[$]/g, GetUnitDisplay(this.ValueMeasurement));
 
         return template;
@@ -710,9 +710,6 @@ class ConfigOrVariableSelection {
                 var subConfig = this.GetSubConfig();
                 if(GetClassProperty(subConfig, "Output"))
                     variable = variables[this.Id];
-                //propogate to subconfig
-                if(subConfig.LiveUpdate) 
-                    subConfig.LiveUpdate(variables, variable);
             } else {
                 var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
                 if(cell) 
@@ -721,8 +718,10 @@ class ConfigOrVariableSelection {
         }
 
         //update value
-        if(variable !== undefined)
+        if(variable !== undefined) {
+            $("#" + this.GUID + "-value").addClass("liveValue");
             $("#" + this.GUID + "-value").html(variable);
+        }
     }
     
     UpdateSelections() {
