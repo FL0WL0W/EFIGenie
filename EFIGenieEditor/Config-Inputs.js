@@ -399,7 +399,7 @@ class ConfigInputs {
 
         var inputlist = "";
         for(var i = 0; i < this.Inputs.length; i++){
-            inputlist += "<a href=\"#\" data-index=\"" + i + "\" class=\"w3-bar-subitem w3-button" + (this.Selected === i? " active" : "") + "\">" + this.Inputs[i].Name + "</a>";
+            inputlist += "<div data-index=\"" + i + "\" class=\"w3-bar-subitem w3-button" + (this.Selected === i? " active" : "") + "\">" + this.Inputs[i].Name + "</div>";
         }
         return "<div id=\"" + this.GUID + "-inputs\">" + inputlist + "</div>";
     }
