@@ -124,7 +124,7 @@ class ConfigOperation_LookupTable {
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
-        this.Table = new Table({
+        this.Table = new Table(getGUID(), {
             YResolution: 1,
             YResolutionModifiable: false,
             XResolution: 10
@@ -328,7 +328,7 @@ class ConfigOperation_2AxisTable {
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
-        this.Table = new Table({
+        this.Table = new Table(getGUID(), {
             YResolution: 10,
             XResolution: 10
         });
