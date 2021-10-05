@@ -1403,14 +1403,12 @@ class ConfigTDCOutput extends ConfigOrVariableSelection {
     }
     
     Attach() {
-        this.Detach();
+        super.Attach();
         var thisClass = this;
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-tdc", function(){
             thisClass.TDC = $(this).val();
         });
-
-        super.Attach();
     }
 
     GetHtml() {

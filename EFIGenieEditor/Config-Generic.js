@@ -36,6 +36,11 @@ class ConfigOperation_Static {
 
     Type = "number";
     Value = 0;
+    Default = true;
+
+    IsDefault() {
+        return this.Default;
+    }
 
     GetObj() {
         return {
@@ -47,6 +52,7 @@ class ConfigOperation_Static {
 
     SetObj(obj) {
         if(obj) {
+            this.Default = false;
             this.Type = obj.Type;
             this.Value = obj.Value;
         }
@@ -69,6 +75,7 @@ class ConfigOperation_Static {
                 $("#" + this.GUID + "-value").prop('checked', thisClass.Value = thisClass.Value !== 0);
             else
                 $("#" + this.GUID + "-value").val(thisClass.Value = thisClass.Value? 1 : 0);
+            thisClass.Default = false;
         });
 
         $(document).on("change."+this.GUID, "#" + this.GUID + "-value", function(){
@@ -76,6 +83,7 @@ class ConfigOperation_Static {
                 thisClass.Value = $(this).prop('checked');
             else
                 thisClass.Value = parseFloat($(this).val());
+            thisClass.Default = false;
         });
     }
     
@@ -121,16 +129,20 @@ class ConfigOperation_LookupTable {
     Type = "number";
     Table = undefined;
     XLabel = "";
+    Default = true;
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
         this.Table = new Table(getGUID(), {
             YResolution: 1,
-            YResolutionModifiable: false,
-            XResolution: 10
+            YResolutionModifiable: false
         });
         if(noParamaterSelection)
             this.NoParamaterSelection = true;
+    }
+
+    IsDefault() {
+        return this.Default && this.Table.IsDefault();
     }
 
     GetObj() {
@@ -171,6 +183,7 @@ class ConfigOperation_LookupTable {
                 var val = $(this).val();
                 thisClass.ParameterSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
+                thisClass.Default = false;
             });
         }
         
@@ -325,17 +338,18 @@ class ConfigOperation_2AxisTable {
     Table = undefined;
     XLabel = "";
     YLabel = "";
+    Default = true;
 
     constructor(noParamaterSelection){
         this.GUID = getGUID();
-        this.Table = new Table(getGUID(), {
-            YResolution: 10,
-            XResolution: 10
-        });
+        this.Table = new Table(getGUID());
         if(noParamaterSelection)
             this.NoParamaterSelection = true;
     }
 
+    IsDefault() {
+        return this.Default && this.Table.IsDefault();
+    }
 
     GetObj() {
         return {
@@ -384,12 +398,14 @@ class ConfigOperation_2AxisTable {
                 var val = $(this).val();
                 thisClass.XSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
+                thisClass.Default = false;
             });
 
             $(document).on("change."+this.GUID, "#" + this.GUID + "-yselection", function(){
                 var val = $(this).val();
                 thisClass.YSelection = {reference: $('option:selected', this).attr('reference'), value: val, measurement: $('option:selected', this).attr('measurement')};
                 thisClass.UpdateTable();
+                thisClass.Default = false;
             });
         }
         
@@ -555,6 +571,8 @@ function GetSelections(selection, measurement, configs) {
             continue;
         if(property === "PostEvent")
             continue;
+        if(property === "LiveUpdate")
+            continue;
 
         var arr = Increments[property];
         
@@ -591,35 +609,34 @@ class ConfigOrVariableSelection {
         this.ValueLabel = valueLabel;
         this.ValueMeasurement = valueMeasurement;
         this.VariableListName = variableListName;
-
-        if(this.Configs)
-        {
-            this.ConfigValues = [];
-            for(var i = 0; i < this.Configs.length; i++)
-            {
-                this.ConfigValues[i] = new this.Configs[i]();
-                this.ConfigValues[i].ValueLabel = this.ValueLabel;
-                this.ConfigValues[i].ValueMeasurement = this.ValueMeasurement;
-                if(this.ValueMeasurement === "Bool")
-                    this.ConfigValues[i].Type = "checkbox";
-                else
-                    this.ConfigValues[i].Type = "number";
-            }
-        }
     }
 
     Configs = undefined;
-    ConfigValues = undefined;
+    ConfigValues = [];
     ValueLabel = undefined;
     ValueMeasurement = undefined;
     VariableListName = undefined;
     Selection = undefined;
 
     GetSubConfig() {
-        for(var i = 0; i < this.Configs.length; i++) {
+        var i;
+        for(i = 0; i < this.ConfigValues.length; i++) {
             if(GetClassProperty(this.ConfigValues[i], "Name") === this.Selection.value) {
                 return this.ConfigValues[i];
             }
+        }
+        for(var i = 0; i < this.Configs.length; i++)
+        {
+            if(GetClassProperty(this.Configs[i], "Name") !== this.Selection.value)
+                continue;
+            this.ConfigValues.push(new this.Configs[i]());
+            this.ConfigValues[this.ConfigValues.length-1].ValueLabel = this.ValueLabel;
+            this.ConfigValues[this.ConfigValues.length-1].ValueMeasurement = this.ValueMeasurement;
+            if(this.ValueMeasurement === "Bool")
+                this.ConfigValues[this.ConfigValues.length-1].Type = "checkbox";
+            else
+                this.ConfigValues[this.ConfigValues.length-1].Type = "number";
+            return this.ConfigValues[this.ConfigValues.length-1];
         }
     }
 
@@ -631,7 +648,8 @@ class ConfigOrVariableSelection {
         if(this.ConfigValues) { 
             obj.Values = [];
             for(var i = 0; i < this.ConfigValues.length; i++){
-                obj.Values.push(this.ConfigValues[i].GetObj());
+                if(!this.ConfigValues[i].IsDefault || !this.ConfigValues[i].IsDefault())
+                    obj.Values.push(this.ConfigValues[i].GetObj());
             }
         }
 
@@ -644,13 +662,29 @@ class ConfigOrVariableSelection {
         if(obj)
             this.Selection = obj.Selection;
 
-            
         if(this.Selection && !this.Selection.reference) {
             for(var i = 0; i < obj.Values.length; i++) {
+                var found = false;
                 for(var t = 0; t < this.ConfigValues.length; t++) {
                     if(GetClassProperty(this.ConfigValues[t], "Name") === obj.Values[i].Name) {
                         this.ConfigValues[t].SetObj(obj.Values[i]);
+                        found = true;
                         break;
+                    }
+                }
+                if(!found){
+                    for(var t = 0; t < this.Configs.length; t++)
+                    {
+                        if(GetClassProperty(this.Configs[t], "Name") !== obj.Values[i].Name)
+                            continue;
+                        this.ConfigValues.push(new this.Configs[t]());
+                        this.ConfigValues[this.ConfigValues.length-1].ValueLabel = this.ValueLabel;
+                        this.ConfigValues[this.ConfigValues.length-1].ValueMeasurement = this.ValueMeasurement;
+                        if(this.ValueMeasurement === "Bool")
+                            this.ConfigValues[this.ConfigValues.length-1].Type = "checkbox";
+                        else
+                            this.ConfigValues[this.ConfigValues.length-1].Type = "number";
+                        this.ConfigValues[this.ConfigValues.length-1].SetObj(obj.Values[i]);
                     }
                 }
             }
