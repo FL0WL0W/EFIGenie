@@ -23,6 +23,9 @@
                 $("#btnSave").click(function(){
                     downloadObject(b.GetObj(), configJsonName);
                 });
+                $("#btnSaveCompressed").click(function(){
+                    downloadCompressedObject(b.GetObj(), configJsonName);
+                });
                 $("#btnLoad").change(function(evt){
                     var test = new FileReader();
 
@@ -66,6 +69,7 @@
         <div>
             <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
             <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
+            <!-- <input id="btnSaveCompressed" type="button" class="w3-button w3-padding-16" value="Save Compressed"> -->
             <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
             <input id="btnLoad" type="file" style="display: none;">
             <select id="selectTarget">
