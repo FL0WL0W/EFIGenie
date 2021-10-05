@@ -373,6 +373,25 @@ select .pinconflict{
     color: #55AA55;
 }
 
+.context-menu {
+    position: fixed;
+    background: #222629;
+    border: 1px solid black;
+    z-index: 10;
+}
+
+.context-menu ul {
+    padding: 0px;
+    margin: 0px;
+    min-width: 150px;
+    list-style: none;
+}
+
+.context-menu ul li {
+    padding: 3px;
+    border: 1px solid black;
+}
+
 .monospace {
 font-family: 'Courier New', monospace;
 }

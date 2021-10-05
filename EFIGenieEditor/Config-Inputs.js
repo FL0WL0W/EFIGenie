@@ -247,6 +247,7 @@ class ConfigInputs {
     Inputs = [new ConfigInput()];
     TargetDevice = "STM32F401C";
     Selected = 0;
+    ContextSelect;
 
     GetObj() {
         var obj  = { Inputs: [], TargetDevice: this.TargetDevice };
@@ -284,6 +285,7 @@ class ConfigInputs {
             this.Inputs[i].Detach();
         }
 
+        $(document).off("contextmenu."+this.GUID);
         $(document).off("change."+this.GUID);
         $(document).off("click."+this.GUID);
     }
@@ -312,7 +314,7 @@ class ConfigInputs {
             }
         });
         
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputs a", function(){
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputs div", function(){
             var selected = parseInt($(this).data("index"));
             if(isNaN(selected))
                 return;
@@ -337,18 +339,48 @@ class ConfigInputs {
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
         });
         
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-Add", function(){
-            thisClass.Inputs.push(new ConfigInput());
+        $(document).on("contextmenu."+this.GUID, "#" + this.GUID + "-inputs div", function(e){
+            $("#" + thisClass.GUID + "-contextmenu").show();
+            $("#" + thisClass.GUID + "-contextmenu").css("left", e.pageX + "px");
+            $("#" + thisClass.GUID + "-contextmenu").css("top" , e.pageY + "px");
+            thisClass.ContextSelect = $(this).data("index");
+            
+            e.preventDefault();
+        });
+        $(document).on("click."+this.GUID, function(){
+            $("#" + thisClass.GUID + "-contextmenu").hide();
+        });
+
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-add", function(){
+            if(isNaN(thisClass.ContextSelect))
+                return;
+
+            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, new ConfigInput());
+            thisClass.Selected = thisClass.ContextSelect + 1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
         
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-Delete", function(){
-            if(isNaN(thisClass.Selected))
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-delete", function(){
+            if(isNaN(thisClass.ContextSelect))
                 return;
             
-            thisClass.Inputs.splice(thisClass.Selected, 1);
+            thisClass.Inputs.splice(thisClass.ContextSelect, 1);
+            if(thisClass.ContextSelect <= thisClass.Selected && thisClass.Selected !== 0)
+                thisClass.Selected--;
+            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
+            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.Attach();
+        });
+
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-duplicate", function(){
+            if(isNaN(thisClass.ContextSelect))
+                return;
+            
+            thisClass.Inputs.push(new ConfigInput());
+            thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[contextSelect].GetObj());
+            thisClass.Selected = thisClass.Inputs.length-1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -379,18 +411,6 @@ class ConfigInputs {
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
-        
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-Duplicate", function(){
-            if(isNaN(thisClass.Selected))
-                return;
-            
-            thisClass.Inputs.push(new ConfigInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[thisClass.Selected].GetObj());
-            thisClass.Selected = thisClass.Inputs.length-1;
-            $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
     }
 
     GetInputsHtml() {
@@ -401,15 +421,16 @@ class ConfigInputs {
         for(var i = 0; i < this.Inputs.length; i++){
             inputlist += "<div data-index=\"" + i + "\" class=\"w3-bar-subitem w3-button" + (this.Selected === i? " active" : "") + "\">" + this.Inputs[i].Name + "</div>";
         }
+        if(this.Inputs.length === 0){
+            this.ContextSelect = -1;
+            inputlist = "<div id=\"" + this.GUID + "-add\" class=\"w3-bar-subitem w3-button\"><span class=\"monospace\">+ </span>Add</div>";
+        }
         return "<div id=\"" + this.GUID + "-inputs\">" + inputlist + "</div>";
     }
 
     GetControlsHtml() {
-        return  "<span id=\"" + this.GUID + "-Add\" style=\"padding: 3px 7px;\">+</span>" +
-                "<span id=\"" + this.GUID + "-Delete\" style=\"padding: 3px 8px;\">-</span>" +
-                "<span id=\"" + this.GUID + "-Up\" style=\"padding: 3px 4px;\">↑</span>" +
-                "<span id=\"" + this.GUID + "-Down\" style=\"padding: 3px 4px;\">↓</span>" +
-                "<span id=\"" + this.GUID + "-Duplicate\" style=\"padding: 3px 7px;\">+</span>";
+        return  "<span id=\"" + this.GUID + "-Up\" style=\"padding: 3px 4px;\">↑</span>" +
+                "<span id=\"" + this.GUID + "-Down\" style=\"padding: 3px 4px;\">↓</span>";
     }
 
     GetHtml() {
