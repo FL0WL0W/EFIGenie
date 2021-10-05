@@ -3,7 +3,7 @@
 An open source engine management. It uses a taskmanager and is coded in a
 operation oriented architecture.
 
-The target microcontroller at the moment are he cheap but powerful STM32 line of processors
+The target microcontroller at the moment are the cheap but powerful STM32 line of processors
 but any microcontroller can be ported by creating just 4 services,
 AnalogService, DigitalService, PwmService, TimerService that can be found in the https://github.com/FL0WL0W/EmbeddedIOServices 
 repository. A large benefit to this architecture is that new sensors/abilities/features/etc. 
