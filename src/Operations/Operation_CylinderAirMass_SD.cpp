@@ -7,12 +7,15 @@ namespace OperationArchitecture
 	Operation_CylinderAirMass_SD::Operation_CylinderAirMass_SD(const float cylinderVolume) : _cylinderVolume(cylinderVolume) { }
 	
 	float Operation_CylinderAirMass_SD::Execute(float cylinderAirTemperature, float manifoldAbsolutePresssure, float volumetricEfficieny)
-	{				
-		float cylinderVolume = _cylinderVolume * 1000 * volumetricEfficieny; //ml
-		
-		float airDensity = (manifoldAbsolutePresssure * 101.325f) / (287 /*GasConstant*/ * (cylinderAirTemperature + 273.15f)); // kg/m^3
+	{
+		//PV=nRT => n = PV/RT
+		//R = 0.083144621 L bar/K mol 
 
-		return cylinderVolume * airDensity;
+		const float n = (manifoldAbsolutePresssure * _cylinderVolume * volumetricEfficieny) / (0.083144621f * (cylinderAirTemperature + 273.15f));
+
+		//the molecular weight of dry air is 28.9647 grams per mole.
+
+		return n * 28.9647f;
 	}
 	
 	IOperationBase *Operation_CylinderAirMass_SD::Create(const void *config, size_t &sizeOut)
