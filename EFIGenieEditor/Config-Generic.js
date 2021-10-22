@@ -263,6 +263,10 @@ class ConfigOperation_LookupTable {
                 max = tableValue[i];
             }
         }
+        if(this.Type == "checkbox") {
+            type = "BOOL"
+            typeId = 11;
+        }
         if(!type){
             if(min < 0) {
                 if(max < 128 && min > -129) {
@@ -485,6 +489,10 @@ class ConfigOperation_2AxisTable {
             if(max === undefined || tableValue[i] < max){
                 max = tableValue[i];
             }
+        }
+        if(this.Type == "checkbox") {
+            type = "BOOL"
+            typeId = 11;
         }
         if(!type){
             if(min < 0) {

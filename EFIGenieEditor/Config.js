@@ -8,7 +8,7 @@ InjectorEnableConfigs.push(ConfigOperation_Static);
 InjectorEnableConfigs.push(ConfigOperation_LookupTable);
 InjectorEnableConfigs.push(ConfigOperation_2AxisTable);
 var InjectorPulseWidthConfigs = [];
-// InjectorPulseWidthConfigs.push(ConfigOperation_Static);
+InjectorPulseWidthConfigs.push(ConfigOperation_Static);
 // InjectorPulseWidthConfigs.push(ConfigOperation_LookupTable);
 // InjectorPulseWidthConfigs.push(ConfigOperation_2AxisTable);
 var IgnitionAdvanceConfigs = [];
