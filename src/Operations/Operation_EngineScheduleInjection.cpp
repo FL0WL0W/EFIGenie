@@ -88,7 +88,7 @@ namespace OperationArchitecture
 			//schedule close based off the last open tick
 			while(ITimerService::TickLessThanTick(openAt + (ticksPerCycle / 2), _lastOpenTick))
 				openAt += ticksPerCycle;
-			closeAt = openAt + pulseTicks;
+			closeAt = _lastOpenTick + pulseTicks;
 
 			//schedule close
 			_timerService->ScheduleTask(_closeTask, closeAt);
