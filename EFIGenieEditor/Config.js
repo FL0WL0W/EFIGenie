@@ -42,7 +42,8 @@ EngineFactoryIDs = {
     PositionPrediction: 4,
     EngineParameters: 5,
     ScheduleIgnition: 6,
-    ScheduleInjection: 7
+    ScheduleInjection: 7,
+    InjectorDeadTime: 8
 }
 
 PackedTypeAlignment = [
@@ -159,57 +160,69 @@ types = [
     }},
     { type: "Operation_Add", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add },
         ]};
     }},
     { type: "Operation_Subtract", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract },
         ]};
     }},
     { type: "Operation_Multiply", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply },
         ]};
     }},
     { type: "Operation_Divide", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide },
         ]};
     }},
     { type: "Operation_And", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And },
         ]};
     }},
     { type: "Operation_Or", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or },
         ]};
     }},
     { type: "Operation_GreaterThan", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan },
         ]};
     }},
     { type: "Operation_LessThan", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan },
         ]};
     }},
     { type: "Operation_Equal", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal },
         ]};
     }},
     { type: "Operation_GreaterThanOrEqual", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual },
         ]};
     }},
     { type: "Operation_LessThanOrEqual", toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual },
+        ]};
+    }},
+    { type: "VariableParameter", toObj(val) {
+        return { value: [
+            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: val },//variable ID
+        ]};
+    }},
+    { type: "OperationParameter", toObj(val) {
+        return { value: [
+            { type: "UINT8", value: val }, //operation index
+            { type: "UINT8", value: 0 }, //use first return
         ]};
     }},
 ]
@@ -531,22 +544,22 @@ class ConfigFuel {
         return template;
     }
 
-    InjectorMassId = -1;
+    CylinderFuelMassId = -1;
     SetIncrements() {
         this.AFRConfigOrVariableSelection.SetIncrements();
 
-        this.InjectorMassId = -1;
+        this.CylinderFuelMassId = -1;
         if(Increments.FuelParameters === undefined)
             Increments.FuelParameters = [];
 
-        this.InjectorMassId = 1;
+        this.CylinderFuelMassId = 1;
         if(Increments.VariableIncrement === undefined)
             Increments.VariableIncrement = 1;
         else
-            this.InjectorMassId = ++Increments.VariableIncrement;
+            this.CylinderFuelMassId = ++Increments.VariableIncrement;
         Increments.FuelParameters.push({ 
-            Name: "Injector Mass", 
-            Id: this.InjectorMassId,
+            Name: "Cylinder Fuel Mass", 
+            Id: this.CylinderFuelMassId,
             Type: "float",
             Measurement: "Mass"
         });
@@ -560,7 +573,7 @@ class ConfigFuel {
     GetObjPackage() {
         if(Increments.VariableIncrement === undefined)
         throw "Set Increments First";
-        if(this.InjectorMassId === -1)
+        if(this.CylinderFuelMassId === -1)
             throw "Set Increments First";
 
         var numberOfOperations = 2;
@@ -576,7 +589,7 @@ class ConfigFuel {
 
             { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
             { type: "Operation_Divide"}, //Divide
-            { type: "UINT32", value: this.InjectorMassId }, //Injector Mass ID
+            { type: "UINT32", value: this.CylinderFuelMassId }, //Cylinder Fuel Mass ID
             { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id },
             { obj: this.AFRConfigOrVariableSelection.GetObjAsParameter(1)}, 
@@ -1058,7 +1071,7 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
 
     SetObj(obj) {
         this.Detach();
-        if(obj)
+        if(obj && this.CylinderVolume !== undefined)
             this.CylinderVolume = obj.CylinderVolume;
 
         $("#" + this.GUID).replaceWith(this.GetHtml());
@@ -1076,8 +1089,6 @@ class ConfigOperationCylinderAirmass_SpeedDensity {
         $(document).on("change."+this.GUID, "#" + this.GUID + "-cylindervolume", function(){
             thisClass.CylinderVolume = parseFloat($(this).val());
         });
-
-
     }
 
     GetHtml() {
@@ -1131,17 +1142,21 @@ class ConfigInjectorPulseWidth_DeadTime {
 
     FlowRateConfigOrVariableSelection = undefined;
     DeadTimeConfigOrVariableSelection = undefined;
+    MinInjectorFuelMass = 0.005;
 
     GetObj() {
         return {
             Name: GetClassProperty(this, "Name"),
             FlowRateConfigOrVariableSelection: this.FlowRateConfigOrVariableSelection.GetObj(),
             DeadTimeConfigOrVariableSelection: this.DeadTimeConfigOrVariableSelection.GetObj(),
+            MinInjectorFuelMass: this.MinInjectorFuelMass
         };
     }
 
     SetObj(obj) {
         this.Detach();
+        if(obj && obj.MinInjectorFuelMass !== undefined)
+            MinInjectorFuelMass = obj.MinInjectorFuelMass;
         this.FlowRateConfigOrVariableSelection.SetObj(!obj? undefined : obj.FlowRateConfigOrVariableSelection);
         this.DeadTimeConfigOrVariableSelection.SetObj(!obj? undefined : obj.DeadTimeConfigOrVariableSelection);
 
@@ -1150,12 +1165,19 @@ class ConfigInjectorPulseWidth_DeadTime {
     }
 
     Detach() {
+        $(document).off("change."+this.GUID);
         this.FlowRateConfigOrVariableSelection.Detach();
         this.DeadTimeConfigOrVariableSelection.Detach();
     }
 
     Attach() {
         this.Detach();
+        var thisClass = this;
+
+        $(document).on("change."+this.GUID, "#" + this.GUID + "-mininjectorfuelmass", function(){
+            thisClass.MinInjectorFuelMass = parseFloat($(this).val());
+        });
+
         this.FlowRateConfigOrVariableSelection.Attach();
         this.DeadTimeConfigOrVariableSelection.Attach();
     }
@@ -1170,6 +1192,9 @@ class ConfigInjectorPulseWidth_DeadTime {
 
         template = template.replace(/[$]deadtime[$]/g, 
             this.DeadTimeConfigOrVariableSelection.GetHtml());
+            
+        template = template.replace(/[$]mininjectorfuelmass[$]/g, this.MinInjectorFuelMass);
+        template = template.replace(/[$]mininjectorfuelmassmeasurement[$]/g, GetUnitDisplay("Mass"));
 
         return template;
     }
@@ -1180,88 +1205,32 @@ class ConfigInjectorPulseWidth_DeadTime {
     }
 
     GetObjOperation() {
-
         return { value: [
-            { type: "Operation_Multiply" }, //Multiply
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+            { type: "FLOAT", value: this.MinInjectorFuelMass }
         ]};
     }
 
     GetObjParameters(){
         return { value: [
-            { type: "UINT8", value: 1 }, //use first suboperation
-            { type: "UINT8", value: 0 }, //use first return
-            { type: "UINT8", value: 2 }, //use second suboperation
-            { type: "UINT8", value: 0 }, //use first return
+            { type: "OperationParameter", value: 1 }, //use first suboperation
+            { type: "VariableParameter", value: Increments.FuelParameters.find(a => a.Name === "Cylinder Fuel Mass").Id },
+            { obj: this.FlowRateConfigOrVariableSelection.GetObjAsParameter(2)},
+            { obj: this.DeadTimeConfigOrVariableSelection.GetObjAsParameter(this.FlowRateConfigOrVariableSelection.IsImmediateOperation()? 3 : 2)},
             //first suboperation
             { obj: { value: [ 
                 { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                { type: "Operation_GreaterThan" }, //GreaterThan
-                { type: "UINT8", value: 0 }, //use variable
-                { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id }, //Injector Mass ID
-                { type: "UINT8", value: 1 }, //use first suboperation
-                { type: "UINT8", value: 0 }, //use first return
+                { type: "Operation_Add" }, //Add
+                { type: "OperationParameter", value: 1 }, //use first suboperation
+                { type: "VariableParameter", value: Increments.EngineSequentialId },
                 //first suboperation
                 { obj: { value: [ 
                     { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                    { type: "Operation_StaticVariable", value: 0 }
+                    { type: "Operation_StaticVariable", value: 1 }
                 ]}},
             ]}},
-
-            //second suboperation
-            { obj: { value: [ 
-                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                { type: "Operation_Add" }, //Add
-                { type: "UINT8", value: 1 }, //use first suboperation
-                { type: "UINT8", value: 0 }, //use first return
-                { obj: this.DeadTimeConfigOrVariableSelection.GetObjAsParameter(2)},
-                //first suboperation
-                { obj: { value: [ 
-                    { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                    { type: "Operation_Multiply" }, //Multiply
-                    { type: "UINT8", value: 1 }, //use first suboperation
-                    { type: "UINT8", value: 0 }, //use first return
-                    { type: "UINT8", value: 2 }, //use second suboperation
-                    { type: "UINT8", value: 0 }, //use first return
-                    //first suboperation
-                    { obj: { value: [ 
-                        { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                        { type: "Operation_Multiply" }, //Multiply
-                        { type: "UINT8", value: 1 }, //use first suboperation
-                        { type: "UINT8", value: 0 }, //use first return
-                        { type: "UINT8", value: 2 }, //use second suboperation
-                        { type: "UINT8", value: 0 }, //use first return
-                        //first suboperation
-                        { obj: { value: [ 
-                            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                            { type: "Operation_StaticVariable", value: 0.5 }
-                        ]}},
-                        //second suboperation
-                        { obj: { value: [ 
-                            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                            { type: "Operation_Add" }, //Add
-                            { type: "UINT8", value: 1 }, //use first suboperation
-                            { type: "UINT8", value: 0 }, //use first return
-                            { type: "UINT8", value: 0 }, //use variable
-                            { type: "UINT32", value: Increments.EngineSequentialId },
-                            //first suboperation
-                            { obj: { value: [ 
-                                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                                { type: "Operation_StaticVariable", value: 1 }
-                            ]}},
-                        ]}},
-                    ]}},
-                    //second suboperation
-                    { obj: { value: [ 
-                        { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                        { type: "Operation_Divide" }, //Divide
-                        { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Mass").Id },
-                        { obj: this.FlowRateConfigOrVariableSelection.GetObjAsParameter(1)},
-                        { obj: this.FlowRateConfigOrVariableSelection.GetObjPackage(true)},
-                    ]}},
-                ]}},
-                { obj: this.DeadTimeConfigOrVariableSelection.GetObjPackage(true)},
-            ]}}
+            { obj: this.FlowRateConfigOrVariableSelection.GetObjPackage(true)},
+            { obj: this.DeadTimeConfigOrVariableSelection.GetObjPackage(true)},
         ]};
     }
 }

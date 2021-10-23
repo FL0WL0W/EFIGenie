@@ -1,0 +1,24 @@
+#include "Operations/Operation_InjectorDeadTime.h"
+#include "Config.h"
+
+#ifdef OPERATION_INJECTORDEADTIME_H
+namespace OperationArchitecture
+{
+	Operation_InjectorDeadTime::Operation_InjectorDeadTime(const float minInjectorFuelMass) : _minInjectorFuelMass(minInjectorFuelMass) { }
+	
+	float Operation_InjectorDeadTime::Execute(uint8_t squirtsPerCycle, float fuelMass, float injectorFlowRate, float injectorDeadTime)
+	{
+		float injectorFuelMass = fuelMass / squirtsPerCycle;
+
+		if(injectorFuelMass < _minInjectorFuelMass)
+			injectorFuelMass = _minInjectorFuelMass;
+		
+		return fuelMass / injectorFlowRate + injectorDeadTime;
+	}
+	
+	IOperationBase *Operation_InjectorDeadTime::Create(const void *config, size_t &sizeOut)
+	{
+		return new Operation_InjectorDeadTime(Config::CastAndOffset<float>(config, sizeOut));
+	}
+}
+#endif

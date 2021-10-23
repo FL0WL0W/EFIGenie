@@ -24,9 +24,12 @@ class ConfigOperation_DigitalPinWrite {
 
     SetObj(obj) {
         if(obj) {
-            this.Pin = obj.Pin;
-            this.Inverted = obj.Inverted;
-            this.HighZ = obj.HighZ;
+            if(obj.Pin !== undefined)
+                this.Pin = obj.Pin;
+            if(obj.Inverted !== undefined)
+                this.Inverted = obj.Inverted;
+            if(obj.HighZ !== undefined)
+                this.HighZ = obj.HighZ;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
     }

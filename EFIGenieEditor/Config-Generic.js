@@ -53,8 +53,10 @@ class ConfigOperation_Static {
     SetObj(obj) {
         if(obj) {
             this.Default = false;
-            this.Type = obj.Type;
-            this.Value = obj.Value;
+            if(obj.Type !== undefined)
+                this.Type = obj.Type;
+            if(obj.Value !== undefined)
+                this.Value = obj.Value;
         }
         $("#" + this.GUID).replaceWith(this.GetElementHtml());
     }
@@ -159,12 +161,17 @@ class ConfigOperation_LookupTable {
 
     SetObj(obj) {
         if(obj) {
-            this.Type = obj.Type;
-            this.Table.SetXResolution(obj.Resolution);
-            this.Table.MinX = obj.MinX;
-            this.Table.MaxX = obj.MaxX;
-            this.Table.Value = obj.Value;
-            if(!this.NoParamaterSelection)
+            if(obj.Type !== undefined)
+                this.Type = obj.Type;
+            if(obj.Resolution !== undefined)
+                this.Table.SetXResolution(obj.Resolution);
+            if(obj.MinX !== undefined)
+                this.Table.MinX = obj.MinX;
+            if(obj.MaxX !== undefined)
+                this.Table.MaxX = obj.MaxX;
+            if(obj.Value !== undefined)
+                this.Table.Value = obj.Value;
+            if(!this.NoParamaterSelection && obj.ParameterSelection !== undefined)
                 this.ParameterSelection = obj.ParameterSelection;
         }
         $("#" + this.GUID).replaceWith(this.GetElementHtml());
@@ -373,17 +380,25 @@ class ConfigOperation_2AxisTable {
 
     SetObj(obj) {
         if(obj) {
-            this.Type = obj.Type;
-            this.Table.SetXResolution(obj.XResolution);
-            this.Table.SetYResolution(obj.YResolution);
-            this.Table.MinX = obj.MinX;
-            this.Table.MaxX = obj.MaxX;
-            this.Table.MinY = obj.MinY;
-            this.Table.MaxY = obj.MaxY;
-            this.Table.Value = obj.Value;
-            if(!this.NoParamaterSelection)
+            if(obj.Type !== undefined)
+                this.Type = obj.Type;
+            if(obj.XResolution !== undefined)
+                this.Table.SetXResolution(obj.XResolution);
+            if(obj.YResolution !== undefined)
+                this.Table.SetYResolution(obj.YResolution);
+            if(obj.MinX !== undefined)
+                this.Table.MinX = obj.MinX;
+            if(obj.MaxX !== undefined)
+                this.Table.MaxX = obj.MaxX;
+            if(obj.MinY !== undefined)
+                this.Table.MinY = obj.MinY;
+            if(obj.MaxY !== undefined)
+                this.Table.MaxY = obj.MaxY;
+            if(obj.Value !== undefined)
+                this.Table.Value = obj.Value;
+            if(!this.NoParamaterSelection && obj.XSelection !== undefined)
                 this.XSelection = obj.XSelection;
-            if(!this.NoParamaterSelection)
+            if(!this.NoParamaterSelection && obj.YSelection !== undefined)
                 this.YSelection = obj.YSelection;
         }
         $("#" + this.GUID).replaceWith(this.GetElementHtml());
@@ -858,15 +873,13 @@ class ConfigOrVariableSelection {
         //if immediate operation
         if(this.IsImmediateOperation()) {     
             return { value: [
-                { type: "UINT8", value: subOperationId }, //use subOperation
-                { type: "UINT8", value: 0 }, //use first return from operation
+                { type: "OperationParameter", value: subOperationId }, //use first suboperation
             ]};
         }
 
         var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
         return { value: [
-            { type: "UINT8", value: 0 }, //use variable
-            { type: "UINT32", value: cell.Id }, //ID
+            { type: "VariableParameter", value: cell.Id }, //ID
         ]};
     }
     
@@ -896,7 +909,6 @@ class ConfigOrVariableSelection {
                 throw "Set Increments First";
             if(this.Id === -1 && GetClassProperty(subConfig, "Output"))
                 throw "Set Increments First";
-
 
             var obj  = {value: [
                     { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(subConfig, "Output") }}, //immediate and store variable, return if subOperation

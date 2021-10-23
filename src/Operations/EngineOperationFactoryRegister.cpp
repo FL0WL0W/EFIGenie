@@ -5,6 +5,7 @@
 #include "Operations/Operation_EngineParameters.h"
 #include "Operations/Operation_EngineScheduleIgnition.h"
 #include "Operations/Operation_EngineScheduleInjection.h"
+#include "Operations/Operation_InjectorDeadTime.h"
 
 using namespace EmbeddedIOServices;
 
@@ -21,6 +22,7 @@ namespace OperationArchitecture
         factory->Register(idOffset + 5, &Operation_EngineParameters::Instance);
         factory->Register(idOffset + 6, [embeddedIOServiceCollection, packager](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, embeddedIOServiceCollection, packager); });
         factory->Register(idOffset + 7, [embeddedIOServiceCollection, packager](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, embeddedIOServiceCollection, packager); });
+        factory->Register(idOffset + 8, Operation_InjectorDeadTime::Create);
     }
 }
 
