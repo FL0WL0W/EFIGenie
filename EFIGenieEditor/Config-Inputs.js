@@ -529,8 +529,10 @@ class ConfigInput {
                 for(var i = 0; i < InputTranslationConfigs.length; i++)
                 {
                     if(InputTranslationConfigs[i].Name === obj.TranslationConfig.Name) {
-                        this.TranslationConfig = new InputTranslationConfigs[i](true);
-                        this.TranslationConfig.XLabel = "Raw Input";
+                        this.TranslationConfig = new InputTranslationConfigs[i]({
+                            NoParameterSelection: true,
+                            XLabel: "Raw Input"
+                        });
                         this.TranslationConfig.SetObj(obj.TranslationConfig);
                         break;
                     }
@@ -591,8 +593,10 @@ class ConfigInput {
                 thisClass.TranslationConfig = undefined;
             else
             {
-                thisClass.TranslationConfig = new InputTranslationConfigs[val](true);
-                thisClass.TranslationConfig.XLabel = "Raw Input";
+                thisClass.TranslationConfig = new InputTranslationConfigs[val]({
+                    NoParameterSelection: true,
+                    XLabel: "Raw Input"
+                });
             }
             
             if(thisClass.TranslationConfig)
@@ -1381,35 +1385,11 @@ class ConfigOperation_Polynomial {
 InputTranslationConfigs.push(ConfigOperation_Polynomial);
 
 
-class ConfigOperation_ReluctorGM24x {
+class ConfigOperation_ReluctorGM24x extends UITemplate {
     static Name = "Reluctor GM 24X";
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
     static Measurement = "ReluctorResult";
-
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-
-    GetObj() {
-        return { 
-            Name: GetClassProperty(this, "Name")
-        };
-    }
-
-    SetObj(obj) {
-    }
-
-    Detach() {
-    }
-
-    Attach() {
-    }
-
-    GetHtml() {
-        return "";
-    }
 
     GetObjOperation() {
         return { value: [
@@ -1419,7 +1399,7 @@ class ConfigOperation_ReluctorGM24x {
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
 
-class ConfigOperation_ReluctorUniversal1x {
+class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     static Name = "Reluctor Universal 1X";
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
@@ -1427,68 +1407,37 @@ class ConfigOperation_ReluctorUniversal1x {
     static Template = getFileContents("ConfigGui/Operation_ReluctorUniversal1x.html");
 
     constructor(){
-        this.GUID = getGUID();
-    }
-    
-    
-    RisingPosition = 0;
-    FallingPosition = 180;
+        super();
 
-    GetObj() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            RisingPosition: this.RisingPosition,
-            FallingPosition: this.FallingPosition
+        this.Elements = { 
+            RisingPosition: new ConfigNumberWithMeasurement({
+                Value: 0,
+                Step: 0.1,
+                Min: 0,
+                Max: 360,
+                Measurement: "Angle"
+            }),
+            FallingPosition: new ConfigNumberWithMeasurement({
+                Value: 180,
+                Step: 0.1,
+                Min: 0,
+                Max: 360,
+                Measurement: "Angle"
+            }),
         };
-    }
-
-    SetObj(obj) {
-        if(obj) {
-            this.RisingPosition = obj.RisingPosition;
-            this.FallingPosition = obj.FallingPosition;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-rising", function(){
-            thisClass.RisingPosition = parseFloat($(this).val());
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-falling", function(){
-            thisClass.FallingPosition = parseFloat($(this).val());
-        });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]rising[$]/g, this.RisingPosition);
-        template = template.replace(/[$]falling[$]/g, this.FallingPosition);
-
-        return template;
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: "FLOAT", value: this.RisingPosition}, //RisingPosition
-            { type: "FLOAT", value: this.FallingPosition}, //FallingPosition
+            { type: "FLOAT", value: this.Elements.RisingPosition.Value}, //RisingPosition
+            { type: "FLOAT", value: this.Elements.FallingPosition.Value}, //FallingPosition
         ]};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal1x);
 
-class ConfigOperation_ReluctorUniversalMissingTeeth {
+class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     static Name = "Reluctor Universal Missing Teeth";
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
@@ -1496,80 +1445,41 @@ class ConfigOperation_ReluctorUniversalMissingTeeth {
     static Template = getFileContents("ConfigGui/Operation_ReluctorUniversalMissingTeeth.html");
 
     constructor(){
-        this.GUID = getGUID();
-    }
-    
-    
-    FirstToothPosition = 0;
-    ToothWidth = 5;
-    NumberOfTeeth = 36;
-    NumberOfTeethMissing = 1;
+        super();
 
-    GetObj() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            FirstToothPosition: this.FirstToothPosition,
-            ToothWidth: this.ToothWidth,
-            NumberOfTeeth: this.NumberOfTeeth,
-            NumberOfTeethMissing: this.NumberOfTeethMissing
+        this.Elements = { 
+            FirstToothPosition: new ConfigNumberWithMeasurement({
+                Value: 0,
+                Step: 0.1,
+                Min: 0,
+                Max: 360,
+                Measurement: "Angle"
+            }),
+            ToothWidth: new ConfigNumberWithMeasurement({
+                Value: 5,
+                Step: 0.1,
+                Min: 0,
+                Max: 360,
+                Measurement: "Angle"
+            }),
+            NumberOfTeeth: new ConfigNumber({
+                Value: 36,
+                Min: 2
+            }),
+            NumberOfTeethMissing: new ConfigNumber({
+                Value: 1,
+                Min: 1
+            }),
         };
-    }
-
-    SetObj(obj) {
-        if(obj) {
-            this.FirstToothPosition = obj.FirstToothPosition;
-            this.ToothWidth = obj.ToothWidth;
-            this.NumberOfTeeth = obj.NumberOfTeeth;
-            this.NumberOfTeethMissing = obj.NumberOfTeethMissing;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-firstToothPosition", function(){
-            thisClass.FirstToothPosition = parseFloat($(this).val());
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-toothWidth", function(){
-            thisClass.ToothWidth = parseFloat($(this).val());
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-numberOfTeeth", function(){
-            thisClass.NumberOfTeeth = parseInt($(this).val());
-        });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-numberOfTeethMissing", function(){
-            thisClass.NumberOfTeethMissing = parseInt($(this).val());
-        });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]firstToothPosition[$]/g, this.FirstToothPosition);
-        template = template.replace(/[$]toothWidth[$]/g, this.ToothWidth);
-        template = template.replace(/[$]numberOfTeeth[$]/g, this.NumberOfTeeth);
-        template = template.replace(/[$]numberOfTeethMissing[$]/g, this.NumberOfTeethMissing);
-
-        return template;
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-            { type: "FLOAT", value: this.FirstToothPosition}, //FirstToothPosition
-            { type: "FLOAT", value: this.ToothWidth}, //ToothWidth
-            { type: "UINT8", value: this.NumberOfTeeth}, //NumberOfTeeth
-            { type: "UINT8", value: this.NumberOfTeethMissing}, //NumberOfTeethMissing
+            { type: "FLOAT", value: this.Elements.FirstToothPosition.Value}, //FirstToothPosition
+            { type: "FLOAT", value: this.Elements.ToothWidth.Value}, //ToothWidth
+            { type: "UINT8", value: this.Elements.NumberOfTeeth.Value}, //NumberOfTeeth
+            { type: "UINT8", value: this.Elements.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
         ]};
     }
 }
