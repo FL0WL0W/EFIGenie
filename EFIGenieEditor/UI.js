@@ -1,5 +1,4 @@
 class UITemplate {
-    Elements = {};
     Attached  = false;
 
     constructor(prop) {
@@ -13,7 +12,7 @@ class UITemplate {
         var name = GetClassProperty(this, "Name");
 
         //grab baseObjName and count number of objects in element values
-        Object.entries(this.Elements).forEach(e => {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
             if(element !== undefined && element.GetValue && typeof element.GetValue() === "object") {
                 objectsInElements++;
@@ -23,13 +22,13 @@ class UITemplate {
 
         //make sure we have 1 element value that is an object
         if(baseObjName && objectsInElements === 1){
-            value = this.Elements[baseObjName].GetValue();
+            value = this[baseObjName].GetValue();
             //make sure the baseobj doesnt have a name
             if(name !== undefined && value.Name !== undefined) {
                 baseObjName = undefined;
             } else {
                 //make sure none of the element values conflict with the baseobj values
-                Object.entries(this.Elements).forEach(e => {
+                Object.entries(this).forEach(e => {
                     var [elementname, element] = e;
                     if(element !== undefined && element.GetValue && elementname !== baseObjName && value[elementname] !== undefined) {
                         baseObjName = undefined;
@@ -41,13 +40,13 @@ class UITemplate {
         }
 
         if(baseObjName) {
-            value = this.Elements[baseObjName].GetValue();
+            value = this[baseObjName].GetValue();
             value.Name = GetClassProperty(this, "Name");
         } else {
             value = {};
         }
 
-        Object.entries(this.Elements).forEach(e => {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
             if(element !== undefined && element.GetValue && elementname !== baseObjName) {
                 value[elementname] = element.GetValue();
@@ -62,7 +61,7 @@ class UITemplate {
 
         var baseObjName;
 
-        Object.entries(this.Elements).forEach(e => {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
             if(element !== undefined && element.GetValue && typeof element.GetValue() === "object") {
                 if(!baseObjName)
@@ -70,12 +69,12 @@ class UITemplate {
             }
         });
 
-        if(!value[baseObjName])
-            this.Elements[baseObjName].SetValue(value);
+        if(baseObjName && !value[baseObjName])
+            this[baseObjName].SetValue(value);
         else
             baseObjName = undefined;
 
-        Object.entries(this.Elements).forEach(e => {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
             if(element !== undefined && element.SetValue && elementname !== baseObjName) {
                 element.SetValue(value[elementname]);
@@ -87,7 +86,7 @@ class UITemplate {
 
     Detach() {
         if(this.Attached) {
-            Object.entries(this.Elements).forEach(e => {
+            Object.entries(this).forEach(e => {
                 var [elementname, element] = e;
                 if(element !== undefined && element.Detach) {
                     element.Detach();
@@ -99,9 +98,9 @@ class UITemplate {
 
     Attach() {
         this.Detach();
-        Object.entries(this.Elements).forEach(e => {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.Detach) {
+            if(element !== undefined && element.Attach) {
                 element.Attach();
             }
         });
@@ -111,22 +110,42 @@ class UITemplate {
     GetHtml(){
         var html = GetClassProperty(this, "Template");
         if(html === undefined)
-            html = "";
+            return "";
 
-        Object.entries(this.Elements).forEach(e => {
-            var [elementname, element] = e;
-            if(element !== undefined && element.GetHtml) {
-                if(elementname) {
-                    html = html.replaceAll("$" + elementname + "$", element.GetHtml());
+        const thisClass = this;
+        var matches;
+        while((matches = html.match(/[$].*?[$]/g)) !== null) {
+            matches.forEach(templateIdentifier => {
+                function GetTemplateReplacement(obj, templateIdentifier) {
+                    const subReplacer = templateIdentifier.indexOf(".") > -1;
+                    const templateReplacer = GetClassProperty(obj, subReplacer? templateIdentifier.substring(0, templateIdentifier.indexOf(".")) : templateIdentifier);
+    
+                    if(templateReplacer !== undefined) {
+                        if(typeof templateReplacer === "object") {
+                            if(subReplacer) {
+                                return GetTemplateReplacement(templateReplacer, templateIdentifier.substring(templateIdentifier.indexOf(".") + 1));
+                            }
+                            if(templateReplacer.GetHtml) {
+                                return templateReplacer.GetHtml();
+                            }
+                            return JSON.stringify(templateReplacer);
+                        }
+                        return templateReplacer;
+                    }
+                    return "";
                 }
-            }
-        });
+                templateIdentifier = templateIdentifier.substring(1, templateIdentifier.length -1);
+                var templateReplacement = GetTemplateReplacement(thisClass, templateIdentifier);
+                
+                html = html.replaceAll("$" + templateIdentifier + "$", templateReplacement);
+            });
+        }
 
         return html;
     }
 }
 
-class UIInputNumber {
+class UINumber {
     GUID = getGUID();
     Value = 0;
     Min = undefined;
@@ -236,7 +255,7 @@ class UICheckbox {
     }
 }
 
-class UIInputText {
+class UIText {
     GUID = getGUID();
     Value = "";
     OnChange = undefined;
@@ -280,15 +299,45 @@ class UIInputText {
 }
 
 class UISelection {
+    static ParseValue(type, value) {
+        switch(type) {
+            case "number":
+                return parseFloat(value);
+            case "boolean":
+                if(typeof value === "number")
+                    return value !== 0;
+                if(typeof value === "boolean")
+                    return value;
+                if(typeof value === "string")
+                    return value === "true" || value === "True" || value === "1";
+                if(typeof value === "object") {
+                    if(value)
+                        return true;
+                    return false;
+                }
+            case "string":
+                if(typeof value === "number" || typeof value === "boolean")
+                    return "" + value;
+                if(typeof value === "string")
+                    return value;
+                if(typeof value === "object")
+                    return JSON.stringify(value);
+            case "object":
+                if(typeof value === "number" || typeof value === "boolean" || typeof value === "object")
+                    return value;
+                if(typeof value === "string")
+                    return JSON.parse(value);
+                break;
+        }
+    }
+
     GUID = getGUID();
     Value = "";
     Options = [];
-    OptionsHtml = "";
     OnChange = undefined;
 
     constructor(prop) {
         Object.assign(this, prop);
-        this.SetOptions(this.Options);
     }
 
     GetValue() {
@@ -299,7 +348,7 @@ class UISelection {
         if(this.Value !== value) {
             this.Value = value;
             $("#" + this.GUID + " option").prop('selected', false);
-            $("#" + this.GUID + " option[value='" + value + "']").prop('selected', true);
+            $("#" + this.GUID + " option[value='" + UISelection.ParseValue("string", value) + "']").prop('selected', true);
 
             if(this.OnChange) {
                 this.OnChange(this.Value);
@@ -316,7 +365,8 @@ class UISelection {
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = $(this).val();
+            thisClass.Value = UISelection.ParseValue($(this).find(":selected").data("type"), $(this).val());
+            
             if(thisClass.OnChange) {
                 thisClass.OnChange(thisClass.Value);
             }
@@ -325,28 +375,44 @@ class UISelection {
 
     SetOptions(options) {
         this.Options = options;
-        this.OptionsHtml = "";
+        $("#" + this.GUID).html(this.GetOptionsHtml());
+    }
 
-        var thisClass = this;
+    GetOptions() {
+        return this.Options;
+    }
+
+    GetOptionsHtml() {
+        var stringValue = UISelection.ParseValue("string", this.Value);
+        var optionsHtml = "";
+        var selected = false;
         this.Options.forEach(option => {
             if(option.Group){
-                var optionsHtml = "";
+                var groupHtml = "";
                 option.Options.forEach(option => {
-                    optionsHtml += "<option value=\"" + option.Value + "\"" + (option.Value == thisClass.Value? " selected" : "") + ">" + option.Name + "</option>";
+                    var stringOptionValue = UISelection.ParseValue("string", option.Value)
+                    var s = stringOptionValue == stringValue;
+                    if(s)
+                        selected = true;
+                    groupHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + (s? " selected" : "") + ">" + option.Name + "</option>";
                 });
 
-                if(optionsHtml) 
-                    thisClass.OptionsHtml += "<optgroup label=\"" + option.Name + "\">" + optionsHtml + "</optgroup>";
+                if(groupHtml) 
+                    optionsHtml += "<optgroup label=\"" + option.Group + "\">" + groupHtml + "</optgroup>";
             } else {
-                optionsHtml += "<option value=\"" + option.Value + "\"" + (option.Value == thisClass.Value? " selected" : "") + ">" + option.Name + "</option>";
+                var stringOptionValue = UISelection.ParseValue("string", option.Value)
+                var s = stringOptionValue == stringValue;
+                if(s)
+                    selected = true;
+                optionsHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + (s? " selected" : "") + ">" + option.Name + "</option>";
             }
         });
-
-        $("#" + this.GUID).html(this.OptionsHtml);
+        optionsHtml = "<option" + (!selected? " selected" : "") + ">select</option>" + optionsHtml;
+        return optionsHtml;
     }
 
     GetHtml() {
-        return "<select id=\"" + this.GUID + "\">" + this.OptionsHtml + "</select>";
+        return "<select id=\"" + this.GUID + "\">" + this.GetOptionsHtml() + "</select>";
     }
 }
 
@@ -388,101 +454,37 @@ class UITable extends Table {
     }
 }
 
-class UIText {
-    GUID = getGUID;
+class UIDialog {
+    GUID = getGUID();
+    TemplateIdentifier = undefined;
+    Title = "Dialog";
+    ButtonText = "Open";
 
     constructor(prop) {
         Object.assign(this, prop);
     }
 
-    SetText(text) {
-        this.Text = text;
-        $("#" + this.GUID).html(text);
-    }
-
-    GetHtml() {
-        return "<span id=\"" + this.GUID + "\">" + this.Text + "<\span>";
-    }
-}
-
-class UIDialog {
-    GUID = getGUID();
-    SubUI = undefined;
-    Title = "";
-    ButtonText = "Open";
-
-    constructor(prop, subUI) {
-        Object.assign(this, prop);
-        this.SubUI = subUI;
-    }
-
-    GetValue() {
-        return this.SubUI.GetValue();
-    }
-
-    SetValue(value) {
-        this.SubUI.SetValue(value);
-    }
-
     Detach() {
-        this.SubUI.Detach();
         $(document).off("click."+this.GUID);
     }
 
     Attach() {
         this.Detach();
-        this.SubUI.Attach();
         var thisClass = this;
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-open", function(){
-            console.log("wroks")
-            $("#" + thisClass.GUID + "-dialog").dialog({ width:'auto', modal:true, title: thisClass.Title });
+            var dialogSelector = $("#" + thisClass.GUID + "-dialog");
+            dialogSelector.dialog({ width:'auto', modal:true, title: dialogSelector.data("title")});
         });
     }
 
     GetHtml() {
         return  "<input id=\"" + this.GUID + "-open\" type=\"button\" class=\"button\" value=\"" + this.ButtonText + "\"></input>" +
-                "<div id=\"" + this.GUID + "-dialog\" style=\"display: none;\">" + this.SubUI.GetHtml() + "</div>";
+                "<div data-title=\"" + this.Title + "\" id=\"" + this.GUID + "-dialog\" style=\"display: none;\">$" + this.TemplateIdentifier + "$</div>";
     }
 }
 
-class UILabel {
-    GUID = undefined;
-    SubUI = undefined;
-    Label = "";
-
-    constructor(prop, subUI) {
-        Object.assign(this, prop);
-        this.SubUI = subUI;
-        if(this.SubUI.GUID)
-            GUID = this.SubUI.GUID;
-        else 
-            GUID = getGUID();
-    }
-
-    GetValue() {
-        return this.SubUI.GetValue();
-    }
-
-    SetValue(value) {
-        this.SubUI.SetValue(value);
-    }
-
-    Detach() {
-        this.SubUI.Detach();
-    }
-
-    Attach() {
-        this.SubUI.Attach();
-    }
-
-    GetHtml() {
-        return  "<label for=\"" + this.GUID + "\">" + this.Label + "</label>" + this.SubUI.GetHtml();
-    }
-}
-
-
-class UIInputNumberWithMeasurement extends UIInputNumber {
+class UINumberWithMeasurement extends UINumber {
     GetHtml() {
         return super.GetHtml() + "<div style=\"display: inline-block;\"  id=\"" + this.GUID + "measurement\">" + GetUnitDisplay(GetClassProperty(this, "Measurement")) + "</div>";;
     }

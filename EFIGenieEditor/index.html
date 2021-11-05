@@ -22,10 +22,10 @@
                 $('#workspace').html(b.GetHtml());
                 b.Attach();
                 $("#btnSave").click(function(){
-                    downloadObject(b.GetObj(), configJsonName);
+                    downloadObject(b.GetValue(), configJsonName);
                 });
                 $("#btnSaveCompressed").click(function(){
-                    downloadCompressedObject(b.GetObj(), configJsonName);
+                    downloadCompressedObject(b.GetValue(), configJsonName);
                 });
                 $("#btnLoad").change(function(evt){
                     var test = new FileReader();
@@ -37,7 +37,7 @@
                             return;
                         }
 
-                        b.SetObj(loadObject(evt.target.result));
+                        b.SetValue(loadObject(evt.target.result));
                         $('#workspace').html(b.GetHtml());
                         $("#btnLoad").val(undefined);
                     };

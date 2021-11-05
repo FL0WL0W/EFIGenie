@@ -1,23 +1,23 @@
 var GenericConfigs = [];
 
-OperationArchitectureFactoryIDs = {
-    Offset :            10000   ,
-    Table :             1       ,
-    LookupTable:        2       ,
-    Polynomial:         3       ,
-    Static:             5       ,
-    FaultDetection:     6       ,
-    Add:                10      ,
-    Subtract:           11      ,
-    Multiply:           12      ,
-    Divide:             13      ,
-    And:                14      ,
-    Or:                 15      ,
-    GreaterThan:        16      ,
-    LessThan:           17      ,
-    Equal:              18      ,
-    GreaterThanOrEqual: 19      ,
-    LessThanOrEqual:    20
+var OperationArchitectureFactoryIDs = {
+    Offset: 10000,
+    Table: 1,
+    LookupTable: 2,
+    Polynomial: 3,
+    Static: 5,
+    FaultDetection: 6,
+    Add: 10,
+    Subtract: 11,
+    Multiply: 12,
+    Divide: 13,
+    And: 14,
+    Or: 15,
+    GreaterThan: 16,
+    LessThan: 17,
+    Equal: 18,
+    GreaterThanOrEqual: 19,
+    LessThanOrEqual: 20
 }
 
 class ConfigOperation_Static extends UITemplate {
@@ -30,29 +30,24 @@ class ConfigOperation_Static extends UITemplate {
     static Template = getFileContents("ConfigGui/Operation_Static.html");
 
     Default = true;
-    UIValue = undefined;
 
     constructor(prop) {
         super(prop);
-        var thisClass = this;
+        const thisClass = this;
 
-        this.UIValue = new UIInputNumberWithMeasurement({
-            OnChange: function(value) { thisClass.Default = false; }
+        this.Value = new UINumberWithMeasurement({
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
         });
-
-        this.Elements = { Value: this.UIValue };
     }
 
-    IsDefault() {
-        return this.Default;
-    }
-    
     GetObjOperation() {
-        return { value: [{ type: "Operation_StaticVariable", value: this.UIValue.GetValue() }]};
+        return { value: [{ type: "Operation_StaticVariable", value: this.GetValue().Value }] };
     }
 
     GetObjParameters() {
-        return { value: []};
+        return { value: [] };
     }
 
     GetElementHtml() {
@@ -61,28 +56,29 @@ class ConfigOperation_Static extends UITemplate {
 }
 GenericConfigs.push(ConfigOperation_Static);
 
-function TableGetType() {
-    var min = 0;
-    max 
-    for(var i = 0; i < tableValue.length; i++) {
-        if(tableValue[i] % 1 != 0){
-            type = "FLOAT";
-            typeId = 9;
-            break;
+function TableGetType(tableValue) {
+    var min = 18446744073709551615;
+    var max = -9223372036854775808;
+    for (var i = 0; i < tableValue.length; i++) {
+        if (tableValue[i] % 1 != 0) {
+            return "FLOAT";
         }
-        if(min === undefined || tableValue[i] < min){
+        if (min === undefined || tableValue[i] < min) {
             min = tableValue[i];
         }
-        if(max === undefined || tableValue[i] < max){
+        if (max === undefined || tableValue[i] < max) {
             max = tableValue[i];
         }
     }
-    if(this.Type == "checkbox") {
-        type = "BOOL"
-        typeId = 11;
+    if (typeof tableValue[0] === "boolean") {
+        return "BOOL";
     }
-    if(!type){
+    if (min < 0) {
+        if (max < 0 || min < -max)
+            return GetType(min);
+        return GetType(-max);
     }
+    return GetType(max);
 }
 
 class ConfigOperation_LookupTable extends UITemplate {
@@ -92,87 +88,67 @@ class ConfigOperation_LookupTable extends UITemplate {
     static Measurement = "Selectable";
     static ValueLabel = "Value";
     static ValueMeasurement = "None";
-    static Template = "$Value$"
-
-    UITableDialog = undefined;
-    UITable = undefined;
-    UIParameterSelection = undefined;
-    UIValueLabel = undefined;
+    static XLabel = "X"
+    static Template = "$Dialog$"
 
     Default = true;
-    XLabel = "";
 
-    constructor(prop){
+    constructor(prop) {
         super(prop);
-        Object.assign(this, prop);
-        var thisClass = this;
+        const thisClass = this;
 
-        this.UITable = new UITable({
+        this.Dialog = new UIDialog({
+            Title: "$ValueLabel$",
+            ButtonText: "Edit Table",
+            TemplateIdentifier: "Value"
+        });
+        this.Value = new UITable({
             YResolution: 1,
             YResolutionModifiable: false,
-            XLabel: this.NoParameterSelection? this.XLabel : "$ParameterSelection$",
+            XLabel: this.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
             ZLabel: "$ValueLabel$",
-            OnChange: function(value) { thisClass.Default = false; }
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
         });
-        this.UITableDialog = new UIDialog({
-            Title: GetClassProperty(this, "ValueLabel"),
-            ButtonText: "Edit Table"
-        }, this.UITable );
-        this.UIParameterSelection = this.NoParameterSelection? undefined : new UISelection({
-            Options: GetSelections()
-        }),
-        this.UIValueLabel = new UIText({
-            Text: GetClassProperty(this, "ValueLabel") + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")])
-        })
-
-        this.Elements = { 
-            Value: new UILabel({
-                Label: "$ValueLabel$"
-            }, this.UITableDialog),
-            ParameterSelection: this.UIParameterSelection,
-            ValueLabel: this.UIValueLabel
-        };
-    }
-
-    SetValueLabel(valueLabel){
-        this.ValueLabel = valueLabel;
-        this.UIValueLabel.SetText(GetClassProperty(this, "ValueLabel") + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]));
-        this.UITableDialog.Title = GetClassProperty(this, "ValueLabel");
-    }
-
-    IsDefault() {
-        return this.Default;
+        this.ParameterSelection = this.NoParameterSelection ? undefined : new UISelection({
+            Options: GetSelections(),
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
+        });
     }
 
     GetObjOperation() {
-        var table = this.GetValue().Value;
-        var tableValue = table.Value;
-        var type;
-        var typeId;
-        var min;
-        var max;
+        const table = this.GetValue().Value;
+        const tableValue = table.Value;
+        const type = TableGetType(tableValue);
+        const typeId = GetTypeId(type);
 
-        
-
-        return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-            { type: "FLOAT", value: table.MinX }, //MinXValue
-            { type: "FLOAT", value: table.MaxX }, //MaxXValue
-            { type: "UINT8", value: table.XResolution }, //XResolution
-            { type: "UINT8", value: typeId }, //Type
-            { type: type, value: tableValue }, //Table
-        ]};
+        return {
+            value: [
+                { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
+                { type: "FLOAT", value: table.MinX }, //MinXValue
+                { type: "FLOAT", value: table.MaxX }, //MaxXValue
+                { type: "UINT8", value: table.XResolution }, //XResolution
+                { type: "UINT8", value: typeId }, //Type
+                { type: type, value: tableValue }, //Table
+            ]
+        };
     }
 
     GetObjParameters() {
-        if(!this.NoParameterSelection) {
-            return { value: [
-                { type: "UINT8", value: 0 }, //variable
-                { type: "UINT32", value: Increments[this.ParameterSelection.reference].find(a => a.Name === this.ParameterSelection.value && a.Measurement === this.ParameterSelection.measurement).Id }
-            ]};
+        if (!this.NoParameterSelection) {
+            const parameterSelection = this.GetValue().ParameterSelection;
+            return {
+                value: [
+                    { type: "UINT8", value: 0 }, //variable
+                    { type: "UINT32", value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }
+                ]
+            };
         }
 
-        return { value: []};
+        return { value: [] };
     }
 }
 GenericConfigs.push(ConfigOperation_LookupTable);
@@ -184,292 +160,221 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static Measurement = "Selectable";
     static ValueLabel = "Value";
     static ValueMeasurement = "None";
+    static XLabel = "X"
+    static YLabel = "Y"
     static Template = "$Value$"
 
-    UITableDialog = undefined;
-    UITable = undefined;
-    UIXSelection = undefined;
-    UIYSelection = undefined;
-    UIValueLabel = undefined;
-
     Default = true;
-    XLabel = "";
-    YLabel = "";
 
-    constructor(prop){
+    constructor(prop) {
         super(prop);
-        Object.assign(this, prop);
-        var thisClass = this;
+        const thisClass = this;
 
-        this.UITable = new UITable({
-            XLabel: this.NoParameterSelection? this.XLabel : "$XSelection$",
-            YLabel: this.NoParameterSelection? this.YLabel : "$YSelection$",
-            ZLabel: "$ValueLabel$",
-            OnChange: function(value) { thisClass.Default = false; }
+        this.Dialog = new UIDialog({
+            Title: "$ValueLabel$",
+            ButtonText: "Edit Table",
+            TemplateIdentifier: "Value"
         });
-        this.UITableDialog = new UIDialog({
-            Title: GetClassProperty(this, "ValueLabel"),
-            ButtonText: "Edit Table"
-        }, this.UITable );
-        this.UIXSelection = this.NoParameterSelection? undefined : new UISelection({
-            Options: GetSelections()
-        }),
-        this.UIYSelection = this.NoParameterSelection? undefined : new UISelection({
-            Options: GetSelections()
-        }),
-        this.UIValueLabel = new UIText({
-            Text: GetClassProperty(this, "ValueLabel") + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")])
-        })
-
-        this.Elements = { 
-            Value: new UILabel({
-                Label: "$ValueLabel$"
-            }, this.UITableDialog),
-            XSelection: this.UIXSelection,
-            YSelection: this.UIYSelection,
-            ValueLabel: this.UIValueLabel
-        };
-    }
-
-    SetValueLabel(valueLabel){
-        this.ValueLabel = valueLabel;
-        this.UIValueLabel.SetText(GetClassProperty(this, "ValueLabel") + GetUnitDisplay(Measurements[GetClassProperty(this, "ValueMeasurement")]));
-        this.UITableDialog.Title = GetClassProperty(this, "ValueLabel");
-    }
-
-    IsDefault() {
-        return this.Default && this.Table.IsDefault();
+        this.Value = new UITable({
+            XLabel: this.NoParameterSelection ? "$XLabel$" : "$XSelection$",
+            YLabel: this.NoParameterSelection ? "$YLabel$" : "$YSelection$",
+            ZLabel: "$ValueLabel$",
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
+        });
+        this.XSelection = this.NoParameterSelection ? undefined : new UISelection({
+            Options: GetSelections(),
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
+        });
+        this.YSelection = this.NoParameterSelection ? undefined : new UISelection({
+            Options: GetSelections(),
+            OnChange: function (value) {
+                thisClass.Default = false;
+            }
+        });
     }
 
     GetObjOperation() {
-        var table = this.GetValue().Value;
-        var tableValue = table.Value;
-        var type;
-        var typeId;
-        var min;
-        var max;
+        const table = this.GetValue().Value;
+        const tableValue = table.Value;
+        const type = TableGetType(tableValue);
+        const typeId = GetTypeId(type);
 
-        for(var i = 0; i < tableValue.length; i++) {
-            if(tableValue[i] % 1 != 0){
-                type = "FLOAT";
-                typeId = 9;
-                break;
-            }
-            if(min === undefined || tableValue[i] < min){
-                min = tableValue[i];
-            }
-            if(max === undefined || tableValue[i] < max){
-                max = tableValue[i];
-            }
-        }
-        if(this.Type == "checkbox") {
-            type = "BOOL"
-            typeId = 11;
-        }
-        if(!type){
-            if(min < 0) {
-                if(max < 128 && min > -129) {
-                    typeId = 5;
-                    type = "INT8";
-                } else if(max < 32768 && min > -32759) {
-                    typeId = 6;
-                    type = "INT16";
-                } else if(max < 2147483648 && min > -2147483649) {
-                    typeId = 7;
-                    type = "INT32";
-                } else if(val < 9223372036854775807 && val > -9223372036854775808){
-                    typeId = 8;
-                    type = "INT64";
-                } else {
-                    throw "number too big";
-                }
-            } else {
-                if(max < 256) {
-                    type = "UINT8";
-                    typeId = 1;
-                } else if(max < 65536) {
-                    type = "UINT16";
-                    typeId = 2;
-                } else if(max < 4294967295) {
-                    type = "UINT32";
-                    typeId = 3;
-                } else if(val < 18446744073709551615) {
-                    type = "UINT64";
-                    typeId = 4;
-                } else {
-                    throw "number too big";
-                }
-            }
-        }
-
-        return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-            { type: "FLOAT", value: table.MinX }, //MinXValue
-            { type: "FLOAT", value: table.MaxX }, //MaxXValue
-            { type: "FLOAT", value: table.MinY }, //MinYValue
-            { type: "FLOAT", value: table.MaxY }, //MaxYValue
-            { type: "UINT8", value: table.XResolution }, //XResolution
-            { type: "UINT8", value: table.YResolution }, //YResolution
-            { type: "UINT8", value: typeId }, //Type
-            { type: type, value: tableValue }, //Table
-        ]};
+        return {
+            value: [
+                { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
+                { type: "FLOAT", value: table.MinX }, //MinXValue
+                { type: "FLOAT", value: table.MaxX }, //MaxXValue
+                { type: "FLOAT", value: table.MinY }, //MinYValue
+                { type: "FLOAT", value: table.MaxY }, //MaxYValue
+                { type: "UINT8", value: table.XResolution }, //XResolution
+                { type: "UINT8", value: table.YResolution }, //YResolution
+                { type: "UINT8", value: typeId }, //Type
+                { type: type, value: tableValue }, //Table
+            ]
+        };
     }
 
     GetObjParameters() {
-        if(!this.NoParameterSelection) {
-            return { value: [
-                { type: "UINT8", value: 0 }, //variable
-                { type: "UINT32", value: Increments[this.XSelection.reference].find(a => a.Name === this.XSelection.value && a.Measurement == this.XSelection.measurement).Id },
-                { type: "UINT8", value: 0 }, //variable
-                { type: "UINT32", value: Increments[this.YSelection.reference].find(a => a.Name === this.YSelection.value && a.Measurement == this.YSelection.measurement).Id }
-            ]};
+        if (!this.NoParameterSelection) {
+            const xSelection = this.XSelection.GetValue();
+            const ySelection = this.YSelection.GetValue();
+            return {
+                value: [
+                    { type: "UINT8", value: 0 }, //variable
+                    { type: "UINT32", value: Increments[xSelection.reference].find(a => a.Name === xSelection.value && a.Measurement == xSelection.measurement).Id },
+                    { type: "UINT8", value: 0 }, //variable
+                    { type: "UINT32", value: Increments[ySelection.reference].find(a => a.Name === ySelection.value && a.Measurement == ySelection.measurement).Id }
+                ]
+            };
         }
-        return { value: []};
+        return { value: [] };
     }
 }
 GenericConfigs.push(ConfigOperation_2AxisTable);
 
 function GetSelections(measurement, configs) {
     var selections = [];
-    if(configs) {
+    if (configs) {
         var calculations = { Group: "Calculations", Options: [] }
-        for(var i = 0; i < configs.length; i++) {
+        for (var i = 0; i < configs.length; i++) {
             calculations.Options.push({
                 Name: configs[i].Name,
-                Value: JSON.stringify({value: configs[i].Name})
+                Value: { value: configs[i].Name }
             });
         }
         selections.push(calculations);
     }
-    
-    for(var property in Increments){
-        if(!Array.isArray(Increments[property]))
-            continue;
-        if(property === "PostEvent")
-            continue;
-        if(property === "LiveUpdate")
+
+    for (var property in Increments) {
+        if (!Array.isArray(Increments[property]))
             continue;
 
         var arr = Increments[property];
-        
-        var arrSelections = { Group: property, Options: []};
 
-        for(var i = 0; i < arr.length; i++) {
-            if(!measurement || arr[i].Measurement === measurement) {
+        var arrSelections = { Group: property, Options: [] };
+
+        for (var i = 0; i < arr.length; i++) {
+            if (!measurement || arr[i].Measurement === measurement) {
                 arrSelections.Options.push({
-                    Name: arr[i].Name + (!measurement? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : ""),
-                    Value: JSON.stringify({reference: property, value: arr[i].Name, measurement: arr[i].measurement})
+                    Name: arr[i].Name + (!measurement ? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : ""),
+                    Value: { reference: property, value: arr[i].Name, measurement: arr[i].measurement }
                 });
             }
         }
+        selections.push(arrSelections);
     }
 
     return selections;
 }
 
 class ConfigOrVariableSelection extends UITemplate {
-    static Template = "$Selection$";//getFileContents("ConfigGui/ConfigOrVariableSelection.html");
+    static ValueLabel = "Value";
+    static Template =
+        "<div id=\"$GUID$\">" +
+        "<label for=\"$Selection.GUID$\">$ValueLabel$:</label>$Selection$ $ConfigValue$" +
+        "</div>";
 
-    constructor(prop){
+    ConfigValues = [];
+
+    constructor(prop) {
         super(prop);
-        Object.assign(this, prop);
-        var thisClass = this;
+        this.GUID = getGUID();
+        const thisClass = this;
 
-        this.Elements = {
-            Selection: new UISelection({
-                Options: GetSelections()
-            })
-        }
+        this.Selection = new UISelection({
+            Options: GetSelections(this.ValueMeasurement, this.Configs),
+            OnChange: function (value) {
+                //proud of myself on this clever bit of self modifying template ;)
+                thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
+                $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            }
+        });
     }
 
-    Configs = undefined;
-    ConfigValues = [];
-    ValueLabel = undefined;
-    ValueMeasurement = undefined;
-    VariableListName = undefined;
-    Selection = undefined;
+    GetSubConfigIndex() {
+        if (this.IsVariable() || !this.Configs)
+            return -1;
 
-    GetSubConfig() {
-        var i;
-        for(i = 0; i < this.ConfigValues.length; i++) {
-            if(GetClassProperty(this.ConfigValues[i], "Name") === this.Selection.value) {
-                return this.ConfigValues[i];
+        const selection = this.Selection.GetValue();
+        for (var i = 0; i < this.ConfigValues.length; i++) {
+            if (GetClassProperty(this.ConfigValues[i], "Name") === selection.value) {
+                return i;
             }
         }
-        for(var i = 0; i < this.Configs.length; i++)
-        {
-            if(GetClassProperty(this.Configs[i], "Name") !== this.Selection.value)
+        for (var i = 0; i < this.Configs.length; i++) {
+            if (GetClassProperty(this.Configs[i], "Name") !== selection.value)
                 continue;
             this.ConfigValues.push(new this.Configs[i]());
-            this.ConfigValues[this.ConfigValues.length-1].ValueLabel = this.ValueLabel;
-            this.ConfigValues[this.ConfigValues.length-1].ValueMeasurement = this.ValueMeasurement;
-            if(this.ValueMeasurement === "Bool")
-                this.ConfigValues[this.ConfigValues.length-1].Type = "checkbox";
+            this.ConfigValues[this.ConfigValues.length - 1].ValueLabel = this.ValueLabel;
+            this.ConfigValues[this.ConfigValues.length - 1].ValueMeasurement = this.ValueMeasurement;
+            if (this.ValueMeasurement === "Bool")
+                this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
             else
-                this.ConfigValues[this.ConfigValues.length-1].Type = "number";
-            return this.ConfigValues[this.ConfigValues.length-1];
+                this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
+            return this.ConfigValues.length-1;
         }
     }
 
-    GetObj() {
-        var obj = { 
-            Selection: this.Selection
-        };
-
-        if(this.ConfigValues) { 
-            obj.Values = [];
-            for(var i = 0; i < this.ConfigValues.length; i++){
-                if(!this.ConfigValues[i].IsDefault || !this.ConfigValues[i].IsDefault())
-                    obj.Values.push(this.ConfigValues[i].GetObj());
-            }
-        }
-
-        return obj;
-    }
-
-    SetObj(obj) {
-        this.Detach();
-
-        if(obj)
-            this.Selection = obj.Selection;
-
-        if(this.Selection && !this.Selection.reference) {
-            for(var i = 0; i < obj.Values.length; i++) {
-                var found = false;
-                for(var t = 0; t < this.ConfigValues.length; t++) {
-                    if(GetClassProperty(this.ConfigValues[t], "Name") === obj.Values[i].Name) {
-                        this.ConfigValues[t].SetObj(obj.Values[i]);
-                        found = true;
-                        break;
-                    }
-                }
-                if(!found){
-                    for(var t = 0; t < this.Configs.length; t++)
-                    {
-                        if(GetClassProperty(this.Configs[t], "Name") !== obj.Values[i].Name)
-                            continue;
-                        this.ConfigValues.push(new this.Configs[t]());
-                        this.ConfigValues[this.ConfigValues.length-1].ValueLabel = this.ValueLabel;
-                        this.ConfigValues[this.ConfigValues.length-1].ValueMeasurement = this.ValueMeasurement;
-                        if(this.ValueMeasurement === "Bool")
-                            this.ConfigValues[this.ConfigValues.length-1].Type = "checkbox";
-                        else
-                            this.ConfigValues[this.ConfigValues.length-1].Type = "number";
-                        this.ConfigValues[this.ConfigValues.length-1].SetObj(obj.Values[i]);
-                    }
-                }
-            }
-        }
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-    
-    GetCellByName(array, name) {
-        if(!array)
+    GetSubConfig() {
+        const subConfigIndex = this.GetSubConfigIndex();
+        if (subConfigIndex < 0)
             return undefined;
-        for(var i = 0; i < array.length; i++) {
-            if(name && name === array[i].Name && this.ValueMeasurement === array[i].Measurement)
+
+        return this.ConfigValues[subConfigIndex];
+    }
+
+    GetValue() {
+        var value = super.GetValue();
+
+        if (this.ConfigValues) {
+            value.Values = [];
+            for (var i = 0; i < this.ConfigValues.length; i++) {
+                if (!this.ConfigValues[i].Default)
+                    value.Values.push(this.ConfigValues[i].GetValue());
+            }
+        }
+
+        return value;
+    }
+
+    SetValue(value) {
+        for (var i = 0; i < value.Values.length; i++) {
+            var found = false;
+            for (var t = 0; t < this.ConfigValues.length; t++) {
+                if (GetClassProperty(this.ConfigValues[t], "Name") === value.Values[i].Name) {
+                    this.ConfigValues[t].SetValue(value.Values[i]);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && this.Configs) {
+                for (var t = 0; t < this.Configs.length; t++) {
+                    if (GetClassProperty(this.Configs[t], "Name") !== value.Values[i].Name)
+                        continue;
+                    this.ConfigValues.push(new this.Configs[t]());
+                    this.ConfigValues[this.ConfigValues.length - 1].ValueLabel = this.ValueLabel;
+                    this.ConfigValues[this.ConfigValues.length - 1].ValueMeasurement = this.ValueMeasurement;
+                    if (this.ValueMeasurement === "Bool")
+                        this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
+                    else
+                        this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
+                    this.ConfigValues[this.ConfigValues.length - 1].SetValue(value.Values[i]);
+                }
+            }
+        }
+
+        super.SetValue(value);
+    }
+
+    GetCellByName(array, name) {
+        if (!array)
+            return undefined;
+        for (var i = 0; i < array.length; i++) {
+            if (name && name === array[i].Name && this.ValueMeasurement === array[i].Measurement)
                 return array[i];
         }
         return undefined;
@@ -477,111 +382,105 @@ class ConfigOrVariableSelection extends UITemplate {
 
     Id = -1;
     SetIncrements() {
-        // var thisClass = this;
-        // if(!Increments.PostEvent)
-        //     Increments.PostEvent = [];
-        // Increments.PostEvent.push(function() { thisClass.UpdateSelections(); });
+        if (this.Selection && this.VariableListName) {
+            if (Increments[this.VariableListName] === undefined)
+                Increments[this.VariableListName] = [];
 
-        // if(!Increments.LiveUpdate)
-        //     Increments.LiveUpdate = [];
-        // Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
+            const selection = this.Selection.GetValue();
+            if (!selection.reference) {
+                const subConfig = this.GetSubConfig();
+                if (GetClassProperty(subConfig, "Output")) {
+                    this.Id = 1;
+                    if (Increments.VariableIncrement === undefined)
+                        Increments.VariableIncrement = 1;
+                    else
+                        this.Id = ++Increments.VariableIncrement;
 
-        // if(this.Selection && this.VariableListName) {
-        //     if(Increments[this.VariableListName] === undefined)
-        //         Increments[this.VariableListName] = [];
-
-        //     if(!this.Selection.reference) {
-        //         var subConfig = this.GetSubConfig();
-        //         if(GetClassProperty(subConfig, "Output")) {
-        //             this.Id = 1;
-        //             if(Increments.VariableIncrement === undefined)
-        //                 Increments.VariableIncrement = 1;
-        //             else
-        //                 this.Id = ++Increments.VariableIncrement;
-
-        //             if(subConfig.SetIncrements)
-        //                 subConfig.SetIncrements();
-                        
-        //             Increments[this.VariableListName].push({ 
-        //                 Name: this.ValueLabel, 
-        //                 Id: this.Id,
-        //                 Type: GetClassProperty(subConfig, "Output"),
-        //                 Measurement: this.ValueMeasurement
-        //             });
-        //         }
-        //     } else {
-        //         var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
-        //         if(cell) {
-        //             Increments[this.VariableListName].push({ 
-        //                 Name: this.ValueLabel, 
-        //                 Id: cell.Id,
-        //                 Type: cell.Type,
-        //                 Measurement: this.ValueMeasurement
-        //             });
-        //         }
-        //     }
-        // }
+                    Increments[this.VariableListName].push({
+                        Name: this.ValueLabel,
+                        Id: this.Id,
+                        Type: GetClassProperty(subConfig, "Output"),
+                        Measurement: this.ValueMeasurement
+                    });
+                }
+            } else {
+                const cell = this.GetCellByName(Increments[selection.reference], selection.value);
+                if (cell) {
+                    Increments[this.VariableListName].push({
+                        Name: this.ValueLabel,
+                        Id: cell.Id,
+                        Type: cell.Type,
+                        Measurement: this.ValueMeasurement
+                    });
+                }
+            }
+        }
     }
-    
-    IsImmediateOperation() {
-        var selection = JSON.parse(this.GetValue().Selection);
+
+    IsVariable() {
+        const selection = this.Selection.GetValue();
         return selection && selection.reference;
     }
 
     GetObjAsParameter(subOperationId) {
         //if immediate operation
-        if(this.IsImmediateOperation()) {     
-            return { value: [
-                { type: "OperationParameter", value: subOperationId }, //use first suboperation
-            ]};
+        if (!this.IsVariable()) {
+            return {
+                value: [
+                    { type: "OperationParameter", value: subOperationId }, //use first suboperation
+                ]
+            };
         }
 
-        var cell = this.GetCellByName(Increments[this.Selection.reference], this.Selection.value);
-        return { value: [
-            { type: "VariableParameter", value: cell.Id }, //ID
-        ]};
+        const selection = this.Selection.GetValue();
+        const cell = this.GetCellByName(Increments[selection.reference], selection.value);
+        return {
+            value: [
+                { type: "VariableParameter", value: cell.Id }, //ID
+            ]
+        };
     }
-    
+
     GetObjOperation() {
         //if immediate operation
-        if(this.IsImmediateOperation()) {
-            return { value: [{ obj: this.GetSubConfig().GetObjOperation() }]};
+        if (!this.IsVariable()) {
+            return { value: [{ obj: this.GetSubConfig().GetObjOperation() }] };
         }
 
-        return { value: []};
+        return { value: [] };
     }
 
     GetObjParameters() {
         //if immediate operation
-        if(this.IsImmediateOperation()) {
-            return { value: [{ obj: this.GetSubConfig().GetObjParameters() }]};
+        if (!this.IsVariable()) {
+            return { value: [{ obj: this.GetSubConfig().GetObjParameters() }] };
         }
 
-        return { value: []};
+        return { value: [] };
     }
 
-    GetObjPackage(subOperation){
+    GetObjPackage(subOperation) {
         //if immediate operation
-        if(this.IsImmediateOperation()) {      
-            var subConfig = this.GetSubConfig();
-            if(Increments.VariableIncrement === undefined && GetClassProperty(subConfig, "Output"))
-                throw "Set Increments First";
-            if(this.Id === -1 && GetClassProperty(subConfig, "Output"))
+        if (!this.IsVariable()) {
+            const subConfig = this.GetSubConfig();
+            if (this.Id === -1 && GetClassProperty(subConfig, "Output"))
                 throw "Set Increments First";
 
-            var obj  = {value: [
-                    { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(subConfig, "Output") }}, //immediate and store variable, return if subOperation
+            var obj = {
+                value: [
+                    { type: "PackageOptions", value: { Immediate: true, Store: true, Return: subOperation && GetClassProperty(subConfig, "Output") } }, //immediate and store variable, return if subOperation
                     { obj: subConfig.GetObjOperation() }
-                ]};
-            
-            if(GetClassProperty(subConfig, "Output"))
+                ]
+            };
+
+            if (GetClassProperty(subConfig, "Output"))
                 obj.value.push({ type: "UINT32", value: this.Id });
 
             obj.value.push({ obj: subConfig.GetObjParameters() });
 
             return obj;
-        }  
-                
-        return { value: []};
+        }
+
+        return { value: [] };
     }
 }

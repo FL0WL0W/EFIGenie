@@ -249,29 +249,29 @@ class ConfigInputs {
     Selected = 0;
     ContextSelect;
 
-    GetObj() {
-        var obj  = { Inputs: [], TargetDevice: this.TargetDevice };
+    GetValue() {
+        var value  = { Inputs: [], TargetDevice: this.TargetDevice };
 
         for(var i = 0; i < this.Inputs.length; i++){
-            obj.Inputs.push(this.Inputs[i].GetObj());
+            value.Inputs.push(this.Inputs[i].GetValue());
         }
 
-        return obj;
+        return value;
     }
 
-    SetObj(obj) {
+    SetValue(value) {
         this.Detach();
         this.Inputs = [];
 
-        if(obj) {
-            if(obj.TargetDevice) {
-                this.TargetDevice = obj.TargetDevice;
+        if(value) {
+            if(value.TargetDevice) {
+                this.TargetDevice = value.TargetDevice;
                 PinOut = PinOuts[this.TargetDevice];
             }
-            if(obj.Inputs){
-                for(var i = 0; i < obj.Inputs.length; i++){
+            if(value.Inputs){
+                for(var i = 0; i < value.Inputs.length; i++){
                     this.Inputs.push(new ConfigInput());
-                    this.Inputs[i].SetObj(obj.Inputs[i]);
+                    this.Inputs[i].SetValue(value.Inputs[i]);
                 }
             }
         }
@@ -379,7 +379,7 @@ class ConfigInputs {
                 return;
             
             thisClass.Inputs.push(new ConfigInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SetObj(thisClass.Inputs[contextSelect].GetObj());
+            thisClass.Inputs[thisClass.Inputs.length-1].SetValue(thisClass.Inputs[contextSelect].GetValue());
             thisClass.Selected = thisClass.Inputs.length-1;
             $("#" + thisClass.GUID + "-inputs").replaceWith(thisClass.GetInputsHtml());
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
@@ -500,45 +500,45 @@ class ConfigInput {
     TranslationConfig = undefined;
     TranslationMeasurement = "None";
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: this.Name,
-            RawConfig: this.RawConfig? this.RawConfig.GetObj() : undefined, 
-            TranslationConfig: this.TranslationConfig? this.TranslationConfig.GetObj() : undefined,
+            RawConfig: this.RawConfig? this.RawConfig.GetValue() : undefined, 
+            TranslationConfig: this.TranslationConfig? this.TranslationConfig.GetValue() : undefined,
             TranslationMeasurement: this.TranslationMeasurement
         };
     }
 
-    SetObj(obj) {
+    SetValue(value) {
         this.Detach();
-        if(obj) {
-            this.Name = obj.Name;
+        if(value) {
+            this.Name = value.Name;
             this.RawConfig = undefined;
-            if(obj.RawConfig){
+            if(value.RawConfig){
                 for(var i = 0; i < InputRawConfigs.length; i++)
                 {
-                    if(InputRawConfigs[i].Name === obj.RawConfig.Name) {
+                    if(InputRawConfigs[i].Name === value.RawConfig.Name) {
                         this.RawConfig = new InputRawConfigs[i]();
-                        this.RawConfig.SetObj(obj.RawConfig);
+                        this.RawConfig.SetValue(value.RawConfig);
                         break;
                     }
                 }
             }
             this.TranslationConfig = undefined;
-            if(obj.TranslationConfig){
+            if(value.TranslationConfig){
                 for(var i = 0; i < InputTranslationConfigs.length; i++)
                 {
-                    if(InputTranslationConfigs[i].Name === obj.TranslationConfig.Name) {
+                    if(InputTranslationConfigs[i].Name === value.TranslationConfig.Name) {
                         this.TranslationConfig = new InputTranslationConfigs[i]({
                             NoParameterSelection: true,
                             XLabel: "Raw Input"
                         });
-                        this.TranslationConfig.SetObj(obj.TranslationConfig);
+                        this.TranslationConfig.SetValue(value.TranslationConfig);
                         break;
                     }
                 }
             }
-            this.TranslationMeasurement = obj.TranslationMeasurement;
+            this.TranslationMeasurement = value.TranslationMeasurement;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -868,16 +868,16 @@ class ConfigOperation_AnalogPinRead {
 
     Pin = 0xFFFF;
 
-    GetObj() {
+    GetValue() {
         return {
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin
         };
     }
 
-    SetObj(obj) {
-        if(obj)
-            this.Pin = obj.Pin;
+    SetValue(value) {
+        if(value)
+            this.Pin = value.Pin;
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
     }
@@ -928,7 +928,7 @@ class ConfigOperation_DigitalPinRead {
     Pin = 0xFFFF;
     Inverted = 0;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -936,10 +936,10 @@ class ConfigOperation_DigitalPinRead {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.Pin = obj.Pin;
-            this.Inverted = obj.Inverted;
+    SetValue(value) {
+        if(value) {
+            this.Pin = value.Pin;
+            this.Inverted = value.Inverted;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -998,7 +998,7 @@ class ConfigOperation_DigitalPinRecord {
     Inverted = 0;
     Length = 2;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -1007,11 +1007,11 @@ class ConfigOperation_DigitalPinRecord {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.Pin = obj.Pin;
-            this.Inverted = obj.Inverted;
-            this.Length = obj.Length;
+    SetValue(value) {
+        if(value) {
+            this.Pin = value.Pin;
+            this.Inverted = value.Inverted;
+            this.Length = value.Length;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -1075,7 +1075,7 @@ class ConfigOperation_DutyCyclePinRead {
     Pin = 0xFFFF;
     MinFrequency = 1000;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -1083,10 +1083,10 @@ class ConfigOperation_DutyCyclePinRead {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.Pin = obj.Pin;
-            this.MinFrequency = obj.MinFrequency;
+    SetValue(value) {
+        if(value) {
+            this.Pin = value.Pin;
+            this.MinFrequency = value.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -1144,7 +1144,7 @@ class ConfigOperation_FrequencyPinRead {
     Pin = 0xFFFF;
     MinFrequency = 1000;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -1152,10 +1152,10 @@ class ConfigOperation_FrequencyPinRead {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.Pin = obj.Pin;
-            this.MinFrequency = obj.MinFrequency;
+    SetValue(value) {
+        if(value) {
+            this.Pin = value.Pin;
+            this.MinFrequency = value.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -1213,7 +1213,7 @@ class ConfigOperation_PulseWidthPinRead {
     Pin = 0xFFFF;
     MinFrequency = 1000;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -1221,10 +1221,10 @@ class ConfigOperation_PulseWidthPinRead {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.Pin = obj.Pin;
-            this.MinFrequency = obj.MinFrequency;
+    SetValue(value) {
+        if(value) {
+            this.Pin = value.Pin;
+            this.MinFrequency = value.MinFrequency;
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -1284,7 +1284,7 @@ class ConfigOperation_Polynomial {
     Degree = 3;
     A = [0, 0, 0];
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             MinValue: this.MinValue,
@@ -1294,12 +1294,12 @@ class ConfigOperation_Polynomial {
         };
     }
 
-    SetObj(obj) {
-        if(obj) {
-            this.MinValue = obj.MinValue;
-            this.MaxValue = obj.MaxValue;
-            this.Degree = obj.Degree;
-            this.A = obj.A.slice();
+    SetValue(value) {
+        if(value) {
+            this.MinValue = value.MinValue;
+            this.MaxValue = value.MaxValue;
+            this.Degree = value.Degree;
+            this.A = value.A.slice();
         }
         $("#" + this.GUID).replaceWith(this.GetHtml());
         this.Attach();
@@ -1410,14 +1410,14 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
         super();
 
         this.Elements = { 
-            RisingPosition: new ConfigNumberWithMeasurement({
+            RisingPosition: new UINumberWithMeasurement({
                 Value: 0,
                 Step: 0.1,
                 Min: 0,
                 Max: 360,
                 Measurement: "Angle"
             }),
-            FallingPosition: new ConfigNumberWithMeasurement({
+            FallingPosition: new UINumberWithMeasurement({
                 Value: 180,
                 Step: 0.1,
                 Min: 0,
@@ -1448,25 +1448,25 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
         super();
 
         this.Elements = { 
-            FirstToothPosition: new ConfigNumberWithMeasurement({
+            FirstToothPosition: new UINumberWithMeasurement({
                 Value: 0,
                 Step: 0.1,
                 Min: 0,
                 Max: 360,
                 Measurement: "Angle"
             }),
-            ToothWidth: new ConfigNumberWithMeasurement({
+            ToothWidth: new UINumberWithMeasurement({
                 Value: 5,
                 Step: 0.1,
                 Min: 0,
                 Max: 360,
                 Measurement: "Angle"
             }),
-            NumberOfTeeth: new ConfigNumber({
+            NumberOfTeeth: new UINumber({
                 Value: 36,
                 Min: 2
             }),
-            NumberOfTeethMissing: new ConfigNumber({
+            NumberOfTeethMissing: new UINumber({
                 Value: 1,
                 Min: 1
             }),
