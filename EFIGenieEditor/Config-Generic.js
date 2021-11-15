@@ -103,6 +103,7 @@ class ConfigOperation_LookupTable extends UITemplate {
             TemplateIdentifier: "Value"
         });
         this.Value = new UITable({
+            BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
             XLabel: this.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
@@ -162,7 +163,7 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static ValueMeasurement = "None";
     static XLabel = "X"
     static YLabel = "Y"
-    static Template = "$Value$"
+    static Template = "$Dialog$"
 
     Default = true;
 
@@ -176,6 +177,7 @@ class ConfigOperation_2AxisTable extends UITemplate {
             TemplateIdentifier: "Value"
         });
         this.Value = new UITable({
+            BaseObj: true,
             XLabel: this.NoParameterSelection ? "$XLabel$" : "$XSelection$",
             YLabel: this.NoParameterSelection ? "$YLabel$" : "$YSelection$",
             ZLabel: "$ValueLabel$",
@@ -300,6 +302,8 @@ class ConfigOrVariableSelection extends UITemplate {
             return -1;
 
         const selection = this.Selection.GetValue();
+        if(selection == undefined)
+            return -1;
         for (var i = 0; i < this.ConfigValues.length; i++) {
             if (GetClassProperty(this.ConfigValues[i], "Name") === selection.value) {
                 return i;
@@ -382,11 +386,11 @@ class ConfigOrVariableSelection extends UITemplate {
 
     Id = -1;
     SetIncrements() {
-        if (this.Selection && this.VariableListName) {
+        const selection = this.Selection.GetValue();
+        if (selection && this.VariableListName) {
             if (Increments[this.VariableListName] === undefined)
                 Increments[this.VariableListName] = [];
 
-            const selection = this.Selection.GetValue();
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if (GetClassProperty(subConfig, "Output")) {

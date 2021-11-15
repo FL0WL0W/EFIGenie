@@ -14,7 +14,7 @@ class UITemplate {
         //grab baseObjName and count number of objects in element values
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object") {
+            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
                 objectsInElements++;
                 baseObjName = elementname;
             }
@@ -59,24 +59,26 @@ class UITemplate {
     SetValue(value) {
         this.Detach();
 
+        const thisClass = this;
         var baseObjName;
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object") {
+            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
                 if(!baseObjName)
                     baseObjName = elementname;
             }
         });
 
-        if(baseObjName && !value[baseObjName])
+        if(baseObjName)
             this[baseObjName].SetValue(value);
         else
             baseObjName = undefined;
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.SetValue && elementname !== baseObjName) {
+            if(element !== undefined && element.SetValue && elementname !== baseObjName && 
+                (baseObjName === undefined || thisClass[baseObjName].GetValue()[elementname] === undefined)) {
                 element.SetValue(value[elementname]);
             }
         });
@@ -435,12 +437,18 @@ class UITable extends Table {
 
     SetValue(value) {
         if(value) {
-            if(value.Value !== undefined)
-                this.Value = value.Value;
             if(value.XResolution !== undefined && this.XResolutionModifiable)
                 this.SetXResolution(value.XResolution);
             if(value.YResolution !== undefined && this.YResolutionModifiable)
                 this.SetYResolution(value.YResolution);
+            if(value.Resolution !== undefined) {
+                if(this.XResolutionModifiable && !this.YResolutionModifiable)
+                    this.SetXResolution(value.Resolution);
+                if(this.YResolutionModifiable && !this.XResolutionModifiable)
+                    this.SetYResolution(value.Resolution);
+            }
+            if(value.Value !== undefined)
+                this.Value = value.Value;
             if(value.MinX !== undefined && this.MinXModifiable)
                 this.MinX = value.MinX;
             if(value.MaxX !== undefined && this.MaxXModifiable)

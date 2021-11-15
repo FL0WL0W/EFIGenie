@@ -659,14 +659,13 @@ class ConfigIgnition {
             ValueMeasurement:   "Time",
             VariableListName:   "IgnitionParameters"
         });
-        this.Outputs[0] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 1", "No Measurement");
-        this.Outputs[1] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 2", "No Measurement");
-        this.Outputs[2] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 3", "No Measurement");
-        this.Outputs[3] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 4", "No Measurement");
-        this.Outputs[4] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 5", "No Measurement");
-        this.Outputs[5] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 6", "No Measurement");
-        this.Outputs[6] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 7", "No Measurement");
-        this.Outputs[7] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition 8", "No Measurement");
+        for(var i = 0; i < 8; i++){
+            this.Outputs[i] = new ConfigTDCOutput({
+                Configs:            BooleanOutputConfigs,
+                ValueLabel:         "Ignition " + (i+1),
+                ValueMeasurement:   "No Measurement"
+            });
+        }
     }
 
     IgnitionEnableConfigOrVariableSelection = undefined;
@@ -700,7 +699,11 @@ class ConfigIgnition {
             this.Outputs = [];
             for(var i = 0; i < obj.Outputs.length; i++){
                 if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Ignition " + (i+1), "No Measurement")
+                    this.Outputs[i] = new ConfigTDCOutput({
+                        Configs:            BooleanOutputConfigs,
+                        ValueLabel:         "Ignition " + (i+1),
+                        ValueMeasurement:   "No Measurement"
+                    });
                 this.Outputs[i].SetValue(obj.Outputs[i])
             }
         }
@@ -1150,14 +1153,13 @@ class ConfigInjectorOutputs {
 
     constructor(){
         this.GUID = getGUID();
-        this.Outputs[0] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 1", "No Measurement");
-        this.Outputs[1] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 2", "No Measurement");
-        this.Outputs[2] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 3", "No Measurement");
-        this.Outputs[3] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 4", "No Measurement");
-        this.Outputs[4] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 5", "No Measurement");
-        this.Outputs[5] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 6", "No Measurement");
-        this.Outputs[6] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 7", "No Measurement");
-        this.Outputs[7] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector 8", "No Measurement");
+        for(var i = 0; i < 8; i++){
+            this.Outputs[i] = new ConfigTDCOutput({
+                Configs:            BooleanOutputConfigs,
+                ValueLabel:         "Injector " + (i+1),
+                ValueMeasurement:   "No Measurement"
+            });
+        }
     }
 
     Outputs = [];
@@ -1180,7 +1182,11 @@ class ConfigInjectorOutputs {
             this.Outputs = [];
             for(var i = 0; i < obj.Outputs.length; i++){
                 if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput(BooleanOutputConfigs, "Injector " + (i+1), "No Measurement")
+                    this.Outputs[i] = new ConfigTDCOutput({
+                        Configs:            BooleanOutputConfigs,
+                        ValueLabel:         "Injector " + (i+1),
+                        ValueMeasurement:   "No Measurement"
+                    });
                 this.Outputs[i].SetValue(obj.Outputs[i])
             }
         }
@@ -1259,40 +1265,19 @@ class ConfigInjectorOutputs {
 }
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template = getFileContents("ConfigGui/TDCOutput.html");
+    static Template =
+        "<div id=\"$GUID$\">" +
+        "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$" +
+        "</div>";
 
-    TDC = 0;
-    
-    GetValue() {
-        var obj = super.GetValue();
-        obj.TDC = this.TDC;
-        return obj;
-    }
+    constructor(prop) {
+        super(prop);
 
-    SetValue(obj) {
-        super.SetValue(obj);
-        this.Detach();
-        if(obj)
-            this.TDC = obj.TDC;
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-    
-    Attach() {
-        super.Attach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-tdc", function(){
-            thisClass.TDC = $(this).val();
-        });
-    }
-
-    GetHtml() {
-        var template = super.GetHtml();
-        
-        template = template.replace(/[$]tdc[$]/g, this.TDC);
-
-        return template;
+        this.TDC = new UINumber({
+            Value: 0,
+            Step: 1,
+            Min: 0,
+            Max: 720
+        })
     }
 }

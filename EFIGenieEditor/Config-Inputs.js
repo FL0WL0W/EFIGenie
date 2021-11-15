@@ -1409,29 +1409,27 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     constructor(){
         super();
 
-        this.Elements = { 
-            RisingPosition: new UINumberWithMeasurement({
-                Value: 0,
-                Step: 0.1,
-                Min: 0,
-                Max: 360,
-                Measurement: "Angle"
-            }),
-            FallingPosition: new UINumberWithMeasurement({
-                Value: 180,
-                Step: 0.1,
-                Min: 0,
-                Max: 360,
-                Measurement: "Angle"
-            }),
-        };
+        this.RisingPosition = new UINumberWithMeasurement({
+            Value: 0,
+            Step: 0.1,
+            Min: 0,
+            Max: 360,
+            Measurement: "Angle"
+        });
+        this.FallingPosition = new UINumberWithMeasurement({
+            Value: 180,
+            Step: 0.1,
+            Min: 0,
+            Max: 360,
+            Measurement: "Angle"
+        });
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: "FLOAT", value: this.Elements.RisingPosition.Value}, //RisingPosition
-            { type: "FLOAT", value: this.Elements.FallingPosition.Value}, //FallingPosition
+            { type: "FLOAT", value: this.GetValue().RisingPosition}, //RisingPosition
+            { type: "FLOAT", value: this.GetValue().FallingPosition}, //FallingPosition
         ]};
     }
 }
@@ -1447,39 +1445,37 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     constructor(){
         super();
 
-        this.Elements = { 
-            FirstToothPosition: new UINumberWithMeasurement({
-                Value: 0,
-                Step: 0.1,
-                Min: 0,
-                Max: 360,
-                Measurement: "Angle"
-            }),
-            ToothWidth: new UINumberWithMeasurement({
-                Value: 5,
-                Step: 0.1,
-                Min: 0,
-                Max: 360,
-                Measurement: "Angle"
-            }),
-            NumberOfTeeth: new UINumber({
-                Value: 36,
-                Min: 2
-            }),
-            NumberOfTeethMissing: new UINumber({
-                Value: 1,
-                Min: 1
-            }),
-        };
+        FirstToothPosition = new UINumberWithMeasurement({
+            Value: 0,
+            Step: 0.1,
+            Min: 0,
+            Max: 360,
+            Measurement: "Angle"
+        });
+        ToothWidth = new UINumberWithMeasurement({
+            Value: 5,
+            Step: 0.1,
+            Min: 0,
+            Max: 360,
+            Measurement: "Angle"
+        });
+        NumberOfTeeth = new UINumber({
+            Value: 36,
+            Min: 2
+        });
+        NumberOfTeethMissing = new UINumber({
+            Value: 1,
+            Min: 1
+        });
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-            { type: "FLOAT", value: this.Elements.FirstToothPosition.Value}, //FirstToothPosition
-            { type: "FLOAT", value: this.Elements.ToothWidth.Value}, //ToothWidth
-            { type: "UINT8", value: this.Elements.NumberOfTeeth.Value}, //NumberOfTeeth
-            { type: "UINT8", value: this.Elements.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
+            { type: "FLOAT", value: this.FirstToothPosition.Value}, //FirstToothPosition
+            { type: "FLOAT", value: this.ToothWidth.Value}, //ToothWidth
+            { type: "UINT8", value: this.NumberOfTeeth.Value}, //NumberOfTeeth
+            { type: "UINT8", value: this.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
         ]};
     }
 }
