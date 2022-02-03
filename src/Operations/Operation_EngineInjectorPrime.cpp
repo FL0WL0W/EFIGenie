@@ -20,7 +20,7 @@ namespace OperationArchitecture
 	void Operation_EngineInjectorPrime::Execute(float time)
 	{
 		_openCallBack();
-		_timerService->ScheduleTask(_closeTask, _timerService->GetTick() + time * _timerService->GetTicksPerSecond());
+		_timerService->ScheduleTask(_closeTask, _timerService->GetTick() + static_cast<tick_t>(time * _timerService->GetTicksPerSecond()));
 	}
 
 	IOperationBase *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)

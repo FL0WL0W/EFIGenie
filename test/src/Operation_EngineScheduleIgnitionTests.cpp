@@ -33,6 +33,6 @@ namespace UnitTests
         _enginePosition.PositionDot = 1;
         _enginePosition.Sequential = true;
         _enginePosition.Synced = true;
-        _operation->Execute(_enginePosition, true, 0.003, 10, 0.0005);
+        _operation->Execute(_enginePosition, true, 0.003f, 10, 0.0005f);
 	}
 }

@@ -47,7 +47,7 @@ namespace OperationArchitecture
 		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
-		const tick_t maxDwellDeviationTicks = ignitionDwellMaxDeviation * ticksPerSecond;
+		const tick_t maxDwellDeviationTicks = static_cast<tick_t>(ignitionDwellMaxDeviation * ticksPerSecond);
 
 		float delta = _tdc - ignitionAdvance - enginePosition.Position;
 		delta -= (static_cast<int16_t>(delta) / cycleDegrees) * cycleDegrees;
