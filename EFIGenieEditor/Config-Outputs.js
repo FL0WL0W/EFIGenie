@@ -13,7 +13,7 @@ class ConfigOperation_DigitalPinWrite {
     Inverted = 0;
     HighZ = 0;
 
-    GetObj() {
+    GetValue() {
         return { 
             Name: GetClassProperty(this, "Name"),
             Pin: this.Pin,
@@ -22,7 +22,7 @@ class ConfigOperation_DigitalPinWrite {
         };
     }
 
-    SetObj(obj) {
+    SetValue(obj) {
         if(obj) {
             if(obj.Pin !== undefined)
                 this.Pin = obj.Pin;

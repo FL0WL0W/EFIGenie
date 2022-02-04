@@ -145,7 +145,7 @@ class UITemplate {
             });
         }
 
-        return "<div id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + html + "</div>";
+        return "<span id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + html + "</span>";
     }
 
     Hide() {
@@ -523,7 +523,8 @@ class UIDialog {
     TemplateIdentifier = undefined;
     Title = "Dialog";
     ButtonText = "Open";
-    Hidden = true;
+    Hidden = false;
+    Opened = false
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -558,12 +559,12 @@ class UIDialog {
     }
     
     Close() {
-        this.Hidden = true;
+        this.Opened = false;
         $("#" + this.GUID + "-dialog").dialog("close");
     }
 
     Open() {
-        this.Hidden = false;
+        this.Opened = true;
         var dialogSelector = $("#" + this.GUID + "-dialog");
         dialogSelector.dialog({ width:'auto', modal:true, title: dialogSelector.data("title")});
     }

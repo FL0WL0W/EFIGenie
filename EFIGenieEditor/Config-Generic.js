@@ -263,7 +263,7 @@ function GetSelections(measurement, configs) {
             if (!measurement || arr[i].Measurement === measurement) {
                 arrSelections.Options.push({
                     Name: arr[i].Name + (!measurement ? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : ""),
-                    Value: { reference: property, value: arr[i].Name, measurement: arr[i].measurement }
+                    Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
                 });
             }
         }
@@ -290,6 +290,10 @@ class ConfigOrVariableSelection extends UITemplate {
                 //proud of myself on this clever bit of self modifying template ;)
                 thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
                 $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+                thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
+                var subConfig = thisClass.GetSubConfig();
+                if(subConfig && subConfig.Attach)
+                    subConfig.Attach();
             }
         });
     }
@@ -334,8 +338,11 @@ class ConfigOrVariableSelection extends UITemplate {
         if (this.ConfigValues) {
             value.Values = [];
             for (var i = 0; i < this.ConfigValues.length; i++) {
-                if (!this.ConfigValues[i].Default)
-                    value.Values.push(this.ConfigValues[i].GetValue());
+                if (!this.ConfigValues[i].Default) {
+                    var configValue = this.ConfigValues[i].GetValue();
+                    configValue.Name = GetClassProperty(this.ConfigValues[i], "Name");
+                    value.Values.push(configValue);
+                }
             }
         }
 
@@ -343,6 +350,16 @@ class ConfigOrVariableSelection extends UITemplate {
     }
 
     SetValue(value) {
+        if(!value.Values) {
+            value.Values = [];
+
+            if(value.Selection && value.Selection.value && !value.Selection.reference)
+            {
+                value.Values.push(value.Selection.value);
+                value.Selection.value = value.Selection.value.Name;
+            }
+        }
+        
         for (var i = 0; i < value.Values.length; i++) {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {

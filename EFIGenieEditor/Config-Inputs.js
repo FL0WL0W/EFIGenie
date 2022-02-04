@@ -268,11 +268,13 @@ class ConfigInputs {
                 this.TargetDevice = value.TargetDevice;
                 PinOut = PinOuts[this.TargetDevice];
             }
-            if(value.Inputs){
-                for(var i = 0; i < value.Inputs.length; i++){
-                    this.Inputs.push(new ConfigInput());
-                    this.Inputs[i].SetValue(value.Inputs[i]);
-                }
+            else if(!value.Inputs) {
+                value = { Inputs: value };
+            }
+
+            for(var i = 0; i < value.Inputs.length; i++){
+                this.Inputs.push(new ConfigInput());
+                this.Inputs[i].SetValue(value.Inputs[i]);
             }
         }
 
@@ -501,10 +503,15 @@ class ConfigInput {
     TranslationMeasurement = "None";
 
     GetValue() {
+        var translationConfigValue;
+        if(this.TranslationConfig) {
+            translationConfigValue = this.TranslationConfig.GetValue();
+            translationConfigValue.Name = GetClassProperty(this.TranslationConfig, "Name")
+        }
         return { 
             Name: this.Name,
             RawConfig: this.RawConfig? this.RawConfig.GetValue() : undefined, 
-            TranslationConfig: this.TranslationConfig? this.TranslationConfig.GetValue() : undefined,
+            TranslationConfig: translationConfigValue,
             TranslationMeasurement: this.TranslationMeasurement
         };
     }
