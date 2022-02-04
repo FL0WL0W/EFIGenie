@@ -275,10 +275,7 @@ function GetSelections(measurement, configs) {
 
 class ConfigOrVariableSelection extends UITemplate {
     static ValueLabel = "Value";
-    static Template =
-        "<div id=\"$GUID$\">" +
-        "<label for=\"$Selection.GUID$\">$ValueLabel$:</label>$Selection$ $ConfigValue$" +
-        "</div>";
+    static Template = "<label for=\"$Selection.GUID$\">$ValueLabel$:</label>$Selection$ $ConfigValue$";
 
     ConfigValues = [];
 
@@ -386,6 +383,7 @@ class ConfigOrVariableSelection extends UITemplate {
 
     Id = -1;
     SetIncrements() {
+        this.Selection.SetOptions(GetSelections(this.ValueMeasurement, this.Configs));
         const selection = this.Selection.GetValue();
         if (selection && this.VariableListName) {
             if (Increments[this.VariableListName] === undefined)

@@ -1,5 +1,7 @@
 class UITemplate {
-    Attached  = false;
+    GUID = getGUID();
+    Attached = false;
+    Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -143,7 +145,17 @@ class UITemplate {
             });
         }
 
-        return html;
+        return "<div id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + html + "</div>";
+    }
+
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID).show();
     }
 }
 
@@ -154,6 +166,7 @@ class UINumber {
     Max = undefined;
     Step = undefined;
     OnChange = undefined;
+    Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -191,7 +204,7 @@ class UINumber {
     }
 
     GetHtml() {
-        var html = "<input id=\"" + this.GUID + "\" type=\"number\" value=\"" + this.Value + "\"";
+        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"number\" value=\"" + this.Value + "\"";
 
         if(this.Min !== undefined)
             html += " min=\"" + this.Min +"\"";
@@ -204,6 +217,16 @@ class UINumber {
 
         return html + "/>";
     }
+
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID).show();
+    }
 }
 
 class UICheckbox {
@@ -213,6 +236,7 @@ class UICheckbox {
     Max = undefined;
     Step = undefined;
     OnChange = undefined;
+    Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -248,12 +272,22 @@ class UICheckbox {
     }
 
     GetHtml() {
-        var html = "<input id=\"" + this.GUID + "\" type=\"checkbox\"";
+        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"checkbox\"";
 
         if(this.Value)
             html += "checked";
 
         return html + "/>";
+    }
+
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID).show();
     }
 }
 
@@ -261,6 +295,7 @@ class UIText {
     GUID = getGUID();
     Value = "";
     OnChange = undefined;
+    Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -296,7 +331,17 @@ class UIText {
     }
 
     GetHtml() {
-        return "<input id=\"" + this.GUID + "\" value=\"" + this.Value + "\"/>";
+        return "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " value=\"" + this.Value + "\"/>";
+    }
+    
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID).show();
     }
 }
 
@@ -337,6 +382,7 @@ class UISelection {
     Value = "";
     Options = [];
     OnChange = undefined;
+    Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -414,7 +460,17 @@ class UISelection {
     }
 
     GetHtml() {
-        return "<select id=\"" + this.GUID + "\">" + this.GetOptionsHtml() + "</select>";
+        return "<select id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + this.GetOptionsHtml() + "</select>";
+    }
+
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID).show();
     }
 }
 
@@ -467,6 +523,7 @@ class UIDialog {
     TemplateIdentifier = undefined;
     Title = "Dialog";
     ButtonText = "Open";
+    Hidden = true;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -481,14 +538,34 @@ class UIDialog {
         var thisClass = this;
 
         $(document).on("click."+this.GUID, "#" + this.GUID + "-open", function(){
-            var dialogSelector = $("#" + thisClass.GUID + "-dialog");
-            dialogSelector.dialog({ width:'auto', modal:true, title: dialogSelector.data("title")});
+            thisClass.Open();
         });
     }
 
     GetHtml() {
-        return  "<input id=\"" + this.GUID + "-open\" type=\"button\" class=\"button\" value=\"" + this.ButtonText + "\"></input>" +
+        return  "<input id=\"" + this.GUID + "-open\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"button\" class=\"button\" value=\"" + this.ButtonText + "\"></input>" +
                 "<div data-title=\"" + this.Title + "\" id=\"" + this.GUID + "-dialog\" style=\"display: none;\">$" + this.TemplateIdentifier + "$</div>";
+    }
+
+    Hide() {
+        this.Hidden = true;
+        $("#" + this.GUID + "-open").hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $("#" + this.GUID + "-open").show();
+    }
+    
+    Close() {
+        this.Hidden = true;
+        $("#" + this.GUID + "-dialog").dialog("close");
+    }
+
+    Open() {
+        this.Hidden = false;
+        var dialogSelector = $("#" + this.GUID + "-dialog");
+        dialogSelector.dialog({ width:'auto', modal:true, title: dialogSelector.data("title")});
     }
 }
 

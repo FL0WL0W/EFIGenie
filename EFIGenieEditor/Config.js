@@ -901,15 +901,24 @@ class ConfigEngine extends UITemplate {
         }
 
         if(requirements && requirements.indexOf("Manifold Absolute Pressure") > -1) {
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.Show();
             this.ManifoldAbsolutePressureConfigOrVariableSelection.SetIncrements();
+        } else {
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.Hide();
         }
         
         if(requirements && requirements.indexOf("Cylinder Air Temperature") > -1) {
+            this.CylinderAirTemperatureConfigOrVariableSelection.Show();
             this.CylinderAirTemperatureConfigOrVariableSelection.SetIncrements();
+        } else {
+            this.CylinderAirTemperatureConfigOrVariableSelection.Hide();
         }
 
         if(requirements && requirements.indexOf("Volumetric Efficiency") > -1) {
+            this.VolumetricEfficiencyConfigOrVariableSelection.Show();
             this.VolumetricEfficiencyConfigOrVariableSelection.SetIncrements();
+        } else {
+            this.VolumetricEfficiencyConfigOrVariableSelection.Hide();
         }
         
         this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
@@ -1267,7 +1276,7 @@ class ConfigInjectorOutputs {
 class ConfigTDCOutput extends ConfigOrVariableSelection {
     static Template =
         "<div id=\"$GUID$\">" +
-        "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$" +
+        "<div><label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>" +
         "</div>";
 
     constructor(prop) {
