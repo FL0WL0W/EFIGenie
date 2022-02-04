@@ -66,7 +66,7 @@ function TableGetType(tableValue) {
         if (min === undefined || tableValue[i] < min) {
             min = tableValue[i];
         }
-        if (max === undefined || tableValue[i] < max) {
+        if (max === undefined || tableValue[i] > max) {
             max = tableValue[i];
         }
     }
@@ -121,7 +121,7 @@ class ConfigOperation_LookupTable extends UITemplate {
     }
 
     GetObjOperation() {
-        const table = this.GetValue().Value;
+        const table = this.GetValue();
         const tableValue = table.Value;
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
@@ -150,6 +150,11 @@ class ConfigOperation_LookupTable extends UITemplate {
         }
 
         return { value: [] };
+    }
+
+    SetIncrements() {
+        if(!this.NoParameterSelection)
+            this.ParameterSelection.SetOptions(GetSelections());
     }
 }
 GenericConfigs.push(ConfigOperation_LookupTable);
@@ -200,7 +205,7 @@ class ConfigOperation_2AxisTable extends UITemplate {
     }
 
     GetObjOperation() {
-        const table = this.GetValue().Value;
+        const table = this.GetValue();
         const tableValue = table.Value;
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
@@ -234,6 +239,13 @@ class ConfigOperation_2AxisTable extends UITemplate {
             };
         }
         return { value: [] };
+    }
+
+    SetIncrements() {
+        if(!this.NoParameterSelection) {
+            this.XSelection.SetOptions(GetSelections());
+            this.YSelection.SetOptions(GetSelections());
+        }
     }
 }
 GenericConfigs.push(ConfigOperation_2AxisTable);
@@ -408,6 +420,8 @@ class ConfigOrVariableSelection extends UITemplate {
 
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
+                if(subConfig.SetIncrements)
+                    subConfig.SetIncrements();
                 if (GetClassProperty(subConfig, "Output")) {
                     this.Id = 1;
                     if (Increments.VariableIncrement === undefined)
