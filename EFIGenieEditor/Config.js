@@ -479,11 +479,11 @@ class ConfigTop {
     }
 }
 
-class ConfigFuel {
+class ConfigFuel extends UITemplate {
     static Template = getFileContents("ConfigGui/Fuel.html");
 
     constructor(){
-        this.GUID = getGUID();
+        super();
         this.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            AFRConfigs,
             ValueLabel:         "Air Fuel Ratio",
@@ -509,65 +509,6 @@ class ConfigFuel {
             VariableListName:   "FuelParameters"
         });
         this.ConfigInjectorOutputs = new ConfigInjectorOutputs();
-    }
-
-    AFRConfigOrVariableSelection = undefined;
-    InjectorEnableConfigOrVariableSelection = undefined;
-    InjectorPulseWidthConfigOrVariableSelection = undefined;
-    InjectorEndPositionConfigOrVariableSelection = undefined
-    ConfigInjectorOutputs = undefined
-
-    GetValue() {
-        return {
-            AFRConfigOrVariableSelection: this.AFRConfigOrVariableSelection.GetValue(),
-            InjectorEnableConfigOrVariableSelection: this.InjectorEnableConfigOrVariableSelection.GetValue(),
-            InjectorPulseWidthConfigOrVariableSelection: this.InjectorPulseWidthConfigOrVariableSelection.GetValue(),
-            InjectorEndPositionConfigOrVariableSelection: this.InjectorEndPositionConfigOrVariableSelection.GetValue(),
-            ConfigInjectorOutputs: this.ConfigInjectorOutputs.GetValue()
-        };
-    }
-
-    SetValue(obj) {
-        this.Detach();
-
-        this.AFRConfigOrVariableSelection.SetValue(!obj? undefined : obj.AFRConfigOrVariableSelection);
-        this.InjectorEnableConfigOrVariableSelection.SetValue(!obj? undefined : obj.InjectorEnableConfigOrVariableSelection);
-        this.InjectorPulseWidthConfigOrVariableSelection.SetValue(!obj? undefined : obj.InjectorPulseWidthConfigOrVariableSelection);
-        this.InjectorEndPositionConfigOrVariableSelection.SetValue(!obj? undefined : obj.InjectorEndPositionConfigOrVariableSelection);
-        this.ConfigInjectorOutputs.SetValue(!obj? undefined : obj.ConfigInjectorOutputs);
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        this.AFRConfigOrVariableSelection.Detach();
-        this.InjectorEnableConfigOrVariableSelection.Detach();
-        this.InjectorPulseWidthConfigOrVariableSelection.Detach();
-        this.InjectorEndPositionConfigOrVariableSelection.Detach();
-        this.ConfigInjectorOutputs.Detach();
-    }
-
-    Attach() {
-        this.Detach();
-        this.AFRConfigOrVariableSelection.Attach();
-        this.InjectorEnableConfigOrVariableSelection.Attach();
-        this.InjectorPulseWidthConfigOrVariableSelection.Attach();
-        this.InjectorEndPositionConfigOrVariableSelection.Attach();
-        this.ConfigInjectorOutputs.Attach();
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]afr[$]/g, this.AFRConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]injectorenable[$]/g, this.InjectorEnableConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]injectorpulsewidth[$]/g, this.InjectorPulseWidthConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]injectorendat[$]/g, this.InjectorEndPositionConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]injectoroutputs[$]/g, this.ConfigInjectorOutputs.GetHtml());
-        
-        return template;
     }
 
     CylinderFuelMassId = -1;
@@ -630,11 +571,11 @@ class ConfigFuel {
     }
 }
 
-class ConfigIgnition {
+class ConfigIgnition extends UITemplate {
     static Template = getFileContents("ConfigGui/Ignition.html");
 
     constructor(){
-        this.GUID = getGUID();
+        super();
         this.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
             ValueLabel:         "Ignition Enable",
@@ -659,6 +600,7 @@ class ConfigIgnition {
             ValueMeasurement:   "Time",
             VariableListName:   "IgnitionParameters"
         });
+        this.Outputs = [];
         for(var i = 0; i < 8; i++){
             this.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
@@ -668,93 +610,31 @@ class ConfigIgnition {
         }
     }
 
-    IgnitionEnableConfigOrVariableSelection = undefined;
-    IgnitionAdvanceConfigOrVariableSelection = undefined;
-    IgnitionDwellConfigOrVariableSelection = undefined;
-    IgnitionDwellDeviationConfigOrVariableSelection = undefined;
-    Outputs = [];
-
     GetValue() {
-        var outputObj = [];
+        var value = super.GetValue();
+        value.Outputs = [];
         for(var i = 0; i < this.Outputs.length; i++){
-            outputObj[i] = this.Outputs[i].GetValue();
+            value.Outputs[i] = this.Outputs[i].GetValue();
         };
-        return {
-            IgnitionEnableConfigOrVariableSelection: this.IgnitionEnableConfigOrVariableSelection.GetValue(),
-            IgnitionAdvanceConfigOrVariableSelection: this.IgnitionAdvanceConfigOrVariableSelection.GetValue(),
-            IgnitionDwellConfigOrVariableSelection: this.IgnitionDwellConfigOrVariableSelection.GetValue(),
-            IgnitionDwellDeviationConfigOrVariableSelection: this.IgnitionDwellDeviationConfigOrVariableSelection.GetValue(),
-            Outputs: outputObj
-        };
+        return value;
     }
 
-    SetValue(obj) {
-        this.Detach();
-        this.IgnitionEnableConfigOrVariableSelection.SetValue(!obj? undefined : obj.IgnitionEnableConfigOrVariableSelection);
-        this.IgnitionAdvanceConfigOrVariableSelection.SetValue(!obj? undefined : obj.IgnitionAdvanceConfigOrVariableSelection);
-        this.IgnitionDwellConfigOrVariableSelection.SetValue(!obj? undefined : obj.IgnitionDwellConfigOrVariableSelection);
-        this.IgnitionDwellDeviationConfigOrVariableSelection.SetValue(!obj? undefined : obj.IgnitionDwellDeviationConfigOrVariableSelection);
-        if(obj && obj.Outputs)
+    SetValue(value) {
+        if(value && value.Outputs)
         {
             this.Outputs = [];
-            for(var i = 0; i < obj.Outputs.length; i++){
+            for(var i = 0; i < value.Outputs.length; i++){
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
                         ValueLabel:         "Ignition " + (i+1),
                         ValueMeasurement:   "No Measurement"
                     });
-                this.Outputs[i].SetValue(obj.Outputs[i])
+                this.Outputs[i].SetValue(value.Outputs[i])
             }
         }
 
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        this.IgnitionEnableConfigOrVariableSelection.Detach();
-        this.IgnitionAdvanceConfigOrVariableSelection.Detach();
-        this.IgnitionDwellConfigOrVariableSelection.Detach();
-        this.IgnitionDwellDeviationConfigOrVariableSelection.Detach();
-
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].Detach();
-        };
-    }
-
-    Attach() {
-        this.Detach();
-        this.IgnitionEnableConfigOrVariableSelection.Attach();
-        this.IgnitionAdvanceConfigOrVariableSelection.Attach();
-        this.IgnitionDwellConfigOrVariableSelection.Attach();
-        this.IgnitionDwellDeviationConfigOrVariableSelection.Attach();
-
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].Attach();
-        };
-
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-
-        template = template.replace(/[$]ignitionenable[$]/g, this.IgnitionEnableConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]ignitionadvance[$]/g, this.IgnitionAdvanceConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]ignitiondwell[$]/g, this.IgnitionDwellConfigOrVariableSelection.GetHtml());
-        template = template.replace(/[$]ignitiondwelldeviation[$]/g, this.IgnitionDwellDeviationConfigOrVariableSelection.GetHtml());
-
-        var outputsHTML = "";
-        
-        for(var i = 0; i < this.Outputs.length; i++){
-            outputsHTML += this.Outputs[i].GetHtml();
-        };
-        
-        template = template.replace(/[$]ignitionoutputs[$]/g, outputsHTML);
-
-        return template;
+        super.SetValue(value);
     }
 
     SetIncrements() {
@@ -1274,10 +1154,7 @@ class ConfigInjectorOutputs {
 }
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template =
-        "<div id=\"$GUID$\">" +
-        "<div><label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>" +
-        "</div>";
+    static Template = "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$";
 
     constructor(prop) {
         super(prop);

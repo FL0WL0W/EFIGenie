@@ -66,9 +66,8 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
-                if(!baseObjName)
-                    baseObjName = elementname;
+            if(!baseObjName && element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
+                baseObjName = elementname;
             }
         });
 
@@ -91,10 +90,15 @@ class UITemplate {
     Detach() {
         if(this.Attached) {
             Object.entries(this).forEach(e => {
-                var [elementname, element] = e;
-                if(element !== undefined && element.Detach) {
-                    element.Detach();
+                function DetachElement(element) {
+                    if(element !== undefined && element.Detach)
+                        element.Attach();
                 }
+                var [elementname, element] = e;
+                if(Array.isArray(element))
+                    element.forEach(DetachElement);
+                else 
+                    DetachElement(element);
             });
             this.Attached = false;
         }
@@ -103,10 +107,15 @@ class UITemplate {
     Attach() {
         this.Detach();
         Object.entries(this).forEach(e => {
-            var [elementname, element] = e;
-            if(element !== undefined && element.Attach) {
-                element.Attach();
+            function AttachElement(element) {
+                if(element !== undefined && element.Attach)
+                    element.Attach();
             }
+            var [elementname, element] = e;
+            if(Array.isArray(element))
+                element.forEach(AttachElement);
+            else 
+                AttachElement(element);
         });
         this.Attached = true;
     }
@@ -131,6 +140,13 @@ class UITemplate {
                             }
                             if(templateReplacer.GetHtml) {
                                 return templateReplacer.GetHtml();
+                            }
+                            if(Array.isArray(templateReplacer)) {
+                                var replacement = "";
+                                for(var i = 0; i < templateReplacer.length; i++) {
+                                    replacement += GetTemplateReplacement(templateReplacer, "" + i);
+                                }
+                                return replacement;
                             }
                             return JSON.stringify(templateReplacer);
                         }

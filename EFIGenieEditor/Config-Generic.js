@@ -362,7 +362,7 @@ class ConfigOrVariableSelection extends UITemplate {
     }
 
     SetValue(value) {
-        if(!value.Values) {
+        if(value.Values === undefined) {
             value.Values = [];
 
             if(value.Selection && value.Selection.value && !value.Selection.reference)
