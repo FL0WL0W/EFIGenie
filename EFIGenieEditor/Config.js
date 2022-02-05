@@ -482,30 +482,30 @@ class ConfigTop {
 class ConfigFuel extends UITemplate {
     static Template = getFileContents("ConfigGui/Fuel.html");
 
-    constructor(){
-        super();
+    constructor(prop) {
+        super(prop);
         this.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            AFRConfigs,
-            ValueLabel:         "Air Fuel Ratio",
-            ValueMeasurement:   "Ratio",
+            Label:         "Air Fuel Ratio",
+            Measurement:        "Ratio",
             VariableListName:   "FuelParameters"
         });
         this.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorEnableConfigs,
-            ValueLabel:         "Injector Enable",
-            ValueMeasurement:   "Bool",
+            Label:         "Injector Enable",
+            Measurement:        "Bool",
             VariableListName:   "FuelParameters"
         });
         this.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
-            ValueLabel:         "Injector Pulse Width",
-            ValueMeasurement:   "Time",
+            Label:         "Injector Pulse Width",
+            Measurement:        "Time",
             VariableListName:   "FuelParameters"
         });
         this.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            ValueLabel:         "Injector End Position(BTDC)",
-            ValueMeasurement:   "Angle",
+            Label:         "Injector End Position(BTDC)",
+            Measurement:        "Angle",
             VariableListName:   "FuelParameters"
         });
         this.ConfigInjectorOutputs = new ConfigInjectorOutputs();
@@ -525,10 +525,10 @@ class ConfigFuel extends UITemplate {
         else
             this.CylinderFuelMassId = ++Increments.VariableIncrement;
         Increments.FuelParameters.push({ 
-            Name: "Cylinder Fuel Mass", 
-            Id: this.CylinderFuelMassId,
-            Type: "float",
-            Measurement: "Mass"
+            Name:           "Cylinder Fuel Mass", 
+            Id:             this.CylinderFuelMassId,
+            Type:           "float",
+            Measurement:    "Mass"
         });
 
         this.InjectorEnableConfigOrVariableSelection.SetIncrements();
@@ -574,38 +574,38 @@ class ConfigFuel extends UITemplate {
 class ConfigIgnition extends UITemplate {
     static Template = getFileContents("ConfigGui/Ignition.html");
 
-    constructor(){
-        super();
+    constructor(prop) {
+        super(prop);
         this.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
-            ValueLabel:         "Ignition Enable",
-            ValueMeasurement:   "Bool",
+            Label:         "Ignition Enable",
+            Measurement:        "Bool",
             VariableListName:   "IgnitionParameters"
         });
         this.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
-            ValueLabel:         "Ignition Advance",
-            ValueMeasurement:   "Angle",
+            Label:         "Ignition Advance",
+            Measurement:        "Angle",
             VariableListName:   "IgnitionParameters"
         });
         this.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            ValueLabel:         "Ignition Dwell",
-            ValueMeasurement:   "Time",
+            Label:         "Ignition Dwell",
+            Measurement:        "Time",
             VariableListName:   "IgnitionParameters"
         });
         this.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            ValueLabel:         "Ignition Dwell Deviation",
-            ValueMeasurement:   "Time",
+            Label:         "Ignition Dwell Deviation",
+            Measurement:        "Time",
             VariableListName:   "IgnitionParameters"
         });
         this.Outputs = [];
         for(var i = 0; i < 8; i++){
             this.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
-                ValueLabel:         "Ignition " + (i+1),
-                ValueMeasurement:   "No Measurement"
+                Label:         "Ignition " + (i+1),
+                Measurement:        "No Measurement"
             });
         }
     }
@@ -627,8 +627,8 @@ class ConfigIgnition extends UITemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
-                        ValueLabel:         "Ignition " + (i+1),
-                        ValueMeasurement:   "No Measurement"
+                        Label:         "Ignition " + (i+1),
+                        Measurement:        "No Measurement"
                     });
                 this.Outputs[i].SetValue(value.Outputs[i])
             }
@@ -700,42 +700,42 @@ class ConfigIgnition extends UITemplate {
 class ConfigEngine extends UITemplate {
     static Template = getFileContents("ConfigGui/Engine.html");
 
-    constructor(){
-        super();
+    constructor(prop) {
+        super(prop);
         this.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
-            ValueLabel:         "Crank Position",
-            ValueMeasurement:   "ReluctorResult",
+            Label:         "Crank Position",
+            Measurement:        "ReluctorResult",
             VariableListName:   "EngineParameters"
         });
         this.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
-            ValueLabel:         "Cam Position",
-            ValueMeasurement:   "ReluctorResult",
+            Label:         "Cam Position",
+            Measurement:        "ReluctorResult",
             VariableListName:   "EngineParameters"
         });
         this.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
-            ValueLabel:         "Cylinder Air Mass",
-            ValueMeasurement:   "Mass",
+            Label:         "Cylinder Air Mass",
+            Measurement:        "Mass",
             VariableListName:   "EngineParameters"
         });
         this.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
-            ValueLabel:         "Cylinder Air Temperature",
-            ValueMeasurement:   "Temperature",
+            Label:         "Cylinder Air Temperature",
+            Measurement:        "Temperature",
             VariableListName:   "EngineParameters"
         });
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
-            ValueLabel:         "Manifold Absolute Pressure",
-            ValueMeasurement:   "Pressure",
+            Label:         "Manifold Absolute Pressure",
+            Measurement:        "Pressure",
             VariableListName:   "EngineParameters"
         });
         this.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
-            ValueLabel:         "Volumetric Efficiency",
-            ValueMeasurement:   "Percentage",
+            Label:         "Volumetric Efficiency",
+            Measurement:        "Percentage",
             VariableListName:   "EngineParameters"
         });
     }
@@ -768,10 +768,10 @@ class ConfigEngine extends UITemplate {
         Increments.EngineSyncedId = this.EngineSyncedId;
         this.EngineRPMId = ++Increments.VariableIncrement;
         Increments.EngineParameters.push({ 
-            Name: "Engine Speed", 
-            Id: this.EngineRPMId,
-            Type: "float",
-            Measurement: "AngularSpeed"
+            Name:           "Engine Speed", 
+            Id:             this.EngineRPMId,
+            Type:           "float",
+            Measurement:    "AngularSpeed"
         });
 
         var requirements = [];
@@ -885,16 +885,15 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
     static Measurement = "Mass";
     static Output = "float";
     static Requirements = ["Cylinder Air Temperature", "Manifold Absolute Pressure", "Volumetric Efficiency"];
-    static Template = getFileContents("ConfigGui/Engine_CylinderAirmass_SpeedDensity.html");
+    static Template = "<div><label for=\"$CylinderVolume.GUID$\">Cylinder Volume:</label>$CylinderVolume$</div>";
 
-    constructor(){
-        super();
-
+    constructor(prop) {
+        super(prop);
         this.CylinderVolume = new UINumberWithMeasurement({
-            Value: 0.66594,
-            Step: 0.001,
-            Min: 0.001,
-            Measurement: "Volume"
+            Value:          0.66594,
+            Step:           0.001,
+            Min:            0.001,
+            Measurement:    "Volume"
         });
     }
 
@@ -918,85 +917,31 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
 }
 CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
 
-class ConfigInjectorPulseWidth_DeadTime {
+class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
     static Name = "Dead Time";
     static Output = "float";
     static Measurement = "Time";
     static Template = getFileContents("ConfigGui/Fuel_InjectorPulseWidth_DeadTime.html");
 
-    constructor(){
-        this.GUID = getGUID();
+    constructor(prop) {
+        super(prop);
         this.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            ValueLabel:         "Injector Flow Rate",
-            ValueMeasurement:   "MassFlow",
+            Label:         "Injector Flow Rate",
+            Measurement:        "MassFlow",
             VariableListName:   "FuelParameters"
         });
         this.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            ValueLabel:         "Injector Dead Time",
-            ValueMeasurement:   "Time",
+            Label:         "Injector Dead Time",
+            Measurement:        "Time",
             VariableListName:   "FuelParameters"
         });
-    }
-
-    FlowRateConfigOrVariableSelection = undefined;
-    DeadTimeConfigOrVariableSelection = undefined;
-    MinInjectorFuelMass = 0.005;
-
-    GetValue() {
-        return {
-            Name: GetClassProperty(this, "Name"),
-            FlowRateConfigOrVariableSelection: this.FlowRateConfigOrVariableSelection.GetValue(),
-            DeadTimeConfigOrVariableSelection: this.DeadTimeConfigOrVariableSelection.GetValue(),
-            MinInjectorFuelMass: this.MinInjectorFuelMass
-        };
-    }
-
-    SetValue(obj) {
-        this.Detach();
-        if(obj && obj.MinInjectorFuelMass !== undefined)
-            this.MinInjectorFuelMass = obj.MinInjectorFuelMass;
-        this.FlowRateConfigOrVariableSelection.SetValue(!obj? undefined : obj.FlowRateConfigOrVariableSelection);
-        this.DeadTimeConfigOrVariableSelection.SetValue(!obj? undefined : obj.DeadTimeConfigOrVariableSelection);
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-        this.FlowRateConfigOrVariableSelection.Detach();
-        this.DeadTimeConfigOrVariableSelection.Detach();
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-mininjectorfuelmass", function(){
-            thisClass.MinInjectorFuelMass = parseFloat($(this).val());
+        this.MinInjectorFuelMass = new UINumberWithMeasurement({
+            Value:          0.005,
+            Step:           0.001,
+            Measurement:    "Mass"
         });
-
-        this.FlowRateConfigOrVariableSelection.Attach();
-        this.DeadTimeConfigOrVariableSelection.Attach();
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-
-        template = template.replace(/[$]flowrate[$]/g, 
-            this.FlowRateConfigOrVariableSelection.GetHtml());
-
-        template = template.replace(/[$]deadtime[$]/g, 
-            this.DeadTimeConfigOrVariableSelection.GetHtml());
-            
-        template = template.replace(/[$]mininjectorfuelmass[$]/g, this.MinInjectorFuelMass);
-        template = template.replace(/[$]mininjectorfuelmassmeasurement[$]/g, GetUnitDisplay("Mass"));
-
-        return template;
     }
 
     SetIncrements() {
@@ -1007,7 +952,7 @@ class ConfigInjectorPulseWidth_DeadTime {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-            { type: "FLOAT", value: this.MinInjectorFuelMass }
+            { type: "FLOAT", value: this.MinInjectorFuelMass.GetValue() }
         ]};
     }
 
@@ -1045,8 +990,8 @@ class ConfigInjectorOutputs {
         for(var i = 0; i < 8; i++){
             this.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
-                ValueLabel:         "Injector " + (i+1),
-                ValueMeasurement:   "No Measurement"
+                Label:         "Injector " + (i+1),
+                Measurement:        "No Measurement"
             });
         }
     }
@@ -1073,8 +1018,8 @@ class ConfigInjectorOutputs {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
-                        ValueLabel:         "Injector " + (i+1),
-                        ValueMeasurement:   "No Measurement"
+                        Label:         "Injector " + (i+1),
+                        Measurement:        "No Measurement"
                     });
                 this.Outputs[i].SetValue(obj.Outputs[i])
             }
@@ -1154,7 +1099,7 @@ class ConfigInjectorOutputs {
 }
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template = "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$ValueLabel$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$";
+    static Template = "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$";
 
     constructor(prop) {
         super(prop);

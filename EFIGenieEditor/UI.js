@@ -2,9 +2,21 @@ class UITemplate {
     GUID = getGUID();
     Attached = false;
     Hidden = false;
+    OnChange = [];
 
     constructor(prop) {
         Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
+        var thisClass = this;
+        Object.entries(this).forEach(e => {
+            var [elementname, element] = e;
+            if(element !== undefined && element.GetValue) {
+                element.OnChange.push(function() {
+                    thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+                });
+            }
+        });
     }
 
     GetValue() {
@@ -141,6 +153,7 @@ class UITemplate {
                             if(templateReplacer.GetHtml) {
                                 return templateReplacer.GetHtml();
                             }
+                            //can display arrays but cannot get/set value of arrays
                             if(Array.isArray(templateReplacer)) {
                                 var replacement = "";
                                 for(var i = 0; i < templateReplacer.length; i++) {
@@ -181,11 +194,13 @@ class UINumber {
     Min = undefined;
     Max = undefined;
     Step = undefined;
-    OnChange = undefined;
+    OnChange = [];
     Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
     }
 
     GetValue() {
@@ -195,11 +210,10 @@ class UINumber {
     SetValue(value) {
         var val = parseFloat(value);
 
-        if(this.Value !== val) {
+        if(value !== undefined && this.Value !== val) {
             this.Value = val;
             $("#" + this.GUID).val(this.Value);
-            if(this.OnChange)
-                this.OnChange(this.Value);
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
@@ -213,9 +227,7 @@ class UINumber {
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
             thisClass.Value = parseFloat($(this).val());
-            if(thisClass.OnChange) {
-                thisClass.OnChange(thisClass.Value);
-            }
+            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
         });
     }
 
@@ -251,11 +263,13 @@ class UICheckbox {
     Min = undefined;
     Max = undefined;
     Step = undefined;
-    OnChange = undefined;
+    OnChange = [];
     Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
     }
 
     GetValue() {
@@ -263,11 +277,10 @@ class UICheckbox {
     }
 
     SetValue(value) {
-        if(this.Value !== value) {
+        if(value !== undefined && this.Value !== value) {
             this.Value = value;
             $("#" + this.GUID).prop('checked', this.Value);
-            if(this.OnChange)
-                this.OnChange(this.Value);
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
@@ -281,9 +294,7 @@ class UICheckbox {
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
             thisClass.Value = $(this).prop('checked');
-            if(thisClass.OnChange) {
-                thisClass.OnChange(thisClass.Value);
-            }
+            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
         });
     }
 
@@ -310,11 +321,13 @@ class UICheckbox {
 class UIText {
     GUID = getGUID();
     Value = "";
-    OnChange = undefined;
+    OnChange = [];
     Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
     }
 
     GetValue() {
@@ -322,11 +335,10 @@ class UIText {
     }
 
     SetValue(value) {
-        if(this.Value !== value) {
+        if(value !== undefined && this.Value !== value) {
             this.Value = value;
             $("#" + this.GUID).val(this.Value);
-            if(this.OnChange)
-                this.OnChange(this.Value);
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
@@ -340,9 +352,7 @@ class UIText {
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
             thisClass.Value = $(this).val();
-            if(thisClass.OnChange) {
-                thisClass.OnChange(thisClass.Value);
-            }
+            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
         });
     }
 
@@ -397,11 +407,13 @@ class UISelection {
     GUID = getGUID();
     Value = "";
     Options = [];
-    OnChange = undefined;
+    OnChange = [];
     Hidden = false;
 
     constructor(prop) {
         Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
     }
 
     GetValue() {
@@ -409,14 +421,11 @@ class UISelection {
     }
     
     SetValue(value) {
-        if(this.Value !== value) {
+        if(value !== undefined && this.Value !== value) {
             this.Value = value;
             $("#" + this.GUID + " option").prop('selected', false);
             $("#" + this.GUID + " option[value='" + UISelection.ParseValue("string", value) + "']").prop('selected', true);
-
-            if(this.OnChange) {
-                this.OnChange(this.Value);
-            }
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
@@ -430,10 +439,7 @@ class UISelection {
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
             thisClass.Value = UISelection.ParseValue($(this).find(":selected").data("type"), $(this).val());
-            
-            if(thisClass.OnChange) {
-                thisClass.OnChange(thisClass.Value);
-            }
+            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
         });
     }
 
@@ -508,7 +514,7 @@ class UITable extends Table {
     }
 
     SetValue(value) {
-        if(value) {
+        if(value !== undefined) {
             if(value.XResolution !== undefined && this.XResolutionModifiable)
                 this.SetXResolution(value.XResolution);
             if(value.YResolution !== undefined && this.YResolutionModifiable)
@@ -529,6 +535,8 @@ class UITable extends Table {
                 this.MinY = value.MinY;
             if(value.MaxY !== undefined && this.MaxYModifiable)
                 this.MaxY = value.MaxY;
+
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
         this.UpdateTable();
     }

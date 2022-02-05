@@ -20,38 +20,18 @@ var OperationArchitectureFactoryIDs = {
     LessThanOrEqual: 20
 }
 
-class ConfigOperation_Static extends UITemplate {
+
+class ConfigOperation_Static extends UINumberWithMeasurement {
     static Name = "Static";
     static Output = "float";
     static Inputs = [];
-    static Measurement = "Selectable";
-    static ValueLabel = "Value";
-    static ValueMeasurement = "None";
-    static Template = getFileContents("ConfigGui/Operation_Static.html");
-
-    Default = true;
-
-    constructor(prop) {
-        super(prop);
-        const thisClass = this;
-
-        this.Value = new UINumberWithMeasurement({
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
-        });
-    }
 
     GetObjOperation() {
-        return { value: [{ type: "Operation_StaticVariable", value: this.GetValue().Value }] };
+        return { value: [{ type: "Operation_StaticVariable", value: this.GetValue() }] };
     }
 
     GetObjParameters() {
         return { value: [] };
-    }
-
-    GetElementHtml() {
-        return this.GetHtml();
     }
 }
 GenericConfigs.push(ConfigOperation_Static);
@@ -86,19 +66,14 @@ class ConfigOperation_LookupTable extends UITemplate {
     static Output = "float";
     static Inputs = ["float"];
     static Measurement = "Selectable";
-    static ValueLabel = "Value";
-    static ValueMeasurement = "None";
+    static Label = "Value";
     static XLabel = "X"
     static Template = "$Dialog$"
 
-    Default = true;
-
     constructor(prop) {
         super(prop);
-        const thisClass = this;
-
         this.Dialog = new UIDialog({
-            Title: "$ValueLabel$",
+            Title: "$Label$",
             ButtonText: "Edit Table",
             TemplateIdentifier: "Value"
         });
@@ -107,16 +82,10 @@ class ConfigOperation_LookupTable extends UITemplate {
             YResolution: 1,
             YResolutionModifiable: false,
             XLabel: this.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
-            ZLabel: "$ValueLabel$",
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
+            ZLabel: "$Label$"
         });
         this.ParameterSelection = this.NoParameterSelection ? undefined : new UISelection({
-            Options: GetSelections(),
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
+            Options: GetSelections()
         });
     }
 
@@ -164,20 +133,15 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static Output = "float";
     static Inputs = ["float", "float"];
     static Measurement = "Selectable";
-    static ValueLabel = "Value";
-    static ValueMeasurement = "None";
+    static Label = "Value";
     static XLabel = "X"
     static YLabel = "Y"
     static Template = "$Dialog$"
 
-    Default = true;
-
     constructor(prop) {
         super(prop);
-        const thisClass = this;
-
         this.Dialog = new UIDialog({
-            Title: "$ValueLabel$",
+            Title: "$Label$",
             ButtonText: "Edit Table",
             TemplateIdentifier: "Value"
         });
@@ -185,22 +149,13 @@ class ConfigOperation_2AxisTable extends UITemplate {
             BaseObj: true,
             XLabel: this.NoParameterSelection ? "$XLabel$" : "$XSelection$",
             YLabel: this.NoParameterSelection ? "$YLabel$" : "$YSelection$",
-            ZLabel: "$ValueLabel$",
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
+            ZLabel: "$Label$"
         });
         this.XSelection = this.NoParameterSelection ? undefined : new UISelection({
-            Options: GetSelections(),
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
+            Options: GetSelections()
         });
         this.YSelection = this.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections(),
-            OnChange: function (value) {
-                thisClass.Default = false;
-            }
         });
     }
 
@@ -286,8 +241,8 @@ function GetSelections(measurement, configs) {
 }
 
 class ConfigOrVariableSelection extends UITemplate {
-    static ValueLabel = "Value";
-    static Template = "<label for=\"$Selection.GUID$\">$ValueLabel$:</label>$Selection$ $ConfigValue$";
+    static Label = "Value";
+    static Template = "<label for=\"$Selection.GUID$\">$Label$:</label>$Selection$ $ConfigValue$";
 
     ConfigValues = [];
 
@@ -297,7 +252,7 @@ class ConfigOrVariableSelection extends UITemplate {
         const thisClass = this;
 
         this.Selection = new UISelection({
-            Options: GetSelections(this.ValueMeasurement, this.Configs),
+            Options: GetSelections(this.Measurement, this.Configs),
             OnChange: function (value) {
                 //proud of myself on this clever bit of self modifying template ;)
                 thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
@@ -325,10 +280,15 @@ class ConfigOrVariableSelection extends UITemplate {
         for (var i = 0; i < this.Configs.length; i++) {
             if (GetClassProperty(this.Configs[i], "Name") !== selection.value)
                 continue;
-            this.ConfigValues.push(new this.Configs[i]());
-            this.ConfigValues[this.ConfigValues.length - 1].ValueLabel = this.ValueLabel;
-            this.ConfigValues[this.ConfigValues.length - 1].ValueMeasurement = this.ValueMeasurement;
-            if (this.ValueMeasurement === "Bool")
+            var configValue = new this.Configs[i]();
+            if(configValue.OnChange)
+                configValue.OnChange.push(function(){configValue.NotDefault = true;});
+            else
+                configValue.NotDefault = true;
+            this.ConfigValues.push(configValue);
+            this.ConfigValues[this.ConfigValues.length - 1].Label = this.Label;
+            this.ConfigValues[this.ConfigValues.length - 1].Measurement = this.Measurement;
+            if (this.Measurement === "Bool")
                 this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
             else
                 this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
@@ -350,8 +310,10 @@ class ConfigOrVariableSelection extends UITemplate {
         if (this.ConfigValues) {
             value.Values = [];
             for (var i = 0; i < this.ConfigValues.length; i++) {
-                if (!this.ConfigValues[i].Default) {
+                if (this.ConfigValues[i].NotDefault) {
                     var configValue = this.ConfigValues[i].GetValue();
+                    if(typeof configValue !== "object" )
+                        configValue = { Value: configValue };
                     configValue.Name = GetClassProperty(this.ConfigValues[i], "Name");
                     value.Values.push(configValue);
                 }
@@ -376,7 +338,10 @@ class ConfigOrVariableSelection extends UITemplate {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {
                 if (GetClassProperty(this.ConfigValues[t], "Name") === value.Values[i].Name) {
-                    this.ConfigValues[t].SetValue(value.Values[i]);
+                    var setVal = value.Values[i];
+                    if(typeof this.ConfigValues[t].GetValue() !== "object" )
+                        setVal = setVal.Value;
+                    this.ConfigValues[t].SetValue(setVal);
                     found = true;
                     break;
                 }
@@ -385,14 +350,22 @@ class ConfigOrVariableSelection extends UITemplate {
                 for (var t = 0; t < this.Configs.length; t++) {
                     if (GetClassProperty(this.Configs[t], "Name") !== value.Values[i].Name)
                         continue;
-                    this.ConfigValues.push(new this.Configs[t]());
-                    this.ConfigValues[this.ConfigValues.length - 1].ValueLabel = this.ValueLabel;
-                    this.ConfigValues[this.ConfigValues.length - 1].ValueMeasurement = this.ValueMeasurement;
-                    if (this.ValueMeasurement === "Bool")
+                    var configValue = new this.Configs[t]();
+                    if(configValue.OnChange)
+                        configValue.OnChange.push(function(){configValue.NotDefault = true;});
+                    else
+                        configValue.NotDefault = true;
+                    this.ConfigValues.push(configValue);
+                    this.ConfigValues[this.ConfigValues.length - 1].Label = this.Label;
+                    this.ConfigValues[this.ConfigValues.length - 1].Measurement = this.Measurement;
+                    if (this.Measurement === "Bool")
                         this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
                     else
                         this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
-                    this.ConfigValues[this.ConfigValues.length - 1].SetValue(value.Values[i]);
+                    var setVal = value.Values[i];
+                    if(typeof this.ConfigValues[this.ConfigValues.length - 1].GetValue() !== "object" )
+                        setVal = setVal.Value;
+                    this.ConfigValues[this.ConfigValues.length - 1].SetValue(setVal);
                 }
             }
         }
@@ -404,7 +377,7 @@ class ConfigOrVariableSelection extends UITemplate {
         if (!array)
             return undefined;
         for (var i = 0; i < array.length; i++) {
-            if (name && name === array[i].Name && this.ValueMeasurement === array[i].Measurement)
+            if (name && name === array[i].Name && this.Measurement === array[i].Measurement)
                 return array[i];
         }
         return undefined;
@@ -412,7 +385,7 @@ class ConfigOrVariableSelection extends UITemplate {
 
     Id = -1;
     SetIncrements() {
-        this.Selection.SetOptions(GetSelections(this.ValueMeasurement, this.Configs));
+        this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));
         const selection = this.Selection.GetValue();
         if (selection && this.VariableListName) {
             if (Increments[this.VariableListName] === undefined)
@@ -430,20 +403,20 @@ class ConfigOrVariableSelection extends UITemplate {
                         this.Id = ++Increments.VariableIncrement;
 
                     Increments[this.VariableListName].push({
-                        Name: this.ValueLabel,
+                        Name: this.Label,
                         Id: this.Id,
                         Type: GetClassProperty(subConfig, "Output"),
-                        Measurement: this.ValueMeasurement
+                        Measurement: this.Measurement
                     });
                 }
             } else {
                 const cell = this.GetCellByName(Increments[selection.reference], selection.value);
                 if (cell) {
                     Increments[this.VariableListName].push({
-                        Name: this.ValueLabel,
+                        Name: this.Label,
                         Id: cell.Id,
                         Type: cell.Type,
-                        Measurement: this.ValueMeasurement
+                        Measurement: this.Measurement
                     });
                 }
             }
