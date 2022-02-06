@@ -71,22 +71,23 @@ class ConfigOperation_LookupTable extends UITemplate {
     static Template = "$Dialog$"
 
     constructor(prop) {
-        super(prop);
-        this.Dialog = new UIDialog({
+        prop = prop === undefined? {} : prop;
+        prop.Dialog = new UIDialog({
             Title: "$Label$",
             ButtonText: "Edit Table",
             TemplateIdentifier: "Value"
         });
-        this.Value = new UITable({
+        prop.Value = new UITable({
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
-            XLabel: this.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
+            XLabel: prop.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
             ZLabel: "$Label$"
         });
-        this.ParameterSelection = this.NoParameterSelection ? undefined : new UISelection({
+        prop.ParameterSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
         });
+        super(prop);
     }
 
     GetObjOperation() {
@@ -139,24 +140,25 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static Template = "$Dialog$"
 
     constructor(prop) {
-        super(prop);
-        this.Dialog = new UIDialog({
+        prop = prop === undefined? {} : prop;
+        prop.Dialog = new UIDialog({
             Title: "$Label$",
             ButtonText: "Edit Table",
             TemplateIdentifier: "Value"
         });
-        this.Value = new UITable({
+        prop.Value = new UITable({
             BaseObj: true,
-            XLabel: this.NoParameterSelection ? "$XLabel$" : "$XSelection$",
-            YLabel: this.NoParameterSelection ? "$YLabel$" : "$YSelection$",
+            XLabel: prop.NoParameterSelection ? "$XLabel$" : "$XSelection$",
+            YLabel: prop.NoParameterSelection ? "$YLabel$" : "$YSelection$",
             ZLabel: "$Label$"
         });
-        this.XSelection = this.NoParameterSelection ? undefined : new UISelection({
+        prop.XSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
         });
-        this.YSelection = this.NoParameterSelection ? undefined : new UISelection({
+        prop.YSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections(),
         });
+        super(prop);
     }
 
     GetObjOperation() {
@@ -242,26 +244,27 @@ function GetSelections(measurement, configs) {
 
 class ConfigOrVariableSelection extends UITemplate {
     static Label = "Value";
-    static Template = "<label for=\"$Selection.GUID$\">$Label$:</label>$Selection$ $ConfigValue$";
+    static Template = "<div><label for=\"$Selection.GUID$\">$Label$:</label>$Selection$ $ConfigValue$</div>";
 
     ConfigValues = [];
 
     constructor(prop) {
+        prop = prop === undefined? {} : prop;
+        prop.Selection = new UISelection({
+            Options: GetSelections(prop.Measurement, prop.Configs),
+            
+        });
         super(prop);
-        this.GUID = getGUID();
-        const thisClass = this;
 
-        this.Selection = new UISelection({
-            Options: GetSelections(this.Measurement, this.Configs),
-            OnChange: function (value) {
-                //proud of myself on this clever bit of self modifying template ;)
-                thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
-                $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
-                thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
-                var subConfig = thisClass.GetSubConfig();
-                if(subConfig && subConfig.Attach)
-                    subConfig.Attach();
-            }
+        var thisClass = this;
+        this.Selection.OnChange.push(function () {
+            //proud of myself on this clever bit of self modifying template ;)
+            thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
+            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
+            var subConfig = thisClass.GetSubConfig();
+            if(subConfig && subConfig.Attach)
+                subConfig.Attach();
         });
     }
 
@@ -304,20 +307,33 @@ class ConfigOrVariableSelection extends UITemplate {
         return this.ConfigValues[subConfigIndex];
     }
 
+    static SaveAll = false;
+    static SaveOnlyActive = false;
     GetValue() {
         var value = super.GetValue();
 
         if (this.ConfigValues) {
-            value.Values = [];
-            for (var i = 0; i < this.ConfigValues.length; i++) {
-                if (this.ConfigValues[i].NotDefault) {
-                    var configValue = this.ConfigValues[i].GetValue();
+            if(ConfigOrVariableSelection.SaveOnlyActive) {
+                var subConfig = this.GetSubConfig();
+                if(subConfig !== undefined && subConfig.GetValue) {
+                    var configValue = subConfig.GetValue();
                     if(typeof configValue !== "object" )
                         configValue = { Value: configValue };
-                    configValue.Name = GetClassProperty(this.ConfigValues[i], "Name");
-                    value.Values.push(configValue);
+                    configValue.Name = GetClassProperty(subConfig, "Name");
+                    value.Values = [configValue];
                 }
-            }
+            } else {
+                value.Values = [];
+                for (var i = 0; i < this.ConfigValues.length; i++) {
+                    if (ConfigOrVariableSelection.SaveAll || this.ConfigValues[i].NotDefault) {
+                        var configValue = this.ConfigValues[i].GetValue();
+                        if(typeof configValue !== "object" )
+                            configValue = { Value: configValue };
+                        configValue.Name = GetClassProperty(this.ConfigValues[i], "Name");
+                        value.Values.push(configValue);
+                    }
+                }
+            } 
         }
 
         return value;

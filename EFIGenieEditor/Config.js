@@ -249,7 +249,7 @@ types = [
     }},
 ]
 
-for(var index in x86TypeAlignment) {
+for(var index in STM32TypeAlignment) {
     var type = types.find(x => x.type == x86TypeAlignment[index].type);
     if(type){
         type.align = x86TypeAlignment[index].align
@@ -261,69 +261,32 @@ function ResetIncrements()
     Increments = {};
 }
 
-class ConfigTop {
+class ConfigTop extends UITemplate {
     static Template = getFileContents("ConfigGui/Top.html");
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-
-    Inputs = new ConfigInputs();
-    Engine = new ConfigEngine();
-    Fuel = new ConfigFuel();
-    Ignition = new ConfigIgnition();
-    
-    GetValue() {
-        return { 
-            Inputs: this.Inputs.GetValue(),
-            Engine: this.Engine.GetValue(),
-            Fuel: this.Fuel.GetValue(),
-            Ignition: this.Ignition.GetValue()
-        };
-    }
-
-    SetValue(obj) {
-        this.Detach();
-        this.Inputs = new ConfigInputs();
-        this.Engine = new ConfigEngine();
-        this.Fuel = new ConfigFuel();
-        this.Ignition = new ConfigIgnition();
-
-        this.Inputs.SetValue(!obj? undefined : obj.Inputs);
-        this.Engine.SetValue(!obj? undefined : obj.Engine);
-        this.Fuel.SetValue(!obj? undefined : obj.Fuel);
-        this.Ignition.SetValue(!obj? undefined : obj.Ignition);
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Inputs = new ConfigInputs();
+        prop.Engine = new ConfigEngine();
+        prop.Fuel = new ConfigFuel();
+        prop.Ignition = new ConfigIgnition();
+        super(prop);
     }
 
     Detach() {
-        ResetIncrements();//this is top level object so reset increments. this is not elegant
+        super.Detach();
         DetachPasteOptions();
-        this.Inputs.Detach();
-        this.Engine.Detach();
-        this.Fuel.Detach();
-        this.Ignition.Detach();
+        ResetIncrements();//this is top level object so reset increments. this is not elegant
 
         $(document).off("click."+this.GUID);
     }
 
     Attach() {
-        this.Detach();
+        super.Attach();
         AttachPasteOptions();
-        var thisClass = this;
         this.SetIncrements();//this is top level object so set increments. this is not elegant
-        if(Increments.PostEvent){
-            Increments.PostEvent.forEach(element => {
-                element();
-            });
-        }
-        this.Inputs.Attach();
-        this.Engine.Attach();
-        this.Fuel.Attach();
-        this.Ignition.Attach();
 
+        var thisClass = this;
         $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-open", function(){
             var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
             var containerSelector = $("#" + thisClass.GUID + "-container");
@@ -416,23 +379,15 @@ class ConfigTop {
     }
 
     GetHtml() {
-        var template = GetClassProperty(this, "Template");
+        var template = super.GetHtml();
 
-        template = template.replace(/[$]id[$]/g, this.GUID);
+        template = template.replace(/[%]inputstablist[%]/g, this.Inputs.GetInputsHtml());
+        template = template.replace(/[%]inputstabcontrols[%]/g, this.Inputs.GetControlsHtml());
 
-        template = template.replace(/[$]inputs[$]/g, this.Inputs.GetHtml());
-        template = template.replace(/[$]inputstablist[$]/g, this.Inputs.GetInputsHtml());
-        template = template.replace(/[$]inputstabcontrols[$]/g, this.Inputs.GetControlsHtml());
-        template = template.replace(/[$]inputsstyle[$]/g, "");
-        
-        template = template.replace(/[$]fuel[$]/g, this.Fuel.GetHtml());
-        template = template.replace(/[$]fuelstyle[$]/g, " style=\"display: none;\"");
-        
-        template = template.replace(/[$]engine[$]/g, this.Engine.GetHtml());
-        template = template.replace(/[$]enginestyle[$]/g, " style=\"display: none;\"");
-        
-        template = template.replace(/[$]ignition[$]/g, this.Ignition.GetHtml());
-        template = template.replace(/[$]ignitionstyle[$]/g, " style=\"display: none;\"");
+        template = template.replace(/[%]inputsstyle[%]/g, "");
+        template = template.replace(/[%]fuelstyle[%]/g, " style=\"display: none;\"");
+        template = template.replace(/[%]enginestyle[%]/g, " style=\"display: none;\"");
+        template = template.replace(/[%]ignitionstyle[%]/g, " style=\"display: none;\"");
 
         return template;
     }
@@ -480,35 +435,74 @@ class ConfigTop {
 }
 
 class ConfigFuel extends UITemplate {
-    static Template = getFileContents("ConfigGui/Fuel.html");
+    static Template =   getFileContents("ConfigGui/Fuel.html");
 
     constructor(prop) {
-        super(prop);
-        this.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop = prop === undefined? {} : prop;
+        prop.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            AFRConfigs,
-            Label:         "Air Fuel Ratio",
+            Label:              "Air Fuel Ratio",
             Measurement:        "Ratio",
             VariableListName:   "FuelParameters"
         });
-        this.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorEnableConfigs,
-            Label:         "Injector Enable",
+            Label:              "Injector Enable",
             Measurement:        "Bool",
             VariableListName:   "FuelParameters"
         });
-        this.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
-            Label:         "Injector Pulse Width",
+            Label:              "Injector Pulse Width",
             Measurement:        "Time",
             VariableListName:   "FuelParameters"
         });
-        this.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:         "Injector End Position(BTDC)",
+            Label:              "Injector End Position(BTDC)",
             Measurement:        "Angle",
             VariableListName:   "FuelParameters"
         });
-        this.ConfigInjectorOutputs = new ConfigInjectorOutputs();
+        prop.Outputs = [];
+        for(var i = 0; i < 8; i++){
+            prop.Outputs[i] = new ConfigTDCOutput({
+                Configs:        BooleanOutputConfigs,
+                Label:          "Injector " + (i+1),
+                Measurement:    "No Measurement"
+            });
+        }
+        super(prop);
+    }
+
+    GetValue() {
+        var value = super.GetValue();
+        value.Outputs = [];
+        for(var i = 0; i < this.Outputs.length; i++){
+            value.Outputs[i] = this.Outputs[i].GetValue();
+        };
+        return value;
+    }
+
+    SetValue(value) {
+        if(value) {
+            if(value.ConfigInjectorOutputs)
+                value.Outputs = value.ConfigInjectorOutputs.Outputs;
+            if(value.Outputs)
+            {
+                this.Outputs = [];
+                for(var i = 0; i < value.Outputs.length; i++){
+                    if(!this.Outputs[i])
+                        this.Outputs[i] = new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            Label:          "Injector " + (i+1),
+                            Measurement:    "No Measurement"
+                        });
+                    this.Outputs[i].SetValue(value.Outputs[i])
+                }
+            }
+        }
+
+        super.SetValue(value);
     }
 
     CylinderFuelMassId = -1;
@@ -534,7 +528,9 @@ class ConfigFuel extends UITemplate {
         this.InjectorEnableConfigOrVariableSelection.SetIncrements();
         this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
         this.InjectorEndPositionConfigOrVariableSelection.SetIncrements();
-        this.ConfigInjectorOutputs.SetIncrements();
+        for(var i = 0; i < this.Outputs.length; i++){
+            this.Outputs[i].SetIncrements();
+        };
     }
 
     GetObjPackage() {
@@ -551,7 +547,26 @@ class ConfigFuel extends UITemplate {
         if(!this.InjectorEndPositionConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
 
-        return { value: [
+        var obj = { 
+        types : [
+            { type: "Operation_EngineScheduleInjection", toObj(val) {
+                return { value: [
+                    { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                    { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
+                    { type: "FLOAT", value: val.TDC }, //tdc
+                    { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
+                    { obj: val.GetObjOperation()}, 
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.EnginePositionId },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
+                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
+                ]};
+            }}],
+        value: [
             { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
             { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
@@ -564,10 +579,14 @@ class ConfigFuel extends UITemplate {
 
             { obj: this.InjectorEnableConfigOrVariableSelection.GetObjPackage()}, 
             { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjPackage()}, 
-
-            { obj: this.ConfigInjectorOutputs.GetObjPackage()}, 
+            { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjPackage()}
         ]};
+
+        for(var i = 0; i < this.Outputs.length; i++) {
+            obj.value.push({ type: "Operation_EngineScheduleInjection", value: this.Outputs[i] });
+        }
+
+        return obj;
     }
 }
 
@@ -575,39 +594,40 @@ class ConfigIgnition extends UITemplate {
     static Template = getFileContents("ConfigGui/Ignition.html");
 
     constructor(prop) {
-        super(prop);
-        this.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop = prop === undefined? {} : prop;
+        prop.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
             Label:         "Ignition Enable",
             Measurement:        "Bool",
             VariableListName:   "IgnitionParameters"
         });
-        this.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
             Label:         "Ignition Advance",
             Measurement:        "Angle",
             VariableListName:   "IgnitionParameters"
         });
-        this.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:         "Ignition Dwell",
             Measurement:        "Time",
             VariableListName:   "IgnitionParameters"
         });
-        this.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:         "Ignition Dwell Deviation",
             Measurement:        "Time",
             VariableListName:   "IgnitionParameters"
         });
-        this.Outputs = [];
+        prop.Outputs = [];
         for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
+            prop.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
                 Label:         "Ignition " + (i+1),
                 Measurement:        "No Measurement"
             });
         }
+        super(prop);
     }
 
     GetValue() {
@@ -701,43 +721,44 @@ class ConfigEngine extends UITemplate {
     static Template = getFileContents("ConfigGui/Engine.html");
 
     constructor(prop) {
-        super(prop);
-        this.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop = prop === undefined? {} : prop;
+        prop.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
             Label:         "Crank Position",
             Measurement:        "ReluctorResult",
             VariableListName:   "EngineParameters"
         });
-        this.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
             Label:         "Cam Position",
             Measurement:        "ReluctorResult",
             VariableListName:   "EngineParameters"
         });
-        this.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
             Label:         "Cylinder Air Mass",
             Measurement:        "Mass",
             VariableListName:   "EngineParameters"
         });
-        this.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
             Label:         "Cylinder Air Temperature",
             Measurement:        "Temperature",
             VariableListName:   "EngineParameters"
         });
-        this.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
             Label:         "Manifold Absolute Pressure",
             Measurement:        "Pressure",
             VariableListName:   "EngineParameters"
         });
-        this.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
             Label:         "Volumetric Efficiency",
             Measurement:        "Percentage",
             VariableListName:   "EngineParameters"
         });
+        super(prop);
     }
 
     CrankPriority = 1;//static set this for now
@@ -888,13 +909,14 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
     static Template = "<div><label for=\"$CylinderVolume.GUID$\">Cylinder Volume:</label>$CylinderVolume$</div>";
 
     constructor(prop) {
-        super(prop);
-        this.CylinderVolume = new UINumberWithMeasurement({
+        prop = prop === undefined? {} : prop;
+        prop.CylinderVolume = new UINumberWithMeasurement({
             Value:          0.66594,
             Step:           0.001,
             Min:            0.001,
             Measurement:    "Volume"
         });
+        super(prop);
     }
 
     GetObjOperation() {
@@ -921,27 +943,30 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
     static Name = "Dead Time";
     static Output = "float";
     static Measurement = "Time";
-    static Template = getFileContents("ConfigGui/Fuel_InjectorPulseWidth_DeadTime.html");
+    static Template =   "<div>$FlowRateConfigOrVariableSelection$</div>" +
+                        "<div>$DeadTimeConfigOrVariableSelection$</div>" +
+                        "<div><label for=\"$MinInjectorFuelMass.GUID$\">Min Injector Fuel Mass:</label>$MinInjectorFuelMass$</div>";
 
     constructor(prop) {
-        super(prop);
-        this.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop = prop === undefined? {} : prop;
+        prop.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
             Label:         "Injector Flow Rate",
             Measurement:        "MassFlow",
             VariableListName:   "FuelParameters"
         });
-        this.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
             Label:         "Injector Dead Time",
             Measurement:        "Time",
             VariableListName:   "FuelParameters"
         });
-        this.MinInjectorFuelMass = new UINumberWithMeasurement({
+        prop.MinInjectorFuelMass = new UINumberWithMeasurement({
             Value:          0.005,
             Step:           0.001,
             Measurement:    "Mass"
         });
+        super(prop);
     }
 
     SetIncrements() {
@@ -982,88 +1007,6 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
 
 class ConfigInjectorOutputs {
-    static Name = "Injector Outputs";
-    static Template = getFileContents("ConfigGui/Fuel_InjectorOutputs.html");
-
-    constructor(){
-        this.GUID = getGUID();
-        for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
-                Configs:            BooleanOutputConfigs,
-                Label:         "Injector " + (i+1),
-                Measurement:        "No Measurement"
-            });
-        }
-    }
-
-    Outputs = [];
-
-    GetValue() {
-        var outputObj = [];
-        for(var i = 0; i < this.Outputs.length; i++){
-            outputObj[i] = this.Outputs[i].GetValue();
-        };
-        return {
-            Name: GetClassProperty(this, "Name"),
-            Outputs: outputObj
-        };
-    }
-
-    SetValue(obj) {
-        this.Detach();
-        if(obj && obj.Outputs)
-        {
-            this.Outputs = [];
-            for(var i = 0; i < obj.Outputs.length; i++){
-                if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput({
-                        Configs:            BooleanOutputConfigs,
-                        Label:         "Injector " + (i+1),
-                        Measurement:        "No Measurement"
-                    });
-                this.Outputs[i].SetValue(obj.Outputs[i])
-            }
-        }
-
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].Detach();
-        };
-    }
-
-    Attach() {
-        this.Detach();
-
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].Attach();
-        };
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-
-        var outputsHTML = "";
-        
-        for(var i = 0; i < this.Outputs.length; i++){
-            outputsHTML += this.Outputs[i].GetHtml();
-        };
-        
-        template = template.replace(/[$]injectoroutputs[$]/g, outputsHTML);
-
-        return template;
-    }
-
-    SetIncrements() {
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].SetIncrements();
-        };
-    }
 
     GetObjPackage() {
 
@@ -1099,16 +1042,16 @@ class ConfigInjectorOutputs {
 }
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template = "<label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$";
+    static Template = "<div><label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>";
 
     constructor(prop) {
-        super(prop);
-
-        this.TDC = new UINumber({
+        prop = prop === undefined? {} : prop;
+        prop.TDC = new UINumber({
             Value: 0,
             Step: 1,
             Min: 0,
             Max: 720
         })
+        super(prop);
     }
 }

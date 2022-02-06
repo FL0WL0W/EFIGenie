@@ -11,7 +11,7 @@ class UITemplate {
         var thisClass = this;
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue) {
+            if(element !== undefined && element.GetValue && element.OnChange !== undefined) {
                 element.OnChange.push(function() {
                     thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
                 });
@@ -241,7 +241,10 @@ class UINumber {
             html += " max=\"" + this.Max +"\"";
             
         if(this.Step !== undefined)
-            html += " step=\"" + this.Step +"\"";
+        html += " step=\"" + this.Step +"\"";
+
+        if(this.Class !== undefined)
+            html += " class=\"" + this.Class +"\"";
 
         return html + "/>";
     }
@@ -304,6 +307,9 @@ class UICheckbox {
         if(this.Value)
             html += "checked";
 
+        if(this.Class !== undefined)
+            html += " class=\"" + this.Class +"\"";
+
         return html + "/>";
     }
 
@@ -357,7 +363,12 @@ class UIText {
     }
 
     GetHtml() {
-        return "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " value=\"" + this.Value + "\"/>";
+        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " value=\"" + this.Value + "\"";
+
+        if(this.Class !== undefined)
+            html += " class=\"" + this.Class +"\"";
+
+        return html + "/>";;
     }
     
     Hide() {
@@ -409,6 +420,8 @@ class UISelection {
     Options = [];
     OnChange = [];
     Hidden = false;
+    SelectDisabled = false;
+    SelectValue = undefined;
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -464,7 +477,9 @@ class UISelection {
                     var s = stringOptionValue == stringValue;
                     if(s)
                         selected = true;
-                    groupHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + (s? " selected" : "") + ">" + option.Name + "</option>";
+                    groupHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + 
+                        (s? " selected" : "") + (option.Disabled? " disabled": "") + (option.Class? " class=\"" + option.Class + "\"" : "") + 
+                        ">" + option.Name + "</option>";
                 });
 
                 if(groupHtml) 
@@ -474,15 +489,23 @@ class UISelection {
                 var s = stringOptionValue == stringValue;
                 if(s)
                     selected = true;
-                optionsHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + (s? " selected" : "") + ">" + option.Name + "</option>";
+                optionsHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + 
+                        (s? " selected" : "") + (option.Disabled? " disabled": "") + (option.Class? " class=\"" + option.Class + "\"" : "") + 
+                        ">" + option.Name + "</option>";
             }
         });
-        optionsHtml = "<option" + (!selected? " selected" : "") + ">select</option>" + optionsHtml;
+        optionsHtml = "<option" + (!selected? " selected" : "") + (this.SelectDisabled? " disabled" : "") + (this.SelectValue !== undefined? " value=\"" + this.SelectValue + "\"" : "") +
+            ">select</option>" + optionsHtml;
         return optionsHtml;
     }
 
     GetHtml() {
-        return "<select id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + this.GetOptionsHtml() + "</select>";
+        var html = "<select id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "");
+
+        if(this.Class !== undefined)
+            html += " class=\"" + this.Class +"\"";
+
+        return html + ">" + this.GetOptionsHtml() + "</select>";
     }
 
     Hide() {

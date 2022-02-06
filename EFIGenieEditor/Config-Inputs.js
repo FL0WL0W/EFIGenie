@@ -138,6 +138,7 @@ function GetNameFromPinSelectElement(element){
     return "unknown";
 }
 
+//The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
 function GenerateOverlay() {
     var pinSelectElements = ParsePinSelectElements($(".pinselect"));
     var ret = "<div style=\"width: " + PinOut.OverlayWidth + "; margin: auto; position: relative;\"><img src=\"" + PinOut.Overlay + "\"></img>";
@@ -177,66 +178,11 @@ function GenerateOverlay() {
     return ret + "</div>";
 }
 
-function UpdatePinout(callingGUID, callingPin) {
-    var pinSelectElements = $(".pinselect");
-    if(pinSelectElements) {
-        for(var i=0; i<pinSelectElements.length; i++) {
-            var je = $(pinSelectElements[i]);
-            var id = je.attr('id');
-            var GUID = id.substring(0, id.length - 4);
-            var pin = parseInt(je.val());
-            if(GUID === callingGUID)
-                pin = callingPin;
-            je.replaceWith(GeneratePinList(GUID, pin, pinSelectElements[i].classList.contains("digital"), pinSelectElements[i].classList.contains("analog"), pinSelectElements[i].classList.contains("pwm")));
-        }
-    }
-
-    //replace overlay
+function UpdateOverlay() {
     $(".gpiooverlay").html(GenerateOverlay());
 }
 
-function GeneratePinList(GUID, pin, digital, analog, pwm) {
-
-    var sel = "<option value=\"65535\" disabled " + (pin === 0xFFFF? "selected" : "")+ ">select</option>";
-    var endsel = "";
-    var pinConflict = false;
-    var pinSelectElements = ParsePinSelectElements($(".pinselect").not("#" + GUID + "-pin"));
-    for(var i = 0; i < PinOut.Pins.length; i++) {
-        var selected = false;
-        if(pin === PinOut.Pins[i].Value) {
-            selected = true;
-        }
-        var name = "";
-        for(var s=0; s<pinSelectElements.length; s++) {
-            if(pin == pinSelectElements[s].pin){
-                pinConflict  = true;
-            }
-            if(PinOut.Pins[i].Value == pinSelectElements[s].pin){
-                name += ", " + pinSelectElements[s].name;
-            }
-        }
-        name = PinOut.Pins[i].Name + (name != ""? ("(" + name.substring(2) + ")") : "");
-        if( (digital && !PinOut.Pins[i].Digital) ||
-            (analog && !PinOut.Pins[i].Analog) ||
-            (pwm && !PinOut.Pins[i].PWM)) {
-            endsel += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? (" class=\"incompatible\"" + " selected") : "") + " disabled>" + name + "</option>";
-        } else {
-            sel += "<option value=\"" + PinOut.Pins[i].Value + "\"" + (selected? " selected" : "")+ ">" + name + "</option>";
-        }
-    }
-    sel += endsel;
-
-    var ret = "<select id=\"" + GUID + "-pin\" class=\"pinselect ";
-    if(analog)
-        ret += "analog";
-    else if(digital)
-        ret += "digital";
-    else if(pwm)
-        ret += "pwm";
-    ret += (pinConflict? " pinconflict" : "") + "\">" + sel + "</select>";
-    return ret
-}
-
+//if any changes are needed in ConfigInputs, refactor to use UITemplate
 class ConfigInputs {
     static Template = getFileContents("ConfigGui/Inputs.html");
 
@@ -490,6 +436,7 @@ class ConfigInputs {
     }
 }
 
+//if any changes are needed in ConfigInput, refactor to use UITemplate
 class ConfigInput {
     static Template = getFileContents("ConfigGui/Input.html");
 
@@ -503,6 +450,11 @@ class ConfigInput {
     TranslationMeasurement = "None";
 
     GetValue() {
+        var rawConfigValue;
+        if(this.RawConfig) {
+            rawConfigValue = this.RawConfig.GetValue();
+            rawConfigValue.Name = GetClassProperty(this.RawConfig, "Name")
+        }
         var translationConfigValue;
         if(this.TranslationConfig) {
             translationConfigValue = this.TranslationConfig.GetValue();
@@ -510,7 +462,7 @@ class ConfigInput {
         }
         return { 
             Name: this.Name,
-            RawConfig: this.RawConfig? this.RawConfig.GetValue() : undefined, 
+            RawConfig: rawConfigValue, 
             TranslationConfig: translationConfigValue,
             TranslationMeasurement: this.TranslationMeasurement
         };
@@ -862,419 +814,237 @@ class ConfigInput {
     }
 }
 
-class ConfigOperation_AnalogPinRead {
+class UIPinSelection extends UISelection {
+    constructor(prop){
+        super(prop);
+        this.SelectDisabled = prop.SelectDisabled === undefined? true : prop.SelectDisabled;
+        this.SelectValue = prop.SelectValue === undefined? 0xFFFF : prop.SelectValue;
+        this.Class = (!prop.Class? this.PinType : prop.Class + " " + this.PinType) + " pinselect";
+        this.Options = this.GenerateOptionList();
+        this.OnChange.push(function() {
+            UpdateOverlay();
+        })
+    }
+
+    GenerateOptionList() {
+        var options = []
+        var endOptions = [];
+        for(var i = 0; i < PinOut.Pins.length; i++) {
+            const selected = this.Value === PinOut.Pins[i].Value;
+            if( (this.PinType === "digital" && !PinOut.Pins[i].Digital) ||
+                (this.PinType === "analog" && !PinOut.Pins[i].Analog) ||
+                (this.PinType === "pwm" && !PinOut.Pins[i].PWM)) {
+                endOptions.push({
+                    Name: PinOut.Pins[i].Name,
+                    Value: PinOut.Pins[i].Value,
+                    Selected: selected,
+                    Class: selected? "incompatible" : undefined,
+                    Disabled: true
+                });
+            } else {
+                options.push({
+                    Name: PinOut.Pins[i].Name,
+                    Value: PinOut.Pins[i].Value,
+                    Selected: selected
+                });
+            }
+        }
+        options = options.concat(endOptions);
+
+        return options;
+    }
+}
+
+class ConfigOperation_AnalogPinRead extends UITemplate {
     static Name = "Analog Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Voltage";
-    static Template = getFileContents("ConfigGui/Operation_AnalogPinRead.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$</div>"
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-
-    Pin = 0xFFFF;
-
-    GetValue() {
-        return {
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin
-        };
-    }
-
-    SetValue(value) {
-        if(value)
-            this.Pin = value.Pin;
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "analog"
         });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, true, false));
-
-        return template;
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_AnalogPinRead);
 
-class ConfigOperation_DigitalPinRead {
+class ConfigOperation_DigitalPinRead extends UITemplate {
     static Name = "Digital Pin";
     static Output = "bool";
     static Inputs = [];
     static Measurement = "";
-    static Template = getFileContents("ConfigGui/Operation_DigitalPinRead.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$$Inverted$Inverted</div>"
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-    Pin = 0xFFFF;
-    Inverted = 0;
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            Inverted: this.Inverted
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.Pin = value.Pin;
-            this.Inverted = value.Inverted;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "digital"
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-inverted", function(){
-            thisClass.Inverted = this.checked? 1 : 0;
-        });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, true, false, false));
-        template = template.replace(/[$]inverted[$]/g, (this.Inverted === 1? "checked": ""));
-
-        return template;
+        prop.Inverted = new UICheckbox();
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
-            { type: "BOOL", value: this.Inverted}, //inverted
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "BOOL", value: this.GetValue().Inverted}, //inverted
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRead);
 
-class ConfigOperation_DigitalPinRecord {
+class ConfigOperation_DigitalPinRecord extends UITemplate {
     static Name = "Digital Pin (Record)";
     static Output = "Record";
     static Inputs = [];
     static Measurement = "";
-    static Template = getFileContents("ConfigGui/Operation_DigitalPinRecord.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$$Inverted$Inverted</div>" +
+                        "<div><label for=\"$Length.GUID$\">Length:</label>$Length$</div>";
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-    Pin = 0xFFFF;
-    Inverted = 0;
-    Length = 2;
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            Inverted: this.Inverted,
-            Length: this.Length
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.Pin = value.Pin;
-            this.Inverted = value.Inverted;
-            this.Length = value.Length;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "digital"
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-inverted", function(){
-            thisClass.Inverted = this.checked? 1 : 0;
+        prop.Inverted = new UICheckbox();
+        prop.Length = new UINumber ({
+            Value: 2,
+            Step: 1,
+            Min: 1,
+            Max: 1000
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-length", function(){
-            thisClass.Length = parseInt($(this).val());
-        });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, true, false, false));
-        template = template.replace(/[$]inverted[$]/g, (this.Inverted === 1? "checked": ""));
-        template = template.replace(/[$]length[$]/g, this.Length);
-
-        return template;
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
-            { type: "BOOL", value: this.Inverted}, //inverted
-            { type: "UINT16", value: this.Length}, //length
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "BOOL", value: this.GetValue().Inverted}, //inverted
+            { type: "UINT16", value: this.GetValue().Length}, //length
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRecord);
 
-class ConfigOperation_DutyCyclePinRead {
-    static Name = "Duty Cycle Pin";
+class ConfigOperation_DutyCyclePinRead extends UITemplate {
+    static Name = "Duty Cycle Pin Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Percentage";
-    static Template = getFileContents("ConfigGui/Operation_DutyCyclePinRead.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$</div>" +
+                        "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-    Pin = 0xFFFF;
-    MinFrequency = 1000;
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            MinFrequency: this.MinFrequency
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.Pin = value.Pin;
-            this.MinFrequency = value.MinFrequency;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "pwm"
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.MinFrequency = parseInt($(this).val());
+        prop.MinFrequency = new UINumberWithMeasurement({
+            Value: 1000,
+            Step: 1,
+            Min: 0,
+            Max: 65535,
+            Measurement: "Frequency"
         });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
-        template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
-
-        return template;
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
-            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_DutyCyclePinRead);
 
-class ConfigOperation_FrequencyPinRead {
+class ConfigOperation_FrequencyPinRead extends UITemplate {
     static Name = "Frequency Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Frequency";
-    static Template = getFileContents("ConfigGui/Operation_FrequencyPinRead.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$</div>" +
+                        "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-    Pin = 0xFFFF;
-    MinFrequency = 1000;
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            MinFrequency: this.MinFrequency
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.Pin = value.Pin;
-            this.MinFrequency = value.MinFrequency;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "pwm"
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.MinFrequency = parseInt($(this).val());
+        prop.MinFrequency = new UINumberWithMeasurement({
+            Value: 1000,
+            Step: 1,
+            Min: 0,
+            Max: 65535,
+            Measurement: "Frequency"
         });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
-        template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
-
-        return template;
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
-            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
 
-class ConfigOperation_PulseWidthPinRead {
+class ConfigOperation_PulseWidthPinRead extends UITemplate {
     static Name = "Pulse Width Pin";
     static Output = "float";
     static Inputs = [];
     static Measurement = "Time";
-    static Template = getFileContents("ConfigGui/Operation_PulseWidthPinRead.html");
+    static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$</div>" +
+                        "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
-    constructor(){
-        this.GUID = getGUID();
-    }
-    
-    Pin = 0xFFFF;
-    MinFrequency = 1000;
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, "Name"),
-            Pin: this.Pin,
-            MinFrequency: this.MinFrequency
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.Pin = value.Pin;
-            this.MinFrequency = value.MinFrequency;
-        }
-        $("#" + this.GUID).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off("change."+this.GUID);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-pin", function(){
-            thisClass.Pin = parseInt($(this).val());
-            UpdatePinout(thisClass.GUID, thisClass.Pin);
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.Pin = new UIPinSelection({
+            Value: 0xFFFF,
+            PinType: "pwm"
         });
-
-        $(document).on("change."+this.GUID, "#" + this.GUID + "-minFrequency", function(){
-            thisClass.MinFrequency = parseInt($(this).val());
+        prop.MinFrequency = new UINumberWithMeasurement({
+            Value: 1000,
+            Step: 1,
+            Min: 0,
+            Max: 65535,
+            Measurement: "Frequency"
         });
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, "Template");
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]pin[$]/g, GeneratePinList(this.GUID, this.Pin, false, false, true));
-        template = template.replace(/[$]minFrequency[$]/g, this.MinFrequency);
-
-        return template;
+        super(prop);
     }
 
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
-            { type: "UINT16", value: this.Pin}, //pin
-            { type: "UINT16", value: this.MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
         ]};
     }
 }
 InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
 
+//this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
 class ConfigOperation_Polynomial {
     static Name = "Polynomial";
     static Output = "float";
@@ -1411,25 +1181,26 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
     static Measurement = "ReluctorResult";
-    static Template = getFileContents("ConfigGui/Operation_ReluctorUniversal1x.html");
+    static Template =   "<div><label for=\"$RisingPosition.GUID$\">Rising Edge Position:</label>$RisingPosition$</div>" +
+                        "<div><label for=\"$FallingPosition.GUID$\">Falling Edge Position:</label>$FallingPosition$</div>";
 
-    constructor(){
-        super();
-
-        this.RisingPosition = new UINumberWithMeasurement({
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.RisingPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: "Angle"
         });
-        this.FallingPosition = new UINumberWithMeasurement({
+        prop.FallingPosition = new UINumberWithMeasurement({
             Value: 180,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: "Angle"
         });
+        super(prop);
     }
 
     GetObjOperation() {
@@ -1447,33 +1218,36 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     static Output = "ReluctorResult";
     static Inputs = ["Record", "CurrentTick"];
     static Measurement = "ReluctorResult";
-    static Template = getFileContents("ConfigGui/Operation_ReluctorUniversalMissingTeeth.html");
+    static Template =   "<div><label for=\"$FirstToothPosition.GUID$\">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>" +
+                        "<div><label for=\"$ToothWidth.GUID$\">Tooth Width:</label>$ToothWidth$</div>" +
+                        "<div><label for=\"$NumberOfTeeth.GUID$\">Number of Teeth:</label>$NumberOfTeeth$</div>" +
+                        "<div><label for=\"$NumberOfTeethMissing.GUID$\">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>";
 
-    constructor(){
-        super();
-
-        FirstToothPosition = new UINumberWithMeasurement({
+    constructor(prop){
+        prop = prop === undefined? {} : prop;
+        prop.FirstToothPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: "Angle"
         });
-        ToothWidth = new UINumberWithMeasurement({
+        prop.ToothWidth = new UINumberWithMeasurement({
             Value: 5,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: "Angle"
         });
-        NumberOfTeeth = new UINumber({
+        prop.NumberOfTeeth = new UINumber({
             Value: 36,
             Min: 2
         });
-        NumberOfTeethMissing = new UINumber({
+        prop.NumberOfTeethMissing = new UINumber({
             Value: 1,
             Min: 1
         });
+        super(prop);
     }
 
     GetObjOperation() {
