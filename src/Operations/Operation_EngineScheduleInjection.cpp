@@ -1,9 +1,12 @@
 #include "Operations/Operation_EngineScheduleInjection.h"
 #include "Config.h"
+
 using namespace EmbeddedIOServices;
+using namespace OperationArchitecture;
+using namespace EmbeddedIOOperations;
 
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, float tdc, callback_t openCallBack, callback_t closeCallBack) : 
 		_timerService(timerService),

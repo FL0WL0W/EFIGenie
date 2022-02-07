@@ -1,8 +1,11 @@
 #include "Operations/Operation_EnginePosition.h"
 #include "Config.h"
 
+using namespace OperationArchitecture;
+using namespace ReluctorOperations;
+
 #ifdef OPERATION_ENGINEPOSITION_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_EnginePosition::Operation_EnginePosition(bool crankPriority)
 	{

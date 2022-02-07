@@ -6,9 +6,9 @@
 
 #ifndef OPERATION_ENGINESCHEDULEINJECTION_H
 #define OPERATION_ENGINESCHEDULEINJECTION_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
-	class Operation_EngineScheduleInjection : public IOperation<std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t>, EnginePosition, bool, float, float>
+	class Operation_EngineScheduleInjection : public OperationArchitecture::IOperation<std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t>, EnginePosition, bool, float, float>
 	{
 	protected:
 		EmbeddedIOServices::ITimerService * const _timerService;
@@ -28,7 +28,7 @@ namespace OperationArchitecture
 		void Open();
 		void Close();
 
-		static IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
 	};
 }
 #endif

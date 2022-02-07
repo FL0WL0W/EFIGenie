@@ -2,9 +2,9 @@
 
 #ifndef OPERATION_CYLINDERAIRMASS_SD
 #define OPERATION_CYLINDERAIRMASS_SD
-namespace OperationArchitecture
+namespace EFIGenie
 {	
-	class Operation_CylinderAirMass_SD : public IOperation<float, float, float, float>
+	class Operation_CylinderAirMass_SD : public OperationArchitecture::IOperation<float, float, float, float>
 	{
 	protected:
 		float _cylinderVolume;
@@ -13,7 +13,7 @@ namespace OperationArchitecture
 
 		float Execute(float cylinderAirTemperature, float manifoldAbsolutePressure, float VolumetricEfficiency) override;
 		
-		static IOperationBase *Create(const void *config, size_t &sizeOut);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut);
 	};
 }
 #endif

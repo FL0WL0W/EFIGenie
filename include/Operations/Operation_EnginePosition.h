@@ -3,14 +3,14 @@
 
 #ifndef OPERATION_ENGINEPOSITION_H
 #define OPERATION_ENGINEPOSITION_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
-	struct EnginePosition : public ReluctorResult
+	struct EnginePosition : public ReluctorOperations::ReluctorResult
 	{
 		bool Sequential : 1;
 	};
 
-	class Operation_EnginePosition : public IOperation<EnginePosition, ReluctorResult, ReluctorResult>
+	class Operation_EnginePosition : public OperationArchitecture::IOperation<EnginePosition, ReluctorOperations::ReluctorResult, ReluctorOperations::ReluctorResult>
 	{
 	protected:
 		EnginePosition _previousPreviousReluctorResult;
@@ -19,7 +19,7 @@ namespace OperationArchitecture
 	public:		
         Operation_EnginePosition(bool crankPriority);
 
-		EnginePosition Execute(ReluctorResult crankPosition, ReluctorResult camPosition) override;
+		EnginePosition Execute(ReluctorOperations::ReluctorResult crankPosition, ReluctorOperations::ReluctorResult camPosition) override;
 
 		static Operation_EnginePosition InstanceCrankPriority;
 		static Operation_EnginePosition InstanceCamPriority;

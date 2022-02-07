@@ -4,9 +4,9 @@
 
 #ifndef OPERATION_ENGINEPARAMETERS_H
 #define OPERATION_ENGINEPARAMETERS_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
-	class Operation_EngineParameters : public IOperation<std::tuple<float, bool, bool>, EnginePosition>
+	class Operation_EngineParameters : public OperationArchitecture::IOperation<std::tuple<float, bool, bool>, EnginePosition>
 	{
 	protected:
 		volatile bool _sequential;

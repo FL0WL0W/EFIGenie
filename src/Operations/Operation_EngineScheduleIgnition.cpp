@@ -1,9 +1,12 @@
 #include "Operations/Operation_EngineScheduleIgnition.h"
 #include "Config.h"
+
 using namespace EmbeddedIOServices;
+using namespace OperationArchitecture;
+using namespace EmbeddedIOOperations;
 
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, callback_t dwellCallBack, callback_t igniteCallBack) :
 		_timerService(timerService),

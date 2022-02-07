@@ -1,4 +1,4 @@
-#include "EngineMain.h"
+#include "EFIGenieMain.h"
 #include "Operations/OperationFactoryRegister.h"
 #include "Operations/EmbeddedIOOperationFactoryRegister.h"
 #include "Operations/ReluctorOperationFactoryRegister.h"
@@ -7,10 +7,12 @@
 
 using namespace OperationArchitecture;
 using namespace EmbeddedIOServices;
+using namespace EmbeddedIOOperations;
+using namespace ReluctorOperations;
 
-namespace Engine
+namespace EFIGenie
 {
-    EngineMain::EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
+    EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
         SystemBus = new OperationArchitecture::SystemBus();
 
@@ -54,13 +56,13 @@ namespace Engine
         delete operationFactory;
     }
 
-    void EngineMain::Setup()
+    void EFIGenieMain::Setup()
     {
         _inputsExecute->Execute();
         _preSyncExecute->Execute();
     }
 
-    void EngineMain::Loop()
+    void EFIGenieMain::Loop()
     {
         _inputsExecute->Execute();
         if(!_syncedOnce)

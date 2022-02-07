@@ -3,9 +3,9 @@
 
 #ifndef ENGINEMAIN_H
 #define ENGINEMAIN_H
-namespace Engine
+namespace EFIGenie
 {
-	class EngineMain
+	class EFIGenieMain
 	{
 		protected:
 		OperationArchitecture::IOperationBase *_inputsExecute;
@@ -16,7 +16,7 @@ namespace Engine
 
 		public:
 		OperationArchitecture::SystemBus *SystemBus;
-		EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection);
+		EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection);
 
 		void Setup();
 		void Loop();

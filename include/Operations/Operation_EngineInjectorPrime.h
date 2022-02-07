@@ -4,9 +4,9 @@
 
 #ifndef OPERATION_ENGINEINJECTORPRIME_H
 #define OPERATION_ENGINEINJECTORPRIME_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
-	class Operation_EngineInjectorPrime : public IOperation<void, float>
+	class Operation_EngineInjectorPrime : public OperationArchitecture::IOperation<void, float>
 	{
 	protected:
 		EmbeddedIOServices::ITimerService *_timerService;
@@ -18,7 +18,7 @@ namespace OperationArchitecture
 
 		void Execute(float time) override;
 
-		static IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOServices::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
 	};
 }
 #endif

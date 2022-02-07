@@ -1,8 +1,10 @@
 #include "Operations/Operation_CylinderAirMass_SD.h"
 #include "Config.h"
 
+using namespace OperationArchitecture;
+
 #ifdef OPERATION_CYLINDERAIRMASS_SD
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_CylinderAirMass_SD::Operation_CylinderAirMass_SD(const float cylinderVolume) : _cylinderVolume(cylinderVolume) { }
 	

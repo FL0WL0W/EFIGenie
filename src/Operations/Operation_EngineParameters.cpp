@@ -2,7 +2,7 @@
 #include "Config.h"
 
 #ifdef OPERATION_ENGINEPARAMETERS_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	std::tuple<float, bool, bool> Operation_EngineParameters::Execute(EnginePosition enginePosition)
 	{

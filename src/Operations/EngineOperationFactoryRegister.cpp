@@ -7,11 +7,11 @@
 #include "Operations/Operation_EngineScheduleInjection.h"
 #include "Operations/Operation_InjectorDeadTime.h"
 
-using namespace EmbeddedIOServices;
+using namespace OperationArchitecture;
+using namespace EmbeddedIOOperations;
 
 #ifdef ENGINEOPERATIONFACTORYREGISTER_H
-
-namespace OperationArchitecture
+namespace EFIGenie
 {
     void EngineOperationFactoryRegister::Register(uint32_t idOffset, OperationFactory *factory, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
     {
@@ -25,5 +25,4 @@ namespace OperationArchitecture
         factory->Register(idOffset + 8, Operation_InjectorDeadTime::Create);
     }
 }
-
 #endif

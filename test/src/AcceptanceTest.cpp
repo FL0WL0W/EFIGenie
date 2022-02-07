@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "EngineMain.h"
+#include "EFIGenieMain.h"
 #include "MockAnalogService.h"
 #include "MockDigitalService.h"
 #include "MockPwmService.h"
@@ -9,7 +9,8 @@
 using namespace testing;
 
 using namespace EmbeddedIOServices;
-using namespace Engine;
+using namespace EmbeddedIOOperations;
+using namespace EFIGenie;
 
 namespace UnitTests
 {
@@ -23,7 +24,7 @@ namespace UnitTests
 		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
 		void *_config;
 		size_t _sizeOut = 0;
-		EngineMain *_engineMain;
+		EFIGenieMain *_eFIGenieMain;
 		callback_t _crankTriggerCallback;
 		callback_t _camTriggerCallback;
 
@@ -58,7 +59,7 @@ namespace UnitTests
 			_config = malloc(size);
 			if (file.read(reinterpret_cast<char *>(_config), size))
 			{
-				_engineMain = new EngineMain(_config, _sizeOut, &_embeddedIOServiceCollection);
+				_eFIGenieMain = new EFIGenieMain(_config, _sizeOut, &_embeddedIOServiceCollection);
 			}
 		}
 	};

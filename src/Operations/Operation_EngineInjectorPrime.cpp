@@ -1,9 +1,12 @@
 #include "Operations/Operation_EngineInjectorPrime.h"
 #include "Config.h"
+
 using namespace EmbeddedIOServices;
+using namespace OperationArchitecture;
+using namespace EmbeddedIOOperations;
 
 #ifdef OPERATION_ENGINEINJECTORPRIME_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_EngineInjectorPrime::Operation_EngineInjectorPrime(ITimerService *timerService, callback_t openCallBack, callback_t closeCallBack) :
 		_timerService(timerService),

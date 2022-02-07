@@ -6,6 +6,7 @@ using namespace testing;
 
 using namespace EmbeddedIOServices;
 using namespace OperationArchitecture;
+using namespace EFIGenie;
 
 namespace UnitTests
 {

@@ -1,8 +1,10 @@
 #include "Operations/Operation_InjectorDeadTime.h"
 #include "Config.h"
 
+using namespace OperationArchitecture;
+
 #ifdef OPERATION_INJECTORDEADTIME_H
-namespace OperationArchitecture
+namespace EFIGenie
 {
 	Operation_InjectorDeadTime::Operation_InjectorDeadTime(const float minInjectorFuelMass) : _minInjectorFuelMass(minInjectorFuelMass) { }
 	
