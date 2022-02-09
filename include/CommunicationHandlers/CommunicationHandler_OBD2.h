@@ -7,6 +7,7 @@
 namespace EFIGenie
 {	
 	struct OBD2VariableMap {
+		uint32_t CalculatedEngineLoadID;
 		uint32_t EngineCoolantTempID;
 	};
 
