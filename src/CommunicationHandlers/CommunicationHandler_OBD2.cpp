@@ -11,14 +11,13 @@ namespace EFIGenie
 			_systemBus(systemBus),
 			_variableMap(variableMap)
 		{
-			_communicationHandler = new CommunicationHandler([this](void *data, size_t length) { return this->Receive(data, length); });
-			_communicationService->RegisterHandler(_communicationHandler);
+			_communicationHandler = [this](void *data, size_t length) { return this->Receive(data, length); };
+			_communicationService->RegisterHandler(&_communicationHandler);
 		}
 
 		CommunicationHandler_OBD2::~CommunicationHandler_OBD2()
 		{
-			_communicationService->UnRegisterHandler(_communicationHandler);
-			delete _communicationHandler;
+			_communicationService->UnRegisterHandler(&_communicationHandler);
 		}
 
 		size_t CommunicationHandler_OBD2::Receive(void *data, size_t length)
