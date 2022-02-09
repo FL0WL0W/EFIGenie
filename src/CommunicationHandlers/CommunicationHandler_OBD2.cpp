@@ -36,10 +36,10 @@ namespace EFIGenie
 					{
 						case 5:
 						{
-      						std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID); //find the variable iterator
+							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID); //find the variable iterator
 							if(it != _systemBus->Variables.end())
 							{
-								const Variable ectVariable = *it->second; //pull variabled out of the iterator
+								Variable ectVariable = *it->second; //pull variabled out of the iterator
 								uint8_t ect = (ectVariable + 40).To<uint8_t>(); //add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
 								_communicationService->Send(&ect, 1); //send formatted ect variable back
 								return 2; //return that we parsed 2 bytes from the data received
