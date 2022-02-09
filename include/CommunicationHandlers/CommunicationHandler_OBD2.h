@@ -9,6 +9,9 @@ namespace EFIGenie
 	struct OBD2VariableMap {
 		uint32_t CalculatedEngineLoadID;
 		uint32_t EngineCoolantTempID;
+		uint32_t FuelTrimID[];
+		uint32_t FuelPressureID;
+		uint32_t IntakeManifoldPressureID;
 	};
 
 	class CommunicationHandler_OBD2

@@ -22,11 +22,16 @@ namespace EFIGenie
 
 		/**
 		 * @brief Parse up to length bytes of data and perform communication service
-		 * response based on service code detected. 
+		 * response based on service code detected.
 		 * 
-		 * @param data A pointer to length bytes. The data is CAN packet data.
+		 * The form of the data will generally be service type followed by PID. The
+		 * PID typically specifies physical sensor readings such as pressure or
+		 * engine load. This function will interpret that data into the proper format
+		 * for communication on the CAN bus.
+		 * 
+		 * @param data A pointer to length bytes. Service type is the first byte and PID is the second.
 		 * @param length Number of bytes that the data pointer is pointing to.
-		 * @return size_t How many bytes parsed. 
+		 * @return size_t Number of bytes parsed from data.
 		 */
 		size_t CommunicationHandler_OBD2::Receive(void *data, size_t length)
 		{
@@ -58,13 +63,54 @@ namespace EFIGenie
 						// Engine Coolant Temp
 						case 5:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID); //find the variable iterator
+							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID);
 							if(it != _systemBus->Variables.end())
 							{
-								Variable ectVariable = *it->second; //pull variabled out of the iterator
-								uint8_t ect = (ectVariable + 40).To<uint8_t>(); //add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
-								_communicationService->Send(&ect, 1); //send formatted ect variable back
-								return 2; //return that we parsed 2 bytes from the data received
+								Variable ectVariable = *it->second;
+ 								//add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
+								uint8_t ect = (ectVariable + 40).To<uint8_t>();
+								_communicationService->Send(&ect, 1);
+								return 2;
+							}
+						}
+						// Fuel Trim
+						case 6:
+						case 7:
+						case 8:
+						case 9:
+						{
+							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->FuelTrimID[pid - 6]);
+							if(it != _systemBus->Variables.end())
+							{
+								// Min value is -100, max is 99.2. Need to normalize so it will fit in an unsigned byte.
+								uint8_t ft = ((*it->second + 100 ) * 1.28).To<uint8_t>();
+								_communicationService->Send(&ft, 1);
+								return 2;
+							}
+						}
+						// Fuel Pressure
+						case 10:
+						{
+							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->FuelPressureID);
+							if(it != _systemBus->Variables.end())
+							{
+								// Fuel pressure is given in Bar but needs to be returned in kPa. Additionally, the byte
+								// will be multiplied by 3 by the receiver so must divide by 3 as well.
+								uint8_t fp = (*it->second * 100 / 3).To<uint8_t>();
+								_communicationService->Send(&fp, 1);
+								return 2;
+							}
+						}
+						// Intake Manifold Absolute Pressure
+						case 11:
+						{
+							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->IntakeManifoldPressureID);
+							if(it != _systemBus->Variables.end())
+							{
+								// Intake manifold pressure is given in Bar but needs to be returned in kPa.
+								uint8_t imp = (*it->second * 100).To<uint8_t>();
+								_communicationService->Send(&imp, 1);
+								return 2;
 							}
 						}
 					}
