@@ -3,7 +3,7 @@
 
 using namespace OperationArchitecture;
 
-#ifdef OPERATION_CYLINDERAIRMASS_SD
+#ifdef OPERATION_CYLINDERAIRMASS_SD_H
 namespace EFIGenie
 {
 	Operation_CylinderAirMass_SD::Operation_CylinderAirMass_SD(const float cylinderVolume) : _cylinderVolume(cylinderVolume) { }

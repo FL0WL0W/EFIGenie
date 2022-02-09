@@ -1,7 +1,7 @@
 #include "Operations/IOperation.h"
 
-#ifndef OPERATION_CYLINDERAIRMASS_SD
-#define OPERATION_CYLINDERAIRMASS_SD
+#ifndef OPERATION_CYLINDERAIRMASS_SD_H
+#define OPERATION_CYLINDERAIRMASS_SD_H
 namespace EFIGenie
 {	
 	class Operation_CylinderAirMass_SD : public OperationArchitecture::IOperation<float, float, float, float>
