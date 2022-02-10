@@ -55,7 +55,7 @@ namespace EFIGenie
 							{
 								// Engine load will be a float value between 0 and 1
 								// Need to normalize to a byte value by multiplying by 255, then perform a type conversion.
-								uint8_t cel = (*it->second * 255).To<uint8_t>();
+								uint8_t cel = it->second->To<float>() * 255;
 								_communicationService->Send(&cel, 1);
 								return 2;
 							}
@@ -66,9 +66,8 @@ namespace EFIGenie
 							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID);
 							if(it != _systemBus->Variables.end())
 							{
-								Variable ectVariable = *it->second;
  								//add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
-								uint8_t ect = (ectVariable + 40).To<uint8_t>();
+								uint8_t ect = it->second->To<int16_t>() + 40;
 								_communicationService->Send(&ect, 1);
 								return 2;
 							}
@@ -83,7 +82,7 @@ namespace EFIGenie
 							if(it != _systemBus->Variables.end())
 							{
 								// Min value is -100, max is 99.2. Need to normalize so it will fit in an unsigned byte.
-								uint8_t ft = ((*it->second + 100 ) * 1.28).To<uint8_t>();
+								uint8_t ft = static_cast<int16_t>(it->second->To<float>() * 128) + 128;
 								_communicationService->Send(&ft, 1);
 								return 2;
 							}
@@ -96,7 +95,7 @@ namespace EFIGenie
 							{
 								// Fuel pressure is given in Bar but needs to be returned in kPa. Additionally, the byte
 								// will be multiplied by 3 by the receiver so must divide by 3 as well.
-								uint8_t fp = (*it->second * 100 / 3).To<uint8_t>();
+								uint8_t fp = it->second->To<float>() * 100 / 3;
 								_communicationService->Send(&fp, 1);
 								return 2;
 							}
@@ -108,7 +107,7 @@ namespace EFIGenie
 							if(it != _systemBus->Variables.end())
 							{
 								// Intake manifold pressure is given in Bar but needs to be returned in kPa.
-								uint8_t imp = (*it->second * 100).To<uint8_t>();
+								uint8_t imp = it->second->To<float>() * 100;
 								_communicationService->Send(&imp, 1);
 								return 2;
 							}
