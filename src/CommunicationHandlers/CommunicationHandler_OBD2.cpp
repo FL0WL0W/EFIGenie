@@ -11,13 +11,13 @@ namespace EFIGenie
 			_systemBus(systemBus),
 			_variableMap(variableMap)
 		{
-			_communicationHandler = [this](void *data, size_t length) { return this->Receive(data, length); };
-			_communicationService->RegisterHandler(&_communicationHandler);
+			_communicationReceiveCallBack = [this](void *data, size_t length) { return this->Receive(data, length); };
+			_communicationService->RegisterReceiveCallBack(&_communicationReceiveCallBack);
 		}
 
 		CommunicationHandler_OBD2::~CommunicationHandler_OBD2()
 		{
-			_communicationService->UnRegisterHandler(&_communicationHandler);
+			_communicationService->UnRegisterReceiveCallBack(&_communicationReceiveCallBack);
 		}
 
 		/**

@@ -20,7 +20,7 @@ namespace EFIGenie
 		EmbeddedIOServices::ICommunicationService *_communicationService;
 		OperationArchitecture::SystemBus *_systemBus;
 		const OBD2VariableMap *_variableMap;
-		EmbeddedIOServices::communication_callback_t _communicationHandler;
+		EmbeddedIOServices::communication_receive_callback_t _communicationReceiveCallBack;
 	public:
 		CommunicationHandler_OBD2(EmbeddedIOServices::ICommunicationService *communicationService, OperationArchitecture::SystemBus *systemBus, const OBD2VariableMap *variableMap);
 		~CommunicationHandler_OBD2();
