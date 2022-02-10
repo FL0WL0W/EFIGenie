@@ -29,7 +29,7 @@ namespace EFIGenie
 			uint8_t offset = *reinterpret_cast<uint8_t *>(data); //grab length from data
 			data = reinterpret_cast<uint8_t *>(data) + 1; //ofset data
 			
-			uint8_t variableBuff[sizeof(VariableType)];//create a buffer for the returned message
+			uint8_t variableBuff[sizeof(VariableType) + sizeof(uint64_t)];//create a buffer for the returned message
 
 			std::map<uint32_t, Variable*>::iterator it = _variableMap->find(variableID); //get the variable
 			if (it != _variableMap->end())
@@ -48,9 +48,8 @@ namespace EFIGenie
 
 				//send the message back
 				_communicationService->Send(&variableBuff[0], sizeof(variableBuff));
-				return sizeof(uint32_t) + sizeof(uint8_t);//return number of bytes handled
 			}
-			return 0;
+			return sizeof(uint32_t) + sizeof(uint8_t);//return number of bytes handled
 		}
 }
 #endif
