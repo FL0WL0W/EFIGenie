@@ -6,9 +6,9 @@ using namespace OperationArchitecture;
 #ifdef COMMUNICATIONHANDLER_GETVARIABLE_H
 namespace EFIGenie
 {	
-		CommunicationHandler_GetVariable::CommunicationHandler_GetVariable(ICommunicationService *communicationService, SystemBus *systemBus) :
+		CommunicationHandler_GetVariable::CommunicationHandler_GetVariable(ICommunicationService *communicationService, std::map<uint32_t, Variable*> *variableMap) :
 			_communicationService(communicationService),
-			_systemBus(systemBus)
+			_variableMap(variableMap)
 		{
 			_communicationHandler = [this](void *data, size_t length) { return this->Receive(data, length); };
 			_communicationService->RegisterHandler(&_communicationHandler);
@@ -31,8 +31,8 @@ namespace EFIGenie
 			
 			uint8_t variableBuff[sizeof(VariableType)];//create a buffer for the returned message
 
-			std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(variableID); //get the variable
-			if (it != _systemBus->Variables.end())
+			std::map<uint32_t, Variable*>::iterator it = _variableMap->find(variableID); //get the variable
+			if (it != _variableMap->end())
 			{
 				variableBuff[0] = it->second->Type;//type is the first byte returned
 				if(it->second->Type == POINTER || it->second->Type == BIGOTHER)//if it is a pointer
