@@ -43,10 +43,10 @@ function TableGetType(tableValue) {
         if (tableValue[i] % 1 != 0) {
             return "FLOAT";
         }
-        if (min === undefined || tableValue[i] < min) {
+        if (tableValue[i] < min) {
             min = tableValue[i];
         }
-        if (max === undefined || tableValue[i] > max) {
+        if (tableValue[i] > max) {
             max = tableValue[i];
         }
     }
@@ -71,7 +71,7 @@ class ConfigOperation_LookupTable extends UITemplate {
     static Template = "$Dialog$"
 
     constructor(prop) {
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Dialog = new UIDialog({
             Title: "$Label$",
             ButtonText: "Edit Table",
@@ -140,7 +140,7 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static Template = "$Dialog$"
 
     constructor(prop) {
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Dialog = new UIDialog({
             Title: "$Label$",
             ButtonText: "Edit Table",
@@ -249,7 +249,7 @@ class ConfigOrVariableSelection extends UITemplate {
     ConfigValues = [];
 
     constructor(prop) {
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Selection = new UISelection({
             Options: GetSelections(prop.Measurement, prop.Configs),
             
@@ -263,7 +263,7 @@ class ConfigOrVariableSelection extends UITemplate {
             $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
             thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
             var subConfig = thisClass.GetSubConfig();
-            if(subConfig && subConfig.Attach)
+            if(subConfig?.Attach)
                 subConfig.Attach();
         });
     }
@@ -312,7 +312,7 @@ class ConfigOrVariableSelection extends UITemplate {
         if (this.ConfigValues) {
             if(ConfigOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
-                if(subConfig !== undefined && subConfig.GetValue) {
+                if(subConfig?.GetValue) {
                     var configValue = subConfig.GetValue();
                     if(typeof configValue !== "object" )
                         configValue = { Value: configValue };
@@ -398,19 +398,15 @@ class ConfigOrVariableSelection extends UITemplate {
         this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));
         const selection = this.Selection.GetValue();
         if (selection && this.VariableListName) {
-            if (Increments[this.VariableListName] === undefined)
-                Increments[this.VariableListName] = [];
+            Increments[this.VariableListName] ??= [];
 
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if(subConfig.SetIncrements)
                     subConfig.SetIncrements();
                 if (GetClassProperty(subConfig, "Output")) {
-                    this.Id = 1;
-                    if (Increments.VariableIncrement === undefined)
-                        Increments.VariableIncrement = 1;
-                    else
-                        this.Id = ++Increments.VariableIncrement;
+                    Increments.VariableIncrement ??= 0;
+                    this.Id = ++Increments.VariableIncrement;
 
                     Increments[this.VariableListName].push({
                         Name: this.Label,

@@ -408,11 +408,8 @@ class ConfigInputs {
     }
 
     SetIncrements() {
-        Increments.CurrentTickId = 1;
-        if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 1;
-        else
-            Increments.CurrentTickId = ++Increments.VariableIncrement;
+        Increments.VariableIncrement ??= 0;
+        Increments.CurrentTickId = ++Increments.VariableIncrement;
 
         for(var i = 0; i < this.Inputs.length; i++){
             this.Inputs[i].SetIncrements();
@@ -445,8 +442,6 @@ class ConfigInput {
     }
 
     Name = "Input";
-    RawConfig = undefined;
-    TranslationConfig = undefined;
     TranslationMeasurement = "None";
 
     GetValue() {
@@ -699,24 +694,6 @@ class ConfigInput {
         return template;
     }
 
-    LiveUpdate(variables) {
-        if(this.TranslationConfig){
-            //update value
-            if(variables[this.InputTranslationId] !== undefined) {
-                $("#" + this.GUID + "-translationvalue").html(variables[this.InputTranslationId]);
-                $("#" + this.GUID + "-translationvalue").addClass("liveValue");
-            }
-        }
-
-        if(this.RawConfig) {
-            //update value
-            if(variables[this.InputRawId] !== undefined) {
-                $("#" + this.GUID + "-rawvalue").html(variables[this.InputRawId]);
-                $("#" + this.GUID + "-rawvalue").addClass("liveValue");
-            }
-        }
-    }
-
     InputTranslationId = -1;
     InputRawId = -1;
     SetIncrements() {
@@ -726,20 +703,12 @@ class ConfigInput {
         if(!this.RawConfig) 
             return;
 
-        var thisClass = this;
-        if(!Increments.LiveUpdate)
-            Increments.LiveUpdate = [];
-        Increments.LiveUpdate.push(function(variables) { thisClass.LiveUpdate(variables); });
+        Increments.VariableIncrement ??= 0;
+        Increments.Inputs ??= [];
 
         if(this.TranslationConfig) {
-            this.InputTranslationId = 1;
-            if(Increments.VariableIncrement === undefined)
-                Increments.VariableIncrement = 1;
-            else
-                this.InputTranslationId = ++Increments.VariableIncrement;
+            this.InputTranslationId = ++Increments.VariableIncrement;
                 
-            if(Increments.Inputs === undefined)
-                Increments.Inputs = [];
             Increments.Inputs.push( { 
                 Name: this.Name, 
                 Id: this.InputTranslationId, 
@@ -748,14 +717,8 @@ class ConfigInput {
             });
         }
         
-        this.InputRawId = 1;
-        if(Increments.VariableIncrement === undefined)
-            Increments.VariableIncrement = 1;
-        else
-            this.InputRawId = ++Increments.VariableIncrement;
+        this.InputRawId = ++Increments.VariableIncrement;
             
-        if(Increments.Inputs === undefined)
-            Increments.Inputs = [];
         Increments.Inputs.push( { 
             Name: this.Name, 
             Id: this.InputRawId,
@@ -763,22 +726,15 @@ class ConfigInput {
             Measurement: GetClassProperty(this.RawConfig, "Measurement")
         });
 
-        if(this.RawConfig && this.RawConfig.SetIncrements)
-            this.RawConfig.SetIncrements();
-        if(this.TranslationConfig && this.TranslationConfig.SetIncrements)
-            this.TranslationConfig.SetIncrements();
+        this.RawConfig?.SetIncrements?.();
+        this.TranslationConfig?.SetIncrements?.();
     }
 
     GetObjPackage() {
-        var rawOutput = GetClassProperty(this.RawConfig, "Output");
-        var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
         if(!this.RawConfig) 
             return arrayBuffer;
-
-        if(Increments.VariableIncrement === undefined)
+        if(this.InputRawId === -1)
             throw "Set Increments First";
-
-        var output = GetClassProperty(this.RawConfig, "Output");
 
         var obj = { value: []};
 
@@ -789,22 +745,20 @@ class ConfigInput {
             obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true }});
             obj.value.push({ obj: this.TranslationConfig.GetObjOperation()});
             obj.value.push({ type: "UINT32", value: this.InputTranslationId });//sensorTranslationID
+            var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
             if(translationInputs) {
                 for(var i = 0; i < translationInputs.length; i++){
                     //add universal inputs for translation
                     if(translationInputs[i] === "CurrentTick"){
                         obj.value.push({ type: "UINT8", value: 0 }); //use variable
                         obj.value.push({ type: "UINT32", value: Increments.CurrentTickId }); //use CurrentTick variable
-                    } else if (translationInputs[i] === output) {
+                    } else if (translationInputs[i] === GetClassProperty(this.RawConfig, "Output")) {
                         obj.value.push({ type: "UINT8", value: 1 }); //use 1st operation
                         obj.value.push({ type: "UINT8", value: 0 }); //use 1st return from operation
                     }
                 }
             }
         }
-            
-        if(this.InputRawId === -1)
-            throw "Set Increments First";
         
         obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true, Return: this.TranslationConfig !== undefined }}); //immediate and store variables, return if TranslationConfig
         obj.value.push({ obj: this.RawConfig.GetObjOperation()});
@@ -817,8 +771,8 @@ class ConfigInput {
 class UIPinSelection extends UISelection {
     constructor(prop){
         super(prop);
-        this.SelectDisabled = prop.SelectDisabled === undefined? true : prop.SelectDisabled;
-        this.SelectValue = prop.SelectValue === undefined? 0xFFFF : prop.SelectValue;
+        this.SelectDisabled = prop.SelectDisabled ?? true;
+        this.SelectValue = prop.SelectValue ?? 0xFFFF;
         this.Class = (!prop.Class? this.PinType : prop.Class + " " + this.PinType) + " pinselect";
         this.Options = this.GenerateOptionList();
         this.OnChange.push(function() {
@@ -863,7 +817,7 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
     static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$</div>"
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "analog"
@@ -888,7 +842,7 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
     static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$$Inverted$Inverted</div>"
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "digital"
@@ -916,7 +870,7 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
                         "<div><label for=\"$Length.GUID$\">Length:</label>$Length$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "digital"
@@ -951,7 +905,7 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
                         "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "pwm"
@@ -985,7 +939,7 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
                         "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "pwm"
@@ -1019,7 +973,7 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
                         "<div><label for=\"$MinFrequency.GUID$\">Minimum Frequency:</label>$MinFrequency$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "pwm"
@@ -1185,7 +1139,7 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
                         "<div><label for=\"$FallingPosition.GUID$\">Falling Edge Position:</label>$FallingPosition$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.RisingPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,
@@ -1224,7 +1178,7 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
                         "<div><label for=\"$NumberOfTeethMissing.GUID$\">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>";
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.FirstToothPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,

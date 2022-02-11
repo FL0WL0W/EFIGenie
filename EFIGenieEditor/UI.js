@@ -11,7 +11,7 @@ class UITemplate {
         var thisClass = this;
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && element.OnChange !== undefined) {
+            if(element?.GetValue && element?.OnChange !== undefined) {
                 element.OnChange.push(function() {
                     thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
                 });
@@ -28,7 +28,7 @@ class UITemplate {
         //grab baseObjName and count number of objects in element values
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
+            if(element?.GetValue && typeof element?.GetValue() === "object" && element?.BaseObj) {
                 objectsInElements++;
                 baseObjName = elementname;
             }
@@ -44,7 +44,7 @@ class UITemplate {
                 //make sure none of the element values conflict with the baseobj values
                 Object.entries(this).forEach(e => {
                     var [elementname, element] = e;
-                    if(element !== undefined && element.GetValue && elementname !== baseObjName && value[elementname] !== undefined) {
+                    if(element?.GetValue && elementname !== baseObjName && value[elementname] !== undefined) {
                         baseObjName = undefined;
                     }
                 });
@@ -62,7 +62,7 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.GetValue && elementname !== baseObjName) {
+            if(element?.GetValue && elementname !== baseObjName) {
                 value[elementname] = element.GetValue();
             }
         });
@@ -78,7 +78,7 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(!baseObjName && element !== undefined && element.GetValue && typeof element.GetValue() === "object" && element.BaseObj) {
+            if(!baseObjName && element?.GetValue && typeof element?.GetValue() === "object" && element?.BaseObj) {
                 baseObjName = elementname;
             }
         });
@@ -90,7 +90,7 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element !== undefined && element.SetValue && elementname !== baseObjName && 
+            if(element?.SetValue && elementname !== baseObjName && 
                 (baseObjName === undefined || thisClass[baseObjName].GetValue()[elementname] === undefined)) {
                 element.SetValue(value[elementname]);
             }
@@ -103,7 +103,7 @@ class UITemplate {
         if(this.Attached) {
             Object.entries(this).forEach(e => {
                 function DetachElement(element) {
-                    if(element !== undefined && element.Detach)
+                    if(element?.Detach)
                         element.Attach();
                 }
                 var [elementname, element] = e;
@@ -120,7 +120,7 @@ class UITemplate {
         this.Detach();
         Object.entries(this).forEach(e => {
             function AttachElement(element) {
-                if(element !== undefined && element.Attach)
+                if(element?.Attach)
                     element.Attach();
             }
             var [elementname, element] = e;
