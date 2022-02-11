@@ -553,7 +553,7 @@ class ConfigFuel extends UITemplate {
                 return { value: [
                     { type: "PackageOptions", value: { Immediate: true } }, //immediate
                     { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                    { type: "FLOAT", value: val.TDC }, //tdc
+                    { type: "FLOAT", value: val.TDC.Value }, //tdc
                     { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
                     { obj: val.GetObjOperation()}, 
                     { type: "UINT8", value: 0 }, //use variable
@@ -647,7 +647,7 @@ class ConfigIgnition extends UITemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
-                        Label:         "Ignition " + (i+1),
+                        Label:              "Ignition " + (i+1),
                         Measurement:        "No Measurement"
                     });
                 this.Outputs[i].SetValue(value.Outputs[i])
@@ -685,7 +685,7 @@ class ConfigIgnition extends UITemplate {
                 return { value: [
                     { type: "PackageOptions", value: { Immediate: true } }, //immediate
                     { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
-                    { type: "FLOAT", value: val.TDC }, //tdc
+                    { type: "FLOAT", value: val.TDC.Value }, //tdc
                     { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
                     { obj: val.GetObjOperation()}, 
                     { type: "UINT8", value: 0 }, //use variable
@@ -977,7 +977,7 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-            { type: "FLOAT", value: this.MinInjectorFuelMass.GetValue() }
+            { type: "FLOAT", value: this.MinInjectorFuelMass.Value }
         ]};
     }
 
@@ -1005,41 +1005,6 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
     }
 }
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
-
-class ConfigInjectorOutputs {
-
-    GetObjPackage() {
-
-        var obj  = { 
-            types : [
-                { type: "Operation_EngineScheduleInjection", toObj(val) {
-                    return { value: [
-                        { type: "PackageOptions", value: { Immediate: true } }, //immediate
-                        { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                        { type: "FLOAT", value: val.TDC }, //tdc
-                        { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
-                        { obj: val.GetObjOperation()}, 
-                        { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.EnginePositionId },
-                        { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
-                        { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
-                        { type: "UINT8", value: 0 }, //use variable
-                        { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
-                    ]};
-                }}],
-            value: [
-                { type: "PackageOptions", value: { Group: this.Outputs.length }}, //group
-            ]};
-    
-        for(var i = 0; i < this.Outputs.length; i++) {
-            obj.value.push({ type: "Operation_EngineScheduleInjection", value: this.Outputs[i] });
-        }
-
-        return obj;
-    }
-}
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
     static Template = "<div><label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>";

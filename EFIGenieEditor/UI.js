@@ -226,8 +226,7 @@ class UINumber {
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = parseFloat($(this).val());
-            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+            thisClass.SetValue($(this).val());
         });
     }
 
@@ -296,8 +295,7 @@ class UICheckbox {
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = $(this).prop('checked');
-            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+            thisClass.SetValue($(this).prop('checked'));
         });
     }
 
@@ -357,8 +355,7 @@ class UIText {
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = $(this).val();
-            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+            thisClass.SetValue($(this).val());
         });
     }
 
@@ -451,8 +448,7 @@ class UISelection {
         var thisClass = this;
         
         $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.Value = UISelection.ParseValue($(this).find(":selected").data("type"), $(this).val());
-            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+            thisClass.SetValue(UISelection.ParseValue($(this).find(":selected").data("type"), $(this).val()));
         });
     }
 
@@ -618,7 +614,56 @@ class UIDialog {
 }
 
 class UINumberWithMeasurement extends UINumber {
+    constructor(prop) {
+        super(prop);
+        if(this.MeasurementIndex === undefined)
+            this.MeasurementIndex = GetDefaultUnitIndex(GetClassProperty(this, "Measurement"));
+    }
+
     GetHtml() {
-        return super.GetHtml() + "<div style=\"display: inline-block;\"  id=\"" + this.GUID + "measurement\">" + GetUnitDisplay(GetClassProperty(this, "Measurement")) + "</div>";;
+        return super.GetHtml().replace("value=\"" + this.Value + "\"", "value=\"" + this.GetDisplayValue() + "\"") + "<div style=\"display: inline-block; cursor: pointer;\"  id=\"" + this.GUID + "-measurement\">" + GetUnitDisplay(GetClassProperty(this, "Measurement"), this.MeasurementIndex) + "</div>";;
+    }
+
+    SetValue(value) {
+        var val = value;
+        if(typeof value === "object")
+            val = value.Value;
+        super.SetValue(val);
+        $("#" + this.GUID).val(this.GetDisplayValue());
+    }
+
+    GetValue() {
+        return {
+            Value: super.GetValue(),
+            MeasurementIndex: this.MeasurementIndex
+        }
+    }
+
+    GetDisplayValue() {
+        var unit = Measurements[GetClassProperty(this, "Measurement")][this.MeasurementIndex];
+        return this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
+    }
+
+    SetDisplayValue(value) {
+        var unit = Measurements[GetClassProperty(this, "Measurement")][this.MeasurementIndex];
+        this.SetValue((value - unit.DisplayOffset) / unit.DisplayMultiplier);
+    }
+
+    Attach() {
+        this.Detach();
+        var thisClass = this;
+        
+        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+            thisClass.SetDisplayValue($(this).val());
+        });
+
+        $(document).on("click."+this.GUID, "#" + this.GUID + "-measurement", function(){
+            alert("click");
+        });
+    }
+
+    Detach() {
+        super.Detach();
+        $(document).off("click."+this.GUID);
     }
 }

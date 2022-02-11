@@ -27,7 +27,7 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
     static Inputs = [];
 
     GetObjOperation() {
-        return { value: [{ type: "Operation_StaticVariable", value: this.GetValue() }] };
+        return { value: [{ type: "Operation_StaticVariable", value: this.Value }] };
     }
 
     GetObjParameters() {
@@ -283,18 +283,15 @@ class ConfigOrVariableSelection extends UITemplate {
         for (var i = 0; i < this.Configs.length; i++) {
             if (GetClassProperty(this.Configs[i], "Name") !== selection.value)
                 continue;
-            var configValue = new this.Configs[i]();
+            var configValue = new this.Configs[i]({
+                Label: this.Label,
+                Measurement: this.Measurement
+            });
             if(configValue.OnChange)
                 configValue.OnChange.push(function(){configValue.NotDefault = true;});
             else
                 configValue.NotDefault = true;
             this.ConfigValues.push(configValue);
-            this.ConfigValues[this.ConfigValues.length - 1].Label = this.Label;
-            this.ConfigValues[this.ConfigValues.length - 1].Measurement = this.Measurement;
-            if (this.Measurement === "Bool")
-                this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
-            else
-                this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
             return this.ConfigValues.length-1;
         }
     }
@@ -366,18 +363,15 @@ class ConfigOrVariableSelection extends UITemplate {
                 for (var t = 0; t < this.Configs.length; t++) {
                     if (GetClassProperty(this.Configs[t], "Name") !== value.Values[i].Name)
                         continue;
-                    var configValue = new this.Configs[t]();
+                    var configValue = new this.Configs[t]({
+                        Label: this.Label,
+                        Measurement: this.Measurement
+                    });
                     if(configValue.OnChange)
                         configValue.OnChange.push(function(){configValue.NotDefault = true;});
                     else
                         configValue.NotDefault = true;
                     this.ConfigValues.push(configValue);
-                    this.ConfigValues[this.ConfigValues.length - 1].Label = this.Label;
-                    this.ConfigValues[this.ConfigValues.length - 1].Measurement = this.Measurement;
-                    if (this.Measurement === "Bool")
-                        this.ConfigValues[this.ConfigValues.length - 1].Type = "checkbox";
-                    else
-                        this.ConfigValues[this.ConfigValues.length - 1].Type = "number";
                     var setVal = value.Values[i];
                     if(typeof this.ConfigValues[this.ConfigValues.length - 1].GetValue() !== "object" )
                         setVal = setVal.Value;

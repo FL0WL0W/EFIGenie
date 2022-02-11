@@ -874,7 +874,7 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
+            { type: "UINT16", value: this.Pin.value}, //pin
         ]};
     }
 }
@@ -900,8 +900,8 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
-            { type: "BOOL", value: this.GetValue().Inverted}, //inverted
+            { type: "UINT16", value: this.Pin.Value}, //pin
+            { type: "BOOL", value: this.Inverted.Value}, //inverted
         ]};
     }
 }
@@ -934,9 +934,9 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
-            { type: "BOOL", value: this.GetValue().Inverted}, //inverted
-            { type: "UINT16", value: this.GetValue().Length}, //length
+            { type: "UINT16", value: this.Pin.Value}, //pin
+            { type: "BOOL", value: this.Inverted.Value}, //inverted
+            { type: "UINT16", value: this.Length.Value}, //length
         ]};
     }
 }
@@ -969,8 +969,8 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
-            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.Pin.Value}, //pin
+            { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
     }
 }
@@ -1003,8 +1003,8 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
-            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.Pin.Value}, //pin
+            { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
     }
 }
@@ -1037,8 +1037,8 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
-            { type: "UINT16", value: this.GetValue().Pin}, //pin
-            { type: "UINT16", value: this.GetValue().MinFrequency}, //minFrequency
+            { type: "UINT16", value: this.Pin.Value}, //pin
+            { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
     }
 }
@@ -1206,8 +1206,8 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     GetObjOperation() {
         return { value: [
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: "FLOAT", value: this.GetValue().RisingPosition}, //RisingPosition
-            { type: "FLOAT", value: this.GetValue().FallingPosition}, //FallingPosition
+            { type: "FLOAT", value: this.RisingPosition.Value}, //RisingPosition
+            { type: "FLOAT", value: this.FallingPosition.Value}, //FallingPosition
         ]};
     }
 }
