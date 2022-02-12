@@ -626,8 +626,11 @@ class UINumberWithMeasurement extends UINumber {
 
     SetValue(value) {
         var val = value;
-        if(typeof value === "object")
+        if(typeof value === "object") {
+            if(value.MeasurementIndex !== undefined)
+                this.MeasurementIndex = value.MeasurementIndex;
             val = value.Value;
+        }
         super.SetValue(val);
         $("#" + this.GUID).val(this.GetDisplayValue());
     }
