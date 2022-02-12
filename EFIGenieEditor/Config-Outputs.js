@@ -6,7 +6,7 @@ class ConfigOperation_DigitalPinWrite extends UITemplate {
     static Template =   "<div><label for=\"$Pin.GUID$\">Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>"
 
     constructor(prop){
-        prop = prop === undefined? {} : prop;
+        prop ??= {};
         prop.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: "digital"

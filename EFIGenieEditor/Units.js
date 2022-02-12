@@ -10,13 +10,12 @@ var AngularSpeedUnits = [ { Name: "RPM", DisplayMultiplier: 1, DisplayOffset: 0 
 var SpeedUnits = [ { Name: "KPH", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "MPH", DisplayMultiplier: 1.61, DisplayOffset: 0 } ];
 var TemperatureUnits = [ { Name: "°C", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "°F", DisplayMultiplier: 1.8, DisplayOffset: 32 } ];
 var GasConstantUnits = [ { Name: "J/kg K", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "kJ/kg K", DisplayMultiplier: 0.1, DisplayOffset: 0 } ];
-var MassUnits = [ { Name: "g", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "kg", DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
+var MassUnits = [ { Name: "g", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mg", DisplayMultiplier: 1000, DisplayOffset: 0 }, { Name: "kg", DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
 var Ratio = [ { Name: ":1", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var CycleUnits = [ { Name: "Cycles", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var LambdaUnits = [ { Name: "λ", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var VolumeUnits = [ { Name: "L", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "mL", DisplayMultiplier: 1000, DisplayOffset: 0 } ];
-var MassFlowUnits = PerSecond(MassUnits); //[ { Name: "g/s", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "g/min", DisplayMultiplier: 60, DisplayOffset: 0 } ];
-MassFlowUnits = MassFlowUnits.concat(PerMinute(MassUnits));
+var MassFlowUnits = [ { Name: "g/s", DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: "g/min", DisplayMultiplier: 60, DisplayOffset: 0 } ];
 var Bool = [ { Name: "", DisplayMultiplier: 1, DisplayOffset: 0 } ];
 
 var Measurements = {
