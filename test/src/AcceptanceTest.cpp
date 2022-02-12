@@ -49,8 +49,8 @@ namespace UnitTests
 			_embeddedIOServiceCollection.TimerService = &_timerService;
 
 			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
-			EXPECT_CALL(_digitalService, AttachInterrupt(11, _)).WillOnce(SaveArg<1>(&_crankTriggerCallback));
-			EXPECT_CALL(_digitalService, AttachInterrupt(17, _)).WillOnce(SaveArg<1>(&_camTriggerCallback));
+			EXPECT_CALL(_digitalService, AttachInterrupt(45, _)).WillOnce(SaveArg<1>(&_crankTriggerCallback));
+			EXPECT_CALL(_digitalService, AttachInterrupt(18, _)).WillOnce(SaveArg<1>(&_camTriggerCallback));
 
 			std::ifstream file("tune.bin", std::ios::binary | std::ios::ate);
 			std::streamsize size = file.tellg();
