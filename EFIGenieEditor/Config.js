@@ -455,7 +455,8 @@ class ConfigFuel extends UITemplate {
             Configs:            InjectorPulseWidthConfigs,
             Label:              "Injector Pulse Width",
             Measurement:        "Time",
-            VariableListName:   "FuelParameters"
+            VariableListName:   "FuelParameters",
+            MeasurementIndex: 1
         });
         prop.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
@@ -602,13 +603,15 @@ class ConfigIgnition extends UITemplate {
             Configs:            IgnitionDwellConfigs,
             Label:              "Ignition Dwell",
             Measurement:        "Time",
-            VariableListName:   "IgnitionParameters"
+            VariableListName:   "IgnitionParameters",
+            MeasurementIndex: 1
         });
         prop.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              "Ignition Dwell Deviation",
             Measurement:        "Time",
-            VariableListName:   "IgnitionParameters"
+            VariableListName:   "IgnitionParameters",
+            MeasurementIndex: 1
         });
         prop.Outputs = [];
         for(var i = 0; i < 8; i++){
@@ -889,7 +892,8 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
             Value:          0.66594,
             Step:           0.001,
             Min:            0.001,
-            Measurement:    "Volume"
+            Measurement:    "Volume",
+            MeasurementIndex: 1
         });
         super(prop);
     }
@@ -934,12 +938,14 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             Configs:            GenericConfigs,
             Label:              "Injector Dead Time",
             Measurement:        "Time",
-            VariableListName:   "FuelParameters"
+            VariableListName:   "FuelParameters",
+            MeasurementIndex: 1
         });
         prop.MinInjectorFuelMass = new UINumberWithMeasurement({
             Value:          0.005,
             Step:           0.001,
-            Measurement:    "Mass"
+            Measurement:    "Mass",
+            MeasurementIndex: 1
         });
         super(prop);
     }

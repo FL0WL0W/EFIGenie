@@ -285,7 +285,8 @@ class ConfigOrVariableSelection extends UITemplate {
                 continue;
             var configValue = new this.Configs[i]({
                 Label: this.Label,
-                Measurement: this.Measurement
+                Measurement: this.Measurement,
+                MeasurementIndex: this.MeasurementIndex
             });
             if(configValue.OnChange)
                 configValue.OnChange.push(function(){configValue.NotDefault = true;});
@@ -365,17 +366,18 @@ class ConfigOrVariableSelection extends UITemplate {
                         continue;
                     var configValue = new this.Configs[t]({
                         Label: this.Label,
-                        Measurement: this.Measurement
+                        Measurement: this.Measurement,
+                        MeasurementIndex: this.MeasurementIndex
                     });
+                    var setVal = value.Values[i];
+                    if(typeof configValue.GetValue() !== "object" )
+                        setVal = setVal.Value;
+                    configValue.SetValue(setVal);
                     if(configValue.OnChange)
                         configValue.OnChange.push(function(){configValue.NotDefault = true;});
                     else
                         configValue.NotDefault = true;
                     this.ConfigValues.push(configValue);
-                    var setVal = value.Values[i];
-                    if(typeof this.ConfigValues[this.ConfigValues.length - 1].GetValue() !== "object" )
-                        setVal = setVal.Value;
-                    this.ConfigValues[this.ConfigValues.length - 1].SetValue(setVal);
                 }
             }
         }
