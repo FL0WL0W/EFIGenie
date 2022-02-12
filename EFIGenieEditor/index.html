@@ -19,7 +19,17 @@
             var b = new ConfigTop();
             var configJsonName = "tune.json"
             $(document).on('change', function() { ResetIncrements(), b.SetIncrements()});//this is a hack but oh well
+            const loadConfig = (config) => {
+                b.SetValue(loadObject(config));
+                $('#workspace').html(b.GetHtml());
+                $("#btnLoad").val(undefined);
+            };
             $(document).ready(function() {
+                const lastConfig = window.localStorage.getItem("config");
+                if (lastConfig) {
+                    loadConfig(lastConfig);
+                }
+
                 $('#workspace').html(b.GetHtml());
                 b.Attach();
                 $("#btnSave").click(function(){
@@ -38,11 +48,11 @@
                             return;
                         }
 
-                        b.SetValue(loadObject(evt.target.result));
-                        $('#workspace').html(b.GetHtml());
-                        $("#btnLoad").val(undefined);
+                        const result = evt.target.result;
+                        window.localStorage.setItem("config", result);
+                        loadConfig(result);
                     };
-                    
+
                     test.readAsText(evt.target.files[0]);
                     configJsonName = evt.target.files[0].name;
                 });
