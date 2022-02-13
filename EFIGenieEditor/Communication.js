@@ -7,7 +7,7 @@ function GetFloatVariableIdList() {
         var arr = Increments[property];
 
         for (var i = 0; i < arr.length; i++) {
-            if(arr[i].Type === "float" && variableIds.indexOf(arr[i].Id) === -1){
+            if(arr[i].Type === `float` && variableIds.indexOf(arr[i].Id) === -1){
                 variableIds.push(arr[i].Id);
             }
         }
@@ -18,10 +18,32 @@ function GetFloatVariableIdList() {
 VariableValues = [];
 function UpdateFloatVariableValues() {
     const variableIds = GetFloatVariableIdList();
+    var offsets = []
+    for(var i = 0; i < variableIds.length; i++) offsets[i] = 0;
 
-    var responseVariables = getFileContents("test.txt").split("\n");
+    $.ajax({
+        type: `POST`,
+        url: `http://127.0.0.1:8080/GetVariable`,
+        data: {
+            Variables: variableIds,
+            Offsets: offsets
+        },
+        success: function(data) {
+            var responseVariables = data.split(`\n`);
+            for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
+                var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === "VOID"
 
-    for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
-        VariableValues[variableIds[i]] = parseFloat(responseVariables[i]);
-    }
+                if(responseVariables[i] === "True")
+                    VariableValues[variableIds[i]] = true;
+                else if(responseVariables[i] === "False")
+                    VariableValues[variableIds[i]] = false;
+                else
+                    VariableValues[variableIds[i]] = voidValue? undefined : parseFloat(responseVariables[i]);
+            }
+        }
+      });
+
+    // for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
+    //     VariableValues[variableIds[i]] = parseFloat(responseVariables[i]);
+    // }
 }

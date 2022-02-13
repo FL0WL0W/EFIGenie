@@ -5,8 +5,15 @@ import serial
 import struct
 import http.server
 import argparse
-import urllib.parse
+from sys import version as python_version
+from cgi import parse_header, parse_multipart
 
+if python_version.startswith('3'):
+    from urllib.parse import parse_qs
+    from http.server import BaseHTTPRequestHandler
+else:
+    from urlparse import parse_qs
+    from BaseHTTPServer import BaseHTTPRequestHandler
 
 class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
     """The EFI Genie Console HTTP Handler extension accepts a serial_handler
@@ -30,23 +37,39 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
     def send_my_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
 
-    def do_GET(self):
-        urlp = urllib.parse.urlparse(self.path)
-        query = urllib.parse.parse_qs(urlp.query)
-        if(urlp.path == "/GetVariable") :
-            varID = 0
-            offset = 0
-            if "id" in query: varID = int(query["id"][0])
-            if "offset" in query: offset = int(query["offset"][0])
-            sendBytes = struct.pack("<IB", varID, offset)
+    def parse_POST(self):
+        ctype, pdict = parse_header(self.headers['content-type'])
+        if ctype == 'multipart/form-data':
+            postvars = parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers['content-length'])
+            postvars = parse_qs(
+                    self.rfile.read(length), 
+                    keep_blank_values=1)
+        else:
+            postvars = {}
+        return postvars
+
+    def do_POST(self):
+        if(self.path == "/GetVariable") :
+            postvars = self.parse_POST()
+            variables = postvars[b'Variables[]']
+            offsets = postvars[b'Offsets[]']
+            # sendBytes = struct.pack("<IB", varID, offset)
+            sendBytes = bytearray([])
+            for i in range(len(variables)):
+                varID = int(variables[i])
+                offset = int(offsets[i])
+                sendBytes += struct.pack("<IB", varID, offset)
             self.serial_conn.write(sendBytes)
-            readType = self.serial_conn.read(1)[0]
-            # if readType == 12 or readType == 14:
-                # ser.write(struct.pack("<I", offset))
-            readBytes = self.serial_conn.read(8)
+            resp = ""
+            for i in range(len(variables)):
+                readType = self.serial_conn.read(1)[0]
+                readBytes = self.serial_conn.read(8)
+                resp += str(parse_readbytes(readBytes, readType)) + "\n"
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(str(parse_readbytes(readBytes, readType)).encode('utf-8'))
+            self.wfile.write(resp.encode('utf-8'))
 
 def parse_readbytes(readBytes, readType):
     """Parse the bytes read off the serial console.
@@ -84,7 +107,7 @@ def parse_readbytes(readBytes, readType):
     elif readType == 11:
         return bool(readBytes[0])
     elif 12 <= readType <= 14:
-        return " ".join(readBytes[0:8])
+        return " "#.join(readBytes[0:8])
 
 def run_server(ser, interface, port):
     """Run a simple HTTP server that relays request information to the serial
