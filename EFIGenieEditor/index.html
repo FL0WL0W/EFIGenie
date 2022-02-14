@@ -33,10 +33,14 @@
                 $('#workspace').html(b.GetHtml());
                 b.Attach();
                 $("#btnSave").click(function(){
-                    downloadObject(b.GetValue(), configJsonName);
+                    var cfg = b.GetValue();
+                    window.localStorage.setItem("config", cfg);
+                    downloadObject(cfg, configJsonName);
                 });
                 $("#btnSaveCompressed").click(function(){
-                    downloadCompressedObject(b.GetValue(), configJsonName);
+                    var cfg = b.GetValue();
+                    window.localStorage.setItem("config", cfg);
+                    downloadCompressedObject(cfg, configJsonName);
                 });
                 $("#btnLoad").change(function(evt){
                     var test = new FileReader();
