@@ -5,11 +5,11 @@ class Increments {
             Increments[elementname] = undefined;
         });
     }
-    static GenerateId(ListName, Name, Type, Measurement) {
+    static GenerateId() {
         Increments.VariableIncrement ??= 0;
         return ++Increments.VariableIncrement;
     }
-    static RegisterVariable(Id, VariableListName, VariableName, Type, Measurement) {
+    static RegisterVariable(Id, ListName, Name, Type, Measurement) {
         Increments[ListName].push({
             Name,
             Type,
