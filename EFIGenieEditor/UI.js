@@ -1,5 +1,5 @@
 class UITemplate {
-    GUID = getGUID();
+    GUID = generateGUID();
     Attached = false;
     Hidden = false;
     OnChange = [];
@@ -189,7 +189,7 @@ class UITemplate {
 }
 
 class UINumber {
-    GUID = getGUID();
+    GUID = generateGUID();
     Value = 0;
     Min = undefined;
     Max = undefined;
@@ -260,7 +260,7 @@ class UINumber {
 }
 
 class UICheckbox {
-    GUID = getGUID();
+    GUID = generateGUID();
     Value = false;
     Min = undefined;
     Max = undefined;
@@ -323,7 +323,7 @@ class UICheckbox {
 }
 
 class UIText {
-    GUID = getGUID();
+    GUID = generateGUID();
     Value = "";
     OnChange = [];
     Hidden = false;
@@ -412,7 +412,7 @@ class UISelection {
         }
     }
 
-    GUID = getGUID();
+    GUID = generateGUID();
     Value = "";
     Options = [];
     OnChange = [];
@@ -517,7 +517,7 @@ class UISelection {
 
 class UITable extends Table {
     constructor(prop) {
-        super(getGUID(), prop);
+        super(generateGUID(), prop);
     }
 
     GetValue() {
@@ -562,7 +562,7 @@ class UITable extends Table {
 }
 
 class UIDialog {
-    GUID = getGUID();
+    GUID = generateGUID();
     TemplateIdentifier = undefined;
     Title = "Dialog";
     ButtonText = "Open";

@@ -187,7 +187,7 @@ class ConfigInputs {
     static Template = getFileContents("ConfigGui/Inputs.html");
 
     constructor(){
-        this.GUID = getGUID();
+        this.GUID = generateGUID();
     }
 
     Inputs = [new ConfigInput()];
@@ -438,7 +438,7 @@ class ConfigInput {
     static Template = getFileContents("ConfigGui/Input.html");
 
     constructor(){
-        this.GUID = getGUID();
+        this.GUID = generateGUID();
     }
 
     Name = "Input";
@@ -1007,7 +1007,7 @@ class ConfigOperation_Polynomial {
     static Template = getFileContents("ConfigGui/Operation_Polynomial.html");
 
     constructor(){
-        this.GUID = getGUID();
+        this.GUID = generateGUID();
     }
     
     MinValue = 0;

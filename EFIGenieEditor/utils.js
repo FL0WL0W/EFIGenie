@@ -112,7 +112,7 @@ function getFileContents(url)
 }
 
 var GUID = 0;
-function getGUID(){
+function generateGUID(){
     return "GUID" + (GUID++);
 }
 
