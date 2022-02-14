@@ -32,6 +32,6 @@
 *.app
 
 build/*
-.vscode
-!.vscode/extenstions.json
+.vscode/*
+!.vscode/extensions.json
 .vs/*

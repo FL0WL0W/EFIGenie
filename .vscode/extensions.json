@@ -4,6 +4,6 @@
     "twxs.cmake",
     "ms-vscode.cmake-tools",
     "marus25.cortex-debug",
-    "davidschuldenfrei.gtest-adapter",
+    "davidschuldenfrei.gtest-adapter"
   ]
 }
