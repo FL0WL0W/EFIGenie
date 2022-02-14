@@ -407,25 +407,23 @@ class ConfigOrVariableSelection extends UITemplate {
                 if(subConfig.SetIncrements)
                     subConfig.SetIncrements();
                 if (GetClassProperty(subConfig, "Output")) {
-                    Increments.VariableIncrement ??= 0;
-                    this.Id = ++Increments.VariableIncrement;
-
-                    Increments[this.VariableListName].push({
-                        Name: this.Label,
-                        Id: this.Id,
-                        Type: GetClassProperty(subConfig, "Output"),
-                        Measurement: this.Measurement
-                    });
+                    this.Id = Increments.GenerateId()
+                    Increments.RegisterVariable(this.Id,
+                        this.VariableListName,
+                        this.Label,
+                        GetClassProperty(subConfig, "Output"),
+                        this.Measurement
+                    )
                 }
             } else {
                 const cell = this.GetCellByName(Increments[selection.reference], selection.value);
                 if (cell) {
-                    Increments[this.VariableListName].push({
-                        Name: this.Label,
-                        Id: cell.Id,
-                        Type: cell.Type,
-                        Measurement: this.Measurement
-                    });
+                    Increments.RegisterVariable(cell.Id,
+                        this.VariableListName,
+                        this.Label,
+                        cell.Type,
+                        this.Measurement
+                    )
                 }
             }
         }

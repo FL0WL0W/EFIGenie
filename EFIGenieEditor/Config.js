@@ -1,4 +1,24 @@
-var Increments = {};
+class Increments {
+    static Reset() {
+        Object.entries(Increments).forEach(e => {
+            var [elementname, element] = e;
+            Increments[elementname] = undefined;
+        });
+    }
+    static GenerateId(ListName, Name, Type, Measurement) {
+        Increments.VariableIncrement ??= 0;
+        return ++Increments.VariableIncrement;
+    }
+    static RegisterVariable(Id, VariableListName, VariableName, Type, Measurement) {
+        Increments[ListName].push({
+            Name,
+            Type,
+            Measurement,
+            Id
+        });
+    }
+}
+
 var AFRConfigs = [];
 AFRConfigs.push(ConfigOperation_Static);
 AFRConfigs.push(ConfigOperation_LookupTable);
@@ -256,11 +276,6 @@ for(var index in STM32TypeAlignment) {
     }
 }
 
-function ResetIncrements()
-{
-    Increments = {};
-}
-
 class ConfigTop extends UITemplate {
     static Template = getFileContents("ConfigGui/Top.html");
 
@@ -276,7 +291,7 @@ class ConfigTop extends UITemplate {
     Detach() {
         super.Detach();
         DetachPasteOptions();
-        ResetIncrements();//this is top level object so reset increments. this is not elegant
+        Increments.Reset();//this is top level object so reset increments. this is not elegant
 
         $(document).off("click."+this.GUID);
     }
@@ -821,7 +836,7 @@ class ConfigEngine extends UITemplate {
             veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
         }
 
-        var numberOfOperations = 1;
+        var numberOfOperations = 2;
         if(mapRequired && !this.ManifoldAbsolutePressureConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
         if(catRequired && !this.CylinderAirTemperatureConfigOrVariableSelection.IsVariable())
@@ -836,25 +851,24 @@ class ConfigEngine extends UITemplate {
         var obj = { value: [
             { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
 
+            //CalculateEnginePosition
+            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
+            { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
+
             //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
             { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
             { type: "UINT32", value: this.EngineRPMId },  //EngineRPMId
             { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
             { type: "UINT32", value: this.EngineSyncedId },  //EngineSyncedId
-            { type: "UINT8", value: 1 }, //use 1st sub operation
-            { type: "UINT8", value: 0 }, //use 1st return from sub operation
-            { type: "PackageOptions", value: { Immediate: true, Store: true, Return: true }}, //immediate store
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-            { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
+            { type: "VariableParameter", value: this.EnginePositionId }, //use 1st sub operation
         ]};
 
 
         var subOperations = 0;
-        if(!this.CrankPositionConfigOrVariableSelection.IsVariable()) 
-            subOperations++;
         obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
-        if(!this.CamPositionConfigOrVariableSelection.IsVariable()) 
+        if(!this.CrankPositionConfigOrVariableSelection.IsVariable()) 
             subOperations++;
         obj.value.push({ obj: this.CamPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
         obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjPackage(true) });

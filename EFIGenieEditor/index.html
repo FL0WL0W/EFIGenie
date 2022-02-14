@@ -61,7 +61,7 @@
                     configJsonName = evt.target.files[0].name;
                 });
                 $("#btnSaveBin").click(function(){
-                    ResetIncrements();
+                    Increments.Reset();
                     b.SetIncrements();
                     downloadBin(b.GetArrayBufferPackage(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
