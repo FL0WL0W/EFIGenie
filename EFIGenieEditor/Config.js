@@ -963,12 +963,14 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             { obj: this.FlowRateConfigOrVariableSelection.GetObjOperation()},
             { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
             
+            //Store a value of 2 into the temporary variable (-1) which will be used for SquirtsPerCycle (2 squirts per cycle default)
             { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "Operation_StaticVariable", value: 1 },
+            { type: "Operation_StaticVariable", value: 2 }, //static value of 2
             { type: "UINT32", value: -1 }, //store in variable id -1
             
+            //Subtract 1 to temporary variable (-1) if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "Operation_Add" }, //Add
+            { type: "Operation_Subtract" }, //Subtract
             { type: "UINT32", value: -1 }, //store in variable id -1
             { type: "UINT32", value: -1 }, //first parameter variable id -1
             { type: "UINT32", value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
