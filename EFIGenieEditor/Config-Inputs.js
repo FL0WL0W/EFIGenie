@@ -416,17 +416,18 @@ class ConfigInputs {
         }
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         var obj = { value: [
-            { type: "PackageOptions", value: { Group: this.Inputs.length + 1 }}, //group
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: this.Inputs.length + 1 }, // number of operations
             
-            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }, //GetTick factory ID
             { type: "UINT32", value: Increments.CurrentTickId }
         ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
-            obj.value.push({ obj: this.Inputs[i].GetObjPackage()});
+            obj.value.push({ obj: this.Inputs[i].GetObjOperation()});
         }
 
         return obj;
@@ -730,41 +731,27 @@ class ConfigInput {
         this.TranslationConfig?.SetIncrements?.();
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         if(!this.RawConfig) 
             return arrayBuffer;
         if(this.InputRawId === -1)
             throw "Set Increments First";
 
-        var obj = { value: []};
+        var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(this.InputRawId)} ]};
 
         if(this.TranslationConfig) {
             if(this.InputTranslationId === -1)
                 throw "Set Increments First";
 
-            obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true }});
-            obj.value.push({ obj: this.TranslationConfig.GetObjOperation()});
-            obj.value.push({ type: "UINT32", value: this.InputTranslationId });//sensorTranslationID
-            var translationInputs = GetClassProperty(this.TranslationConfig, "Inputs");
-            if(translationInputs) {
-                for(var i = 0; i < translationInputs.length; i++){
-                    //add universal inputs for translation
-                    if(translationInputs[i] === "CurrentTick"){
-                        obj.value.push({ type: "UINT8", value: 0 }); //use variable
-                        obj.value.push({ type: "UINT32", value: Increments.CurrentTickId }); //use CurrentTick variable
-                    } else if (translationInputs[i] === GetClassProperty(this.RawConfig, "Output")) {
-                        obj.value.push({ type: "UINT8", value: 1 }); //use 1st operation
-                        obj.value.push({ type: "UINT8", value: 0 }); //use 1st return from operation
-                    }
-                }
-            }
+            objOperation.value.unshift([
+                { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+                { type: "UINT16", value: 2 }, // number of operations
+            ]);
+
+            objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(this.InputTranslationId, this.InputRawId)});            
         }
         
-        obj.value.push({ type: "PackageOptions", value: { Immediate: true, Store: true, Return: this.TranslationConfig !== undefined }}); //immediate and store variables, return if TranslationConfig
-        obj.value.push({ obj: this.RawConfig.GetObjOperation()});
-        obj.value.push({ type: "UINT32", value: this.InputRawId });//sensorID
-
-        return obj;
+        return objOperation;
     }
 }
 
@@ -825,11 +812,19 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
             { type: "UINT16", value: this.Pin.value}, //pin
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_AnalogPinRead);
@@ -851,12 +846,20 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "BOOL", value: this.Inverted.Value}, //inverted
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRead);
@@ -885,13 +888,21 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "BOOL", value: this.Inverted.Value}, //inverted
             { type: "UINT16", value: this.Length.Value}, //length
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_DigitalPinRecord);
@@ -920,12 +931,20 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_DutyCyclePinRead);
@@ -954,12 +973,20 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
@@ -988,12 +1015,20 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
@@ -1103,14 +1138,22 @@ class ConfigOperation_Polynomial {
         return template;
     }
 
-    GetObjOperation() {
-        return { value: [
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
             { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
             { type: "FLOAT", value: this.MinValue}, //MinValue
             { type: "FLOAT", value: this.MaxValue}, //MaxValue
             { type: "UINT8", value: this.Degree}, //Degree
             { type: "FLOAT", value: this.A}, //coefficients
         ]};
+
+        if (outputVariableId || inputVariableId) {
+            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+        }
+
+        return objOperation;
     }
 }
 InputTranslationConfigs.push(ConfigOperation_Polynomial);
@@ -1119,12 +1162,16 @@ InputTranslationConfigs.push(ConfigOperation_Polynomial);
 class ConfigOperation_ReluctorGM24x extends UITemplate {
     static Name = "Reluctor GM 24X";
     static Output = "ReluctorResult";
-    static Inputs = ["Record", "CurrentTick"];
+    static Inputs = ["Record"];
     static Measurement = "ReluctorResult";
 
-    GetObjOperation() {
+    GetObjOperation(outputVariableId, inputVariableId) {
         return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
+            { type: "UINT32", value: outputVariableId ?? 0 },
+            { type: "UINT32", value: inputVariableId ?? 0 },
+            { type: "UINT32", value: Increments.CurrentTickId }
         ]};
     }
 }
@@ -1133,7 +1180,7 @@ InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
 class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     static Name = "Reluctor Universal 1X";
     static Output = "ReluctorResult";
-    static Inputs = ["Record", "CurrentTick"];
+    static Inputs = ["Record"];
     static Measurement = "ReluctorResult";
     static Template =   "<div><label for=\"$RisingPosition.GUID$\">Rising Edge Position:</label>$RisingPosition$</div>" +
                         "<div><label for=\"$FallingPosition.GUID$\">Falling Edge Position:</label>$FallingPosition$</div>";
@@ -1157,11 +1204,15 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
+    GetObjOperation(outputVariableId, inputVariableId) {
         return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
             { type: "FLOAT", value: this.RisingPosition.Value}, //RisingPosition
             { type: "FLOAT", value: this.FallingPosition.Value}, //FallingPosition
+            { type: "UINT32", value: outputVariableId ?? 0 },
+            { type: "UINT32", value: inputVariableId ?? 0 },
+            { type: "UINT32", value: Increments.CurrentTickId },
         ]};
     }
 }
@@ -1170,7 +1221,7 @@ InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal1x);
 class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     static Name = "Reluctor Universal Missing Teeth";
     static Output = "ReluctorResult";
-    static Inputs = ["Record", "CurrentTick"];
+    static Inputs = ["Record"];
     static Measurement = "ReluctorResult";
     static Template =   "<div><label for=\"$FirstToothPosition.GUID$\">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>" +
                         "<div><label for=\"$ToothWidth.GUID$\">Tooth Width:</label>$ToothWidth$</div>" +
@@ -1204,13 +1255,17 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
+    GetObjOperation(outputVariableId, inputVariableId) {
         return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
             { type: "FLOAT", value: this.FirstToothPosition.Value}, //FirstToothPosition
             { type: "FLOAT", value: this.ToothWidth.Value}, //ToothWidth
             { type: "UINT8", value: this.NumberOfTeeth.Value}, //NumberOfTeeth
             { type: "UINT8", value: this.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
+            { type: "UINT32", value: outputVariableId ?? 0 },
+            { type: "UINT32", value: inputVariableId ?? 0 },
+            { type: "UINT32", value: Increments.CurrentTickId },
         ]};
     }
 }

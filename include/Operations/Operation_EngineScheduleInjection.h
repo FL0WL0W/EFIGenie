@@ -1,7 +1,7 @@
 #include "Operations/IOperation.h"
 #include "Operation_EnginePosition.h"
 #include "EmbeddedIOServiceCollection.h"
-#include "Operations/OperationPackager.h"
+#include "Operations/OperationFactory.h"
 #include <tuple>
 
 #ifndef OPERATION_ENGINESCHEDULEINJECTION_H
@@ -28,7 +28,7 @@ namespace EFIGenie
 		void Open();
 		void Close();
 
-		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
 	};
 }
 #endif

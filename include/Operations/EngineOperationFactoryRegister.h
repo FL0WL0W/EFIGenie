@@ -1,6 +1,5 @@
 #include <map>
 #include "Operations/OperationFactory.h"
-#include "Operations/OperationPackager.h"
 #include "EmbeddedIOServiceCollection.h"
 
 #ifndef ENGINEOPERATIONFACTORYREGISTER_H
@@ -10,7 +9,7 @@ namespace EFIGenie
 	class EngineOperationFactoryRegister
 	{
 		public:
-		static void Register(uint32_t idOffset, OperationArchitecture::OperationFactory *factory, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
+		static void Register(uint32_t idOffset, OperationArchitecture::OperationFactory *factory, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection);
 	};
 }
 #endif

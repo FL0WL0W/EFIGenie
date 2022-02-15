@@ -127,14 +127,14 @@ namespace EFIGenie
 		_open = false;
 	}
 
-	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
+	IOperationBase *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		callback_t openCallBack = 0;
 		callback_t closeCallBack = 0;
 
 		size_t size = 0;
-		IOperationBase *operation = packager->Package(config, size);
+		IOperationBase *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
@@ -146,7 +146,7 @@ namespace EFIGenie
 			openCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
-			IOperationBase *operationClose = packager->Package(config, size);
+			IOperationBase *operationClose = factory->Create(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}

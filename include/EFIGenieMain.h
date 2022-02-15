@@ -1,5 +1,5 @@
 #include "EmbeddedIOServiceCollection.h"
-#include "Operations/OperationPackager.h"
+#include "Operations/Operation_Package.h"
 
 #ifndef ENGINEMAIN_H
 #define ENGINEMAIN_H
@@ -15,7 +15,7 @@ namespace EFIGenie
 		bool _syncedOnce = false;
 
 		public:
-		OperationArchitecture::SystemBus *SystemBus;
+		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *VariableMap;
 		EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection);
 
 		void Setup();

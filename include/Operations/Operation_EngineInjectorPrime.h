@@ -1,6 +1,6 @@
 #include "Operations/IOperation.h"
 #include "EmbeddedIOServiceCollection.h"
-#include "Operations/OperationPackager.h"
+#include "Operations/OperationFactory.h"
 
 #ifndef OPERATION_ENGINEINJECTORPRIME_H
 #define OPERATION_ENGINEINJECTORPRIME_H
@@ -18,7 +18,7 @@ namespace EFIGenie
 
 		void Execute(float time) override;
 
-		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
 	};
 }
 #endif

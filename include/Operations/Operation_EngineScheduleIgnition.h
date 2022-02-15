@@ -1,5 +1,5 @@
 #include "Operations/IOperation.h"
-#include "Operations/OperationPackager.h"
+#include "Operations/OperationFactory.h"
 #include "Operation_EnginePosition.h"
 #include "EmbeddedIOServiceCollection.h"
 #include <tuple>
@@ -28,7 +28,7 @@ namespace EFIGenie
 		void Dwell();
 		void Ignite();
 
-		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationPackager *packager);
+		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *packager);
 	};
 }
 #endif

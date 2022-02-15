@@ -135,14 +135,14 @@ namespace EFIGenie
 		_dwelling = false;
 	}
 
-	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationPackager *packager)
+	IOperationBase *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		callback_t dwellCallBack = 0;
 		callback_t igniteCallBack = 0;
 
 		size_t size = 0;
-		IOperationBase *operation = packager->Package(config, size);
+		IOperationBase *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
@@ -154,7 +154,7 @@ namespace EFIGenie
 			dwellCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
-			IOperationBase *operationIgnite = packager->Package(config, size);
+			IOperationBase *operationIgnite = factory->Create(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
 			igniteCallBack = [operationIgnite]() { operationIgnite->Execute(); };
 		}

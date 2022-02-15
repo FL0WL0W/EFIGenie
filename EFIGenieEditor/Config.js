@@ -10,6 +10,7 @@ class Increments {
         return ++Increments.VariableIncrement;
     }
     static RegisterVariable(Id, ListName, Name, Type, Measurement) {
+        Increments[ListName] ??= [];
         Increments[ListName].push({
             Name,
             Type,
@@ -178,25 +179,16 @@ types = [
     { type: "UINT64", toArrayBuffer: function(val) { return new BigUint64Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: "FLOAT", toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: "DOUBLE", toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "PackageOptions", toObj(val) {
-        if(val.Group !== undefined)
-            return { value: [
-                { type: "UINT8", value: 0x08}, //group
-                { type: "UINT16", value: val.Group}, //number of operations
-            ]};
-        
-        return { value: [{ type: "UINT8", value: (val.DoNotPackage? 0x10 : 0x00) | (val.Return? 0x04 : 0x00) | (val.Store? 0x02 : 0x00) | (val.Immediate? 0x01 : 0x00)}]};
-    }},
     { type: "Operation_StaticVariable", toObj(val) {
         obj = { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static} //number of operations
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
         ]};
 
         var type = GetType(val);
         var typeID = GetTypeId(type);
         
         obj.value.push({ type: "UINT8", value: typeID }); //typeid
-        obj.value.push({ type: type, value: val }); //type
+        obj.value.push({ type: type, value: val }); //val
 
         return obj;
     }},
@@ -254,19 +246,7 @@ types = [
         return { value: [
             { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual },
         ]};
-    }},
-    { type: "VariableParameter", toObj(val) {
-        return { value: [
-            { type: "UINT8", value: 0 }, //use variable
-            { type: "UINT32", value: val },//variable ID
-        ]};
-    }},
-    { type: "OperationParameter", toObj(val) {
-        return { value: [
-            { type: "UINT8", value: val }, //operation index
-            { type: "UINT8", value: 0 }, //use first return
-        ]};
-    }},
+    }}
 ]
 
 for(var index in STM32TypeAlignment) {
@@ -415,36 +395,41 @@ class ConfigTop extends UITemplate {
     }
 
     GetArrayBufferPackage() {
-        return (new ArrayBuffer()).build({ types: types, value: [{obj: this.GetObjPackage()}]});
+        return (new ArrayBuffer()).build({ types: types, value: [{obj: this.GetObjOperation()}]});
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         return { value: [
             { type: "UINT32", value: 0}, //signal last operation
 
             //inputs
-            { type: "PackageOptions", value: { Group: 2 }}, //group
-            { obj: this.Inputs.GetObjPackage()}, 
-            { obj: this.Engine.GetObjPackage()}, 
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: 2 }, // number of operations
+            { obj: this.Inputs.GetObjOperation()}, 
+            { obj: this.Engine.GetObjOperation()}, 
 
             //preSync
-            { type: "PackageOptions", value: { Group: 0 }}, //group
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: 0 }, // number of operations
 
             //sync condition
-            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
-            //no function to just use a variable so do an OR with a static false.
-            { type: "Operation_Or"}, //OR
-            { type: "UINT8", value: 0 }, //use variable
-            { type: "UINT32", value: Increments.EngineSyncedId }, //bool
-            { type: "UINT8", value: 1 }, //use first operation
-            { type: "UINT8", value: 0 }, //use first return
-            { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate return
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: 2 }, // number of operations
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
             { type: "Operation_StaticVariable", value: false}, //bool
-            
+            { type: "UINT32", value: -1 }, //store in static value variable
+
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+            { type: "Operation_Or"}, //OR
+            { type: "UINT32", value: 0 }, //return this result
+            { type: "UINT32", value: Increments.EngineSyncedId }, //bool
+            { type: "UINT32", value: -1 }, //use static value variable
+
             //main loop execute
-            { type: "PackageOptions", value: { Group: 2 }}, //group
-            { obj: this.Fuel.GetObjPackage()}, 
-            { obj: this.Ignition.GetObjPackage()}, 
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: 2 }, // number of operations
+            { obj: this.Fuel.GetObjOperation()}, 
+            { obj: this.Ignition.GetObjOperation()}, 
         ]};
     }
 }
@@ -542,11 +527,13 @@ class ConfigFuel extends UITemplate {
         };
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         if(this.CylinderFuelMassId === -1)
             throw "Set Increments First";
 
-        var numberOfOperations = 2;
+        var numberOfOperations = 1 + this.Outputs.length;
+        if(!this.AFRConfigOrVariableSelection.IsVariable())
+            ++numberOfOperations;
         if(!this.InjectorEnableConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
         if(!this.InjectorPulseWidthConfigOrVariableSelection.IsVariable())
@@ -558,35 +545,33 @@ class ConfigFuel extends UITemplate {
         types : [
             { type: "Operation_EngineScheduleInjection", toObj(val) {
                 return { value: [
-                    { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                    { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
                     { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
                     { type: "FLOAT", value: val.TDC.Value }, //tdc
-                    { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
                     { obj: val.GetObjOperation()}, 
-                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: -1 }, //store returns at -1
+                    { type: "UINT32", value: -1 }, //store returns at -1
                     { type: "UINT32", value: Increments.EnginePositionId },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
                 ]};
             }}],
         value: [
-            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: numberOfOperations }, // number of operations
 
-            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
+
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
             { type: "Operation_Divide"}, //Divide
             { type: "UINT32", value: this.CylinderFuelMassId }, //Cylinder Fuel Mass ID
-            { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id },
-            { obj: this.AFRConfigOrVariableSelection.GetObjAsParameter(1)}, 
-            { obj: this.AFRConfigOrVariableSelection.GetObjPackage(true)}, 
+            { type: "UINT32", value: this.AFRConfigOrVariableSelection.GetVariableId()}, 
 
-            { obj: this.InjectorEnableConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjPackage()}
+            { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
+            { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
+            { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation()}
         ]};
 
         for(var i = 0; i < this.Outputs.length; i++) {
@@ -677,7 +662,7 @@ class ConfigIgnition extends UITemplate {
         };
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         var numberOfOperations = this.Outputs.length;
         if(!this.IgnitionEnableConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
@@ -692,30 +677,27 @@ class ConfigIgnition extends UITemplate {
         types : [
             { type: "Operation_EngineScheduleIgnition", toObj(val) {
                 return { value: [
-                    { type: "PackageOptions", value: { Immediate: true } }, //immediate
+                    { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
                     { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
                     { type: "FLOAT", value: val.TDC.Value }, //tdc
-                    { type: "PackageOptions", value: { Immediate: true, DoNotPackage: true } }, //immediate donotpackage
                     { obj: val.GetObjOperation()}, 
-                    { type: "UINT8", value: 0 }, //use variable
+                    { type: "UINT32", value: -1 }, //store returns at -1
+                    { type: "UINT32", value: -1 }, //store returns at -1
                     { type: "UINT32", value: Increments.EnginePositionId },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Enable").Id },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id },
-                    { type: "UINT8", value: 0 }, //use variable
                     { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell Deviation").Id },
                 ]};
             }}],
         value: [
-            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: numberOfOperations }, // number of operations
 
-            { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjPackage()}, 
-            { obj: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjPackage()}, 
+            { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjOperation()}, 
+            { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation()}, 
+            { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjOperation()}, 
+            { obj: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation()}, 
         ]};
 
         for(var i = 0; i < this.Outputs.length; i++) {
@@ -822,7 +804,7 @@ class ConfigEngine extends UITemplate {
         this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
     }
 
-    GetObjPackage() {
+    GetObjOperation() {
         if(this.EnginePositionId === -1 || this.EngineSequentialId === -1 || this.EngineSyncedId === -1 || this.EngineRPMId === -1)
             throw "Set Increments First";
 
@@ -837,6 +819,10 @@ class ConfigEngine extends UITemplate {
         }
 
         var numberOfOperations = 2;
+        if(!this.CrankPositionConfigOrVariableSelection.IsVariable())
+            ++numberOfOperations;
+        if(!this.CamPositionConfigOrVariableSelection.IsVariable())
+            ++numberOfOperations;
         if(mapRequired && !this.ManifoldAbsolutePressureConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
         if(catRequired && !this.CylinderAirTemperatureConfigOrVariableSelection.IsVariable())
@@ -849,45 +835,43 @@ class ConfigEngine extends UITemplate {
 
 
         var obj = { value: [
-            { type: "PackageOptions", value: { Group: numberOfOperations }}, //group
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: numberOfOperations }, // number of operations
+
+            { obj: this.CrankPositionConfigOrVariableSelection.GetObjOperation() },
+
+            { obj: this.CamPositionConfigOrVariableSelection.GetObjOperation() },
 
             //CalculateEnginePosition
-            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
             { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
+            { type: "UINT32", value: this.CrankPositionConfigOrVariableSelection.GetVariableId() },  //CrankPositionId
+            { type: "UINT32", value: this.CamPositionConfigOrVariableSelection.GetVariableId() },  //CamPositionId
 
-            //big operation to setup Crank Cam position -> Engine Position -> Engine RPM
-            { type: "PackageOptions", value: { Immediate: true, Store: true }}, //immediate store
+            //EngineParameters
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
             { type: "UINT32", value: this.EngineRPMId },  //EngineRPMId
             { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
             { type: "UINT32", value: this.EngineSyncedId },  //EngineSyncedId
-            { type: "VariableParameter", value: this.EnginePositionId }, //use 1st sub operation
+            { type: "UINT32", value: this.EnginePositionId }, //EnginePositionId
         ]};
 
-
-        var subOperations = 0;
-        obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
-        if(!this.CrankPositionConfigOrVariableSelection.IsVariable()) 
-            subOperations++;
-        obj.value.push({ obj: this.CamPositionConfigOrVariableSelection.GetObjAsParameter(subOperations) });
-        obj.value.push({ obj: this.CrankPositionConfigOrVariableSelection.GetObjPackage(true) });
-        obj.value.push({ obj: this.CamPositionConfigOrVariableSelection.GetObjPackage(true) });
         
         if(mapRequired) {
-            obj.value.push({ obj: this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjPackage() });
+            obj.value.push({ obj: this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation() });
         }
 
         if(catRequired) {
-            obj.value.push({ obj: this.CylinderAirTemperatureConfigOrVariableSelection.GetObjPackage() });
+            obj.value.push({ obj: this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation() });
         }
         
         if(veRequired) {
-            obj.value.push({ obj: this.VolumetricEfficiencyConfigOrVariableSelection.GetObjPackage() });
+            obj.value.push({ obj: this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation() });
         }
         
-        var test = this.CylinderAirmassConfigOrVariableSelection.GetObjPackage();
-        obj.value.push({ obj: test });
+        obj.value.push({ obj: this.CylinderAirmassConfigOrVariableSelection.GetObjOperation() });
 
         return obj;
     }
@@ -912,20 +896,14 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation() {
+    GetObjOperation(outputVariableId) {
         return { value: [
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD }, //factory ID
             { type: "FLOAT", value: this.CylinderVolume.Value }, //Cylinder Volume
-        ]};
-    }
-
-    GetObjParameters() {
-        return { value: [
-            { type: "UINT8", value: 0 }, //use variable
+            { type: "UINT32", value: outputVariableId ?? 0 },
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id },
-            { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id },
-            { type: "UINT8", value: 0 }, //use variable
             { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id },
         ]};
     }
@@ -969,33 +947,38 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
         this.FlowRateConfigOrVariableSelection.SetIncrements();
     }
 
-    GetObjOperation() {
-        return { value: [
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-            { type: "FLOAT", value: this.MinInjectorFuelMass.Value }
-        ]};
-    }
+    GetObjOperation(outputVariableId) {
+        var numberOfOperations = 3;
+        if(!this.FlowRateConfigOrVariableSelection.IsVariable())
+            numberOfOperations++;
+        if(!this.DeadTimeConfigOrVariableSelection.IsVariable())
+            numberOfOperations++;
 
-    GetObjParameters(){
         return { value: [
-            { type: "OperationParameter", value: 1 }, //use first suboperation
-            { type: "VariableParameter", value: Increments.FuelParameters.find(a => a.Name === "Cylinder Fuel Mass").Id },
-            { obj: this.FlowRateConfigOrVariableSelection.GetObjAsParameter(2)},
-            { obj: this.DeadTimeConfigOrVariableSelection.GetObjAsParameter(!this.FlowRateConfigOrVariableSelection.IsVariable()? 3 : 2)},
-            //first suboperation
-            { obj: { value: [ 
-                { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                { type: "Operation_Add" }, //Add
-                { type: "OperationParameter", value: 1 }, //use first suboperation
-                { type: "VariableParameter", value: Increments.EngineSequentialId },
-                //first suboperation
-                { obj: { value: [ 
-                    { type: "PackageOptions", value: { Immediate: true, Return: true }}, //immediate and return
-                    { type: "Operation_StaticVariable", value: 1 }
-                ]}},
-            ]}},
-            { obj: this.FlowRateConfigOrVariableSelection.GetObjPackage(true)},
-            { obj: this.DeadTimeConfigOrVariableSelection.GetObjPackage(true)},
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: "UINT16", value: numberOfOperations }, // number of operations
+
+            { obj: this.FlowRateConfigOrVariableSelection.GetObjOperation()},
+            { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
+            
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: "Operation_StaticVariable", value: 1 },
+            { type: "UINT32", value: -1 }, //store in variable id -1
+            
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: "Operation_Add" }, //Add
+            { type: "UINT32", value: -1 }, //store in variable id -1
+            { type: "UINT32", value: -1 }, //first parameter variable id -1
+            { type: "VariableParameter", value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
+
+            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+            { type: "FLOAT", value: this.MinInjectorFuelMass.Value },
+            { type: "UINT32", value: outputVariableId ?? 0 },
+            { type: "UINT32", value: -1 }, //first parameter variable id -1
+            { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Cylinder Fuel Mass").Id },
+            { type: "UINT32", value: this.FlowRateConfigOrVariableSelection.GetVariableId() },
+            { type: "UINT32", value: this.DeadTimeConfigOrVariableSelection.GetVariableId() },
         ]};
     }
 }

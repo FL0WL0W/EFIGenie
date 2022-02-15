@@ -68,6 +68,8 @@ ArrayBuffer.prototype.build = function(obj) {
                     objobj.types = [];
                 }
                 for(var typeIndex in obj.types){
+                    if(objobj.types == undefined)
+                        debugger;
                     var typetypeInfo = objobj.types.find(x => x.type === obj.types[typeIndex].type);
                     if(typetypeInfo === undefined){
                         objobj.types.push(obj.types[typeIndex]);

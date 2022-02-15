@@ -6,10 +6,10 @@ using namespace OperationArchitecture;
 #ifdef COMMUNICATIONHANDLER_OBD2_H
 namespace EFIGenie
 {	
-		CommunicationHandler_OBD2::CommunicationHandler_OBD2(ICommunicationService *communicationService, SystemBus *systemBus, const OBD2VariableMap *variableMap) :
+		CommunicationHandler_OBD2::CommunicationHandler_OBD2(ICommunicationService *communicationService, GeneratorMap<Variable> *variableMap, const OBD2VariableMap *obd2VariableMap) :
 			_communicationService(communicationService),
-			_systemBus(systemBus),
-			_variableMap(variableMap)
+			_variableMap(variableMap),
+			_obd2VariableMap(obd2VariableMap)
 		{
 			_communicationReceiveCallBack = [this](void *data, size_t length) { return this->Receive(data, length); };
 			_communicationService->RegisterReceiveCallBack(&_communicationReceiveCallBack);
@@ -50,8 +50,8 @@ namespace EFIGenie
 						// Calculated Engine Load
 						case 4:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->CalculatedEngineLoadID);
-							if(it != _systemBus->Variables.end())
+							GeneratorMap<Variable>::iterator it = _variableMap->find(_obd2VariableMap->CalculatedEngineLoadID);
+							if(it != _variableMap->end())
 							{
 								// Engine load will be a float value between 0 and 1
 								// Need to normalize to a byte value by multiplying by 255, then perform a type conversion.
@@ -63,8 +63,8 @@ namespace EFIGenie
 						// Engine Coolant Temp
 						case 5:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->EngineCoolantTempID);
-							if(it != _systemBus->Variables.end())
+							GeneratorMap<Variable>::iterator it = _variableMap->find(_obd2VariableMap->EngineCoolantTempID);
+							if(it != _variableMap->end())
 							{
  								//add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
 								uint8_t ect = it->second->To<int16_t>() + 40;
@@ -78,8 +78,8 @@ namespace EFIGenie
 						case 8:
 						case 9:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->FuelTrimID[pid - 6]);
-							if(it != _systemBus->Variables.end())
+							GeneratorMap<Variable>::iterator it = _variableMap->find(_obd2VariableMap->FuelTrimID[pid - 6]);
+							if(it != _variableMap->end())
 							{
 								// Min value is -100, max is 99.2. Need to normalize so it will fit in an unsigned byte.
 								uint8_t ft = static_cast<int16_t>(it->second->To<float>() * 128) + 128;
@@ -90,8 +90,8 @@ namespace EFIGenie
 						// Fuel Pressure
 						case 10:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->FuelPressureID);
-							if(it != _systemBus->Variables.end())
+							GeneratorMap<Variable>::iterator it = _variableMap->find(_obd2VariableMap->FuelPressureID);
+							if(it != _variableMap->end())
 							{
 								// Fuel pressure is given in Bar but needs to be returned in kPa. Additionally, the byte
 								// will be multiplied by 3 by the receiver so must divide by 3 as well.
@@ -103,8 +103,8 @@ namespace EFIGenie
 						// Intake Manifold Absolute Pressure
 						case 11:
 						{
-							std::map<uint32_t, Variable*>::iterator it = _systemBus->Variables.find(_variableMap->IntakeManifoldPressureID);
-							if(it != _systemBus->Variables.end())
+							GeneratorMap<Variable>::iterator it = _variableMap->find(_obd2VariableMap->IntakeManifoldPressureID);
+							if(it != _variableMap->end())
 							{
 								// Intake manifold pressure is given in Bar but needs to be returned in kPa.
 								uint8_t imp = it->second->To<float>() * 100;

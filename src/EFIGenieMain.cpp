@@ -14,15 +14,14 @@ namespace EFIGenie
 {
     EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {
-        SystemBus = new OperationArchitecture::SystemBus();
+        VariableMap = new OperationArchitecture::GeneratorMap<Variable>();
 
         OperationFactory *operationFactory = new OperationFactory();
-        OperationPackager *packager = new OperationPackager(operationFactory, SystemBus);
 
-        OperationFactoryRegister::Register(10000, operationFactory);
+        OperationFactoryRegister::Register(10000, operationFactory, VariableMap);
         EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
         ReluctorOperationFactoryRegister::Register(30000, operationFactory);
-        EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection, packager);
+        EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection);
 
         size_t size = 0;
         do
@@ -31,28 +30,26 @@ namespace EFIGenie
             const uint32_t operationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
             if(operationId == 0)
                 break;
-            SystemBus->Operations.insert(std::pair<uint32_t, IOperationBase*>(operationId, packager->Package(config, size)));
+            operationFactory->Create(config, size);
             Config::OffsetConfig(config, sizeOut, size);
         }
         while(size > 0);
 
-        size = 0;
-        _inputsExecute = packager->Package(config, size);
+        _inputsExecute = operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _preSyncExecute = packager->Package(config, size);
+        _preSyncExecute = operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _syncCondition = packager->Package(config, size);
+        _syncCondition = operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _mainLoopExecute = packager->Package(config, size);
+        _mainLoopExecute = operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
-        delete packager;
         delete operationFactory;
     }
 
