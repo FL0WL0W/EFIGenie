@@ -743,10 +743,10 @@ class ConfigInput {
             if(this.InputTranslationId === -1)
                 throw "Set Increments First";
 
-            objOperation.value.unshift([
+            objOperation.value.unshift(
                 { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
                 { type: "UINT16", value: 2 }, // number of operations
-            ]);
+            );
 
             objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(this.InputTranslationId, this.InputRawId)});            
         }
@@ -812,16 +812,15 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
             { type: "UINT16", value: this.Pin.value}, //pin
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -846,17 +845,16 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "BOOL", value: this.Inverted.Value}, //inverted
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -888,7 +886,7 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
@@ -896,10 +894,9 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
             { type: "UINT16", value: this.Length.Value}, //length
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -931,17 +928,16 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -973,17 +969,16 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -1015,17 +1010,16 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: "UINT32", value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
             { type: "UINT16", value: this.Pin.Value}, //pin
             { type: "UINT16", value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId || inputVariableId) {
+        if (outputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
         }
 
         return objOperation;
@@ -1149,8 +1143,10 @@ class ConfigOperation_Polynomial {
 
         if (outputVariableId || inputVariableId) {
             objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: "UINT32", value: outputVariableId ?? 0 }); //outputVariable
-            objOperation.value.push({ type: "UINT32", value: inputVariableId ?? 0 }); //inputVariable
+            objOperation.value.push(
+                { type: "UINT32", value: outputVariableId ?? 0 }, //outputVariable
+                { type: "UINT32", value: inputVariableId ?? 0 } //inputVariable
+            );
         }
 
         return objOperation;

@@ -187,8 +187,10 @@ types = [
         var type = GetType(val);
         var typeID = GetTypeId(type);
         
-        obj.value.push({ type: "UINT8", value: typeID }); //typeid
-        obj.value.push({ type: type, value: val }); //val
+        obj.value.push(
+            { type: "UINT8", value: typeID }, //typeid
+            { type: type, value: val } //val
+        );
 
         return obj;
     }},
@@ -969,7 +971,7 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             { type: "Operation_Add" }, //Add
             { type: "UINT32", value: -1 }, //store in variable id -1
             { type: "UINT32", value: -1 }, //first parameter variable id -1
-            { type: "VariableParameter", value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
+            { type: "UINT32", value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
 
             { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
