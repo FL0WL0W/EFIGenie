@@ -276,10 +276,10 @@ class ConfigOrVariableSelection extends UITemplate {
     }
 
     GetSubConfigIndex() {
-        if (this.IsVariable() || !this.Configs)
+        if (this.Selection.Value?.reference || !this.Configs)
             return -1;
 
-        const selection = this.Selection.GetValue();
+        const selection = this.Selection.Value;
         if(selection == undefined)
             return -1;
         for (var i = 0; i < this.ConfigValues.length; i++) {
@@ -404,7 +404,7 @@ class ConfigOrVariableSelection extends UITemplate {
 
     RegisterVariables() {
         this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));
-        const selection = this.Selection.GetValue();
+        const selection = this.Selection.Value;
         if (selection && this.VariableListName) {
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
@@ -426,11 +426,6 @@ class ConfigOrVariableSelection extends UITemplate {
                 );
             }
         }
-    }
-
-    IsVariable() {
-        const selection = this.Selection.Value;
-        return selection && selection.reference;
     }
 
     GetObjOperation(...args) {
