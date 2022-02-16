@@ -24,8 +24,9 @@ class ConfigOperation_DigitalPinWrite extends UITemplate {
         ]};
 
         if (inputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: inputVariableId }); //inputVariable
+            
+            objOperation.type = `Package`;
+            objOperation.inputVariables = [ inputVariableId ];
         }
 
         return objOperation;

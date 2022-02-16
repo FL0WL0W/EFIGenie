@@ -220,6 +220,23 @@ types = [
     { type: `FLOAT`, toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: `DOUBLE`, toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: `VariableId`, toObj(val) { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(val) }]}; }},
+    { type: `Package`, toObj(val) {
+        val.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+        
+        val.outputVariables?.forEach(function(outputVariable) {
+            val.value.push({ type: `VariableId`, value: outputVariable ?? 0 })
+        });
+
+        val.outputVariables = undefined;
+
+        val.inputVariables?.forEach(function(inputVariable) {
+            val.value.push({ type: `VariableId`, value: inputVariable ?? 0 })
+        });
+
+        val.inputVariables = undefined;
+
+        return val;
+    }},
     { type: `Operation_StaticVariable`, toObj(val) {
         obj = { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
@@ -458,15 +475,19 @@ class ConfigTop extends UITemplate {
             //sync condition
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
             { type: `UINT16`, value: 2 }, // number of operations
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: `Operation_StaticVariable`, value: false}, //bool
-            { type: `VariableId`, value: -1 }, //store in static value variable
-
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: `Operation_Or`}, //OR
-            { type: `VariableId`, value: 0 }, //return this result
-            { type: `VariableId`, value: `EngineSyncedId` }, //bool
-            { type: `VariableId`, value: -1 }, //use static value variable
+            { type: `Package`, value: { 
+                value: [ { type: `Operation_StaticVariable`, value: false} ],
+                outputVariables: [ -1 ] //store in static value variable
+            }},
+            
+            { type: `Package`, value: { 
+                value: [ { type: `Operation_Or`} ],
+                outputVariables: [ 0 ], //return this result
+                inputVariables: [
+                    `EngineSyncedId`,
+                    -1
+                ]
+            }},
 
             //main loop execute
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
@@ -573,16 +594,23 @@ class ConfigFuel extends UITemplate {
         types : [
             { type: `Operation_EngineScheduleInjection`, toObj(val) {
                 return { value: [
-                    { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                    { type: `FLOAT`, value: val.TDC.Value }, //tdc
-                    { obj: val.GetObjOperation()}, 
-                    { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: `EnginePositionId` },
-                    { type: `VariableId`, value: `FuelParameters.Injector Enable` },
-                    { type: `VariableId`, value: `FuelParameters.Injector Pulse Width` },
-                    { type: `VariableId`, value: `FuelParameters.Injector End Position(BTDC)` },
+                    { type: `Package`, value: { 
+                        value: [ 
+                            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
+                            { type: `FLOAT`, value: val.TDC.Value }, //tdc
+                            { obj: val.GetObjOperation()},
+                         ],
+                        outputVariables: [ 
+                            -1, //store returns at -1
+                            -1 //store returns at -1
+                         ],
+                        inputVariables: [
+                            `EnginePositionId`,
+                            `FuelParameters.Injector Enable`,
+                            `FuelParameters.Injector Pulse Width`,
+                            `FuelParameters.Injector End Position(BTDC)`
+                        ]
+                    }}
                 ]};
             }}],
         value: [
@@ -591,11 +619,14 @@ class ConfigFuel extends UITemplate {
 
             { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
 
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: `Operation_Divide`}, //Divide
-            { type: `VariableId`, value: `FuelParameters.Cylinder Fuel Mass` }, //Cylinder Fuel Mass ID
-            { type: `VariableId`, value: `EngineParameters.Cylinder Air Mass` },
-            { type: `VariableId`, value: `FuelParameters.Air Fuel Ratio`}, 
+            { type: `Package`, value: { 
+                value: [ { type: `Operation_Divide`} ],
+                outputVariables: [ `FuelParameters.Cylinder Fuel Mass` ],
+                inputVariables: [
+                    `EngineParameters.Cylinder Air Mass`,
+                    `FuelParameters.Air Fuel Ratio`
+                ]
+            }},
 
             { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
             { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
@@ -705,17 +736,24 @@ class ConfigIgnition extends UITemplate {
         types : [
             { type: `Operation_EngineScheduleIgnition`, toObj(val) {
                 return { value: [
-                    { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
-                    { type: `FLOAT`, value: val.TDC.Value }, //tdc
-                    { obj: val.GetObjOperation()}, 
-                    { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: `EnginePositionId` },
-                    { type: `VariableId`, value: `IgnitionParameters.Ignition Enable` },
-                    { type: `VariableId`, value: `IgnitionParameters.Ignition Dwell` },
-                    { type: `VariableId`, value: `IgnitionParameters.Ignition Advance` },
-                    { type: `VariableId`, value: `IgnitionParameters.Ignition Dwell Deviation` },
+                    { type: `Package`, value: { 
+                        value: [ 
+                            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
+                            { type: `FLOAT`, value: val.TDC.Value }, //tdc
+                            { obj: val.GetObjOperation()},
+                         ],
+                        outputVariables: [ 
+                            -1, //store returns at -1
+                            -1 //store returns at -1
+                         ],
+                        inputVariables: [
+                            `EnginePositionId`,
+                            `IgnitionParameters.Ignition Enable`,
+                            `IgnitionParameters.Ignition Dwell`,
+                            `IgnitionParameters.Ignition Advance`,
+                            `IgnitionParameters.Ignition Dwell Deviation`
+                        ]
+                    }}
                 ]};
             }}],
         value: [
@@ -854,19 +892,29 @@ class ConfigEngine extends UITemplate {
             { obj: this.CamPositionConfigOrVariableSelection.GetObjOperation() },
 
             //CalculateEnginePosition
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-            { type: `VariableId`, value: `EnginePositionId` },
-            { type: `VariableId`, value: `EngineParameters.Crank Position` },
-            { type: `VariableId`, value: `EngineParameters.Cam Position` },
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
+                 ],
+                outputVariables: [ `EnginePositionId` ],
+                inputVariables: [
+                    `EngineParameters.Crank Position`,
+                    `EngineParameters.Cam Position`
+                ]
+            }},
 
             //EngineParameters
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
-            { type: `VariableId`, value: `EngineParameters.Engine Speed` },
-            { type: `VariableId`, value: `EngineSequentialId` },
-            { type: `VariableId`, value: `EngineSyncedId` },
-            { type: `VariableId`, value: `EnginePositionId` },
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
+                 ],
+                outputVariables: [ 
+                    `EngineParameters.Engine Speed`,
+                    `EngineSequentialId`,
+                    `EngineSyncedId`
+                ],
+                inputVariables: [ `EnginePositionId`  ]
+            }},
         ]};
 
         
@@ -909,13 +957,18 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
 
     GetObjOperation(outputVariableId) {
         return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD }, //factory ID
-            { type: `FLOAT`, value: this.CylinderVolume.Value }, //Cylinder Volume
-            { type: `VariableId`, value: outputVariableId ?? 0 },
-            { type: `VariableId`, value: `EngineParameters.Cylinder Air Temperature` },
-            { type: `VariableId`, value: `EngineParameters.Manifold Absolute Pressure` },
-            { type: `VariableId`, value: `EngineParameters.Volumetric Efficiency` },
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
+                    { type: `FLOAT`, value: this.CylinderVolume.Value }, //Cylinder Volume
+                 ],
+                outputVariables: [ 0 ], //Return
+                inputVariables: [ 
+                    `EngineParameters.Cylinder Air Temperature`,
+                    `EngineParameters.Manifold Absolute Pressure`,
+                    `EngineParameters.Volumetric Efficiency`
+                 ]
+            }},
         ]};
     }
 }
@@ -973,25 +1026,37 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
             
             //Store a value of 2 into the temporary variable (-1) which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `Operation_StaticVariable`, value: 2 }, //static value of 2
-            { type: `VariableId`, value: -1 }, //store in variable id -1
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `Operation_StaticVariable`, value: 2 } //static value of 2
+                 ],
+                outputVariables: [ -1 ]
+            }},
             
             //Subtract 1 to temporary variable (-1) if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `Operation_Subtract` }, //Subtract
-            { type: `VariableId`, value: -1 }, //store in variable id -1
-            { type: `VariableId`, value: -1 }, //first parameter variable id -1
-            { type: `VariableId`, value: `EngineSequentialId` }, //second parameter EngineSequentialId
-
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-            { type: `FLOAT`, value: this.MinInjectorFuelMass.Value },
-            { type: `VariableId`, value: outputVariableId ?? 0 },
-            { type: `VariableId`, value: -1 }, //first parameter variable id -1
-            { type: `VariableId`, value: `FuelParameters.Cylinder Fuel Mass` },
-            { type: `VariableId`, value: `FuelParameters.Injector Flow Rate` },
-            { type: `VariableId`, value: `FuelParameters.Injector Dead Time` },
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `Operation_Subtract` } //Subtract
+                 ],
+                outputVariables: [ -1 ], //Return
+                inputVariables: [ 
+                    -1,
+                    `EngineSequentialId`
+                 ]
+            }},
+            { type: `Package`, value: { 
+                value: [ 
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+                    { type: `FLOAT`, value: this.MinInjectorFuelMass.Value }
+                 ],
+                outputVariables: [ outputVariableId ?? 0 ], //Return
+                inputVariables: [ 
+                    -1,
+                    `FuelParameters.Cylinder Fuel Mass`,
+                    `FuelParameters.Injector Flow Rate`,
+                    `FuelParameters.Injector Dead Time`
+                 ]
+            }},
         ]};
     }
 }

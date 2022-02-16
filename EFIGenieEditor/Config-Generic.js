@@ -32,8 +32,8 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
         var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -113,13 +113,13 @@ class ConfigOperation_LookupTable extends UITemplate {
         };
 
         if (!this.NoParameterSelection || outputVariableId || inputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ?? 0 ];
             if(inputVariableId) {
-                objOperation.value.push({ type: `UINT32`, value: inputVariableId }); //inputVariable
+                objOperation.inputVariables = [ inputVariableId ]; //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.ParameterSelection.Value;
-                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //inputVariable
+                objOperation.inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ]; //inputVariable
             }
         }
 
@@ -186,19 +186,19 @@ class ConfigOperation_2AxisTable extends UITemplate {
         };
 
         if (!this.NoParameterSelection || outputVariableId || xVariableId || yVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ?? 0 ];
             if(xVariableId) {
-                objOperation.value.push({ type: `UINT32`, value: xVariableId }); //xtVariable
+                objOperation.inputVariables = [ xVariableId ]; //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.XSelection.Value;
-                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //xVariable
+                objOperation.inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ]; //xVariable
             }
             if(yVariableId) {
-                objOperation.value.push({ type: `UINT32`, value: yVariableId }); //ytVariable
+                objOperation.inputVariables.push({ yVariableId }); //ytVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.YSelection.Value;
-                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //yVariable
+                objOperation.inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ); //yVariable
             }
         }
 

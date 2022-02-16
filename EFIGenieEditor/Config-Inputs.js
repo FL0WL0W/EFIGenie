@@ -801,8 +801,8 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -835,8 +835,8 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -877,8 +877,8 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -918,8 +918,8 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -959,8 +959,8 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -1000,8 +1000,8 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
         ]};
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ];
         }
 
         return objOperation;
@@ -1124,11 +1124,9 @@ class ConfigOperation_Polynomial {
         ]};
 
         if (outputVariableId || inputVariableId) {
-            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push(
-                { type: `VariableId`, value: outputVariableId ?? 0 }, //outputVariable
-                { type: `VariableId`, value: inputVariableId ?? 0 } //inputVariable
-            );
+            objOperation.type = `Package`;
+            objOperation.outputVariables = [ outputVariableId ?? 0 ];
+            objOperation.inputVariables = [ inputVariableId ?? 0 ];
         }
 
         return objOperation;
@@ -1144,13 +1142,16 @@ class ConfigOperation_ReluctorGM24x extends UITemplate {
     static Measurement = `ReluctorResult`;
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
-            { type: `VariableId`, value: outputVariableId ?? 0 },
-            { type: `VariableId`, value: inputVariableId ?? 0 },
-            { type: `VariableId`, value: `CurrentTickId` }
-        ]};
+        return { type: `Package`, value: { 
+            value: [ 
+                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X} //factory ID
+             ],
+            outputVariables: [ outputVariableId ?? 0 ],
+            inputVariables: [
+                inputVariableId ?? 0,
+                `CurrentTickId`
+            ]
+        }};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
@@ -1183,15 +1184,18 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
-            { type: `FLOAT`, value: this.FallingPosition.Value}, //FallingPosition
-            { type: `VariableId`, value: outputVariableId ?? 0 },
-            { type: `VariableId`, value: inputVariableId ?? 0 },
-            { type: `VariableId`, value: `CurrentTickId` },
-        ]};
+        return { type: `Package`, value: { 
+            value: [ 
+                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
+                { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
+                { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
+             ],
+            outputVariables: [ outputVariableId ?? 0 ],
+            inputVariables: [
+                inputVariableId ?? 0,
+                `CurrentTickId`
+            ]
+        }};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal1x);
@@ -1234,17 +1238,20 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-            { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
-            { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
-            { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
-            { type: `UINT8`, value: this.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
-            { type: `VariableId`, value: outputVariableId ?? 0 },
-            { type: `VariableId`, value: inputVariableId ?? 0 },
-            { type: `VariableId`, value: `CurrentTickId` },
-        ]};
+        return { type: `Package`, value: { 
+            value: [ 
+                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
+                { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
+                { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
+                { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
+                { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
+             ],
+            outputVariables: [ outputVariableId ?? 0 ],
+            inputVariables: [
+                inputVariableId ?? 0,
+                `CurrentTickId`
+            ]
+        }};
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversalMissingTeeth);
