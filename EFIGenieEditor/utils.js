@@ -1,5 +1,5 @@
 Uint8Array.prototype.toHex = function() { // buffer is an ArrayBuffer
-    return "0x" + Array.prototype.map.call(new Uint8Array(this), x => ('00' + x.toString(16)).slice(-2)).join(' 0x');
+    return `0x` + Array.prototype.map.call(new Uint8Array(this), x => (`00` + x.toString(16)).slice(-2)).join(` 0x`);
 }
 
 ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same type
@@ -92,7 +92,7 @@ ArrayBuffer.prototype.equals = function(buf)
     return true;
 }
 
-jQuery.expr[':'].parents = function(a,i,m){
+jQuery.expr[`:`].parents = function(a,i,m){
     return jQuery(a).parents(m[3]).length < 1;
 };
 
@@ -101,7 +101,7 @@ function getFileContents(url)
     var contents
 
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
+    xhr.open(`GET`, url, false);
 
     xhr.onload = function(e) {
         contents = e.target.response;
@@ -113,7 +113,7 @@ function getFileContents(url)
 
 var GUID = 0;
 function generateGUID(){
-    return "GUID" + (GUID++);
+    return `GUID${GUID++}`;
 }
 
 var downloadObject = function(obj, fileName) {
@@ -121,11 +121,11 @@ var downloadObject = function(obj, fileName) {
 }
 
 var downloadCompressedObject = function(obj, fileName) {
-    downloadstring("lzjson" + lzjs.compress(JSON.stringify(obj)), fileName);
+    downloadstring(`lzjson${lzjs.compress(JSON.stringify(obj))}`, fileName);
 }
 
 var loadObject = function(s) {
-    if(s.indexOf("lzjson") === 0)
+    if(s.indexOf(`lzjson`) === 0)
         return JSON.parse(lzjs.decompress(s.substring(6)));
     return JSON.parse(s);
 }
@@ -133,7 +133,7 @@ var loadObject = function(s) {
 var downloadBin = function(data, fileName) {
     var blob, url;
     blob = new Blob([data], {
-      type: "application/octet-stream"
+      type: `application/octet-stream`
     });
     url = window.URL.createObjectURL(blob);
     downloadURL(url, fileName);
@@ -145,7 +145,7 @@ var downloadBin = function(data, fileName) {
 var downloadstring = function(text, fileName) {
     var blob, url;
     blob = new Blob([text], { 
-        type: "text/plain" 
+        type: `text/plain` 
     });
     url = window.URL.createObjectURL(blob);
     downloadURL(url, fileName);
@@ -156,22 +156,22 @@ var downloadstring = function(text, fileName) {
   
 var downloadURL = function(data, fileName) {
     var a;
-    a = document.createElement('a');
+    a = document.createElement(`a`);
     a.href = data;
     a.download = fileName;
     document.body.appendChild(a);
-    a.style = 'display: none';
+    a.style = `display: none`;
     a.click();
     a.remove();
   };
 
 $(document).blur(function(event) {
-    console.log("focus " + event.target.id);
+    console.log(`focus ` + event.target.id);
 })
 
 function IsBrowserSupported() {
     var obj = {
-        c: "test",
+        c: `test`,
         a: 1
       };
       obj = JSON.parse(JSON.stringify(obj));
@@ -180,8 +180,8 @@ function IsBrowserSupported() {
         keys.push(key);
       }
       keys = JSON.parse(JSON.stringify(keys));
-      if(keys[0] !== "c") {
-          alert("Browser not supported. Try using a different browser.");
+      if(keys[0] !== `c`) {
+          alert(`Browser not supported. Try using a different browser.`);
           return false;
       }
       return true;

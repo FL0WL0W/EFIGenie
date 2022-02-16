@@ -17,66 +17,66 @@
         <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
         <script type="text/javascript">
             var b = new ConfigTop();
-            var configJsonName = "tune.json"
-            $(document).on('change', function() { ResetIncrements(), b.SetIncrements()});//this is a hack but oh well
+            var configJsonName = `tune.json`
+            $(document).on(`change`, function() { Increments.Reset(); b.SetIncrements()});//this is a hack but oh well
             const loadConfig = (config) => {
                 b.SetValue(loadObject(config));
-                $('#workspace').html(b.GetHtml());
-                $("#btnLoad").val(undefined);
+                $(`#workspace`).html(b.GetHtml());
+                $(`#btnLoad`).val(undefined);
             };
             $(document).ready(function() {
-                const lastConfig = window.localStorage.getItem("config");
+                const lastConfig = window.localStorage.getItem(`config`);
                 if (lastConfig) {
                     loadConfig(lastConfig);
                 }
 
-                $('#workspace').html(b.GetHtml());
+                $(`#workspace`).html(b.GetHtml());
                 b.Attach();
-                $("#btnSave").click(function(){
+                $(`#btnSave`).click(function(){
                     var cfg = b.GetValue();
-                    window.localStorage.setItem("config", cfg);
+                    window.localStorage.setItem(`config`, cfg);
                     downloadObject(cfg, configJsonName);
                 });
-                $("#btnSaveCompressed").click(function(){
+                $(`#btnSaveCompressed`).click(function(){
                     var cfg = b.GetValue();
-                    window.localStorage.setItem("config", cfg);
+                    window.localStorage.setItem(`config`, cfg);
                     downloadCompressedObject(cfg, configJsonName);
                 });
-                $("#btnLoad").change(function(evt){
+                $(`#btnLoad`).change(function(evt){
                     var test = new FileReader();
 
                     test.onload = function(evt) {
                         if(evt.target.readyState != 2) return;
                         if(evt.target.error) {
-                            alert('Error while reading file');
+                            alert(`Error while reading file`);
                             return;
                         }
 
                         const result = evt.target.result;
-                        window.localStorage.setItem("config", result);
+                        window.localStorage.setItem(`config`, result);
                         loadConfig(result);
                     };
 
                     test.readAsText(evt.target.files[0]);
                     configJsonName = evt.target.files[0].name;
                 });
-                $("#btnSaveBin").click(function(){
+                $(`#btnSaveBin`).click(function(){
                     Increments.Reset();
                     b.SetIncrements();
                     downloadBin(b.GetArrayBufferPackage(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
 
-                $("#selectTarget").change(function(evt){
+                $(`#selectTarget`).change(function(evt){
                     b.Inputs.TargetDevice = $(this).val();
                     PinOut = PinOuts[b.Inputs.TargetDevice];
                     UpdatePinout();
                 });
-                var targets = "";
+                var targets = ``;
                 Object.entries(PinOuts).forEach(entry => {
                     const [key, value] = entry;
-                    targets += "<option value=\"" + key + "\">" + value.Name + "</option>"
+                    targets += `<option value="${key}">${value.Name}</option>`;
                 });
-                $("#selectTarget").html(targets);
+                $(`#selectTarget`).html(targets);
             });
         </script>
         <meta name="viewport" content="width=600, initial-scale=1">

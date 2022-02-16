@@ -31,11 +31,11 @@ function UpdateFloatVariableValues() {
         success: function(data) {
             var responseVariables = data.split(`\n`);
             for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
-                var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === "VOID"
+                var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
 
-                if(responseVariables[i] === "True")
+                if(responseVariables[i] === `True`)
                     VariableValues[variableIds[i]] = true;
-                else if(responseVariables[i] === "False")
+                else if(responseVariables[i] === `False`)
                     VariableValues[variableIds[i]] = false;
                 else
                     VariableValues[variableIds[i]] = voidValue? undefined : parseFloat(responseVariables[i]);

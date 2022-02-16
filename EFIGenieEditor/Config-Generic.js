@@ -24,16 +24,16 @@ var OperationArchitectureFactoryIDs = {
 
 
 class ConfigOperation_Static extends UINumberWithMeasurement {
-    static Name = "Static";
-    static Output = "float";
+    static Name = `Static`;
+    static Output = `float`;
     static Inputs = [];
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [{ type: "Operation_StaticVariable", value: this.Value }] };
+        var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: "UINT32", value: outputVariableId }); //outputVariable
+            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
         }
 
         return objOperation;
@@ -46,7 +46,7 @@ function TableGetType(tableValue) {
     var max = -9223372036854775808;
     for (var i = 0; i < tableValue.length; i++) {
         if (tableValue[i] % 1 != 0) {
-            return "FLOAT";
+            return `FLOAT`;
         }
         if (tableValue[i] < min) {
             min = tableValue[i];
@@ -55,8 +55,8 @@ function TableGetType(tableValue) {
             max = tableValue[i];
         }
     }
-    if (typeof tableValue[0] === "boolean") {
-        return "BOOL";
+    if (typeof tableValue[0] === `boolean`) {
+        return `BOOL`;
     }
     if (min < 0) {
         if (max < 0 || min < -max)
@@ -67,27 +67,27 @@ function TableGetType(tableValue) {
 }
 
 class ConfigOperation_LookupTable extends UITemplate {
-    static Name = "Lookup Table";
-    static Output = "float";
-    static Inputs = ["float"];
-    static Measurement = "Selectable";
-    static Label = "Value";
-    static XLabel = "X"
-    static Template = "$Dialog$"
+    static Name = `Lookup Table`;
+    static Output = `float`;
+    static Inputs = [`float`];
+    static Measurement = `Selectable`;
+    static Label = `Value`;
+    static XLabel = `X`
+    static Template = `$Dialog$`
 
     constructor(prop) {
         prop ??= {};
         prop.Dialog = new UIDialog({
-            Title: "$Label$",
-            ButtonText: "Edit Table",
-            TemplateIdentifier: "Value"
+            Title: `$Label$`,
+            ButtonText: `Edit Table`,
+            TemplateIdentifier: `Value`
         });
         prop.Value = new UITable({
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
-            XLabel: prop.NoParameterSelection ? "$XLabel$" : "$ParameterSelection$",
-            ZLabel: "$Label$"
+            XLabel: prop.NoParameterSelection ? `$XLabel$` : `$ParameterSelection$`,
+            ZLabel: `$Label$`
         });
         prop.ParameterSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
@@ -103,23 +103,23 @@ class ConfigOperation_LookupTable extends UITemplate {
 
         var objOperation = {
             value: [
-                { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-                { type: "FLOAT", value: table.MinX }, //MinXValue
-                { type: "FLOAT", value: table.MaxX }, //MaxXValue
-                { type: "UINT8", value: table.XResolution }, //XResolution
-                { type: "UINT8", value: typeId }, //Type
+                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
+                { type: `FLOAT`, value: table.MinX }, //MinXValue
+                { type: `FLOAT`, value: table.MaxX }, //MaxXValue
+                { type: `UINT8`, value: table.XResolution }, //XResolution
+                { type: `UINT8`, value: typeId }, //Type
                 { type: type, value: tableValue }, //Table
             ]
         };
 
         if (!this.NoParameterSelection || outputVariableId || inputVariableId) {
-            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: "UINT32", value: outputVariableId }); //outputVariable
+            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
             if(inputVariableId) {
-                objOperation.value.push({ type: "UINT32", value: inputVariableId }); //inputVariable
+                objOperation.value.push({ type: `UINT32`, value: inputVariableId }); //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.ParameterSelection.Value;
-                objOperation.value.push({ type: "UINT32", value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //inputVariable
+                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //inputVariable
             }
         }
 
@@ -134,27 +134,27 @@ class ConfigOperation_LookupTable extends UITemplate {
 GenericConfigs.push(ConfigOperation_LookupTable);
 
 class ConfigOperation_2AxisTable extends UITemplate {
-    static Name = "2 Axis Table";
-    static Output = "float";
-    static Inputs = ["float", "float"];
-    static Measurement = "Selectable";
-    static Label = "Value";
-    static XLabel = "X"
-    static YLabel = "Y"
-    static Template = "$Dialog$"
+    static Name = `2 Axis Table`;
+    static Output = `float`;
+    static Inputs = [`float`, `float`];
+    static Measurement = `Selectable`;
+    static Label = `Value`;
+    static XLabel = `X`
+    static YLabel = `Y`
+    static Template = `$Dialog$`
 
     constructor(prop) {
         prop ??= {};
         prop.Dialog = new UIDialog({
-            Title: "$Label$",
-            ButtonText: "Edit Table",
-            TemplateIdentifier: "Value"
+            Title: `$Label$`,
+            ButtonText: `Edit Table`,
+            TemplateIdentifier: `Value`
         });
         prop.Value = new UITable({
             BaseObj: true,
-            XLabel: prop.NoParameterSelection ? "$XLabel$" : "$XSelection$",
-            YLabel: prop.NoParameterSelection ? "$YLabel$" : "$YSelection$",
-            ZLabel: "$Label$"
+            XLabel: prop.NoParameterSelection ? `$XLabel$` : `$XSelection$`,
+            YLabel: prop.NoParameterSelection ? `$YLabel$` : `$YSelection$`,
+            ZLabel: `$Label$`
         });
         prop.XSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
@@ -173,32 +173,32 @@ class ConfigOperation_2AxisTable extends UITemplate {
 
         var objOperation = {
             value: [
-                { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-                { type: "FLOAT", value: table.MinX }, //MinXValue
-                { type: "FLOAT", value: table.MaxX }, //MaxXValue
-                { type: "FLOAT", value: table.MinY }, //MinYValue
-                { type: "FLOAT", value: table.MaxY }, //MaxYValue
-                { type: "UINT8", value: table.XResolution }, //XResolution
-                { type: "UINT8", value: table.YResolution }, //YResolution
-                { type: "UINT8", value: typeId }, //Type
+                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
+                { type: `FLOAT`, value: table.MinX }, //MinXValue
+                { type: `FLOAT`, value: table.MaxX }, //MaxXValue
+                { type: `FLOAT`, value: table.MinY }, //MinYValue
+                { type: `FLOAT`, value: table.MaxY }, //MaxYValue
+                { type: `UINT8`, value: table.XResolution }, //XResolution
+                { type: `UINT8`, value: table.YResolution }, //YResolution
+                { type: `UINT8`, value: typeId }, //Type
                 { type: type, value: tableValue }, //Table
             ]
         };
 
         if (!this.NoParameterSelection || outputVariableId || xVariableId || yVariableId) {
-            objOperation.value.unshift({ type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: "UINT32", value: outputVariableId }); //outputVariable
+            objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+            objOperation.value.push({ type: `UINT32`, value: outputVariableId }); //outputVariable
             if(xVariableId) {
-                objOperation.value.push({ type: "UINT32", value: xVariableId }); //xtVariable
+                objOperation.value.push({ type: `UINT32`, value: xVariableId }); //xtVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.XSelection.Value;
-                objOperation.value.push({ type: "UINT32", value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //xVariable
+                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //xVariable
             }
             if(yVariableId) {
-                objOperation.value.push({ type: "UINT32", value: yVariableId }); //ytVariable
+                objOperation.value.push({ type: `UINT32`, value: yVariableId }); //ytVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.YSelection.Value;
-                objOperation.value.push({ type: "UINT32", value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //yVariable
+                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //yVariable
             }
         }
 
@@ -217,7 +217,7 @@ GenericConfigs.push(ConfigOperation_2AxisTable);
 function GetSelections(measurement, configs) {
     var selections = [];
     if (configs) {
-        var calculations = { Group: "Calculations", Options: [] }
+        var calculations = { Group: `Calculations`, Options: [] }
         for (var i = 0; i < configs.length; i++) {
             calculations.Options.push({
                 Name: configs[i].Name,
@@ -238,7 +238,7 @@ function GetSelections(measurement, configs) {
         for (var i = 0; i < arr.length; i++) {
             if (!measurement || arr[i].Measurement === measurement) {
                 arrSelections.Options.push({
-                    Name: arr[i].Name + (!measurement ? " [" + GetUnitDisplay(arr[i].Measurement) + "]" : ""),
+                    Name: arr[i].Name + (!measurement ? ` [${GetUnitDisplay(arr[i].Measurement)}]` : ``),
                     Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
                 });
             }
@@ -250,8 +250,8 @@ function GetSelections(measurement, configs) {
 }
 
 class ConfigOrVariableSelection extends UITemplate {
-    static Label = "Value";
-    static Template = "<div><label for=\"$Selection.GUID$\">$Label$:</label>$Selection$ $ConfigValue$</div>";
+    static Label = `Value`;
+    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$ $ConfigValue$</div>`;
 
     ConfigValues = [];
 
@@ -266,8 +266,8 @@ class ConfigOrVariableSelection extends UITemplate {
         var thisClass = this;
         this.Selection.OnChange.push(function () {
             //proud of myself on this clever bit of self modifying template ;)
-            thisClass.ConfigValue = "$ConfigValues." + thisClass.GetSubConfigIndex() + "$";
-            $("#" + thisClass.GUID).replaceWith(thisClass.GetHtml());
+            thisClass.ConfigValue = `$ConfigValues.${thisClass.GetSubConfigIndex()}$`;
+            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
@@ -283,12 +283,12 @@ class ConfigOrVariableSelection extends UITemplate {
         if(selection == undefined)
             return -1;
         for (var i = 0; i < this.ConfigValues.length; i++) {
-            if (GetClassProperty(this.ConfigValues[i], "Name") === selection.value) {
+            if (GetClassProperty(this.ConfigValues[i], `Name`) === selection.value) {
                 return i;
             }
         }
         for (var i = 0; i < this.Configs.length; i++) {
-            if (GetClassProperty(this.Configs[i], "Name") !== selection.value)
+            if (GetClassProperty(this.Configs[i], `Name`) !== selection.value)
                 continue;
             var configValue = new this.Configs[i]({
                 Label: this.Label,
@@ -322,9 +322,9 @@ class ConfigOrVariableSelection extends UITemplate {
                 var subConfig = this.GetSubConfig();
                 if(subConfig?.GetValue) {
                     var configValue = subConfig.GetValue();
-                    if(typeof configValue !== "object" )
+                    if(typeof configValue !== `object` )
                         configValue = { Value: configValue };
-                    configValue.Name = GetClassProperty(subConfig, "Name");
+                    configValue.Name = GetClassProperty(subConfig, `Name`);
                     value.Values = [configValue];
                 }
             } else {
@@ -332,9 +332,9 @@ class ConfigOrVariableSelection extends UITemplate {
                 for (var i = 0; i < this.ConfigValues.length; i++) {
                     if (ConfigOrVariableSelection.SaveAll || this.ConfigValues[i].NotDefault) {
                         var configValue = this.ConfigValues[i].GetValue();
-                        if(typeof configValue !== "object" )
+                        if(typeof configValue !== `object` )
                             configValue = { Value: configValue };
-                        configValue.Name = GetClassProperty(this.ConfigValues[i], "Name");
+                        configValue.Name = GetClassProperty(this.ConfigValues[i], `Name`);
                         value.Values.push(configValue);
                     }
                 }
@@ -358,9 +358,9 @@ class ConfigOrVariableSelection extends UITemplate {
         for (var i = 0; i < value.Values.length; i++) {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {
-                if (GetClassProperty(this.ConfigValues[t], "Name") === value.Values[i].Name) {
+                if (GetClassProperty(this.ConfigValues[t], `Name`) === value.Values[i].Name) {
                     var setVal = value.Values[i];
-                    if(typeof this.ConfigValues[t].GetValue() !== "object" )
+                    if(typeof this.ConfigValues[t].GetValue() !== `object` )
                         setVal = setVal.Value;
                     this.ConfigValues[t].SetValue(setVal);
                     found = true;
@@ -369,7 +369,7 @@ class ConfigOrVariableSelection extends UITemplate {
             }
             if (!found && this.Configs) {
                 for (var t = 0; t < this.Configs.length; t++) {
-                    if (GetClassProperty(this.Configs[t], "Name") !== value.Values[i].Name)
+                    if (GetClassProperty(this.Configs[t], `Name`) !== value.Values[i].Name)
                         continue;
                     var configValue = new this.Configs[t]({
                         Label: this.Label,
@@ -377,7 +377,7 @@ class ConfigOrVariableSelection extends UITemplate {
                         MeasurementIndex: this.MeasurementIndex
                     });
                     var setVal = value.Values[i];
-                    if(typeof configValue.GetValue() !== "object" )
+                    if(typeof configValue.GetValue() !== `object` )
                         setVal = setVal.Value;
                     configValue.SetValue(setVal);
                     if(configValue.OnChange)
@@ -411,12 +411,12 @@ class ConfigOrVariableSelection extends UITemplate {
                 const subConfig = this.GetSubConfig();
                 if(subConfig.SetIncrements)
                     subConfig.SetIncrements();
-                if (GetClassProperty(subConfig, "Output")) {
+                if (GetClassProperty(subConfig, `Output`)) {
                     this.Id = Increments.GenerateId()
                     Increments.RegisterVariable(this.Id,
                         this.VariableListName,
                         this.Label,
-                        GetClassProperty(subConfig, "Output"),
+                        GetClassProperty(subConfig, `Output`),
                         this.Measurement
                     )
                 }
@@ -445,7 +445,7 @@ class ConfigOrVariableSelection extends UITemplate {
             return undefined;
 
         if(!selection.reference && this.VariableListName) {
-            if(GetClassProperty(this.GetSubConfig(), "Output"))
+            if(GetClassProperty(this.GetSubConfig(), `Output`))
                 return this.Id;
             return undefined;
         }

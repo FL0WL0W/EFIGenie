@@ -69,184 +69,184 @@ EngineFactoryIDs = {
 
 function GetType(value) {
     if(value == undefined)
-        return "VOID";
-    if(typeof value === "boolean")
-        return "BOOL"
+        return `VOID`;
+    if(typeof value === `boolean`)
+        return `BOOL`
     if(value % 1 !== 0)
-        return "FLOAT";
+        return `FLOAT`;
 
     if(value < 0) {
         if(value < 128 && value > -129)
-            return "INT8";
+            return `INT8`;
         if(value < 32768 && value > -32759)
-            return "INT16";
+            return `INT16`;
         if(value < 2147483648 && value > -2147483649)
-            return "INT32";
+            return `INT32`;
         if(value < 9223372036854775807 && value > -9223372036854775808)
-            return "INT64";
+            return `INT64`;
 
-        throw "number too big";
+        throw `number too big`;
     }
 
     if(value < 128)
-        return "INT8";
+        return `INT8`;
     if(value < 256)
-        return "UINT8";
+        return `UINT8`;
     if(value < 32768)
-        return "INT16";
+        return `INT16`;
     if(value < 65536)
-        return "UINT16";
+        return `UINT16`;
     if(value < 2147483648)
-        return "INT32";
+        return `INT32`;
     if(value < 4294967295)
-        return "UINT32";
+        return `UINT32`;
     if(value < 9223372036854775807)
-        return "INT64";
+        return `INT64`;
     if(value < 18446744073709551615)
-        return "UINT64";
-    throw "number too big";
+        return `UINT64`;
+    throw `number too big`;
 }
 
 function GetTypeId(type) {
     switch(type) {
-        case "VOID": return 0;
-        case "UINT8": return 1;
-        case "UINT16": return 2;
-        case "UINT32": return 3;
-        case "UINT64": return 4;
-        case "INT8": return 5;
-        case "INT16": return 6;
-        case "INT32": return 7;
-        case "INT64": return 8;
-        case "FLOAT": return 9;
-        case "DOUBLE": return 10;
-        case "BOOL": return 11;
+        case `VOID`: return 0;
+        case `UINT8`: return 1;
+        case `UINT16`: return 2;
+        case `UINT32`: return 3;
+        case `UINT64`: return 4;
+        case `INT8`: return 5;
+        case `INT16`: return 6;
+        case `INT32`: return 7;
+        case `INT64`: return 8;
+        case `FLOAT`: return 9;
+        case `DOUBLE`: return 10;
+        case `BOOL`: return 11;
     }
 }
 
 
 PackedTypeAlignment = [
-    { type: "INT8", align: 1 }, 
-    { type: "INT16", align: 1 },
-    { type: "INT32", align: 1 },
-    { type: "INT64", align: 1 },
-    { type: "BOOL", align: 1 }, 
-    { type: "UINT8", align: 1 },
-    { type: "UINT16", align: 1 },
-    { type: "UINT32", align: 1 },
-    { type: "UINT64", align: 1 },
-    { type: "FLOAT", align: 1 },
-    { type: "DOUBLE", align: 1 },
+    { type: `INT8`, align: 1 }, 
+    { type: `INT16`, align: 1 },
+    { type: `INT32`, align: 1 },
+    { type: `INT64`, align: 1 },
+    { type: `BOOL`, align: 1 }, 
+    { type: `UINT8`, align: 1 },
+    { type: `UINT16`, align: 1 },
+    { type: `UINT32`, align: 1 },
+    { type: `UINT64`, align: 1 },
+    { type: `FLOAT`, align: 1 },
+    { type: `DOUBLE`, align: 1 },
 ]
 
 STM32TypeAlignment = [
-    { type: "INT8", align: 1 }, 
-    { type: "INT16", align: 2 },
-    { type: "INT32", align: 4 },
-    { type: "INT64", align: 8 },
-    { type: "BOOL", align: 1 }, 
-    { type: "UINT8", align: 1 },
-    { type: "UINT16", align: 2 },
-    { type: "UINT32", align: 4 },
-    { type: "UINT64", align: 8 },
-    { type: "FLOAT", align: 4 },
-    { type: "DOUBLE", align: 8 },
+    { type: `INT8`, align: 1 }, 
+    { type: `INT16`, align: 2 },
+    { type: `INT32`, align: 4 },
+    { type: `INT64`, align: 8 },
+    { type: `BOOL`, align: 1 }, 
+    { type: `UINT8`, align: 1 },
+    { type: `UINT16`, align: 2 },
+    { type: `UINT32`, align: 4 },
+    { type: `UINT64`, align: 8 },
+    { type: `FLOAT`, align: 4 },
+    { type: `DOUBLE`, align: 8 },
 ]
 
 x86TypeAlignment = [
-    { type: "INT8", align: 1 }, 
-    { type: "INT16", align: 2 },
-    { type: "INT32", align: 4 },
-    { type: "INT64", align: 8 },
-    { type: "BOOL", align: 1 }, 
-    { type: "UINT8", align: 1 },
-    { type: "UINT16", align: 2 },
-    { type: "UINT32", align: 4 },
-    { type: "UINT64", align: 8 },
-    { type: "FLOAT", align: 4 },
-    { type: "DOUBLE", align: 8 },
+    { type: `INT8`, align: 1 }, 
+    { type: `INT16`, align: 2 },
+    { type: `INT32`, align: 4 },
+    { type: `INT64`, align: 8 },
+    { type: `BOOL`, align: 1 }, 
+    { type: `UINT8`, align: 1 },
+    { type: `UINT16`, align: 2 },
+    { type: `UINT32`, align: 4 },
+    { type: `UINT64`, align: 8 },
+    { type: `FLOAT`, align: 4 },
+    { type: `DOUBLE`, align: 8 },
 ]
 
 types = [
-    { type: "INT8", toArrayBuffer: function(val) { return new Int8Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "INT16", toArrayBuffer: function(val) { return new Int16Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "INT32", toArrayBuffer: function(val) { return new Int32Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "INT64", toArrayBuffer: function(val) { return new BigInt64Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "BOOL", toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "UINT8", toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "UINT16", toArrayBuffer: function(val) { return new Uint16Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "UINT32", toArrayBuffer: function(val) { return new Uint32Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "UINT64", toArrayBuffer: function(val) { return new BigUint64Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "FLOAT", toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "DOUBLE", toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: "Operation_StaticVariable", toObj(val) {
+    { type: `INT8`, toArrayBuffer: function(val) { return new Int8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `INT16`, toArrayBuffer: function(val) { return new Int16Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `INT32`, toArrayBuffer: function(val) { return new Int32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `INT64`, toArrayBuffer: function(val) { return new BigInt64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `BOOL`, toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `UINT8`, toArrayBuffer: function(val) { return new Uint8Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `UINT16`, toArrayBuffer: function(val) { return new Uint16Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `UINT32`, toArrayBuffer: function(val) { return new Uint32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `UINT64`, toArrayBuffer: function(val) { return new BigUint64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `FLOAT`, toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `DOUBLE`, toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
+    { type: `Operation_StaticVariable`, toObj(val) {
         obj = { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
         ]};
 
         var type = GetType(val);
         var typeID = GetTypeId(type);
         
         obj.value.push(
-            { type: "UINT8", value: typeID }, //typeid
+            { type: `UINT8`, value: typeID }, //typeid
             { type: type, value: val } //val
         );
 
         return obj;
     }},
-    { type: "Operation_Add", toObj(val) {
+    { type: `Operation_Add`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add },
         ]};
     }},
-    { type: "Operation_Subtract", toObj(val) {
+    { type: `Operation_Subtract`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract },
         ]};
     }},
-    { type: "Operation_Multiply", toObj(val) {
+    { type: `Operation_Multiply`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply },
         ]};
     }},
-    { type: "Operation_Divide", toObj(val) {
+    { type: `Operation_Divide`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide },
         ]};
     }},
-    { type: "Operation_And", toObj(val) {
+    { type: `Operation_And`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And },
         ]};
     }},
-    { type: "Operation_Or", toObj(val) {
+    { type: `Operation_Or`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or },
         ]};
     }},
-    { type: "Operation_GreaterThan", toObj(val) {
+    { type: `Operation_GreaterThan`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan },
         ]};
     }},
-    { type: "Operation_LessThan", toObj(val) {
+    { type: `Operation_LessThan`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan },
         ]};
     }},
-    { type: "Operation_Equal", toObj(val) {
+    { type: `Operation_Equal`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal },
         ]};
     }},
-    { type: "Operation_GreaterThanOrEqual", toObj(val) {
+    { type: `Operation_GreaterThanOrEqual`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual },
         ]};
     }},
-    { type: "Operation_LessThanOrEqual", toObj(val) {
+    { type: `Operation_LessThanOrEqual`, toObj(val) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual },
         ]};
     }}
 ]
@@ -259,7 +259,7 @@ for(var index in STM32TypeAlignment) {
 }
 
 class ConfigTop extends UITemplate {
-    static Template = getFileContents("ConfigGui/Top.html");
+    static Template = getFileContents(`ConfigGui/Top.html`);
 
     constructor(prop){
         prop ??= {};
@@ -275,7 +275,7 @@ class ConfigTop extends UITemplate {
         DetachPasteOptions();
         Increments.Reset();//this is top level object so reset increments. this is not elegant
 
-        $(document).off("click."+this.GUID);
+        $(document).off(`click.${this.GUID}`);
     }
 
     Attach() {
@@ -284,94 +284,94 @@ class ConfigTop extends UITemplate {
         this.SetIncrements();//this is top level object so set increments. this is not elegant
 
         var thisClass = this;
-        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-open", function(){
-            var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
-            var containerSelector = $("#" + thisClass.GUID + "-container");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){
+            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
+            var containerSelector = $(`#${thisClass.GUID}-container`);
             var width = sidebarSelector.width();
             var moveamount = 0.005 * width / 0.1;
             var left = containerSelector.position().left;
             sidebarSelector.show();
-            sidebarSelector.css("left", (left-width) + "px");
+            sidebarSelector.css(`left`, `${left-width}px`);
             var intervalId = setInterval(function() {
                 if (left >= width) {
                     clearInterval(intervalId);
                 } else {
                     left += moveamount;
-                    containerSelector.css("left", left + "px");
-                    containerSelector.css("margin-right", left + "px");
-                    sidebarSelector.css("left", (left-width) + "px");
-                    sidebarSelector.css('opacity', left / width);
+                    containerSelector.css(`left`, `${left}px`);
+                    containerSelector.css(`margin-right`, `${left}px`);
+                    sidebarSelector.css(`left`, `${left-width}px`);
+                    sidebarSelector.css(`opacity`, left / width);
                 }
             }, 5);
-            $("#" + thisClass.GUID + "-sidebar-open").hide();
+            $(`#${thisClass.GUID}-sidebar-open`).hide();
         });
 
-        $(document).on("click." + this.GUID, "#" + this.GUID + "-sidebar-close", function(){
-            var sidebarSelector = $("#" + thisClass.GUID + "-sidebar");
-            var containerSelector = $("#" + thisClass.GUID + "-container");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-close`, function(){
+            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
+            var containerSelector = $(`#${thisClass.GUID}-container`);
             var width = sidebarSelector.width();
             var moveamount = 0.005 * width / 0.1;
             var left = containerSelector.position().left;
-            sidebarSelector.css("left", (left-width) + "px");
+            sidebarSelector.css(`left`, `${left-width}px`);
             var intervalId = setInterval(function() {
                 if (left <= 0) {
                     clearInterval(intervalId);
                     sidebarSelector.hide();
                 } else {
                     left -= moveamount;
-                    containerSelector.css("left", left + "px");
-                    containerSelector.css("margin-right", left + "px");
-                    sidebarSelector.css("left", (left-width) + "px");
-                    sidebarSelector.css('opacity', left / width);
+                    containerSelector.css(`left`, `${left}px`);
+                    containerSelector.css(`margin-right`, `${left}px`);
+                    sidebarSelector.css(`left`, `${left-width}px`);
+                    sidebarSelector.css(`opacity`, left / width);
                 }
             }, 5);
-            $("#" + thisClass.GUID + "-sidebar-open").show();
+            $(`#${thisClass.GUID}-sidebar-open`).show();
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-inputstab, #" + this.GUID + "-inputstablist", function(e){
-            if($(e.target).hasClass("expand")) {
-                if( $("#" + thisClass.GUID + "-inputstablist").is(":visible")) {
-                    $(e.target).html("►&nbsp;");
-                    $("#" + thisClass.GUID + "-inputstablist").hide();
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-inputstab, #${this.GUID}-inputstablist`, function(e){
+            if($(e.target).hasClass(`expand`)) {
+                if( $(`#${thisClass.GUID}-inputstablist`).is(`:visible`)) {
+                    $(e.target).html(`►&nbsp;`);
+                    $(`#${thisClass.GUID}-inputstablist`).hide();
                 } else {
-                    $(e.target).html("▼&nbsp;");
-                    $("#" + thisClass.GUID + "-inputstablist").show();
+                    $(e.target).html(`▼&nbsp;`);
+                    $(`#${thisClass.GUID}-inputstablist`).show();
                 }
             } else {
-                $("." + thisClass.GUID + "-content").hide();
-                $("#" + thisClass.GUID + "-inputs").show();
-                $("#" + thisClass.GUID + "-inputstab .w3-right").show();
-                $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
-                $("#" + thisClass.GUID + "-inputstab").addClass("active");
-                $("#" + thisClass.GUID + "-title").html("Inputs");
+                $(`.${thisClass.GUID}-content`).hide();
+                $(`#${thisClass.GUID}-inputs`).show();
+                $(`#${thisClass.GUID}-inputstab .w3-right`).show();
+                $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
+                $(`#${thisClass.GUID}-inputstab`).addClass(`active`);
+                $(`#${thisClass.GUID}-title`).html(`Inputs`);
             }
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-enginetab", function(){
-            $("." + thisClass.GUID + "-content").hide();
-            $("#" + thisClass.GUID + "-engine").show();
-            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
-            $("#" + thisClass.GUID + "-enginetab").addClass("active");
-            $("#" + thisClass.GUID + "-title").html("Engine");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-enginetab`, function(){
+            $(`.${thisClass.GUID}-content`).hide();
+            $(`#${thisClass.GUID}-engine`).show();
+            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
+            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
+            $(`#${thisClass.GUID}-enginetab`).addClass(`active`);
+            $(`#${thisClass.GUID}-title`).html(`Engine`);
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-fueltab", function(){
-            $("." + thisClass.GUID + "-content").hide();
-            $("#" + thisClass.GUID + "-fuel").show();
-            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
-            $("#" + thisClass.GUID + "-fueltab").addClass("active");
-            $("#" + thisClass.GUID + "-title").html("Fuel");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-fueltab`, function(){
+            $(`.${thisClass.GUID}-content`).hide();
+            $(`#${thisClass.GUID}-fuel`).show();
+            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
+            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
+            $(`#${thisClass.GUID}-fueltab`).addClass(`active`);
+            $(`#${thisClass.GUID}-title`).html(`Fuel`);
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-ignitiontab", function(){
-            $("." + thisClass.GUID + "-content").hide();
-            $("#" + thisClass.GUID + "-ignition").show();
-            $("#" + thisClass.GUID + "-inputstab .w3-right").hide();
-            $("#" + thisClass.GUID + "-sidebar .w3-bar-item").removeClass("active");
-            $("#" + thisClass.GUID + "-ignitiontab").addClass("active");
-            $("#" + thisClass.GUID + "-title").html("Ignition");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-ignitiontab`, function(){
+            $(`.${thisClass.GUID}-content`).hide();
+            $(`#${thisClass.GUID}-ignition`).show();
+            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
+            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
+            $(`#${thisClass.GUID}-ignitiontab`).addClass(`active`);
+            $(`#${thisClass.GUID}-title`).html(`Ignition`);
         });
     }
 
@@ -381,10 +381,10 @@ class ConfigTop extends UITemplate {
         template = template.replace(/[%]inputstablist[%]/g, this.Inputs.GetInputsHtml());
         template = template.replace(/[%]inputstabcontrols[%]/g, this.Inputs.GetControlsHtml());
 
-        template = template.replace(/[%]inputsstyle[%]/g, "");
-        template = template.replace(/[%]fuelstyle[%]/g, " style=\"display: none;\"");
-        template = template.replace(/[%]enginestyle[%]/g, " style=\"display: none;\"");
-        template = template.replace(/[%]ignitionstyle[%]/g, " style=\"display: none;\"");
+        template = template.replace(/[%]inputsstyle[%]/g, ``);
+        template = template.replace(/[%]fuelstyle[%]/g, ` style="display: none;"`);
+        template = template.replace(/[%]enginestyle[%]/g, ` style="display: none;"`);
+        template = template.replace(/[%]ignitionstyle[%]/g, ` style="display: none;"`);
 
         return template;
     }
@@ -402,34 +402,34 @@ class ConfigTop extends UITemplate {
 
     GetObjOperation() {
         return { value: [
-            { type: "UINT32", value: 0}, //signal last operation
+            { type: `UINT32`, value: 0}, //signal last operation
 
             //inputs
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: 2 }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 2 }, // number of operations
             { obj: this.Inputs.GetObjOperation()}, 
             { obj: this.Engine.GetObjOperation()}, 
 
             //preSync
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: 0 }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 0 }, // number of operations
 
             //sync condition
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: 2 }, // number of operations
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: "Operation_StaticVariable", value: false}, //bool
-            { type: "UINT32", value: -1 }, //store in static value variable
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 2 }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+            { type: `Operation_StaticVariable`, value: false}, //bool
+            { type: `UINT32`, value: -1 }, //store in static value variable
 
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: "Operation_Or"}, //OR
-            { type: "UINT32", value: 0 }, //return this result
-            { type: "UINT32", value: Increments.EngineSyncedId }, //bool
-            { type: "UINT32", value: -1 }, //use static value variable
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+            { type: `Operation_Or`}, //OR
+            { type: `UINT32`, value: 0 }, //return this result
+            { type: `UINT32`, value: Increments.EngineSyncedId }, //bool
+            { type: `UINT32`, value: -1 }, //use static value variable
 
             //main loop execute
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: 2 }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 2 }, // number of operations
             { obj: this.Fuel.GetObjOperation()}, 
             { obj: this.Ignition.GetObjOperation()}, 
         ]};
@@ -437,41 +437,41 @@ class ConfigTop extends UITemplate {
 }
 
 class ConfigFuel extends UITemplate {
-    static Template =   getFileContents("ConfigGui/Fuel.html");
+    static Template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
         prop ??= {};
         prop.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            AFRConfigs,
-            Label:              "Air Fuel Ratio",
-            Measurement:        "Ratio",
-            VariableListName:   "FuelParameters"
+            Label:              `Air Fuel Ratio`,
+            Measurement:        `Ratio`,
+            VariableListName:   `FuelParameters`
         });
         prop.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorEnableConfigs,
-            Label:              "Injector Enable",
-            Measurement:        "Bool",
-            VariableListName:   "FuelParameters"
+            Label:              `Injector Enable`,
+            Measurement:        `Bool`,
+            VariableListName:   `FuelParameters`
         });
         prop.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
-            Label:              "Injector Pulse Width",
-            Measurement:        "Time",
-            VariableListName:   "FuelParameters",
+            Label:              `Injector Pulse Width`,
+            Measurement:        `Time`,
+            VariableListName:   `FuelParameters`,
             MeasurementIndex: 1
         });
         prop.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              "Injector End Position(BTDC)",
-            Measurement:        "Angle",
-            VariableListName:   "FuelParameters"
+            Label:              `Injector End Position(BTDC)`,
+            Measurement:        `Angle`,
+            VariableListName:   `FuelParameters`
         });
         prop.Outputs = [];
         for(var i = 0; i < 8; i++){
             prop.Outputs[i] = new ConfigTDCOutput({
                 Configs:        BooleanOutputConfigs,
-                Label:          "Injector " + (i+1),
-                Measurement:    "No Measurement"
+                Label:          `Injector ${i+1}`,
+                Measurement:    `No Measurement`
             });
         }
         super(prop);
@@ -496,8 +496,8 @@ class ConfigFuel extends UITemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:        BooleanOutputConfigs,
-                        Label:          "Injector " + (i+1),
-                        Measurement:    "No Measurement"
+                        Label:          `Injector ${i+1}`,
+                        Measurement:    `No Measurement`
                     });
                 this.Outputs[i].SetValue(value.Outputs[i])
             }
@@ -515,10 +515,10 @@ class ConfigFuel extends UITemplate {
 
         Increments.FuelParameters ??= [];
         Increments.FuelParameters.push({ 
-            Name:           "Cylinder Fuel Mass", 
+            Name:           `Cylinder Fuel Mass`, 
             Id:             this.CylinderFuelMassId,
-            Type:           "float",
-            Measurement:    "Mass"
+            Type:           `float`,
+            Measurement:    `Mass`
         });
 
         this.InjectorEnableConfigOrVariableSelection.SetIncrements();
@@ -531,7 +531,7 @@ class ConfigFuel extends UITemplate {
 
     GetObjOperation() {
         if(this.CylinderFuelMassId === -1)
-            throw "Set Increments First";
+            throw `Set Increments First`;
 
         var numberOfOperations = 1 + this.Outputs.length;
         if(!this.AFRConfigOrVariableSelection.IsVariable())
@@ -545,31 +545,31 @@ class ConfigFuel extends UITemplate {
 
         var obj = { 
         types : [
-            { type: "Operation_EngineScheduleInjection", toObj(val) {
+            { type: `Operation_EngineScheduleInjection`, toObj(val) {
                 return { value: [
-                    { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-                    { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                    { type: "FLOAT", value: val.TDC.Value }, //tdc
+                    { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
+                    { type: `FLOAT`, value: val.TDC.Value }, //tdc
                     { obj: val.GetObjOperation()}, 
-                    { type: "UINT32", value: -1 }, //store returns at -1
-                    { type: "UINT32", value: -1 }, //store returns at -1
-                    { type: "UINT32", value: Increments.EnginePositionId },
-                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Enable").Id },
-                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector Pulse Width").Id },
-                    { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Injector End Position(BTDC)").Id },
+                    { type: `UINT32`, value: -1 }, //store returns at -1
+                    { type: `UINT32`, value: -1 }, //store returns at -1
+                    { type: `UINT32`, value: Increments.EnginePositionId },
+                    { type: `UINT32`, value: Increments.FuelParameters.find(a => a.Name === `Injector Enable`).Id },
+                    { type: `UINT32`, value: Increments.FuelParameters.find(a => a.Name === `Injector Pulse Width`).Id },
+                    { type: `UINT32`, value: Increments.FuelParameters.find(a => a.Name === `Injector End Position(BTDC)`).Id },
                 ]};
             }}],
         value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: numberOfOperations }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: numberOfOperations }, // number of operations
 
             { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
 
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-            { type: "Operation_Divide"}, //Divide
-            { type: "UINT32", value: this.CylinderFuelMassId }, //Cylinder Fuel Mass ID
-            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Mass").Id },
-            { type: "UINT32", value: this.AFRConfigOrVariableSelection.GetVariableId()}, 
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+            { type: `Operation_Divide`}, //Divide
+            { type: `UINT32`, value: this.CylinderFuelMassId }, //Cylinder Fuel Mass ID
+            { type: `UINT32`, value: Increments.EngineParameters.find(a => a.Name === `Cylinder Air Mass`).Id },
+            { type: `UINT32`, value: this.AFRConfigOrVariableSelection.GetVariableId()}, 
 
             { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
             { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
@@ -577,7 +577,7 @@ class ConfigFuel extends UITemplate {
         ]};
 
         for(var i = 0; i < this.Outputs.length; i++) {
-            obj.value.push({ type: "Operation_EngineScheduleInjection", value: this.Outputs[i] });
+            obj.value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs[i] });
         }
 
         return obj;
@@ -585,42 +585,42 @@ class ConfigFuel extends UITemplate {
 }
 
 class ConfigIgnition extends UITemplate {
-    static Template = getFileContents("ConfigGui/Ignition.html");
+    static Template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
         prop ??= {};
         prop.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
-            Label:              "Ignition Enable",
-            Measurement:        "Bool",
-            VariableListName:   "IgnitionParameters"
+            Label:              `Ignition Enable`,
+            Measurement:        `Bool`,
+            VariableListName:   `IgnitionParameters`
         });
         prop.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
-            Label:              "Ignition Advance",
-            Measurement:        "Angle",
-            VariableListName:   "IgnitionParameters"
+            Label:              `Ignition Advance`,
+            Measurement:        `Angle`,
+            VariableListName:   `IgnitionParameters`
         });
         prop.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              "Ignition Dwell",
-            Measurement:        "Time",
-            VariableListName:   "IgnitionParameters",
+            Label:              `Ignition Dwell`,
+            Measurement:        `Time`,
+            VariableListName:   `IgnitionParameters`,
             MeasurementIndex: 1
         });
         prop.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              "Ignition Dwell Deviation",
-            Measurement:        "Time",
-            VariableListName:   "IgnitionParameters",
+            Label:              `Ignition Dwell Deviation`,
+            Measurement:        `Time`,
+            VariableListName:   `IgnitionParameters`,
             MeasurementIndex: 1
         });
         prop.Outputs = [];
         for(var i = 0; i < 8; i++){
             prop.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
-                Label:              "Ignition " + (i+1),
-                Measurement:        "No Measurement"
+                Label:              `Ignition ${i+1}`,
+                Measurement:        `No Measurement`
             });
         }
         super(prop);
@@ -643,8 +643,8 @@ class ConfigIgnition extends UITemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
-                        Label:              "Ignition " + (i+1),
-                        Measurement:        "No Measurement"
+                        Label:              `Ignition ${i+1}`,
+                        Measurement:        `No Measurement`
                     });
                 this.Outputs[i].SetValue(value.Outputs[i])
             }
@@ -677,24 +677,24 @@ class ConfigIgnition extends UITemplate {
 
         var obj  = { 
         types : [
-            { type: "Operation_EngineScheduleIgnition", toObj(val) {
+            { type: `Operation_EngineScheduleIgnition`, toObj(val) {
                 return { value: [
-                    { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
-                    { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
-                    { type: "FLOAT", value: val.TDC.Value }, //tdc
+                    { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
+                    { type: `FLOAT`, value: val.TDC.Value }, //tdc
                     { obj: val.GetObjOperation()}, 
-                    { type: "UINT32", value: -1 }, //store returns at -1
-                    { type: "UINT32", value: -1 }, //store returns at -1
-                    { type: "UINT32", value: Increments.EnginePositionId },
-                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Enable").Id },
-                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell").Id },
-                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Advance").Id },
-                    { type: "UINT32", value: Increments.IgnitionParameters.find(a => a.Name === "Ignition Dwell Deviation").Id },
+                    { type: `UINT32`, value: -1 }, //store returns at -1
+                    { type: `UINT32`, value: -1 }, //store returns at -1
+                    { type: `UINT32`, value: Increments.EnginePositionId },
+                    { type: `UINT32`, value: Increments.IgnitionParameters.find(a => a.Name === `Ignition Enable`).Id },
+                    { type: `UINT32`, value: Increments.IgnitionParameters.find(a => a.Name === `Ignition Dwell`).Id },
+                    { type: `UINT32`, value: Increments.IgnitionParameters.find(a => a.Name === `Ignition Advance`).Id },
+                    { type: `UINT32`, value: Increments.IgnitionParameters.find(a => a.Name === `Ignition Dwell Deviation`).Id },
                 ]};
             }}],
         value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: numberOfOperations }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: numberOfOperations }, // number of operations
 
             { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjOperation()}, 
             { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation()}, 
@@ -703,7 +703,7 @@ class ConfigIgnition extends UITemplate {
         ]};
 
         for(var i = 0; i < this.Outputs.length; i++) {
-            obj.value.push({ type: "Operation_EngineScheduleIgnition", value: this.Outputs[i] });
+            obj.value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs[i] });
         }
 
         return obj;
@@ -711,45 +711,45 @@ class ConfigIgnition extends UITemplate {
 }
 
 class ConfigEngine extends UITemplate {
-    static Template = getFileContents("ConfigGui/Engine.html");
+    static Template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
         prop ??= {};
         prop.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
-            Label:              "Crank Position",
-            Measurement:        "ReluctorResult",
-            VariableListName:   "EngineParameters"
+            Label:              `Crank Position`,
+            Measurement:        `ReluctorResult`,
+            VariableListName:   `EngineParameters`
         });
         prop.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            undefined,
-            Label:              "Cam Position",
-            Measurement:        "ReluctorResult",
-            VariableListName:   "EngineParameters"
+            Label:              `Cam Position`,
+            Measurement:        `ReluctorResult`,
+            VariableListName:   `EngineParameters`
         });
         prop.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
-            Label:              "Cylinder Air Mass",
-            Measurement:        "Mass",
-            VariableListName:   "EngineParameters"
+            Label:              `Cylinder Air Mass`,
+            Measurement:        `Mass`,
+            VariableListName:   `EngineParameters`
         });
         prop.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
-            Label:              "Cylinder Air Temperature",
-            Measurement:        "Temperature",
-            VariableListName:   "EngineParameters"
+            Label:              `Cylinder Air Temperature`,
+            Measurement:        `Temperature`,
+            VariableListName:   `EngineParameters`
         });
         prop.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
-            Label:              "Manifold Absolute Pressure",
-            Measurement:        "Pressure",
-            VariableListName:   "EngineParameters"
+            Label:              `Manifold Absolute Pressure`,
+            Measurement:        `Pressure`,
+            VariableListName:   `EngineParameters`
         });
         prop.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
-            Label:              "Volumetric Efficiency",
-            Measurement:        "Percentage",
-            VariableListName:   "EngineParameters"
+            Label:              `Volumetric Efficiency`,
+            Measurement:        `Percentage`,
+            VariableListName:   `EngineParameters`
         });
         super(prop);
     }
@@ -770,33 +770,33 @@ class ConfigEngine extends UITemplate {
 
         Increments.EngineParameters ??= [];
         Increments.EngineParameters.push({ 
-            Name:           "Engine Speed", 
+            Name:           `Engine Speed`, 
             Id:             this.EngineRPMId,
-            Type:           "float",
-            Measurement:    "AngularSpeed"
+            Type:           `float`,
+            Measurement:    `AngularSpeed`
         });
 
         var requirements = [];
 
         if(!this.CylinderAirmassConfigOrVariableSelection.Selection?.reference) {
-            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), "Requirements");
+            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
         }
 
-        if(requirements?.indexOf("Manifold Absolute Pressure") > -1) {
+        if(requirements?.indexOf(`Manifold Absolute Pressure`) > -1) {
             this.ManifoldAbsolutePressureConfigOrVariableSelection.Show();
             this.ManifoldAbsolutePressureConfigOrVariableSelection.SetIncrements();
         } else {
             this.ManifoldAbsolutePressureConfigOrVariableSelection.Hide();
         }
         
-        if(requirements?.indexOf("Cylinder Air Temperature") > -1) {
+        if(requirements?.indexOf(`Cylinder Air Temperature`) > -1) {
             this.CylinderAirTemperatureConfigOrVariableSelection.Show();
             this.CylinderAirTemperatureConfigOrVariableSelection.SetIncrements();
         } else {
             this.CylinderAirTemperatureConfigOrVariableSelection.Hide();
         }
 
-        if(requirements?.indexOf("Volumetric Efficiency") > -1) {
+        if(requirements?.indexOf(`Volumetric Efficiency`) > -1) {
             this.VolumetricEfficiencyConfigOrVariableSelection.Show();
             this.VolumetricEfficiencyConfigOrVariableSelection.SetIncrements();
         } else {
@@ -808,16 +808,16 @@ class ConfigEngine extends UITemplate {
 
     GetObjOperation() {
         if(this.EnginePositionId === -1 || this.EngineSequentialId === -1 || this.EngineSyncedId === -1 || this.EngineRPMId === -1)
-            throw "Set Increments First";
+            throw `Set Increments First`;
 
         var mapRequired = false;
         var catRequired = false;
         var veRequired  = false;
         if(!this.CylinderAirmassConfigOrVariableSelection.Selection?.reference) {
-            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), "Requirements");
-            mapRequired = requirements && requirements.indexOf("Manifold Absolute Pressure") > -1;
-            catRequired = requirements && requirements.indexOf("Cylinder Air Temperature") > -1
-            veRequired = requirements && requirements.indexOf("Volumetric Efficiency") > -1;
+            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
+            mapRequired = requirements && requirements.indexOf(`Manifold Absolute Pressure`) > -1;
+            catRequired = requirements && requirements.indexOf(`Cylinder Air Temperature`) > -1
+            veRequired = requirements && requirements.indexOf(`Volumetric Efficiency`) > -1;
         }
 
         var numberOfOperations = 2;
@@ -837,27 +837,27 @@ class ConfigEngine extends UITemplate {
 
 
         var obj = { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: numberOfOperations }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: numberOfOperations }, // number of operations
 
             { obj: this.CrankPositionConfigOrVariableSelection.GetObjOperation() },
 
             { obj: this.CamPositionConfigOrVariableSelection.GetObjOperation() },
 
             //CalculateEnginePosition
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-            { type: "UINT32", value: this.EnginePositionId },  //EnginePositionId
-            { type: "UINT32", value: this.CrankPositionConfigOrVariableSelection.GetVariableId() },  //CrankPositionId
-            { type: "UINT32", value: this.CamPositionConfigOrVariableSelection.GetVariableId() },  //CamPositionId
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
+            { type: `UINT32`, value: this.EnginePositionId },  //EnginePositionId
+            { type: `UINT32`, value: this.CrankPositionConfigOrVariableSelection.GetVariableId() },  //CrankPositionId
+            { type: `UINT32`, value: this.CamPositionConfigOrVariableSelection.GetVariableId() },  //CamPositionId
 
             //EngineParameters
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
-            { type: "UINT32", value: this.EngineRPMId },  //EngineRPMId
-            { type: "UINT32", value: this.EngineSequentialId },  //EngineSequentialId
-            { type: "UINT32", value: this.EngineSyncedId },  //EngineSyncedId
-            { type: "UINT32", value: this.EnginePositionId }, //EnginePositionId
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
+            { type: `UINT32`, value: this.EngineRPMId },  //EngineRPMId
+            { type: `UINT32`, value: this.EngineSequentialId },  //EngineSequentialId
+            { type: `UINT32`, value: this.EngineSyncedId },  //EngineSyncedId
+            { type: `UINT32`, value: this.EnginePositionId }, //EnginePositionId
         ]};
 
         
@@ -880,11 +880,11 @@ class ConfigEngine extends UITemplate {
 }
 
 class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
-    static Name = "Speed Density";
-    static Measurement = "Mass";
-    static Output = "float";
-    static Requirements = ["Cylinder Air Temperature", "Manifold Absolute Pressure", "Volumetric Efficiency"];
-    static Template = "<div><label for=\"$CylinderVolume.GUID$\">Cylinder Volume:</label>$CylinderVolume$</div>";
+    static Name = `Speed Density`;
+    static Measurement = `Mass`;
+    static Output = `float`;
+    static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`];
+    static Template = `<div><label for="$CylinderVolume.GUID$">Cylinder Volume:</label>$CylinderVolume$</div>`;
 
     constructor(prop) {
         prop ??= {};
@@ -892,7 +892,7 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
             Value:          0.66594,
             Step:           0.001,
             Min:            0.001,
-            Measurement:    "Volume",
+            Measurement:    `Volume`,
             MeasurementIndex: 1
         });
         super(prop);
@@ -900,45 +900,45 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
 
     GetObjOperation(outputVariableId) {
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD }, //factory ID
-            { type: "FLOAT", value: this.CylinderVolume.Value }, //Cylinder Volume
-            { type: "UINT32", value: outputVariableId ?? 0 },
-            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Cylinder Air Temperature").Id },
-            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Manifold Absolute Pressure").Id },
-            { type: "UINT32", value: Increments.EngineParameters.find(a => a.Name === "Volumetric Efficiency").Id },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD }, //factory ID
+            { type: `FLOAT`, value: this.CylinderVolume.Value }, //Cylinder Volume
+            { type: `UINT32`, value: outputVariableId ?? 0 },
+            { type: `UINT32`, value: Increments.EngineParameters.find(a => a.Name === `Cylinder Air Temperature`).Id },
+            { type: `UINT32`, value: Increments.EngineParameters.find(a => a.Name === `Manifold Absolute Pressure`).Id },
+            { type: `UINT32`, value: Increments.EngineParameters.find(a => a.Name === `Volumetric Efficiency`).Id },
         ]};
     }
 }
 CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
 
 class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
-    static Name = "Dead Time";
-    static Output = "float";
-    static Measurement = "Time";
-    static Template =   "<div>$FlowRateConfigOrVariableSelection$</div>" +
-                        "<div>$DeadTimeConfigOrVariableSelection$</div>" +
-                        "<div><label for=\"$MinInjectorFuelMass.GUID$\">Min Injector Fuel Mass:</label>$MinInjectorFuelMass$</div>";
+    static Name = `Dead Time`;
+    static Output = `float`;
+    static Measurement = `Time`;
+    static Template =   `<div>$FlowRateConfigOrVariableSelection$</div>` +
+                        `<div>$DeadTimeConfigOrVariableSelection$</div>` +
+                        `<div><label for="$MinInjectorFuelMass.GUID$">Min Injector Fuel Mass:</label>$MinInjectorFuelMass$</div>`;
 
     constructor(prop) {
         prop ??= {};
         prop.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              "Injector Flow Rate",
-            Measurement:        "MassFlow",
-            VariableListName:   "FuelParameters"
+            Label:              `Injector Flow Rate`,
+            Measurement:        `MassFlow`,
+            VariableListName:   `FuelParameters`
         });
         prop.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              "Injector Dead Time",
-            Measurement:        "Time",
-            VariableListName:   "FuelParameters",
+            Label:              `Injector Dead Time`,
+            Measurement:        `Time`,
+            VariableListName:   `FuelParameters`,
             MeasurementIndex: 1
         });
         prop.MinInjectorFuelMass = new UINumberWithMeasurement({
             Value:          0.005,
             Step:           0.001,
-            Measurement:    "Mass",
+            Measurement:    `Mass`,
             MeasurementIndex: 1
         });
         super(prop);
@@ -957,39 +957,39 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             numberOfOperations++;
 
         return { value: [
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: "UINT16", value: numberOfOperations }, // number of operations
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: numberOfOperations }, // number of operations
 
             { obj: this.FlowRateConfigOrVariableSelection.GetObjOperation()},
             { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
             
             //Store a value of 2 into the temporary variable (-1) which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "Operation_StaticVariable", value: 2 }, //static value of 2
-            { type: "UINT32", value: -1 }, //store in variable id -1
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `Operation_StaticVariable`, value: 2 }, //static value of 2
+            { type: `UINT32`, value: -1 }, //store in variable id -1
             
             //Subtract 1 to temporary variable (-1) if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "Operation_Subtract" }, //Subtract
-            { type: "UINT32", value: -1 }, //store in variable id -1
-            { type: "UINT32", value: -1 }, //first parameter variable id -1
-            { type: "UINT32", value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `Operation_Subtract` }, //Subtract
+            { type: `UINT32`, value: -1 }, //store in variable id -1
+            { type: `UINT32`, value: -1 }, //first parameter variable id -1
+            { type: `UINT32`, value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
 
-            { type: "UINT32", value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: "UINT32", value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-            { type: "FLOAT", value: this.MinInjectorFuelMass.Value },
-            { type: "UINT32", value: outputVariableId ?? 0 },
-            { type: "UINT32", value: -1 }, //first parameter variable id -1
-            { type: "UINT32", value: Increments.FuelParameters.find(a => a.Name === "Cylinder Fuel Mass").Id },
-            { type: "UINT32", value: this.FlowRateConfigOrVariableSelection.GetVariableId() },
-            { type: "UINT32", value: this.DeadTimeConfigOrVariableSelection.GetVariableId() },
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+            { type: `FLOAT`, value: this.MinInjectorFuelMass.Value },
+            { type: `UINT32`, value: outputVariableId ?? 0 },
+            { type: `UINT32`, value: -1 }, //first parameter variable id -1
+            { type: `UINT32`, value: Increments.FuelParameters.find(a => a.Name === `Cylinder Fuel Mass`).Id },
+            { type: `UINT32`, value: this.FlowRateConfigOrVariableSelection.GetVariableId() },
+            { type: `UINT32`, value: this.DeadTimeConfigOrVariableSelection.GetVariableId() },
         ]};
     }
 }
 InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
 
 class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template = "<div><label for=\"$TDC.GUID$\"><div style=\"display: inline-block;\">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>";
+    static Template = `<div><label for="$TDC.GUID$"><div style="display: inline-block;">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>`;
 
     constructor(prop) {
         prop ??= {};

@@ -23,12 +23,12 @@ class UITemplate {
         var value;
         var baseObjName;
         var objectsInElements = 0;
-        var name = GetClassProperty(this, "Name");
+        var name = GetClassProperty(this, `Name`);
 
         //grab baseObjName and count number of objects in element values
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.GetValue && typeof element?.GetValue() === "object" && element?.BaseObj) {
+            if(element?.GetValue && typeof element?.GetValue() === `object` && element?.BaseObj) {
                 objectsInElements++;
                 baseObjName = elementname;
             }
@@ -55,7 +55,7 @@ class UITemplate {
 
         if(baseObjName) {
             value = this[baseObjName].GetValue();
-            value.Name = GetClassProperty(this, "Name");
+            value.Name = GetClassProperty(this, `Name`);
         } else {
             value = {};
         }
@@ -78,7 +78,7 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(!baseObjName && element?.GetValue && typeof element?.GetValue() === "object" && element?.BaseObj) {
+            if(!baseObjName && element?.GetValue && typeof element?.GetValue() === `object` && element?.BaseObj) {
                 baseObjName = elementname;
             }
         });
@@ -133,31 +133,31 @@ class UITemplate {
     }
 
     GetHtml(){
-        var html = GetClassProperty(this, "Template");
+        var html = GetClassProperty(this, `Template`);
         if(html === undefined)
-            return "";
+            return ``;
 
         const thisClass = this;
         var matches;
         while((matches = html.match(/[$].*?[$]/g)) !== null) {
             matches.forEach(templateIdentifier => {
                 function GetTemplateReplacement(obj, templateIdentifier) {
-                    const subReplacer = templateIdentifier.indexOf(".") > -1;
-                    const templateReplacer = GetClassProperty(obj, subReplacer? templateIdentifier.substring(0, templateIdentifier.indexOf(".")) : templateIdentifier);
+                    const subReplacer = templateIdentifier.indexOf(`.`) > -1;
+                    const templateReplacer = GetClassProperty(obj, subReplacer? templateIdentifier.substring(0, templateIdentifier.indexOf(`.`)) : templateIdentifier);
     
                     if(templateReplacer !== undefined) {
-                        if(typeof templateReplacer === "object") {
+                        if(typeof templateReplacer === `object`) {
                             if(subReplacer) {
-                                return GetTemplateReplacement(templateReplacer, templateIdentifier.substring(templateIdentifier.indexOf(".") + 1));
+                                return GetTemplateReplacement(templateReplacer, templateIdentifier.substring(templateIdentifier.indexOf(`.`) + 1));
                             }
                             if(templateReplacer.GetHtml) {
                                 return templateReplacer.GetHtml();
                             }
                             //can display arrays but cannot get/set value of arrays
                             if(Array.isArray(templateReplacer)) {
-                                var replacement = "";
+                                var replacement = ``;
                                 for(var i = 0; i < templateReplacer.length; i++) {
-                                    replacement += GetTemplateReplacement(templateReplacer, "" + i);
+                                    replacement += GetTemplateReplacement(templateReplacer, `${i}`);
                                 }
                                 return replacement;
                             }
@@ -165,26 +165,26 @@ class UITemplate {
                         }
                         return templateReplacer;
                     }
-                    return "";
+                    return ``;
                 }
                 templateIdentifier = templateIdentifier.substring(1, templateIdentifier.length -1);
                 var templateReplacement = GetTemplateReplacement(thisClass, templateIdentifier);
                 
-                html = html.replaceAll("$" + templateIdentifier + "$", templateReplacement);
+                html = html.replaceAll(`$${templateIdentifier}$`, templateReplacement);
             });
         }
 
-        return "<span id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + ">" + html + "</span>";
+        return `<span id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``}>${html}</span>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID).hide();
+        $(`#${this.GUID}`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID).show();
+        $(`#${this.GUID}`).show();
     }
 }
 
@@ -212,50 +212,50 @@ class UINumber {
 
         if(value !== undefined && this.Value !== val) {
             this.Value = val;
-            $("#" + this.GUID).val(this.Value);
+            $(`#${this.GUID}`).val(this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);
+        $(document).off(`change.${this.GUID}`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
         
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
             thisClass.SetValue($(this).val());
         });
     }
 
     GetHtml() {
-        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"number\" value=\"" + this.Value + "\"";
+        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} type="number" value="${this.Value}"`;
 
         if(this.Min !== undefined)
-            html += " min=\"" + this.Min +"\"";
+            html += ` min="${this.Min}"`;
             
         if(this.Max !== undefined)
-            html += " max=\"" + this.Max +"\"";
+            html += ` max="${this.Max}"`;
             
         if(this.Step !== undefined)
-        html += " step=\"" + this.Step +"\"";
+            html += ` step="${this.Step}"`;
 
         if(this.Class !== undefined)
-            html += " class=\"" + this.Class +"\"";
+            html += ` class="${this.Class}"`;
 
-        return html + "/>";
+        return `${html}/>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID).hide();
+        $(`#${this.GUID}`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID).show();
+        $(`#${this.GUID}`).show();
     }
 }
 
@@ -281,50 +281,50 @@ class UICheckbox {
     SetValue(value) {
         if(value !== undefined && this.Value !== value) {
             this.Value = value;
-            $("#" + this.GUID).prop('checked', this.Value);
+            $(`#${this.GUID}`).prop(`checked`, this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);
+        $(document).off(`change.${this.GUID}`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
         
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.SetValue($(this).prop('checked'));
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
+            thisClass.SetValue($(this).prop(`checked`));
         });
     }
 
     GetHtml() {
-        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"checkbox\"";
+        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} type="checkbox"`;
 
         if(this.Value)
-            html += "checked";
+            html += `checked`;
 
         if(this.Class !== undefined)
-            html += " class=\"" + this.Class +"\"";
+            html += ` class="${this.Class}"`;
 
-        return html + "/>";
+        return `${html}/>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID).hide();
+        $(`#${this.GUID}`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID).show();
+        $(`#${this.GUID}`).show();
     }
 }
 
 class UIText {
     GUID = generateGUID();
-    Value = "";
+    Value = ``;
     OnChange = [];
     Hidden = false;
 
@@ -341,79 +341,79 @@ class UIText {
     SetValue(value) {
         if(value !== undefined && this.Value !== value) {
             this.Value = value;
-            $("#" + this.GUID).val(this.Value);
+            $(`#${this.GUID}`).val(this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);
+        $(document).off(`change.${this.GUID}`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
         
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
             thisClass.SetValue($(this).val());
         });
     }
 
     GetHtml() {
-        var html = "<input id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "") + " value=\"" + this.Value + "\"";
+        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} value="${this.Value}"`;
 
         if(this.Class !== undefined)
-            html += " class=\"" + this.Class +"\"";
+            html += ` class="${this.Class}"`;
 
-        return html + "/>";;
+        return `${html}/>`;
     }
     
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID).hide();
+        $(`#${this.GUID}`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID).show();
+        $(`#${this.GUID}`).show();
     }
 }
 
 class UISelection {
     static ParseValue(type, value) {
         switch(type) {
-            case "number":
+            case `number`:
                 return parseFloat(value);
-            case "boolean":
-                if(typeof value === "number")
+            case `boolean`:
+                if(typeof value === `number`)
                     return value !== 0;
-                if(typeof value === "boolean")
+                if(typeof value === `boolean`)
                     return value;
-                if(typeof value === "string")
-                    return value === "true" || value === "True" || value === "1";
-                if(typeof value === "object") {
+                if(typeof value === `string`)
+                    return value === `true` || value === `True` || value === `1`;
+                if(typeof value === `object`) {
                     if(value)
                         return true;
                     return false;
                 }
-            case "string":
-                if(typeof value === "number" || typeof value === "boolean")
-                    return "" + value;
-                if(typeof value === "string")
+            case `string`:
+                if(typeof value === `number` || typeof value === `boolean`)
+                    return `${value}`;
+                if(typeof value === `string`)
                     return value;
-                if(typeof value === "object")
+                if(typeof value === `object`)
                     return JSON.stringify(value);
-            case "object":
-                if(typeof value === "number" || typeof value === "boolean" || typeof value === "object")
+            case `object`:
+                if(typeof value === `number` || typeof value === `boolean` || typeof value === `object`)
                     return value;
-                if(typeof value === "string")
+                if(typeof value === `string`)
                     return JSON.parse(value);
                 break;
         }
     }
 
     GUID = generateGUID();
-    Value = "";
+    Value = ``;
     Options = [];
     OnChange = [];
     Hidden = false;
@@ -433,28 +433,28 @@ class UISelection {
     SetValue(value) {
         if(value !== undefined && this.Value !== value) {
             this.Value = value;
-            $("#" + this.GUID + " option").prop('selected', false);
-            $("#" + this.GUID + " option[value='" + UISelection.ParseValue("string", value) + "']").prop('selected', true);
+            $(`#${this.GUID} option`).prop(`selected`, false);
+            $(`#${this.GUID} option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
 
     Detach() {
-        $(document).off("change."+this.GUID);
+        $(document).off(`change.${this.GUID}`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
         
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
-            thisClass.SetValue(UISelection.ParseValue($(this).find(":selected").data("type"), $(this).val()));
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
+            thisClass.SetValue(UISelection.ParseValue($(this).find(`:selected`).data(`type`), $(this).val()));
         });
     }
 
     SetOptions(options) {
         this.Options = options;
-        $("#" + this.GUID).html(this.GetOptionsHtml());
+        $(`#${this.GUID}`).html(this.GetOptionsHtml());
     }
 
     GetOptions() {
@@ -462,56 +462,56 @@ class UISelection {
     }
 
     GetOptionsHtml() {
-        var stringValue = UISelection.ParseValue("string", this.Value);
-        var optionsHtml = "";
+        var stringValue = UISelection.ParseValue(`string`, this.Value);
+        var optionsHtml = ``;
         var selected = false;
         this.Options.forEach(option => {
             if(option.Group){
-                var groupHtml = "";
+                var groupHtml = ``;
                 option.Options.forEach(option => {
-                    var stringOptionValue = UISelection.ParseValue("string", option.Value)
+                    var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
                     var s = stringOptionValue == stringValue;
                     if(s)
                         selected = true;
-                    groupHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + 
-                        (s? " selected" : "") + (option.Disabled? " disabled": "") + (option.Class? " class=\"" + option.Class + "\"" : "") + 
-                        ">" + option.Name + "</option>";
+                    groupHtml += `<option data-type="${typeof option.Value}" value='${stringOptionValue}'` + 
+                        `${s? ` selected` : ``}${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                        `>${option.Name}</option>`;
                 });
 
                 if(groupHtml) 
-                    optionsHtml += "<optgroup label=\"" + option.Group + "\">" + groupHtml + "</optgroup>";
+                    optionsHtml += `<optgroup label="${option.Group}">${groupHtml}</optgroup>`;
             } else {
-                var stringOptionValue = UISelection.ParseValue("string", option.Value)
+                var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
                 var s = stringOptionValue == stringValue;
                 if(s)
                     selected = true;
-                optionsHtml += "<option data-type=\"" + (typeof option.Value) + "\" value=\'" + stringOptionValue + "\'" + 
-                        (s? " selected" : "") + (option.Disabled? " disabled": "") + (option.Class? " class=\"" + option.Class + "\"" : "") + 
-                        ">" + option.Name + "</option>";
+                optionsHtml += `<option data-type="${typeof option.Value}" value='${stringOptionValue}'` + 
+                    `${s? ` selected` : ``}${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                    `>${option.Name}</option>`;
             }
         });
-        optionsHtml = "<option" + (!selected? " selected" : "") + (this.SelectDisabled? " disabled" : "") + (this.SelectValue !== undefined? " value=\"" + this.SelectValue + "\"" : "") +
-            ">select</option>" + optionsHtml;
+        optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
+            `>select</option>${optionsHtml}`;
         return optionsHtml;
     }
 
     GetHtml() {
-        var html = "<select id=\"" + this.GUID + "\"" + (this.Hidden? " style=\"display: none;\"" : "");
+        var html = `<select id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``}`;
 
         if(this.Class !== undefined)
-            html += " class=\"" + this.Class +"\"";
+            html += ` class="${this.Class}"`;
 
-        return html + ">" + this.GetOptionsHtml() + "</select>";
+        return `${html}>${this.GetOptionsHtml()}</select>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID).hide();
+        $(`#${this.GUID}`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID).show();
+        $(`#${this.GUID}`).show();
     }
 }
 
@@ -564,8 +564,8 @@ class UITable extends Table {
 class UIDialog {
     GUID = generateGUID();
     TemplateIdentifier = undefined;
-    Title = "Dialog";
-    ButtonText = "Open";
+    Title = `Dialog`;
+    ButtonText = `Open`;
     Hidden = false;
     Opened = false
 
@@ -574,42 +574,42 @@ class UIDialog {
     }
 
     Detach() {
-        $(document).off("click."+this.GUID);
+        $(document).off(`click.${this.GUID}`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-open", function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-open`, function(){
             thisClass.Open();
         });
     }
 
     GetHtml() {
-        return  "<input id=\"" + this.GUID + "-open\"" + (this.Hidden? " style=\"display: none;\"" : "") + " type=\"button\" class=\"button\" value=\"" + this.ButtonText + "\"></input>" +
-                "<div data-title=\"" + this.Title + "\" id=\"" + this.GUID + "-dialog\" style=\"display: none;\">$" + this.TemplateIdentifier + "$</div>";
+        return  `<input id="${this.GUID}-open"${this.Hidden? ` style="display: none;"` : ``} type="button" class="button" value="${this.ButtonText}"></input>` +
+                `<div data-title="${this.Title}" id="${this.GUID}-dialog" style="display: none;">$${this.TemplateIdentifier}$</div>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $("#" + this.GUID + "-open").hide();
+        $(`#${this.GUID}-open`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $("#" + this.GUID + "-open").show();
+        $(`#${this.GUID}-open`).show();
     }
     
     Close() {
         this.Opened = false;
-        $("#" + this.GUID + "-dialog").dialog("close");
+        $(`#${this.GUID}-dialog`).dialog(`close`);
     }
 
     Open() {
         this.Opened = true;
-        var dialogSelector = $("#" + this.GUID + "-dialog");
-        dialogSelector.dialog({ width:'auto', modal:true, title: dialogSelector.data("title")});
+        var dialogSelector = $(`#${this.GUID}-dialog`);
+        dialogSelector.dialog({ width:`auto`, modal:true, title: dialogSelector.data(`title`)});
     }
 }
 
@@ -617,22 +617,22 @@ class UINumberWithMeasurement extends UINumber {
     constructor(prop) {
         super(prop);
         if(this.MeasurementIndex === undefined)
-            this.MeasurementIndex = GetDefaultUnitIndex(GetClassProperty(this, "Measurement"));
+            this.MeasurementIndex = GetDefaultUnitIndex(GetClassProperty(this, `Measurement`));
     }
 
     GetHtml() {
-        return super.GetHtml().replace("value=\"" + this.Value + "\"", "value=\"" + this.GetDisplayValue() + "\"") + "<div style=\"display: inline-block; cursor: pointer;\"  id=\"" + this.GUID + "-measurement\">" + GetUnitDisplay(GetClassProperty(this, "Measurement"), this.MeasurementIndex) + "</div>";;
+        return super.GetHtml().replace(`value="${this.Value}", "value="${this.GetDisplayValue()}"`) + `<div style="display: inline-block; cursor: pointer;"  id="${this.GUID}-measurement">${GetUnitDisplay(GetClassProperty(this, `Measurement`), this.MeasurementIndex)}</div>`;
     }
 
     SetValue(value) {
         var val = value;
-        if(typeof value === "object") {
+        if(typeof value === `object`) {
             if(value.MeasurementIndex !== undefined)
                 this.MeasurementIndex = value.MeasurementIndex;
             val = value.Value;
         }
         super.SetValue(val);
-        $("#" + this.GUID).val(this.GetDisplayValue());
+        $(`#${this.GUID}`).val(this.GetDisplayValue());
     }
 
     GetValue() {
@@ -643,12 +643,12 @@ class UINumberWithMeasurement extends UINumber {
     }
 
     GetDisplayValue() {
-        var unit = Measurements[GetClassProperty(this, "Measurement")][this.MeasurementIndex];
+        var unit = Measurements[GetClassProperty(this, `Measurement`)][this.MeasurementIndex];
         return this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
     }
 
     SetDisplayValue(value) {
-        var unit = Measurements[GetClassProperty(this, "Measurement")][this.MeasurementIndex];
+        var unit = Measurements[GetClassProperty(this, `Measurement`)][this.MeasurementIndex];
         this.SetValue((value - unit.DisplayOffset) / unit.DisplayMultiplier);
     }
 
@@ -656,17 +656,18 @@ class UINumberWithMeasurement extends UINumber {
         this.Detach();
         var thisClass = this;
         
-        $(document).on("change."+this.GUID, "#" + this.GUID, function(){
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
             thisClass.SetDisplayValue($(this).val());
         });
 
-        $(document).on("click."+this.GUID, "#" + this.GUID + "-measurement", function(){
-            alert("click");
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-measurement`, function(){
+            alert(`click`);
         });
     }
 
     Detach() {
         super.Detach();
-        $(document).off("click."+this.GUID);
+        $(document).off(`change.${this.GUID}`);
+        $(document).off(`click.${this.GUID}`);
     }
 }
