@@ -119,7 +119,7 @@ class ConfigOperation_LookupTable extends UITemplate {
                 objOperation.value.push({ type: `UINT32`, value: inputVariableId }); //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.ParameterSelection.Value;
-                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //inputVariable
+                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //inputVariable
             }
         }
 
@@ -192,13 +192,13 @@ class ConfigOperation_2AxisTable extends UITemplate {
                 objOperation.value.push({ type: `UINT32`, value: xVariableId }); //xtVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.XSelection.Value;
-                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //xVariable
+                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //xVariable
             }
             if(yVariableId) {
                 objOperation.value.push({ type: `UINT32`, value: yVariableId }); //ytVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.YSelection.Value;
-                objOperation.value.push({ type: `UINT32`, value: Increments[parameterSelection.reference].find(a => a.Name === parameterSelection.value && a.Measurement === parameterSelection.measurement).Id }); //yVariable
+                objOperation.value.push({ type: `VariableId`, value: `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` }); //yVariable
             }
         }
 
