@@ -1,10 +1,10 @@
 function GetFloatVariableIdList() {
     var variableIds = [];
-    for (var property in Increments) {
-        if (!Array.isArray(Increments[property]))
+    for (var property in VariableRegister) {
+        if (!Array.isArray(VariableRegister[property]))
             continue;
 
-        var arr = Increments[property];
+        var arr = VariableRegister[property];
 
         for (var i = 0; i < arr.length; i++) {
             if(arr[i].Type === `float` && variableIds.indexOf(arr[i].Id) === -1){

@@ -407,12 +407,9 @@ class ConfigInputs {
         return template;
     }
 
-    SetIncrements() {
-        Increments.VariableIncrement ??= 0;
-        Increments.CurrentTickId = ++Increments.VariableIncrement;
-
+    RegisterVariables() {
         for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].SetIncrements();
+            this.Inputs[i].RegisterVariables();
         }
     }
 
@@ -423,7 +420,7 @@ class ConfigInputs {
             
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }, //GetTick factory ID
-            { type: `UINT32`, value: Increments.CurrentTickId }
+            { type: `VariableId`, value: `CurrentTickId` }
         ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
@@ -693,60 +690,47 @@ class ConfigInput {
         return template;
     }
 
-    InputTranslationId = -1;
-    InputRawId = -1;
-    SetIncrements() {
-        this.InputRawId = -1;
-        this.InputTranslationId = -1;
-
+    RegisterVariables() {
         if(!this.RawConfig) 
             return;
 
-        Increments.VariableIncrement ??= 0;
-        Increments.Inputs ??= [];
-
         if(this.TranslationConfig) {
-            this.InputTranslationId = ++Increments.VariableIncrement;
-                
-            Increments.Inputs.push( { 
-                Name: this.Name, 
-                Id: this.InputTranslationId, 
-                Type: GetClassProperty(this.TranslationConfig, `Output`),
-                Measurement: this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement
-            });
+            VariableRegister.RegisterVariable(
+                `Inputs`, 
+                this.Name, 
+                GetClassProperty(this.TranslationConfig, `Output`), 
+                this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement
+            );
         }
-        
-        this.InputRawId = ++Increments.VariableIncrement;
-            
-        Increments.Inputs.push( { 
-            Name: this.Name, 
-            Id: this.InputRawId,
-            Type: GetClassProperty(this.RawConfig, `Output`),
-            Measurement: GetClassProperty(this.RawConfig, `Measurement`)
-        });
 
-        this.RawConfig?.SetIncrements?.();
-        this.TranslationConfig?.SetIncrements?.();
+        VariableRegister.RegisterVariable(
+            `Inputs`, 
+            this.Name, 
+            GetClassProperty(this.TranslationConfig, `Output`), 
+            GetClassProperty(this.RawConfig, `Measurement`)
+        );
+
+        this.RawConfig?.RegisterVariables?.();
+        this.TranslationConfig?.RegisterVariables?.();
     }
 
     GetObjOperation() {
         if(!this.RawConfig) 
             return arrayBuffer;
-        if(this.InputRawId === -1)
-            throw `Set Increments First`;
 
-        var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(this.InputRawId)} ]};
+        const inputRawId = `Inputs.${this.Name}(${GetClassProperty(this.RawConfig, `Measurement`)})`;
+
+        var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(inputRawId)} ]};
 
         if(this.TranslationConfig) {
-            if(this.InputTranslationId === -1)
-                throw `Set Increments First`;
+            const translationId = `Inputs.${this.Name}(${this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement})`;
 
             objOperation.value.unshift(
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
                 { type: `UINT16`, value: 2 }, // number of operations
             );
 
-            objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(this.InputTranslationId, this.InputRawId)});            
+            objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(translationId, inputRawId)});            
         }
         
         return objOperation;
@@ -818,7 +802,7 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -852,7 +836,7 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -894,7 +878,7 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -935,7 +919,7 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -976,7 +960,7 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -1017,7 +1001,7 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
 
         if (outputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
-            objOperation.value.push({ type: `UINT32`, value: outputVariableId ?? 0 }); //outputVariable
+            objOperation.value.push({ type: `VariableId`, value: outputVariableId ?? 0 }); //outputVariable
         }
 
         return objOperation;
@@ -1142,8 +1126,8 @@ class ConfigOperation_Polynomial {
         if (outputVariableId || inputVariableId) {
             objOperation.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
             objOperation.value.push(
-                { type: `UINT32`, value: outputVariableId ?? 0 }, //outputVariable
-                { type: `UINT32`, value: inputVariableId ?? 0 } //inputVariable
+                { type: `VariableId`, value: outputVariableId ?? 0 }, //outputVariable
+                { type: `VariableId`, value: inputVariableId ?? 0 } //inputVariable
             );
         }
 
@@ -1163,9 +1147,9 @@ class ConfigOperation_ReluctorGM24x extends UITemplate {
         return { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
-            { type: `UINT32`, value: outputVariableId ?? 0 },
-            { type: `UINT32`, value: inputVariableId ?? 0 },
-            { type: `UINT32`, value: Increments.CurrentTickId }
+            { type: `VariableId`, value: outputVariableId ?? 0 },
+            { type: `VariableId`, value: inputVariableId ?? 0 },
+            { type: `VariableId`, value: `CurrentTickId` }
         ]};
     }
 }
@@ -1204,9 +1188,9 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
             { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
             { type: `FLOAT`, value: this.FallingPosition.Value}, //FallingPosition
-            { type: `UINT32`, value: outputVariableId ?? 0 },
-            { type: `UINT32`, value: inputVariableId ?? 0 },
-            { type: `UINT32`, value: Increments.CurrentTickId },
+            { type: `VariableId`, value: outputVariableId ?? 0 },
+            { type: `VariableId`, value: inputVariableId ?? 0 },
+            { type: `VariableId`, value: `CurrentTickId` },
         ]};
     }
 }
@@ -1257,9 +1241,9 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
             { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
             { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
             { type: `UINT8`, value: this.NumberOfTeethMissing.Value}, //NumberOfTeethMissing
-            { type: `UINT32`, value: outputVariableId ?? 0 },
-            { type: `UINT32`, value: inputVariableId ?? 0 },
-            { type: `UINT32`, value: Increments.CurrentTickId },
+            { type: `VariableId`, value: outputVariableId ?? 0 },
+            { type: `VariableId`, value: inputVariableId ?? 0 },
+            { type: `VariableId`, value: `CurrentTickId` },
         ]};
     }
 }

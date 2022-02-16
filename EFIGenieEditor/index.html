@@ -18,7 +18,7 @@
         <script type="text/javascript">
             var b = new ConfigTop();
             var configJsonName = `tune.json`
-            $(document).on(`change`, function() { Increments.Reset(); b.SetIncrements()});//this is a hack but oh well
+            $(document).on(`change`, function() { VariableRegister.Clear(); b.RegisterVariables()});//this is a hack but oh well
             const loadConfig = (config) => {
                 b.SetValue(loadObject(config));
                 $(`#workspace`).html(b.GetHtml());
@@ -61,8 +61,8 @@
                     configJsonName = evt.target.files[0].name;
                 });
                 $(`#btnSaveBin`).click(function(){
-                    Increments.Reset();
-                    b.SetIncrements();
+                    VariableRegister.Clear();
+                    b.RegisterVariables();
                     downloadBin(b.GetArrayBufferPackage(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
 

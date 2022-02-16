@@ -1,21 +1,61 @@
-class Increments {
-    static Reset() {
-        Object.entries(Increments).forEach(e => {
+class VariableRegister {
+    static Clear() {
+        Object.entries(VariableRegister).forEach(e => {
             var [elementname, element] = e;
-            Increments[elementname] = undefined;
+            VariableRegister[elementname] = undefined;
         });
     }
-    static GenerateId() {
-        Increments.VariableIncrement ??= 0;
-        return ++Increments.VariableIncrement;
+    static GenerateVariableId() {
+        VariableRegister.VariableIncrement ??= 0;
+        return ++VariableRegister.VariableIncrement;
     }
-    static RegisterVariable(Id, ListName, Name, Type, Measurement) {
-        Increments[ListName] ??= [];
-        Increments[ListName].push({
+    static GetVariableId(variableReference) {
+        if(typeof variableReference === `string`) {
+            if(variableReference.indexOf(`.`) !== -1) {
+                const listName = variableReference.substring(0, variableReference.indexOf(`.`));
+                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
+                if(Array.isArray(VariableRegister[listName])) {
+                    var variable = VariableRegister[listName].find(a => a.Name === variableName);
+                    if(variableName.indexOf(`(`) !== -1) {
+                        var measurementName = variableName.substring(variableName.indexOf(`(`) + 1);
+                        measurementName = measurementName.substring(0, measurementName.length - 1);
+                        variableName = variableName.substring(0, variableName.indexOf(`(`));
+                        var variableWithMeasurement = VariableRegister[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
+                        if(variableWithMeasurement)
+                            variable = variableWithMeasurement;
+                    }
+                    if(variable) {
+                        if(typeof variable.Id === `string`)
+                            return VariableRegister.GetVariableId(variable.Id);
+                        if(variable.Id !== undefined)
+                            return variable.Id;
+                        return variable.Id = VariableRegister.GenerateVariableId();
+                    }
+                }
+            }
+            if(typeof VariableRegister[variableReference] === `string`)
+                return VariableRegister.GetVariableId(VariableRegister[variableReference]);
+            if(VariableRegister[variableReference] !== undefined)
+                return VariableRegister[variableReference];
+            return VariableRegister[variableReference] = VariableRegister.GenerateVariableId();
+        }
+        if(typeof variableReference === `number`)
+            return variableReference;
+        return 0;
+    }
+    static RegisterVariable(ListName, Name, Type, Measurement) {
+        VariableRegister[ListName] ??= [];
+        VariableRegister[ListName].push({
             Name,
             Type,
-            Measurement,
-            Id
+            Measurement
+        });
+    }
+    static RegisterVariableReference(ListName, Name, Reference) { 
+        VariableRegister[ListName] ??= [];
+        VariableRegister[ListName].push({
+            Name,
+            Id: Reference
         });
     }
 }
@@ -179,28 +219,7 @@ types = [
     { type: `UINT64`, toArrayBuffer: function(val) { return new BigUint64Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: `FLOAT`, toArrayBuffer: function(val) { return new Float32Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: `DOUBLE`, toArrayBuffer: function(val) { return new Float64Array(Array.isArray(val)? val : [val]).buffer; }},
-    { type: `VariableId`, toObj(val) {
-        if(typeof val === `string` && val.indexOf(`.`) !== -1) {
-            const listName = val.substring(0, val.indexOf(`.`));
-            var variableName = val.substring(val.indexOf(`.`) + 1);
-            if(Array.isArray(Increments[listName])) {
-                var variable = Increments[listName].find(a => a.Name === variableName);
-                if(variableName.indexOf(`(`) !== -1) {
-                    var measurementName = variableName.substring(variableName.indexOf(`(`) + 1);
-                    measurementName = measurementName.substring(0, measurementName.length - 1);
-                    variableName = variableName.substring(0, variableName.indexOf(`(`));
-                    var variableWithMeasurement = Increments[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
-                    if(variableWithMeasurement)
-                        variable = variableWithMeasurement;
-                }
-                if(variable)
-                    return { value: [{ type: `UINT32`, value: variable.Id }]};
-            }
-        }
-        if(typeof val === `number`)
-            return { value: [{ type: `UINT32`, value: val }]};
-        return { value: [{ type: `UINT32`, value: 0 }]};
-    }},
+    { type: `VariableId`, toObj(val) { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(val) }]}; }},
     { type: `Operation_StaticVariable`, toObj(val) {
         obj = { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
@@ -295,7 +314,7 @@ class ConfigTop extends UITemplate {
     Detach() {
         super.Detach();
         DetachPasteOptions();
-        Increments.Reset();//this is top level object so reset increments. this is not elegant
+        VariableRegister.Clear();//this is top level object so reset increments. this is not elegant
 
         $(document).off(`click.${this.GUID}`);
     }
@@ -303,7 +322,7 @@ class ConfigTop extends UITemplate {
     Attach() {
         super.Attach();
         AttachPasteOptions();
-        this.SetIncrements();//this is top level object so set increments. this is not elegant
+        this.RegisterVariables();//this is top level object so set increments. this is not elegant
 
         var thisClass = this;
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){
@@ -411,11 +430,11 @@ class ConfigTop extends UITemplate {
         return template;
     }
 
-    SetIncrements() {
-        this.Inputs.SetIncrements();
-        this.Engine.SetIncrements();
-        this.Fuel.SetIncrements();
-        this.Ignition.SetIncrements();
+    RegisterVariables() {
+        this.Inputs.RegisterVariables();
+        this.Engine.RegisterVariables();
+        this.Fuel.RegisterVariables();
+        this.Ignition.RegisterVariables();
     }
 
     GetArrayBufferPackage() {
@@ -446,7 +465,7 @@ class ConfigTop extends UITemplate {
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
             { type: `Operation_Or`}, //OR
             { type: `VariableId`, value: 0 }, //return this result
-            { type: `VariableId`, value: Increments.EngineSyncedId }, //bool
+            { type: `VariableId`, value: `EngineSyncedId` }, //bool
             { type: `VariableId`, value: -1 }, //use static value variable
 
             //main loop execute
@@ -528,33 +547,18 @@ class ConfigFuel extends UITemplate {
         super.SetValue(value);
     }
 
-    CylinderFuelMassId = -1;
-    SetIncrements() {
-        this.AFRConfigOrVariableSelection.SetIncrements();
-
-        Increments.VariableIncrement ??= 0;
-        this.CylinderFuelMassId = ++Increments.VariableIncrement;
-
-        Increments.FuelParameters ??= [];
-        Increments.FuelParameters.push({ 
-            Name:           `Cylinder Fuel Mass`, 
-            Id:             this.CylinderFuelMassId,
-            Type:           `float`,
-            Measurement:    `Mass`
-        });
-
-        this.InjectorEnableConfigOrVariableSelection.SetIncrements();
-        this.InjectorPulseWidthConfigOrVariableSelection.SetIncrements();
-        this.InjectorEndPositionConfigOrVariableSelection.SetIncrements();
+    RegisterVariables() {
+        this.AFRConfigOrVariableSelection.RegisterVariables();
+        VariableRegister.RegisterVariable(`FuelParameters`, `Cylinder Fuel Mass`, `float`, `Mass`);
+        this.InjectorEnableConfigOrVariableSelection.RegisterVariables();
+        this.InjectorPulseWidthConfigOrVariableSelection.RegisterVariables();
+        this.InjectorEndPositionConfigOrVariableSelection.RegisterVariables();
         for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].SetIncrements();
+            this.Outputs[i].RegisterVariables();
         };
     }
 
     GetObjOperation() {
-        if(this.CylinderFuelMassId === -1)
-            throw `Set Increments First`;
-
         var numberOfOperations = 1 + this.Outputs.length;
         if(!this.AFRConfigOrVariableSelection.IsVariable())
             ++numberOfOperations;
@@ -575,7 +579,7 @@ class ConfigFuel extends UITemplate {
                     { obj: val.GetObjOperation()}, 
                     { type: `VariableId`, value: -1 }, //store returns at -1
                     { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: Increments.EnginePositionId },
+                    { type: `VariableId`, value: `EnginePositionId` },
                     { type: `VariableId`, value: `FuelParameters.Injector Enable` },
                     { type: `VariableId`, value: `FuelParameters.Injector Pulse Width` },
                     { type: `VariableId`, value: `FuelParameters.Injector End Position(BTDC)` },
@@ -589,9 +593,9 @@ class ConfigFuel extends UITemplate {
 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, // Package
             { type: `Operation_Divide`}, //Divide
-            { type: `VariableId`, value: this.CylinderFuelMassId }, //Cylinder Fuel Mass ID
+            { type: `VariableId`, value: `FuelParameters.Cylinder Fuel Mass` }, //Cylinder Fuel Mass ID
             { type: `VariableId`, value: `EngineParameters.Cylinder Air Mass` },
-            { type: `VariableId`, value: this.AFRConfigOrVariableSelection.GetVariableId()}, 
+            { type: `VariableId`, value: `FuelParameters.Air Fuel Ratio`}, 
 
             { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
             { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
@@ -675,14 +679,14 @@ class ConfigIgnition extends UITemplate {
         super.SetValue(value);
     }
 
-    SetIncrements() {
-        this.IgnitionEnableConfigOrVariableSelection.SetIncrements();
-        this.IgnitionAdvanceConfigOrVariableSelection.SetIncrements();
-        this.IgnitionDwellConfigOrVariableSelection.SetIncrements();
-        this.IgnitionDwellDeviationConfigOrVariableSelection.SetIncrements();
+    RegisterVariables() {
+        this.IgnitionEnableConfigOrVariableSelection.RegisterVariables();
+        this.IgnitionAdvanceConfigOrVariableSelection.RegisterVariables();
+        this.IgnitionDwellConfigOrVariableSelection.RegisterVariables();
+        this.IgnitionDwellDeviationConfigOrVariableSelection.RegisterVariables();
 
         for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].SetIncrements();
+            this.Outputs[i].RegisterVariables();
         };
     }
 
@@ -707,7 +711,7 @@ class ConfigIgnition extends UITemplate {
                     { obj: val.GetObjOperation()}, 
                     { type: `VariableId`, value: -1 }, //store returns at -1
                     { type: `VariableId`, value: -1 }, //store returns at -1
-                    { type: `VariableId`, value: Increments.EnginePositionId },
+                    { type: `VariableId`, value: `EnginePositionId` },
                     { type: `VariableId`, value: `IgnitionParameters.Ignition Enable` },
                     { type: `VariableId`, value: `IgnitionParameters.Ignition Dwell` },
                     { type: `VariableId`, value: `IgnitionParameters.Ignition Advance` },
@@ -778,25 +782,11 @@ class ConfigEngine extends UITemplate {
 
     CrankPriority = 1;//static set this for now
 
-    EnginePositionId = -1;
-    EngineRPMId = -1;
-    SetIncrements() {
-        this.CrankPositionConfigOrVariableSelection.SetIncrements();
-        this.CamPositionConfigOrVariableSelection.SetIncrements();
+    RegisterVariables() {
+        this.CrankPositionConfigOrVariableSelection.RegisterVariables();
+        this.CamPositionConfigOrVariableSelection.RegisterVariables();
 
-        Increments.VariableIncrement ??= 0;
-        Increments.EnginePositionId = this.EnginePositionId = ++Increments.VariableIncrement;
-        Increments.EngineSequentialId = this.EngineSequentialId = ++Increments.VariableIncrement;
-        Increments.EngineSyncedId = this.EngineSyncedId = ++Increments.VariableIncrement;
-        this.EngineRPMId = ++Increments.VariableIncrement;
-
-        Increments.EngineParameters ??= [];
-        Increments.EngineParameters.push({ 
-            Name:           `Engine Speed`, 
-            Id:             this.EngineRPMId,
-            Type:           `float`,
-            Measurement:    `AngularSpeed`
-        });
+        VariableRegister.RegisterVariable(`EngineParameters`, `Engine Speed`, `float`, `AngularSpeed`);
 
         var requirements = [];
 
@@ -806,32 +796,29 @@ class ConfigEngine extends UITemplate {
 
         if(requirements?.indexOf(`Manifold Absolute Pressure`) > -1) {
             this.ManifoldAbsolutePressureConfigOrVariableSelection.Show();
-            this.ManifoldAbsolutePressureConfigOrVariableSelection.SetIncrements();
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables();
         } else {
             this.ManifoldAbsolutePressureConfigOrVariableSelection.Hide();
         }
         
         if(requirements?.indexOf(`Cylinder Air Temperature`) > -1) {
             this.CylinderAirTemperatureConfigOrVariableSelection.Show();
-            this.CylinderAirTemperatureConfigOrVariableSelection.SetIncrements();
+            this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables();
         } else {
             this.CylinderAirTemperatureConfigOrVariableSelection.Hide();
         }
 
         if(requirements?.indexOf(`Volumetric Efficiency`) > -1) {
             this.VolumetricEfficiencyConfigOrVariableSelection.Show();
-            this.VolumetricEfficiencyConfigOrVariableSelection.SetIncrements();
+            this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables();
         } else {
             this.VolumetricEfficiencyConfigOrVariableSelection.Hide();
         }
         
-        this.CylinderAirmassConfigOrVariableSelection.SetIncrements();
+        this.CylinderAirmassConfigOrVariableSelection.RegisterVariables();
     }
 
     GetObjOperation() {
-        if(this.EnginePositionId === -1 || this.EngineSequentialId === -1 || this.EngineSyncedId === -1 || this.EngineRPMId === -1)
-            throw `Set Increments First`;
-
         var mapRequired = false;
         var catRequired = false;
         var veRequired  = false;
@@ -869,17 +856,17 @@ class ConfigEngine extends UITemplate {
             //CalculateEnginePosition
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-            { type: `VariableId`, value: this.EnginePositionId },  //EnginePositionId
-            { type: `VariableId`, value: this.CrankPositionConfigOrVariableSelection.GetVariableId() },  //CrankPositionId
-            { type: `VariableId`, value: this.CamPositionConfigOrVariableSelection.GetVariableId() },  //CamPositionId
+            { type: `VariableId`, value: `EnginePositionId` },
+            { type: `VariableId`, value: `EngineParameters.Crank Position` },
+            { type: `VariableId`, value: `EngineParameters.Cam Position` },
 
             //EngineParameters
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
-            { type: `VariableId`, value: this.EngineRPMId },  //EngineRPMId
-            { type: `VariableId`, value: this.EngineSequentialId },  //EngineSequentialId
-            { type: `VariableId`, value: this.EngineSyncedId },  //EngineSyncedId
-            { type: `VariableId`, value: this.EnginePositionId }, //EnginePositionId
+            { type: `VariableId`, value: `EngineParameters.Engine Speed` },
+            { type: `VariableId`, value: `EngineSequentialId` },
+            { type: `VariableId`, value: `EngineSyncedId` },
+            { type: `VariableId`, value: `EnginePositionId` },
         ]};
 
         
@@ -966,9 +953,9 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
         super(prop);
     }
 
-    SetIncrements() {
-        this.DeadTimeConfigOrVariableSelection.SetIncrements();
-        this.FlowRateConfigOrVariableSelection.SetIncrements();
+    RegisterVariables() {
+        this.DeadTimeConfigOrVariableSelection.RegisterVariables();
+        this.FlowRateConfigOrVariableSelection.RegisterVariables();
     }
 
     GetObjOperation(outputVariableId) {
@@ -995,7 +982,7 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             { type: `Operation_Subtract` }, //Subtract
             { type: `VariableId`, value: -1 }, //store in variable id -1
             { type: `VariableId`, value: -1 }, //first parameter variable id -1
-            { type: `VariableId`, value: Increments.EngineSequentialId }, //second parameter EngineSequentialId
+            { type: `VariableId`, value: `EngineSequentialId` }, //second parameter EngineSequentialId
 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
@@ -1003,8 +990,8 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             { type: `VariableId`, value: outputVariableId ?? 0 },
             { type: `VariableId`, value: -1 }, //first parameter variable id -1
             { type: `VariableId`, value: `FuelParameters.Cylinder Fuel Mass` },
-            { type: `VariableId`, value: this.FlowRateConfigOrVariableSelection.GetVariableId() },
-            { type: `VariableId`, value: this.DeadTimeConfigOrVariableSelection.GetVariableId() },
+            { type: `VariableId`, value: `FuelParameters.Injector Flow Rate` },
+            { type: `VariableId`, value: `FuelParameters.Injector Dead Time` },
         ]};
     }
 }

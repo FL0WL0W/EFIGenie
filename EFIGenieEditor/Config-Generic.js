@@ -126,7 +126,7 @@ class ConfigOperation_LookupTable extends UITemplate {
         return objOperation;
     }
 
-    SetIncrements() {
+    RegisterVariables() {
         if(!this.NoParameterSelection)
             this.ParameterSelection.SetOptions(GetSelections());
     }
@@ -205,7 +205,7 @@ class ConfigOperation_2AxisTable extends UITemplate {
         return objOperation;
     }
 
-    SetIncrements() {
+    RegisterVariables() {
         if(!this.NoParameterSelection) {
             this.XSelection.SetOptions(GetSelections());
             this.YSelection.SetOptions(GetSelections());
@@ -227,11 +227,11 @@ function GetSelections(measurement, configs) {
         selections.push(calculations);
     }
 
-    for (var property in Increments) {
-        if (!Array.isArray(Increments[property]))
+    for (var property in VariableRegister) {
+        if (!Array.isArray(VariableRegister[property]))
             continue;
 
-        var arr = Increments[property];
+        var arr = VariableRegister[property];
 
         var arrSelections = { Group: property, Options: [] };
 
@@ -402,34 +402,28 @@ class ConfigOrVariableSelection extends UITemplate {
         return undefined;
     }
 
-    Id = -1;
-    SetIncrements() {
+    RegisterVariables() {
         this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));
         const selection = this.Selection.GetValue();
         if (selection && this.VariableListName) {
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
-                if(subConfig.SetIncrements)
-                    subConfig.SetIncrements();
+                if(subConfig.RegisterVariables)
+                    subConfig.RegisterVariables();
                 if (GetClassProperty(subConfig, `Output`)) {
-                    this.Id = Increments.GenerateId()
-                    Increments.RegisterVariable(this.Id,
+                    VariableRegister.RegisterVariable(
                         this.VariableListName,
                         this.Label,
                         GetClassProperty(subConfig, `Output`),
                         this.Measurement
-                    )
+                    );
                 }
             } else {
-                const cell = this.GetCellByName(Increments[selection.reference], selection.value);
-                if (cell) {
-                    Increments.RegisterVariable(cell.Id,
-                        this.VariableListName,
-                        this.Label,
-                        cell.Type,
-                        this.Measurement
-                    )
-                }
+                VariableRegister.RegisterVariableReference(
+                    this.VariableListName,
+                    this.Label,
+                    `${selection.reference}.${selection.value}(${selection.measurement})`
+                );
             }
         }
     }
@@ -437,21 +431,6 @@ class ConfigOrVariableSelection extends UITemplate {
     IsVariable() {
         const selection = this.Selection.Value;
         return selection && selection.reference;
-    }
-
-    GetVariableId() {
-        const selection = this.Selection.Value;
-        if(!selection) 
-            return undefined;
-
-        if(!selection.reference && this.VariableListName) {
-            if(GetClassProperty(this.GetSubConfig(), `Output`))
-                return this.Id;
-            return undefined;
-        }
-
-        const cell = this.GetCellByName(Increments[selection.reference], selection.value);
-        return cell.Id;
     }
 
     GetObjOperation(...args) {
