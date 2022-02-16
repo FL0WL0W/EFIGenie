@@ -164,7 +164,6 @@ function GetTypeId(type) {
     }
 }
 
-
 PackedTypeAlignment = [
     { type: `INT8`, align: 1 }, 
     { type: `INT16`, align: 1 },
@@ -207,6 +206,14 @@ x86TypeAlignment = [
     { type: `DOUBLE`, align: 8 },
 ]
 
+function Packagize(obj, val) {
+    if(val.outputVariables || val.intputVariables) {
+        obj.Type = "Package"
+        obj.outputVariables = val.outputVariables;
+        obj.intputVariables = val.intputVariables;
+    }
+}
+
 types = [
     { type: `INT8`, toArrayBuffer: function(val) { return new Int8Array(Array.isArray(val)? val : [val]).buffer; }},
     { type: `INT16`, toArrayBuffer: function(val) { return new Int16Array(Array.isArray(val)? val : [val]).buffer; }},
@@ -238,74 +245,69 @@ types = [
         return val;
     }},
     { type: `Operation_StaticVariable`, toObj(val) {
-        obj = { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static}
-        ]};
-
         var type = GetType(val);
         var typeID = GetTypeId(type);
-        
-        obj.value.push(
+
+        return { value: [ 
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static},
             { type: `UINT8`, value: typeID }, //typeid
             { type: type, value: val } //val
-        );
-
-        return obj;
+        ]};
     }},
     { type: `Operation_Add`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_Subtract`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_Multiply`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_Divide`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_And`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_Or`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_GreaterThan`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_LessThan`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_Equal`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_GreaterThanOrEqual`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual } ]};
+        Packagize(obj, val);
+        return obj;
     }},
     { type: `Operation_LessThanOrEqual`, toObj(val) {
-        return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual },
-        ]};
+        obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual } ]};
+        Packagize(obj, val);
+        return obj;
     }}
 ]
 
@@ -480,8 +482,7 @@ class ConfigTop extends UITemplate {
                 outputVariables: [ -1 ] //store in static value variable
             }},
             
-            { type: `Package`, value: { 
-                value: [ { type: `Operation_Or`} ],
+            { type: `Operation_Or`, value: { 
                 outputVariables: [ 0 ], //return this result
                 inputVariables: [
                     `EngineSyncedId`,
@@ -619,8 +620,7 @@ class ConfigFuel extends UITemplate {
 
             { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
 
-            { type: `Package`, value: { 
-                value: [ { type: `Operation_Divide`} ],
+            { type: `Operation_Divide`, value: { 
                 outputVariables: [ `FuelParameters.Cylinder Fuel Mass` ],
                 inputVariables: [
                     `EngineParameters.Cylinder Air Mass`,
@@ -1034,10 +1034,7 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
             }},
             
             //Subtract 1 to temporary variable (-1) if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { type: `Package`, value: { 
-                value: [ 
-                    { type: `Operation_Subtract` } //Subtract
-                 ],
+            { type: `Operation_Subtract`, value: { 
                 outputVariables: [ -1 ], //Return
                 inputVariables: [ 
                     -1,
