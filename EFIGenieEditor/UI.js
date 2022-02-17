@@ -453,8 +453,10 @@ class UISelection {
     }
 
     SetOptions(options) {
-        this.Options = options;
-        $(`#${this.GUID}`).html(this.GetOptionsHtml());
+        if(!objectTester(this.Options, options)) {
+            this.Options = options;
+            $(`#${this.GUID}`).html(this.GetOptionsHtml())
+        }
     }
 
     GetOptions() {

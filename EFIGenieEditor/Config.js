@@ -48,7 +48,8 @@ class VariableRegister {
         VariableRegister[ListName].push({
             Name,
             Type,
-            Measurement
+            Measurement,
+            Id: VariableRegister.GenerateVariableId()
         });
     }
     static RegisterVariableReference(ListName, Name, Reference) { 
@@ -328,10 +329,14 @@ class ConfigTop extends UITemplate {
         super(prop);
     }
 
+    SetValue(val) {
+        super.SetValue(val);
+        this.RegisterVariables();
+    }
+
     Detach() {
         super.Detach();
         DetachPasteOptions();
-        VariableRegister.Clear();//this is top level object so reset increments. this is not elegant
 
         $(document).off(`click.${this.GUID}`);
     }
@@ -339,7 +344,6 @@ class ConfigTop extends UITemplate {
     Attach() {
         super.Attach();
         AttachPasteOptions();
-        this.RegisterVariables();//this is top level object so set increments. this is not elegant
 
         var thisClass = this;
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){
@@ -448,13 +452,15 @@ class ConfigTop extends UITemplate {
     }
 
     RegisterVariables() {
+        VariableRegister.Clear();
         this.Inputs.RegisterVariables();
         this.Engine.RegisterVariables();
         this.Fuel.RegisterVariables();
         this.Ignition.RegisterVariables();
     }
 
-    GetArrayBufferPackage() {
+    GetArrayBuffer() {
+        this.RegisterVariables();
         return (new ArrayBuffer()).build({ types: types, value: [{obj: this.GetObjOperation()}]});
     }
 
