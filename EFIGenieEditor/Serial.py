@@ -64,14 +64,28 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             self.serial_conn.write(sendBytes)
             resp = ""
             for i in range(len(variables)):
-                readType = self.serial_conn.read(1)[0]
-                readBytes = self.serial_conn.read(8)
-                resp += str(parse_readbytes(readBytes, readType)) + "\n"
+                resp += str(parse_readbytes(self.serial_conn)) + "\n"
             self.send_response(200)
             self.end_headers()
             self.wfile.write(resp.encode('utf-8'))
 
-def parse_readbytes(readBytes, readType):
+# For the simple cases lets make a dictionary of the read type
+# key mapping to a tuple containing the struct format and the slice
+# of byte data that should be unpacked.
+fmt_switch = {
+    1: "B",
+    2: "H",
+    3: "I",
+    4: "L",
+    5: "b",
+    6: "h",
+    7: "i",
+    8: "l",
+    9: "f",
+    10: "d"
+}
+
+def parse_readbytes(ser):
     """Parse the bytes read off the serial console.
 
     Args:
@@ -83,31 +97,17 @@ def parse_readbytes(readBytes, readType):
     Returns:
         readBytes parsed into a string or possibly a bool. 
     """
-    # For the simple cases lets make a dictionary of the read type
-    # key mapping to a tuple containing the struct format and the slice
-    # of byte data that should be unpacked.
-    fmtslc_switch = {
-        1: ("B", slice(0, 1)),
-        2: ("H", slice(0, 2)),
-        3: ("I", slice(0, 4)),
-        4: ("L", slice(0, 8)),
-        5: ("b", slice(0, 1)),
-        6: ("h", slice(0, 2)),
-        7: ("i", slice(0, 4)),
-        8: ("l", slice(0, 8)),
-        9: ("f", slice(0, 4)),
-        10: ("d", slice(0, 8)),
-    }
+    readType = ser.read(1)[0]
     # For all cases we'll just use a simple if/else construct to parse
     if readType == 0:
         return "VOID"
     elif 1 <= readType <= 10:
-        fmt, slc = fmtslc_switch[readType][:]
-        return struct.unpack(fmt, readBytes[slc])[0]
+        fmt = fmt_switch[readType]
+        return struct.unpack(fmt, ser.read(struct.Struct(fmt).size))[0]
     elif readType == 11:
-        return bool(readBytes[0])
+        return bool(ser.read(1)[0])
     elif 12 <= readType <= 14:
-        return " "#.join(readBytes[0:8])
+        return ''.join('{:02x}'.format(x) for x in ser.read(8))
 
 def run_server(ser, interface, port):
     """Run a simple HTTP server that relays request information to the serial
@@ -129,8 +129,6 @@ def run_serial(ser):
         ser: An open connection to a serial port.
     """
 
-    readBytes = bytearray([0, 0, 0, 0, 0, 0, 0, 0, 0])
-
     while True:
         variableID = input("Enter ID of variable to check (q to quit): ")
         if variableID.lower() == "q":
@@ -140,15 +138,21 @@ def run_serial(ser):
         sendBytes = struct.pack("<IB", variableID, 0)
         ser.write(sendBytes)
         readType = ser.read(1)
-        readBytes = ser.read(8)
         if len(readType) == 0:
             continue 
         if readType[0] == 12 or readType[0] == 14:
+            ser.read(8) # clear read variable bytes and ask user for offset
             offset = int(input("Enter Offset: "))
             ser.write(struct.pack("<IB", variableID, offset))
-            readType = ser.read(1)
-            readBytes = ser.read(8)
-        print(parse_readbytes(readBytes, readType[0]))
+        elif readType[0] == 11:
+            ser.read(1)
+            ser.write(sendBytes)
+        elif readType[0] == 0:
+            ser.write(sendBytes)
+        else:
+            ser.read(struct.Struct(fmt_switch[readType[0]]).size)
+            ser.write(sendBytes)
+        print(parse_readbytes(ser))
 
     ser.close()
 
