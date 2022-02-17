@@ -401,6 +401,10 @@ class ConfigOrVariableSelection extends UITemplate {
         }
         return undefined;
     }
+    
+    IsVariable() {
+        return this.Selection.Value?.reference;
+    }
 
     RegisterVariables() {
         this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));

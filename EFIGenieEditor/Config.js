@@ -208,10 +208,11 @@ x86TypeAlignment = [
 
 function Packagize(obj, val) {
     if(val.outputVariables || val.intputVariables) {
-        obj.Type = "Package"
-        obj.outputVariables = val.outputVariables;
-        obj.intputVariables = val.intputVariables;
+        val.type = "Package";
+        val.value = obj
+        return val;
     }
+    return obj;
 }
 
 types = [
@@ -256,58 +257,47 @@ types = [
     }},
     { type: `Operation_Add`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Add } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_Subtract`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Subtract } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_Multiply`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Multiply } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_Divide`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Divide } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_And`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.And } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_Or`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Or } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_GreaterThan`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThan } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_LessThan`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThan } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_Equal`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Equal } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_GreaterThanOrEqual`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.GreaterThanOrEqual } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }},
     { type: `Operation_LessThanOrEqual`, toObj(val) {
         obj = { value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LessThanOrEqual } ]};
-        Packagize(obj, val);
-        return obj;
+        return Packagize(obj, val);
     }}
 ]
 
@@ -600,11 +590,11 @@ class ConfigFuel extends UITemplate {
                             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
                             { type: `FLOAT`, value: val.TDC.Value }, //tdc
                             { obj: val.GetObjOperation()},
-                         ],
+                        ],
                         outputVariables: [ 
                             -1, //store returns at -1
                             -1 //store returns at -1
-                         ],
+                        ],
                         inputVariables: [
                             `EnginePositionId`,
                             `FuelParameters.Injector Enable`,

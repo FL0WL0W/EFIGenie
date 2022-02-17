@@ -24,9 +24,9 @@ class ConfigOperation_DigitalPinWrite extends UITemplate {
         ]};
 
         if (inputVariableId) {
-            
-            objOperation.type = `Package`;
-            objOperation.inputVariables = [ inputVariableId ];
+            return Packagize(objOperation, {
+                inputVariables: [ inputVariableId ]
+            })
         }
 
         return objOperation;

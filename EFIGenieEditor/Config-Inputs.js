@@ -418,9 +418,10 @@ class ConfigInputs {
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
             { type: `UINT16`, value: this.Inputs.length + 1 }, // number of operations
             
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }, //Package
-            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }, //GetTick factory ID
-            { type: `VariableId`, value: `CurrentTickId` }
+            { type: `Package`, value: { //Package
+                value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
+                outputVariables: [`CurrentTickId`]
+            }}
         ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
@@ -723,13 +724,12 @@ class ConfigInput {
         var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(inputRawId)} ]};
 
         if(this.TranslationConfig) {
-            const translationId = `Inputs.${this.Name}(${this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement})`;
-
             objOperation.value.unshift(
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
                 { type: `UINT16`, value: 2 }, // number of operations
             );
 
+            const translationId = `Inputs.${this.Name}(${this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement})`;
             objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(translationId, inputRawId)});            
         }
         
@@ -800,10 +800,10 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
             { type: `UINT16`, value: this.Pin.value}, //pin
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId)
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -834,10 +834,10 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
             { type: `BOOL`, value: this.Inverted.Value}, //inverted
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId)
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -876,10 +876,10 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
             { type: `UINT16`, value: this.Length.Value}, //length
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -917,10 +917,10 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -958,10 +958,10 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -999,10 +999,10 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
-        if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
-        }
+        if (outputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ] 
+            });
 
         return objOperation;
     }
@@ -1123,11 +1123,11 @@ class ConfigOperation_Polynomial {
             { type: `FLOAT`, value: this.A}, //coefficients
         ]};
 
-        if (outputVariableId || inputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ?? 0 ];
-            objOperation.inputVariables = [ inputVariableId ?? 0 ];
-        }
+        if (outputVariableId || inputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ?? 0 ],
+                inputVariables: [ inputVariableId ?? 0 ]
+            });
 
         return objOperation;
     }
@@ -1142,16 +1142,17 @@ class ConfigOperation_ReluctorGM24x extends UITemplate {
     static Measurement = `ReluctorResult`;
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { type: `Package`, value: { 
-            value: [ 
-                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X} //factory ID
-             ],
+        var objOperation = { value: [ 
+            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X} //factory ID
+        ]};
+        
+        return Packagize(objOperation, { 
             outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [
+            inputVariables: [ 
                 inputVariableId ?? 0,
                 `CurrentTickId`
             ]
-        }};
+        });
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
@@ -1184,18 +1185,19 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { type: `Package`, value: { 
-            value: [ 
-                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-                { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
-                { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
-             ],
+        var objOperation = { value: [ 
+            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
+            { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
+            { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
+        ]};
+            
+        return Packagize(objOperation, { 
             outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [
+            inputVariables: [ 
                 inputVariableId ?? 0,
                 `CurrentTickId`
             ]
-        }};
+        });
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal1x);
@@ -1238,20 +1240,21 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        return { type: `Package`, value: { 
-            value: [ 
-                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-                { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
-                { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
-                { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
-                { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
-             ],
+        var objOperation = { value: [ 
+            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
+            { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
+            { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
+            { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
+            { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
+        ]};
+            
+        return Packagize(objOperation, { 
             outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [
+            inputVariables: [ 
                 inputVariableId ?? 0,
                 `CurrentTickId`
             ]
-        }};
+        });
     }
 }
 InputTranslationConfigs.push(ConfigOperation_ReluctorUniversalMissingTeeth);
