@@ -32,7 +32,7 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
         var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            return Packagize(objOperation, { outputVariables: [ outputVariableId ] });
+            objOperation.value[0].value = { value: this.Value, result: outputVariableId };
         }
 
         return objOperation;

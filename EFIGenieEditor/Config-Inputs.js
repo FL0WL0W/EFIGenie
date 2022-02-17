@@ -799,7 +799,7 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
     GetObjOperation(outputVariableId) {
         var objOperation = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
-            { type: `UINT16`, value: this.Pin.value}, //pin
+            { type: `UINT16`, value: this.Pin.Value}, //pin
         ]};
 
         if (outputVariableId)

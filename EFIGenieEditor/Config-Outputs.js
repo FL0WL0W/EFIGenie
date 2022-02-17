@@ -19,7 +19,7 @@ class ConfigOperation_DigitalPinWrite extends UITemplate {
     GetObjOperation(inputVariableId) {
         var objOperation = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
-            { type: `UINT16`, value: this.Pin },
+            { type: `UINT16`, value: this.Pin.Value },
             { type: `UINT8`, value: this.Inverted.Value | (this.HighZ.Value? 0x02 : 0x00) }
         ]};
 
