@@ -32,8 +32,7 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
         var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ];
+            return Packagize(objOperation, { outputVariables: [ outputVariableId ] });
         }
 
         return objOperation;
@@ -113,14 +112,17 @@ class ConfigOperation_LookupTable extends UITemplate {
         };
 
         if (!this.NoParameterSelection || outputVariableId || inputVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ?? 0 ];
+            var inputVariables;
             if(inputVariableId) {
-                objOperation.inputVariables = [ inputVariableId ]; //inputVariable
+                inputVariables = [ inputVariableId ]; //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.ParameterSelection.Value;
-                objOperation.inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ]; //inputVariable
+                inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //inputVariable
             }
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ?? 0 ],
+                inputVariables
+            });
         }
 
         return objOperation;
@@ -186,20 +188,23 @@ class ConfigOperation_2AxisTable extends UITemplate {
         };
 
         if (!this.NoParameterSelection || outputVariableId || xVariableId || yVariableId) {
-            objOperation.type = `Package`;
-            objOperation.outputVariables = [ outputVariableId ?? 0 ];
+            var inputVariables;
             if(xVariableId) {
-                objOperation.inputVariables = [ xVariableId ]; //inputVariable
+                inputVariables = [ xVariableId ]; //inputVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.XSelection.Value;
-                objOperation.inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ]; //xVariable
+                inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //xVariable
             }
             if(yVariableId) {
-                objOperation.inputVariables.push({ yVariableId }); //ytVariable
+                inputVariables.push({ yVariableId }); //ytVariable
             } else if (!this.NoParameterSelection) {
                 const parameterSelection = this.YSelection.Value;
-                objOperation.inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}(${parameterSelection.measurement})` ); //yVariable
+                inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ); //yVariable
             }
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ?? 0 ],
+                inputVariables
+            });
         }
 
         return objOperation;
@@ -426,7 +431,7 @@ class ConfigOrVariableSelection extends UITemplate {
                 VariableRegister.RegisterVariableReference(
                     this.VariableListName,
                     this.Label,
-                    `${selection.reference}.${selection.value}(${selection.measurement})`
+                    `${selection.reference}.${selection.value}${selection.measurement? `(${selection.measurement})` : ``}`
                 );
             }
         }
@@ -436,7 +441,7 @@ class ConfigOrVariableSelection extends UITemplate {
         const selection = this.Selection.Value;            
         if(!selection.reference) {
             if(this.VariableListName)
-                return this.GetSubConfig().GetObjOperation(this.Id, ...args);
+                return this.GetSubConfig().GetObjOperation(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`, ...args);
             return this.GetSubConfig().GetObjOperation(...args);
         }
 

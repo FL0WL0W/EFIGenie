@@ -208,9 +208,12 @@ x86TypeAlignment = [
 
 function Packagize(obj, val) {
     if(val.outputVariables || val.intputVariables) {
-        val.type = "Package";
-        val.value = obj
-        return val;
+        obj.outputVariables = val.outputVariables;
+        obj.inputVariables = val.inputVariables;
+        return { value: [{ 
+            type: `Package`,
+            value: obj
+        }]};
     }
     return obj;
 }

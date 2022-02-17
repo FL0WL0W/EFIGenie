@@ -719,7 +719,8 @@ class ConfigInput {
         if(!this.RawConfig) 
             return arrayBuffer;
 
-        const inputRawId = `Inputs.${this.Name}(${GetClassProperty(this.RawConfig, `Measurement`)})`;
+        const inputMeasurement = GetClassProperty(this.RawConfig, `Measurement`);
+        const inputRawId = `Inputs.${this.Name}${inputMeasurement? `(${inputMeasurement})` : ``}`;
 
         var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(inputRawId)} ]};
 
@@ -729,7 +730,8 @@ class ConfigInput {
                 { type: `UINT16`, value: 2 }, // number of operations
             );
 
-            const translationId = `Inputs.${this.Name}(${this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement})`;
+            const translationMeasurement = this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement;
+            const translationId = `Inputs.${this.Name}${translationMeasurement? `(${translationMeasurement})` : ``}`;
             objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(translationId, inputRawId)});            
         }
         
