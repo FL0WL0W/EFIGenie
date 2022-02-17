@@ -264,7 +264,7 @@ class ConfigOrVariableSelection extends UITemplate {
         prop ??= {};
         prop.Selection = new UISelection({
             Options: GetSelections(prop.Measurement, prop.Configs),
-            
+            SelectDisabled: true
         });
         super(prop);
 

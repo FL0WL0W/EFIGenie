@@ -18,7 +18,7 @@
         <script type="text/javascript">
             var b = new ConfigTop();
             var configJsonName = `tune.json`
-            $(document).on(`change`, function() { VariableRegister.Clear(); b.RegisterVariables(); });//this is a hack but oh well
+            $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
                 b.SetValue(loadObject(config));
                 $(`#workspace`).html(b.GetHtml());
@@ -28,6 +28,8 @@
                 const lastConfig = window.localStorage.getItem(`config`);
                 if (lastConfig) {
                     loadConfig(lastConfig);
+                } else {
+                    b.RegisterVariables();
                 }
 
                 $(`#workspace`).html(b.GetHtml());
