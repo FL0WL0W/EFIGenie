@@ -256,7 +256,7 @@ function GetSelections(measurement, configs) {
 
 class ConfigOrVariableSelection extends UITemplate {
     static Label = `Value`;
-    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$ $ConfigValue$</div>`;
+    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span>$ConfigValue$</div>`;
 
     ConfigValues = [];
 
@@ -268,6 +268,11 @@ class ConfigOrVariableSelection extends UITemplate {
         });
         super(prop);
 
+        this.LiveUpdate = new DisplayLiveUpdate({
+            Measurement: this.Measurement,
+            MeasurementIndex: this.MeasurementIndex
+        });
+
         var thisClass = this;
         this.Selection.OnChange.push(function () {
             //proud of myself on this clever bit of self modifying template ;)
@@ -277,6 +282,10 @@ class ConfigOrVariableSelection extends UITemplate {
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
                 subConfig.Attach();
+            if(thisClass.Selection.Value.value === `Static`)
+                thisClass.LiveUpdate.Hide?.();
+            else
+                thisClass.LiveUpdate.Show?.();
         });
     }
 
@@ -434,6 +443,7 @@ class ConfigOrVariableSelection extends UITemplate {
                     `${selection.reference}.${selection.value}${selection.measurement? `(${selection.measurement})` : ``}`
                 );
             }
+            this.LiveUpdate.VariableId = VariableRegister.GetVariableId(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`)
         }
     }
 
@@ -449,5 +459,53 @@ class ConfigOrVariableSelection extends UITemplate {
         }
 
         return;
+    }
+}
+
+class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
+    StickyHide = true;
+
+    constructor(prop) {
+        prop.StickyHide = prop.Hidden;
+        prop.Hidden = true;
+        super(prop);
+    }
+
+    Attach() {
+        if(this.VariableId)
+            LiveUpdateEvents.push(this.Update);
+        super.Attach();
+    }
+    Detach() {
+        const index = LiveUpdateEvents.indexOf(this.Update);
+        if (index > -1) {
+            LiveUpdateEvents.splice(index, 1);
+        }
+        super.Detach();
+    }
+    Update() {
+        if(this.VariableId) {
+            this.SetValue(VariableValues[this.VariableId]);
+            if(!this.StickyHide) {
+                super.Show();
+                if(this.TimeoutHandle)
+                window.clearTimeout(this.TimeoutHandle);
+
+                var thisClass = this;
+                this.TimeoutHandle = window.setTimeout(function() {
+                    thisClass.HideSuper();
+                });
+            }
+        }
+    }
+    HideSuper() {
+        super.Hide();
+    }
+    Hide() {
+        this.StickyHide = true;
+        this.HideSuper();
+    }
+    Show() {
+        this.StickyHide = false;
     }
 }

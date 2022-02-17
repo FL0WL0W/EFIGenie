@@ -174,17 +174,17 @@ class UITemplate {
             });
         }
 
-        return `<span id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``}>${html}</span>`;
+        return `<span id="${this.GUID}-TemplateSpan"${this.Hidden? ` style="display: none;"` : ``}>${html}</span>`;
     }
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`#${this.GUID}-TemplateSpan`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).show();
+        $(`#${this.GUID}-TemplateSpan`).show();
     }
 }
 
@@ -615,61 +615,155 @@ class UIDialog {
     }
 }
 
-class UINumberWithMeasurement extends UINumber {
+class UIMeasurement {
+    GUID = generateGUID();
+    OnChange = [];
+    Hidden = false;
+
     constructor(prop) {
-        super(prop);
-        if(this.MeasurementIndex === undefined)
-            this.MeasurementIndex = GetDefaultUnitIndex(GetClassProperty(this, `Measurement`));
-    }
-
-    GetHtml() {
-        return super.GetHtml().replace(`value="${this.Value}", "value="${this.GetDisplayValue()}"`) + `<div style="display: inline-block; cursor: pointer;"  id="${this.GUID}-measurement">${GetUnitDisplay(GetClassProperty(this, `Measurement`), this.MeasurementIndex)}</div>`;
-    }
-
-    SetValue(value) {
-        var val = value;
-        if(typeof value === `object`) {
-            if(value.MeasurementIndex !== undefined)
-                this.MeasurementIndex = value.MeasurementIndex;
-            val = value.Value;
-        }
-        super.SetValue(val);
-        $(`#${this.GUID}`).val(this.GetDisplayValue());
+        Object.assign(this, prop);
+        if(!Array.isArray(this.OnChange))
+            this.OnChange = [ this.OnChange ];
+        this.Value ??= GetDefaultUnitIndex(this.Measurement);
     }
 
     GetValue() {
-        return {
-            Value: super.GetValue(),
-            MeasurementIndex: this.MeasurementIndex
+        return this.Value;
+    }
+
+    SetValue(value) {
+        var val = parseInt(value);
+
+        if(value !== undefined && this.Value !== val) {
+            this.Value = val;
+            $(`#${this.GUID}`).val(this.Value);
+            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
-    }
-
-    GetDisplayValue() {
-        var unit = Measurements[GetClassProperty(this, `Measurement`)][this.MeasurementIndex];
-        return this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
-    }
-
-    SetDisplayValue(value) {
-        var unit = Measurements[GetClassProperty(this, `Measurement`)][this.MeasurementIndex];
-        this.SetValue((value - unit.DisplayOffset) / unit.DisplayMultiplier);
     }
 
     Attach() {
         this.Detach();
-        var thisClass = this;
         
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.SetDisplayValue($(this).val());
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-measurement`, function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(){
             alert(`click`);
         });
     }
 
     Detach() {
-        super.Detach();
-        $(document).off(`change.${this.GUID}`);
         $(document).off(`click.${this.GUID}`);
+    }
+
+    GetHtml() {
+        return `<div style="display: ${this.Hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this.Measurement, this.Value)}</div>`;
+    }
+
+    Hide() {
+        this.Hidden = true;
+        $(`#${this.GUID}`).hide();
+    }
+
+    Show() {
+        this.Hidden = false;
+        $(`#${this.GUID}`).css('display', 'inline-block');
+        $(`#${this.GUID}`).show();
+    }
+}
+
+class UINumberWithMeasurement extends UITemplate {
+    static Template = `$DisplayValue$$MeasurementIndex$`
+
+    constructor(prop) {
+        super(prop);
+        //place after super(prop) in order to interrcept the change callbacks
+        var thisClass = this;
+
+        prop.Hidden = false;
+        var measurementIndexProp = {};
+        Object.assign(measurementIndexProp, prop);
+        var displayValueProp = {};
+        Object.assign(displayValueProp, prop);
+
+        measurementIndexProp.Value = prop.MeasurementIndex;
+        measurementIndexProp.MeasurementIndex = undefined;
+        measurementIndexProp.OnChange = function() {
+            const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
+            thisClass.DisplayValue.SetValue(thisClass.Value * unit.DisplayMultiplier + unit.DisplayOffset);
+        };
+        this.MeasurementIndex = new UIMeasurement(measurementIndexProp);
+
+        displayValueProp.GUID = this.GUID;
+        displayValueProp.MeasurementIndex = undefined;
+        displayValueProp.OnChange = function() {
+            const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
+            thisClass.Value = (thisClass.DisplayValue.Value - unit.DisplayOffset) / unit.DisplayMultiplier;
+            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
+        };
+        this.DisplayValue = new UINumber(displayValueProp);
+    }
+
+    SetValue(value) {
+        if(typeof value === `object`) {
+            this.Value = value.Value;
+            this.MeasurementIndex.SetValue(value.MeasurementIndex);
+        } else {
+            this.Value = value;
+        }
+        const unit = Measurements[this.Measurement][this.MeasurementIndex.Value];
+        this.DisplayValue.SetValue(this.Value * unit.DisplayMultiplier + unit.DisplayOffset);
+    }
+
+    GetValue() {
+        return {
+            MeasurementIndex: this.MeasurementIndex.GetValue(),
+            Value: this.Value
+        };
+    }
+}
+
+class DisplayNumberWithMeasurement extends UITemplate {
+    static Template = `<span id="$GUID$-DisplayValue">$DisplayValue$</span> $MeasurementIndex$`
+
+    constructor(prop) {
+        var measurementIndexProp = {};
+        Object.assign(measurementIndexProp, prop);
+
+        measurementIndexProp.Hidden = false;
+        measurementIndexProp.Value = prop.MeasurementIndex;
+        measurementIndexProp.MeasurementIndex = undefined;
+        prop.MeasurementIndex = new UIMeasurement(measurementIndexProp);
+        super(prop);
+        var thisClass = this;
+        this.MeasurementIndex.OnChange.push(function() {
+            thisClass.UpdateDisplayValue();
+        });
+        this.UpdateDisplayValue();
+    }
+
+    UpdateDisplayValue() {
+        const unit = Measurements[this.Measurement]?.[this.MeasurementIndex.Value];
+        if(unit) {
+            this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
+            $(`#${this.GUID}-DisplayValue`).html(this.DisplayValue);
+        }
+    }
+
+    SetValue(value) {
+        if(value === undefined)
+            return;
+            
+        if(typeof value === `object`) {
+            this.Value = value.Value;
+            this.MeasurementIndex.SetValue(value.MeasurementIndex);
+        } else {
+            this.Value = value;
+        }
+
+        this.UpdateDisplayValue();
+    }
+
+    GetValue() {
+        return {
+            MeasurementIndex: this.MeasurementIndex.GetValue()
+        };
     }
 }

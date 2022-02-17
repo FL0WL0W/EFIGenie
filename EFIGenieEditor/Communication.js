@@ -15,7 +15,9 @@ function GetFloatVariableIdList() {
     return variableIds;
 }
 
-VariableValues = [];
+var LiveUpdateEvents = [];
+
+var VariableValues = [];
 function UpdateFloatVariableValues() {
     const variableIds = GetFloatVariableIdList();
     var offsets = []
@@ -39,11 +41,9 @@ function UpdateFloatVariableValues() {
                     VariableValues[variableIds[i]] = false;
                 else
                     VariableValues[variableIds[i]] = voidValue? undefined : parseFloat(responseVariables[i]);
+
+                LiveUpdateEvents.forEach(function(LiveUpdateEvent) { LiveUpdateEvent(); });
             }
         }
       });
-
-    // for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
-    //     VariableValues[variableIds[i]] = parseFloat(responseVariables[i]);
-    // }
 }

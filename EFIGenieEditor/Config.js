@@ -29,7 +29,7 @@ class VariableRegister {
                             return VariableRegister.GetVariableId(variable.Id);
                         if(variable.Id !== undefined)
                             return variable.Id;
-                        return variable.Id = VariableRegister.GenerateVariableId();
+                        return 0;
                     }
                 }
             }
