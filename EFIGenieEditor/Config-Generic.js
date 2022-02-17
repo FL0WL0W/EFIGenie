@@ -32,7 +32,7 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
         var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            objOperation.value[0].value = { value: this.Value, result: outputVariableId };
+            objOperation.value[0].result = outputVariableId;
         }
 
         return objOperation;
@@ -440,11 +440,14 @@ class ConfigOrVariableSelection extends UITemplate {
     GetObjOperation(...args) {
         const selection = this.Selection.Value;            
         if(!selection.reference) {
+            const subConfig = this.GetSubConfig();
+            if(!subConfig)
+                return;
             if(this.VariableListName)
-                return this.GetSubConfig().GetObjOperation(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`, ...args);
-            return this.GetSubConfig().GetObjOperation(...args);
+                return subConfig.GetObjOperation(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`, ...args);
+            return subConfig.GetObjOperation(...args);
         }
 
-        return undefined;
+        return;
     }
 }

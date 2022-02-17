@@ -47,7 +47,7 @@ ArrayBuffer.prototype.build = function(obj) {
             toArrayBuffer = typeInfo.toArrayBuffer;
         }
         if(toArrayBuffer !== undefined){
-            buffer = buffer.concatArray(toArrayBuffer(obj.value[index].value));
+            buffer = buffer.concatArray(toArrayBuffer.call(obj.value[index]));
         } else {
             var objobj = obj.value[index].obj;
             if(objobj === undefined && typeInfo !== undefined){
@@ -60,7 +60,7 @@ ArrayBuffer.prototype.build = function(obj) {
                     toObj = typeInfo.toObj;
                 }
                 if(toObj) {
-                    objobj = toObj(obj.value[index].value);
+                    objobj = toObj.call(obj.value[index]);
                 }
             }
             if(objobj !== undefined){

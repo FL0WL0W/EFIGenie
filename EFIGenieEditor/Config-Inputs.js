@@ -418,10 +418,11 @@ class ConfigInputs {
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
             { type: `UINT16`, value: this.Inputs.length + 1 }, // number of operations
             
-            { type: `Package`, value: { //Package
+            { 
+                type: `Package`, //Package
                 value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
                 outputVariables: [`CurrentTickId`]
-            }}
+            }
         ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
@@ -717,7 +718,7 @@ class ConfigInput {
 
     GetObjOperation() {
         if(!this.RawConfig) 
-            return arrayBuffer;
+            return;
 
         const inputMeasurement = GetClassProperty(this.RawConfig, `Measurement`);
         const inputRawId = `Inputs.${this.Name}${inputMeasurement? `(${inputMeasurement})` : ``}`;
