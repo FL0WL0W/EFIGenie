@@ -20,9 +20,8 @@ class VariableRegister {
                         var measurementName = variableName.substring(variableName.indexOf(`(`) + 1);
                         measurementName = measurementName.substring(0, measurementName.length - 1);
                         variableName = variableName.substring(0, variableName.indexOf(`(`));
-                        var variableWithMeasurement = VariableRegister[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
-                        if(variableWithMeasurement)
-                            variable = variableWithMeasurement;
+                        variable ??= VariableRegister[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
+                        variable ??= VariableRegister[listName].find(a => a.Name === variableName)
                     }
                     if(variable) {
                         if(typeof variable.Id === `string`)
@@ -52,10 +51,11 @@ class VariableRegister {
             Id: VariableRegister.GenerateVariableId()
         });
     }
-    static RegisterVariableReference(ListName, Name, Reference) { 
+    static RegisterVariableReference(ListName, Name, Measurement, Reference) { 
         VariableRegister[ListName] ??= [];
         VariableRegister[ListName].push({
             Name,
+            Measurement,
             Id: Reference
         });
     }

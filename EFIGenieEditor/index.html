@@ -20,7 +20,7 @@
             var configJsonName = `tune.json`
             $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
-                b.SetValue(loadObject(config));
+                b.SetValue(parseObject(config));
                 $(`#workspace`).html(b.GetHtml());
                 $(`#btnLoad`).val(undefined);
             };
@@ -32,11 +32,13 @@
                     b.RegisterVariables();
                 }
 
+                setInterval(UpdateFloatVariableValues, 100);
+
                 $(`#workspace`).html(b.GetHtml());
                 b.Attach();
                 $(`#btnSave`).click(function(){
                     var cfg = b.GetValue();
-                    window.localStorage.setItem(`config`, cfg);
+                    window.localStorage.setItem(`config`, stringifyObject(cfg));
                     downloadObject(cfg, configJsonName);
                 });
                 $(`#btnSaveCompressed`).click(function(){

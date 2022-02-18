@@ -1,15 +1,28 @@
-function GetFloatVariableIdList() {
+function GetVariableIdList() {
     var variableIds = [];
     for (var property in VariableRegister) {
-        if (!Array.isArray(VariableRegister[property]))
+        if (VariableRegister[property] === undefined)
             continue;
 
-        var arr = VariableRegister[property];
+        if(property === `VariableIncrement`)
+            continue;
 
-        for (var i = 0; i < arr.length; i++) {
-            if(arr[i].Type === `float` && variableIds.indexOf(arr[i].Id) === -1){
-                variableIds.push(arr[i].Id);
+        if (Array.isArray(VariableRegister[property])) {
+            var arr = VariableRegister[property];
+
+            for (var i = 0; i < arr.length; i++) {
+                var id = arr[i].Id;
+                if(isNaN(id))
+                    continue;
+                if(variableIds.indexOf(id) === -1)
+                    variableIds.push(id);
             }
+        } else {
+            var id = parseInt(VariableRegister[property]);
+            if(isNaN(id))
+                continue;
+            if(variableIds.indexOf(id) === -1)
+                variableIds.push(id);
         }
     }
     return variableIds;
@@ -19,7 +32,7 @@ var LiveUpdateEvents = [];
 
 var VariableValues = [];
 function UpdateFloatVariableValues() {
-    const variableIds = GetFloatVariableIdList();
+    const variableIds = GetVariableIdList();
     var offsets = []
     for(var i = 0; i < variableIds.length; i++) offsets[i] = 0;
 
@@ -41,9 +54,12 @@ function UpdateFloatVariableValues() {
                     VariableValues[variableIds[i]] = false;
                 else
                     VariableValues[variableIds[i]] = voidValue? undefined : parseFloat(responseVariables[i]);
-
-                LiveUpdateEvents.forEach(function(LiveUpdateEvent) { LiveUpdateEvent(); });
             }
+
+            Object.entries(LiveUpdateEvents).forEach(e => {
+                var [elementname, element] = e;
+                element?.();
+            });
         }
       });
 }

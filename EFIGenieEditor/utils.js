@@ -117,17 +117,24 @@ function generateGUID(){
 }
 
 var downloadObject = function(obj, fileName) {
-    downloadstring(JSON.stringify(obj), fileName);
+    downloadstring(stringifyObject(obj), fileName);
 }
 
 var downloadCompressedObject = function(obj, fileName) {
-    downloadstring(`lzjson${lzjs.compress(JSON.stringify(obj))}`, fileName);
+    downloadstring(stringifyCompressedObject(obj), fileName);
 }
 
-var loadObject = function(s) {
+var parseObject = function(s) {
     if(s.indexOf(`lzjson`) === 0)
         return JSON.parse(lzjs.decompress(s.substring(6)));
     return JSON.parse(s);
+}
+
+var stringifyObject = function(o) {
+    return JSON.stringify(o);
+}
+var stringifyCompressedObject = function(o) {
+    return `lzjson${lzjs.compress(JSON.stringify(o))}`
 }
 
 var downloadBin = function(data, fileName) {

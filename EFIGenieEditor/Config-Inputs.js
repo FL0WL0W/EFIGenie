@@ -851,7 +851,7 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
-    static Measurement = ``;
+    static Measurement = `Record`;
     static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted</div>` +
                         `<div><label for="$Length.GUID$">Length:</label>$Length$</div>`;
 

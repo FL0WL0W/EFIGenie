@@ -1,5 +1,5 @@
 var BlankUnits = [ { Name: ``, DisplayMultiplier: 1, DisplayOffset: 0} ];
-var PercentUnits = [ { Name: `0.0-1.0`, DisplayMultiplier: 1, DisplayOffset: 0}, { Name: `%`, DisplayMultiplier: 100, DisplayOffset: 0 } ];
+var PercentUnits = [ { Name: `%`, DisplayMultiplier: 100, DisplayOffset: 0 }, { Name: `[0.0-1.0]`, DisplayMultiplier: 1, DisplayOffset: 0} ];
 var PercentageAccelerationUnits = PerSecond(PercentUnits);// [ { Name: `(0.0-1.0)/s`, DisplayMultiplier: 1, DisplayOffset: 0}, { Name: `%/s`, DisplayMultiplier: 100, DisplayOffset: 0 } ];
 var TimeUnits = [ { Name: `s`, DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: `ms`, DisplayMultiplier: 1000, DisplayOffset: 0 }, { Name: `us`, DisplayMultiplier: 1000000, DisplayOffset: 0 }, { Name: `ns`, DisplayMultiplier: 1000000000, DisplayOffset: 0 } ];
 var FrequencyUnits = [ { Name: `Hz`, DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: `KHz`, DisplayMultiplier: 0.001, DisplayOffset: 0 }, { Name: `MHz`, DisplayMultiplier: 0.000001, DisplayOffset: 0 } ];

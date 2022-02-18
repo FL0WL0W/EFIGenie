@@ -282,10 +282,7 @@ class ConfigOrVariableSelection extends UITemplate {
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
                 subConfig.Attach();
-            if(thisClass.Selection.Value.value === `Static`)
-                thisClass.LiveUpdate.Hide?.();
-            else
-                thisClass.LiveUpdate.Show?.();
+            thisClass.LiveUpdate.Show?.();
         });
     }
 
@@ -440,6 +437,7 @@ class ConfigOrVariableSelection extends UITemplate {
                 VariableRegister.RegisterVariableReference(
                     this.VariableListName,
                     this.Label,
+                    this.Measurement,
                     `${selection.reference}.${selection.value}${selection.measurement? `(${selection.measurement})` : ``}`
                 );
             }
@@ -472,34 +470,34 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
     }
 
     Attach() {
-        if(this.VariableId)
-            LiveUpdateEvents.push(this.Update);
         super.Attach();
+        if(this.VariableId){
+            var thisClass = this
+            LiveUpdateEvents[this.GUID] = function() {
+                if(thisClass.VariableId && VariableValues[thisClass.VariableId] !== undefined) {
+                    thisClass.SetValue(VariableValues[thisClass.VariableId]);
+                    if(!thisClass.StickyHide) {
+                        thisClass.ShowSuper();
+                        if(thisClass.TimeoutHandle)
+                            window.clearTimeout(thisClass.TimeoutHandle);
+        
+                        thisClass.TimeoutHandle = window.setTimeout(function() {
+                            thisClass.HideSuper();
+                        },5000);
+                    }
+                }
+            };
+        }
     }
     Detach() {
-        const index = LiveUpdateEvents.indexOf(this.Update);
-        if (index > -1) {
-            LiveUpdateEvents.splice(index, 1);
-        }
+        LiveUpdateEvents[this.GUID] = null
         super.Detach();
-    }
-    Update() {
-        if(this.VariableId) {
-            this.SetValue(VariableValues[this.VariableId]);
-            if(!this.StickyHide) {
-                super.Show();
-                if(this.TimeoutHandle)
-                window.clearTimeout(this.TimeoutHandle);
-
-                var thisClass = this;
-                this.TimeoutHandle = window.setTimeout(function() {
-                    thisClass.HideSuper();
-                });
-            }
-        }
     }
     HideSuper() {
         super.Hide();
+    }
+    ShowSuper() {
+        super.Show();
     }
     Hide() {
         this.StickyHide = true;

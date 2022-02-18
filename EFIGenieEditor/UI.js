@@ -721,7 +721,7 @@ class UINumberWithMeasurement extends UITemplate {
 }
 
 class DisplayNumberWithMeasurement extends UITemplate {
-    static Template = `<span id="$GUID$-DisplayValue">$DisplayValue$</span> $MeasurementIndex$`
+    static Template = `<span class="monospace" id="$GUID$-DisplayValue">$DisplayValue$</span> $MeasurementIndex$`
 
     constructor(prop) {
         var measurementIndexProp = {};
@@ -743,7 +743,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
         const unit = Measurements[this.Measurement]?.[this.MeasurementIndex.Value];
         if(unit) {
             this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
-            $(`#${this.GUID}-DisplayValue`).html(this.DisplayValue);
+            $(`#${this.GUID}-DisplayValue`).html(parseFloat(parseFloat(this.DisplayValue).toFixed(5)).toPrecision(6));
         }
     }
 
