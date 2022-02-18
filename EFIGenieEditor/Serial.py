@@ -61,10 +61,14 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
                 varID = int(variables[i])
                 offset = int(offsets[i])
                 sendBytes += struct.pack("<IB", varID, offset)
+            self.serial_conn.flushOutput()
+            self.serial_conn.flushInput()
             self.serial_conn.write(sendBytes)
             resp = ""
             for i in range(len(variables)):
-                resp += str(parse_readbytes(self.serial_conn)) + "\n"
+                val = str(parse_readbytes(self.serial_conn));
+                # print(val)
+                resp += val + "\n"
             self.send_response(200)
             self.end_headers()
             self.wfile.write(resp.encode('utf-8'))
