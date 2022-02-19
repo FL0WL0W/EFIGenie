@@ -2,7 +2,7 @@ class VariableRegister {
     static Clear() {
         Object.entries(VariableRegister).forEach(e => {
             var [elementname, element] = e;
-            VariableRegister[elementname] = undefined;
+            delete VariableRegister[elementname];
         });
     }
     static GenerateVariableId() {
@@ -220,17 +220,17 @@ function Operation_Math(mathFactoryId) {
     if(this.a !== undefined) {
         this.inputVariables ??= [0,0];
         this.inputVariables[0] = this.a;
-        this.a = undefined;
+        delete this.a;
     }
     if(this.b !== undefined) {
         this.inputVariables ??= [0,0];
         this.inputVariables[1] = this.b;
-        this.b = undefined;
+        delete this.b;
     }
     if(this.result !== undefined) {
         this.outputVariables ??= [0];
         this.outputVariables[0] = this.result;
-        this.result = undefined;
+        delete this.result;
     }
     if(this.outputVariables || this.intputVariables){
         this.inputVariables ??= [0,0];
@@ -261,20 +261,20 @@ types = [
             thisValue.value.push({ type: `VariableId`, value: outputVariable ?? 0 })
         });
 
-        this.outputVariables = undefined;
+        delete this.outputVariables;
 
         this.inputVariables?.forEach(function(inputVariable) {
             thisValue.value.push({ type: `VariableId`, value: inputVariable ?? 0 })
         });
 
-        this.inputVariables = undefined;
+        delete this.inputVariables;
 
         return this;
     }},
     { type: `Operation_StaticVariable`, toObj() {
         if(this.result !== undefined){
             this.outputVariables = [this.result];
-            this.result = undefined;
+            delete this.result;
         }
 
         var type = GetType(this.value);

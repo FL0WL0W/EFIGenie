@@ -272,7 +272,7 @@ function GetSelections(measurement, output, inputs, configs) {
 
 class ConfigOrVariableSelection extends UITemplate {
     static Label = `Value`;
-    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span>$ConfigValue$</div>`;
+    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
 
     ConfigValues = [];
 
@@ -282,18 +282,18 @@ class ConfigOrVariableSelection extends UITemplate {
             Options: GetSelections(prop.Measurement, prop.Output, prop.Inputs, prop.Configs),
             SelectDisabled: true
         });
+        prop.LiveUpdate = new DisplayLiveUpdate({
+            Measurement: prop.Measurement,
+            MeasurementIndex: prop.MeasurementIndex
+        });
         super(prop);
 
-        this.LiveUpdate = new DisplayLiveUpdate({
-            Measurement: this.Measurement,
-            MeasurementIndex: this.MeasurementIndex
-        });
 
         var thisClass = this;
         this.Selection.OnChange.push(function () {
-            //proud of myself on this clever bit of self modifying template ;)
-            thisClass.ConfigValue = `$ConfigValues.${thisClass.GetSubConfigIndex()}$`;
-            $(`#${thisClass.GUID}-TemplateSpan`).replaceWith(thisClass.GetHtml());
+            const subConfigIndex = thisClass.GetSubConfigIndex();
+            thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
+            $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml());
             thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
@@ -409,11 +409,11 @@ class ConfigOrVariableSelection extends UITemplate {
                     var setVal = value.Values[i];
                     if(typeof configValue.GetValue() !== `object` )
                         setVal = setVal.Value;
-                    configValue.SetValue(setVal);
                     if(configValue.OnChange)
                         configValue.OnChange.push(function(){configValue.NotDefault = true;});
                     else
                         configValue.NotDefault = true;
+                    configValue.SetValue(setVal);
                     this.ConfigValues.push(configValue);
                 }
             }
@@ -497,9 +497,10 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
             var thisClass = this
             LiveUpdateEvents[this.GUID] = function() {
                 if(thisClass.VariableId && VariableValues[thisClass.VariableId] !== undefined) {
-                    thisClass.SetValue(VariableValues[thisClass.VariableId]);
+                    thisClass.Value = VariableValues[thisClass.VariableId];
+                    thisClass.UpdateDisplayValue();
                     if(!thisClass.StickyHide) {
-                        // if(thisClass.Hidden)
+                        if(thisClass.Hidden)
                             thisClass.ShowSuper();
                         if(thisClass.TimeoutHandle)
                             window.clearTimeout(thisClass.TimeoutHandle);
@@ -513,8 +514,8 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
         }
     }
     Detach() {
-        LiveUpdateEvents[this.GUID] = null
         super.Detach();
+        delete LiveUpdateEvents[this.GUID];
     }
     HideSuper() {
         super.Hide();

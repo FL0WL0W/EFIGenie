@@ -67,6 +67,9 @@ class UITemplate {
             }
         });
 
+        if(Object.keys(value).length === 0)
+            return undefined;
+
         return value;
     }
 
@@ -104,7 +107,7 @@ class UITemplate {
             Object.entries(this).forEach(e => {
                 function DetachElement(element) {
                     if(element?.Detach)
-                        element.Attach();
+                        element.Detach();
                 }
                 var [elementname, element] = e;
                 if(Array.isArray(element))
@@ -693,7 +696,7 @@ class UINumberWithMeasurement extends UITemplate {
         Object.assign(displayValueProp, prop);
 
         measurementIndexProp.Value = prop.MeasurementIndex;
-        measurementIndexProp.MeasurementIndex = undefined;
+        delete measurementIndexProp.MeasurementIndex;
         measurementIndexProp.OnChange = function() {
             const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
             thisClass.DisplayValue.SetValue(thisClass.Value * unit.DisplayMultiplier + unit.DisplayOffset);
@@ -701,7 +704,7 @@ class UINumberWithMeasurement extends UITemplate {
         this.MeasurementIndex = new UIMeasurement(measurementIndexProp);
 
         displayValueProp.GUID = this.GUID;
-        displayValueProp.MeasurementIndex = undefined;
+        delete displayValueProp.MeasurementIndex;
         displayValueProp.OnChange = function() {
             const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
             thisClass.Value = (thisClass.DisplayValue.Value - unit.DisplayOffset) / unit.DisplayMultiplier;
@@ -765,22 +768,10 @@ class DisplayNumberWithMeasurement extends UITemplate {
     }
 
     SetValue(value) {
-        if(value === undefined)
-            return;
-            
-        if(typeof value === `object`) {
-            this.Value = value.Value;
-            this.MeasurementIndex.SetValue(value.MeasurementIndex);
-        } else {
-            this.Value = value;
-        }
-
-        this.UpdateDisplayValue();
+        return this.MeasurementIndex.SetValue(value);
     }
 
     GetValue() {
-        return {
-            MeasurementIndex: this.MeasurementIndex.GetValue()
-        };
+        return this.MeasurementIndex.GetValue()
     }
 }

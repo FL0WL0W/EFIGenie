@@ -127,7 +127,7 @@ function ParsePinSelectElements(pinSelectElements){
 }
 
 function GetNameFromPinSelectElement(element){
-    var inputName = $($($(element).parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
+    var inputName = $($($(element).parent().parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
     if(inputName)
         return inputName;
 
@@ -214,7 +214,6 @@ class ConfigInputs {
 
     SetValue(value) {
         this.Detach();
-        this.Inputs = [];
 
         if(value) {
             if(value.TargetDevice) {
@@ -226,9 +225,11 @@ class ConfigInputs {
             }
 
             for(var i = 0; i < value.Inputs.length; i++){
-                this.Inputs.push(this.NewInput());
+                if(i >= this.Inputs.length)
+                    this.Inputs.push(this.NewInput());
                 this.Inputs[i].SetValue(value.Inputs[i]);
             }
+            this.Inputs = this.Inputs.slice(0, value.Inputs.length)
         }
 
         $(`#${this.GUID}`).replaceWith(this.GetHtml());
