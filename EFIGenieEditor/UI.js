@@ -186,12 +186,12 @@ class UITemplate {
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}-TemplateSpan`).hide();
+        $(`[id="${this.GUID}-TemplateSpan"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}-TemplateSpan`).show();
+        $(`[id="${this.GUID}-TemplateSpan"]`).show();
     }
 }
 
@@ -219,7 +219,7 @@ class UINumber {
 
         if(value !== undefined && this.Value !== val) {
             this.Value = val;
-            $(`#${this.GUID}`).val(this.Value);
+            $(`[id="${this.GUID}"]`).val(this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
@@ -257,12 +257,12 @@ class UINumber {
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`[id="${this.GUID}"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).show();
+        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -288,7 +288,7 @@ class UICheckbox {
     SetValue(value) {
         if(value !== undefined && this.Value !== value) {
             this.Value = value;
-            $(`#${this.GUID}`).prop(`checked`, this.Value);
+            $(`[id="${this.GUID}"]`).prop(`checked`, this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
@@ -320,12 +320,12 @@ class UICheckbox {
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`[id="${this.GUID}"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).show();
+        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -348,7 +348,7 @@ class UIText {
     SetValue(value) {
         if(value !== undefined && this.Value !== value) {
             this.Value = value;
-            $(`#${this.GUID}`).val(this.Value);
+            $(`[id="${this.GUID}"]`).val(this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
@@ -377,12 +377,12 @@ class UIText {
     
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`[id="${this.GUID}"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).show();
+        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -462,7 +462,7 @@ class UISelection {
     SetOptions(options) {
         if(!objectTester(this.Options, options)) {
             this.Options = options;
-            $(`#${this.GUID}`).html(this.GetOptionsHtml())
+            $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml())
         }
     }
 
@@ -516,12 +516,12 @@ class UISelection {
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`[id="${this.GUID}"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).show();
+        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -644,7 +644,7 @@ class UIMeasurement {
 
         if(value !== undefined && this.Value !== val) {
             this.Value = val;
-            $(`#${this.GUID}`).val(this.Value);
+            $(`[id="${this.GUID}"]`).val(this.Value);
             this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
     }
@@ -667,13 +667,13 @@ class UIMeasurement {
 
     Hide() {
         this.Hidden = true;
-        $(`#${this.GUID}`).hide();
+        $(`[id="${this.GUID}"]`).hide();
     }
 
     Show() {
         this.Hidden = false;
-        $(`#${this.GUID}`).css('display', 'inline-block');
-        $(`#${this.GUID}`).show();
+        $(`[id="${this.GUID}"]`).css('display', 'inline-block');
+        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -760,7 +760,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
             spacesToAdd = 6;
         for(var i = 0; i < spacesToAdd; i++)
             displayValue += `&nbsp;`
-        $(`#${this.GUID}-DisplayValue`).html(displayValue);
+        $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
     }
 
     SetValue(value) {

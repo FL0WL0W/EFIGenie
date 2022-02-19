@@ -366,7 +366,10 @@ class ConfigInputs {
 
         var inputlist = ``;
         for(var i = 0; i < this.Inputs.length; i++){
-            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button${this.Selected === i? ` active` : ``}">${this.Inputs[i].Name.Value}</div>`;
+            var liveUpdate = this.Inputs[i].TranslationConfig.LiveUpdate;
+            if(!this.Inputs[i].TranslationConfig.Selection.Value)
+                liveUpdate = this.Inputs[i].RawConfig.LiveUpdate;
+            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button${this.Selected === i? ` active` : ``}">${this.Inputs[i].Name.Value}<span style="float: right;">${liveUpdate.GetHtml()}</span></div>`;
         }
         if(this.Inputs.length === 0){
             this.ContextSelect = -1;

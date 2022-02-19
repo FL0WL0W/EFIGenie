@@ -499,7 +499,8 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
                 if(thisClass.VariableId && VariableValues[thisClass.VariableId] !== undefined) {
                     thisClass.SetValue(VariableValues[thisClass.VariableId]);
                     if(!thisClass.StickyHide) {
-                        thisClass.ShowSuper();
+                        // if(thisClass.Hidden)
+                            thisClass.ShowSuper();
                         if(thisClass.TimeoutHandle)
                             window.clearTimeout(thisClass.TimeoutHandle);
         
