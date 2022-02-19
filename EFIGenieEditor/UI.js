@@ -635,11 +635,12 @@ class UIMeasurement {
         Object.assign(this, prop);
         if(!Array.isArray(this.OnChange))
             this.OnChange = [ this.OnChange ];
-        this.Default = this.Value ??= GetDefaultUnitIndex(this.Measurement);
+        this.Value ??= GetDefaultUnitIndex(this.Measurement);
+        this.Default = this.Value;
     }
 
     GetValue() {
-        if(this.Value != this.Default)
+        if(this.Value !== this.Default)
             return this.Value;
     }
 
