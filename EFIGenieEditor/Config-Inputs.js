@@ -127,7 +127,7 @@ function ParsePinSelectElements(pinSelectElements){
 }
 
 function GetNameFromPinSelectElement(element){
-    var inputName = $($($(element).parent().parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
+    var inputName = $($($(element).parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
     if(inputName)
         return inputName;
 
@@ -498,7 +498,7 @@ class UIPinSelection extends UISelection {
         super(prop);
         this.SelectDisabled = prop.SelectDisabled ?? true;
         this.SelectValue = prop.SelectValue ?? 0xFFFF;
-        this.Class = !prop.Class? this.PinType : `${prop.Class} ${this.PinType} pinselect`;
+        this.Class = !prop.Class? `${this.PinType} pinselect` : `${prop.Class} ${this.PinType} pinselect`;
         this.Options = this.GenerateOptionList();
         this.OnChange.push(function() {
             UpdateOverlay();
