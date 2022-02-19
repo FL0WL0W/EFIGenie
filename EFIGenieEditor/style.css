@@ -251,15 +251,6 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     padding: 2.5px;
     margin: 2.5px;
 }
-.configDivider {
-    border-style: solid;
-    border-width: 1px;
-    border-color: #666;
-    padding: 0px;
-    margin: 2.5px;
-    display: inline-block;
-    width: 100%;
-}
 label:not(.w3-button) {
     font: bold 16px Arial;
     display: inline-block;
@@ -393,5 +384,5 @@ select .pinconflict{
 }
 
 .monospace {
-font-family: 'Courier New', monospace;
+    font-family: 'Courier New', monospace;
 }

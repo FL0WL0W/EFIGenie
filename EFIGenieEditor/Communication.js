@@ -14,6 +14,8 @@ function GetVariableIdList() {
                 var id = arr[i].Id;
                 if(isNaN(id))
                     continue;
+                if(arr[i].Type !== "float" && arr[i].Type !== "bool")
+                    continue;
                 if(variableIds.indexOf(id) === -1)
                     variableIds.push(id);
             }

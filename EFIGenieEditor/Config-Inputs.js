@@ -1,7 +1,7 @@
 var CurrentTickVariableID = 0;
-var InputRawConfigs = [];
-var InputTranslationConfigs = [];
-InputTranslationConfigs.push(ConfigOperation_LookupTable);
+var InputConfigs = [];
+InputConfigs.push(ConfigOperation_Static);
+InputConfigs.push(ConfigOperation_LookupTable);
 
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -188,12 +188,19 @@ class ConfigInputs {
 
     constructor(){
         this.GUID = generateGUID();
+        this.Inputs = [this.NewInput()];
     }
 
-    Inputs = [new ConfigInput()];
     TargetDevice = `STM32F401C`;
     Selected = 0;
     ContextSelect;
+
+    NewInput() {
+        const thisClass = this;
+        return new ConfigInput({
+            OnChange: function() {$(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());}
+        });
+    }
 
     GetValue() {
         var value  = { Inputs: [], TargetDevice: this.TargetDevice };
@@ -219,7 +226,7 @@ class ConfigInputs {
             }
 
             for(var i = 0; i < value.Inputs.length; i++){
-                this.Inputs.push(new ConfigInput());
+                this.Inputs.push(this.NewInput());
                 this.Inputs[i].SetValue(value.Inputs[i]);
             }
         }
@@ -278,15 +285,7 @@ class ConfigInputs {
             //so nuking it instead
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
         });
-        
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-name`, function(){
-            if(isNaN(thisClass.Selected))
-                return;
-
-            thisClass.Inputs[thisClass.Selected].Name = $(this).val();
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-        });
-        
+                
         $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-inputs div`, function(e){
             $(`#${thisClass.GUID}-contextmenu`).show();
             $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${e.pageX}px`);
@@ -303,7 +302,7 @@ class ConfigInputs {
             if(isNaN(thisClass.ContextSelect))
                 return;
 
-            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, new ConfigInput());
+            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, this.NewInput());
             thisClass.Selected = thisClass.ContextSelect + 1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
@@ -326,7 +325,7 @@ class ConfigInputs {
             if(isNaN(thisClass.ContextSelect))
                 return;
             
-            thisClass.Inputs.push(new ConfigInput());
+            thisClass.Inputs.push(this.NewInput());
             thisClass.Inputs[thisClass.Inputs.length-1].SetValue(thisClass.Inputs[contextSelect].GetValue());
             thisClass.Selected = thisClass.Inputs.length-1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
@@ -367,7 +366,7 @@ class ConfigInputs {
 
         var inputlist = ``;
         for(var i = 0; i < this.Inputs.length; i++){
-            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button${this.Selected === i? ` active` : ``}">${this.Inputs[i].Name}</div>`;
+            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button${this.Selected === i? ` active` : ``}">${this.Inputs[i].Name.Value}</div>`;
         }
         if(this.Inputs.length === 0){
             this.ContextSelect = -1;
@@ -393,8 +392,6 @@ class ConfigInputs {
         for(var i = 0; i < this.Inputs.length; i++)
         {
             configs += `<div id="${this.GUID}-${i}" class="inputconfig"${i===this.Selected? `` : ` style="display: none;"`}><div  class="configContainer" style="border-style: none;">` +
-            `    <label for="${this.GUID}"-name">Name:</label>` +
-            `    <input id="${this.GUID}"-name" type="text" value="${this.Inputs[i].Name}"/>` +
             `</div>` +
             `   <div class="configContainer">` + 
             this.Inputs[i].GetHtml() +
@@ -433,310 +430,63 @@ class ConfigInputs {
     }
 }
 
-//if any changes are needed in ConfigInput, refactor to use UITemplate
-class ConfigInput {
-    static Template = getFileContents(`ConfigGui/Input.html`);
+class ConfigInput extends UITemplate {
+    static Template = `<div><label for="$Name.GUID$">Name:</label>$Name$</div>$RawConfig$<hr style="margin: 2px;"/>$TranslationConfig$`
 
-    constructor(){
-        this.GUID = generateGUID();
-    }
-
-    Name = `Input`;
-    TranslationMeasurement = `None`;
-
-    GetValue() {
-        var rawConfigValue;
-        if(this.RawConfig) {
-            rawConfigValue = this.RawConfig.GetValue();
-            rawConfigValue.Name = GetClassProperty(this.RawConfig, `Name`)
-        }
-        var translationConfigValue;
-        if(this.TranslationConfig) {
-            translationConfigValue = this.TranslationConfig.GetValue();
-            translationConfigValue.Name = GetClassProperty(this.TranslationConfig, `Name`)
-        }
-        return { 
-            Name: this.Name,
-            RawConfig: rawConfigValue, 
-            TranslationConfig: translationConfigValue,
-            TranslationMeasurement: this.TranslationMeasurement
-        };
-    }
-
-    SetValue(value) {
-        this.Detach();
-        if(value) {
-            this.Name = value.Name;
-            this.RawConfig = undefined;
-            if(value.RawConfig){
-                for(var i = 0; i < InputRawConfigs.length; i++)
-                {
-                    if(InputRawConfigs[i].Name === value.RawConfig.Name) {
-                        this.RawConfig = new InputRawConfigs[i]();
-                        this.RawConfig.SetValue(value.RawConfig);
-                        break;
-                    }
-                }
-            }
-            this.TranslationConfig = undefined;
-            if(value.TranslationConfig){
-                for(var i = 0; i < InputTranslationConfigs.length; i++)
-                {
-                    if(InputTranslationConfigs[i].Name === value.TranslationConfig.Name) {
-                        this.TranslationConfig = new InputTranslationConfigs[i]({
-                            NoParameterSelection: true,
-                            XLabel: `Raw Input`
-                        });
-                        this.TranslationConfig.SetValue(value.TranslationConfig);
-                        break;
-                    }
-                }
-            }
-            this.TranslationMeasurement = value.TranslationMeasurement;
-        }
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off(`change.${this.GUID}`);
-        if(this.RawConfig) 
-            this.RawConfig.Detach();
-        if(this.TranslationConfig) 
-            this.TranslationConfig.Detach();
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-rawselection`, function(){
-            thisClass.Detach();
-
-            var val = $(this).val();
-            if(val === `-1`)
-                thisClass.RawConfig = undefined;
-            else
-                thisClass.RawConfig = new InputRawConfigs[val]();
-            
-            if(thisClass.RawConfig) {
-                $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
-                $(`#${thisClass.GUID}-rawmeasurement`).html(GetUnitDisplay(GetClassProperty(thisClass.RawConfig, `Measurement`)));
-            } else {
-                $(`#${thisClass.GUID}-raw`).html(``);
-                $(`#${thisClass.GUID}-rawmeasurement`).html(``);
-            }
-                
-            var translationSelections = thisClass.GetTranslationSelections();
-            $(`#${thisClass.GUID}-translationselection`).html(translationSelections.Html);
-            
-            if(translationSelections.Available) {
-                $(`#${thisClass.GUID}-translationselection`).prop(`disabled`, false );
-            } else {
-                $(`#${thisClass.GUID}-translationselection`).prop(`disabled`, true );
-                $(`#${thisClass.GUID}-translationmeasurement`).html(``);
-            }
-
-            thisClass.Attach();
+    constructor(prop) {
+        prop ??= {};
+        prop.RawConfig = new ConfigOrVariableSelection({
+            Configs:            InputConfigs,
+            Label:              `Raw Input`,
+            Inputs:             [],
+            Name:               prop.Name,
+            VariableListName:   `Inputs`,
         });
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-translationselection`, function(){
-            thisClass.Detach();
-
-            var val = $(this).val();
-            if(val === `-1`)
-                thisClass.TranslationConfig = undefined;
-            else
-            {
-                thisClass.TranslationConfig = new InputTranslationConfigs[val]({
-                    NoParameterSelection: true,
-                    XLabel: `Raw Input`
-                });
-            }
-            
-            if(thisClass.TranslationConfig)
-                $(`#${thisClass.GUID}-translation`).html(thisClass.TranslationConfig.GetHtml());
-            else
-                $(`#${thisClass.GUID}-translation`).html(``);
-            
-            $(`#${thisClass.GUID}-translationmeasurement`).html(thisClass.GetTranslationMeasurement());
-
-            thisClass.Attach();
+        prop.TranslationConfig = new ConfigOrVariableSelection({
+            Configs:            InputConfigs,
+            Label:              `Translation`,
+            Inputs:             [``],
+            Name:               prop.Name,
+            VariableListName:   `Inputs`,
+            Template: ConfigOrVariableSelection.Template.replace(`$Selection$`, `$Selection$ \\$TranslationMeasurement\\$`)
         });
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-translationmeasurementselection`, function(){
-            thisClass.TranslationMeasurement = $(this).val();
+        prop.Name = new UIText({
+            Value: prop.Name ?? `Input`
+        })
+        const measurementKeys = Object.keys(Measurements)
+        var options = [];
+        measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
+        prop.TranslationMeasurement = new UISelection({
+            Value: `None`,
+            SelectNotVisible: true,
+            Options: options,
         });
-
-        if(this.RawConfig) 
-            this.RawConfig.Attach();
-        if(this.TranslationConfig) 
-            this.TranslationConfig.Attach();
-    }
-
-    GetTranslationMeasurement() {
-        if(!this.TranslationConfig)
-            return ``;
-
-        var translationMeasurement = this.TranslationConfig.constructor.Measurement;
-        if(translationMeasurement === `Selectable`)
-        {
-            var selections = `<select id="${this.GUID}-translationmeasurementselection">`;
-            var measurements = Object.keys(Measurements);
-            for(var i = 0; i < measurements.length; i++)
-            {
-                selections += `<option value="${measurements[i]}"${this.TranslationMeasurement === measurements[i]? ` selected` : ``}>${GetMeasurementDisplay(measurements[i], 0)}</option>`
-            }
-
-            selections = `${selections}</select>`;
-            return selections;
-        }
-        return GetUnitDisplay(translationMeasurement);
-    }
-
-    GetTranslationSelections() {
-        var availableTranslation = false;
-        var translationSelections;
-        if(this.RawConfig)
-        {
-            var output = GetClassProperty(this.RawConfig, `Output`);
-            var translationSelected = false;
-            if(output !== undefined)
-            {
-                for(var i = 0; i < InputTranslationConfigs.length; i++)
-                {
-                    var inputs = InputTranslationConfigs[i].Inputs;
-                    var validInputCnt = 0;
-                    for(var inp = 0; inp < inputs.length; inp++){
-                        if(inputs[inp] !== output) {
-                            validInputCnt = 0;
-                            break;
-                        }
-                        validInputCnt++;
-                    }
-                    if(validInputCnt !== 1)
-                        continue;
-
-                    var selected = false;
-                    if(this.TranslationConfig && this.TranslationConfig instanceof InputTranslationConfigs[i]){
-                        selected = true;
-                        translationSelected = true;
-                    }
-
-                    translationSelections += `<option value="${i}"${selected? ` selected` : ``}>${InputTranslationConfigs[i].Name}</option>`;
-                    availableTranslation = true;
-                }
-            }
-
-            if(!translationSelected) {
-                this.TranslationConfig = undefined;
-                $(`#${this.GUID}-translation`).html(``);
-            }
-
-            if(availableTranslation){
-                translationSelections = `<option value="-1"${translationSelected? `` : ` selected`}>None</option>${translationSelections}`;
-            } else {
-                translationSelections = `<option value="-1" disabled selected>None</option>`;
-            }
-        } else {
-            this.TranslationConfig = undefined;
-            $(`#${this.GUID}-translation`).html(``);
-            translationSelections = `<option value="-1">Select Raw First</option>`
-        }
-        return { Html : translationSelections, Available: availableTranslation };
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, `Template`);
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        
-        var rawSelections;
-        var rawSelected = false;
-        for(var i = 0; i < InputRawConfigs.length; i++)
-        {
-            var selected = false;
-            if(this.RawConfig && this.RawConfig instanceof InputRawConfigs[i]){
-                selected = true;
-                rawSelected = true;
-            }
-
-            rawSelections += `<option value="${i}"${selected? ` selected` : ``}>${InputRawConfigs[i].Name}</option>`
-        }
-        if(!rawSelected)
-            this.RawConfig = undefined;
-        rawSelections = `<option value="-1" disabled${rawSelected? `` : ` selected`}>Select</option>${rawSelections}`;
-        template = template.replace(/[$]rawselections[$]/g, rawSelections);
-
-        var translationSelections = this.GetTranslationSelections();
-        template = template.replace(/[$]translationselections[$]/g, translationSelections.Html);
-        template = template.replace(/[$]translationdisabled[$]/g, translationSelections.Available? `` : `disabled`);
-        
-        if(this.RawConfig) {
-            template = template.replace(/[$]raw[$]/g, this.RawConfig.GetHtml());
-            template = template.replace(/[$]rawvalue[$]/g, GetMeasurementDisplay(GetClassProperty(this.RawConfig, `Measurement`)));
-            template = template.replace(/[$]rawmeasurement[$]/g, GetUnitDisplay(GetClassProperty(this.RawConfig, `Measurement`)));
-        } else {
-            template = template.replace(/[$]raw[$]/g, ``);
-            template = template.replace(/[$]rawvalue[$]/g, ``);
-            template = template.replace(/[$]rawmeasurement[$]/g, ``);
-        }
-        if(this.TranslationConfig) {
-            template = template.replace(/[$]translation[$]/g, this.TranslationConfig.GetHtml());
-            template = template.replace(/[$]translationmeasurement[$]/g, this.GetTranslationMeasurement());
-            template = template.replace(/[$]translationvalue[$]/g, ``);//this is for interactivity later
-        } else {
-            template = template.replace(/[$]translation[$]/g, ``);
-            template = template.replace(/[$]translationmeasurement[$]/g, ``);
-            template = template.replace(/[$]translationvalue[$]/g, ``);
-        }
-
-        return template;
+        super(prop);
+        const thisClass = this;
+        this.RawConfig.OnChange.push(function() { thisClass.TranslationConfig.Inputs = [GetClassProperty(thisClass.RawConfig.GetSubConfig(), `Output`)]; })
+        this.Name.OnChange.push(function() { thisClass.TranslationConfig.Name = thisClass.RawConfig.Name = thisClass.Name.Value });
+        this.TranslationMeasurement.OnChange.push(function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value })
     }
 
     RegisterVariables() {
-        if(!this.RawConfig) 
-            return;
-
-        if(this.TranslationConfig) {
-            VariableRegister.RegisterVariable(
-                `Inputs`, 
-                this.Name, 
-                GetClassProperty(this.TranslationConfig, `Output`), 
-                this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement
-            );
-        }
-
-        VariableRegister.RegisterVariable(
-            `Inputs`, 
-            this.Name, 
-            GetClassProperty(this.TranslationConfig, `Output`), 
-            GetClassProperty(this.RawConfig, `Measurement`)
-        );
-
-        this.RawConfig?.RegisterVariables?.();
-        this.TranslationConfig?.RegisterVariables?.();
+        this.TranslationConfig.RegisterVariables?.();
+        this.RawConfig.RegisterVariables?.();
     }
 
-    GetObjOperation() {
-        if(!this.RawConfig) 
-            return;
-
-        const inputMeasurement = GetClassProperty(this.RawConfig, `Measurement`);
-        const inputRawId = `Inputs.${this.Name}${inputMeasurement? `(${inputMeasurement})` : ``}`;
-
-        var objOperation = { value: [ { obj: this.RawConfig.GetObjOperation(inputRawId)} ]};
-
-        if(this.TranslationConfig) {
-            objOperation.value.unshift(
-                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-                { type: `UINT16`, value: 2 }, // number of operations
-            );
-
-            const translationMeasurement = this.TranslationConfig.constructor.Measurement === `Selectable`? this.TranslationMeasurement : this.TranslationConfig.constructor.Measurement;
-            const translationId = `Inputs.${this.Name}${translationMeasurement? `(${translationMeasurement})` : ``}`;
-            objOperation.value.push({ obj: this.TranslationConfig.GetObjOperation(translationId, inputRawId)});            
+    SetValue(value) {
+        if(value?.RawConfig?.Name){
+            value.RawConfig = {
+                Values: [ value.RawConfig ],
+                Selection: { value: value.RawConfig.Name }
+            };
         }
-        
-        return objOperation;
+        if(value?.TranslationConfig?.Name){
+            value.TranslationConfig = {
+                Values: [ value.TranslationConfig ],
+                Selection: { value: value.TranslationConfig.Name }
+            };
+        }
+        super.SetValue(value);
     }
 }
 
@@ -811,7 +561,7 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_AnalogPinRead);
+InputConfigs.push(ConfigOperation_AnalogPinRead);
 
 class ConfigOperation_DigitalPinRead extends UITemplate {
     static Name = `Digital Pin`;
@@ -845,7 +595,7 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_DigitalPinRead);
+InputConfigs.push(ConfigOperation_DigitalPinRead);
 
 class ConfigOperation_DigitalPinRecord extends UITemplate {
     static Name = `Digital Pin (Record)`;
@@ -887,7 +637,7 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_DigitalPinRecord);
+InputConfigs.push(ConfigOperation_DigitalPinRecord);
 
 class ConfigOperation_DutyCyclePinRead extends UITemplate {
     static Name = `Duty Cycle Pin Pin`;
@@ -928,7 +678,7 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_DutyCyclePinRead);
+InputConfigs.push(ConfigOperation_DutyCyclePinRead);
 
 class ConfigOperation_FrequencyPinRead extends UITemplate {
     static Name = `Frequency Pin`;
@@ -969,7 +719,7 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_FrequencyPinRead);
+InputConfigs.push(ConfigOperation_FrequencyPinRead);
 
 class ConfigOperation_PulseWidthPinRead extends UITemplate {
     static Name = `Pulse Width Pin`;
@@ -1010,14 +760,13 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputRawConfigs.push(ConfigOperation_PulseWidthPinRead);
+InputConfigs.push(ConfigOperation_PulseWidthPinRead);
 
 //this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
 class ConfigOperation_Polynomial {
     static Name = `Polynomial`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Measurement = `Selectable`;
     static Template = getFileContents(`ConfigGui/Operation_Polynomial.html`);
 
     constructor(){
@@ -1135,7 +884,7 @@ class ConfigOperation_Polynomial {
         return objOperation;
     }
 }
-InputTranslationConfigs.push(ConfigOperation_Polynomial);
+InputConfigs.push(ConfigOperation_Polynomial);
 
 
 class ConfigOperation_ReluctorGM24x extends UITemplate {
@@ -1158,7 +907,7 @@ class ConfigOperation_ReluctorGM24x extends UITemplate {
         });
     }
 }
-InputTranslationConfigs.push(ConfigOperation_ReluctorGM24x);
+InputConfigs.push(ConfigOperation_ReluctorGM24x);
 
 class ConfigOperation_ReluctorUniversal1x extends UITemplate {
     static Name = `Reluctor Universal 1X`;
@@ -1203,7 +952,7 @@ class ConfigOperation_ReluctorUniversal1x extends UITemplate {
         });
     }
 }
-InputTranslationConfigs.push(ConfigOperation_ReluctorUniversal1x);
+InputConfigs.push(ConfigOperation_ReluctorUniversal1x);
 
 class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
     static Name = `Reluctor Universal Missing Teeth`;
@@ -1260,4 +1009,4 @@ class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
         });
     }
 }
-InputTranslationConfigs.push(ConfigOperation_ReluctorUniversalMissingTeeth);
+InputConfigs.push(ConfigOperation_ReluctorUniversalMissingTeeth);

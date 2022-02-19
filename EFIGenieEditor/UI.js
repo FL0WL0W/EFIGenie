@@ -139,7 +139,7 @@ class UITemplate {
 
         const thisClass = this;
         var matches;
-        while((matches = html.match(/[$].*?[$]/g)) !== null) {
+        while((matches = html.replaceAll(`\\$`, ``).match(/[$].*?[$]/g)) !== null) {
             matches.forEach(templateIdentifier => {
                 function GetTemplateReplacement(obj, templateIdentifier) {
                     const subReplacer = templateIdentifier.indexOf(`.`) > -1;
@@ -173,6 +173,13 @@ class UITemplate {
                 html = html.replaceAll(`$${templateIdentifier}$`, templateReplacement);
             });
         }
+        if((matches = html.replaceAll(`\\\\$`, ``).match(/(\\[$]).*?(\\[$])/g)) !== null)
+            matches.forEach(templateIdentifier => {
+                templateIdentifier = templateIdentifier.substring(2, templateIdentifier.length -2);
+                html = html.replaceAll(`\\$${templateIdentifier}\\$`, `$${templateIdentifier}$`);
+            });
+        
+            html = html.replaceAll(`\\\\$`, `\\$`);
 
         return `<span id="${this.GUID}-TemplateSpan"${this.Hidden? ` style="display: none;"` : ``}>${html}</span>`;
     }
@@ -492,8 +499,9 @@ class UISelection {
                     `>${option.Name}</option>`;
             }
         });
-        optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
-            `>select</option>${optionsHtml}`;
+        if(!this.SelectNotVisible)
+            optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
+                `>select</option>${optionsHtml}`;
         return optionsHtml;
     }
 
@@ -721,7 +729,7 @@ class UINumberWithMeasurement extends UITemplate {
 }
 
 class DisplayNumberWithMeasurement extends UITemplate {
-    static Template = `<span class="monospace" id="$GUID$-DisplayValue">$DisplayValue$</span> $MeasurementIndex$`
+    static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$MeasurementIndex$</div>`
 
     constructor(prop) {
         var measurementIndexProp = {};
@@ -740,11 +748,19 @@ class DisplayNumberWithMeasurement extends UITemplate {
     }
 
     UpdateDisplayValue() {
-        const unit = Measurements[this.Measurement]?.[this.MeasurementIndex.Value];
-        if(unit) {
-            this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
-            $(`#${this.GUID}-DisplayValue`).html(parseFloat(parseFloat(this.DisplayValue).toFixed(5)).toPrecision(6));
-        }
+        var unit = Measurements[this.Measurement]?.[this.MeasurementIndex.Value];
+        if(!unit)
+            unit = { DisplayMultiplier: 1, DisplayOffset: 0};
+
+        this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
+        var displayValue = `${parseFloat(parseFloat(parseFloat(this.DisplayValue).toFixed(5)).toPrecision(6))}`;
+        const indexOfPoint = displayValue.indexOf(`.`);
+        var spacesToAdd = 6-(displayValue.length - indexOfPoint);
+        if(indexOfPoint === -1)
+            spacesToAdd = 6;
+        for(var i = 0; i < spacesToAdd; i++)
+            displayValue += `&nbsp;`
+        $(`#${this.GUID}-DisplayValue`).html(displayValue);
     }
 
     SetValue(value) {

@@ -69,7 +69,6 @@ class ConfigOperation_LookupTable extends UITemplate {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Measurement = `Selectable`;
     static Label = `Value`;
     static XLabel = `X`
     static Template = `$Dialog$`
@@ -139,7 +138,6 @@ class ConfigOperation_2AxisTable extends UITemplate {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
-    static Measurement = `Selectable`;
     static Label = `Value`;
     static XLabel = `X`
     static YLabel = `Y`
@@ -219,18 +217,36 @@ class ConfigOperation_2AxisTable extends UITemplate {
 }
 GenericConfigs.push(ConfigOperation_2AxisTable);
 
-function GetSelections(measurement, configs) {
+function GetSelections(measurement, output, inputs, configs) {
     var selections = [];
     if (configs) {
         var calculations = { Group: `Calculations`, Options: [] }
         for (var i = 0; i < configs.length; i++) {
-            calculations.Options.push({
-                Name: configs[i].Name,
-                Value: { value: configs[i].Name }
-            });
+            if (output === undefined || !configs[i].Output || configs[i].Output === output) {
+                if(inputs !== undefined) {
+                    if(inputs.length !== configs[i].Inputs.length)
+                        continue;
+                    var inputsMatch = true;
+                    for(var im = 0; im < inputs.length; im++){
+                        if(inputs[im] !== configs[i].Inputs[im]){
+                            inputsMatch = false;
+                            break;
+                        }
+                    }
+                    if(!inputsMatch)
+                        continue;
+                }
+                calculations.Options.push({
+                    Name: configs[i].Name,
+                    Value: { value: configs[i].Name }
+                });
+            }
         }
         selections.push(calculations);
     }
+
+    if(configs && inputs)
+        return selections[0].Options;
 
     for (var property in VariableRegister) {
         if (!Array.isArray(VariableRegister[property]))
@@ -241,7 +257,7 @@ function GetSelections(measurement, configs) {
         var arrSelections = { Group: property, Options: [] };
 
         for (var i = 0; i < arr.length; i++) {
-            if (!measurement || arr[i].Measurement === measurement) {
+            if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
                 arrSelections.Options.push({
                     Name: arr[i].Name + (!measurement ? ` [${GetUnitDisplay(arr[i].Measurement)}]` : ``),
                     Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
@@ -263,7 +279,7 @@ class ConfigOrVariableSelection extends UITemplate {
     constructor(prop) {
         prop ??= {};
         prop.Selection = new UISelection({
-            Options: GetSelections(prop.Measurement, prop.Configs),
+            Options: GetSelections(prop.Measurement, prop.Output, prop.Inputs, prop.Configs),
             SelectDisabled: true
         });
         super(prop);
@@ -277,11 +293,12 @@ class ConfigOrVariableSelection extends UITemplate {
         this.Selection.OnChange.push(function () {
             //proud of myself on this clever bit of self modifying template ;)
             thisClass.ConfigValue = `$ConfigValues.${thisClass.GetSubConfigIndex()}$`;
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
+            $(`#${thisClass.GUID}-TemplateSpan`).replaceWith(thisClass.GetHtml());
             thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
                 subConfig.Attach();
+            thisClass.LiveUpdate.MeasurementIndex.Measurement = thisClass.GetMeasurement();
             thisClass.LiveUpdate.Show?.();
         });
     }
@@ -356,6 +373,8 @@ class ConfigOrVariableSelection extends UITemplate {
     }
 
     SetValue(value) {
+        value ??= {};
+
         if(value.Values === undefined) {
             value.Values = [];
 
@@ -402,24 +421,15 @@ class ConfigOrVariableSelection extends UITemplate {
 
         super.SetValue(value);
     }
-
-    GetCellByName(array, name) {
-        if (!array)
-            return undefined;
-        for (var i = 0; i < array.length; i++) {
-            if (name && name === array[i].Name && this.Measurement === array[i].Measurement)
-                return array[i];
-        }
-        return undefined;
-    }
     
     IsVariable() {
         return this.Selection.Value?.reference;
     }
 
     RegisterVariables() {
-        this.Selection.SetOptions(GetSelections(this.Measurement, this.Configs));
+        this.Selection.SetOptions(GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs));
         const selection = this.Selection.Value;
+        const measurement = this.GetMeasurement();
         if (selection && this.VariableListName) {
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
@@ -428,31 +438,42 @@ class ConfigOrVariableSelection extends UITemplate {
                 if (GetClassProperty(subConfig, `Output`)) {
                     VariableRegister.RegisterVariable(
                         this.VariableListName,
-                        this.Label,
+                        this.Name ?? this.Label,
                         GetClassProperty(subConfig, `Output`),
-                        this.Measurement
+                        measurement
                     );
                 }
             } else {
                 VariableRegister.RegisterVariableReference(
                     this.VariableListName,
-                    this.Label,
-                    this.Measurement,
-                    `${selection.reference}.${selection.value}${selection.measurement? `(${selection.measurement})` : ``}`
+                    this.Name ?? this.Label,
+                    measurement,
+                    `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`
                 );
             }
-            this.LiveUpdate.VariableId = VariableRegister.GetVariableId(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`)
+            this.LiveUpdate.VariableId = VariableRegister.GetVariableId(`${this.VariableListName}.${this.Name ?? this.Label}${measurement? `(${measurement})` : ``}`)
+            this.LiveUpdate.MeasurementIndex.Measurement = measurement;
         }
     }
 
+    GetMeasurement() {
+        const selection = this.Selection.Value;
+        if (!selection.reference) {
+            const subConfig = this.GetSubConfig();
+            return this.Measurement ?? GetClassProperty(subConfig, `Measurement`);
+        }
+        return this.Measurement ?? selection.measurement;
+    }
+
     GetObjOperation(...args) {
-        const selection = this.Selection.Value;            
+        const selection = this.Selection.Value;
+        const measurement = this.GetMeasurement();            
         if(!selection.reference) {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
                 return;
             if(this.VariableListName)
-                return subConfig.GetObjOperation(`${this.VariableListName}.${this.Label}${this.Measurement? `(${this.Measurement})` : ``}`, ...args);
+                return subConfig.GetObjOperation(`${this.VariableListName}.${this.Name ?? this.Label}${measurement? `(${measurement})` : ``}`, ...args);
             return subConfig.GetObjOperation(...args);
         }
 
@@ -466,6 +487,7 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
     constructor(prop) {
         prop.StickyHide = prop.Hidden;
         prop.Hidden = true;
+        prop.NumberClass = "livevalue";
         super(prop);
     }
 
