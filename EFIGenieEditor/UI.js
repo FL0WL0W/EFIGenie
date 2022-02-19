@@ -632,11 +632,12 @@ class UIMeasurement {
         Object.assign(this, prop);
         if(!Array.isArray(this.OnChange))
             this.OnChange = [ this.OnChange ];
-        this.Value ??= GetDefaultUnitIndex(this.Measurement);
+        this.Default = this.Value ??= GetDefaultUnitIndex(this.Measurement);
     }
 
     GetValue() {
-        return this.Value;
+        if(this.Value != this.Default)
+            return this.Value;
     }
 
     SetValue(value) {
@@ -748,8 +749,8 @@ class DisplayNumberWithMeasurement extends UITemplate {
     }
 
     UpdateDisplayValue() {
-        var unit = Measurements[this.Measurement]?.[this.MeasurementIndex.Value];
-        if(!unit)
+        var unit = Measurements[this.MeasurementIndex.Measurement]?.[this.MeasurementIndex.Value];
+        if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
 
         this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
