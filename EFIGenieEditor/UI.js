@@ -750,7 +750,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
             thisClass.UpdateDisplayValue();
         });
         this.UpdateDisplayValue();
-        this.SpacesToAdd = 10000000;
+        this.ZeroesToAdd = 10000000;
     }
 
     UpdateDisplayValue() {
@@ -761,14 +761,14 @@ class DisplayNumberWithMeasurement extends UITemplate {
         this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
         var displayValue = `${parseFloat(parseFloat(parseFloat(this.DisplayValue).toFixed(5)).toPrecision(6))}`;
         const indexOfPoint = displayValue.indexOf(`.`);
-        var spacesToAdd = 6-(displayValue.length - indexOfPoint);
+        var zeroesToAdd = 6-(displayValue.length - indexOfPoint);
         if(indexOfPoint === -1)
-            spacesToAdd = 6;
-        if(spacesToAdd < this.SpacesToAdd)
-            this.SpacesToAdd = spacesToAdd;
-        spacesToAdd -= this.SpacesToAdd;
-        for(var i = 0; i < spacesToAdd; i++)
-            displayValue += `&nbsp;`
+            zeroesToAdd = 6;
+        if(zeroesToAdd < this.ZeroesToAdd)
+            this.ZeroesToAdd = zeroesToAdd;
+        zeroesToAdd -= this.ZeroesToAdd;
+        for(var i = 0; i < zeroesToAdd; i++)
+            displayValue += `0`
         $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
     }
 
