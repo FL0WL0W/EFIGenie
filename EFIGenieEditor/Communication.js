@@ -24,21 +24,25 @@ function compareVariableIds(a, b) {
     return true;
 }
 
+function GetVariableLogArrayBuffer() {
+
+    var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableMetadata.GetVariableReferenceList())));
+    return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray).concatArray(LogBytes);
+}
+
 var LiveUpdateEvents = [];
 
 var VariableMetadata;
 var CurrentVariableValues = [];
 var LoggedVariableValues = [];
-var LogFile
+var LogBytes = new ArrayBuffer();
 var previousVariableIds = []
 function UpdateFloatCurrentVariableValues() {
     const variableIds = GetVariableIdList();
     if(variableIds.length < 1)
         return;
     if(!compareVariableIds(variableIds, previousVariableIds)){
-        LogFile = lzjs.compress(JSON.stringify(VariableRegister.GetVariableReferenceList()));
-        LogFile = `${new Uint32Array([LogFile.length]).buffer.toRawString()}${LogFile}`
-        LogFile += new Uint32Array([variableIds.Length]).buffer.toRawString() + new Uint32Array(variableIds).buffer.toRawString();
+        LogBytes = new ArrayBuffer();
         LoggedVariableValues = [];
         previousVariableIds = variableIds;
     }
@@ -54,7 +58,7 @@ function UpdateFloatCurrentVariableValues() {
         },
         success: function(data) {
             var responseVariables = data.split(`\n`);
-            LogFile += atob(responseVariables[0]);
+            LogBytes = LogBytes.concatArray(base64ToArrayBuffer(responseVariables[0]));
             for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
                 var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
 
