@@ -1,5 +1,16 @@
 Uint8Array.prototype.toHex = function() { // buffer is an ArrayBuffer
-    return `0x` + Array.prototype.map.call(new Uint8Array(this), x => (`00` + x.toString(16)).slice(-2)).join(` 0x`);
+    var hexArray = Array.prototype.map.call(new Uint8Array(this), x => (`00` + x.toString(16)).slice(-2));
+    var string = `${hexArray[0]}`
+    for(var i = 1; i<hexArray.length; i++){
+        if(i%16===0)
+            string += `\n`;
+        else if(i%8===0)
+            string += `  `;
+        else
+            string += ` `
+        string += hexArray[i];
+    }
+    return string;
 }
 
 ArrayBuffer.prototype.toRawString = function() { // a, b TypedArray of same type
@@ -131,7 +142,7 @@ var downloadObject = function(obj, fileName) {
 }
 
 var downloadCompressedObject = function(obj, fileName) {
-    downloadstring(stringifyCompressedObject(obj), fileName);
+    downloadstring(stringifyCompressedObject(obj), fileName);   
 }
 
 var parseObject = function(s) {
@@ -276,4 +287,14 @@ function objectTester(a, b) {
         });
     }
     return false;
+  }
+
+  function base64ToArrayBuffer(base64) {
+      var binary_string = window.atob(base64);
+      var len = binary_string.length;
+      var bytes = new Uint8Array(len);
+      for (var i = 0; i < len; i++) {
+          bytes[i] = binary_string.charCodeAt(i);
+      }
+      return bytes.buffer;
   }

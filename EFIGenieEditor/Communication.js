@@ -46,6 +46,7 @@ function compareVariableIds(a, b) {
 
 var LiveUpdateEvents = [];
 
+var VariableMetadata;
 var CurrentVariableValues = [];
 var LoggedVariableValues = [];
 var LogFile
@@ -92,3 +93,14 @@ function UpdateFloatCurrentVariableValues() {
         }
       });
 }
+
+var blob
+$.ajax({
+    type: `GET`,
+    url: `http://127.0.0.1:8080/GetVariableMetaData`,
+    success: function(data) {
+        VariableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(data)));
+        VariableMetadata.CreateIfNotFound = false;
+        setInterval(UpdateFloatCurrentVariableValues, 100);
+    }
+});

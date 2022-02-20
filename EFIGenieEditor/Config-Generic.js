@@ -500,7 +500,7 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
             var thisClass = this
             LiveUpdateEvents[this.GUID] = function() {
                 if(thisClass.VariableReference) { 
-                    const variableId = VariableRegister.GetVariableId(thisClass.VariableReference);
+                    const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
                     if(CurrentVariableValues[variableId] !== undefined) {
                         thisClass.Value = CurrentVariableValues[variableId];
                         thisClass.UpdateDisplayValue();
@@ -514,6 +514,8 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
                                 thisClass.HideSuper();
                             },5000);
                         }
+                    } else {
+                        thisClass.HideSuper();
                     }
                 }
             };

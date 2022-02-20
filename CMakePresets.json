@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "Linux GCC 9.3.0",
+            "displayName": "Linux GCC 9.3.0",
+            "description": "Using compilers: C = /bin/gcc-9, CXX = /bin/g++-9",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "/bin/gcc-9",
+                "CMAKE_CXX_COMPILER": "/bin/g++-9",
+                "EFIGenie_build_tests": true,
+                "EmbeddedIOOperations_build_tests": true,
+                "EmbeddedIOServices_build_tests": true,
+                "OperationArchitecture_build_tests": true,
+                "ReluctorOperations_build_tests": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Linux GCC 9.3.0",
+            "configurePreset": "Linux GCC 9.3.0"
+        }
+    ]
+}

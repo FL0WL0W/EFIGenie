@@ -1,68 +1,73 @@
-class VariableRegister {
-    static Clear() {
-        Object.entries(VariableRegister).forEach(e => {
+class VariableRegistry {
+    CreateIfNotFound = true;
+    constructor(prop) {
+        Object.assign(this, prop);
+    }
+    Clear() {
+        Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            delete VariableRegister[elementname];
+            delete this[elementname];
         });
     }
-    static GenerateVariableId() {
-        VariableRegister.VariableIncrement ??= 0;
-        return ++VariableRegister.VariableIncrement;
+    GenerateVariableId() {
+        this.VariableIncrement ??= 0;
+        return ++this.VariableIncrement;
     }
-    static GetVariableId(variableReference) {
+    GetVariableId(variableReference) {
         if(typeof variableReference === `string`) {
             if(variableReference.indexOf(`.`) !== -1) {
                 const listName = variableReference.substring(0, variableReference.indexOf(`.`));
                 var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
-                if(Array.isArray(VariableRegister[listName])) {
-                    var variable = VariableRegister[listName].find(a => a.Name === variableName);
+                if(Array.isArray(this[listName])) {
+                    var variable = this[listName].find(a => a.Name === variableName);
                     if(variableName.indexOf(`(`) !== -1) {
                         var measurementName = variableName.substring(variableName.indexOf(`(`) + 1);
                         measurementName = measurementName.substring(0, measurementName.length - 1);
                         variableName = variableName.substring(0, variableName.indexOf(`(`));
-                        variable ??= VariableRegister[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
-                        variable ??= VariableRegister[listName].find(a => a.Name === variableName)
+                        variable ??= this[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
+                        variable ??= this[listName].find(a => a.Name === variableName)
                     }
                     if(variable) {
                         if(typeof variable.Id === `string`)
-                            return VariableRegister.GetVariableId(variable.Id);
+                            return this.GetVariableId(variable.Id);
                         if(variable.Id !== undefined)
                             return variable.Id;
-                        return 0;
+                        return undefined;
                     }
                 }
             }
-            if(typeof VariableRegister[variableReference] === `string`)
-                return VariableRegister.GetVariableId(VariableRegister[variableReference]);
-            if(VariableRegister[variableReference] !== undefined)
-                return VariableRegister[variableReference];
-            return VariableRegister[variableReference] = VariableRegister.GenerateVariableId();
+            if(typeof this[variableReference] === `string`)
+                return this.GetVariableId(this[variableReference]);
+            if(this[variableReference] !== undefined)
+                return this[variableReference];
+            if(this.CreateIfNotFound)
+                return this[variableReference] = this.GenerateVariableId();
         }
         if(typeof variableReference === `number`)
             return variableReference;
-        return 0;
+        return undefined;
     }
-    static RegisterVariable(ListName, Name, Type, Measurement) {
-        VariableRegister[ListName] ??= [];
-        VariableRegister[ListName].push({
+    RegisterVariable(ListName, Name, Type, Measurement) {
+        this[ListName] ??= [];
+        this[ListName].push({
             Name,
             Type,
             Measurement,
-            Id: VariableRegister.GenerateVariableId()
+            Id: this.GenerateVariableId()
         });
     }
-    static RegisterVariableReference(ListName, Name, Measurement, Reference) { 
-        VariableRegister[ListName] ??= [];
-        VariableRegister[ListName].push({
+    RegisterVariableReference(ListName, Name, Measurement, Reference) { 
+        this[ListName] ??= [];
+        this[ListName].push({
             Name,
             Measurement,
             Id: Reference
         });
     }
-    static GetVariableReferenceList() {
+    GetVariableReferenceList() {
         var variableReferences = {};
-        for (var property in VariableRegister) {
-            if (VariableRegister[property] === undefined)
+        for (var property in this) {
+            if (this[property] === undefined)
                 continue;
     
             if(property === `VariableIncrement`)
@@ -70,19 +75,22 @@ class VariableRegister {
             if(property.toLowerCase().indexOf(`temp`) === 0)
                 continue;
     
-            if (Array.isArray(VariableRegister[property])) {
-                var arr = VariableRegister[property];
+            if (Array.isArray(this[property])) {
+                variableReferences[property] ??= [];
+                var arr = this[property];
     
                 for (var i = 0; i < arr.length; i++) {
-                    variableReferences[property] = { Name: arr[i].Name, Measurement: arr[i].Measurement, Id: VariableRegister.GetVariableId(arr[i].Id)}
+                    variableReferences[property].push({ Name: arr[i].Name, Measurement: arr[i].Measurement, Id: this.GetVariableId(arr[i].Id)})
                 }
             } else {
-                variableReferences[property] = VariableRegister.GetVariableId(VariableRegister[property]);
+                variableReferences[property] = this.GetVariableId(this[property]);
             }
         }
         return variableReferences;
     }
 }
+
+VariableRegister = new VariableRegistry();
 
 var AFRConfigs = [];
 AFRConfigs.push(ConfigOperation_Static);
@@ -275,7 +283,7 @@ types = [
     { type: `UINT64`, toArrayBuffer() { return new BigUint64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
     { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
     { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `Text`, toArrayBuffer() { return new TextEncoder().encode(this.value).buffer; }},
+    { type: `CompressedObject`, toArrayBuffer() { return base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.value))); }},
     { type: `VariableId`, toObj() { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]}; }},
     { type: `Package`, toObj() {
         this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
@@ -507,12 +515,9 @@ class ConfigTop extends UITemplate {
             { type: `UINT16`, value: 2 }, // number of operations
             { obj: this.Fuel.GetObjOperation()}, 
             { obj: this.Ignition.GetObjOperation()}, 
-            { toObj() {
-                const variableList = lzjs.compress(JSON.stringify(VariableRegister.GetVariableReferenceList()));
-                return { value: [
-                    { type: `UINT32`, value: variableList.Length }, 
-                    { type: `Text`, value: variableList }
-                ]};
+            { toArrayBuffer() {
+                var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
+                return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray);
             }}
         ]};
     }

@@ -456,7 +456,8 @@ class ConfigInput extends UITemplate {
             Template: ConfigOrVariableSelection.Template.replace(`$Selection$`, `$Selection$ \\$TranslationMeasurement\\$`)
         });
         prop.Name = new UIText({
-            Value: prop.Name ?? `Input`
+            Value: prop.Name ?? `Input`,
+            OnChange: function() { prop.TranslationConfig.Name = prop.RawConfig.Name = prop.Name.Value }
         })
         const measurementKeys = Object.keys(Measurements)
         var options = [];
@@ -469,7 +470,6 @@ class ConfigInput extends UITemplate {
         super(prop);
         const thisClass = this;
         this.RawConfig.OnChange.push(function() { thisClass.TranslationConfig.Inputs = [GetClassProperty(thisClass.RawConfig.GetSubConfig(), `Output`)]; })
-        this.Name.OnChange.push(function() { thisClass.TranslationConfig.Name = thisClass.RawConfig.Name = thisClass.Name.Value });
         this.TranslationMeasurement.OnChange.push(function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value })
     }
 
