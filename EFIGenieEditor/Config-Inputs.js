@@ -409,6 +409,7 @@ class ConfigInputs {
     }
 
     RegisterVariables() {
+        VariableRegister.CurrentTickId = VariableRegister.GenerateVariableId();
         for(var i = 0; i < this.Inputs.length; i++){
             this.Inputs[i].RegisterVariables();
         }
@@ -491,6 +492,20 @@ class ConfigInput extends UITemplate {
             };
         }
         super.SetValue(value);
+    }
+
+    GetObjOperation() {
+        var rawConfigObj = this.RawConfig.GetObjOperation();
+        var rawConfigVariable = this.RawConfig.GetVariableReference();
+        var translationConfigVariable = this.TranslationConfig.GetObjOperation(rawConfigVariable);
+        if(rawConfigObj && rawConfigVariable && translationConfigVariable) 
+            return { value: [
+                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+                { type: `UINT16`, value: 2 }, // number of operations
+                { obj: rawConfigObj },
+                { obj: translationConfigVariable }
+            ]};
+        return rawConfigObj;
     }
 }
 

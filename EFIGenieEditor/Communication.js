@@ -32,8 +32,10 @@ function GetVariableIdList() {
 
 var LiveUpdateEvents = [];
 
-var VariableValues = [];
-function UpdateFloatVariableValues() {
+var CurrentVariableValues = [];
+var LoggedVariableValues = [];
+var LogFile = ``
+function UpdateFloatCurrentVariableValues() {
     const variableIds = GetVariableIdList();
     var offsets = []
     for(var i = 0; i < variableIds.length; i++) offsets[i] = 0;
@@ -47,16 +49,19 @@ function UpdateFloatVariableValues() {
         },
         success: function(data) {
             var responseVariables = data.split(`\n`);
-            for(var i = 0; i < Math.min(responseVariables.length, variableIds.length); i++) {
+            atob(responseVariables[0]);
+            for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
                 var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
 
                 if(responseVariables[i] === `True`)
-                    VariableValues[variableIds[i]] = true;
-                else if(responseVariables[i] === `False`)
-                    VariableValues[variableIds[i]] = false;
+                    CurrentVariableValues[variableIds[i-1]] = true;
+                else if(responseVariables[i-1] === `False`)
+                    CurrentVariableValues[variableIds[i]] = false;
                 else
-                    VariableValues[variableIds[i]] = voidValue? undefined : parseFloat(responseVariables[i]);
+                    CurrentVariableValues[variableIds[i-1]] = voidValue? undefined : parseFloat(responseVariables[i]);
             }
+
+            LoggedVariableValues.push({ Tick: CurrentVariableValues[VariableRegister.CurrentTickId], VariableValue: CurrentVariableValues });
 
             Object.entries(LiveUpdateEvents).forEach(e => {
                 var [elementname, element] = e;

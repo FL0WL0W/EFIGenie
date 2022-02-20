@@ -1,10 +1,12 @@
 """This module provides a simple serial console and HTTP request
 library for communicating with the EFIGenie.
 """
+from telnetlib import NOP
 import serial
 import struct
 import http.server
 import argparse
+import base64
 from sys import version as python_version
 from cgi import parse_header, parse_multipart
 
@@ -65,10 +67,13 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             self.serial_conn.flushInput()
             self.serial_conn.write(sendBytes)
             resp = ""
+            totalbytes = bytearray([])
             for i in range(len(variables)):
-                val = str(parse_readbytes(self.serial_conn));
+                ( val, readBytes ) = parse_readbytes(self.serial_conn)
+                totalbytes += readBytes
                 # print(val)
-                resp += val + "\n"
+                resp += str(val) + "\n"
+            resp = base64.b64encode(totalbytes).decode('ascii') + "\n" + resp
             self.send_response(200)
             self.end_headers()
             self.wfile.write(resp.encode('utf-8'))
@@ -101,17 +106,24 @@ def parse_readbytes(ser):
     Returns:
         readBytes parsed into a string or possibly a bool. 
     """
-    readType = ser.read(1)[0]
+    readBytes = ser.read(1)
+    val = "VOID"
     # For all cases we'll just use a simple if/else construct to parse
-    if readType == 0:
-        return "VOID"
-    elif 1 <= readType <= 10:
-        fmt = fmt_switch[readType]
-        return struct.unpack(fmt, ser.read(struct.Struct(fmt).size))[0]
-    elif readType == 11:
-        return bool(ser.read(1)[0])
-    elif 12 <= readType <= 14:
-        return ''.join('{:02x}'.format(x) for x in ser.read(8))
+    if readBytes[0] == 0:
+        NOP
+    elif 1 <= readBytes[0] <= 10:
+        fmt = fmt_switch[readBytes[0]]
+        size = struct.Struct(fmt).size
+        readBytes += ser.read(size)
+        val = struct.unpack(fmt, readBytes[1:])[0]
+    elif readBytes[0] == 11:
+        readBytes += ser.read(1)
+        val = bool(readBytes[1])
+    elif 12 <= readBytes[0] <= 14:
+        readBytes += ser.read(8)
+        val = ''.join('{:02x}'.format(x) for x in readBytes[1:8])
+
+    return (val, readBytes)
 
 def run_server(ser, interface, port):
     """Run a simple HTTP server that relays request information to the serial
