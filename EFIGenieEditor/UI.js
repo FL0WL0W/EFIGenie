@@ -750,6 +750,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
             thisClass.UpdateDisplayValue();
         });
         this.UpdateDisplayValue();
+        this.SpacesToAdd = 10000000;
     }
 
     UpdateDisplayValue() {
@@ -763,6 +764,9 @@ class DisplayNumberWithMeasurement extends UITemplate {
         var spacesToAdd = 6-(displayValue.length - indexOfPoint);
         if(indexOfPoint === -1)
             spacesToAdd = 6;
+        if(spacesToAdd < this.SpacesToAdd)
+            this.SpacesToAdd = spacesToAdd;
+        spacesToAdd -= this.SpacesToAdd;
         for(var i = 0; i < spacesToAdd; i++)
             displayValue += `&nbsp;`
         $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);

@@ -1,11 +1,13 @@
 class VariableRegistry {
-    CreateIfNotFound = true;
     constructor(prop) {
         Object.assign(this, prop);
+        this.CreateIfNotFound = true;
     }
     Clear() {
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
+            if(elementname === `CreateIfNotFound`)
+                return;
             delete this[elementname];
         });
     }
@@ -21,9 +23,9 @@ class VariableRegistry {
                 if(Array.isArray(this[listName])) {
                     var variable = this[listName].find(a => a.Name === variableName);
                     if(variableName.indexOf(`(`) !== -1) {
-                        var measurementName = variableName.substring(variableName.indexOf(`(`) + 1);
+                        var measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1);
                         measurementName = measurementName.substring(0, measurementName.length - 1);
-                        variableName = variableName.substring(0, variableName.indexOf(`(`));
+                        variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
                         variable ??= this[listName].find(a => a.Name === variableName && a.Measurement === measurementName)
                         variable ??= this[listName].find(a => a.Name === variableName)
                     }
@@ -70,7 +72,7 @@ class VariableRegistry {
             if (this[property] === undefined)
                 continue;
     
-            if(property === `VariableIncrement`)
+            if(property === `VariableIncrement` || property === `CreateIfNotFound`)
                 continue;
             if(property.toLowerCase().indexOf(`temp`) === 0)
                 continue;
