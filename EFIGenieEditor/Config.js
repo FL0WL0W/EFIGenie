@@ -60,7 +60,7 @@ class VariableRegister {
         });
     }
     static GetVariableReferenceList() {
-        var variableReferences = [];
+        var variableReferences = {};
         for (var property in VariableRegister) {
             if (VariableRegister[property] === undefined)
                 continue;
@@ -74,12 +74,10 @@ class VariableRegister {
                 var arr = VariableRegister[property];
     
                 for (var i = 0; i < arr.length; i++) {
-                    var id = arr[i].Id;
-                    variableReferences.push({Reference: `${property}.${arr[i].Name}${arr[i].Measurement? `(${arr[i].Measurement})` : ``}`, Id: VariableRegister.GetVariableId(id)})
+                    variableReferences[property] = { Name: arr[i].Name, Measurement: arr[i].Measurement, Id: VariableRegister.GetVariableId(arr[i].Id)}
                 }
             } else {
-                var id = VariableRegister[property];
-                variableReferences.push({Reference: `${property}`, Id: VariableRegister.GetVariableId(id)})
+                variableReferences[property] = VariableRegister.GetVariableId(VariableRegister[property]);
             }
         }
         return variableReferences;
