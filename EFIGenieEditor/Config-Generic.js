@@ -410,7 +410,7 @@ class ConfigOrVariableSelection extends UITemplate {
                     `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`
                 );
             }
-            this.LiveUpdate.VariableId = VariableRegister.GetVariableId(this.GetVariableReference());
+            this.LiveUpdate.VariableReference = this.GetVariableReference();
             this.LiveUpdate.MeasurementIndex.Measurement = measurement;
         }
     }
@@ -496,21 +496,24 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
 
     Attach() {
         super.Attach();
-        if(this.VariableId){
+        if(this.VariableReference){
             var thisClass = this
             LiveUpdateEvents[this.GUID] = function() {
-                if(thisClass.VariableId && CurrentVariableValues[thisClass.VariableId] !== undefined) {
-                    thisClass.Value = CurrentVariableValues[thisClass.VariableId];
-                    thisClass.UpdateDisplayValue();
-                    if(!thisClass.StickyHide) {
-                        if(thisClass.Hidden)
-                            thisClass.ShowSuper();
-                        if(thisClass.TimeoutHandle)
-                            window.clearTimeout(thisClass.TimeoutHandle);
-        
-                        thisClass.TimeoutHandle = window.setTimeout(function() {
-                            thisClass.HideSuper();
-                        },5000);
+                if(thisClass.VariableReference) { 
+                    const variableId = VariableRegister.GetVariableId(thisClass.VariableReference);
+                    if(CurrentVariableValues[variableId] !== undefined) {
+                        thisClass.Value = CurrentVariableValues[variableId];
+                        thisClass.UpdateDisplayValue();
+                        if(!thisClass.StickyHide) {
+                            if(thisClass.Hidden)
+                                thisClass.ShowSuper();
+                            if(thisClass.TimeoutHandle)
+                                window.clearTimeout(thisClass.TimeoutHandle);
+            
+                            thisClass.TimeoutHandle = window.setTimeout(function() {
+                                thisClass.HideSuper();
+                            },5000);
+                        }
                     }
                 }
             };

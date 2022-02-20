@@ -2,6 +2,16 @@ Uint8Array.prototype.toHex = function() { // buffer is an ArrayBuffer
     return `0x` + Array.prototype.map.call(new Uint8Array(this), x => (`00` + x.toString(16)).slice(-2)).join(` 0x`);
 }
 
+ArrayBuffer.prototype.toRawString = function() { // a, b TypedArray of same type
+    var binary = '';
+    var bytes = new Uint8Array( this );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return binary
+}
+
 ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same type
     var tmp = new Uint8Array(this.byteLength + b.byteLength);
     if(this.byteLength > 0)

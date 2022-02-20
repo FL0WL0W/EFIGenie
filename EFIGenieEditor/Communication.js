@@ -16,27 +16,49 @@ function GetVariableIdList() {
                     continue;
                 if(arr[i].Type !== "float" && arr[i].Type !== "bool")
                     continue;
-                if(variableIds.indexOf(id) === -1)
+                if(variableIds.indexOf(id) === -1) {
                     variableIds.push(id);
+                }
             }
         } else {
             var id = parseInt(VariableRegister[property]);
             if(isNaN(id))
                 continue;
-            if(variableIds.indexOf(id) === -1)
+            if(variableIds.indexOf(id) === -1){
                 variableIds.push(id);
+            }
         }
     }
     return variableIds;
+}
+
+function compareVariableIds(a, b) {
+    if(a.length !== b.length)
+        return false;
+    
+    for(var i = 0; i < a.length; i++){
+        if(a[i] !== b[i])
+            return false;
+    }
+    
+    return true;
 }
 
 var LiveUpdateEvents = [];
 
 var CurrentVariableValues = [];
 var LoggedVariableValues = [];
-var LogFile = ``
+var LogFile
+var previousVariableIds = []
 function UpdateFloatCurrentVariableValues() {
     const variableIds = GetVariableIdList();
+    if(!compareVariableIds(variableIds, previousVariableIds)){
+        LogFile = lzjs.compress(JSON.stringify(VariableRegister.GetVariableReferenceList()));
+        LogFile = `${new Uint32Array([LogFile.length]).buffer.toRawString()}${LogFile}`
+        LogFile += new Uint32Array([variableIds.Length]).buffer.toRawString() + new Uint32Array(variableIds).buffer.toRawString();
+        LoggedVariableValues = [];
+        previousVariableIds = variableIds;
+    }
     var offsets = []
     for(var i = 0; i < variableIds.length; i++) offsets[i] = 0;
 
@@ -49,7 +71,7 @@ function UpdateFloatCurrentVariableValues() {
         },
         success: function(data) {
             var responseVariables = data.split(`\n`);
-            atob(responseVariables[0]);
+            LogFile += atob(responseVariables[0]);
             for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
                 var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
 
@@ -61,7 +83,7 @@ function UpdateFloatCurrentVariableValues() {
                     CurrentVariableValues[variableIds[i-1]] = voidValue? undefined : parseFloat(responseVariables[i]);
             }
 
-            LoggedVariableValues.push({ Tick: CurrentVariableValues[VariableRegister.CurrentTickId], VariableValue: CurrentVariableValues });
+            LoggedVariableValues.push(CurrentVariableValues);
 
             Object.entries(LiveUpdateEvents).forEach(e => {
                 var [elementname, element] = e;

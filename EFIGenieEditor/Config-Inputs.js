@@ -303,7 +303,7 @@ class ConfigInputs {
             if(isNaN(thisClass.ContextSelect))
                 return;
 
-            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, this.NewInput());
+            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, thisClass.NewInput());
             thisClass.Selected = thisClass.ContextSelect + 1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());

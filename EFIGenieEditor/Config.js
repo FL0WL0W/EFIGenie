@@ -59,6 +59,31 @@ class VariableRegister {
             Id: Reference
         });
     }
+    static GetVariableReferenceList() {
+        var variableReferences = [];
+        for (var property in VariableRegister) {
+            if (VariableRegister[property] === undefined)
+                continue;
+    
+            if(property === `VariableIncrement`)
+                continue;
+            if(property.toLowerCase().indexOf(`temp`) === 0)
+                continue;
+    
+            if (Array.isArray(VariableRegister[property])) {
+                var arr = VariableRegister[property];
+    
+                for (var i = 0; i < arr.length; i++) {
+                    var id = arr[i].Id;
+                    variableReferences.push({Reference: `${property}.${arr[i].Name}${arr[i].Measurement? `(${arr[i].Measurement})` : ``}`, Id: VariableRegister.GetVariableId(id)})
+                }
+            } else {
+                var id = VariableRegister[property];
+                variableReferences.push({Reference: `${property}`, Id: VariableRegister.GetVariableId(id)})
+            }
+        }
+        return variableReferences;
+    }
 }
 
 var AFRConfigs = [];
@@ -252,6 +277,7 @@ types = [
     { type: `UINT64`, toArrayBuffer() { return new BigUint64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
     { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
     { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
+    { type: `Text`, toArrayBuffer() { return new TextEncoder().encode(this.value).buffer; }},
     { type: `VariableId`, toObj() { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]}; }},
     { type: `Package`, toObj() {
         this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
@@ -483,6 +509,13 @@ class ConfigTop extends UITemplate {
             { type: `UINT16`, value: 2 }, // number of operations
             { obj: this.Fuel.GetObjOperation()}, 
             { obj: this.Ignition.GetObjOperation()}, 
+            { toObj() {
+                const variableList = lzjs.compress(JSON.stringify(VariableRegister.GetVariableReferenceList()));
+                return { value: [
+                    { type: `UINT32`, value: variableList.Length }, 
+                    { type: `Text`, value: variableList }
+                ]};
+            }}
         ]};
     }
 }
