@@ -1,36 +1,16 @@
 function GetVariableIdList() {
     var variableIds = [];
-    for (var property in VariableRegister) {
-        if (VariableRegister[property] === undefined)
-            continue;
-
-        if(property === `VariableIncrement`)
-            continue;
-
-        if (Array.isArray(VariableRegister[property])) {
-            var arr = VariableRegister[property];
-
-            for (var i = 0; i < arr.length; i++) {
-                var id = arr[i].Id;
-                if(isNaN(id))
-                    continue;
-                if(arr[i].Type !== "float" && arr[i].Type !== "bool")
-                    continue;
-                if(variableIds.indexOf(id) === -1) {
-                    variableIds.push(id);
-                }
-            }
-        } else {
-            var id = parseInt(VariableRegister[property]);
-            if(isNaN(id))
-                continue;
-            if(variableIds.indexOf(id) === -1){
-                variableIds.push(id);
-            }
-        }
+    const currentTickId = VariableMetadata.GetVariableId(`CurrentTickId`);
+    if(currentTickId)
+        variableIds.push(currentTickId);
+    for (var variableReference in VariablesToPoll) {
+        const variableId = VariableMetadata.GetVariableId(VariablesToPoll[variableReference]);
+        if(variableId !== undefined && variableIds.indexOf(variableId) === -1)
+            variableIds.push(variableId);
     }
     return variableIds;
 }
+var VariablesToPoll = [];
 
 function compareVariableIds(a, b) {
     if(a.length !== b.length)
@@ -53,6 +33,8 @@ var LogFile
 var previousVariableIds = []
 function UpdateFloatCurrentVariableValues() {
     const variableIds = GetVariableIdList();
+    if(variableIds.length < 1)
+        return;
     if(!compareVariableIds(variableIds, previousVariableIds)){
         LogFile = lzjs.compress(JSON.stringify(VariableRegister.GetVariableReferenceList()));
         LogFile = `${new Uint32Array([LogFile.length]).buffer.toRawString()}${LogFile}`

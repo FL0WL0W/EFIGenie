@@ -394,11 +394,12 @@ class ConfigOrVariableSelection extends UITemplate {
                 const subConfig = this.GetSubConfig();
                 if(subConfig.RegisterVariables)
                     subConfig.RegisterVariables();
-                if (GetClassProperty(subConfig, `Output`)) {
+                const type = GetClassProperty(subConfig, `Output`)
+                if (type) {
                     VariableRegister.RegisterVariable(
                         this.VariableListName,
                         this.Name ?? this.Label,
-                        GetClassProperty(subConfig, `Output`),
+                        type,
                         measurement
                     );
                 }
@@ -410,7 +411,12 @@ class ConfigOrVariableSelection extends UITemplate {
                     `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`
                 );
             }
-            this.LiveUpdate.VariableReference = this.GetVariableReference();
+            const thisReference = this.GetVariableReference();
+            const variable = VariableRegister.GetVariableByReference(thisReference)
+            if(variable.Type === `float` || variable.Type === `bool`)
+                this.LiveUpdate.VariableReference = thisReference;
+            else 
+                this.LiveUpdate.VariableReference = undefined;
             this.LiveUpdate.MeasurementIndex.Measurement = measurement;
         }
     }
@@ -498,8 +504,12 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
         super.Attach();
         if(this.VariableReference){
             var thisClass = this
+            if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+                VariablesToPoll.push(thisClass.VariableReference)
             LiveUpdateEvents[this.GUID] = function() {
                 if(thisClass.VariableReference) { 
+                    if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+                        VariablesToPoll.push(thisClass.VariableReference)
                     const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
                     if(CurrentVariableValues[variableId] !== undefined) {
                         thisClass.Value = CurrentVariableValues[variableId];

@@ -15,7 +15,7 @@ class VariableRegistry {
         this.VariableIncrement ??= 0;
         return ++this.VariableIncrement;
     }
-    GetVariableId(variableReference) {
+    GetVariableByReference(variableReference) {
         if(typeof variableReference === `string`) {
             if(variableReference.indexOf(`.`) !== -1) {
                 const listName = variableReference.substring(0, variableReference.indexOf(`.`));
@@ -31,23 +31,27 @@ class VariableRegistry {
                     }
                     if(variable) {
                         if(typeof variable.Id === `string`)
-                            return this.GetVariableId(variable.Id);
-                        if(variable.Id !== undefined)
-                            return variable.Id;
-                        return undefined;
+                            return this.GetVariableByReference(variable.Id);
+                        return variable;
                     }
                 }
             }
             if(typeof this[variableReference] === `string`)
-                return this.GetVariableId(this[variableReference]);
+                return this.GetVariableByReference(this[variableReference]);
             if(this[variableReference] !== undefined)
                 return this[variableReference];
-            if(this.CreateIfNotFound)
-                return this[variableReference] = this.GenerateVariableId();
         }
         if(typeof variableReference === `number`)
             return variableReference;
         return undefined;
+    }
+    GetVariableId(variableReference) {
+        var variable = this.GetVariableByReference(variableReference);
+        if(variable === undefined && this.CreateIfNotFound)
+            return this[variableReference] = this.GenerateVariableId();
+        if(typeof variable === `object`)
+            return variable.Id;
+        return variable;
     }
     RegisterVariable(ListName, Name, Type, Measurement) {
         this[ListName] ??= [];
