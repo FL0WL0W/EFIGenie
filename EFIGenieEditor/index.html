@@ -68,12 +68,12 @@
                 $(`#selectTarget`).change(function(evt){
                     b.Inputs.TargetDevice = $(this).val();
                     PinOut = PinOuts[b.Inputs.TargetDevice];
-                    UpdatePinout();
+                    UpdateOverlay();
                 });
                 var targets = ``;
                 Object.entries(PinOuts).forEach(entry => {
                     const [key, value] = entry;
-                    targets += `<option value="${key}">${value.Name}</option>`;
+                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.Name}</option>`;
                 });
                 $(`#selectTarget`).html(targets);
             });
