@@ -99,39 +99,39 @@ class VariableRegistry {
 VariableRegister = new VariableRegistry();
 
 var AFRConfigs = [];
-AFRConfigs.push(ConfigOperation_Static);
-AFRConfigs.push(ConfigOperation_LookupTable);
-AFRConfigs.push(ConfigOperation_2AxisTable);
+AFRConfigs.push(Calculation_Static);
+AFRConfigs.push(Calculation_LookupTable);
+AFRConfigs.push(Calculation_2AxisTable);
 var InjectorEnableConfigs = [];
-InjectorEnableConfigs.push(ConfigOperation_Static);
-InjectorEnableConfigs.push(ConfigOperation_LookupTable);
-InjectorEnableConfigs.push(ConfigOperation_2AxisTable);
+InjectorEnableConfigs.push(Calculation_Static);
+InjectorEnableConfigs.push(Calculation_LookupTable);
+InjectorEnableConfigs.push(Calculation_2AxisTable);
 var InjectorPulseWidthConfigs = [];
-InjectorPulseWidthConfigs.push(ConfigOperation_Static);
-// InjectorPulseWidthConfigs.push(ConfigOperation_LookupTable);
-// InjectorPulseWidthConfigs.push(ConfigOperation_2AxisTable);
+InjectorPulseWidthConfigs.push(Calculation_Static);
+// InjectorPulseWidthConfigs.push(Calculation_LookupTable);
+// InjectorPulseWidthConfigs.push(Calculation_2AxisTable);
 var IgnitionAdvanceConfigs = [];
-IgnitionAdvanceConfigs.push(ConfigOperation_Static);
-IgnitionAdvanceConfigs.push(ConfigOperation_LookupTable);
-IgnitionAdvanceConfigs.push(ConfigOperation_2AxisTable);
+IgnitionAdvanceConfigs.push(Calculation_Static);
+IgnitionAdvanceConfigs.push(Calculation_LookupTable);
+IgnitionAdvanceConfigs.push(Calculation_2AxisTable);
 var IgnitionEnableConfigs = [];
-IgnitionEnableConfigs.push(ConfigOperation_Static);
-IgnitionEnableConfigs.push(ConfigOperation_LookupTable);
-IgnitionEnableConfigs.push(ConfigOperation_2AxisTable);
+IgnitionEnableConfigs.push(Calculation_Static);
+IgnitionEnableConfigs.push(Calculation_LookupTable);
+IgnitionEnableConfigs.push(Calculation_2AxisTable);
 var IgnitionDwellConfigs = [];
-IgnitionDwellConfigs.push(ConfigOperation_Static);
-IgnitionDwellConfigs.push(ConfigOperation_LookupTable);
-IgnitionDwellConfigs.push(ConfigOperation_2AxisTable);
+IgnitionDwellConfigs.push(Calculation_Static);
+IgnitionDwellConfigs.push(Calculation_LookupTable);
+IgnitionDwellConfigs.push(Calculation_2AxisTable);
 var CylinderAirmassConfigs = [];
-CylinderAirmassConfigs.push(ConfigOperation_Static);
+CylinderAirmassConfigs.push(Calculation_Static);
 var CylinderAirTemperatureConfigs = [];
-CylinderAirTemperatureConfigs.push(ConfigOperation_Static);
+CylinderAirTemperatureConfigs.push(Calculation_Static);
 var ManifoldAbsolutePressureConfigs = [];
-ManifoldAbsolutePressureConfigs.push(ConfigOperation_Static);
+ManifoldAbsolutePressureConfigs.push(Calculation_Static);
 var VolumetricEfficiencyConfigs = [];
-VolumetricEfficiencyConfigs.push(ConfigOperation_Static);
-VolumetricEfficiencyConfigs.push(ConfigOperation_LookupTable);
-VolumetricEfficiencyConfigs.push(ConfigOperation_2AxisTable);
+VolumetricEfficiencyConfigs.push(Calculation_Static);
+VolumetricEfficiencyConfigs.push(Calculation_LookupTable);
+VolumetricEfficiencyConfigs.push(Calculation_2AxisTable);
 
 EngineFactoryIDs = {
     Offset : 40000,
@@ -534,26 +534,26 @@ class ConfigFuel extends UITemplate {
 
     constructor(prop) {
         prop ??= {};
-        prop.AFRConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.AFRConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            AFRConfigs,
             Label:              `Air Fuel Ratio`,
             Measurement:        `Ratio`,
             VariableListName:   `FuelParameters`
         });
-        prop.InjectorEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorEnableConfigs,
             Label:              `Injector Enable`,
             Measurement:        `Bool`,
             VariableListName:   `FuelParameters`
         });
-        prop.InjectorPulseWidthConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
             Label:              `Injector Pulse Width`,
             Measurement:        `Time`,
             VariableListName:   `FuelParameters`,
             MeasurementIndex: 1
         });
-        prop.InjectorEndPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Injector End Position(BTDC)`,
             Measurement:        `Angle`,
@@ -674,26 +674,26 @@ class ConfigIgnition extends UITemplate {
 
     constructor(prop) {
         prop ??= {};
-        prop.IgnitionEnableConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
             Label:              `Ignition Enable`,
             Measurement:        `Bool`,
             VariableListName:   `IgnitionParameters`
         });
-        prop.IgnitionAdvanceConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
             Label:              `Ignition Advance`,
             Measurement:        `Angle`,
             VariableListName:   `IgnitionParameters`
         });
-        prop.IgnitionDwellConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              `Ignition Dwell`,
             Measurement:        `Time`,
             VariableListName:   `IgnitionParameters`,
             MeasurementIndex: 1
         });
-        prop.IgnitionDwellDeviationConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              `Ignition Dwell Deviation`,
             Measurement:        `Time`,
@@ -806,37 +806,37 @@ class ConfigEngine extends UITemplate {
 
     constructor(prop) {
         prop ??= {};
-        prop.CrankPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
             Label:              `Crank Position`,
             Measurement:        `ReluctorResult`,
             VariableListName:   `EngineParameters`
         });
-        prop.CamPositionConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
             Label:              `Cam Position`,
             Measurement:        `ReluctorResult`,
             VariableListName:   `EngineParameters`
         });
-        prop.CylinderAirmassConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
             Label:              `Cylinder Air Mass`,
             Measurement:        `Mass`,
             VariableListName:   `EngineParameters`
         });
-        prop.CylinderAirTemperatureConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
             Label:              `Cylinder Air Temperature`,
             Measurement:        `Temperature`,
             VariableListName:   `EngineParameters`
         });
-        prop.ManifoldAbsolutePressureConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
             Label:              `Manifold Absolute Pressure`,
             Measurement:        `Pressure`,
             VariableListName:   `EngineParameters`
         });
-        prop.VolumetricEfficiencyConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
             Label:              `Volumetric Efficiency`,
             Measurement:        `Percentage`,
@@ -965,7 +965,22 @@ class ConfigEngine extends UITemplate {
     }
 }
 
-class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
+class ConfigTDCOutput extends CalculationOrVariableSelection {
+    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:`)
+
+    constructor(prop) {
+        prop ??= {};
+        prop.TDC = new UINumber({
+            Value: 0,
+            Step: 1,
+            Min: 0,
+            Max: 720
+        })
+        super(prop);
+    }
+}
+
+class CylinderAirmass_SpeedDensity extends UITemplate {
     static Name = `Speed Density`;
     static Measurement = `Mass`;
     static Output = `float`;
@@ -1000,9 +1015,9 @@ class ConfigOperationCylinderAirmass_SpeedDensity extends UITemplate {
         }]};
     }
 }
-CylinderAirmassConfigs.push(ConfigOperationCylinderAirmass_SpeedDensity);
+CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
 
-class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
+class InjectorPulseWidth_DeadTime extends UITemplate {
     static Name = `Dead Time`;
     static Output = `float`;
     static Measurement = `Time`;
@@ -1012,13 +1027,13 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
 
     constructor(prop) {
         prop ??= {};
-        prop.FlowRateConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Injector Flow Rate`,
             Measurement:        `MassFlow`,
             VariableListName:   `FuelParameters`
         });
-        prop.DeadTimeConfigOrVariableSelection = new ConfigOrVariableSelection({
+        prop.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Injector Dead Time`,
             Measurement:        `Time`,
@@ -1081,19 +1096,4 @@ class ConfigInjectorPulseWidth_DeadTime extends UITemplate {
         ]};
     }
 }
-InjectorPulseWidthConfigs.push(ConfigInjectorPulseWidth_DeadTime);
-
-class ConfigTDCOutput extends ConfigOrVariableSelection {
-    static Template = `<div><label for="$TDC.GUID$"><div style="display: inline-block;">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:</label>$Selection$ $ConfigValue$</div>`;
-
-    constructor(prop) {
-        prop ??= {};
-        prop.TDC = new UINumber({
-            Value: 0,
-            Step: 1,
-            Min: 0,
-            Max: 720
-        })
-        super(prop);
-    }
-}
+InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime);

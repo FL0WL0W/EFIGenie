@@ -1,7 +1,7 @@
 var CurrentTickVariableID = 0;
 var InputConfigs = [];
-InputConfigs.push(ConfigOperation_Static);
-InputConfigs.push(ConfigOperation_LookupTable);
+InputConfigs.push(Calculation_Static);
+InputConfigs.push(Calculation_LookupTable);
 
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -440,25 +440,6 @@ class ConfigInput extends UITemplate {
 
     constructor(prop) {
         prop ??= {};
-        prop.RawConfig = new ConfigOrVariableSelection({
-            Configs:            InputConfigs,
-            Label:              `Raw Input`,
-            Inputs:             [],
-            Name:               prop.Name,
-            VariableListName:   `Inputs`,
-        });
-        prop.TranslationConfig = new ConfigOrVariableSelection({
-            Configs:            InputConfigs,
-            Label:              `Translation`,
-            Inputs:             [``],
-            Name:               prop.Name,
-            VariableListName:   `Inputs`,
-            Template: ConfigOrVariableSelection.Template.replace(`$Selection$`, `$Selection$ \\$TranslationMeasurement\\$`)
-        });
-        prop.Name = new UIText({
-            Value: prop.Name ?? `Input`,
-            OnChange: function() { prop.TranslationConfig.Name = prop.RawConfig.Name = prop.Name.Value }
-        })
         const measurementKeys = Object.keys(Measurements)
         var options = [];
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
@@ -466,32 +447,41 @@ class ConfigInput extends UITemplate {
             Value: `None`,
             SelectNotVisible: true,
             Options: options,
+            Hidden: true
         });
+        prop.RawConfig = new CalculationOrVariableSelection({
+            Configs:            InputConfigs,
+            Label:              `Raw Input`,
+            Inputs:             [],
+            Name:               prop.Name,
+            VariableListName:   `Inputs`,
+        });
+        prop.TranslationConfig = new CalculationOrVariableSelection({
+            Configs:            InputConfigs,
+            Label:              `Translation`,
+            Inputs:             [``],
+            Name:               prop.Name,
+            VariableListName:   `Inputs`,
+            Template: CalculationOrVariableSelection.Template.replace(`$Selection$`, `$Selection$ \\$TranslationMeasurement\\$`),
+            OnChange: function() { if(prop.TranslationConfig.GetSubConfig()?.constructor.Measurement === undefined) prop.TranslationMeasurement.Show(); else prop.TranslationMeasurement.Hide(); }
+        });
+        prop.Name = new UIText({
+            Value: prop.Name ?? `Input`,
+            OnChange: function() { prop.TranslationConfig.Name = prop.RawConfig.Name = prop.Name.Value }
+        })
         super(prop);
         const thisClass = this;
         this.RawConfig.OnChange.push(function() { thisClass.TranslationConfig.Inputs = [GetClassProperty(thisClass.RawConfig.GetSubConfig(), `Output`)]; })
+        // this.TranslationConfig.OnChange.push(function() { 
+        //     thisClass.RawConfig.Output = GetClassProperty(thisClass.TranslationConfig.GetSubConfig(), `Inputs`)?.[0];
+        //     thisClass.RawConfig.Output ??= ``;
+        // });
         this.TranslationMeasurement.OnChange.push(function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value })
     }
 
     RegisterVariables() {
         this.TranslationConfig.RegisterVariables?.();
         this.RawConfig.RegisterVariables?.();
-    }
-
-    SetValue(value) {
-        if(value?.RawConfig?.Name){
-            value.RawConfig = {
-                Values: [ value.RawConfig ],
-                Selection: { value: value.RawConfig.Name }
-            };
-        }
-        if(value?.TranslationConfig?.Name){
-            value.TranslationConfig = {
-                Values: [ value.TranslationConfig ],
-                Selection: { value: value.TranslationConfig.Name }
-            };
-        }
-        super.SetValue(value);
     }
 
     GetObjOperation() {
@@ -550,7 +540,7 @@ class UIPinSelection extends UISelection {
     }
 }
 
-class ConfigOperation_AnalogPinRead extends UITemplate {
+class Input_Analog extends UITemplate {
     static Name = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -580,9 +570,9 @@ class ConfigOperation_AnalogPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_AnalogPinRead);
+InputConfigs.push(Input_Analog);
 
-class ConfigOperation_DigitalPinRead extends UITemplate {
+class Input_Digital extends UITemplate {
     static Name = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
@@ -614,9 +604,9 @@ class ConfigOperation_DigitalPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_DigitalPinRead);
+InputConfigs.push(Input_Digital);
 
-class ConfigOperation_DigitalPinRecord extends UITemplate {
+class Input_DigitalRecord extends UITemplate {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
@@ -656,9 +646,9 @@ class ConfigOperation_DigitalPinRecord extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_DigitalPinRecord);
+InputConfigs.push(Input_DigitalRecord);
 
-class ConfigOperation_DutyCyclePinRead extends UITemplate {
+class Input_DutyCycle extends UITemplate {
     static Name = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -697,9 +687,9 @@ class ConfigOperation_DutyCyclePinRead extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_DutyCyclePinRead);
+InputConfigs.push(Input_DutyCycle);
 
-class ConfigOperation_FrequencyPinRead extends UITemplate {
+class Input_Frequency extends UITemplate {
     static Name = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -738,9 +728,9 @@ class ConfigOperation_FrequencyPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_FrequencyPinRead);
+InputConfigs.push(Input_Frequency);
 
-class ConfigOperation_PulseWidthPinRead extends UITemplate {
+class Input_PulseWidth extends UITemplate {
     static Name = `Pulse Width Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -779,253 +769,4 @@ class ConfigOperation_PulseWidthPinRead extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(ConfigOperation_PulseWidthPinRead);
-
-//this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
-class ConfigOperation_Polynomial {
-    static Name = `Polynomial`;
-    static Output = `float`;
-    static Inputs = [`float`];
-    static Template = getFileContents(`ConfigGui/Operation_Polynomial.html`);
-
-    constructor(){
-        this.GUID = generateGUID();
-    }
-    
-    MinValue = 0;
-    MaxValue = 1;
-    Degree = 3;
-    A = [0, 0, 0];
-
-    GetValue() {
-        return { 
-            Name: GetClassProperty(this, `Name`),
-            MinValue: this.MinValue,
-            MaxValue: this.MaxValue,
-            Degree: this.Degree,
-            A: this.A.slice()
-        };
-    }
-
-    SetValue(value) {
-        if(value) {
-            this.MinValue = value.MinValue;
-            this.MaxValue = value.MaxValue;
-            this.Degree = value.Degree;
-            this.A = value.A.slice();
-        }
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off(`change.${this.GUID}`);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-min`, function(){
-            thisClass.MinValue = parseFloat($(this).val());
-        });
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-max`, function(){
-            thisClass.MaxValue = parseFloat($(this).val());
-        });
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-degree`, function(){
-            thisClass.Degree = parseInt($(this).val());
-
-            var oldA = thisClass.A;
-
-            thisClass.A = new Array(thisClass.Degree);
-            for(var i = 0; i < thisClass.A.length; i++){
-                if(i < oldA.length)
-                    thisClass.A[i] = oldA[i];
-                else
-                    thisClass.A[i] = 0;
-            }
-            $(`#${thisClass.GUID}-coefficients`).html(thisClass.GetCoefficientsHtml());
-        });
-        
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-A`, function(){
-            var index = $(this).data(`index`);
-            var val = parseFloat($(this).val());
-
-            thisClass.A[index] = val;
-        });
-    }
-
-    GetCoefficientsHtml() {
-        var coefficients = `<label>Coefficients:</label>`;
-        for(var i = this.Degree-1; i > 0; i--)
-        {
-            coefficients += `<input id="${this.GUID}-A" data-index="${i}" type="number" step="0.1" value="${this.A[i]}"/>`;
-            if(i > 1)
-                coefficients += ` x<sup>${i}</sup> + `;
-            else
-                coefficients += ` x + `;
-        }
-        coefficients += `<input id="${this.GUID}-A" data-index="0" type="number" step="0.1" value="${this.A[0]}"/>`;
-
-        return coefficients;
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, `Template`);
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]min[$]/g, this.MinValue);
-        template = template.replace(/[$]max[$]/g, this.MaxValue);
-        template = template.replace(/[$]degree[$]/g, this.Degree);
-
-        template = template.replace(/[$]coefficients[$]/g, this.GetCoefficientsHtml());
-
-        return template;
-    }
-
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
-            { type: `FLOAT`, value: this.MinValue}, //MinValue
-            { type: `FLOAT`, value: this.MaxValue}, //MaxValue
-            { type: `UINT8`, value: this.Degree}, //Degree
-            { type: `FLOAT`, value: this.A}, //coefficients
-        ]};
-
-        if (outputVariableId || inputVariableId) 
-            return Packagize(objOperation, { 
-                outputVariables: [ outputVariableId ?? 0 ],
-                inputVariables: [ inputVariableId ?? 0 ]
-            });
-
-        return objOperation;
-    }
-}
-InputConfigs.push(ConfigOperation_Polynomial);
-
-
-class ConfigOperation_ReluctorGM24x extends UITemplate {
-    static Name = `Reluctor GM 24X`;
-    static Output = `ReluctorResult`;
-    static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
-
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [ 
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X} //factory ID
-        ]};
-        
-        return Packagize(objOperation, { 
-            outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [ 
-                inputVariableId ?? 0,
-                `CurrentTickId`
-            ]
-        });
-    }
-}
-InputConfigs.push(ConfigOperation_ReluctorGM24x);
-
-class ConfigOperation_ReluctorUniversal1x extends UITemplate {
-    static Name = `Reluctor Universal 1X`;
-    static Output = `ReluctorResult`;
-    static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
-    static Template =   `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
-                        `<div><label for="$FallingPosition.GUID$">Falling Edge Position:</label>$FallingPosition$</div>`;
-
-    constructor(prop){
-        prop ??= {};
-        prop.RisingPosition = new UINumberWithMeasurement({
-            Value: 0,
-            Step: 0.1,
-            Min: 0,
-            Max: 360,
-            Measurement: `Angle`
-        });
-        prop.FallingPosition = new UINumberWithMeasurement({
-            Value: 180,
-            Step: 0.1,
-            Min: 0,
-            Max: 360,
-            Measurement: `Angle`
-        });
-        super(prop);
-    }
-
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [ 
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
-            { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
-        ]};
-            
-        return Packagize(objOperation, { 
-            outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [ 
-                inputVariableId ?? 0,
-                `CurrentTickId`
-            ]
-        });
-    }
-}
-InputConfigs.push(ConfigOperation_ReluctorUniversal1x);
-
-class ConfigOperation_ReluctorUniversalMissingTeeth extends UITemplate {
-    static Name = `Reluctor Universal Missing Teeth`;
-    static Output = `ReluctorResult`;
-    static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
-    static Template =   `<div><label for="$FirstToothPosition.GUID$">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>` +
-                        `<div><label for="$ToothWidth.GUID$">Tooth Width:</label>$ToothWidth$</div>` +
-                        `<div><label for="$NumberOfTeeth.GUID$">Number of Teeth:</label>$NumberOfTeeth$</div>` +
-                        `<div><label for="$NumberOfTeethMissing.GUID$">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>`;
-
-    constructor(prop){
-        prop ??= {};
-        prop.FirstToothPosition = new UINumberWithMeasurement({
-            Value: 0,
-            Step: 0.1,
-            Min: 0,
-            Max: 360,
-            Measurement: `Angle`
-        });
-        prop.ToothWidth = new UINumberWithMeasurement({
-            Value: 5,
-            Step: 0.1,
-            Min: 0,
-            Max: 360,
-            Measurement: `Angle`
-        });
-        prop.NumberOfTeeth = new UINumber({
-            Value: 36,
-            Min: 2
-        });
-        prop.NumberOfTeethMissing = new UINumber({
-            Value: 1,
-            Min: 1
-        });
-        super(prop);
-    }
-
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [ 
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-            { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
-            { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
-            { type: `UINT8`, value: this.NumberOfTeeth.Value}, //NumberOfTeeth
-            { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
-        ]};
-            
-        return Packagize(objOperation, { 
-            outputVariables: [ outputVariableId ?? 0 ],
-            inputVariables: [ 
-                inputVariableId ?? 0,
-                `CurrentTickId`
-            ]
-        });
-    }
-}
-InputConfigs.push(ConfigOperation_ReluctorUniversalMissingTeeth);
+InputConfigs.push(Input_PulseWidth);

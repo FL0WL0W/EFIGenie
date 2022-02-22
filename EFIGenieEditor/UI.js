@@ -557,7 +557,7 @@ class UITable extends Table {
                 if(this.YResolutionModifiable && !this.XResolutionModifiable)
                     this.SetYResolution(value.Resolution);
             }
-            if(value.Value !== undefined)
+            if(value.Value !== undefined && Array.isArray(value.Value))
                 this.Value = value.Value;
             if(value.MinX !== undefined && this.MinXModifiable)
                 this.MinX = value.MinX;

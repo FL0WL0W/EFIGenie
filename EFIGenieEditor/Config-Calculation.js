@@ -23,7 +23,7 @@ var OperationArchitectureFactoryIDs = {
 }
 
 
-class ConfigOperation_Static extends UINumberWithMeasurement {
+class Calculation_Static extends UINumberWithMeasurement {
     static Name = `Static`;
     static Output = `float`;
     static Inputs = [];
@@ -38,7 +38,7 @@ class ConfigOperation_Static extends UINumberWithMeasurement {
         return objOperation;
     }
 }
-GenericConfigs.push(ConfigOperation_Static);
+GenericConfigs.push(Calculation_Static);
 
 function TableGetType(tableValue) {
     var min = 18446744073709551615;
@@ -65,7 +65,130 @@ function TableGetType(tableValue) {
     return GetType(max);
 }
 
-class ConfigOperation_LookupTable extends UITemplate {
+//this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
+class Calculation_Polynomial {
+    static Name = `Polynomial`;
+    static Output = `float`;
+    static Inputs = [`float`];
+    static Template = getFileContents(`ConfigGui/Operation_Polynomial.html`);
+
+    constructor(){
+        this.GUID = generateGUID();
+    }
+    
+    MinValue = 0;
+    MaxValue = 1;
+    Degree = 3;
+    A = [0, 0, 0];
+
+    GetValue() {
+        return { 
+            MinValue: this.MinValue,
+            MaxValue: this.MaxValue,
+            Degree: this.Degree,
+            A: this.A.slice()
+        };
+    }
+
+    SetValue(value) {
+        if(value) {
+            this.MinValue = value.MinValue;
+            this.MaxValue = value.MaxValue;
+            this.Degree = value.Degree;
+            this.A = value.A.slice();
+        }
+        $(`#${this.GUID}`).replaceWith(this.GetHtml());
+        this.Attach();
+    }
+
+    Detach() {
+        $(document).off(`change.${this.GUID}`);
+    }
+
+    Attach() {
+        this.Detach();
+        var thisClass = this;
+
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}-min`, function(){
+            thisClass.MinValue = parseFloat($(this).val());
+        });
+
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}-max`, function(){
+            thisClass.MaxValue = parseFloat($(this).val());
+        });
+
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}-degree`, function(){
+            thisClass.Degree = parseInt($(this).val());
+
+            var oldA = thisClass.A;
+
+            thisClass.A = new Array(thisClass.Degree);
+            for(var i = 0; i < thisClass.A.length; i++){
+                if(i < oldA.length)
+                    thisClass.A[i] = oldA[i];
+                else
+                    thisClass.A[i] = 0;
+            }
+            $(`#${thisClass.GUID}-coefficients`).html(thisClass.GetCoefficientsHtml());
+        });
+        
+        $(document).on(`change.${this.GUID}`, `#${this.GUID}-A`, function(){
+            var index = $(this).data(`index`);
+            var val = parseFloat($(this).val());
+
+            thisClass.A[index] = val;
+        });
+    }
+
+    GetCoefficientsHtml() {
+        var coefficients = `<label>Coefficients:</label>`;
+        for(var i = this.Degree-1; i > 0; i--)
+        {
+            coefficients += `<input id="${this.GUID}-A" data-index="${i}" type="number" step="0.1" value="${this.A[i]}"/>`;
+            if(i > 1)
+                coefficients += ` x<sup>${i}</sup> + `;
+            else
+                coefficients += ` x + `;
+        }
+        coefficients += `<input id="${this.GUID}-A" data-index="0" type="number" step="0.1" value="${this.A[0]}"/>`;
+
+        return coefficients;
+    }
+
+    GetHtml() {
+        var template = GetClassProperty(this, `Template`);
+
+        template = template.replace(/[$]id[$]/g, this.GUID);
+        template = template.replace(/[$]min[$]/g, this.MinValue);
+        template = template.replace(/[$]max[$]/g, this.MaxValue);
+        template = template.replace(/[$]degree[$]/g, this.Degree);
+
+        template = template.replace(/[$]coefficients[$]/g, this.GetCoefficientsHtml());
+
+        return template;
+    }
+
+    GetObjOperation(outputVariableId, inputVariableId) {
+        var objOperation = { value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
+            { type: `FLOAT`, value: this.MinValue}, //MinValue
+            { type: `FLOAT`, value: this.MaxValue}, //MaxValue
+            { type: `UINT8`, value: this.Degree}, //Degree
+            { type: `FLOAT`, value: this.A}, //coefficients
+        ]};
+
+        if (outputVariableId || inputVariableId) 
+            return Packagize(objOperation, { 
+                outputVariables: [ outputVariableId ?? 0 ],
+                inputVariables: [ inputVariableId ?? 0 ]
+            });
+
+        return objOperation;
+    }
+}
+GenericConfigs.push(Calculation_Polynomial);
+
+class Calculation_LookupTable extends UITemplate {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
@@ -132,9 +255,9 @@ class ConfigOperation_LookupTable extends UITemplate {
             this.ParameterSelection.SetOptions(GetSelections());
     }
 }
-GenericConfigs.push(ConfigOperation_LookupTable);
+GenericConfigs.push(Calculation_LookupTable);
 
-class ConfigOperation_2AxisTable extends UITemplate {
+class Calculation_2AxisTable extends UITemplate {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
@@ -215,14 +338,14 @@ class ConfigOperation_2AxisTable extends UITemplate {
         }
     }
 }
-GenericConfigs.push(ConfigOperation_2AxisTable);
+GenericConfigs.push(Calculation_2AxisTable);
 
 function GetSelections(measurement, output, inputs, configs) {
     var selections = [];
     if (configs) {
         var calculations = { Group: `Calculations`, Options: [] }
         for (var i = 0; i < configs.length; i++) {
-            if (output === undefined || !configs[i].Output || configs[i].Output === output) {
+            if (output === undefined || configs[i].Output === output) {
                 if(inputs !== undefined) {
                     if(inputs.length !== configs[i].Inputs.length)
                         continue;
@@ -238,7 +361,7 @@ function GetSelections(measurement, output, inputs, configs) {
                 }
                 calculations.Options.push({
                     Name: configs[i].Name,
-                    Value: { value: configs[i].Name }
+                    Value: { value: configs[i].name }
                 });
             }
         }
@@ -270,7 +393,7 @@ function GetSelections(measurement, output, inputs, configs) {
     return selections;
 }
 
-class ConfigOrVariableSelection extends UITemplate {
+class CalculationOrVariableSelection extends UITemplate {
     static Label = `Value`;
     static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
 
@@ -293,8 +416,8 @@ class ConfigOrVariableSelection extends UITemplate {
         this.Selection.OnChange.push(function () {
             const subConfigIndex = thisClass.GetSubConfigIndex();
             thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
-            $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml());
-            thisClass.ConfigValues.forEach(function(val) { val.Detach(); });
+            $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
+            thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
             var subConfig = thisClass.GetSubConfig();
             if(subConfig?.Attach)
                 subConfig.Attach();
@@ -309,23 +432,23 @@ class ConfigOrVariableSelection extends UITemplate {
         var value = super.GetValue();
 
         if (this.ConfigValues) {
-            if(ConfigOrVariableSelection.SaveOnlyActive) {
+            if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
                 if(subConfig?.GetValue) {
-                    var configValue = subConfig.GetValue();
+                    var configValue = subConfig.GetValue?.();
                     if(typeof configValue !== `object` )
                         configValue = { Value: configValue };
-                    configValue.Name = GetClassProperty(subConfig, `Name`);
+                    configValue.ClassName = subConfig.constructor.name;
                     value.Values = [configValue];
                 }
             } else {
                 value.Values = [];
                 for (var i = 0; i < this.ConfigValues.length; i++) {
-                    if (ConfigOrVariableSelection.SaveAll || this.ConfigValues[i].NotDefault) {
-                        var configValue = this.ConfigValues[i].GetValue();
+                    if (CalculationOrVariableSelection.SaveAll || this.ConfigValues[i].NotDefault) {
+                        var configValue = this.ConfigValues[i].GetValue?.();
                         if(typeof configValue !== `object` )
                             configValue = { Value: configValue };
-                        configValue.Name = GetClassProperty(this.ConfigValues[i], `Name`);
+                        configValue.ClassName = this.ConfigValues[i].constructor.name
                         value.Values.push(configValue);
                     }
                 }
@@ -338,20 +461,13 @@ class ConfigOrVariableSelection extends UITemplate {
     SetValue(value) {
         value ??= {};
 
-        if(value.Values === undefined) {
+        if(value.Values === undefined)
             value.Values = [];
-
-            if(value.Selection && value.Selection.value && !value.Selection.reference)
-            {
-                value.Values.push(value.Selection.value);
-                value.Selection.value = value.Selection.value.Name;
-            }
-        }
         
         for (var i = 0; i < value.Values.length; i++) {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {
-                if (GetClassProperty(this.ConfigValues[t], `Name`) === value.Values[i].Name) {
+                if (value.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
                     var setVal = value.Values[i];
                     if(typeof this.ConfigValues[t].GetValue() !== `object` )
                         setVal = setVal.Value;
@@ -362,22 +478,24 @@ class ConfigOrVariableSelection extends UITemplate {
             }
             if (!found && this.Configs) {
                 for (var t = 0; t < this.Configs.length; t++) {
-                    if (GetClassProperty(this.Configs[t], `Name`) !== value.Values[i].Name)
+                    if (value.Values[i].ClassName !== this.Configs[t].name)
                         continue;
                     var configValue = new this.Configs[t]({
                         Label: this.Label,
                         Measurement: this.Measurement,
                         MeasurementIndex: this.MeasurementIndex
                     });
-                    var setVal = value.Values[i];
-                    if(typeof configValue.GetValue() !== `object` )
-                        setVal = setVal.Value;
-                    if(configValue.OnChange)
-                        configValue.OnChange.push(function(){configValue.NotDefault = true;});
-                    else
-                        configValue.NotDefault = true;
-                    configValue.SetValue(setVal);
-                    this.ConfigValues.push(configValue);
+                    if(configValue.SetValue) {
+                        var setVal = value.Values[i];
+                        if(typeof configValue.GetValue() !== `object` )
+                            setVal = setVal.Value;
+                        if(configValue.OnChange)
+                            configValue.OnChange.push(function(){configValue.NotDefault = true;});
+                        else
+                            configValue.NotDefault = true;
+                        configValue.SetValue(setVal);
+                        this.ConfigValues.push(configValue);
+                    }
                 }
             }
         }
@@ -392,7 +510,7 @@ class ConfigOrVariableSelection extends UITemplate {
         if (selection && this.VariableListName) {
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
-                if(subConfig.RegisterVariables)
+                if(subConfig?.RegisterVariables)
                     subConfig.RegisterVariables();
                 const type = GetClassProperty(subConfig, `Output`)
                 if (type) {
@@ -413,7 +531,7 @@ class ConfigOrVariableSelection extends UITemplate {
             }
             const thisReference = this.GetVariableReference();
             const variable = VariableRegister.GetVariableByReference(thisReference)
-            if(variable.Type === `float` || variable.Type === `bool`)
+            if(variable?.Type === `float` || variable?.Type === `bool`)
                 this.LiveUpdate.VariableReference = thisReference;
             else 
                 this.LiveUpdate.VariableReference = undefined;
@@ -441,12 +559,12 @@ class ConfigOrVariableSelection extends UITemplate {
         if(selection == undefined)
             return -1;
         for (var i = 0; i < this.ConfigValues.length; i++) {
-            if (GetClassProperty(this.ConfigValues[i], `Name`) === selection.value) {
+            if (this.ConfigValues[i].constructor.name === selection.value) {
                 return i;
             }
         }
         for (var i = 0; i < this.Configs.length; i++) {
-            if (GetClassProperty(this.Configs[i], `Name`) !== selection.value)
+            if (this.Configs[i].name !== selection.value)
                 continue;
             var configValue = new this.Configs[i]({
                 Label: this.Label,

@@ -1,6 +1,6 @@
 var BooleanOutputConfigs = [];
 
-class ConfigOperation_DigitalPinWrite extends UITemplate {
+class Output_Digital extends UITemplate {
     static Name = `Digital Pin`;
     static Inputs = [`bool`];
     static Template = `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>`
@@ -32,4 +32,4 @@ class ConfigOperation_DigitalPinWrite extends UITemplate {
         return objOperation;
     }
 }
-BooleanOutputConfigs.push(ConfigOperation_DigitalPinWrite);
+BooleanOutputConfigs.push(Output_Digital);
