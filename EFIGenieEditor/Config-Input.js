@@ -126,16 +126,30 @@ function ParsePinSelectElements(pinSelectElements){
     return elements;
 }
 
-function GetNameFromPinSelectElement(element){
-    var inputName = $($($(element).parent().parent().parent().parent().parent().parent().children()[0]).children()[1]).val();
-    if(inputName)
-        return inputName;
+function GetNameFromPinSelectChildren(element){
+    const elementSelector = $(element);
 
-    var outputName = $($($($(element).parent().parent().parent().parent().children()[0]).children()[0]).children()[0]).text();
-    if(outputName)
-        return outputName;
+    if(elementSelector.hasClass(`pinselectname`)){
+        const name = elementSelector.val();
+        if(!name)
+            return elementSelector.text();
+        return name;
+    }
 
-    return `unknown`;
+    const elements = elementSelector.children();
+    for(var i = 0; i < elements?.length; i++) {
+        const name = GetNameFromPinSelectChildren(elements[i]);
+        if(name)
+            return name;
+    }
+}
+
+function GetNameFromPinSelectElement(element){    
+    const name = GetNameFromPinSelectChildren(element);
+    if(name)
+        return name;
+
+    return GetNameFromPinSelectElement($(element).parent());
 }
 
 //The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
@@ -436,66 +450,84 @@ class ConfigInputs {
 }
 
 class ConfigInput extends UITemplate {
-    static Template = `<div><label for="$Name.GUID$">Name:</label>$Name$</div>$RawConfig$<hr style="margin: 2px;"/>$TranslationConfig$`
+    static Template = `<div><label for="$Name.GUID$">Name:</label>$Name$</div>
+$TranslationConfig$
+<hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
+<div id="$GUID$-raw">$RawConfigReplacer$</div>`
 
     constructor(prop) {
         prop ??= {};
         const measurementKeys = Object.keys(Measurements)
         var options = [];
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
-        prop.TranslationMeasurement = new UISelection({
-            Value: `None`,
-            SelectNotVisible: true,
-            Options: options,
-            Hidden: true
-        });
         prop.RawConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Raw Input`,
+            Label:              `Source`,
             Inputs:             [],
-            Name:               prop.Name,
-            VariableListName:   `Inputs`,
+            ReferenceName:      `Inputs.${prop.Name}`
         });
         prop.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Translation`,
-            Inputs:             [``],
-            Name:               prop.Name,
-            VariableListName:   `Inputs`,
-            Template: CalculationOrVariableSelection.Template.replace(`$Selection$`, `$Selection$ \\$TranslationMeasurement\\$`),
-            OnChange: function() { if(prop.TranslationConfig.GetSubConfig()?.constructor.Measurement === undefined) prop.TranslationMeasurement.Show(); else prop.TranslationMeasurement.Hide(); }
+            Label:              `Input \\$TranslationMeasurement\\$`,
+            ConfigsOnly:        true,
+            Measurement:        `None`,
+            ReferenceName:      `Inputs.${prop.Name}`
+        });
+        prop.TranslationMeasurement = new UISelection({
+            Value:              `None`,
+            SelectNotVisible:   true,
+            Options:            options,
+            OnChange:           function() { prop.TranslationConfig.Measurement = prop.TranslationMeasurement.Value; }
         });
         prop.Name = new UIText({
             Value: prop.Name ?? `Input`,
-            OnChange: function() { prop.TranslationConfig.Name = prop.RawConfig.Name = prop.Name.Value }
+            Class: `pinselectname`,
+            OnChange: function() { prop.TranslationConfig.ReferenceName = prop.RawConfig.ReferenceName = `Inputs.${prop.Name.Value}` }
         })
+        prop.HRDisplay = `display: none; `;
         super(prop);
         const thisClass = this;
-        this.RawConfig.OnChange.push(function() { thisClass.TranslationConfig.Inputs = [GetClassProperty(thisClass.RawConfig.GetSubConfig(), `Output`)]; })
-        // this.TranslationConfig.OnChange.push(function() { 
-        //     thisClass.RawConfig.Output = GetClassProperty(thisClass.TranslationConfig.GetSubConfig(), `Inputs`)?.[0];
-        //     thisClass.RawConfig.Output ??= ``;
-        // });
-        this.TranslationMeasurement.OnChange.push(function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value })
+        this.TranslationConfig.OnChange.push(function() { 
+            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                $(`${thisClass.GUID}-hr`).hide();
+                thisClass.HRDisplay = `display: none; `;
+                $(`${thisClass.GUID}-raw`).html(``);
+                thisClass.RawConfigReplacer = ``
+            } else {
+                thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
+                $(`${thisClass.GUID}-hr`).show();
+                thisClass.HRDisplay = ``;
+                $(`${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
+                thisClass.RawConfigReplacer = `$RawConfig$`
+            }
+        });
     }
 
     RegisterVariables() {
         this.TranslationConfig.RegisterVariables?.();
-        this.RawConfig.RegisterVariables?.();
+        const subConfig = this.TranslationConfig.GetSubConfig();
+        if(!(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0))
+            this.RawConfig.RegisterVariables?.();
     }
 
     GetObjOperation() {
-        var rawConfigObj = this.RawConfig.GetObjOperation();
-        var rawConfigVariable = this.RawConfig.GetVariableReference();
-        var translationConfigVariable = this.TranslationConfig.GetObjOperation(rawConfigVariable);
-        if(rawConfigObj && rawConfigVariable && translationConfigVariable) 
-            return { value: [
-                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-                { type: `UINT16`, value: 2 }, // number of operations
-                { obj: rawConfigObj },
-                { obj: translationConfigVariable }
-            ]};
-        return rawConfigObj;
+        const translationConfig = this.TranslationConfig.GetSubConfig();
+        if(translationConfig === undefined)
+            return { value: [] };
+
+        if(translationConfig.constructor.Inputs === undefined || translationConfig.constructor.Inputs.length === 0)
+            return this.TranslationConfig.GetObjOperation();
+        
+        const rawConfigObj = this.RawConfig.GetObjOperation();
+        const rawConfigVariable = this.RawConfig.GetVariableReference();
+        const translationConfigObj = this.TranslationConfig.GetObjOperation(rawConfigVariable);
+        return { value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 2 }, // number of operations
+            { obj: rawConfigObj },
+            { obj: translationConfigObj }
+        ]};
     }
 }
 

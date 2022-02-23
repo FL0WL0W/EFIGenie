@@ -95,7 +95,7 @@ class UITemplate {
             var [elementname, element] = e;
             if(element?.SetValue && elementname !== baseObjName && 
                 (baseObjName === undefined || thisClass[baseObjName].GetValue()[elementname] === undefined)) {
-                element.SetValue(value[elementname]);
+                element.SetValue(value?.[elementname]);
             }
         });
 
@@ -502,9 +502,12 @@ class UISelection {
                     `>${option.Name}</option>`;
             }
         });
-        if(!this.SelectNotVisible)
+        if(!this.SelectNotVisible) {
             optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
                 `>select</option>${optionsHtml}`;
+            if(!selected)
+                this.SetValue(this.SelectValue);
+        }
         return optionsHtml;
     }
 

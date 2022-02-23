@@ -2,7 +2,7 @@ class Reluctor_GM24x {
     static Name = `Reluctor GM 24X`;
     static Output = `ReluctorResult`;
     static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
+    static Measurement = `Reluctor`;
 
     GetHtml() { return ``; }
 
@@ -26,7 +26,7 @@ InputConfigs.push(Reluctor_GM24x);
 
 class Reluctor_Universal1x extends UITemplate {
     static Name = `Reluctor Universal 1X`;
-    static Output = `ReluctorResult`;
+    static Output = `Reluctor`;
     static Inputs = [`Record`];
     static Measurement = `ReluctorResult`;
     static Template =   `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
@@ -71,7 +71,7 @@ InputConfigs.push(Reluctor_Universal1x);
 
 class Reluctor_UniversalMissingTeeth extends UITemplate {
     static Name = `Reluctor Universal Missing Teeth`;
-    static Output = `ReluctorResult`;
+    static Output = `Reluctor`;
     static Inputs = [`Record`];
     static Measurement = `ReluctorResult`;
     static Template =   `<div><label for="$FirstToothPosition.GUID$">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>` +

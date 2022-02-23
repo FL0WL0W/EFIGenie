@@ -340,35 +340,39 @@ class Calculation_2AxisTable extends UITemplate {
 }
 GenericConfigs.push(Calculation_2AxisTable);
 
-function GetSelections(measurement, output, inputs, configs) {
+function GetSelections(measurement, output, inputs, configs, configsOnly) {
     var selections = [];
     if (configs) {
         var calculations = { Group: `Calculations`, Options: [] }
         for (var i = 0; i < configs.length; i++) {
-            if (output === undefined || configs[i].Output === output) {
-                if(inputs !== undefined) {
-                    if(inputs.length !== configs[i].Inputs.length)
-                        continue;
-                    var inputsMatch = true;
-                    for(var im = 0; im < inputs.length; im++){
-                        if(inputs[im] !== configs[i].Inputs[im]){
-                            inputsMatch = false;
-                            break;
-                        }
+            if (output !== undefined && configs[i].Output !== output) 
+                continue;
+
+            if(measurement !== undefined && configs[i].Measurement !== undefined && measurement !== configs[i].Measurement)
+                continue;
+            
+            if(inputs !== undefined) {
+                if(inputs.length !== configs[i].Inputs.length || configs[i].Inputs === undefined)
+                    continue;
+                var inputsMatch = true;
+                for(var im = 0; im < inputs.length; im++){
+                    if(inputs[im] !== configs[i].Inputs[im]){
+                        inputsMatch = false;
+                        break;
                     }
-                    if(!inputsMatch)
-                        continue;
                 }
-                calculations.Options.push({
-                    Name: configs[i].Name,
-                    Value: { value: configs[i].name }
-                });
+                if(!inputsMatch)
+                    continue;
             }
+            calculations.Options.push({
+                Name: configs[i].Name,
+                Value: { value: configs[i].name }
+            });
         }
         selections.push(calculations);
     }
 
-    if(configs && inputs)
+    if(inputs || configsOnly)
         return selections[0].Options;
 
     for (var property in VariableRegister) {
@@ -402,7 +406,7 @@ class CalculationOrVariableSelection extends UITemplate {
     constructor(prop) {
         prop ??= {};
         prop.Selection = new UISelection({
-            Options: GetSelections(prop.Measurement, prop.Output, prop.Inputs, prop.Configs),
+            Options: GetSelections(prop.Measurement, prop.Output, prop.Inputs, prop.Configs, prop.ConfigsOnly),
             SelectDisabled: true
         });
         prop.LiveUpdate = new DisplayLiveUpdate({
@@ -481,6 +485,7 @@ class CalculationOrVariableSelection extends UITemplate {
                     if (value.Values[i].ClassName !== this.Configs[t].name)
                         continue;
                     var configValue = new this.Configs[t]({
+                        ReferenceName: this.ReferenceName,
                         Label: this.Label,
                         Measurement: this.Measurement,
                         MeasurementIndex: this.MeasurementIndex
@@ -504,32 +509,24 @@ class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.Selection.SetOptions(GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs));
+        this.Selection.SetOptions(GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly));
         const selection = this.Selection.Value;
         const measurement = this.GetMeasurement();
-        if (selection && this.VariableListName) {
+        if (selection && this.ReferenceName) {
+            const thisReference = this.GetVariableReference();
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
-                if(subConfig?.RegisterVariables)
-                    subConfig.RegisterVariables();
-                const type = GetClassProperty(subConfig, `Output`)
-                if (type) {
-                    VariableRegister.RegisterVariable(
-                        this.VariableListName,
-                        this.Name ?? this.Label,
-                        type,
-                        measurement
-                    );
+                if(subConfig !== undefined) {
+                    subConfig.ReferenceName = this.ReferenceName;
+                    subConfig.RegisterVariables?.();
+                    const type = GetClassProperty(subConfig, `Output`)
+                    if (type) {
+                        VariableRegister.RegisterVariable(thisReference, type);
+                    }
                 }
             } else {
-                VariableRegister.RegisterVariableReference(
-                    this.VariableListName,
-                    this.Name ?? this.Label,
-                    measurement,
-                    `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`
-                );
+                VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`);
             }
-            const thisReference = this.GetVariableReference();
             const variable = VariableRegister.GetVariableByReference(thisReference)
             if(variable?.Type === `float` || variable?.Type === `bool`)
                 this.LiveUpdate.VariableReference = thisReference;
@@ -545,7 +542,7 @@ class CalculationOrVariableSelection extends UITemplate {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
                 return;
-            if(this.VariableListName)
+            if(this.ReferenceName)
                 return subConfig.GetObjOperation(this.GetVariableReference(), ...args);
             return subConfig.GetObjOperation(...args);
         }
@@ -567,6 +564,7 @@ class CalculationOrVariableSelection extends UITemplate {
             if (this.Configs[i].name !== selection.value)
                 continue;
             var configValue = new this.Configs[i]({
+                ReferenceName: this.ReferenceName,
                 Label: this.Label,
                 Measurement: this.Measurement,
                 MeasurementIndex: this.MeasurementIndex
@@ -603,8 +601,8 @@ class CalculationOrVariableSelection extends UITemplate {
 
     GetVariableReference() {
         const measurement = this.GetMeasurement();
-        if (this.Selection.Value && this.VariableListName)
-            return `${this.VariableListName}.${this.Name ?? this.Label}${measurement? `(${measurement})` : ``}`;
+        if (this.Selection.Value && this.ReferenceName)
+            return `${this.ReferenceName}${measurement? `(${measurement})` : ``}`;
     }
 }
 

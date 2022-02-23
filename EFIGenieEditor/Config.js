@@ -53,22 +53,26 @@ class VariableRegistry {
             return variable.Id;
         return variable;
     }
-    RegisterVariable(ListName, Name, Type, Measurement) {
-        this[ListName] ??= [];
-        this[ListName].push({
-            Name,
-            Type,
-            Measurement,
-            Id: this.GenerateVariableId()
-        });
-    }
-    RegisterVariableReference(ListName, Name, Measurement, Reference) { 
-        this[ListName] ??= [];
-        this[ListName].push({
-            Name,
-            Measurement,
-            Id: Reference
-        });
+    RegisterVariable(variableReference, Type, Id) {
+        if(variableReference.indexOf(`.`) !== -1) {
+            const listName = variableReference.substring(0, variableReference.indexOf(`.`));
+            var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
+            var measurement;
+            if(variableName.indexOf(`(`) !== -1) {
+                var measurement = variableName.substring(variableName.lastIndexOf(`(`) + 1);
+                measurement = measurement.substring(0, measurement.length - 1);
+                variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
+            }
+            this[listName] ??= [];
+            this[listName].push({
+                Name: variableName,
+                Measurement: measurement,
+                Type,
+                Id: Id == undefined? this.GenerateVariableId() : Id
+            });
+        } else {
+            this[variableReference] = Id == undefined? this.GenerateVariableId() : Id
+        }
     }
     GetVariableReferenceList() {
         var variableReferences = {};
@@ -538,26 +542,26 @@ class ConfigFuel extends UITemplate {
             Configs:            AFRConfigs,
             Label:              `Air Fuel Ratio`,
             Measurement:        `Ratio`,
-            VariableListName:   `FuelParameters`
+            ReferenceName:      `FuelParameters.Air Fuel Ratio`
         });
         prop.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorEnableConfigs,
             Label:              `Injector Enable`,
             Measurement:        `Bool`,
-            VariableListName:   `FuelParameters`
+            ReferenceName:      `FuelParameters.Injector Enable`
         });
         prop.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
             Label:              `Injector Pulse Width`,
             Measurement:        `Time`,
-            VariableListName:   `FuelParameters`,
+            ReferenceName:      `FuelParameters.Injector Pulse Width`,
             MeasurementIndex: 1
         });
         prop.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Injector End Position(BTDC)`,
             Measurement:        `Angle`,
-            VariableListName:   `FuelParameters`
+            ReferenceName:      `FuelParameters.Injector End Position`
         });
         prop.Outputs = [];
         for(var i = 0; i < 8; i++){
@@ -601,7 +605,7 @@ class ConfigFuel extends UITemplate {
 
     RegisterVariables() {
         this.AFRConfigOrVariableSelection.RegisterVariables();
-        VariableRegister.RegisterVariable(`FuelParameters`, `Cylinder Fuel Mass`, `float`, `Mass`);
+        VariableRegister.RegisterVariable(`FuelParameters.Cylinder Fuel Mass(Mass)`, `float`);
         this.InjectorEnableConfigOrVariableSelection.RegisterVariables();
         this.InjectorPulseWidthConfigOrVariableSelection.RegisterVariables();
         this.InjectorEndPositionConfigOrVariableSelection.RegisterVariables();
@@ -678,26 +682,26 @@ class ConfigIgnition extends UITemplate {
             Configs:            IgnitionEnableConfigs,
             Label:              `Ignition Enable`,
             Measurement:        `Bool`,
-            VariableListName:   `IgnitionParameters`
+            ReferenceName:      `IgnitionParameters.Ignition Enable`
         });
         prop.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
             Label:              `Ignition Advance`,
             Measurement:        `Angle`,
-            VariableListName:   `IgnitionParameters`
+            ReferenceName:      `IgnitionParameters.Ignition Advance`
         });
         prop.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              `Ignition Dwell`,
             Measurement:        `Time`,
-            VariableListName:   `IgnitionParameters`,
+            ReferenceName:      `IgnitionParameters.Ignition Dwell`,
             MeasurementIndex: 1
         });
         prop.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              `Ignition Dwell Deviation`,
             Measurement:        `Time`,
-            VariableListName:   `IgnitionParameters`,
+            ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
             MeasurementIndex: 1
         });
         prop.Outputs = [];
@@ -810,37 +814,37 @@ class ConfigEngine extends UITemplate {
             Configs:            undefined,
             Label:              `Crank Position`,
             Measurement:        `ReluctorResult`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Crank Position`
         });
         prop.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
             Label:              `Cam Position`,
             Measurement:        `ReluctorResult`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Cam Position`
         });
         prop.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
             Label:              `Cylinder Air Mass`,
             Measurement:        `Mass`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Cylinder Air Mass`
         });
         prop.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
             Label:              `Cylinder Air Temperature`,
             Measurement:        `Temperature`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Cylinder Air Temperature`
         });
         prop.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
             Label:              `Manifold Absolute Pressure`,
             Measurement:        `Pressure`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Manifold Absolute Pressure`
         });
         prop.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
             Label:              `Volumetric Efficiency`,
             Measurement:        `Percentage`,
-            VariableListName:   `EngineParameters`
+            ReferenceName:      `EngineParameters.Volumetric Efficiency`
         });
         super(prop);
     }
@@ -851,7 +855,7 @@ class ConfigEngine extends UITemplate {
         this.CrankPositionConfigOrVariableSelection.RegisterVariables();
         this.CamPositionConfigOrVariableSelection.RegisterVariables();
 
-        VariableRegister.RegisterVariable(`EngineParameters`, `Engine Speed`, `float`, `AngularSpeed`);
+        VariableRegister.RegisterVariable(`EngineParameters.Engine Speed(AngularSpeed)`, `float`);
 
         var requirements = [];
 
@@ -966,7 +970,7 @@ class ConfigEngine extends UITemplate {
 }
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
-    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:`)
+    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:`)
 
     constructor(prop) {
         prop ??= {};
@@ -1031,13 +1035,13 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
             Configs:            GenericConfigs,
             Label:              `Injector Flow Rate`,
             Measurement:        `MassFlow`,
-            VariableListName:   `FuelParameters`
+            ReferenceName:      `FuelParameters.Injector Flow Rate`
         });
         prop.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Injector Dead Time`,
             Measurement:        `Time`,
-            VariableListName:   `FuelParameters`,
+            ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementIndex: 1
         });
         prop.MinInjectorFuelMass = new UINumberWithMeasurement({
