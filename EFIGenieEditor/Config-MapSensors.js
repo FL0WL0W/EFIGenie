@@ -1,11 +1,15 @@
 class Input_AnalogPolynomial extends UITemplate {
-    static Template = `$AnalogInput$`//$Polynomial$`
+    static Template = `<div><span style="float: right;">$VoltageLiveUpdate$</span>$AnalogInput$</div>`//$Polynomial$</div>`
     static Output = `float`;
     static Inputs = [];
+
     constructor(prop){
         prop ??= {};
         prop.AnalogInput = new Input_Analog();
         prop.Polynomial = new Calculation_Polynomial();
+        prop.VoltageLiveUpdate = new DisplayLiveUpdate({
+            Measurement: Input_Analog.Measurement
+        });
         super(prop);
     }
 
@@ -14,13 +18,14 @@ class Input_AnalogPolynomial extends UITemplate {
             `${this.ReferenceName}(Voltage)`,
             type
         );
+        this.VoltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
     }
 
     GetObjOperation(outputVariableId) {
         return { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
             { type: `UINT16`, value: 2 }, // number of operations
-            { obj: this.AnalogInput.GetObjOperation() },
+            { obj: this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`) },
             { obj: this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`) }
         ]};
     }

@@ -1,37 +1,55 @@
-class Reluctor_GM24x {
-    static Name = `Reluctor GM 24X`;
+ReluctorFactoryIDs = {
+    Offset: 30000,
+    GM24X: 1,
+    Universal1X: 2,
+    UniversalMissintTooth: 3
+};
+
+class Reluctor_Template extends Input_DigitalRecord {
     static Output = `ReluctorResult`;
-    static Inputs = [`Record`];
     static Measurement = `Reluctor`;
+    static Inputs = [];
+    static Template = Input_DigitalRecord.Template.substring(0, Input_DigitalRecord.Template.indexOf(`Inverted</div>`) + 14)
 
-    GetHtml() { return ``; }
-
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [
-            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
-            { type: `UINT16`, value: this.Pin.Value}, //pin
-            { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
+    GetObjOperation(objOperation) {
+        return { value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
+            { type: `UINT16`, value: 2 }, // number of operations
+            { obj: super.GetObjOperation(`${this.ReferenceName}(Reluctor)`) },
+            { obj: objOperation }
         ]};
+    }
+}
 
-        if (outputVariableId || inputVariableId) 
-            return Packagize(objOperation, { 
-                outputVariables: [ outputVariableId ?? 0 ], 
-                inputVariables: [ inputVariableId ?? 0 ]
-            });
+class Reluctor_GM24x extends Reluctor_Template {
+    static Name = `Reluctor GM 24X`;
 
-        return objOperation;
+    constructor(prop) {
+        super(prop);
+        this.Length.Value = 100;
+    }
+
+    GetObjOperation(outputVariableId) {
+        var objOperation = { value: [
+            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
+        ]};
+        objOperation =  Packagize(objOperation, { 
+            outputVariables: [ outputVariableId ?? 0 ], 
+            inputVariables: [ 
+                `${this.ReferenceName}(Reluctor)`,
+                `CurrentTickId`
+            ]
+        });
+        return super.GetObjOperation(objOperation)
     }
 }
 InputConfigs.push(Reluctor_GM24x);
 
-class Reluctor_Universal1x extends UITemplate {
+class Reluctor_Universal1x extends Reluctor_Template {
     static Name = `Reluctor Universal 1X`;
-    static Output = `Reluctor`;
-    static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
-    static Template =   `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
+    static Template =   Reluctor_Template.Template +
+                        `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
                         `<div><label for="$FallingPosition.GUID$">Falling Edge Position:</label>$FallingPosition$</div>`;
-
     constructor(prop){
         prop ??= {};
         prop.RisingPosition = new UINumberWithMeasurement({
@@ -49,32 +67,31 @@ class Reluctor_Universal1x extends UITemplate {
             Measurement: `Angle`
         });
         super(prop);
+        this.Length.Value = 4;
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
             { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
             { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
         ]};
-            
-        return Packagize(objOperation, { 
-            outputVariables: [ outputVariableId ?? 0 ],
+        objOperation =  Packagize(objOperation, { 
+            outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
-                inputVariableId ?? 0,
+                `${this.ReferenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
+        return super.GetObjOperation(objOperation)
     }
 }
 InputConfigs.push(Reluctor_Universal1x);
 
-class Reluctor_UniversalMissingTeeth extends UITemplate {
+class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     static Name = `Reluctor Universal Missing Teeth`;
-    static Output = `Reluctor`;
-    static Inputs = [`Record`];
-    static Measurement = `ReluctorResult`;
-    static Template =   `<div><label for="$FirstToothPosition.GUID$">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>` +
+    static Template =   Reluctor_Template.Template +
+                        `<div><label for="$FirstToothPosition.GUID$">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>` +
                         `<div><label for="$ToothWidth.GUID$">Tooth Width:</label>$ToothWidth$</div>` +
                         `<div><label for="$NumberOfTeeth.GUID$">Number of Teeth:</label>$NumberOfTeeth$</div>` +
                         `<div><label for="$NumberOfTeethMissing.GUID$">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>`;
@@ -106,7 +123,7 @@ class Reluctor_UniversalMissingTeeth extends UITemplate {
         super(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
+    GetObjOperation(outputVariableId) {
         var objOperation = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
             { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
@@ -115,13 +132,14 @@ class Reluctor_UniversalMissingTeeth extends UITemplate {
             { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
         ]};
             
-        return Packagize(objOperation, { 
-            outputVariables: [ outputVariableId ?? 0 ],
+        objOperation =  Packagize(objOperation, { 
+            outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
-                inputVariableId ?? 0,
+                `${this.ReferenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
+        return super.GetObjOperation(objOperation)
     }
 }
 InputConfigs.push(Reluctor_UniversalMissingTeeth);

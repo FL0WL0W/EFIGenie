@@ -18,13 +18,6 @@ EmbeddedOperationsFactoryIDs = {
     TickToSeconds: 11
 };
 
-ReluctorFactoryIDs = {
-    Offset: 30000,
-    GM24X: 1,
-    Universal1X: 2,
-    UniversalMissintTooth: 3
-};
-
 PinOuts = {
     STM32F103C: { 
         Name: `Blue pill: STM32F103C`,

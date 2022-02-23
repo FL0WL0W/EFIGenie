@@ -813,13 +813,13 @@ class ConfigEngine extends UITemplate {
         prop.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
             Label:              `Crank Position`,
-            Measurement:        `ReluctorResult`,
+            Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Crank Position`
         });
         prop.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
             Label:              `Cam Position`,
-            Measurement:        `ReluctorResult`,
+            Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Cam Position`
         });
         prop.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
@@ -970,7 +970,7 @@ class ConfigEngine extends UITemplate {
 }
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
-    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$° &nbsp;&nbsp;&nbsp;Output:`)
+    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$°`)
 
     constructor(prop) {
         prop ??= {};

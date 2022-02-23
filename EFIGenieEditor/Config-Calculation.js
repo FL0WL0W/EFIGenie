@@ -174,7 +174,7 @@ class Calculation_Polynomial {
             { type: `FLOAT`, value: this.MinValue}, //MinValue
             { type: `FLOAT`, value: this.MaxValue}, //MaxValue
             { type: `UINT8`, value: this.Degree}, //Degree
-            { type: `FLOAT`, value: this.A}, //coefficients
+            { type: `FLOAT`, value: this.A.slice(0, this.Degree)}, //coefficients
         ]};
 
         if (outputVariableId || inputVariableId) 
@@ -607,10 +607,9 @@ class CalculationOrVariableSelection extends UITemplate {
 }
 
 class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
-    StickyHide = true;
-
     constructor(prop) {
-        prop.StickyHide = prop.Hidden;
+        prop ??= {};
+        prop.StickyHide = prop.Hidden ?? false;
         prop.Hidden = true;
         prop.NumberClass = "livevalue";
         super(prop);

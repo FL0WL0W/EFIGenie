@@ -254,7 +254,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 label:not(.w3-button) {
     font: bold 16px Arial;
     display: inline-block;
-    min-width: 245px;
+    min-width: 256px;
     padding-right: 5px;
     margin: 1px;
 }
