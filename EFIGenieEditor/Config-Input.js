@@ -1,7 +1,12 @@
 var CurrentTickVariableID = 0;
-var InputConfigs = [];
-InputConfigs.push(Calculation_Static);
-InputConfigs.push(Calculation_LookupTable);
+var RawInputConfigs = [];
+var InputConfigs = [
+    { Group: `Generic Pin Input`, Configs: RawInputConfigs},
+    { Group: `Custom Input`, Configs: [ 
+        Calculation_Static,
+        Calculation_LookupTable
+    ]}
+];
 
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -595,7 +600,7 @@ class Input_Analog extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_Analog);
+RawInputConfigs.push(Input_Analog);
 
 class Input_Digital extends UITemplate {
     static Name = `Digital Pin`;
@@ -629,7 +634,7 @@ class Input_Digital extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_Digital);
+RawInputConfigs.push(Input_Digital);
 
 class Input_DigitalRecord extends UITemplate {
     static Name = `Digital Pin (Record)`;
@@ -671,7 +676,7 @@ class Input_DigitalRecord extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_DigitalRecord);
+RawInputConfigs.push(Input_DigitalRecord);
 
 class Input_DutyCycle extends UITemplate {
     static Name = `Duty Cycle Pin Pin`;
@@ -712,7 +717,7 @@ class Input_DutyCycle extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_DutyCycle);
+RawInputConfigs.push(Input_DutyCycle);
 
 class Input_Frequency extends UITemplate {
     static Name = `Frequency Pin`;
@@ -753,7 +758,7 @@ class Input_Frequency extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_Frequency);
+RawInputConfigs.push(Input_Frequency);
 
 class Input_PulseWidth extends UITemplate {
     static Name = `Pulse Width Pin`;
@@ -794,4 +799,4 @@ class Input_PulseWidth extends UITemplate {
         return objOperation;
     }
 }
-InputConfigs.push(Input_PulseWidth);
+RawInputConfigs.push(Input_PulseWidth);

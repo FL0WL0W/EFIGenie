@@ -1,3 +1,6 @@
+var ReluctorConfigs = [];
+InputConfigs.unshift({Group: `Reluctor Decoders`, Configs: ReluctorConfigs});
+
 ReluctorFactoryIDs = {
     Offset: 30000,
     GM24X: 1,
@@ -43,7 +46,7 @@ class Reluctor_GM24x extends Reluctor_Template {
         return super.GetObjOperation(objOperation)
     }
 }
-InputConfigs.push(Reluctor_GM24x);
+ReluctorConfigs.push(Reluctor_GM24x);
 
 class Reluctor_Universal1x extends Reluctor_Template {
     static Name = `Reluctor Universal 1X`;
@@ -86,7 +89,7 @@ class Reluctor_Universal1x extends Reluctor_Template {
         return super.GetObjOperation(objOperation)
     }
 }
-InputConfigs.push(Reluctor_Universal1x);
+ReluctorConfigs.push(Reluctor_Universal1x);
 
 class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     static Name = `Reluctor Universal Missing Teeth`;
@@ -142,4 +145,4 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
         return super.GetObjOperation(objOperation)
     }
 }
-InputConfigs.push(Reluctor_UniversalMissingTeeth);
+ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);

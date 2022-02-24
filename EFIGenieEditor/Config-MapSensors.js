@@ -1,3 +1,6 @@
+var MapConfigs = [];
+InputConfigs.unshift({Group: `MAP Sensors`, Configs: MapConfigs});
+
 class Input_AnalogPolynomial extends UITemplate {
     static Template = `<div><span style="float: right;">$VoltageLiveUpdate$</span>$AnalogInput$</div>`//$Polynomial$</div>`
     static Output = `float`;
@@ -48,7 +51,7 @@ class ConfigOperation_GM1BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.18987012987013;
     }
 }
-InputConfigs.push(ConfigOperation_GM1BarMAP);
+MapConfigs.push(ConfigOperation_GM1BarMAP);
 
 class ConfigOperation_GM2BarMAP extends Input_AnalogPolynomial {
     static Name = `GM 2 Bar MAP`;
@@ -67,7 +70,7 @@ class ConfigOperation_GM2BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.398493506493506;
     }
 }
-InputConfigs.push(ConfigOperation_GM2BarMAP);
+MapConfigs.push(ConfigOperation_GM2BarMAP);
 
 class ConfigOperation_GM3BarMAP extends Input_AnalogPolynomial {
     static Name = `GM 3 Bar MAP`;
@@ -86,4 +89,4 @@ class ConfigOperation_GM3BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.628;
     }
 }
-InputConfigs.push(ConfigOperation_GM3BarMAP);
+MapConfigs.push(ConfigOperation_GM3BarMAP);

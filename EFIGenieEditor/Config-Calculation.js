@@ -342,57 +342,68 @@ GenericConfigs.push(Calculation_2AxisTable);
 
 function GetSelections(measurement, output, inputs, configs, configsOnly) {
     var selections = [];
-    if (configs) {
-        var calculations = { Group: `Calculations`, Options: [] }
-        for (var i = 0; i < configs.length; i++) {
-            if (output !== undefined && configs[i].Output !== output) 
-                continue;
+    if (configs?.length > 0) {
+        var configGroups = configs;
+        if(!configs[0].Group && !configs[0].Configs)
+            configGroups = [{ Group: `Calculations`, Configs: configs }];
 
-            if(measurement !== undefined && configs[i].Measurement !== undefined && measurement !== configs[i].Measurement)
-                continue;
-            
-            if(inputs !== undefined) {
-                if(inputs.length !== configs[i].Inputs.length || configs[i].Inputs === undefined)
+        for(var c = 0; c < configGroups.length; c++) {
+            var configOptions = { Group: configGroups[c].Group, Options: [] }
+            configs = configGroups[c].Configs;
+            for (var i = 0; i < configs.length; i++) {
+                if (output !== undefined && configs[i].Output !== output) 
                     continue;
-                var inputsMatch = true;
-                for(var im = 0; im < inputs.length; im++){
-                    if(inputs[im] !== configs[i].Inputs[im]){
-                        inputsMatch = false;
-                        break;
+
+                if(measurement !== undefined && configs[i].Measurement !== undefined && measurement !== configs[i].Measurement)
+                    continue;
+                
+                if(inputs !== undefined) {
+                    if(inputs.length !== configs[i].Inputs.length || configs[i].Inputs === undefined)
+                        continue;
+                    var inputsMatch = true;
+                    for(var im = 0; im < inputs.length; im++){
+                        if(inputs[im] !== configs[i].Inputs[im]){
+                            inputsMatch = false;
+                            break;
+                        }
                     }
+                    if(!inputsMatch)
+                        continue;
                 }
-                if(!inputsMatch)
-                    continue;
-            }
-            calculations.Options.push({
-                Name: configs[i].Name,
-                Value: { value: configs[i].name }
-            });
-        }
-        selections.push(calculations);
-    }
-
-    if(inputs || configsOnly)
-        return selections[0].Options;
-
-    for (var property in VariableRegister) {
-        if (!Array.isArray(VariableRegister[property]))
-            continue;
-
-        var arr = VariableRegister[property];
-
-        var arrSelections = { Group: property, Options: [] };
-
-        for (var i = 0; i < arr.length; i++) {
-            if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
-                arrSelections.Options.push({
-                    Name: arr[i].Name + (!measurement ? ` [${GetUnitDisplay(arr[i].Measurement)}]` : ``),
-                    Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
+                configOptions.Options.push({
+                    Name: configs[i].Name,
+                    Value: { value: configs[i].name }
                 });
             }
+            if(configOptions.Options.length > 0)
+                selections.push(configOptions);
         }
-        selections.push(arrSelections);
     }
+
+    if(!(inputs || configsOnly)) {
+        for (var property in VariableRegister) {
+            if (!Array.isArray(VariableRegister[property]))
+                continue;
+
+            var arr = VariableRegister[property];
+
+            var arrSelections = { Group: property, Options: [] };
+
+            for (var i = 0; i < arr.length; i++) {
+                if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
+                    arrSelections.Options.push({
+                        Name: arr[i].Name + (!measurement ? ` [${GetUnitDisplay(arr[i].Measurement)}]` : ``),
+                        Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
+                    });
+                }
+            }
+            if(arrSelections.Options.length > 0)
+                selections.push(arrSelections);
+        }
+    }
+
+    if(selections.length === 1)
+        return selections[0].Options;
 
     return selections;
 }
@@ -481,25 +492,32 @@ class CalculationOrVariableSelection extends UITemplate {
                 }
             }
             if (!found && this.Configs) {
-                for (var t = 0; t < this.Configs.length; t++) {
-                    if (value.Values[i].ClassName !== this.Configs[t].name)
-                        continue;
-                    var configValue = new this.Configs[t]({
-                        ReferenceName: this.ReferenceName,
-                        Label: this.Label,
-                        Measurement: this.Measurement,
-                        MeasurementIndex: this.MeasurementIndex
-                    });
-                    if(configValue.SetValue) {
-                        var setVal = value.Values[i];
-                        if(typeof configValue.GetValue() !== `object` )
-                            setVal = setVal.Value;
-                        if(configValue.OnChange)
-                            configValue.OnChange.push(function(){configValue.NotDefault = true;});
-                        else
-                            configValue.NotDefault = true;
-                        configValue.SetValue(setVal);
-                        this.ConfigValues.push(configValue);
+                var configGroups = this.Configs;
+                if(!this.Configs[0].Group && !this.Configs[0].Configs)
+                    configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+        
+                for(var c = 0; c < configGroups.length; c++) {
+                    const configs = configGroups[c].Configs;
+                    for (var t = 0; t < configs.length; t++) {
+                        if (value.Values[i].ClassName !== configs[t].name)
+                            continue;
+                        var configValue = new configs[t]({
+                            ReferenceName: this.ReferenceName,
+                            Label: this.Label,
+                            Measurement: this.Measurement,
+                            MeasurementIndex: this.MeasurementIndex
+                        });
+                        if(configValue.SetValue) {
+                            var setVal = value.Values[i];
+                            if(typeof configValue.GetValue() !== `object` )
+                                setVal = setVal.Value;
+                            if(configValue.OnChange)
+                                configValue.OnChange.push(function(){configValue.NotDefault = true;});
+                            else
+                                configValue.NotDefault = true;
+                            configValue.SetValue(setVal);
+                            this.ConfigValues.push(configValue);
+                        }
                     }
                 }
             }
@@ -561,20 +579,27 @@ class CalculationOrVariableSelection extends UITemplate {
             }
         }
         for (var i = 0; i < this.Configs.length; i++) {
-            if (this.Configs[i].name !== selection.value)
-                continue;
-            var configValue = new this.Configs[i]({
-                ReferenceName: this.ReferenceName,
-                Label: this.Label,
-                Measurement: this.Measurement,
-                MeasurementIndex: this.MeasurementIndex
-            });
-            if(configValue.OnChange)
-                configValue.OnChange.push(function(){configValue.NotDefault = true;});
-            else
-                configValue.NotDefault = true;
-            this.ConfigValues.push(configValue);
-            return this.ConfigValues.length-1;
+            var configGroups = this.Configs;
+            if(!this.Configs[0].Group && !this.Configs[0].Configs)
+                configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+    
+            for(var c = 0; c < configGroups.length; c++) {
+                const configs = configGroups[c].Configs;
+                if (configs[i].name !== selection.value)
+                    continue;
+                var configValue = new configs[i]({
+                    ReferenceName: this.ReferenceName,
+                    Label: this.Label,
+                    Measurement: this.Measurement,
+                    MeasurementIndex: this.MeasurementIndex
+                });
+                if(configValue.OnChange)
+                    configValue.OnChange.push(function(){configValue.NotDefault = true;});
+                else
+                    configValue.NotDefault = true;
+                this.ConfigValues.push(configValue);
+                return this.ConfigValues.length-1;
+            }
         }
     }
 
