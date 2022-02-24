@@ -287,16 +287,7 @@ class ConfigInputs {
             if(isNaN(selected))
                 return;
 
-            thisClass.Selected = selected;
-
-            $(`#${thisClass.GUID} .inputconfig`).hide();
-            $(`#${thisClass.GUID}-${thisClass.Selected}`).show();
-
-            //this doesn't work for some reason
-            // $(`#${this.GUID}-inputs a`).removeClass(`active`);
-            // $(this).addClass(`active`);
-            //so nuking it instead
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
+            $(`#${thisClass.GUID}-${selected}`)[0].scrollIntoView();
         });
                 
         $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-inputs div`, function(e){
@@ -316,7 +307,6 @@ class ConfigInputs {
                 return;
 
             thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, thisClass.NewInput());
-            thisClass.Selected = thisClass.ContextSelect + 1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -327,8 +317,6 @@ class ConfigInputs {
                 return;
             
             thisClass.Inputs.splice(thisClass.ContextSelect, 1);
-            if(thisClass.ContextSelect <= thisClass.Selected && thisClass.Selected !== 0)
-                thisClass.Selected--;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -340,33 +328,32 @@ class ConfigInputs {
             
             thisClass.Inputs.push(this.NewInput());
             thisClass.Inputs[thisClass.Inputs.length-1].SetValue(thisClass.Inputs[contextSelect].GetValue());
-            thisClass.Selected = thisClass.Inputs.length-1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
         
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-Up`, function(){
-            if(isNaN(thisClass.Selected) || thisClass.Selected === 0)
-                return;
+            // if(isNaN(thisClass.Selected) || thisClass.Selected === 0)
+            //     return;
             
-            var temp = thisClass.Inputs[thisClass.Selected];
-            thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected - 1];
-            thisClass.Inputs[thisClass.Selected - 1] = temp;
-            thisClass.Selected -= 1;
+            // var temp = thisClass.Inputs[thisClass.Selected];
+            // thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected - 1];
+            // thisClass.Inputs[thisClass.Selected - 1] = temp;
+            // thisClass.Selected -= 1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
         
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-Down`, function(){
-            if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1)
-                return;
+            // if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1)
+            //     return;
             
-            var temp = thisClass.Inputs[thisClass.Selected];
-            thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected + 1];
-            thisClass.Inputs[thisClass.Selected + 1] = temp;
-            thisClass.Selected += 1;
+            // var temp = thisClass.Inputs[thisClass.Selected];
+            // thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected + 1];
+            // thisClass.Inputs[thisClass.Selected + 1] = temp;
+            // thisClass.Selected += 1;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -374,15 +361,13 @@ class ConfigInputs {
     }
 
     GetInputsHtml() {
-        if(isNaN(this.Selected))
-            this.Selected = 0;
 
         var inputlist = ``;
         for(var i = 0; i < this.Inputs.length; i++){
             var liveUpdate = this.Inputs[i].TranslationConfig.LiveUpdate;
             if(!this.Inputs[i].TranslationConfig.Selection.Value)
                 liveUpdate = this.Inputs[i].RawConfig.LiveUpdate;
-            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button${this.Selected === i? ` active` : ``}">${this.Inputs[i].Name.Value}<span style="float: right;">${liveUpdate.GetHtml()}</span></div>`;
+            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button">${this.Inputs[i].Name.Value}<span style="float: right;">${liveUpdate.GetHtml()}</span></div>`;
         }
         if(this.Inputs.length === 0){
             this.ContextSelect = -1;
@@ -392,8 +377,8 @@ class ConfigInputs {
     }
 
     GetControlsHtml() {
-        return  `<span id="${this.GUID}-Up" style="padding: 3px 4px;">↑</span>` +
-                `<span id="${this.GUID}-Down" style="padding: 3px 4px;">↓</span>`;
+        return  ``;//`<span id="${this.GUID}-Up" style="padding: 3px 4px;">↑</span>` +
+                //`<span id="${this.GUID}-Down" style="padding: 3px 4px;">↓</span>`;
     }
 
     GetHtml() {
@@ -401,17 +386,11 @@ class ConfigInputs {
 
         template = template.replace(/[$]id[$]/g, this.GUID);
         
-        if(isNaN(this.Selected))
-            this.Selected = 0;
 
         var configs = ``;
         for(var i = 0; i < this.Inputs.length; i++)
         {
-            configs += `<div id="${this.GUID}-${i}" class="inputconfig"${i===this.Selected? `` : ` style="display: none;"`}><div  class="configContainer" style="border-style: none;">` +
-            `</div>` +
-            `   <div class="configContainer">` + 
-            this.Inputs[i].GetHtml() +
-            `</div></div>`;
+            configs += `<div id="${this.GUID}-${i}" class="inputconfig">${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
         }
 
         template = template.replace(/[$]inputconfig[$]/g, configs);
@@ -448,10 +427,12 @@ class ConfigInputs {
 }
 
 class ConfigInput extends UITemplate {
-    static Template = `<div><label for="$Name.GUID$">Name:</label>$Name$</div>
-$TranslationConfig$
-<hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
-<div id="$GUID$-raw">$RawConfigReplacer$</div>`
+    static Template = `<div>$Name$</div>
+<div class="inputContainer">
+    $TranslationConfig$
+    <hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
+    <div id="$GUID$-raw">$RawConfigReplacer$</div>
+</div>`
 
     constructor(prop) {
         prop ??= {};
@@ -462,15 +443,18 @@ $TranslationConfig$
             Configs:            InputConfigs,
             Label:              `Source`,
             Inputs:             [],
-            ReferenceName:      `Inputs.${prop.Name}`
+            ReferenceName:      `Inputs.${prop.Name}`,
+            NoParameterSelection: true
         });
         prop.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Input \\$TranslationMeasurement\\$`,
+            Label:              `Input`,
             ConfigsOnly:        true,
             Measurement:        `None`,
-            ReferenceName:      `Inputs.${prop.Name}`
+            ReferenceName:      `Inputs.${prop.Name}`,
+            NoParameterSelection: true
         });
+        prop.TranslationConfig.Template = CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`);
         prop.TranslationMeasurement = new UISelection({
             Value:              `None`,
             SelectNotVisible:   true,
@@ -479,7 +463,7 @@ $TranslationConfig$
         });
         prop.Name = new UIText({
             Value: prop.Name ?? `Input`,
-            Class: `pinselectname`,
+            Class: `pinselectname inputName`,
             OnChange: function() { prop.TranslationConfig.ReferenceName = prop.RawConfig.ReferenceName = `Inputs.${prop.Name.Value}` }
         })
         prop.HRDisplay = `display: none; `;
@@ -488,15 +472,15 @@ $TranslationConfig$
         this.TranslationConfig.OnChange.push(function() { 
             const subConfig = thisClass.TranslationConfig.GetSubConfig();
             if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
-                $(`${thisClass.GUID}-hr`).hide();
+                $(`#${thisClass.GUID}-hr`).hide();
                 thisClass.HRDisplay = `display: none; `;
-                $(`${thisClass.GUID}-raw`).html(``);
+                $(`#${thisClass.GUID}-raw`).html(``);
                 thisClass.RawConfigReplacer = ``
             } else {
                 thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
-                $(`${thisClass.GUID}-hr`).show();
+                $(`#${thisClass.GUID}-hr`).show();
                 thisClass.HRDisplay = ``;
-                $(`${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
+                $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
                 thisClass.RawConfigReplacer = `$RawConfig$`
             }
         });

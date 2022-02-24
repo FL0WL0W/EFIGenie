@@ -410,7 +410,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
 
 class CalculationOrVariableSelection extends UITemplate {
     static Label = `Value`;
-    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
+    static Template = `<label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span>`;
 
     ConfigValues = [];
 
@@ -502,6 +502,7 @@ class CalculationOrVariableSelection extends UITemplate {
                         if (value.Values[i].ClassName !== configs[t].name)
                             continue;
                         var configValue = new configs[t]({
+                            NoParameterSelection: this.NoParameterSelection,
                             ReferenceName: this.ReferenceName,
                             Label: this.Label,
                             Measurement: this.Measurement,
@@ -588,6 +589,7 @@ class CalculationOrVariableSelection extends UITemplate {
                 if (configs[i].name !== selection.value)
                     continue;
                 var configValue = new configs[i]({
+                    NoParameterSelection: this.NoParameterSelection,
                     ReferenceName: this.ReferenceName,
                     Label: this.Label,
                     Measurement: this.Measurement,
