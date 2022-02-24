@@ -242,28 +242,44 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 
 body {background-color: #222629; color: #eee; font-weight:bold;}
 
-.inputcontroladd,
-.inputcontroldelete,
-.inputcontrolup,
-.inputcontroldown,
-.inputcontroldummy {
-    padding: 3px 4px;
-    font-family: 'Courier New', monospace;
-    font-size: 1.25em;
-    font-weight: bold;
-    cursor: pointer;
-}
-.inputcontroladd:hover,
-.inputcontroldelete:hover,
-.inputcontrolup:hover,
-.inputcontroldown:hover {
-    border-radius: 6px;
-    background-color: #666;
-}
 .inputconfig {
     display: inline-block;
 }
-.inputContainer {
+.controladd,
+.controldelete,
+.controlup,
+.controldown,
+.controldummy {
+    padding: 3px 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+.controladd:hover,
+.controldelete:hover,
+.controlup:hover,
+.controldown:hover {
+    border-radius: 6px;
+    background-color: #666;
+}
+.subOperationSelection {
+    width: 110px;
+}
+.subOperationName {
+    width: 125px;
+}
+.configContainer {
+    vertical-align:top; 
+    border-radius: 6px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    padding: 2.5px;
+    margin: 2.5px;
+    display: inline-block;
+    min-width: 700px;
+}
+.mathContainer {
     vertical-align:top; 
     border-radius: 6px;
     border-style: solid;

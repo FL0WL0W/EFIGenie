@@ -402,19 +402,19 @@ class ConfigInputs {
         for(var i = 0; i < this.Inputs.length; i++)
         {
             configs += `<div id="${this.GUID}-${i}" class="inputconfig"><span style="float: right;">`;
-            configs += `<span class="inputcontroldelete" data-i="${i}">-</span>`;
+            configs += `<span class="controldelete" data-i="${i}">-</span>`;
             if(i !== 0)
-                configs += `<span class="inputcontrolup" data-i="${i}">↑</span>`;
+                configs += `<span class="controlup" data-i="${i}">↑</span>`;
             else
-                configs += `<span class="inputcontroldummy">&nbsp;</span>`;
+                configs += `<span class="controldummy">&nbsp;</span>`;
             if(i !== this.Inputs.length - 1)
-                configs += `<span class="inputcontroldown" data-i="${i}">↓</span>`;
+                configs += `<span class="controldown" data-i="${i}">↓</span>`;
             else
-                configs += `<span class="inputcontroldummy">&nbsp;</span>`;
+                configs += `<span class="controldummy">&nbsp;</span>`;
 
             configs += `</span>${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
         }
-        configs += `<span class="inputcontroladd" data-i="${this.Inputs.length-1}">+ New</span>`;
+        configs += `<span class="controladd" data-i="${this.Inputs.length-1}">+ New</span>`;
 
         template = template.replace(/[$]inputconfig[$]/g, configs);
         template = template.replace(/[$]overlay[$]/g, GenerateOverlay());
@@ -451,7 +451,7 @@ class ConfigInputs {
 
 class ConfigInput extends UITemplate {
     static Template = `<div>$Name$</div>
-<div class="inputContainer">
+<div class="configContainer">
     $TranslationConfig$
     <hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
     <div id="$GUID$-raw">$RawConfigReplacer$</div>
@@ -475,9 +475,9 @@ class ConfigInput extends UITemplate {
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
-            NoParameterSelection: true
+            NoParameterSelection: true,
+            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`)
         });
-        prop.TranslationConfig.Template = CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`);
         prop.TranslationMeasurement = new UISelection({
             Value:              `None`,
             SelectNotVisible:   true,

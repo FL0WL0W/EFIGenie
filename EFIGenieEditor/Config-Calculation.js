@@ -434,8 +434,7 @@ class CalculationOrVariableSelection extends UITemplate {
             $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
             thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
             var subConfig = thisClass.GetSubConfig();
-            if(subConfig?.Attach)
-                subConfig.Attach();
+            subConfig?.Attach?.();
             thisClass.LiveUpdate.MeasurementIndex.Measurement = thisClass.GetMeasurement();
             thisClass.LiveUpdate.Show?.();
         });
@@ -537,11 +536,11 @@ class CalculationOrVariableSelection extends UITemplate {
                 const subConfig = this.GetSubConfig();
                 if(subConfig !== undefined) {
                     subConfig.ReferenceName = this.ReferenceName;
-                    subConfig.RegisterVariables?.();
                     const type = GetClassProperty(subConfig, `Output`)
                     if (type) {
                         VariableRegister.RegisterVariable(thisReference, type);
                     }
+                    subConfig.RegisterVariables?.();
                 }
             } else {
                 VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`);
@@ -633,6 +632,56 @@ class CalculationOrVariableSelection extends UITemplate {
     }
 }
 
+class Calculation_Operation extends UITemplate {
+    static Name=`Operation`
+    static Template=`</br><div class="configContainer"><div><span style="float: right;">$LiveUpdate$</span>$Base$</div>$SubOperation$<span class="controladd">+ Add Operation</span></div`;
+    static Output = `float`;
+
+    constructor(prop) {
+        prop ??= {};
+        prop.Base = new CalculationOrVariableSelection({
+            Configs:            GenericConfigs,
+            Label:              `Base`,
+            Measurement:        prop.Measurement,
+            MeasurementIndex:   prop.MeasurementIndex
+        });
+        prop.SubOperation = [new CalculationOrVariableSelection({
+            Configs:            GenericConfigs,
+            Measurement:        prop.Measurement,
+            MeasurementIndex:   prop.MeasurementIndex,
+            Template: `<div>${CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)}</div>`
+        })];
+        prop.OperationSelection = [new UISelection({
+            Options: [
+                { Name: `Adder`,        Value: 1 },
+                { Name: `Subtracter`,   Value: 2 },
+                { Name: `Multiplier`,   Value: 3 },
+                { Name: `Divider`,      Value: 4 }
+            ],
+            Class: `subOperationSelection`,
+            SelectDisabled: true
+        })];
+        prop.OperationName = [new UIText({
+            Class: `subOperationName`,
+        })];
+        prop.LiveUpdate = new DisplayLiveUpdate({
+            Measurement: prop.Measurement,
+            MeasurementIndex: prop.MeasurementIndex,
+            Hidden: false
+        });
+        super(prop)
+        const thisClass = this
+        prop.OperationName[0].OnChange.push(function() {
+            thisClass.SubOperation[0].Label = prop.OperationName[0].Value;
+        });
+    }
+
+    RegisterVariables() {
+        this.LiveUpdate.VariableReference = `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
+        this.LiveUpdate.MeasurementIndex.Measurement = this.Measurement;
+    }
+}
+
 class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
     constructor(prop) {
         prop ??= {};
@@ -644,34 +693,32 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
 
     Attach() {
         super.Attach();
-        if(this.VariableReference){
-            var thisClass = this
-            if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-                VariablesToPoll.push(thisClass.VariableReference)
-            LiveUpdateEvents[this.GUID] = function() {
-                if(thisClass.VariableReference) { 
-                    if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-                        VariablesToPoll.push(thisClass.VariableReference)
-                    const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
-                    if(CurrentVariableValues[variableId] !== undefined) {
-                        thisClass.Value = CurrentVariableValues[variableId];
-                        thisClass.UpdateDisplayValue();
-                        if(!thisClass.StickyHide) {
-                            if(thisClass.Hidden)
-                                thisClass.ShowSuper();
-                            if(thisClass.TimeoutHandle)
-                                window.clearTimeout(thisClass.TimeoutHandle);
-            
-                            thisClass.TimeoutHandle = window.setTimeout(function() {
-                                thisClass.HideSuper();
-                            },5000);
-                        }
-                    } else {
-                        thisClass.HideSuper();
+        var thisClass = this
+        if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+            VariablesToPoll.push(thisClass.VariableReference)
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.VariableReference) { 
+                if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+                    VariablesToPoll.push(thisClass.VariableReference)
+                const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
+                if(CurrentVariableValues[variableId] !== undefined) {
+                    thisClass.Value = CurrentVariableValues[variableId];
+                    thisClass.UpdateDisplayValue();
+                    if(!thisClass.StickyHide) {
+                        if(thisClass.Hidden)
+                            thisClass.ShowSuper();
+                        if(thisClass.TimeoutHandle)
+                            window.clearTimeout(thisClass.TimeoutHandle);
+        
+                        thisClass.TimeoutHandle = window.setTimeout(function() {
+                            thisClass.HideSuper();
+                        },5000);
                     }
+                } else {
+                    thisClass.HideSuper();
                 }
-            };
-        }
+            }
+        };
     }
     Detach() {
         super.Detach();
