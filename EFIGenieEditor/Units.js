@@ -16,6 +16,7 @@ var CycleUnits = [ { Name: `Cycles`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var LambdaUnits = [ { Name: `λ`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
 var VolumeUnits = [ { Name: `L`, DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: `mL`, DisplayMultiplier: 1000, DisplayOffset: 0 } ];
 var MassFlowUnits = [ { Name: `g/s`, DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: `g/min`, DisplayMultiplier: 60, DisplayOffset: 0 } ];
+var ResistanceUnits = [ { Name: `Ω`, DisplayMultiplier: 1, DisplayOffset: 0 }, { Name: `kΩ`, DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
 var Bool = [ { Name: ``, DisplayMultiplier: 1, DisplayOffset: 0 } ];
 
 var Measurements = {
@@ -36,6 +37,7 @@ var Measurements = {
     Angle: AngleUnits,
     AngularSpeed: AngularSpeedUnits,
     Ratio: Ratio,
+    Resistance: ResistanceUnits,
     Bool: Bool
 }
 

@@ -19,7 +19,7 @@ class Input_AnalogPolynomial extends UITemplate {
     RegisterVariables() {
         VariableRegister.RegisterVariable(
             `${this.ReferenceName}(Voltage)`,
-            type
+            `float`
         );
         this.VoltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
     }
