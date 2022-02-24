@@ -471,7 +471,6 @@ class ConfigTop extends UITemplate {
         var template = super.GetHtml();
 
         template = template.replace(/[%]inputstablist[%]/g, this.Inputs.GetInputsHtml());
-        template = template.replace(/[%]inputstabcontrols[%]/g, this.Inputs.GetControlsHtml());
 
         template = template.replace(/[%]inputsstyle[%]/g, ``);
         template = template.replace(/[%]fuelstyle[%]/g, ` style="display: none;"`);

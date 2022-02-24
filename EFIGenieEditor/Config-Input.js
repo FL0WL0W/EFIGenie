@@ -295,11 +295,13 @@ class ConfigInputs {
             $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${e.pageX}px`);
             $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${e.pageY}px`);
             thisClass.ContextSelect = $(this).data(`index`);
+            $(this).addClass(`active`);
             
             e.preventDefault();
         });
         $(document).on(`click.${this.GUID}`, function(){
             $(`#${thisClass.GUID}-contextmenu`).hide();
+            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
         });
 
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-add`, function(){
@@ -333,27 +335,41 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-Up`, function(){
-            // if(isNaN(thisClass.Selected) || thisClass.Selected === 0)
-            //     return;
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroladd`, function(){
+            var selected = $(this).data('i');
             
-            // var temp = thisClass.Inputs[thisClass.Selected];
-            // thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected - 1];
-            // thisClass.Inputs[thisClass.Selected - 1] = temp;
-            // thisClass.Selected -= 1;
+            thisClass.Inputs.splice(selected + 1, 0, thisClass.NewInput());
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-Down`, function(){
-            // if(isNaN(thisClass.Selected) || thisClass.Selected === thisClass.Inputs.length-1)
-            //     return;
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroldelete`, function(){
+            var selected = $(this).data('i');
             
-            // var temp = thisClass.Inputs[thisClass.Selected];
-            // thisClass.Inputs[thisClass.Selected] = thisClass.Inputs[thisClass.Selected + 1];
-            // thisClass.Inputs[thisClass.Selected + 1] = temp;
-            // thisClass.Selected += 1;
+            thisClass.Inputs.splice(selected, 1);
+            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
+            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
+            thisClass.Attach();
+        });
+        
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontrolup`, function(){
+            var selected = $(this).data('i');
+
+            var temp = thisClass.Inputs[selected];
+            thisClass.Inputs[selected] = thisClass.Inputs[selected - 1];
+            thisClass.Inputs[selected - 1] = temp;
+            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
+            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
+            thisClass.Attach();
+        });
+        
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroldown`, function(){
+            var selected = $(this).data('i');
+
+            var temp = thisClass.Inputs[selected];
+            thisClass.Inputs[selected] = thisClass.Inputs[selected + 1];
+            thisClass.Inputs[selected + 1] = temp;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -376,11 +392,6 @@ class ConfigInputs {
         return `<div id="${this.GUID}-inputs">${inputlist}</div>`;
     }
 
-    GetControlsHtml() {
-        return  ``;//`<span id="${this.GUID}-Up" style="padding: 3px 4px;">↑</span>` +
-                //`<span id="${this.GUID}-Down" style="padding: 3px 4px;">↓</span>`;
-    }
-
     GetHtml() {
         var template = GetClassProperty(this, `Template`);
 
@@ -390,8 +401,20 @@ class ConfigInputs {
         var configs = ``;
         for(var i = 0; i < this.Inputs.length; i++)
         {
-            configs += `<div id="${this.GUID}-${i}" class="inputconfig">${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
+            configs += `<div id="${this.GUID}-${i}" class="inputconfig"><span style="float: right;">`;
+            configs += `<span class="inputcontroldelete" data-i="${i}">-</span>`;
+            if(i !== 0)
+                configs += `<span class="inputcontrolup" data-i="${i}">↑</span>`;
+            else
+                configs += `<span class="inputcontroldummy">&nbsp;</span>`;
+            if(i !== this.Inputs.length - 1)
+                configs += `<span class="inputcontroldown" data-i="${i}">↓</span>`;
+            else
+                configs += `<span class="inputcontroldummy">&nbsp;</span>`;
+
+            configs += `</span>${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
         }
+        configs += `<span class="inputcontroladd" data-i="${this.Inputs.length-1}">+ New</span>`;
 
         template = template.replace(/[$]inputconfig[$]/g, configs);
         template = template.replace(/[$]overlay[$]/g, GenerateOverlay());
