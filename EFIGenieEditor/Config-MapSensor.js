@@ -34,7 +34,7 @@ class Input_AnalogPolynomial extends UITemplate {
     }
 }
 
-class ConfigOperation_GM1BarMAP extends Input_AnalogPolynomial {
+class MAP_GM1Bar extends Input_AnalogPolynomial {
     static Name = `GM 1 Bar MAP`;
     static Measurement = `Pressure`;
 
@@ -51,9 +51,9 @@ class ConfigOperation_GM1BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.18987012987013;
     }
 }
-MapConfigs.push(ConfigOperation_GM1BarMAP);
+MapConfigs.push(MAP_GM1Bar);
 
-class ConfigOperation_GM2BarMAP extends Input_AnalogPolynomial {
+class MAP_GM2Bar extends Input_AnalogPolynomial {
     static Name = `GM 2 Bar MAP`;
     static Measurement = `Pressure`;
 
@@ -70,9 +70,9 @@ class ConfigOperation_GM2BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.398493506493506;
     }
 }
-MapConfigs.push(ConfigOperation_GM2BarMAP);
+MapConfigs.push(MAP_GM2Bar);
 
-class ConfigOperation_GM3BarMAP extends Input_AnalogPolynomial {
+class MAP_GM3Bar extends Input_AnalogPolynomial {
     static Name = `GM 3 Bar MAP`;
     static Measurement = `Pressure`;
 
@@ -89,4 +89,4 @@ class ConfigOperation_GM3BarMAP extends Input_AnalogPolynomial {
         this.Polynomial.A[1] = 0.628;
     }
 }
-MapConfigs.push(ConfigOperation_GM3BarMAP);
+MapConfigs.push(MAP_GM3Bar);

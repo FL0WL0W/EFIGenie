@@ -586,7 +586,7 @@ class CalculationOrVariableSelection extends UITemplate {
     
             for(var c = 0; c < configGroups.length; c++) {
                 const configs = configGroups[c].Configs;
-                if (configs[i].name !== selection.value)
+                if (configs[i] === undefined || configs[i].name !== selection.value)
                     continue;
                 var configValue = new configs[i]({
                     NoParameterSelection: this.NoParameterSelection,
