@@ -586,10 +586,21 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
 }
 
 class CalculationOrVariableSelection extends UITemplate {
-    static Label = `Value`;
     static Template = `<label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span>`;
-
     ConfigValues = [];
+
+    _label = `Value`;
+    get Label() {
+        return this._label;
+    }
+    set Label(label) {
+        if(this._label === label)
+            return;
+
+        this._label = label;
+
+        this.ConfigValues.forEach(function(configValue) { configValue.Label = label; });
+    }
 
     constructor(prop) {
         super();

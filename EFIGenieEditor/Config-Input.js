@@ -473,12 +473,12 @@ class ConfigInput extends UITemplate {
         });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Input`,
+            Label:              prop.Name ?? `Input`,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
             NoParameterSelection: true,
-            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`),
+            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `Input\\$TranslationMeasurement\\$`),
             OnChange: function() { 
                 const subConfig = thisClass.TranslationConfig.GetSubConfig();
                 if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
@@ -504,7 +504,10 @@ class ConfigInput extends UITemplate {
         prop.Name = new UIText({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
-            OnChange: function() { thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}` }
+            OnChange: function() { 
+                thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
+                thisClass.TranslationConfig.Label = thisClass.Name.Value;
+            }
         })
         this.HRDisplay = `display: none; `;
         this.Setup(prop);
