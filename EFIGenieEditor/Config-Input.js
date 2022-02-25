@@ -335,7 +335,7 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroladd`, function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controladd`, function(){
             var selected = $(this).data('i');
             
             thisClass.Inputs.splice(selected + 1, 0, thisClass.NewInput());
@@ -344,7 +344,7 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroldelete`, function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldelete`, function(){
             var selected = $(this).data('i');
             
             thisClass.Inputs.splice(selected, 1);
@@ -353,7 +353,7 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontrolup`, function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controlup`, function(){
             var selected = $(this).data('i');
 
             var temp = thisClass.Inputs[selected];
@@ -364,7 +364,7 @@ class ConfigInputs {
             thisClass.Attach();
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .inputcontroldown`, function(){
+        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldown`, function(){
             var selected = $(this).data('i');
 
             var temp = thisClass.Inputs[selected];
