@@ -769,7 +769,9 @@ class UIMeasurement {
 
         this._measurement = measurement;
         this.Default = GetDefaultUnitIndex(this.Measurement);
-        this.Value ??= this.Default;
+        this._value ??= this.Default;
+        $(`[id="${this.GUID}"]`).html(GetUnitDisplay(this._measurement, this._value));
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 
     _value = undefined;
@@ -786,7 +788,7 @@ class UIMeasurement {
             return;
 
         this._value = val;
-        $(`[id="${this.GUID}"]`).val(this._value);
+        $(`[id="${this.GUID}"]`).html(GetUnitDisplay(this._measurement, this._value));
         this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 

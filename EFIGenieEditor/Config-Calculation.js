@@ -602,6 +602,61 @@ class CalculationOrVariableSelection extends UITemplate {
         this.ConfigValues.forEach(function(configValue) { configValue.Label = label; });
     }
 
+    _xlabel = `X`;
+    get XLabel() {
+        return this._xlabel;
+    }
+    set XLabel(xlabel) {
+        if(this._xlabel === xlabel)
+            return;
+
+        this._xlabel = xlabel;
+
+        this.ConfigValues.forEach(function(configValue) { configValue.XLabel = xlabel; });
+    }
+
+    _ylabel = `Y`;
+    get YLabel() {
+        return this._xlabel;
+    }
+    set YLabel(ylabel) {
+        if(this._ylabel === ylabel)
+            return;
+
+        this._ylabel = ylabel;
+
+        this.ConfigValues.forEach(function(configValue) { configValue.YLabel = ylabel; });
+    }
+
+    _referenceName = undefined;
+    get ReferenceName() {
+        return this._referenceName;
+    }
+    set ReferenceName(referenceName) {
+        if(this._referenceName === referenceName)
+            return;
+
+        this._referenceName = referenceName;
+
+        this.ConfigValues.forEach(function(configValue) { configValue.ReferenceName = referenceName; });
+    }
+
+    _measurement = undefined;
+    get Measurement() {
+        if(this._measurement)
+            return this._measurement;
+
+        const selection = this.Selection.Value;
+        if (!selection.reference) {
+            const subConfig = this.GetSubConfig();
+            return GetClassProperty(subConfig, `Measurement`);
+        }
+        return selection.measurement;
+    }
+    set Measurement(measurement) {
+        this._measurement = measurement;
+    }
+
     constructor(prop) {
         super();
         var thisClass = this;
@@ -680,10 +735,12 @@ class CalculationOrVariableSelection extends UITemplate {
                         if (saveValue.Values[i].ClassName !== configs[t].name)
                             continue;
                         this.ConfigValues.push(new configs[t]({
-                            SaveValue: saveValue.Values[i],
                             NoParameterSelection: this.NoParameterSelection,
-                            ReferenceName: this.ReferenceName,
                             Label: this.Label,
+                            XLabel: this.XLabel,
+                            YLabel: this.YLabel,
+                            ReferenceName: this.ReferenceName,
+                            SaveValue: saveValue.Values[i],
                             Measurement: this._measurement,
                             MeasurementIndex: this.MeasurementIndex
                         }));
@@ -703,7 +760,6 @@ class CalculationOrVariableSelection extends UITemplate {
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if(subConfig !== undefined) {
-                    subConfig.ReferenceName = this.ReferenceName;
                     const type = GetClassProperty(subConfig, `Output`)
                     if (type) {
                         VariableRegister.RegisterVariable(thisReference, type);
@@ -757,8 +813,10 @@ class CalculationOrVariableSelection extends UITemplate {
                     continue;
                 this.ConfigValues.push(new configs[i]({
                     NoParameterSelection: this.NoParameterSelection,
-                    ReferenceName: this.ReferenceName,
                     Label: this.Label,
+                    XLabel: this.XLabel,
+                    YLabel: this.YLabel,
+                    ReferenceName: this.ReferenceName,
                     Measurement: this._measurement,
                     MeasurementIndex: this.MeasurementIndex
                 }));
@@ -777,22 +835,6 @@ class CalculationOrVariableSelection extends UITemplate {
     
     IsVariable() {
         return this.Selection.Value?.reference;
-    }
-
-    _measurement = undefined;
-    get Measurement() {
-        if(this._measurement)
-            return this._measurement;
-
-        const selection = this.Selection.Value;
-        if (!selection.reference) {
-            const subConfig = this.GetSubConfig();
-            return GetClassProperty(subConfig, `Measurement`);
-        }
-        return selection.measurement;
-    }
-    set Measurement(measurement) {
-        this._measurement = measurement;
     }
 
     GetVariableReference() {
@@ -866,6 +908,21 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
         this._stickyHidden = hidden
         if(hidden)
             super.Hidden = hidden;
+    }
+
+    _variableReference = undefined;
+    get VariableReference() {
+        return this._variableReference;
+    }
+    set VariableReference(variableReference) {
+        if(this._variableReference === variableReference)
+            return;
+
+        this._variableReference = variableReference;
+
+        let measurement = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
+        measurement = measurement.substring(0, measurement.length - 1);
+        this.Measurement = measurement;
     }
 
     constructor(prop) {
