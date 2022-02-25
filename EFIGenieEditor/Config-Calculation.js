@@ -81,7 +81,7 @@ class Calculation_Polynomial {
     Degree = 3;
     A = [0, 0, 0];
 
-    GetValue() {
+    get SaveValue() {
         return { 
             MinValue: this.MinValue,
             MaxValue: this.MaxValue,
@@ -90,12 +90,12 @@ class Calculation_Polynomial {
         };
     }
 
-    SetValue(value) {
-        if(value) {
-            this.MinValue = value.MinValue;
-            this.MaxValue = value.MaxValue;
-            this.Degree = value.Degree;
-            this.A = value.A.slice();
+    set SaveValue(saveValue) {
+        if(saveValue) {
+            this.MinValue = saveValue.MinValue;
+            this.MaxValue = saveValue.MaxValue;
+            this.Degree = saveValue.Degree;
+            this.A = saveValue.A.slice();
         }
         $(`#${this.GUID}`).replaceWith(this.GetHtml());
         this.Attach();
@@ -197,27 +197,27 @@ class Calculation_LookupTable extends UITemplate {
     static Template = `$Dialog$`
 
     constructor(prop) {
-        prop ??= {};
-        prop.Dialog = new UIDialog({
+        super();
+        this.Dialog = new UIDialog({
             Title: `$Label$`,
             ButtonText: `Edit Table`,
-            TemplateIdentifier: `Value`
+            TemplateIdentifier: `Table`
         });
-        prop.Value = new UITable({
+        this.Table = new UITable({
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
             XLabel: prop.NoParameterSelection ? `$XLabel$` : `$ParameterSelection$`,
             ZLabel: `$Label$`
         });
-        prop.ParameterSelection = prop.NoParameterSelection ? undefined : new UISelection({
+        this.ParameterSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        const table = this.GetValue();
+        const table = this.Table;
         const tableValue = table.Value;
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
@@ -252,7 +252,7 @@ class Calculation_LookupTable extends UITemplate {
 
     RegisterVariables() {
         if(!this.NoParameterSelection)
-            this.ParameterSelection.SetOptions(GetSelections());
+            this.ParameterSelection.Options = GetSelections();
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
@@ -267,29 +267,29 @@ class Calculation_2AxisTable extends UITemplate {
     static Template = `$Dialog$`
 
     constructor(prop) {
-        prop ??= {};
-        prop.Dialog = new UIDialog({
+        super();
+        this.Dialog = new UIDialog({
             Title: `$Label$`,
             ButtonText: `Edit Table`,
-            TemplateIdentifier: `Value`
+            TemplateIdentifier: `Table`
         });
-        prop.Value = new UITable({
+        this.Table = new UITable({
             BaseObj: true,
             XLabel: prop.NoParameterSelection ? `$XLabel$` : `$XSelection$`,
             YLabel: prop.NoParameterSelection ? `$YLabel$` : `$YSelection$`,
             ZLabel: `$Label$`
         });
-        prop.XSelection = prop.NoParameterSelection ? undefined : new UISelection({
+        this.XSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections()
         });
-        prop.YSelection = prop.NoParameterSelection ? undefined : new UISelection({
+        this.YSelection = prop.NoParameterSelection ? undefined : new UISelection({
             Options: GetSelections(),
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId, xVariableId, yVariableId) {
-        const table = this.GetValue();
+        const table = this.Table;
         const tableValue = table.Value;
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
@@ -333,8 +333,8 @@ class Calculation_2AxisTable extends UITemplate {
 
     RegisterVariables() {
         if(!this.NoParameterSelection) {
-            this.XSelection.SetOptions(GetSelections());
-            this.YSelection.SetOptions(GetSelections());
+            this.XSelection.Options = GetSelections();
+            this.YSelection.Options = GetSelections();
         }
     }
 }
@@ -415,77 +415,68 @@ class CalculationOrVariableSelection extends UITemplate {
     ConfigValues = [];
 
     constructor(prop) {
-        prop ??= {};
-        prop.Selection = new UISelection({
-            Options: GetSelections(prop.Measurement, prop.Output, prop.Inputs, prop.Configs, prop.ConfigsOnly),
-            SelectDisabled: true
-        });
-        prop.LiveUpdate = new DisplayLiveUpdate({
-            Measurement: prop.Measurement,
-            MeasurementIndex: prop.MeasurementIndex
-        });
-        super(prop);
-
-
+        super();
         var thisClass = this;
-        this.Selection.OnChange.push(function () {
-            const subConfigIndex = thisClass.GetSubConfigIndex();
-            thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
-            $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
-            thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
-            var subConfig = thisClass.GetSubConfig();
-            subConfig?.Attach?.();
-            thisClass.LiveUpdate.MeasurementIndex.Measurement = thisClass.GetMeasurement();
-            thisClass.LiveUpdate.Show?.();
+        this.LiveUpdate = new DisplayLiveUpdate({
+            Measurement: prop?.Measurement,
+            MeasurementIndex: prop?.MeasurementIndex
         });
+        this.Selection = new UISelection({
+            Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
+            SelectDisabled: true,
+            OnChange: function () {
+                const subConfigIndex = thisClass.GetSubConfigIndex();
+                thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
+                $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
+                thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
+                var subConfig = thisClass.GetSubConfig();
+                subConfig?.Attach?.();
+                thisClass.LiveUpdate.Measurement = thisClass.GetMeasurement();
+            }
+        });
+        this.Setup(prop);
     }
 
-    static SaveAll = false;
     static SaveOnlyActive = false;
-    GetValue() {
-        var value = super.GetValue();
+    get SaveValue() {
+        var saveValue = super.SaveValue;
 
         if (this.ConfigValues) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
-                if(subConfig?.GetValue) {
-                    var configValue = subConfig.GetValue?.();
-                    if(typeof configValue !== `object` )
+                if(subConfig?.SaveValue !== undefined) {
+                    var configValue = subConfig.SaveValue;
+                    if(typeof configValue !== `object`)
                         configValue = { Value: configValue };
                     configValue.ClassName = subConfig.constructor.name;
-                    value.Values = [configValue];
+                    saveValue.Values = [ configValue ];
                 }
             } else {
-                value.Values = [];
+                saveValue.Values = [];
                 for (var i = 0; i < this.ConfigValues.length; i++) {
-                    if (CalculationOrVariableSelection.SaveAll || this.ConfigValues[i].NotDefault) {
-                        var configValue = this.ConfigValues[i].GetValue?.();
-                        if(typeof configValue !== `object` )
-                            configValue = { Value: configValue };
-                        configValue.ClassName = this.ConfigValues[i].constructor.name
-                        value.Values.push(configValue);
-                    }
+                    var configValue = this.ConfigValues[i].SaveValue;
+                    if(typeof configValue !== `object`)
+                        configValue = { Value: configValue };
+                    configValue.ClassName = this.ConfigValues[i].constructor.name
+                    saveValue.Values.push(configValue);
                 }
             } 
         }
 
-        return value;
+        return saveValue;
     }
 
-    SetValue(value) {
-        value ??= {};
+    set SaveValue(saveValue) {
+        saveValue ??= {};
 
-        if(value.Values === undefined)
-            value.Values = [];
+        if(saveValue.Values === undefined)
+        saveValue.Values = [];
         
-        for (var i = 0; i < value.Values.length; i++) {
+        for (var i = 0; i < saveValue.Values.length; i++) {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {
-                if (value.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
-                    var setVal = value.Values[i];
-                    if(typeof this.ConfigValues[t].GetValue() !== `object` )
-                        setVal = setVal.Value;
-                    this.ConfigValues[t].SetValue(setVal);
+                if (saveValue.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
+                    this.ConfigValues[t].SaveValue = saveValue.Values[i];
                     found = true;
                     break;
                 }
@@ -498,36 +489,26 @@ class CalculationOrVariableSelection extends UITemplate {
                 for(var c = 0; c < configGroups.length; c++) {
                     const configs = configGroups[c].Configs;
                     for (var t = 0; t < configs.length; t++) {
-                        if (value.Values[i].ClassName !== configs[t].name)
+                        if (saveValue.Values[i].ClassName !== configs[t].name)
                             continue;
-                        var configValue = new configs[t]({
+                        this.ConfigValues.push(new configs[t]({
+                            SaveValue: saveValue.Values[i],
                             NoParameterSelection: this.NoParameterSelection,
                             ReferenceName: this.ReferenceName,
                             Label: this.Label,
                             Measurement: this.Measurement,
                             MeasurementIndex: this.MeasurementIndex
-                        });
-                        if(configValue.SetValue) {
-                            var setVal = value.Values[i];
-                            if(typeof configValue.GetValue() !== `object` )
-                                setVal = setVal.Value;
-                            if(configValue.OnChange)
-                                configValue.OnChange.push(function(){configValue.NotDefault = true;});
-                            else
-                                configValue.NotDefault = true;
-                            configValue.SetValue(setVal);
-                            this.ConfigValues.push(configValue);
-                        }
+                        }));
                     }
                 }
             }
         }
 
-        super.SetValue(value);
+        super.SaveValue = saveValue;
     }
 
     RegisterVariables() {
-        this.Selection.SetOptions(GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly));
+        this.Selection.Options = GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
         const selection = this.Selection.Value;
         const measurement = this.GetMeasurement();
         if (selection && this.ReferenceName) {
@@ -550,7 +531,7 @@ class CalculationOrVariableSelection extends UITemplate {
                 this.LiveUpdate.VariableReference = thisReference;
             else 
                 this.LiveUpdate.VariableReference = undefined;
-            this.LiveUpdate.MeasurementIndex.Measurement = measurement;
+            this.LiveUpdate.Measurement = measurement;
         }
     }
 
@@ -587,18 +568,13 @@ class CalculationOrVariableSelection extends UITemplate {
                 const configs = configGroups[c].Configs;
                 if (configs[i] === undefined || configs[i].name !== selection.value)
                     continue;
-                var configValue = new configs[i]({
+                this.ConfigValues.push(new configs[i]({
                     NoParameterSelection: this.NoParameterSelection,
                     ReferenceName: this.ReferenceName,
                     Label: this.Label,
                     Measurement: this.Measurement,
                     MeasurementIndex: this.MeasurementIndex
-                });
-                if(configValue.OnChange)
-                    configValue.OnChange.push(function(){configValue.NotDefault = true;});
-                else
-                    configValue.NotDefault = true;
-                this.ConfigValues.push(configValue);
+                }));
                 return this.ConfigValues.length-1;
             }
         }
@@ -638,20 +614,21 @@ class Calculation_Operation extends UITemplate {
     static Output = `float`;
 
     constructor(prop) {
-        prop ??= {};
-        prop.Base = new CalculationOrVariableSelection({
+        super();
+        const thisClass = this
+        this.Base = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
             Label:              `Base`,
-            Measurement:        prop.Measurement,
-            MeasurementIndex:   prop.MeasurementIndex
+            Measurement:        prop?.Measurement,
+            MeasurementIndex:   prop?.MeasurementIndex
         });
-        prop.SubOperation = [new CalculationOrVariableSelection({
+        this.SubOperation = [new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Measurement:        prop.Measurement,
-            MeasurementIndex:   prop.MeasurementIndex,
+            Measurement:        prop?.Measurement,
+            MeasurementIndex:   prop?.MeasurementIndex,
             Template: `<div>${CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)}</div>`
         })];
-        prop.OperationSelection = [new UISelection({
+        this.OperationSelection = [new UISelection({
             Options: [
                 { Name: `Adder`,        Value: 1 },
                 { Name: `Subtracter`,   Value: 2 },
@@ -661,19 +638,17 @@ class Calculation_Operation extends UITemplate {
             Class: `subOperationSelection`,
             SelectDisabled: true
         })];
-        prop.OperationName = [new UIText({
+        this.OperationName = [new UIText({
             Class: `subOperationName`,
+            OnChange: function() {
+                thisClass.SubOperation[0].Label = prop.OperationName[0].Value;
+            }
         })];
-        prop.LiveUpdate = new DisplayLiveUpdate({
-            Measurement: prop.Measurement,
-            MeasurementIndex: prop.MeasurementIndex,
-            Hidden: false
+        this.LiveUpdate = new DisplayLiveUpdate({
+            Measurement: prop?.Measurement,
+            MeasurementIndex: prop?.MeasurementIndex
         });
-        super(prop)
-        const thisClass = this
-        prop.OperationName[0].OnChange.push(function() {
-            thisClass.SubOperation[0].Label = prop.OperationName[0].Value;
-        });
+        this.Setup(prop)
     }
 
     RegisterVariables() {
@@ -683,58 +658,61 @@ class Calculation_Operation extends UITemplate {
 }
 
 class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
+    get SuperHidden() {
+        return super.Hidden;
+    }
+    set SuperHidden(hidden) {
+        super.Hidden = hidden;
+    }
+    get Hidden() {
+        return this._stickyHidden;
+    }
+    set Hidden(hidden) {
+        if(hidden === false)
+            debugger;
+        this._stickyHidden = hidden
+        if(hidden)
+            super.Hidden = hidden;
+    }
+
     constructor(prop) {
         prop ??= {};
-        prop.StickyHide = prop.Hidden ?? false;
-        prop.Hidden = true;
         prop.NumberClass = "livevalue";
         super(prop);
+        this.SuperHidden = true;
     }
 
     Attach() {
         super.Attach();
         var thisClass = this
-        if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-            VariablesToPoll.push(thisClass.VariableReference)
-        LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.VariableReference) { 
-                if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-                    VariablesToPoll.push(thisClass.VariableReference)
-                const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
-                if(CurrentVariableValues[variableId] !== undefined) {
-                    thisClass.Value = CurrentVariableValues[variableId];
-                    thisClass.UpdateDisplayValue();
-                    if(!thisClass.StickyHide) {
-                        if(thisClass.Hidden)
-                            thisClass.ShowSuper();
-                        if(thisClass.TimeoutHandle)
-                            window.clearTimeout(thisClass.TimeoutHandle);
+        // if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+        //     VariablesToPoll.push(thisClass.VariableReference)
+        // LiveUpdateEvents[this.GUID] = function() {
+        //     if(thisClass.VariableReference) { 
+        //         if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+        //             VariablesToPoll.push(thisClass.VariableReference)
+        //         const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
+        //         if(CurrentVariableValues[variableId] !== undefined) {
+        //             thisClass.Value = CurrentVariableValues[variableId];
+        //             thisClass.UpdateDisplayValue();
+        //             if(!thisClass.SuperHidden) {
+        //                 if(thisClass.SuperHidden)
+        //                     thisClass.SuperHidden = false;
+        //                 if(thisClass.TimeoutHandle)
+        //                     window.clearTimeout(thisClass.TimeoutHandle);
         
-                        thisClass.TimeoutHandle = window.setTimeout(function() {
-                            thisClass.HideSuper();
-                        },5000);
-                    }
-                } else {
-                    thisClass.HideSuper();
-                }
-            }
-        };
+        //                 thisClass.TimeoutHandle = window.setTimeout(function() {
+        //                     thisClass.HideSuper();
+        //                 },5000);
+        //             }
+        //         } else {
+        //             thisClass.HideSuper();
+        //         }
+        //     }
+        // };
     }
     Detach() {
         super.Detach();
         delete LiveUpdateEvents[this.GUID];
-    }
-    HideSuper() {
-        super.Hide();
-    }
-    ShowSuper() {
-        super.Show();
-    }
-    Hide() {
-        this.StickyHide = true;
-        this.HideSuper();
-    }
-    Show() {
-        this.StickyHide = false;
     }
 }

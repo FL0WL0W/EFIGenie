@@ -6,14 +6,14 @@ class Output_Digital extends UITemplate {
     static Template = `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>`
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `digital`
         });
-        prop.Inverted = new UICheckbox();
-        prop.HighZ = new UICheckbox();
-        super(prop);
+        this.Inverted = new UICheckbox();
+        this.HighZ = new UICheckbox();
+        this.Setup(prop);
     }
 
     GetObjOperation(inputVariableId) {

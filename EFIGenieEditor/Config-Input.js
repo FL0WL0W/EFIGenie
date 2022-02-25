@@ -214,34 +214,34 @@ class ConfigInputs {
         });
     }
 
-    GetValue() {
-        var value  = { Inputs: [], TargetDevice: this.TargetDevice };
+    get SaveValue() {
+        var saveValue = { Inputs: [], TargetDevice: this.TargetDevice };
 
         for(var i = 0; i < this.Inputs.length; i++){
-            value.Inputs.push(this.Inputs[i].GetValue());
+            saveValue.Inputs.push(this.Inputs[i].SaveValue);
         }
 
-        return value;
+        return saveValue;
     }
 
-    SetValue(value) {
+    set SaveValue(saveValue) {
         this.Detach();
 
-        if(value) {
-            if(value.TargetDevice) {
-                this.TargetDevice = value.TargetDevice;
+        if(saveValue) {
+            if(saveValue.TargetDevice) {
+                this.TargetDevice = saveValue.TargetDevice;
                 PinOut = PinOuts[this.TargetDevice];
             }
-            else if(!value.Inputs) {
-                value = { Inputs: value };
+            else if(!saveValue.Inputs) {
+                saveValue = { Inputs: saveValue };
             }
 
-            for(var i = 0; i < value.Inputs.length; i++){
+            for(var i = 0; i < saveValue.Inputs.length; i++){
                 if(i >= this.Inputs.length)
                     this.Inputs.push(this.NewInput());
-                this.Inputs[i].SetValue(value.Inputs[i]);
+                this.Inputs[i].SaveValue = saveValue.Inputs[i];
             }
-            this.Inputs = this.Inputs.slice(0, value.Inputs.length)
+            this.Inputs = this.Inputs.slice(0, saveValue.Inputs.length)
         }
 
         $(`#${this.GUID}`).replaceWith(this.GetHtml());
@@ -329,7 +329,7 @@ class ConfigInputs {
                 return;
             
             thisClass.Inputs.push(this.NewInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SetValue(thisClass.Inputs[contextSelect].GetValue());
+            thisClass.Inputs[thisClass.Inputs.length-1].SaveValue = thisClass.Inputs[contextSelect].SaveValue;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -458,55 +458,56 @@ class ConfigInput extends UITemplate {
 </div>`
 
     constructor(prop) {
+        super();
+        const thisClass = this;
         prop ??= {};
         const measurementKeys = Object.keys(Measurements)
         var options = [];
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
-        prop.RawConfig = new CalculationOrVariableSelection({
+        this.RawConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
             Label:              `Source`,
             Inputs:             [],
             ReferenceName:      `Inputs.${prop.Name}`,
             NoParameterSelection: true
         });
-        prop.TranslationConfig = new CalculationOrVariableSelection({
+        this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
             Label:              `Input`,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
             NoParameterSelection: true,
-            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`)
+            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `$Label$\\$TranslationMeasurement\\$`),
+            OnChange: function() { 
+                const subConfig = thisClass.TranslationConfig.GetSubConfig();
+                if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                    $(`#${thisClass.GUID}-hr`).hide();
+                    thisClass.HRDisplay = `display: none; `;
+                    $(`#${thisClass.GUID}-raw`).html(``);
+                    thisClass.RawConfigReplacer = ``
+                } else {
+                    thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
+                    $(`#${thisClass.GUID}-hr`).show();
+                    thisClass.HRDisplay = ``;
+                    $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
+                    thisClass.RawConfigReplacer = `$RawConfig$`
+                }
+            }
         });
-        prop.TranslationMeasurement = new UISelection({
+        this.TranslationMeasurement = new UISelection({
             Value:              `None`,
             SelectNotVisible:   true,
             Options:            options,
-            OnChange:           function() { prop.TranslationConfig.Measurement = prop.TranslationMeasurement.Value; }
+            OnChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
         prop.Name = new UIText({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
-            OnChange: function() { prop.TranslationConfig.ReferenceName = prop.RawConfig.ReferenceName = `Inputs.${prop.Name.Value}` }
+            OnChange: function() { thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}` }
         })
-        prop.HRDisplay = `display: none; `;
-        super(prop);
-        const thisClass = this;
-        this.TranslationConfig.OnChange.push(function() { 
-            const subConfig = thisClass.TranslationConfig.GetSubConfig();
-            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
-                $(`#${thisClass.GUID}-hr`).hide();
-                thisClass.HRDisplay = `display: none; `;
-                $(`#${thisClass.GUID}-raw`).html(``);
-                thisClass.RawConfigReplacer = ``
-            } else {
-                thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
-                $(`#${thisClass.GUID}-hr`).show();
-                thisClass.HRDisplay = ``;
-                $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
-                thisClass.RawConfigReplacer = `$RawConfig$`
-            }
-        });
+        this.HRDisplay = `display: none; `;
+        this.Setup(prop);
     }
 
     RegisterVariables() {
@@ -585,12 +586,12 @@ class Input_Analog extends UITemplate {
     static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$</div>`
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `analog`
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {
@@ -617,13 +618,13 @@ class Input_Digital extends UITemplate {
     static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted</div>`
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `digital`
         });
-        prop.Inverted = new UICheckbox();
-        super(prop);
+        this.Inverted = new UICheckbox();
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {
@@ -652,19 +653,19 @@ class Input_DigitalRecord extends UITemplate {
                         `<div><label for="$Length.GUID$">Length:</label>$Length$</div>`;
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `digital`
         });
-        prop.Inverted = new UICheckbox();
-        prop.Length = new UINumber ({
+        this.Inverted = new UICheckbox();
+        this.Length = new UINumber ({
             Value: 2,
             Step: 1,
             Min: 1,
             Max: 1000
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {
@@ -694,19 +695,19 @@ class Input_DutyCycle extends UITemplate {
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        prop.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UINumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
             Max: 65535,
             Measurement: `Frequency`
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {
@@ -735,19 +736,19 @@ class Input_Frequency extends UITemplate {
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        prop.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UINumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
             Max: 65535,
             Measurement: `Frequency`
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {
@@ -776,19 +777,19 @@ class Input_PulseWidth extends UITemplate {
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){
-        prop ??= {};
-        prop.Pin = new UIPinSelection({
+        super();
+        this.Pin = new UIPinSelection({
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        prop.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UINumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
             Max: 65535,
             Measurement: `Frequency`
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {

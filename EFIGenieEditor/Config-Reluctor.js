@@ -54,22 +54,22 @@ class Reluctor_Universal1x extends Reluctor_Template {
                         `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
                         `<div><label for="$FallingPosition.GUID$">Falling Edge Position:</label>$FallingPosition$</div>`;
     constructor(prop){
-        prop ??= {};
-        prop.RisingPosition = new UINumberWithMeasurement({
+        super();
+        this.RisingPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        prop.FallingPosition = new UINumberWithMeasurement({
+        this.FallingPosition = new UINumberWithMeasurement({
             Value: 180,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        super(prop);
+        this.Setup(prop);
         this.Length.Value = 4;
     }
 
@@ -100,30 +100,30 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
                         `<div><label for="$NumberOfTeethMissing.GUID$">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>`;
 
     constructor(prop){
-        prop ??= {};
-        prop.FirstToothPosition = new UINumberWithMeasurement({
+        super()
+        this.FirstToothPosition = new UINumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        prop.ToothWidth = new UINumberWithMeasurement({
+        this.ToothWidth = new UINumberWithMeasurement({
             Value: 5,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        prop.NumberOfTeeth = new UINumber({
+        this.NumberOfTeeth = new UINumber({
             Value: 36,
             Min: 2
         });
-        prop.NumberOfTeethMissing = new UINumber({
+        this.NumberOfTeethMissing = new UINumber({
             Value: 1,
             Min: 1
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId) {

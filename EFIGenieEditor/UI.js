@@ -1,17 +1,34 @@
 class UITemplate {
     GUID = generateGUID();
     Attached = false;
-    Hidden = false;
     OnChange = [];
 
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}-TemplateSpan"]`).hide();
+        } else {
+            $(`[id="${this.GUID}-TemplateSpan"]`).show();
+        }
+    }
+
     constructor(prop) {
+        if(prop)
+            this.Setup(prop);
+    }
+
+    Setup(prop) {
         Object.assign(this, prop);
         if(!Array.isArray(this.OnChange))
             this.OnChange = [ this.OnChange ];
         var thisClass = this;
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.GetValue && element?.OnChange !== undefined) {
+            if(element?.OnChange !== undefined && !element?.ExcludeFromOnChange) {
                 element.OnChange.push(function() {
                     thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
                 });
@@ -19,8 +36,8 @@ class UITemplate {
         });
     }
 
-    GetValue() {
-        var value;
+    get SaveValue() {
+        var saveValue;
         var baseObjName;
         var objectsInElements = 0;
         var name = GetClassProperty(this, `Name`);
@@ -28,7 +45,7 @@ class UITemplate {
         //grab baseObjName and count number of objects in element values
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.GetValue && typeof element?.GetValue() === `object` && element?.BaseObj) {
+            if(typeof element === `object` && element?.BaseObj) {
                 objectsInElements++;
                 baseObjName = elementname;
             }
@@ -36,15 +53,15 @@ class UITemplate {
 
         //make sure we have 1 element value that is an object
         if(baseObjName && objectsInElements === 1){
-            value = this[baseObjName].GetValue();
+            saveValue = this[baseObjName].SaveValue;
             //make sure the baseobj doesnt have a name
-            if(name !== undefined && value.Name !== undefined) {
+            if(name !== undefined && saveValue.Name !== undefined) {
                 baseObjName = undefined;
             } else {
                 //make sure none of the element values conflict with the baseobj values
                 Object.entries(this).forEach(e => {
                     var [elementname, element] = e;
-                    if(element?.GetValue && elementname !== baseObjName && value[elementname] !== undefined) {
+                    if(elementname !== baseObjName && saveValue[elementname] !== undefined) {
                         baseObjName = undefined;
                     }
                 });
@@ -54,26 +71,29 @@ class UITemplate {
         }
 
         if(baseObjName) {
-            value = this[baseObjName].GetValue();
-            value.Name = GetClassProperty(this, `Name`);
+            saveValue = this[baseObjName].SaveValue;
+            saveValue.Name = GetClassProperty(this, `Name`);
         } else {
-            value = {};
+            saveValue = {};
         }
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.GetValue && elementname !== baseObjName) {
-                value[elementname] = element.GetValue();
+            if(element && elementname !== baseObjName) {
+                saveValue[elementname] = element.SaveValue;
             }
         });
 
-        if(Object.keys(value).length === 0)
+        if(Object.keys(saveValue).length === 0)
             return undefined;
 
-        return value;
+        return saveValue;
     }
 
-    SetValue(value) {
+    set SaveValue(saveValue) {
+        if(saveValue === undefined)
+            return;
+
         this.Detach();
 
         const thisClass = this;
@@ -81,21 +101,20 @@ class UITemplate {
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(!baseObjName && element?.GetValue && typeof element?.GetValue() === `object` && element?.BaseObj) {
+            if(!baseObjName && typeof element === `object` && element?.BaseObj) {
                 baseObjName = elementname;
             }
         });
 
         if(baseObjName)
-            this[baseObjName].SetValue(value);
+            this[baseObjName].SaveValue = saveValue;
         else
             baseObjName = undefined;
 
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.SetValue && elementname !== baseObjName && 
-                (baseObjName === undefined || thisClass[baseObjName].GetValue()[elementname] === undefined)) {
-                element.SetValue(value?.[elementname]);
+            if(saveValue[elementname] !== undefined && typeof element === `object` && elementname !== baseObjName && (baseObjName === undefined || thisClass[baseObjName].SaveValue[elementname] === undefined)) {
+                element.SaveValue = saveValue[elementname];
             }
         });
 
@@ -184,28 +203,80 @@ class UITemplate {
         
             html = html.replaceAll(`\\\\$`, `\\$`);
 
-        return `<span id="${this.GUID}-TemplateSpan"${this.Hidden? ` style="display: none;"` : ``}>${html}</span>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}-TemplateSpan"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}-TemplateSpan"]`).show();
+        return `<span id="${this.GUID}-TemplateSpan"${this._hidden? ` style="display: none;"` : ``}>${html}</span>`;
     }
 }
 
 class UINumber {
     GUID = generateGUID();
-    Value = 0;
-    Min = undefined;
-    Max = undefined;
-    Step = undefined;
     OnChange = [];
-    Hidden = false;
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _class = undefined;
+    get Class() {
+        return this._class
+    }
+    set Class(pclass) {
+        this._class = pclass;
+        $(`[id="${this.GUID}"]`).removeClass();
+        $(`[id="${this.GUID}"]`).addClass(pclass);
+    }
+
+    _min = undefined;
+    get Min() {
+        return this._min
+    }
+    set Min(min) {
+        this._min = min;
+        $(`[id="${this.GUID}"]`).prop(`min`, min);
+    }
+
+    _max = undefined;
+    get Max() {
+        return this._max
+    }
+    set Max(max) {
+        this._max = max;
+        $(`[id="${this.GUID}"]`).prop(`max`, max);
+    }
+
+    _step = undefined;
+    get Step() {
+        return this._step
+    }
+    set Step(step) {
+        this._step = step;
+        $(`[id="${this.GUID}"]`).prop(`step`, step);
+    }
+
+    _value = 0;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined)
+            return;
+
+        var val = parseFloat(value);
+        if(this._value === val) 
+            return;
+
+        this._value = val;
+        $(`[id="${this.GUID}"]`).val(this._value);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -213,18 +284,11 @@ class UINumber {
             this.OnChange = [ this.OnChange ];
     }
 
-    GetValue() {
+    get SaveValue() {
         return this.Value;
     }
-
-    SetValue(value) {
-        var val = parseFloat(value);
-
-        if(value !== undefined && this.Value !== val) {
-            this.Value = val;
-            $(`[id="${this.GUID}"]`).val(this.Value);
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
-        }
+    set SaveValue(saveValue){
+        this.Value = saveValue;
     }
 
     Detach() {
@@ -236,47 +300,68 @@ class UINumber {
         var thisClass = this;
         
         $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.SetValue($(this).val());
+            thisClass.Value = $(this).val();
         });
     }
 
     GetHtml() {
-        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} type="number" value="${this.Value}"`;
+        var html = `<input id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``} type="number" value="${this._value}"`;
 
-        if(this.Min !== undefined)
-            html += ` min="${this.Min}"`;
+        if(this._min !== undefined)
+            html += ` min="${this._min}"`;
             
-        if(this.Max !== undefined)
-            html += ` max="${this.Max}"`;
+        if(this._max !== undefined)
+            html += ` max="${this._max}"`;
             
-        if(this.Step !== undefined)
-            html += ` step="${this.Step}"`;
+        if(this._step !== undefined)
+            html += ` step="${this._step}"`;
 
-        if(this.Class !== undefined)
-            html += ` class="${this.Class}"`;
+        if(this._class !== undefined)
+            html += ` class="${this._class}"`;
 
         return `${html}/>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}"]`).show();
     }
 }
 
 class UICheckbox {
     GUID = generateGUID();
-    Value = false;
-    Min = undefined;
-    Max = undefined;
-    Step = undefined;
     OnChange = [];
-    Hidden = false;
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _class = undefined;
+    get Class() {
+        return this._class
+    }
+    set Class(pclass) {
+        this._class = pclass;
+        $(`[id="${this.GUID}"]`).removeClass();
+        $(`[id="${this.GUID}"]`).addClass(pclass);
+    }
+
+    _value = false;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined || this._value === value)
+            return;
+
+        this._value = value;
+        $(`[id="${this.GUID}"]`).prop(`checked`, this._value);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -284,16 +369,11 @@ class UICheckbox {
             this.OnChange = [ this.OnChange ];
     }
 
-    GetValue() {
+    get SaveValue() {
         return this.Value;
     }
-
-    SetValue(value) {
-        if(value !== undefined && this.Value !== value) {
-            this.Value = value;
-            $(`[id="${this.GUID}"]`).prop(`checked`, this.Value);
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
-        }
+    set SaveValue(saveValue){
+        this.Value = saveValue;
     }
 
     Detach() {
@@ -305,38 +385,62 @@ class UICheckbox {
         var thisClass = this;
         
         $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.SetValue($(this).prop(`checked`));
+            thisClass.Value = $(this).prop(`checked`);
         });
     }
 
     GetHtml() {
-        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} type="checkbox"`;
+        var html = `<input id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``} type="checkbox"`;
 
-        if(this.Value)
+        if(this._value)
             html += `checked`;
 
-        if(this.Class !== undefined)
-            html += ` class="${this.Class}"`;
+        if(this._class !== undefined)
+            html += ` class="${this._class}"`;
 
         return `${html}/>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}"]`).show();
     }
 }
 
 class UIText {
     GUID = generateGUID();
-    Value = ``;
     OnChange = [];
-    Hidden = false;
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _class = undefined;
+    get Class() {
+        return this._class
+    }
+    set Class(pclass) {
+        this._class = pclass;
+        $(`[id="${this.GUID}"]`).removeClass();
+        $(`[id="${this.GUID}"]`).addClass(pclass);
+    }
+    
+    _value = ``;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined || this._value === value)
+            return;
+
+        this._value = value;
+        $(`[id="${this.GUID}"]`).val(this._value);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -344,16 +448,11 @@ class UIText {
             this.OnChange = [ this.OnChange ];
     }
 
-    GetValue() {
+    get SaveValue() {
         return this.Value;
     }
-
-    SetValue(value) {
-        if(value !== undefined && this.Value !== value) {
-            this.Value = value;
-            $(`[id="${this.GUID}"]`).val(this.Value);
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
-        }
+    set SaveValue(saveValue){
+        this.Value = saveValue;
     }
 
     Detach() {
@@ -365,27 +464,17 @@ class UIText {
         var thisClass = this;
         
         $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.SetValue($(this).val());
+            thisClass.Value = $(this).val();
         });
     }
 
     GetHtml() {
-        var html = `<input id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``} value="${this.Value}"`;
+        var html = `<input id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``} value="${this._value}"`;
 
-        if(this.Class !== undefined)
-            html += ` class="${this.Class}"`;
+        if(this._class !== undefined)
+            html += ` class="${this._class}"`;
 
         return `${html}/>`;
-    }
-    
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -423,12 +512,46 @@ class UISelection {
     }
 
     GUID = generateGUID();
-    Value = ``;
-    Options = [];
     OnChange = [];
-    Hidden = false;
     SelectDisabled = false;
-    SelectValue = undefined;
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _options = [];
+    get Options() {
+        return this._options;
+    }
+    set Options(options) {
+        if(!objectTester(this._options, options)) {
+            this._options = options;
+            $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml())
+        }
+    }
+
+    _value = ``;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined || this._value === value)
+            return;
+
+        this._value = value;
+        $(`#${this.GUID} option`).prop(`selected`, false);
+        $(`#${this.GUID} option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -436,17 +559,11 @@ class UISelection {
             this.OnChange = [ this.OnChange ];
     }
 
-    GetValue() {
+    get SaveValue() {
         return this.Value;
     }
-    
-    SetValue(value) {
-        if(value !== undefined && this.Value !== value) {
-            this.Value = value;
-            $(`#${this.GUID} option`).prop(`selected`, false);
-            $(`#${this.GUID} option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
-        }
+    set SaveValue(saveValue){
+        this.Value = saveValue;
     }
 
     Detach() {
@@ -458,26 +575,15 @@ class UISelection {
         var thisClass = this;
         
         $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.SetValue(UISelection.ParseValue($(this).find(`:selected`).data(`type`), $(this).val()));
+            thisClass.Value = UISelection.ParseValue($(this).find(`:selected`).data(`type`), $(this).val());
         });
-    }
-
-    SetOptions(options) {
-        if(!objectTester(this.Options, options)) {
-            this.Options = options;
-            $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml())
-        }
-    }
-
-    GetOptions() {
-        return this.Options;
     }
 
     GetOptionsHtml() {
         var stringValue = UISelection.ParseValue(`string`, this.Value);
         var optionsHtml = ``;
         var selected = false;
-        this.Options.forEach(option => {
+        this._options.forEach(option => {
             if(option.Group){
                 var groupHtml = ``;
                 option.Options.forEach(option => {
@@ -506,28 +612,18 @@ class UISelection {
             optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
                 `>select</option>${optionsHtml}`;
             if(!selected)
-                this.SetValue(this.SelectValue);
+                this.Value = this.SelectValue;
         }
         return optionsHtml;
     }
 
     GetHtml() {
-        var html = `<select id="${this.GUID}"${this.Hidden? ` style="display: none;"` : ``}`;
+        var html = `<select id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``}`;
 
-        if(this.Class !== undefined)
-            html += ` class="${this.Class}"`;
+        if(this._class !== undefined)
+            html += ` class="${this._class}"`;
 
         return `${html}>${this.GetOptionsHtml()}</select>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}"]`).show();
     }
 }
 
@@ -536,7 +632,7 @@ class UITable extends Table {
         super(generateGUID(), prop);
     }
 
-    GetValue() {
+    get SaveValue() {
         return {
             Value: this.Value,
             MinX: this.MinXModifiable? this.MinX : undefined,
@@ -548,32 +644,33 @@ class UITable extends Table {
         };
     }
 
-    SetValue(value) {
-        if(value !== undefined) {
-            if(value.XResolution !== undefined && this.XResolutionModifiable)
-                this.SetXResolution(value.XResolution);
-            if(value.YResolution !== undefined && this.YResolutionModifiable)
-                this.SetYResolution(value.YResolution);
-            if(value.Resolution !== undefined) {
-                if(this.XResolutionModifiable && !this.YResolutionModifiable)
-                    this.SetXResolution(value.Resolution);
-                if(this.YResolutionModifiable && !this.XResolutionModifiable)
-                    this.SetYResolution(value.Resolution);
-            }
-            if(value.Value !== undefined && Array.isArray(value.Value))
-                this.Value = value.Value;
-            if(value.MinX !== undefined && this.MinXModifiable)
-                this.MinX = value.MinX;
-            if(value.MaxX !== undefined && this.MaxXModifiable)
-                this.MaxX = value.MaxX;
-            if(value.MinY !== undefined && this.MinYModifiable)
-                this.MinY = value.MinY;
-            if(value.MaxY !== undefined && this.MaxYModifiable)
-                this.MaxY = value.MaxY;
+    set SaveValue(saveValue) {
+        if(saveValue === undefined) 
+            return;
 
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
+        if(saveValue.XResolution !== undefined && this.XResolutionModifiable)
+            this.XResolution = saveValue.XResolution;
+        if(saveValue.YResolution !== undefined && this.YResolutionModifiable)
+            this.YResolution = saveValue.YResolution;
+        if(saveValue.Resolution !== undefined) {
+            if(this.XResolutionModifiable && !this.YResolutionModifiable)
+                this.XResolution = saveValue.Resolution;
+            if(this.YResolutionModifiable && !this.XResolutionModifiable)
+                this.YResolution = saveValue.Resolution;
         }
+        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
+            this.Value = saveValue.Value;
+        if(saveValue.MinX !== undefined && this.MinXModifiable)
+            this.MinX = saveValue.MinX;
+        if(saveValue.MaxX !== undefined && this.MaxXModifiable)
+            this.MaxX = saveValue.MaxX;
+        if(saveValue.MinY !== undefined && this.MinYModifiable)
+            this.MinY = saveValue.MinY;
+        if(saveValue.MaxY !== undefined && this.MaxYModifiable)
+            this.MaxY = saveValue.MaxY;
+
         this.UpdateTable();
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 }
 
@@ -582,8 +679,20 @@ class UIDialog {
     TemplateIdentifier = undefined;
     Title = `Dialog`;
     ButtonText = `Open`;
-    Hidden = false;
     Opened = false
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`#${this.GUID}-open`).hide();
+        } else {
+            $(`#${this.GUID}-open`).show();
+        }
+    }
 
     constructor(prop) {
         Object.assign(this, prop);
@@ -603,18 +712,8 @@ class UIDialog {
     }
 
     GetHtml() {
-        return  `<input id="${this.GUID}-open"${this.Hidden? ` style="display: none;"` : ``} type="button" class="button" value="${this.ButtonText}"></input>` +
+        return  `<input id="${this.GUID}-open"${this._hidden? ` style="display: none;"` : ``} type="button" class="button" value="${this.ButtonText}"></input>` +
                 `<div data-title="${this.Title}" id="${this.GUID}-dialog" style="display: none;">$${this.TemplateIdentifier}$</div>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`#${this.GUID}-open`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`#${this.GUID}-open`).show();
     }
     
     Close() {
@@ -632,29 +731,71 @@ class UIDialog {
 class UIMeasurement {
     GUID = generateGUID();
     OnChange = [];
-    Hidden = false;
+    
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).css('display', 'inline-block');
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _measurement = undefined;
+    get Measurement() {
+        return this._measurement;
+    }
+    set Measurement(measurement){
+        if(!measurement || this._measurement === measurement)
+            return;
+
+        this._measurement = measurement;
+        this.Default = GetDefaultUnitIndex(this.Measurement);
+        this.Value ??= this.Default;
+    }
+
+    _value = undefined;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined)
+            return;
+        var val = parseInt(value);
+        if(isNaN(val))
+            debugger;
+        if(this._value === val)
+            return;
+
+        this._value = val;
+        $(`[id="${this.GUID}"]`).val(this._value);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
 
     constructor(prop) {
+        if(prop?.Measurement && prop?.MeasurementIndex !== undefined) {
+            this.Measurement = prop.Measurement;
+            this.MeasurementIndex = prop.MeasurementIndex;
+            this.Default = this.MeasurementIndex;
+        }
         Object.assign(this, prop);
         if(!Array.isArray(this.OnChange))
             this.OnChange = [ this.OnChange ];
-        this.Value ??= GetDefaultUnitIndex(this.Measurement);
-        this.Default = this.Value;
     }
 
-    GetValue() {
-        if(this.Value !== this.Default)
+    get SaveValue() {
+        if(this.Value !== this.Default){
+            console.log(this.Value, this.Default)
             return this.Value;
-    }
-
-    SetValue(value) {
-        var val = parseInt(value);
-
-        if(value !== undefined && this.Value !== val) {
-            this.Value = val;
-            $(`[id="${this.GUID}"]`).val(this.Value);
-            this.OnChange.forEach(function(OnChange) { OnChange(); });
         }
+    }
+    set SaveValue(saveValue){
+        this.Value = saveValue;
     }
 
     Attach() {
@@ -670,94 +811,161 @@ class UIMeasurement {
     }
 
     GetHtml() {
-        return `<div style="display: ${this.Hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this.Measurement, this.Value)}</div>`;
-    }
-
-    Hide() {
-        this.Hidden = true;
-        $(`[id="${this.GUID}"]`).hide();
-    }
-
-    Show() {
-        this.Hidden = false;
-        $(`[id="${this.GUID}"]`).css('display', 'inline-block');
-        $(`[id="${this.GUID}"]`).show();
+        return `<div style="display: ${this._hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>`;
     }
 }
 
 class UINumberWithMeasurement extends UITemplate {
-    static Template = `$DisplayValue$$MeasurementIndex$`
+    static Template = `$DisplayValue$$DisplayMeasurement$`
+
+    get MeasurementIndex() {
+        return this.DisplayMeasurement.Value;
+    }
+    set MeasurementIndex(measurementIndex) {
+        this.DisplayMeasurement.Value = measurementIndex;
+        if(this.Unit)
+            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+    }
+
+    get Measurement() {
+        return this.DisplayMeasurement.Measurement;
+    }
+    set Measurement(measurement) {
+        this.DisplayMeasurement.Measurement = measurement;
+        if(this.Unit)
+            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+    }
+
+    get Class() {
+        return this.DisplayValue.Class;
+    }
+    set Class(pclass) {
+        this.DisplayValue.Class = pclass;
+    }
+
+    get Min() {
+        return this.DisplayValue.Min;
+    }
+    set Min(min) {
+        this.DisplayValue.Min = min;
+    }
+
+    get Max() {
+        return this.DisplayValue.Max;
+    }
+    set Max(max) {
+        this.DisplayValue.Max = max;
+    }
+
+    get Step() {
+        return this.DisplayValue.Step;
+    }
+    set Step(step) {
+        this.DisplayValue.Step = step;
+    }
+
+    _value = 0;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === this._value)
+            return;
+
+        this._value = value;
+
+        if(this.Unit)
+            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+        this.OnChange.forEach(function(OnChange) { OnChange(); });
+    }
+
+    get Unit() {
+        if(this.Measurement) {
+            const measurementIndex = this.MeasurementIndex ?? 0;
+            const measurement = Measurements[this.Measurement];
+            return measurement?.[measurementIndex];
+        }
+    }
 
     constructor(prop) {
-        super(prop);
-        //place after super(prop) in order to interrcept the change callbacks
+        super();
         var thisClass = this;
-
-        prop.Hidden = false;
-        var measurementIndexProp = {};
-        Object.assign(measurementIndexProp, prop);
-        var displayValueProp = {};
-        Object.assign(displayValueProp, prop);
-
-        measurementIndexProp.Value = prop.MeasurementIndex;
-        delete measurementIndexProp.MeasurementIndex;
-        measurementIndexProp.OnChange = function() {
-            const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
-            thisClass.DisplayValue.SetValue(thisClass.Value * unit.DisplayMultiplier + unit.DisplayOffset);
-        };
-        this.MeasurementIndex = new UIMeasurement(measurementIndexProp);
-
-        displayValueProp.GUID = this.GUID;
-        delete displayValueProp.MeasurementIndex;
-        displayValueProp.OnChange = function() {
-            const unit = Measurements[thisClass.Measurement][thisClass.MeasurementIndex.Value];
-            thisClass.Value = (thisClass.DisplayValue.Value - unit.DisplayOffset) / unit.DisplayMultiplier;
-            thisClass.OnChange.forEach(function(OnChange) { OnChange(); });
-        };
-        this.DisplayValue = new UINumber(displayValueProp);
+        this.DisplayMeasurement = new UIMeasurement({
+            Measurement : prop?.Measurement,
+            MeasurementIndex: prop?.MeasurementIndex,
+            OnChange: function() {
+                if(thisClass.Unit)
+                    thisClass.DisplayValue.Value = (thisClass.Value * thisClass.Unit.DisplayMultiplier + thisClass.Unit.DisplayOffset);
+            }
+        });
+        this.DisplayValue = new UINumber({
+            ExcludeFromOnChange: true,
+            OnChange: function() {
+                if(thisClass.Unit)
+                    thisClass.Value = (thisClass.DisplayValue.Value - thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
+            }
+        });
+        this.DisplayValue.GUID = this.GUID;
+        this.Setup(prop);
     }
 
-    SetValue(value) {
-        if(typeof value === `object`) {
-            this.Value = value.Value;
-            this.MeasurementIndex.SetValue(value.MeasurementIndex);
-        } else {
-            this.Value = value;
-        }
-        const unit = Measurements[this.Measurement][this.MeasurementIndex.Value];
-        this.DisplayValue.SetValue(this.Value * unit.DisplayMultiplier + unit.DisplayOffset);
-    }
+    get SaveValue() {
+        if(this.DisplayMeasurement.SaveValue === undefined)
+            return this.Value;
 
-    GetValue() {
         return {
-            MeasurementIndex: this.MeasurementIndex.GetValue(),
+            MeasurementIndex: this.DisplayMeasurement.SaveValue,
             Value: this.Value
         };
+    }
+    set SaveValue(saveValue){
+        if(typeof saveValue === `object`) {
+            this.DisplayMeasurement.SaveValue = saveValue?.MeasurementIndex;
+            this.Value = saveValue?.Value;
+        } else {
+            this.Value = saveValue;
+        }
     }
 }
 
 class DisplayNumberWithMeasurement extends UITemplate {
-    static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$MeasurementIndex$</div>`
+    static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
+
+    get MeasurementIndex() {
+        return this.DisplayMeasurement.Value;
+    }
+    set MeasurementIndex(measurementIndex) {
+        this.DisplayMeasurement.Value = measurementIndex;
+        if(this.Unit)
+            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+    }
+
+    get Measurement() {
+        return this.DisplayMeasurement.Measurement;
+    }
+    set Measurement(measurement) {
+        this.DisplayMeasurement.Measurement = measurement;
+        if(this.Unit)
+            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+    }
 
     constructor(prop) {
-        var measurementIndexProp = {};
-        Object.assign(measurementIndexProp, prop);
-
-        measurementIndexProp.Hidden = false;
-        measurementIndexProp.Value = prop.MeasurementIndex;
-        measurementIndexProp.MeasurementIndex = undefined;
-        prop.MeasurementIndex = new UIMeasurement(measurementIndexProp);
-        super(prop);
+        super();
         var thisClass = this;
-        this.MeasurementIndex.OnChange.push(function() {
-            thisClass.UpdateDisplayValue();
+        this.DisplayMeasurement = new UIMeasurement({
+            Measurement : prop?.Measurement,
+            MeasurementIndex: prop?.MeasurementIndex,
+            OnChange: function() {
+                thisClass.UpdateDisplayValue();
+            }
         });
+        this.Setup(prop);
         this.UpdateDisplayValue();
         this.ZeroesToAdd = 10000000;
     }
 
     UpdateDisplayValue() {
-        var unit = Measurements[this.MeasurementIndex.Measurement]?.[this.MeasurementIndex.Value];
+        var unit = Measurements[this.Measurement]?.[this.MeasurementIndex];
         if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
 
@@ -775,11 +983,10 @@ class DisplayNumberWithMeasurement extends UITemplate {
         $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
     }
 
-    SetValue(value) {
-        return this.MeasurementIndex.SetValue(value);
+    get SaveValue() {
+        return this.DisplayMeasurement.SaveValue;
     }
-
-    GetValue() {
-        return this.MeasurementIndex.GetValue()
+    set SaveValue(saveValue) {
+        this.DisplayMeasurement.SaveValue = saveValue;
     }
 }

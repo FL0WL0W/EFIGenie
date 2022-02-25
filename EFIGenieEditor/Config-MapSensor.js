@@ -7,13 +7,13 @@ class Input_AnalogPolynomial extends UITemplate {
     static Inputs = [];
 
     constructor(prop){
-        prop ??= {};
-        prop.AnalogInput = new Input_Analog();
-        prop.Polynomial = new Calculation_Polynomial();
-        prop.VoltageLiveUpdate = new DisplayLiveUpdate({
+        super();
+        this.AnalogInput = new Input_Analog();
+        this.Polynomial = new Calculation_Polynomial();
+        this.VoltageLiveUpdate = new DisplayLiveUpdate({
             Measurement: Input_Analog.Measurement
         });
-        super(prop);
+        this.Setup(prop);
     }
 
     RegisterVariables() {
@@ -38,8 +38,8 @@ class MAP_GM1Bar extends Input_AnalogPolynomial {
     static Name = `GM 1 Bar MAP`;
     static Measurement = `Pressure`;
 
-    GetValue() { return this.AnalogInput.GetValue(); }
-    SetValue(value) { return this.AnalogInput.SetValue(value); }
+    get SaveValue() { return this.AnalogInput.SaveValue; }
+    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
@@ -57,8 +57,8 @@ class MAP_GM2Bar extends Input_AnalogPolynomial {
     static Name = `GM 2 Bar MAP`;
     static Measurement = `Pressure`;
 
-    GetValue() { return this.AnalogInput.GetValue(); }
-    SetValue(value) { return this.AnalogInput.SetValue(value); }
+    get SaveValue() { return this.AnalogInput.SaveValue; }
+    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
@@ -76,8 +76,8 @@ class MAP_GM3Bar extends Input_AnalogPolynomial {
     static Name = `GM 3 Bar MAP`;
     static Measurement = `Pressure`;
 
-    GetValue() { return this.AnalogInput.GetValue(); }
-    SetValue(value) { return this.AnalogInput.SetValue(value); }
+    get SaveValue() { return this.AnalogInput.SaveValue; }
+    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
