@@ -557,7 +557,7 @@ class UISelection {
         return this._value;
     }
     set Value(value) {
-        if(value === undefined || this._value === value)
+        if(this._value === value)
             return;
 
         this._value = value;
@@ -624,8 +624,6 @@ class UISelection {
         if(!this.SelectNotVisible) {
             optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
                 `>select</option>${optionsHtml}`;
-            if(!selected)
-                this.Value = this.SelectValue;
         }
         return optionsHtml;
     }
@@ -805,7 +803,6 @@ class UIMeasurement {
 
     get SaveValue() {
         if(this.Value !== this.Default){
-            console.log(this.Value, this.Default)
             return this.Value;
         }
     }

@@ -193,10 +193,6 @@ var downloadURL = function(data, fileName) {
     a.remove();
   };
 
-$(document).blur(function(event) {
-    console.log(`focus ` + event.target.id);
-})
-
 function IsBrowserSupported() {
     var obj = {
         c: `test`,

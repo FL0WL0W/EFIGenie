@@ -655,6 +655,28 @@ class CalculationOrVariableSelection extends UITemplate {
     }
     set Measurement(measurement) {
         this._measurement = measurement;
+        if(!this._measurement)
+            return;
+
+        if(this.Selection.Value) {
+            let selections = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
+            let match = false;
+            let stringValue = UISelection.ParseValue(`string`, this.Selection.Value)
+            selections.forEach(option => {
+                if(option.Group){
+                    option.Options.forEach(option => {
+                        if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+                            match = true;
+                    });
+                } else {
+                    if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+                        match = true;
+                }
+            });
+
+            if(!match) 
+                this.Selection.Value = this.Selection.SelectValue;
+        }
     }
 
     constructor(prop) {
@@ -670,7 +692,7 @@ class CalculationOrVariableSelection extends UITemplate {
             OnChange: function () {
                 const subConfigIndex = thisClass.GetSubConfigIndex();
                 thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
-                $(`#${thisClass.GUID}-ConfigValue`).html(thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
+                $(`#${thisClass.GUID}-ConfigValue`).html(subConfigIndex === -1? `` : thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
                 thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
                 var subConfig = thisClass.GetSubConfig();
                 subConfig?.Attach?.();
@@ -920,9 +942,11 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
 
         this._variableReference = variableReference;
 
-        let measurement = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
-        measurement = measurement.substring(0, measurement.length - 1);
-        this.Measurement = measurement;
+        if(this._variableReference) {
+            let measurement = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
+            measurement = measurement.substring(0, measurement.length - 1);
+            this.Measurement = measurement;
+        }
     }
 
     constructor(prop) {
