@@ -874,16 +874,16 @@ class Calculation_Operation extends UITemplate {
         super();
         const thisClass = this
         this.Base = new CalculationOrVariableSelection({
-            Configs:            GenericConfigs,
+            Configs:            prop.Configs,
             Label:              `Base`,
             Measurement:        prop?.Measurement,
             MeasurementIndex:   prop?.MeasurementIndex
         });
         this.SubOperation = [new CalculationOrVariableSelection({
-            Configs:            GenericConfigs,
+            Configs:            prop.Configs,
             Measurement:        prop?.Measurement,
             MeasurementIndex:   prop?.MeasurementIndex,
-            Template: `<div>${CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)}</div>`
+            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
         })];
         this.OperationSelection = [new UISelection({
             Options: [
@@ -898,7 +898,7 @@ class Calculation_Operation extends UITemplate {
         this.OperationName = [new UIText({
             Class: `subOperationName`,
             OnChange: function() {
-                thisClass.SubOperation[0].Label = prop.OperationName[0].Value;
+                thisClass.SubOperation[0].Label = thisClass.OperationName[0].Value;
             }
         })];
         this.LiveUpdate = new DisplayLiveUpdate({
@@ -909,8 +909,10 @@ class Calculation_Operation extends UITemplate {
     }
 
     RegisterVariables() {
+        this.Base.RegisterVariables();
+        this.SubOperation.forEach(function(subOperation) {subOperation.RegisterVariables(); });
         this.LiveUpdate.VariableReference = `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
-        this.LiveUpdate.MeasurementIndex.Measurement = this.Measurement;
+        this.LiveUpdate.Measurement = this.Measurement;
     }
 }
 

@@ -631,8 +631,8 @@ class UISelection {
     GetHtml() {
         var html = `<select id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``}`;
 
-        if(this._class !== undefined)
-            html += ` class="${this._class}"`;
+        if(this.Class !== undefined)
+            html += ` class="${this.Class}"`;
 
         return `${html}>${this.GetOptionsHtml()}</select>`;
     }
