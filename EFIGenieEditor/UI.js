@@ -545,10 +545,11 @@ class UISelection {
         return this._options;
     }
     set Options(options) {
-        if(!objectTester(this._options, options)) {
-            this._options = options;
-            $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml())
-        }
+        if(objectTester(this._options, options)) 
+            return;
+        
+        this._options = options;
+        $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml());
     }
 
     _value = ``;
@@ -681,7 +682,7 @@ class UITable extends Table {
         if(saveValue.MaxY !== undefined && this.MaxYModifiable)
             this.MaxY = saveValue.MaxY;
 
-        this.UpdateTable();
+        $(`#${this.GUID}-table`).replaceWith(this.GetTable());
         this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 }

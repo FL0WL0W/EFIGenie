@@ -40,31 +40,6 @@ class Calculation_Static extends UINumberWithMeasurement {
 }
 GenericConfigs.push(Calculation_Static);
 
-function TableGetType(tableValue) {
-    var min = 18446744073709551615;
-    var max = -9223372036854775808;
-    for (var i = 0; i < tableValue.length; i++) {
-        if (tableValue[i] % 1 != 0) {
-            return `FLOAT`;
-        }
-        if (tableValue[i] < min) {
-            min = tableValue[i];
-        }
-        if (tableValue[i] > max) {
-            max = tableValue[i];
-        }
-    }
-    if (typeof tableValue[0] === `boolean`) {
-        return `BOOL`;
-    }
-    if (min < 0) {
-        if (max < 0 || min < -max)
-            return GetType(min);
-        return GetType(-max);
-    }
-    return GetType(max);
-}
-
 //this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
 class Calculation_Polynomial {
     static Name = `Polynomial`;
@@ -196,18 +171,107 @@ class Calculation_Polynomial {
 }
 GenericConfigs.push(Calculation_Polynomial);
 
+function TableGetType(tableValue) {
+    var min = 18446744073709551615;
+    var max = -9223372036854775808;
+    for (var i = 0; i < tableValue.length; i++) {
+        if (tableValue[i] % 1 != 0) {
+            return `FLOAT`;
+        }
+        if (tableValue[i] < min) {
+            min = tableValue[i];
+        }
+        if (tableValue[i] > max) {
+            max = tableValue[i];
+        }
+    }
+    if (typeof tableValue[0] === `boolean`) {
+        return `BOOL`;
+    }
+    if (min < 0) {
+        if (max < 0 || min < -max)
+            return GetType(min);
+        return GetType(-max);
+    }
+    return GetType(max);
+}
+
 class Calculation_LookupTable extends UITemplate {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Label = `Value`;
-    static XLabel = `X`
     static Template = `$Dialog$`
+
+    get Label() {
+        return this.Table.ZLabel;
+    }
+    set Label(label){
+        this.Table.ZLabel = label;
+        this.Dialog.Title = label;
+    }
+
+    _xLabel = `X`
+    get XLabel() {
+        return this._xLabel;
+    }
+    set XLabel(xLabel) {
+        if(this._xLabel === xLabel)
+            return;
+
+        this._xLabel = xLabel;
+        if(!this.ParameterSelection)
+            this.Table.XLabel = xLabel;
+    }
+
+    get XOptions() {
+        if(!this.ParameterSelection) 
+            return;
+
+        return this.ParameterSelection.Options;
+    }
+    set XOptions(options) {
+        if(!this.ParameterSelection || objectTester(this.ParameterSelection.Options, options)) 
+            return;
+
+        this.ParameterSelection.Options = options;
+        this.Table.XLabel = this.ParameterSelection.GetHtml();
+    }
+
+    get NoParameterSelection() {
+        if(this.ParameterSelection)
+            return false;
+        return true;
+    }
+    set NoParameterSelection(noParameterSelection) {
+        if(noParameterSelection) {
+            this.ParameterSelection = undefined;
+            this.Table.XLabel = this.XLabel;
+            return;
+        }
+
+        const thisClass = this;
+        if(!this.ParameterSelection) {
+            this.ParameterSelection = new UISelection({
+                Options: GetSelections(),
+                OnChange: function() {
+                    thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
+                }
+            });
+            this.Table.XLabel = this.ParameterSelection.GetHtml();
+        }
+    }
+
+    get Resolution() {
+        return this.Table.XResolution;
+    }
+    set Resolution(res){
+        this.Table.XResolution = res;
+    }
 
     constructor(prop) {
         super();
+        const thisClass = this;
         this.Dialog = new UIDialog({
-            Title: `$Label$`,
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
@@ -215,12 +279,13 @@ class Calculation_LookupTable extends UITemplate {
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
-            XLabel: prop.NoParameterSelection ? `$XLabel$` : `$ParameterSelection$`,
-            ZLabel: `$Label$`
+            OnChange: function() {
+                if(thisClass.ParameterSelection) 
+                    thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
+            }
         });
-        this.ParameterSelection = prop.NoParameterSelection ? undefined : new UISelection({
-            Options: GetSelections()
-        });
+        this.NoParameterSelection = false;
+        this.Label = `Value`;
         this.Setup(prop);
     }
 
@@ -259,8 +324,7 @@ class Calculation_LookupTable extends UITemplate {
     }
 
     RegisterVariables() {
-        if(!this.NoParameterSelection)
-            this.ParameterSelection.Options = GetSelections();
+        this.XOptions = GetSelections();
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
@@ -269,30 +333,137 @@ class Calculation_2AxisTable extends UITemplate {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
-    static Label = `Value`;
-    static XLabel = `X`
-    static YLabel = `Y`
     static Template = `$Dialog$`
+
+    get Label() {
+        return this.Table.ZLabel;
+    }
+    set Label(label){
+        this.Table.ZLabel = label;
+        this.Dialog.Title = label;
+    }
+
+    _xLabel = `X`
+    get XLabel() {
+        return this._xLabel;
+    }
+    set XLabel(xLabel) {
+        if(this._xLabel === xLabel)
+            return;
+
+        this._xLabel = xLabel;
+        if(!this.XSelection)
+            this.Table.XLabel = xLabel;
+    }
+
+    _yLabel = `Y`
+    get yLabel() {
+        return this._yLabel;
+    }
+    set YLabel(yLabel) {
+        if(this._yLabel === yLabel)
+            return;
+
+        this._yLabel = yLabel;
+        if(!this.YSelection)
+            this.Table.YLabel = yLabel;
+    }
+
+    get XOptions() {
+        if(!this.XSelection) 
+            return;
+
+        return this.XSelection.Options;
+    }
+    set XOptions(options) {
+        if(!this.XSelection || objectTester(this.XSelection.Options, options)) 
+            return;
+
+        this.XSelection.Options = options;
+        this.Table.XLabel = this.XSelection.GetHtml();
+    }
+
+    get YOptions() {
+        if(!this.YSelection) 
+            return;
+
+        return this.YSelection.Options;
+    }
+    set YOptions(options) {
+        if(!this.YSelection || objectTester(this.YSelection.Options, options)) 
+            return;
+
+        this.YSelection.Options = options;
+        this.Table.YLabel = this.YSelection.GetHtml();
+    }
+
+    get NoParameterSelection() {
+        if(this.XSelection || this.YSelection)
+            return false;
+        return true;
+    }
+    set NoParameterSelection(noParameterSelection) {
+        if(noParameterSelection) {
+            this.XSelection = undefined;
+            this.YSelection = undefined;
+            this.Table.XLabel = this.XLabel;
+            this.Table.YLabel = this.YLabel;
+            return;
+        }
+
+        const thisClass = this;
+        if(!this.XSelection) {
+            this.XSelection = new UISelection({
+                Options: GetSelections(),
+                OnChange: function() {
+                    thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
+                }
+            });
+            this.Table.XLabel = this.XSelection.GetHtml();
+        }
+        if(!this.YSelection) {
+            this.YSelection = new UISelection({
+                Options: GetSelections(),
+                OnChange: function() {
+                    thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
+                }
+            });
+            this.Table.YLabel = this.YSelection.GetHtml();
+        }
+    }
+
+    get XResolution() {
+        return this.Table.XResolution;
+    }
+    set XResolution(xRes){
+        this.Table.XResolution = xRes;
+    }
+
+    get YResolution() {
+        return this.Table.YResolution;
+    }
+    set YResolution(yRes){
+        this.Table.YResolution = yRes;
+    }
 
     constructor(prop) {
         super();
+        const thisClass = this;
         this.Dialog = new UIDialog({
-            Title: `$Label$`,
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
         this.Table = new UITable({
             BaseObj: true,
-            XLabel: prop.NoParameterSelection ? `$XLabel$` : `$XSelection$`,
-            YLabel: prop.NoParameterSelection ? `$YLabel$` : `$YSelection$`,
-            ZLabel: `$Label$`
+            OnChange: function() {
+                if(thisClass.XSelection) 
+                    thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
+                if(thisClass.YSelection) 
+                    thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
+            }
         });
-        this.XSelection = prop.NoParameterSelection ? undefined : new UISelection({
-            Options: GetSelections()
-        });
-        this.YSelection = prop.NoParameterSelection ? undefined : new UISelection({
-            Options: GetSelections(),
-        });
+        this.NoParameterSelection = false;
+        this.Label = `Value`;
         this.Setup(prop);
     }
 
@@ -340,10 +511,8 @@ class Calculation_2AxisTable extends UITemplate {
     }
 
     RegisterVariables() {
-        if(!this.NoParameterSelection) {
-            this.XSelection.Options = GetSelections();
-            this.YSelection.Options = GetSelections();
-        }
+        this.XOptions = GetSelections();
+        this.YOptions = GetSelections();
     }
 }
 GenericConfigs.push(Calculation_2AxisTable);
