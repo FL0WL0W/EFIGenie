@@ -560,8 +560,8 @@ class UISelection {
             return;
 
         this._value = value;
-        $(`#${this.GUID} option`).prop(`selected`, false);
-        $(`#${this.GUID} option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
+        $(`[id="${this.GUID}"] option`).prop(`selected`, false);
+        $(`[id="${this.GUID}"] option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
         this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 
@@ -700,9 +700,9 @@ class UIDialog {
     set Hidden(hidden) {
         this._hidden = hidden;
         if(hidden) {
-            $(`#${this.GUID}-open`).hide();
+            $(`[id="${this.GUID}-open"]`).hide();
         } else {
-            $(`#${this.GUID}-open`).show();
+            $(`[id="${this.GUID}-open"]`).show();
         }
     }
 
@@ -730,12 +730,12 @@ class UIDialog {
     
     Close() {
         this.Opened = false;
-        $(`#${this.GUID}-dialog`).dialog(`close`);
+        $(`[id="${this.GUID}-dialog"]`).dialog(`close`);
     }
 
     Open() {
         this.Opened = true;
-        var dialogSelector = $(`#${this.GUID}-dialog`);
+        var dialogSelector = $(`[id="${this.GUID}-dialog"]`);
         dialogSelector.dialog({ width:`auto`, modal:true, title: dialogSelector.data(`title`)});
     }
 }

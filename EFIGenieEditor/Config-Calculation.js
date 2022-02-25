@@ -439,7 +439,7 @@ class CalculationOrVariableSelection extends UITemplate {
                 thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
                 var subConfig = thisClass.GetSubConfig();
                 subConfig?.Attach?.();
-                thisClass.LiveUpdate.Measurement = thisClass.GetMeasurement();
+                thisClass.LiveUpdate.Measurement = thisClass.Measurement;
             }
         });
         this.Setup(prop);
@@ -478,7 +478,7 @@ class CalculationOrVariableSelection extends UITemplate {
         saveValue ??= {};
 
         if(saveValue.Values === undefined)
-        saveValue.Values = [];
+            saveValue.Values = [];
         
         for (var i = 0; i < saveValue.Values.length; i++) {
             var found = false;
@@ -504,7 +504,7 @@ class CalculationOrVariableSelection extends UITemplate {
                             NoParameterSelection: this.NoParameterSelection,
                             ReferenceName: this.ReferenceName,
                             Label: this.Label,
-                            Measurement: this.Measurement,
+                            Measurement: this._measurement,
                             MeasurementIndex: this.MeasurementIndex
                         }));
                     }
@@ -516,9 +516,8 @@ class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.Selection.Options = GetSelections(this.Measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
+        this.Selection.Options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
         const selection = this.Selection.Value;
-        const measurement = this.GetMeasurement();
         if (selection && this.ReferenceName) {
             const thisReference = this.GetVariableReference();
             if (!selection.reference) {
@@ -532,14 +531,14 @@ class CalculationOrVariableSelection extends UITemplate {
                     subConfig.RegisterVariables?.();
                 }
             } else {
-                VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${measurement? `(${measurement})` : ``}`);
+                VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${this.Measurement? `(${this.Measurement})` : ``}`);
             }
             const variable = VariableRegister.GetVariableByReference(thisReference)
             if(variable?.Type === `float` || variable?.Type === `bool`)
                 this.LiveUpdate.VariableReference = thisReference;
             else 
                 this.LiveUpdate.VariableReference = undefined;
-            this.LiveUpdate.Measurement = measurement;
+            this.LiveUpdate.Measurement = this.Measurement;
         }
     }
 
@@ -580,7 +579,7 @@ class CalculationOrVariableSelection extends UITemplate {
                     NoParameterSelection: this.NoParameterSelection,
                     ReferenceName: this.ReferenceName,
                     Label: this.Label,
-                    Measurement: this.Measurement,
+                    Measurement: this._measurement,
                     MeasurementIndex: this.MeasurementIndex
                 }));
                 return this.ConfigValues.length-1;
@@ -600,19 +599,25 @@ class CalculationOrVariableSelection extends UITemplate {
         return this.Selection.Value?.reference;
     }
 
-    GetMeasurement() {
+    _measurement = undefined;
+    get Measurement() {
+        if(this._measurement)
+            return this._measurement;
+
         const selection = this.Selection.Value;
         if (!selection.reference) {
             const subConfig = this.GetSubConfig();
-            return this.Measurement ?? GetClassProperty(subConfig, `Measurement`);
+            return GetClassProperty(subConfig, `Measurement`);
         }
-        return this.Measurement ?? selection.measurement;
+        return selection.measurement;
+    }
+    set Measurement(measurement) {
+        this._measurement = measurement;
     }
 
     GetVariableReference() {
-        const measurement = this.GetMeasurement();
         if (this.Selection.Value && this.ReferenceName)
-            return `${this.ReferenceName}${measurement? `(${measurement})` : ``}`;
+            return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
     }
 }
 
