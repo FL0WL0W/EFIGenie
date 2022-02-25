@@ -72,6 +72,15 @@ class Calculation_Polynomial {
     static Inputs = [`float`];
     static Template = getFileContents(`ConfigGui/Operation_Polynomial.html`);
 
+    A = [0, 0, 0];
+    get Value() {
+        return this.A.slice(0, this.Degree);
+    }
+    set Value(value) {
+        this.A = value;
+        this.Degree = value.length;
+    }
+
     constructor(){
         this.GUID = generateGUID();
     }
@@ -79,7 +88,6 @@ class Calculation_Polynomial {
     MinValue = 0;
     MaxValue = 1;
     Degree = 3;
-    A = [0, 0, 0];
 
     get SaveValue() {
         return { 
@@ -174,7 +182,7 @@ class Calculation_Polynomial {
             { type: `FLOAT`, value: this.MinValue}, //MinValue
             { type: `FLOAT`, value: this.MaxValue}, //MaxValue
             { type: `UINT8`, value: this.Degree}, //Degree
-            { type: `FLOAT`, value: this.A.slice(0, this.Degree)}, //coefficients
+            { type: `FLOAT`, value: this.Value}, //coefficients
         ]};
 
         if (outputVariableId || inputVariableId) 
@@ -685,31 +693,32 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
     Attach() {
         super.Attach();
         var thisClass = this
-        // if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-        //     VariablesToPoll.push(thisClass.VariableReference)
-        // LiveUpdateEvents[this.GUID] = function() {
-        //     if(thisClass.VariableReference) { 
-        //         if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
-        //             VariablesToPoll.push(thisClass.VariableReference)
-        //         const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
-        //         if(CurrentVariableValues[variableId] !== undefined) {
-        //             thisClass.Value = CurrentVariableValues[variableId];
-        //             thisClass.UpdateDisplayValue();
-        //             if(!thisClass.SuperHidden) {
-        //                 if(thisClass.SuperHidden)
-        //                     thisClass.SuperHidden = false;
-        //                 if(thisClass.TimeoutHandle)
-        //                     window.clearTimeout(thisClass.TimeoutHandle);
+        if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+            VariablesToPoll.push(thisClass.VariableReference)
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.VariableReference) { 
+                if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
+                    VariablesToPoll.push(thisClass.VariableReference)
+                const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
+                if(CurrentVariableValues[variableId] !== undefined) {
+                    thisClass.SuperHidden = false;
+                    thisClass.Value = CurrentVariableValues[variableId];
+                    thisClass.UpdateDisplayValue();
+                    if(!thisClass.SuperHidden) {
+                        if(thisClass.SuperHidden)
+                            thisClass.SuperHidden = false;
+                        if(thisClass.TimeoutHandle)
+                            window.clearTimeout(thisClass.TimeoutHandle);
         
-        //                 thisClass.TimeoutHandle = window.setTimeout(function() {
-        //                     thisClass.HideSuper();
-        //                 },5000);
-        //             }
-        //         } else {
-        //             thisClass.HideSuper();
-        //         }
-        //     }
-        // };
+                        thisClass.TimeoutHandle = window.setTimeout(function() {
+                            thisClass.SuperHidden = true;
+                        },5000);
+                    }
+                } else {
+                    thisClass.SuperHidden = true;
+                }
+            }
+        };
     }
     Detach() {
         super.Detach();

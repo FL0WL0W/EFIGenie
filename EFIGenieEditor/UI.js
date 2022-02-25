@@ -229,6 +229,9 @@ class UINumber {
         return this._class
     }
     set Class(pclass) {
+        if(this._class === pclass)
+            return;
+
         this._class = pclass;
         $(`[id="${this.GUID}"]`).removeClass();
         $(`[id="${this.GUID}"]`).addClass(pclass);
@@ -239,6 +242,9 @@ class UINumber {
         return this._min
     }
     set Min(min) {
+        if(this._min === min)
+            return;
+
         this._min = min;
         $(`[id="${this.GUID}"]`).prop(`min`, min);
     }
@@ -248,6 +254,9 @@ class UINumber {
         return this._max
     }
     set Max(max) {
+        if(this._max === max)
+            return;
+
         this._max = max;
         $(`[id="${this.GUID}"]`).prop(`max`, max);
     }
@@ -257,6 +266,9 @@ class UINumber {
         return this._step
     }
     set Step(step) {
+        if(this._step === step)
+            return;
+            
         this._step = step;
         $(`[id="${this.GUID}"]`).prop(`step`, step);
     }
@@ -822,18 +834,22 @@ class UINumberWithMeasurement extends UITemplate {
         return this.DisplayMeasurement.Value;
     }
     set MeasurementIndex(measurementIndex) {
+        if(this.DisplayMeasurement.Value = measurementIndex)
+            return;
+
         this.DisplayMeasurement.Value = measurementIndex;
-        if(this.Unit)
-            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+        this.UpdateDisplayValue();
     }
 
     get Measurement() {
         return this.DisplayMeasurement.Measurement;
     }
     set Measurement(measurement) {
+        if(this.DisplayMeasurement.Measurement == measurement)
+            return;
+
         this.DisplayMeasurement.Measurement = measurement;
-        if(this.Unit)
-            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+        this.UpdateDisplayValue();
     }
 
     get Class() {
@@ -843,25 +859,40 @@ class UINumberWithMeasurement extends UITemplate {
         this.DisplayValue.Class = pclass;
     }
 
+    _min = undefined;
     get Min() {
-        return this.DisplayValue.Min;
+        return this._min;
     }
     set Min(min) {
-        this.DisplayValue.Min = min;
+        if(this._min === min)
+            return;
+
+        this._min = min;
+        this.UpdateDisplayValue();
     }
 
+    _max = undefined;
     get Max() {
-        return this.DisplayValue.Max;
+        return this._max;
     }
     set Max(max) {
-        this.DisplayValue.Max = max;
+        if(this._max === max)
+            return;
+
+        this._max = max;
+        this.UpdateDisplayValue();
     }
 
+    _step = undefined;
     get Step() {
-        return this.DisplayValue.Step;
+        return this._step;
     }
     set Step(step) {
-        this.DisplayValue.Step = step;
+        if(this._step === step)
+            return;
+
+        this._step = step;
+        this.UpdateDisplayValue();
     }
 
     _value = 0;
@@ -869,14 +900,11 @@ class UINumberWithMeasurement extends UITemplate {
         return this._value;
     }
     set Value(value) {
-        if(value === this._value)
+        if(this._value === value)
             return;
 
         this._value = value;
-
-        if(this.Unit)
-            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
-        this.OnChange.forEach(function(OnChange) { OnChange(); });
+        this.UpdateDisplayValue();
     }
 
     get Unit() {
@@ -887,6 +915,26 @@ class UINumberWithMeasurement extends UITemplate {
         }
     }
 
+    UpdateDisplayValue() {
+        const displayValue = this.ValueToDisplayValue(this._value);
+        if(displayValue !== undefined)
+            this.DisplayValue.Value = displayValue;
+        const displayMin = this.ValueToDisplayValue(this._min);
+        if(displayMin !== undefined)
+            this.DisplayValue.Min = displayMin;
+        const displayMax = this.ValueToDisplayValue(this._max);
+        if(displayMax !== undefined)
+            this.DisplayValue.Max = displayMax;
+        const displayStep = this.ValueToDisplayValue(this._step);
+        if(displayStep !== undefined)
+            this.DisplayValue.Step = displayStep;
+    }
+
+    ValueToDisplayValue(value) {
+        if(value !== undefined && this.Unit)
+            return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
+    }
+
     constructor(prop) {
         super();
         var thisClass = this;
@@ -894,15 +942,14 @@ class UINumberWithMeasurement extends UITemplate {
             Measurement : prop?.Measurement,
             MeasurementIndex: prop?.MeasurementIndex,
             OnChange: function() {
-                if(thisClass.Unit)
-                    thisClass.DisplayValue.Value = (thisClass.Value * thisClass.Unit.DisplayMultiplier + thisClass.Unit.DisplayOffset);
+                thisClass.UpdateDisplayValue()
             }
         });
         this.DisplayValue = new UINumber({
             ExcludeFromOnChange: true,
             OnChange: function() {
-                if(thisClass.Unit)
-                    thisClass.Value = (thisClass.DisplayValue.Value - thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
+                if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
+                    thisClass.Value = (thisClass.DisplayValue.Value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
             }
         });
         this.DisplayValue.GUID = this.GUID;
