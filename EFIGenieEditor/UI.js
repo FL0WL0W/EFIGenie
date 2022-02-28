@@ -858,12 +858,14 @@ class UIMeasurement {
     }
 
     GetHtml() {
-        let html = `<div style="display: ${this._hidden? `none` : `inline-block`}; cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
+        let html = `<div style="display: ${this._hidden? `none` : `inline-block`};${Measurements[this._measurement]?.length > 1? ` cursor: pointer;` : ``}" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
 <div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
 
-        for(let i=0; i<Measurements[this._measurement]?.length; i++) {
-            const measurementName = Measurements[this._measurement][i].Name;
-            html += `<div class="w3-bar-item w3-button" data-unitname="${measurementName}">${measurementName}</div>`;
+        if(Measurements[this._measurement]?.length > 1) {
+            for(let i=0; i<Measurements[this._measurement]?.length; i++) {
+                const measurementName = Measurements[this._measurement][i].Name;
+                html += `<div class="w3-bar-item w3-button" data-unitname="${measurementName}">${measurementName}</div>`;
+            }
         }
 
         return `${html}</div>`
