@@ -684,7 +684,7 @@ class CalculationOrVariableSelection extends UITemplate {
         var thisClass = this;
         this.LiveUpdate = new DisplayLiveUpdate({
             Measurement: prop?.Measurement,
-            MeasurementIndex: prop?.MeasurementIndex
+            MeasurementUnitName: prop?.MeasurementUnitName
         });
         this.Selection = new UISelection({
             Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
@@ -764,7 +764,7 @@ class CalculationOrVariableSelection extends UITemplate {
                             ReferenceName: this.ReferenceName,
                             SaveValue: saveValue.Values[i],
                             Measurement: this._measurement,
-                            MeasurementIndex: this.MeasurementIndex
+                            MeasurementUnitName: this.MeasurementUnitName
                         }));
                     }
                 }
@@ -840,7 +840,7 @@ class CalculationOrVariableSelection extends UITemplate {
                     YLabel: this.YLabel,
                     ReferenceName: this.ReferenceName,
                     Measurement: this._measurement,
-                    MeasurementIndex: this.MeasurementIndex
+                    MeasurementUnitName: this.MeasurementUnitName
                 }));
                 return this.ConfigValues.length-1;
             }
@@ -877,12 +877,12 @@ class Calculation_Operation extends UITemplate {
             Configs:            prop.Configs,
             Label:              `Base`,
             Measurement:        prop?.Measurement,
-            MeasurementIndex:   prop?.MeasurementIndex
+            MeasurementUnitName:   prop?.MeasurementUnitName
         });
         this.SubOperation = [new CalculationOrVariableSelection({
             Configs:            prop.Configs,
             Measurement:        prop?.Measurement,
-            MeasurementIndex:   prop?.MeasurementIndex,
+            MeasurementUnitName:   prop?.MeasurementUnitName,
             Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
         })];
         this.OperationSelection = [new UISelection({
@@ -903,7 +903,7 @@ class Calculation_Operation extends UITemplate {
         })];
         this.LiveUpdate = new DisplayLiveUpdate({
             Measurement: prop?.Measurement,
-            MeasurementIndex: prop?.MeasurementIndex
+            MeasurementUnitName: prop?.MeasurementUnitName
         });
         this.Setup(prop)
     }

@@ -800,22 +800,19 @@ class UIMeasurement {
     set Value(value) {
         if(value === undefined)
             return;
-        var val = parseInt(value);
-        if(isNaN(val))
-            debugger;
-        if(this._value === val)
+        if(this._value === value)
             return;
 
-        this._value = val;
+        this._value = value;
         $(`[id="${this.GUID}"]`).html(GetUnitDisplay(this._measurement, this._value));
         this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 
     constructor(prop) {
-        if(prop?.Measurement && prop?.MeasurementIndex !== undefined) {
+        if(prop?.Measurement && prop?.MeasurementUnitName !== undefined) {
             this.Measurement = prop.Measurement;
-            this.MeasurementIndex = prop.MeasurementIndex;
-            this.Default = this.MeasurementIndex;
+            this.MeasurementUnitName = prop.MeasurementUnitName;
+            this.Default = this.MeasurementUnitName;
         }
         Object.assign(this, prop);
         if(!Array.isArray(this.OnChange))
@@ -843,7 +840,7 @@ class UIMeasurement {
         });
 
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-contextmenu div`, function(e){
-            thisClass.Value = $(this).data(`index`);
+            thisClass.Value = $(this).data(`unitname`);
             $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
         });
 
@@ -862,7 +859,8 @@ class UIMeasurement {
 <div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
 
         for(let i=0; i<Measurements[this._measurement]?.length; i++) {
-            html += `<div class="w3-bar-item w3-button" data-index="${i}">${Measurements[this._measurement][i].Name}</div>`;
+            const measurementName = Measurements[this._measurement][i].Name;
+            html += `<div class="w3-bar-item w3-button" data-unitname="${measurementName}">${measurementName}</div>`;
         }
 
         return `${html}</div>`
@@ -872,14 +870,14 @@ class UIMeasurement {
 class UINumberWithMeasurement extends UITemplate {
     static Template = `$DisplayValue$$DisplayMeasurement$`
 
-    get MeasurementIndex() {
+    get MeasurementUnitName() {
         return this.DisplayMeasurement.Value;
     }
-    set MeasurementIndex(measurementIndex) {
-        if(this.DisplayMeasurement.Value = measurementIndex)
+    set MeasurementUnitName(measurementUnitName) {
+        if(this.DisplayMeasurement.Value = measurementUnitName)
             return;
 
-        this.DisplayMeasurement.Value = measurementIndex;
+        this.DisplayMeasurement.Value = measurementUnitName;
         this.UpdateDisplayValue();
     }
 
@@ -950,11 +948,7 @@ class UINumberWithMeasurement extends UITemplate {
     }
 
     get Unit() {
-        if(this.Measurement) {
-            const measurementIndex = this.MeasurementIndex ?? 0;
-            const measurement = Measurements[this.Measurement];
-            return measurement?.[measurementIndex];
-        }
+        return GetUnit(this.Measurement, this.MeasurementUnitName)
     }
 
     constructor(prop) {
@@ -962,7 +956,7 @@ class UINumberWithMeasurement extends UITemplate {
         var thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
-            MeasurementIndex: prop?.MeasurementIndex,
+            MeasurementUnitName: prop?.MeasurementUnitName,
             OnChange: function() {
                 thisClass.UpdateDisplayValue()
             }
@@ -983,13 +977,13 @@ class UINumberWithMeasurement extends UITemplate {
             return this.Value;
 
         return {
-            MeasurementIndex: this.DisplayMeasurement.SaveValue,
+            MeasurementUnitName: this.DisplayMeasurement.SaveValue,
             Value: this.Value
         };
     }
     set SaveValue(saveValue){
         if(typeof saveValue === `object`) {
-            this.DisplayMeasurement.SaveValue = saveValue?.MeasurementIndex;
+            this.DisplayMeasurement.SaveValue = saveValue?.MeasurementUnitName;
             this.Value = saveValue?.Value;
         } else {
             this.Value = saveValue;
@@ -1020,11 +1014,11 @@ class UINumberWithMeasurement extends UITemplate {
 class DisplayNumberWithMeasurement extends UITemplate {
     static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
 
-    get MeasurementIndex() {
+    get MeasurementUnitName() {
         return this.DisplayMeasurement.Value;
     }
-    set MeasurementIndex(measurementIndex) {
-        this.DisplayMeasurement.Value = measurementIndex;
+    set MeasurementUnitName(measurementUnitName) {
+        this.DisplayMeasurement.Value = measurementUnitName;
         if(this.Unit)
             this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
     }
@@ -1054,7 +1048,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
         var thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
-            MeasurementIndex: prop?.MeasurementIndex,
+            MeasurementUnitName: prop?.MeasurementUnitName,
             OnChange: function() {
                 thisClass.UpdateDisplayValue();
                 thisClass.ZeroesToAdd = 10000000;
@@ -1073,7 +1067,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
     }
 
     UpdateDisplayValue() {
-        var unit = Measurements[this.Measurement]?.[this.MeasurementIndex];
+        let unit = GetUnit(this.Measurement, this.MeasurementUnitName)
         if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
 

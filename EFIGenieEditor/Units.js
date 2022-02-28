@@ -64,7 +64,11 @@ function GetMeasurementDisplay(measurement, index) {
     return measurement[index].Name;
 }
 
-function GetUnitDisplay(measurement, index) {
+function GetUnitDisplay(measurement, name) {
+    return GetUnit(measurement, name).Name;
+}
+
+function GetUnit(measurement, name) {
     if(typeof measurement === `string`) {
         measurement = Measurements[measurement];
     }
@@ -72,13 +76,21 @@ function GetUnitDisplay(measurement, index) {
     if(!measurement)
         return ``;
     
-    if(!index)
-        index = 0;
-
-    if(index >= measurement.length)
+    if(measurement.length < 1)
         return ``;
+
+    let index = 0
+
+    if(name) {
+        for(let i=0; i<measurement.length; i++){
+            if(measurement[i].Name === name) {
+                index = i;
+                break;
+            }
+        }
+    }
         
-    return measurement[index].Name;
+    return measurement[index];
 }
 
 function GetDefaultUnitIndex(measurement) {

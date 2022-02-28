@@ -558,7 +558,7 @@ class ConfigFuel extends UITemplate {
             Label:              `Injector Pulse Width`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Pulse Width`,
-            MeasurementIndex: 1
+            MeasurementUnitName:`ms`
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
@@ -699,14 +699,14 @@ class ConfigIgnition extends UITemplate {
             Label:              `Ignition Dwell`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell`,
-            MeasurementIndex: 1
+            MeasurementUnitName:`ms`
         });
         this.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
             Label:              `Ignition Dwell Deviation`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
-            MeasurementIndex: 1
+            MeasurementUnitName:`ms`
         });
         this.Outputs = [];
         for(var i = 0; i < 8; i++){
@@ -991,11 +991,11 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
     constructor(prop) {
         super();
         this.CylinderVolume = new UINumberWithMeasurement({
-            Value:          0.66594,
-            Step:           0.001,
-            Min:            0.001,
-            Measurement:    `Volume`,
-            MeasurementIndex: 1
+            Value:              0.66594,
+            Step:               0.001,
+            Min:                0.001,
+            Measurement:        `Volume`,
+            MeasurementUnitName:`mL`
         });
         this.Setup(prop);
     }
@@ -1039,13 +1039,13 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
             Label:              `Injector Dead Time`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Dead Time`,
-            MeasurementIndex: 1
+            MeasurementUnitName:`ms`
         });
         this.MinInjectorFuelMass = new UINumberWithMeasurement({
-            Value:          0.005,
-            Step:           0.001,
-            Measurement:    `Mass`,
-            MeasurementIndex: 1
+            Value:              0.005,
+            Step:               0.001,
+            Measurement:        `Mass`,
+            MeasurementUnitName:`g`
         });
         this.Setup(prop);
     }
