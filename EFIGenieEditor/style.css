@@ -395,6 +395,9 @@ select:hover {
   }
 
 
+.gpiooverlay {
+    margin-left: 150px;
+}
 .gpiooverlayselect {
     position: absolute; 
     margin: 0;
@@ -402,7 +405,7 @@ select:hover {
 select.gpiooverlayselect {
     margin: 0;
     padding: 0;
-    width: auto;
+    width: 150px;
 }
 select .pinconflict{
     background-color:rgb(255, 0, 0);

@@ -8,6 +8,9 @@ class UITemplate {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}-TemplateSpan"]`).hide();
@@ -216,6 +219,9 @@ class UINumber {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}"]`).hide();
@@ -344,6 +350,9 @@ class UICheckbox {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}"]`).hide();
@@ -423,6 +432,9 @@ class UIText {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}"]`).hide();
@@ -532,6 +544,9 @@ class UISelection {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}"]`).hide();
@@ -697,6 +712,9 @@ class UIDialog {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}-open"]`).hide();
@@ -748,6 +766,9 @@ class UIMeasurement {
         return this._hidden;
     }
     set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
         this._hidden = hidden;
         if(hidden) {
             $(`[id="${this.GUID}"]`).hide();
@@ -915,26 +936,6 @@ class UINumberWithMeasurement extends UITemplate {
         }
     }
 
-    UpdateDisplayValue() {
-        const displayValue = this.ValueToDisplayValue(this._value);
-        if(displayValue !== undefined)
-            this.DisplayValue.Value = displayValue;
-        const displayMin = this.ValueToDisplayValue(this._min);
-        if(displayMin !== undefined)
-            this.DisplayValue.Min = displayMin;
-        const displayMax = this.ValueToDisplayValue(this._max);
-        if(displayMax !== undefined)
-            this.DisplayValue.Max = displayMax;
-        const displayStep = this.ValueToDisplayValue(this._step);
-        if(displayStep !== undefined)
-            this.DisplayValue.Step = displayStep;
-    }
-
-    ValueToDisplayValue(value) {
-        if(value !== undefined && this.Unit)
-            return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
-    }
-
     constructor(prop) {
         super();
         var thisClass = this;
@@ -973,6 +974,26 @@ class UINumberWithMeasurement extends UITemplate {
             this.Value = saveValue;
         }
     }
+
+    UpdateDisplayValue() {
+        const displayValue = this.ValueToDisplayValue(this._value);
+        if(displayValue !== undefined)
+            this.DisplayValue.Value = displayValue;
+        const displayMin = this.ValueToDisplayValue(this._min);
+        if(displayMin !== undefined)
+            this.DisplayValue.Min = displayMin;
+        const displayMax = this.ValueToDisplayValue(this._max);
+        if(displayMax !== undefined)
+            this.DisplayValue.Max = displayMax;
+        const displayStep = this.ValueToDisplayValue(this._step);
+        if(displayStep !== undefined)
+            this.DisplayValue.Step = displayStep;
+    }
+
+    ValueToDisplayValue(value) {
+        if(value !== undefined && this.Unit)
+            return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
+    }
 }
 
 class DisplayNumberWithMeasurement extends UITemplate {
@@ -996,6 +1017,17 @@ class DisplayNumberWithMeasurement extends UITemplate {
             this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
     }
 
+    get Value() { 
+        return this._value;
+    }
+    set Value(value) {
+        if(value === this._value)
+            return;
+
+        this._value = value;
+        this.UpdateDisplayValue();
+    }
+
     constructor(prop) {
         super();
         var thisClass = this;
@@ -1009,6 +1041,13 @@ class DisplayNumberWithMeasurement extends UITemplate {
         this.Setup(prop);
         this.UpdateDisplayValue();
         this.ZeroesToAdd = 10000000;
+    }
+
+    get SaveValue() {
+        return this.DisplayMeasurement.SaveValue;
+    }
+    set SaveValue(saveValue) {
+        this.DisplayMeasurement.SaveValue = saveValue;
     }
 
     UpdateDisplayValue() {
@@ -1028,12 +1067,5 @@ class DisplayNumberWithMeasurement extends UITemplate {
         for(var i = 0; i < zeroesToAdd; i++)
             displayValue += `0`
         $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
-    }
-
-    get SaveValue() {
-        return this.DisplayMeasurement.SaveValue;
-    }
-    set SaveValue(saveValue) {
-        this.DisplayMeasurement.SaveValue = saveValue;
     }
 }

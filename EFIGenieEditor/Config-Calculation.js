@@ -971,7 +971,6 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
                 if(CurrentVariableValues[variableId] !== undefined) {
                     thisClass.SuperHidden = false;
                     thisClass.Value = CurrentVariableValues[variableId];
-                    thisClass.UpdateDisplayValue();
                     if(!thisClass.SuperHidden) {
                         if(thisClass.SuperHidden)
                             thisClass.SuperHidden = false;

@@ -83,8 +83,7 @@
         </script>
         <meta name="viewport" content="width=600, initial-scale=1">
     </head>
-    <body>
-        <div>
+        <div style="position: fixed; background-color: #121619; z-index: 100; width: 100%; height: 57px;">
             <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
             <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
             <input id="btnSaveCompressed" type="button" class="w3-button w3-padding-16" value="Save Compressed">
@@ -94,6 +93,6 @@
             </select>
         </div>
         <div id="overlay"></div>
-        <div id="workspace"></div>
+        <div id="workspace" style="position: absolute; top: 57px;"></div>
     </body>
 </html>
