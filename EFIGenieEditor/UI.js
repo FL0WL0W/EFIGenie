@@ -1069,3 +1069,144 @@ class DisplayNumberWithMeasurement extends UITemplate {
         $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
     }
 }
+
+class DisplayGauge {
+    GUID = generateGUID();
+
+    _hidden = false;
+    get Hidden() {
+        return this._hidden;
+    }
+    set Hidden(hidden) {
+        if(this._hidden === hidden)
+            return;
+            
+        this._hidden = hidden;
+        if(hidden) {
+            $(`[id="${this.GUID}"]`).hide();
+        } else {
+            $(`[id="${this.GUID}"]`).show();
+        }
+    }
+
+    _class = undefined;
+    get Class() {
+        return this._class
+    }
+    set Class(pclass) {
+        if(this._class === pclass)
+            return;
+
+        this._class = pclass;
+        $(`[id="${this.GUID}"]`).removeClass();
+        $(`[id="${this.GUID}"]`).addClass(pclass);
+    }
+
+    _min = 0;
+    get Min() {
+        return this._min
+    }
+    set Min(min) {
+        if(this._min === min)
+            return;
+
+        this._min = min;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    _label = ``;
+    get Label() {
+        return this._label
+    }
+    set Label(label) {
+        if(this._label === label)
+            return;
+
+        this._label = label;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    _max = 100;
+    get Max() {
+        return this._max
+    }
+    set Max(max) {
+        if(this._max === max)
+            return;
+
+        this._max = max;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    _step = 10;
+    get Step() {
+        return this._step
+    }
+    set Step(step) {
+        if(this._step === step)
+            return;
+            
+        this._step = step;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    _value = 0;
+    get Value() {
+        return this._value;
+    }
+    set Value(value) {
+        if(value === undefined)
+            return;
+
+        var val = parseFloat(value);
+        if(this._value === val) 
+            return;
+
+        this._value = val;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    _gaugeHTML;
+    get GaugeHTML() {
+        return this._gaugeHTML;
+    }
+    set GaugeHTML(gaugeHTML) {
+        if(objectTester(gaugeHTML, this._gaugeHTML))
+            return;
+
+        this._gaugeHTML = gaugeHTML;
+        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
+    }
+
+    constructor(prop) {
+        Object.assign(this, prop);
+    }
+
+    GetHtml() {
+        var html = `<div id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``}`;
+
+        if(this._class !== undefined)
+            html += ` class="${this._class}"`;
+
+        return `${html}>${this.GaugeHTML?.(this)}</div>`;
+    }
+}
+
+Gauges = {
+    Dial: function({Label, Value, Step, Min, Max}) { 
+        let gauge = `<div class="gauge">
+<div class="tick-circle"><div class="tick-circle-inner"></div></div>`;
+        let steps = (Max - Min) / Step;
+        gauge += `<div class="tick min" style="--gauge-tick-deg:0deg;"></div>`
+        gauge += `<div class="text" style="--gauge-text-deg:0deg;">${Min}</div>`
+        for(let i = 1; (i+0.01) < steps; i++) {
+            gauge += `<div class="tick" style="--gauge-tick-deg:${270 * i / steps}deg;"></div>`
+            gauge += `<div class="text" style="--gauge-text-deg:${270 * i / steps}deg;">${Step * i + Min}</div>`
+        }
+        gauge += `<div class="tick max" style="--gauge-tick-deg:270deg;"></div>`
+        gauge += `<div class="text" style="--gauge-text-deg:270deg;">${Max}</div>`
+        gauge += `<div class="needle" style="--gauge-value-deg:${Value * 270 / (Max - Min)}deg;"></div>`
+        gauge += `<div class="value">${Label}</div>`
+        return `${gauge}</div>`;
+    }
+}

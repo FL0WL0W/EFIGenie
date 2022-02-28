@@ -19,12 +19,20 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
         <script type="text/javascript">
+            var gauge = new DisplayGauge({
+                Value: 50,
+                Min: 0,
+                Max: 100,
+                Step: 10,
+                Label: `poo`,
+                GaugeHTML: Gauges.Dial
+            });
             var b = new ConfigTop();
             var configJsonName = `tune.json`
             $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
                 b.SaveValue = parseObject(config);
-                $(`#workspace`).html(b.GetHtml());
+                // $(`#workspace`).html(b.GetHtml());
                 $(`#btnLoad`).val(undefined);
             };
             $(document).ready(function() {
@@ -34,7 +42,8 @@
                 } else {
                     b.RegisterVariables();
                 }
-                $(`#workspace`).html(b.GetHtml());
+                // $(`#workspace`).html(b.GetHtml());
+                $(`#workspace`).html(gauge.GetHtml());
                 b.Attach();
                 $(`#btnSave`).click(function(){
                     var cfg = b.SaveValue;
