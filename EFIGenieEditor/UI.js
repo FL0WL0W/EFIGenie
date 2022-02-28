@@ -833,18 +833,39 @@ class UIMeasurement {
 
     Attach() {
         this.Detach();
+        const thisClass = this;
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(){
-            alert(`click`);
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e){
+            $(`[id="${thisClass.GUID}-contextmenu"]`).show();
+            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`left`, `${e.pageX}px`);
+            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`top` , `${e.pageY}px`);
+            e.preventDefault();
+        });
+
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-contextmenu div`, function(e){
+            thisClass.Value = $(this).data(`index`);
+            $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
+        });
+
+        $(document).on(`mouseup.${this.GUID}`, function(e){
+            $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
         });
     }
 
     Detach() {
         $(document).off(`click.${this.GUID}`);
+        $(document).off(`mouseup.${this.GUID}`);
     }
 
     GetHtml() {
-        return `<div style="display: ${this._hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>`;
+        let html = `<div style="display: ${this._hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
+<div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
+
+        for(let i=0; i<Measurements[this._measurement]?.length; i++) {
+            html += `<div class="w3-bar-item w3-button" data-index="${i}">${Measurements[this._measurement][i].Name}</div>`;
+        }
+
+        return `${html}</div>`
     }
 }
 
@@ -1036,6 +1057,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
             MeasurementIndex: prop?.MeasurementIndex,
             OnChange: function() {
                 thisClass.UpdateDisplayValue();
+                thisClass.ZeroesToAdd = 10000000;
             }
         });
         this.Setup(prop);
