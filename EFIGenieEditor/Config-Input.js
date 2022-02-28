@@ -153,7 +153,8 @@ function GetNameFromPinSelectElement(element){
 //The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
 function GenerateOverlay() {
     var pinSelectElements = ParsePinSelectElements($(`.pinselect`));
-    var ret = `<div style="width: ${PinOut.OverlayWidth}; margin: auto; position: relative;"><img src="${PinOut.Overlay}"></img>`;
+    let scale = 700 / (PinOut.OverlayWidth + 300);
+    var ret = `<div style="width: ${PinOut.OverlayWidth + 300}px; position: relative; transform-origin: top left; transform: scale(${scale}););"><img src="${PinOut.Overlay}" style="position: absolute; left: 150px;"></img><br>`;
     for(var i = 0; i < PinOut.Pins.length; i++) {
         var selectCount = 0;
         var sel = ``;
@@ -182,7 +183,7 @@ function GenerateOverlay() {
         sel = `<select class="gpiooverlayselect${selectCount > 1? ` pinconflict` : ``}" data-pin="${PinOut.Pins[i].Value}" style="` +
             `; height: ${PinOut.OverlayElementHeight}` + 
             `; top: ${PinOut.Pins[i].OverlayY - PinOut.OverlayElementHeight / 2}`+ 
-            `; ${PinOut.Pins[i].Align}: ${PinOut.Pins[i].OverlayX};">` +
+            `; left: ${PinOut.Pins[i].Align === `left`? PinOut.Pins[i].OverlayX + 150: PinOut.OverlayWidth - PinOut.Pins[i].OverlayX}px;">` +
             `<option value="" disabled ${selectCount != 1? `selected` : ``}>select</option>${sel}</select>`;
 
         ret += sel;
@@ -192,6 +193,7 @@ function GenerateOverlay() {
 
 function UpdateOverlay() {
     $(`.gpiooverlay`).html(GenerateOverlay());
+    $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
 }
 
 //if any changes are needed in ConfigInputs, refactor to use UITemplate

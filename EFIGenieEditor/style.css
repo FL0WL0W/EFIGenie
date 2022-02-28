@@ -394,14 +394,9 @@ select:hover {
   }
 
 
-.gpiooverlay {
-    margin-left: 150px;
-}
-.gpiooverlayselect {
+select.gpiooverlayselect {
     position: absolute; 
     margin: 0;
-}
-select.gpiooverlayselect {
     margin: 0;
     padding: 0;
     width: 150px;
