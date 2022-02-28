@@ -833,9 +833,12 @@ class UIMeasurement {
         const thisClass = this;
         
         $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e){
+            var relativeX = (e.pageX - window.scrollX),
+                relativeY = (e.pageY - window.scrollY);
+
             $(`[id="${thisClass.GUID}-contextmenu"]`).show();
-            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`left`, `${e.pageX}px`);
-            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`top` , `${e.pageY}px`);
+            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`left`, `${relativeX}px`);
+            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`top` , `${relativeY}px`);
             e.preventDefault();
         });
 
@@ -855,7 +858,7 @@ class UIMeasurement {
     }
 
     GetHtml() {
-        let html = `<div style="display: ${this._hidden? `none` : `inline-block`};" cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
+        let html = `<div style="display: ${this._hidden? `none` : `inline-block`}; cursor: pointer;" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
 <div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
 
         for(let i=0; i<Measurements[this._measurement]?.length; i++) {

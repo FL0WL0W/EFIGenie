@@ -293,9 +293,12 @@ class ConfigInputs {
         });
                 
         $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-inputs div`, function(e){
+            var relativeX = (e.pageX - window.scrollX),
+                relativeY = (e.pageY - window.scrollY);
+
             $(`#${thisClass.GUID}-contextmenu`).show();
-            $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${e.pageX}px`);
-            $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${e.pageY}px`);
+            $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${relativeX}px`);
+            $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${relativeY}px`);
             thisClass.ContextSelect = $(this).data(`index`);
             $(this).addClass(`active`);
             
@@ -389,7 +392,7 @@ class ConfigInputs {
         }
         if(this.Inputs.length === 0){
             this.ContextSelect = -1;
-            inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>Add</div>`;
+            inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
         }
         return `<div id="${this.GUID}-inputs">${inputlist}</div>`;
     }
