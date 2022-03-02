@@ -695,8 +695,7 @@ class UITable extends Table {
         if(saveValue.MaxY !== undefined && this.MaxYModifiable)
             this.MaxY = saveValue.MaxY;
 
-        $(`#${this.GUID}-table`).replaceWith(this.GetTable());
-        this.OnChange.forEach(function(OnChange) { OnChange(); });
+        this.TableValueUpdate();
     }
 }
 
