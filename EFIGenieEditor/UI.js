@@ -836,6 +836,10 @@ class UIMeasurement {
                 relativeY = (e.pageY - window.scrollY);
 
             $(`[id="${thisClass.GUID}-contextmenu"]`).show();
+            $(document).on(`mouseup.${this.GUID}`, function(e){
+                $(document).off(`mouseup.${thisClass.GUID}`)
+                $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
+            });
             $(`[id="${thisClass.GUID}-contextmenu"]`).css(`left`, `${relativeX}px`);
             $(`[id="${thisClass.GUID}-contextmenu"]`).css(`top` , `${relativeY}px`);
             e.preventDefault();
@@ -843,10 +847,6 @@ class UIMeasurement {
 
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-contextmenu div`, function(e){
             thisClass.Value = $(this).data(`unitname`);
-            $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
-        });
-
-        $(document).on(`mouseup.${this.GUID}`, function(e){
             $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
         });
     }
