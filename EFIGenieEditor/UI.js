@@ -661,11 +661,9 @@ class UITable extends Table {
     get SaveValue() {
         return {
             Value: this.Value,
-            MinX: this.MinXModifiable? this.MinX : undefined,
-            MaxX: this.MaxXModifiable? this.MaxX : undefined,
+            XAxis: this.XAxisModifiable? this.XAxis : undefined,
             XResolution: this.XResolutionModifiable? this.XResolution : undefined,
-            MinY: this.MinYModifiable? this.MinY : undefined,
-            MaxY: this.MaxYModifiable? this.MaxY : undefined,
+            YAxis: this.YAxisModifiable? this.YAxis : undefined,
             YResolution: this.YResolutionModifiable? this.YResolution : undefined,
         };
     }
@@ -686,14 +684,25 @@ class UITable extends Table {
         }
         if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
             this.Value = saveValue.Value;
-        if(saveValue.MinX !== undefined && this.MinXModifiable)
-            this.MinX = saveValue.MinX;
-        if(saveValue.MaxX !== undefined && this.MaxXModifiable)
-            this.MaxX = saveValue.MaxX;
-        if(saveValue.MinY !== undefined && this.MinYModifiable)
-            this.MinY = saveValue.MinY;
-        if(saveValue.MaxY !== undefined && this.MaxYModifiable)
-            this.MaxY = saveValue.MaxY;
+
+        if(saveValue.XAxis !== undefined && this.XAxisModifiable)
+            this.XAxis = saveValue.XAxis;
+        if(saveValue.yAxis !== undefined && this.YAxisModifiable)
+            this.YAxis = saveValue.YAxis;
+
+
+        if(saveValue.MaxX !== undefined && saveValue.MinX !== undefined && this.XAxisModifiable) {
+            const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (this.XResolution - 1);
+            for(let x=0; x<this.XResolution; x++){
+                this.XAxis[x] = saveValue.MinX + xAxisAdd * x;
+            }
+        }
+        if(saveValue.MaxY !== undefined && saveValue.MinY !== undefined && this.YAxisModifiable) {
+            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (this.YResolution - 1);
+            for(let y=0; y<this.YResolution; y++){
+                this.YAxis[y] = saveValue.MinY + yAxisAdd * y;
+            }
+        }
 
         this.TableValueUpdate();
     }

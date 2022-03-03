@@ -298,8 +298,8 @@ class Calculation_LookupTable extends UITemplate {
         var objOperation = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-                { type: `FLOAT`, value: table.MinX }, //MinXValue
-                { type: `FLOAT`, value: table.MaxX }, //MaxXValue
+                { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
+                { type: `FLOAT`, value: table.XAxis[table.XResolution-1] }, //MaxXValue
                 { type: `UINT8`, value: table.XResolution }, //XResolution
                 { type: `UINT8`, value: typeId }, //Type
                 { type: type, value: tableValue }, //Table
@@ -476,10 +476,10 @@ class Calculation_2AxisTable extends UITemplate {
         var objOperation = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-                { type: `FLOAT`, value: table.MinX }, //MinXValue
-                { type: `FLOAT`, value: table.MaxX }, //MaxXValue
-                { type: `FLOAT`, value: table.MinY }, //MinYValue
-                { type: `FLOAT`, value: table.MaxY }, //MaxYValue
+                { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
+                { type: `FLOAT`, value: table.XAxis[table.XResolution-1] }, //MaxXValue
+                { type: `FLOAT`, value: table.YAxis[0] }, //MinYValue
+                { type: `FLOAT`, value: table.YAxis[table.YResolution-1] }, //MaxYValue
                 { type: `UINT8`, value: table.XResolution }, //XResolution
                 { type: `UINT8`, value: table.YResolution }, //YResolution
                 { type: `UINT8`, value: typeId }, //Type
