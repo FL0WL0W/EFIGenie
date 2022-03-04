@@ -244,6 +244,7 @@ class Calculation_LookupTable extends UITemplate {
     }
     set NoParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
+            this.ParameterReference = undefined;
             this.ParameterSelection = undefined;
             this.Table.XLabel = this.XLabel;
             return;
@@ -254,6 +255,7 @@ class Calculation_LookupTable extends UITemplate {
             this.ParameterSelection = new UISelection({
                 Options: GetSelections(),
                 OnChange: function() {
+                    thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
                 }
             });
@@ -287,6 +289,23 @@ class Calculation_LookupTable extends UITemplate {
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);
+    }
+
+    Attach() {
+        super.Attach();
+        const thisClass = this
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.ParameterReference) { 
+                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.ParameterReference);
+                if(CurrentVariableValues[parameterVariableId] !== undefined) {
+                    thisClass.Table.Trail(CurrentVariableValues[parameterVariableId])
+                } 
+            }
+        };
+    }
+    Detach() {
+        super.Detach();
+        delete LiveUpdateEvents[this.GUID];
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
@@ -325,6 +344,8 @@ class Calculation_LookupTable extends UITemplate {
 
     RegisterVariables() {
         this.XOptions = GetSelections();
+        if(VariablesToPoll.indexOf(this.ParameterReference) === -1)
+            VariablesToPoll.push(this.ParameterReference);
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
@@ -404,6 +425,8 @@ class Calculation_2AxisTable extends UITemplate {
     }
     set NoParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
+            this.XReference = undefined;
+            this.YReference = undefined;
             this.XSelection = undefined;
             this.YSelection = undefined;
             this.Table.XLabel = this.XLabel;
@@ -416,6 +439,7 @@ class Calculation_2AxisTable extends UITemplate {
             this.XSelection = new UISelection({
                 Options: GetSelections(),
                 OnChange: function() {
+                    thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
                 }
             });
@@ -425,6 +449,7 @@ class Calculation_2AxisTable extends UITemplate {
             this.YSelection = new UISelection({
                 Options: GetSelections(),
                 OnChange: function() {
+                    thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
                     thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
                 }
             });
@@ -465,6 +490,24 @@ class Calculation_2AxisTable extends UITemplate {
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);
+    }
+
+    Attach() {
+        super.Attach();
+        const thisClass = this
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.XReference && thisClass.YReference) { 
+                const xVariableId = VariableMetadata.GetVariableId(thisClass.XReference);
+                const yVariableId = VariableMetadata.GetVariableId(thisClass.YReference);
+                if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
+                    thisClass.Table.Trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
+                } 
+            }
+        };
+    }
+    Detach() {
+        super.Detach();
+        delete LiveUpdateEvents[this.GUID];
     }
 
     GetObjOperation(outputVariableId, xVariableId, yVariableId) {
@@ -513,6 +556,10 @@ class Calculation_2AxisTable extends UITemplate {
     RegisterVariables() {
         this.XOptions = GetSelections();
         this.YOptions = GetSelections();
+        if(VariablesToPoll.indexOf(this.XReference) === -1)
+            VariablesToPoll.push(this.XReference);
+        if(VariablesToPoll.indexOf(this.YReference) === -1)
+            VariablesToPoll.push(this.YReference);
     }
 }
 GenericConfigs.push(Calculation_2AxisTable);
@@ -960,7 +1007,7 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
 
     Attach() {
         super.Attach();
-        var thisClass = this
+        const thisClass = this
         if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
             VariablesToPoll.push(thisClass.VariableReference)
         LiveUpdateEvents[this.GUID] = function() {
