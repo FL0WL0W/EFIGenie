@@ -682,14 +682,6 @@ class UITable extends Table {
             if(this.YResolutionModifiable && !this.XResolutionModifiable)
                 this.YResolution = saveValue.Resolution;
         }
-        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
-            this.Value = saveValue.Value;
-
-        if(saveValue.XAxis !== undefined && this.XAxisModifiable)
-            this.XAxis = saveValue.XAxis;
-        if(saveValue.yAxis !== undefined && this.YAxisModifiable)
-            this.YAxis = saveValue.YAxis;
-
 
         if(saveValue.MaxX !== undefined && saveValue.MinX !== undefined && this.XAxisModifiable) {
             const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (this.XResolution - 1);
@@ -704,7 +696,13 @@ class UITable extends Table {
             }
         }
 
-        this.TableValueUpdate();
+        if(saveValue.XAxis !== undefined && this.XAxisModifiable)
+            this.XAxis = saveValue.XAxis;
+        if(saveValue.yAxis !== undefined && this.YAxisModifiable)
+            this.YAxis = saveValue.YAxis;
+
+        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
+            this.Value = saveValue.Value;
     }
 }
 
