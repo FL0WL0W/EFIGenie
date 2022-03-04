@@ -673,14 +673,14 @@ class UITable extends Table {
             return;
 
         if(saveValue.XResolution !== undefined && this.XResolutionModifiable)
-            this.XResolution = saveValue.XResolution;
+            this._xResolution = saveValue.XResolution;
         if(saveValue.YResolution !== undefined && this.YResolutionModifiable)
-            this.YResolution = saveValue.YResolution;
+            this._yResolution = saveValue.YResolution;
         if(saveValue.Resolution !== undefined) {
             if(this.XResolutionModifiable && !this.YResolutionModifiable)
-                this.XResolution = saveValue.Resolution;
+                this._xResolution = saveValue.Resolution;
             if(this.YResolutionModifiable && !this.XResolutionModifiable)
-                this.YResolution = saveValue.Resolution;
+                this._yResolution = saveValue.Resolution;
         }
 
         if(saveValue.MaxX !== undefined && saveValue.MinX !== undefined && this.XAxisModifiable) {
