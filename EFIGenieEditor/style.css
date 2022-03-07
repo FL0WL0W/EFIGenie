@@ -517,5 +517,5 @@ select .pinconflict{
     border-radius: 50%;
 }
 .TableParameterSelect {
-    width: 100%
+    width: auto;
 }
