@@ -257,7 +257,8 @@ class Calculation_LookupTable extends UITemplate {
                 OnChange: function() {
                     thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
-                }
+                },
+                Class: `TableParameterSelect`
             });
             this.Table.XLabel = this.ParameterSelection.GetHtml();
         }
@@ -441,7 +442,8 @@ class Calculation_2AxisTable extends UITemplate {
                 OnChange: function() {
                     thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
-                }
+                },
+                Class: `TableParameterSelect`
             });
             this.Table.XLabel = this.XSelection.GetHtml();
         }
@@ -451,7 +453,8 @@ class Calculation_2AxisTable extends UITemplate {
                 OnChange: function() {
                     thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
                     thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
-                }
+                },
+                Class: `TableParameterSelect`
             });
             this.Table.YLabel = this.YSelection.GetHtml();
         }
@@ -616,7 +619,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
             for (var i = 0; i < arr.length; i++) {
                 if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
                     arrSelections.Options.push({
-                        Name: arr[i].Name + (!measurement ? ` [${GetUnitDisplay(arr[i].Measurement)}]` : ``),
+                        Name: arr[i].Name + (!measurement ? ` [${arr[i].Measurement}]` : ``),
                         Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
                     });
                 }
