@@ -350,12 +350,33 @@ input[type="number"]:hover {
     background-color: #666;
     border-color: #3590d0;
 }
+.select .selectgroup {
+    border-top: 1px solid #505962;
+    background-color: #3590d0;
+}
+.select p {
+    white-space: normal;
+    inline-size: 200px;
+    padding: 0 0 0 2em;
+    text-indent: -1.2em;
+    margin: 0;
+    border-top: 1px solid #505962;
+    border-bottom: 1px solid transparent;
+}
+.select p:hover:not(.disabled) {
+    background-color: #666; 
+    border-color: #3590d0;
+}
 .select {
     font: bold 16px Arial;
     min-width: 200px;
+    cursor: default;
 }
 .select .context-menu {
+    border: 1px solid #505962;
     min-width: 200px;
+    max-height: 400px;
+    overflow-y: scroll;
 }
 select,
 .select {
@@ -521,4 +542,16 @@ select .pinconflict{
     width: 100%;
     height: 100%;
     border-radius: 50%;
+}
+
+::-webkit-scrollbar {
+    width: 1em;
+}
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+    background-color: #505962;
+    outline: 1px solid #1A1A20;
+    border-radius: 0.4em;
 }

@@ -607,7 +607,7 @@ class UISelection {
             if(visible) 
                 return;
 
-            $(`#${thisClass.GUID}`).append(`<div id="${thisClass.GUID}-options" class="context-menu w3-bar-block">${thisClass.GetOptionsHtml()}</div>`);
+            $(`#${thisClass.GUID}`).append(`<div id="${thisClass.GUID}-options" class="context-menu">${thisClass.GetOptionsHtml()}</div>`);
             $(document).on(`click.${thisClass.GUID}-context`, function(){
                 $(`#${thisClass.GUID}-options`).remove();
                 $(document).off(`click.${thisClass.GUID}-context`);
@@ -616,7 +616,7 @@ class UISelection {
             visible = true;
         });
         
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-options div`, function(e) {
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-options p`, function(e) {
             const t = $(this);
             const type = t.attr(`data-type`);
             if(type === undefined)
@@ -634,23 +634,23 @@ class UISelection {
                 var groupHtml = ``;
                 option.Options.forEach(option => {
                     var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
-                    groupHtml += `<div class="w3-bar-item w3-button" data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
+                    groupHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
                         `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
-                        `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</div>`;
+                        `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
                 });
 
                 if(groupHtml) 
                     optionsHtml += `<div class="selectgroup">${option.Group}</div><div>${groupHtml}</div>`;
             } else {
                 var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
-                optionsHtml += `<div class="w3-bar-item w3-button" data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
+                optionsHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
                     `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
-                    `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</div>`;
+                    `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
             }
         });
         if(!this.SelectNotVisible) {
-            optionsHtml = `<div class="w3-bar-item${this.SelectDisabled? `` : ` w3-button`}"${this.SelectValue !== undefined? ` data-type="${typeof this.SelectValue}" data-value="${this.SelectValue}"` : ``}` +
-                `>select</div>${optionsHtml}`;
+            optionsHtml = `<p ${this.SelectDisabled? ` class="disabled"` : ``}${this.SelectValue !== undefined? ` data-type="${typeof this.SelectValue}" data-value="${this.SelectValue}"` : ``}` +
+                `>select</p>${optionsHtml}`;
         }
         return optionsHtml;
     }
