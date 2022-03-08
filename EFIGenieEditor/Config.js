@@ -1039,12 +1039,6 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var numberOfOperations = 3;
-        if(!this.FlowRateConfigOrVariableSelection.IsVariable())
-            numberOfOperations++;
-        if(!this.DeadTimeConfigOrVariableSelection.IsVariable())
-            numberOfOperations++;
-
         let group = { type: `Group`, value: [
             this.FlowRateConfigOrVariableSelection.GetObjOperation(),
             this.DeadTimeConfigOrVariableSelection.GetObjOperation(),
