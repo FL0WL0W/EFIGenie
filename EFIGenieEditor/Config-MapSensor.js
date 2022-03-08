@@ -25,11 +25,9 @@ class Input_AnalogPolynomial extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        return { value: [
-            { type: `Group`, value: [
-                { obj: this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`) },
-                { obj: this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`) }
-            ]}
+        return { type: `Group`, value: [
+            this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`),
+            this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`)
         ]};
     }
 }

@@ -17,19 +17,19 @@ class Output_Digital extends UITemplate {
     }
 
     GetObjOperation(inputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
             { type: `UINT16`, value: this.Pin.Value },
             { type: `UINT8`, value: this.Inverted.Value | (this.HighZ.Value? 0x02 : 0x00) }
         ]};
 
         if (inputVariableId) {
-            return Packagize(objOperation, {
+            obj = Packagize(obj, {
                 inputVariables: [ inputVariableId ]
             })
         }
 
-        return objOperation;
+        return { obj };
     }
 }
 BooleanOutputConfigs.push(Output_Digital);

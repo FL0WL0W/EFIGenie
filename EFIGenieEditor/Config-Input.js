@@ -436,21 +436,18 @@ class ConfigInputs {
     }
 
     GetObjOperation() {
-        var obj = { value: [
-            { type: `Group`, value: [
-                { 
-                    type: `Package`, //Package
-                    value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
-                    outputVariables: [`CurrentTickId`]
-                }
-            ]}
+        var group = { type: `Group`, value: [
+            { 
+                type: `Package`, //Package
+                value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
+                outputVariables: [`CurrentTickId`]
+            }
         ]};
-
         for(var i = 0; i < this.Inputs.length; i++){
-            obj.value.push({ obj: this.Inputs[i].GetObjOperation()});
+            group.value.push(this.Inputs[i].GetObjOperation());
         }
 
-        return obj;
+        return group;
     }
 }
 
@@ -528,7 +525,7 @@ class ConfigInput extends UITemplate {
     GetObjOperation() {
         const translationConfig = this.TranslationConfig.GetSubConfig();
         if(translationConfig === undefined)
-            return { value: [] };
+            return undefined;
 
         if(translationConfig.constructor.Inputs === undefined || translationConfig.constructor.Inputs.length === 0)
             return this.TranslationConfig.GetObjOperation();
@@ -536,11 +533,9 @@ class ConfigInput extends UITemplate {
         const rawConfigObj = this.RawConfig.GetObjOperation();
         const rawConfigVariable = this.RawConfig.GetVariableReference();
         const translationConfigObj = this.TranslationConfig.GetObjOperation(rawConfigVariable);
-        return { value: [
-            { type: `Group`, value: [
-                { obj: rawConfigObj },
-                { obj: translationConfigObj }
-            ]}
+        return { type: `Group`, value: [
+            rawConfigObj,
+            translationConfigObj
         ]};
     }
 }
@@ -603,17 +598,17 @@ class Input_Analog extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
         ]};
 
         if (outputVariableId)
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_Analog);
@@ -636,18 +631,18 @@ class Input_Digital extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
             { type: `BOOL`, value: this.Inverted.Value}, //inverted
         ]};
 
         if (outputVariableId)
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_Digital);
@@ -677,7 +672,7 @@ class Input_DigitalRecord extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
             { type: `BOOL`, value: this.Inverted.Value}, //inverted
@@ -685,11 +680,11 @@ class Input_DigitalRecord extends UITemplate {
         ]};
 
         if (outputVariableId) 
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_DigitalRecord);
@@ -719,18 +714,18 @@ class Input_DutyCycle extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
         if (outputVariableId) 
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_DutyCycle);
@@ -760,18 +755,18 @@ class Input_Frequency extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
         if (outputVariableId) 
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_Frequency);
@@ -801,18 +796,18 @@ class Input_PulseWidth extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
             { type: `UINT16`, value: this.Pin.Value}, //pin
             { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
         ]};
 
         if (outputVariableId) 
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ] 
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 RawInputConfigs.push(Input_PulseWidth);

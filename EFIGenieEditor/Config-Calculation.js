@@ -29,13 +29,13 @@ class Calculation_Static extends UINumberWithMeasurement {
     static Inputs = [];
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
+        var obj = { value: [{ type: `Operation_StaticVariable`, value: this.Value }] };
 
         if (outputVariableId) {
-            objOperation.value[0].result = outputVariableId;
+            obj.value[0].result = outputVariableId;
         }
 
-        return objOperation;
+        return { obj };
     }
 }
 GenericConfigs.push(Calculation_Static);
@@ -152,7 +152,7 @@ class Calculation_Polynomial {
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
             { type: `FLOAT`, value: this.MinValue}, //MinValue
             { type: `FLOAT`, value: this.MaxValue}, //MaxValue
@@ -161,12 +161,12 @@ class Calculation_Polynomial {
         ]};
 
         if (outputVariableId || inputVariableId) 
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ?? 0 ],
                 inputVariables: [ inputVariableId ?? 0 ]
             });
 
-        return objOperation;
+        return { obj };
     }
 }
 GenericConfigs.push(Calculation_Polynomial);
@@ -316,7 +316,7 @@ class Calculation_LookupTable extends UITemplate {
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
 
-        var objOperation = {
+        var obj = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
                 { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
@@ -335,13 +335,13 @@ class Calculation_LookupTable extends UITemplate {
                 const parameterSelection = this.ParameterSelection.Value;
                 inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //inputVariable
             }
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ?? 0 ],
                 inputVariables
             });
         }
 
-        return objOperation;
+        return { obj };
     }
 
     RegisterVariables() {
@@ -520,7 +520,7 @@ class Calculation_2AxisTable extends UITemplate {
         const type = TableGetType(tableValue);
         const typeId = GetTypeId(type);
 
-        var objOperation = {
+        var obj = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
                 { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
@@ -548,13 +548,13 @@ class Calculation_2AxisTable extends UITemplate {
                 const parameterSelection = this.YSelection.Value;
                 inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ); //yVariable
             }
-            return Packagize(objOperation, { 
+            obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ?? 0 ],
                 inputVariables
             });
         }
 
-        return objOperation;
+        return { obj };
     }
 
     RegisterVariables() {

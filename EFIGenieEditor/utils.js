@@ -72,7 +72,7 @@ ArrayBuffer.prototype.build = function(obj) {
         } else {
             var objobj = obj.value[index].obj;
             if(objobj === undefined && typeInfo !== undefined){
-                objobj = typeInfo.objobj;
+                objobj = typeInfo.obj;
             }
             if(objobj === undefined){
                 var toObj

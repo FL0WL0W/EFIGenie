@@ -15,11 +15,9 @@ class Reluctor_Template extends Input_DigitalRecord {
     static Template = Input_DigitalRecord.Template.substring(0, Input_DigitalRecord.Template.indexOf(`Inverted</div>`) + 14)
 
     GetObjOperation(objOperation) {
-        return { value: [
-            { type: `Group`, value: [
-                { obj: super.GetObjOperation(`${this.ReferenceName}(Reluctor)`) },
-                { obj: objOperation }
-            ]}
+        return { type: `Group`, value: [
+            super.GetObjOperation(`${this.ReferenceName}(Reluctor)`),
+            objOperation
         ]};
     }
 }
@@ -33,17 +31,17 @@ class Reluctor_GM24x extends Reluctor_Template {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [
+        var obj = { value: [
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
         ]};
-        objOperation =  Packagize(objOperation, { 
+        obj =  Packagize(obj, { 
             outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
                 `${this.ReferenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation(objOperation)
+        return super.GetObjOperation({ obj });
     }
 }
 ReluctorConfigs.push(Reluctor_GM24x);
@@ -74,19 +72,19 @@ class Reluctor_Universal1x extends Reluctor_Template {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [ 
+        var obj = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
             { type: `FLOAT`, value: this.RisingPosition.Value}, //RisingPosition
             { type: `FLOAT`, value: this.FallingPosition.Value} //FallingPosition
         ]};
-        objOperation =  Packagize(objOperation, { 
+        obj =  Packagize(obj, { 
             outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
                 `${this.ReferenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation(objOperation)
+        return super.GetObjOperation({ obj });
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);
@@ -127,7 +125,7 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     }
 
     GetObjOperation(outputVariableId) {
-        var objOperation = { value: [ 
+        var obj = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
             { type: `FLOAT`, value: this.FirstToothPosition.Value}, //FirstToothPosition
             { type: `FLOAT`, value: this.ToothWidth.Value}, //ToothWidth
@@ -135,14 +133,14 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
             { type: `UINT8`, value: this.NumberOfTeethMissing.Value} //NumberOfTeethMissing
         ]};
             
-        objOperation =  Packagize(objOperation, { 
+        obj =  Packagize(obj, { 
             outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
                 `${this.ReferenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation(objOperation)
+        return super.GetObjOperation({ obj });
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);
