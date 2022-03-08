@@ -300,6 +300,7 @@ class ConfigInputs {
             $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${relativeX}px`);
             $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${relativeY}px`);
             thisClass.ContextSelect = $(this).data(`index`);
+            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
             $(this).addClass(`active`);
             
             e.preventDefault();

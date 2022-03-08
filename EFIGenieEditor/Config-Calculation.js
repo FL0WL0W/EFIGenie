@@ -279,6 +279,7 @@ class Calculation_LookupTable extends UITemplate {
             TemplateIdentifier: `Table`
         });
         this.Table = new UITable({
+            SelectNotVisible: true,
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
@@ -438,23 +439,23 @@ class Calculation_2AxisTable extends UITemplate {
         const thisClass = this;
         if(!this.XSelection) {
             this.XSelection = new UISelection({
+                SelectNotVisible: true,
                 Options: GetSelections(),
                 OnChange: function() {
                     thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
-                },
-                Class: `TableParameterSelect`
+                }
             });
             this.Table.XLabel = this.XSelection.GetHtml();
         }
         if(!this.YSelection) {
             this.YSelection = new UISelection({
+                SelectNotVisible: true,
                 Options: GetSelections(),
                 OnChange: function() {
                     thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
                     thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
-                },
-                Class: `TableParameterSelect`
+                }
             });
             this.Table.YLabel = this.YSelection.GetHtml();
         }
@@ -619,7 +620,8 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
             for (var i = 0; i < arr.length; i++) {
                 if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
                     arrSelections.Options.push({
-                        Name: arr[i].Name + (!measurement ? ` [${arr[i].Measurement}]` : ``),
+                        Name: arr[i].Name,
+                        Info: (!measurement ? `[${arr[i].Measurement}]` : undefined),
                         Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
                     });
                 }

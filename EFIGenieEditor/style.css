@@ -350,21 +350,23 @@ input[type="number"]:hover {
     background-color: #666;
     border-color: #3590d0;
 }
-select:not(.gpiooverlayselect) {
+.select:not(.gpiooverlayselect) {
     font: bold 16px Arial;
 }
-select {
+.select {
+    font: bold 16px Arial;
+    text-decoration: none;
     background-color: #505962;
+    color: #dfdfdf;
     border-radius: 6px;
     border: 2px solid #1A1A20;
-    color: #dfdfdf;
-    width: 200px;
+    min-width: 200px;
     margin: 1px;
     padding: 1px 2px;
+    display: inline-block;
 }
-select:hover {
-    background-color: #666;
-    border-color: #3590d0;
+.select .context-menu {
+    width: 200px;
 }
 .button {
     font: bold 16px Arial;
@@ -375,7 +377,8 @@ select:hover {
     border: 2px solid #1A1A20;
     cursor: pointer;
 }
-.button:hover {
+.button:hover,
+.select:hover {
     background-color: #666;
     border-color: #3590d0;
 }
@@ -394,14 +397,14 @@ select:hover {
   }
 
 
-select.gpiooverlayselect {
+.select.gpiooverlayselect {
     position: absolute; 
     margin: 0;
     margin: 0;
     padding: 0;
     width: 150px;
 }
-select .pinconflict{
+.select .pinconflict{
     background-color:rgb(255, 0, 0);
 }
 .pinconflict{
@@ -412,7 +415,8 @@ select .pinconflict{
 }
 
 .context-menu {
-    position: fixed;
+    cursor: default;
+    position: absolute;
     background: #222629;
     border: 1px solid black;
     z-index: 10;
@@ -515,7 +519,4 @@ select .pinconflict{
     width: 100%;
     height: 100%;
     border-radius: 50%;
-}
-.TableParameterSelect {
-    width: auto;
 }

@@ -552,6 +552,7 @@ class UISelection {
             $(`[id="${this.GUID}"]`).hide();
         } else {
             $(`[id="${this.GUID}"]`).show();
+            $(`[id="${this.GUID}"]`).attr(`style`, `display: inline-block;`)
         }
     }
 
@@ -564,7 +565,6 @@ class UISelection {
             return;
         
         this._options = options;
-        $(`[id="${this.GUID}"]`).html(this.GetOptionsHtml());
     }
 
     _value = ``;
@@ -576,8 +576,7 @@ class UISelection {
             return;
 
         this._value = value;
-        $(`[id="${this.GUID}"] option`).prop(`selected`, false);
-        $(`[id="${this.GUID}"] option[value='${UISelection.ParseValue(`string`, value)}']`).prop(`selected`, true);
+        $(`#${this.GUID}`).replaceWith(this.GetHtml());
         this.OnChange.forEach(function(OnChange) { OnChange(); });
     }
 
@@ -595,61 +594,79 @@ class UISelection {
     }
 
     Detach() {
-        $(document).off(`change.${this.GUID}`);
+        $(document).off(`click.${this.GUID}`);
+        $(document).off(`click.${this.GUID}-context`);
     }
 
     Attach() {
         this.Detach();
         var thisClass = this;
+        let visible = false;
         
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}`, function(){
-            thisClass.Value = UISelection.ParseValue($(this).find(`:selected`).data(`type`), $(this).val());
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e) {
+            if(visible) 
+                return;
+
+            $(`#${thisClass.GUID}`).append(`<div id="${thisClass.GUID}-options" class="context-menu w3-bar-block">${thisClass.GetOptionsHtml()}</div>`);
+            $(document).on(`click.${thisClass.GUID}-context`, function(){
+                $(`#${thisClass.GUID}-options`).remove();
+                $(document).off(`click.${thisClass.GUID}-context`);
+                visible = false;
+            });
+            visible = true;
+        });
+        
+        $(document).on(`click.${this.GUID}`, `#${this.GUID}-options div`, function(e) {
+            const t = $(this);
+            const type = t.attr(`data-type`);
+            if(type === undefined)
+                return;
+            const val = t.attr(`data-value`);
+            thisClass.Value = UISelection.ParseValue(type, val);
+            $(document).trigger(`change`);
         });
     }
 
     GetOptionsHtml() {
-        var stringValue = UISelection.ParseValue(`string`, this.Value);
         var optionsHtml = ``;
-        var selected = false;
         this._options.forEach(option => {
             if(option.Group){
                 var groupHtml = ``;
                 option.Options.forEach(option => {
                     var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
-                    var s = stringOptionValue == stringValue;
-                    if(s)
-                        selected = true;
-                    groupHtml += `<option data-type="${typeof option.Value}" value='${stringOptionValue}'` + 
-                        `${s? ` selected` : ``}${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
-                        `>${option.Name}</option>`;
+                    groupHtml += `<div class="w3-bar-item w3-button" data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
+                        `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                        `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</div>`;
                 });
 
                 if(groupHtml) 
-                    optionsHtml += `<optgroup label="${option.Group}">${groupHtml}</optgroup>`;
+                    optionsHtml += `<div class="selectgroup">${option.Group}</div><div>${groupHtml}</div>`;
             } else {
                 var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
-                var s = stringOptionValue == stringValue;
-                if(s)
-                    selected = true;
-                optionsHtml += `<option data-type="${typeof option.Value}" value='${stringOptionValue}'` + 
-                    `${s? ` selected` : ``}${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
-                    `>${option.Name}</option>`;
+                optionsHtml += `<div class="w3-bar-item w3-button" data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
+                    `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                    `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</div>`;
             }
         });
         if(!this.SelectNotVisible) {
-            optionsHtml = `<option${!selected? ` selected` : ``}${this.SelectDisabled? ` disabled` : ``}${this.SelectValue !== undefined? ` value="${this.SelectValue}"` : ``}` +
-                `>select</option>${optionsHtml}`;
+            optionsHtml = `<div class="w3-bar-item${this.SelectDisabled? `` : ` w3-button`}"${this.SelectValue !== undefined? ` data-type="${typeof this.SelectValue}" data-value="${this.SelectValue}"` : ``}` +
+                `>select</div>${optionsHtml}`;
         }
         return optionsHtml;
     }
 
     GetHtml() {
-        var html = `<select id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``}`;
+        var html = `<div id="${this.GUID}" style="display: ${this._hidden? `none` : `inline-block`};" class="select`;
 
         if(this.Class !== undefined)
-            html += ` class="${this.Class}"`;
+            html += ` ${this.Class}`;
 
-        return `${html}>${this.GetOptionsHtml()}</select>`;
+        var stringValue = UISelection.ParseValue(`string`, this.Value);
+        var selectedOption = this._options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue || x.Options?.findIndex(x => UISelection.ParseValue(`string`, x.Value) === stringValue) > -1)
+        if(selectedOption?.Group)
+            selectedOption = selectedOption.Options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue);
+
+        return `${html}">${selectedOption?.Name ?? `select`}</div>`;
     }
 }
 
@@ -698,7 +715,7 @@ class UITable extends Table {
 
         if(saveValue.XAxis !== undefined && this.XAxisModifiable)
             this.XAxis = saveValue.XAxis;
-        if(saveValue.yAxis !== undefined && this.YAxisModifiable)
+        if(saveValue.YAxis !== undefined && this.YAxisModifiable)
             this.YAxis = saveValue.YAxis;
 
         if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
@@ -735,6 +752,7 @@ class UIDialog {
 
     Detach() {
         $(document).off(`click.${this.GUID}`);
+        $(document).off(`dialogclose.${this.GUID}`);
     }
 
     Attach() {
@@ -744,6 +762,9 @@ class UIDialog {
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-open`, function(){
             thisClass.Open();
         });
+        $(document).on('dialogclose', `[id="${this.GUID}-dialog"]`, function(event) {
+            thisClass.Close();
+        });
     }
 
     GetHtml() {
@@ -752,14 +773,23 @@ class UIDialog {
     }
     
     Close() {
+        if(!this.Opened)
+            return;
         this.Opened = false;
         $(`[id="${this.GUID}-dialog"]`).dialog(`close`);
     }
 
     Open() {
+        if(this.Opened)
+            return;
         this.Opened = true;
         var dialogSelector = $(`[id="${this.GUID}-dialog"]`);
-        dialogSelector.dialog({ width:`auto`, modal:true, title: dialogSelector.data(`title`)});
+        dialogSelector.dialog({ 
+            resizable: false, 
+            width:`auto`, 
+            modal:true, 
+            title: dialogSelector.data(`title`)
+        });
     }
 }
 
@@ -839,16 +869,11 @@ class UIMeasurement {
         const thisClass = this;
         
         $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e){
-            var relativeX = (e.pageX - window.scrollX),
-                relativeY = (e.pageY - window.scrollY);
-
             $(`[id="${thisClass.GUID}-contextmenu"]`).show();
             $(document).on(`mouseup.${this.GUID}`, function(e){
                 $(document).off(`mouseup.${thisClass.GUID}`)
                 $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
             });
-            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`left`, `${relativeX}px`);
-            $(`[id="${thisClass.GUID}-contextmenu"]`).css(`top` , `${relativeY}px`);
             e.preventDefault();
         });
 
@@ -864,7 +889,7 @@ class UIMeasurement {
     }
 
     GetHtml() {
-        let html = `<div style="display: ${this._hidden? `none` : `inline-block`};${Measurements[this._measurement]?.length > 1? ` cursor: pointer;` : ``}" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
+        let html = `<div style="display: inline-block"><div style="display: ${this._hidden? `none` : `inline-block`};${Measurements[this._measurement]?.length > 1? ` cursor: pointer;` : ``}" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
 <div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
 
         if(Measurements[this._measurement]?.length > 1) {
@@ -874,7 +899,7 @@ class UIMeasurement {
             }
         }
 
-        return `${html}</div>`
+        return `${html}</div></div>`
     }
 }
 
