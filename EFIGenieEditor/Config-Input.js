@@ -585,7 +585,7 @@ class Input_Analog extends UITemplate {
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Voltage`;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$</div>`
+    static Template =   `<div><label>Pin:</label>$Pin$</div>`
 
     constructor(prop){
         super();
@@ -617,7 +617,7 @@ class Input_Digital extends UITemplate {
     static Output = `bool`;
     static Inputs = [];
     static Measurement = ``;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted</div>`
+    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>`
 
     constructor(prop){
         super();
@@ -651,7 +651,7 @@ class Input_DigitalRecord extends UITemplate {
     static Output = `Record`;
     static Inputs = [];
     static Measurement = `Record`;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted</div>` +
+    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>` +
                         `<div><label for="$Length.GUID$">Length:</label>$Length$</div>`;
 
     constructor(prop){
@@ -693,7 +693,7 @@ class Input_DutyCycle extends UITemplate {
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Percentage`;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$</div>` +
+    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){
@@ -734,7 +734,7 @@ class Input_Frequency extends UITemplate {
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Frequency`;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$</div>` +
+    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){
@@ -775,7 +775,7 @@ class Input_PulseWidth extends UITemplate {
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Time`;
-    static Template =   `<div><label for="$Pin.GUID$">Pin:</label>$Pin$</div>` +
+    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
                         `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
 
     constructor(prop){

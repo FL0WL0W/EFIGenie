@@ -949,7 +949,7 @@ class ConfigEngine extends UITemplate {
 }
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
-    static Template = CalculationOrVariableSelection.Template.replace(`for="$Selection.GUID$">$Label$:`, `for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$°`)
+    static Template = CalculationOrVariableSelection.Template.replace(`>$Label$:`, ` for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$°`)
 
     constructor(prop) {
         super();

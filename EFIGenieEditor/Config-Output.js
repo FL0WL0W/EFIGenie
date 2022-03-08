@@ -3,7 +3,7 @@ var BooleanOutputConfigs = [];
 class Output_Digital extends UITemplate {
     static Name = `Digital Pin`;
     static Inputs = [`bool`];
-    static Template = `<div><label for="$Pin.GUID$">Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>`
+    static Template = `<div><label>Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>`
 
     constructor(prop){
         super();

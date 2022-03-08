@@ -638,7 +638,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
 }
 
 class CalculationOrVariableSelection extends UITemplate {
-    static Template = `<div><label for="$Selection.GUID$">$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
+    static Template = `<div><label>$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
     ConfigValues = [];
 
     _label = `Value`;
