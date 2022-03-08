@@ -29,7 +29,7 @@ class Output_Digital extends UITemplate {
             })
         }
 
-        return { obj };
+        return obj;
     }
 }
 BooleanOutputConfigs.push(Output_Digital);

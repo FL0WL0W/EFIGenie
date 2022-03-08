@@ -607,7 +607,7 @@ class Input_Analog extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_Analog);
@@ -641,7 +641,7 @@ class Input_Digital extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_Digital);
@@ -683,7 +683,7 @@ class Input_DigitalRecord extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_DigitalRecord);
@@ -724,7 +724,7 @@ class Input_DutyCycle extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_DutyCycle);
@@ -765,7 +765,7 @@ class Input_Frequency extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_Frequency);
@@ -806,7 +806,7 @@ class Input_PulseWidth extends UITemplate {
                 outputVariables: [ outputVariableId ] 
             });
 
-        return { obj };
+        return obj;
     }
 }
 RawInputConfigs.push(Input_PulseWidth);

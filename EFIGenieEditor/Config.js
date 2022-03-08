@@ -528,7 +528,7 @@ class ConfigTop extends UITemplate {
     }
 
     GetObjOperation() {
-        let obj = { value: [
+        return { value: [
             { type: `UINT32`, value: 0}, //signal last operation
 
             //inputs
@@ -558,8 +558,6 @@ class ConfigTop extends UITemplate {
                 return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray);
             }}
         ]};
-
-        return { obj };
     }
 }
 
@@ -983,7 +981,7 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
-        let obj = { value: [{ 
+        return { value: [{ 
             type: `Package`,
             value: [ 
                 { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
@@ -996,7 +994,6 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
                 `EngineParameters.Volumetric Efficiency`
             ]
         }]};
-        return { obj };
     }
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);

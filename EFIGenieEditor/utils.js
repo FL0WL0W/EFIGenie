@@ -84,6 +84,9 @@ ArrayBuffer.prototype.build = function(obj) {
                     objobj = toObj.call(obj.value[index]);
                 }
             }
+            if(obj.value[index].type === undefined && Array.isArray(obj.value[index].value)) {
+                objobj = obj.value[index];
+            }
             if(objobj !== undefined){
                 if(objobj.types === undefined) {
                     objobj.types = [];

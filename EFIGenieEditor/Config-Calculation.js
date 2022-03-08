@@ -35,7 +35,7 @@ class Calculation_Static extends UINumberWithMeasurement {
             obj.value[0].result = outputVariableId;
         }
 
-        return { obj };
+        return obj;
     }
 }
 GenericConfigs.push(Calculation_Static);
@@ -166,7 +166,7 @@ class Calculation_Polynomial {
                 inputVariables: [ inputVariableId ?? 0 ]
             });
 
-        return { obj };
+        return obj;
     }
 }
 GenericConfigs.push(Calculation_Polynomial);
@@ -341,7 +341,7 @@ class Calculation_LookupTable extends UITemplate {
             });
         }
 
-        return { obj };
+        return obj;
     }
 
     RegisterVariables() {
@@ -554,7 +554,7 @@ class Calculation_2AxisTable extends UITemplate {
             });
         }
 
-        return { obj };
+        return obj;
     }
 
     RegisterVariables() {
