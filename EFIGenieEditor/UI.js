@@ -666,7 +666,7 @@ class UISelection {
         if(selectedOption?.Group)
             selectedOption = selectedOption.Options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue);
 
-        return `${html}">${selectedOption?.Name ?? `select`}</div>`;
+        return `${html}" data-value="${stringValue}">${selectedOption?.Name ?? `select`}</div>`;
     }
 }
 

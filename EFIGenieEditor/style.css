@@ -350,9 +350,14 @@ input[type="number"]:hover {
     background-color: #666;
     border-color: #3590d0;
 }
-.select:not(.gpiooverlayselect) {
+.select {
     font: bold 16px Arial;
+    min-width: 200px;
 }
+.select .context-menu {
+    min-width: 200px;
+}
+select,
 .select {
     font: bold 16px Arial;
     text-decoration: none;
@@ -360,13 +365,9 @@ input[type="number"]:hover {
     color: #dfdfdf;
     border-radius: 6px;
     border: 2px solid #1A1A20;
-    min-width: 200px;
     margin: 1px;
     padding: 1px 2px;
     display: inline-block;
-}
-.select .context-menu {
-    width: 200px;
 }
 .button {
     font: bold 16px Arial;
@@ -377,6 +378,7 @@ input[type="number"]:hover {
     border: 2px solid #1A1A20;
     cursor: pointer;
 }
+select:hover,
 .button:hover,
 .select:hover {
     background-color: #666;
@@ -397,14 +399,14 @@ input[type="number"]:hover {
   }
 
 
-.select.gpiooverlayselect {
+select.gpiooverlayselect {
     position: absolute; 
     margin: 0;
     margin: 0;
     padding: 0;
     width: 150px;
 }
-.select .pinconflict{
+select .pinconflict{
     background-color:rgb(255, 0, 0);
 }
 .pinconflict{

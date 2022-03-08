@@ -117,7 +117,7 @@ function ParsePinSelectElements(pinSelectElements){
                 digital: pinSelectElements[i].classList.contains(`digital`),
                 analog: pinSelectElements[i].classList.contains(`analog`),
                 pwm: pinSelectElements[i].classList.contains(`pwm`),
-                pin: $(pinSelectElements[i]).val()
+                pin: parseInt($(pinSelectElements[i]).attr(`data-value`))
             });
         }
     }
