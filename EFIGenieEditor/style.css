@@ -376,7 +376,7 @@ input[type="number"]:hover {
     border: 1px solid #505962;
     min-width: 200px;
     max-height: 400px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 select,
 .select {
