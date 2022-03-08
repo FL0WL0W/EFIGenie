@@ -650,7 +650,7 @@ class UISelection {
         });
         if(!this.SelectNotVisible) {
             optionsHtml = `<p ${this.SelectDisabled? ` class="disabled"` : ``}${this.SelectValue !== undefined? ` data-type="${typeof this.SelectValue}" data-value="${this.SelectValue}"` : ``}` +
-                `>select</p>${optionsHtml}`;
+                `>${this.SelectName}</p>${optionsHtml}`;
         }
         return optionsHtml;
     }
@@ -666,7 +666,7 @@ class UISelection {
         if(selectedOption?.Group)
             selectedOption = selectedOption.Options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue);
 
-        return `${html}" data-value="${stringValue}">${selectedOption?.Name ?? `select`}</div>`;
+        return `${html}" data-value="${stringValue}">${selectedOption?.Name ?? this.SelectName}</div>`;
     }
 }
 

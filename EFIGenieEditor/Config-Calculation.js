@@ -740,7 +740,8 @@ class CalculationOrVariableSelection extends UITemplate {
         });
         this.Selection = new UISelection({
             Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
-            SelectDisabled: true,
+            SelectDisabled: false,
+            SelectName: `None`,
             OnChange: function () {
                 const subConfigIndex = thisClass.GetSubConfigIndex();
                 thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
@@ -854,7 +855,7 @@ class CalculationOrVariableSelection extends UITemplate {
 
     GetObjOperation(...args) {
         const selection = this.Selection.Value;         
-        if(!selection.reference) {
+        if(!selection?.reference) {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
                 return;
