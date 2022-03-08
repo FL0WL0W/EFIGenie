@@ -253,8 +253,9 @@ function Packagize(obj, val) {
         obj.type = `Package`;
         obj.outputVariables = val.outputVariables;
         obj.inputVariables = val.inputVariables;
+        return { value: [ obj ] };
     }
-    return { value: [ obj ] };
+    return obj;y
 }
 
 function Operation_Math(mathFactoryId) {
@@ -312,6 +313,23 @@ types = [
         delete this.inputVariables;
 
         return this;
+    }},
+    { type: `Group`, toObj() {
+        let newValue = [];
+        
+        this.value.forEach(function(value) {
+            if(isEmptyObject(value))
+                return;
+            else if(value.type === `Group`)
+                newValue = newValue.concat(value.value);
+            else
+                newValue.push(value);
+        })
+
+        newValue.unshift({ type: `UINT16`, value: newValue.length });
+        newValue.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }); //Group
+
+        return Packagize({ value: newValue }, this);
     }},
     { type: `Operation_StaticVariable`, toObj() {
         if(this.result !== undefined){
@@ -502,32 +520,27 @@ class ConfigTop extends UITemplate {
             { type: `UINT32`, value: 0}, //signal last operation
 
             //inputs
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { obj: this.Inputs.GetObjOperation()}, 
-            { obj: this.Engine.GetObjOperation()}, 
+            { type: `Group`, value: [
+                { obj: this.Inputs.GetObjOperation()}, 
+                { obj: this.Engine.GetObjOperation()}
+            ]},
 
             //preSync
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 0 }, // number of operations
+            { type: `Group`, value: [ ] },
 
             //sync condition
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { type: `Operation_StaticVariable`, value: false, result: `temp` }, //store result in temp variable
-            
-            { 
-                type: `Operation_Or`,
-                result: 0, //return result
-                a: `EngineSyncedId`,
-                b: `temp`
-            },
+            { type: `Group`, value: [ 
+                { type: `Operation_StaticVariable`, value: false, result: `temp` }, //store static variable result in temp variable
+                { type: `Operation_Or`, result: 0, a: `EngineSyncedId`, b: `temp` },
+            ]},
 
             //main loop execute
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { obj: this.Fuel.GetObjOperation()}, 
-            { obj: this.Ignition.GetObjOperation()}, 
+            { type: `Group`, value: [ 
+                { obj: this.Fuel.GetObjOperation()}, 
+                { obj: this.Ignition.GetObjOperation()}
+            ]},
+
+            //metadata
             { toArrayBuffer() {
                 var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
                 return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray);
@@ -619,16 +632,6 @@ class ConfigFuel extends UITemplate {
     }
 
     GetObjOperation() {
-        var numberOfOperations = 1 + this.Outputs.length;
-        if(!this.AFRConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.InjectorEnableConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.InjectorPulseWidthConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.InjectorEndPositionConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-
         var obj = { 
             types : [{ type: `Operation_EngineScheduleInjection`, toObj() {
                 return { value: [ {
@@ -651,26 +654,25 @@ class ConfigFuel extends UITemplate {
                 }]};
             }}],
             value: [
-                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-                { type: `UINT16`, value: numberOfOperations }, // number of operations
+                { type: `Group`, value: [
+                    { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
 
-                { obj: this.AFRConfigOrVariableSelection.GetObjOperation()}, 
+                    { 
+                        type: `Operation_Divide`,
+                        result: `FuelParameters.Cylinder Fuel Mass`,
+                        a: `EngineParameters.Cylinder Air Mass`,
+                        b: `FuelParameters.Air Fuel Ratio`
+                    },
 
-                { 
-                    type: `Operation_Divide`,
-                    result: `FuelParameters.Cylinder Fuel Mass`,
-                    a: `EngineParameters.Cylinder Air Mass`,
-                    b: `FuelParameters.Air Fuel Ratio`
-                },
-
-                { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
-                { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
-                { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation()}
+                    { obj: this.InjectorEnableConfigOrVariableSelection.GetObjOperation()}, 
+                    { obj: this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation()}, 
+                    { obj: this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation()}
+                ]},
             ]
         };
 
         for(var i = 0; i < this.Outputs.length; i++) {
-            obj.value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs[i] });
+            obj.value[0].value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs[i] });
         }
 
         return obj;
@@ -760,16 +762,6 @@ class ConfigIgnition extends UITemplate {
     }
 
     GetObjOperation() {
-        var numberOfOperations = this.Outputs.length;
-        if(!this.IgnitionEnableConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.IgnitionAdvanceConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.IgnitionDwellConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-        if(!this.IgnitionDwellDeviationConfigOrVariableSelection.IsVariable())
-            ++numberOfOperations;
-
         var obj  = { 
             types : [{ type: `Operation_EngineScheduleIgnition`, toObj() {
                 return { value: [ {
@@ -793,18 +785,17 @@ class ConfigIgnition extends UITemplate {
                 }]};
             }}],
             value: [
-                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-                { type: `UINT16`, value: numberOfOperations }, // number of operations
-
-                { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjOperation()}, 
-                { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation()}, 
-                { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjOperation()}, 
-                { obj: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation()}, 
+                { type: `Group`, value: [
+                    { obj: this.IgnitionEnableConfigOrVariableSelection.GetObjOperation()}, 
+                    { obj: this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation()}, 
+                    { obj: this.IgnitionDwellConfigOrVariableSelection.GetObjOperation()}, 
+                    { obj: this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation()}, 
+                ]}
             ]
         };
 
         for(var i = 0; i < this.Outputs.length; i++) {
-            obj.value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs[i] });
+            obj.value[0].value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs[i] });
         }
 
         return obj;
@@ -912,55 +903,53 @@ class ConfigEngine extends UITemplate {
 
 
         var obj = { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: numberOfOperations }, // number of operations
+            { type: `Group`, value: [
+                { obj: this.CrankPositionConfigOrVariableSelection.GetObjOperation() },
+                { obj: this.CamPositionConfigOrVariableSelection.GetObjOperation() },
 
-            { obj: this.CrankPositionConfigOrVariableSelection.GetObjOperation() },
+                //CalculateEnginePosition
+                { 
+                    type: `Package`,
+                    value: [ 
+                        { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
+                    ],
+                    outputVariables: [ `EnginePositionId` ],
+                    inputVariables: [
+                        `EngineParameters.Crank Position`,
+                        `EngineParameters.Cam Position`
+                    ]
+                },
 
-            { obj: this.CamPositionConfigOrVariableSelection.GetObjOperation() },
-
-            //CalculateEnginePosition
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-                 ],
-                outputVariables: [ `EnginePositionId` ],
-                inputVariables: [
-                    `EngineParameters.Crank Position`,
-                    `EngineParameters.Cam Position`
-                ]
-            },
-
-            //EngineParameters
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
-                 ],
-                outputVariables: [ 
-                    `EngineParameters.Engine Speed`,
-                    `EngineSequentialId`,
-                    `EngineSyncedId`
-                ],
-                inputVariables: [ `EnginePositionId`  ]
-            },
+                //EngineParameters
+                { 
+                    type: `Package`,
+                    value: [ 
+                        { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
+                    ],
+                    outputVariables: [ 
+                        `EngineParameters.Engine Speed`,
+                        `EngineSequentialId`,
+                        `EngineSyncedId`
+                    ],
+                    inputVariables: [ `EnginePositionId`  ]
+                }
+            ]}
         ]};
-
+        console.log(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation());
         
         if(mapRequired) {
-            obj.value.push({ obj: this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation() });
+            obj.value[0].value.push({ obj: this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation() });
         }
 
         if(catRequired) {
-            obj.value.push({ obj: this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation() });
+            obj.value[0].value.push({ obj: this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation() });
         }
         
         if(veRequired) {
-            obj.value.push({ obj: this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation() });
+            obj.value[0].value.push({ obj: this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation() });
         }
         
-        obj.value.push({ obj: this.CylinderAirmassConfigOrVariableSelection.GetObjOperation() });
+        obj.value[0].value.push({ obj: this.CylinderAirmassConfigOrVariableSelection.GetObjOperation() });
 
         return obj;
     }
@@ -1063,37 +1052,36 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
             numberOfOperations++;
 
         return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: numberOfOperations }, // number of operations
+            { type: `Group`, value: [
+                { obj: this.FlowRateConfigOrVariableSelection.GetObjOperation()},
+                { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
+                
+                //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
+                { type: `Operation_StaticVariable`, value: 2, result: `temp` },//static value of 2
+                
+                //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
+                { 
+                    type: `Operation_Subtract`,
+                    result: `temp`, //Return
+                    a: `temp`,
+                    b: `EngineSequentialId`
+                },
 
-            { obj: this.FlowRateConfigOrVariableSelection.GetObjOperation()},
-            { obj: this.DeadTimeConfigOrVariableSelection.GetObjOperation()},
-            
-            //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Operation_StaticVariable`, value: 2, result: `temp` },//static value of 2
-            
-            //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { 
-                type: `Operation_Subtract`,
-                result: `temp`, //Return
-                a: `temp`,
-                b: `EngineSequentialId`
-            },
-
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-                    { type: `FLOAT`, value: this.MinInjectorFuelMass.Value }
-                 ],
-                outputVariables: [ outputVariableId ?? 0 ], //Return
-                inputVariables: [ 
-                    `temp`,
-                    `FuelParameters.Cylinder Fuel Mass`,
-                    `FuelParameters.Injector Flow Rate`,
-                    `FuelParameters.Injector Dead Time`
-                 ]
-            }
+                { 
+                    type: `Package`,
+                    value: [ 
+                        { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+                        { type: `FLOAT`, value: this.MinInjectorFuelMass.Value }
+                    ],
+                    outputVariables: [ outputVariableId ?? 0 ], //Return
+                    inputVariables: [ 
+                        `temp`,
+                        `FuelParameters.Cylinder Fuel Mass`,
+                        `FuelParameters.Injector Flow Rate`,
+                        `FuelParameters.Injector Dead Time`
+                    ]
+                }
+            ]}
         ]};
     }
 }

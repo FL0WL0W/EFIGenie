@@ -294,3 +294,15 @@ function objectTester(a, b) {
       }
       return bytes.buffer;
   }
+
+  function isEmptyObject(obj) {
+    for(var prop in obj) {
+        if(obj[prop] === undefined)
+            continue;
+        if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+            return false;
+        }
+    }
+  
+    return true;
+  }

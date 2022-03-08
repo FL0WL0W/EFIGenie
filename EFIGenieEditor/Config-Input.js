@@ -437,14 +437,13 @@ class ConfigInputs {
 
     GetObjOperation() {
         var obj = { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: this.Inputs.length + 1 }, // number of operations
-            
-            { 
-                type: `Package`, //Package
-                value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
-                outputVariables: [`CurrentTickId`]
-            }
+            { type: `Group`, value: [
+                { 
+                    type: `Package`, //Package
+                    value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
+                    outputVariables: [`CurrentTickId`]
+                }
+            ]}
         ]};
 
         for(var i = 0; i < this.Inputs.length; i++){
@@ -538,10 +537,10 @@ class ConfigInput extends UITemplate {
         const rawConfigVariable = this.RawConfig.GetVariableReference();
         const translationConfigObj = this.TranslationConfig.GetObjOperation(rawConfigVariable);
         return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { obj: rawConfigObj },
-            { obj: translationConfigObj }
+            { type: `Group`, value: [
+                { obj: rawConfigObj },
+                { obj: translationConfigObj }
+            ]}
         ]};
     }
 }

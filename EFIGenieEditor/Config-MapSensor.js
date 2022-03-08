@@ -26,10 +26,10 @@ class Input_AnalogPolynomial extends UITemplate {
 
     GetObjOperation(outputVariableId) {
         return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { obj: this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`) },
-            { obj: this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`) }
+            { type: `Group`, value: [
+                { obj: this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`) },
+                { obj: this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`) }
+            ]}
         ]};
     }
 }

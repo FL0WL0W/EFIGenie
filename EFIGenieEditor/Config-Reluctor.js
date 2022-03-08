@@ -16,10 +16,10 @@ class Reluctor_Template extends Input_DigitalRecord {
 
     GetObjOperation(objOperation) {
         return { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }, // Group
-            { type: `UINT16`, value: 2 }, // number of operations
-            { obj: super.GetObjOperation(`${this.ReferenceName}(Reluctor)`) },
-            { obj: objOperation }
+            { type: `Group`, value: [
+                { obj: super.GetObjOperation(`${this.ReferenceName}(Reluctor)`) },
+                { obj: objOperation }
+            ]}
         ]};
     }
 }
