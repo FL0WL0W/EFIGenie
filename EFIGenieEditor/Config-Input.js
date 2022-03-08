@@ -30,38 +30,38 @@ PinOuts = {
         OverlayWidth: 844,
         OverlayElementHeight: 24,
         Pins: [
-            { Name: `PC_13`, Value: (16*2 + 13), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 174, Align: `right`},
-            { Name: `PC_14`, Value: (16*2 + 14), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 200, Align: `right`},
-            { Name: `PC_15`, Value: (16*2 + 15), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 226, Align: `right`},
-            { Name: `PA_0`,  Value: (16*0 + 0 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 252, Align: `right`},
-            { Name: `PA_1`,  Value: (16*0 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 278, Align: `right`},
-            { Name: `PA_2`,  Value: (16*0 + 2 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 304, Align: `right`},
-            { Name: `PA_3`,  Value: (16*0 + 3 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 330, Align: `right`},
-            { Name: `PA_4`,  Value: (16*0 + 4 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 356, Align: `right`},
-            { Name: `PA_5`,  Value: (16*0 + 5 ), Digital: true , Analog: true , PWM: false, OverlayX: 844, OverlayY: 382, Align: `right`},
-            { Name: `PA_6`,  Value: (16*0 + 6 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 408, Align: `right`},
-            { Name: `PA_7`,  Value: (16*0 + 7 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 434, Align: `right`},
-            { Name: `PB_0`,  Value: (16*1 + 0 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 460, Align: `right`},
-            { Name: `PB_1`,  Value: (16*1 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 844, OverlayY: 486, Align: `right`},
-            { Name: `PB_10`, Value: (16*1 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 512, Align: `right`},
-            { Name: `PB_11`, Value: (16*1 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 538, Align: `right`},
-            { Name: `PB_9`,  Value: (16*1 + 9 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 226, Align: `left`},
-            { Name: `PB_8`,  Value: (16*1 + 8 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 252, Align: `left`},
-            { Name: `PB_7`,  Value: (16*1 + 7 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 278, Align: `left`},
-            { Name: `PB_6`,  Value: (16*1 + 6 ), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 304, Align: `left`},
-            { Name: `PB_5`,  Value: (16*1 + 5 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 330, Align: `left`},
-            { Name: `PB_4`,  Value: (16*1 + 4 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 356, Align: `left`},
-            { Name: `PB_3`,  Value: (16*1 + 3 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 382, Align: `left`},
-            { Name: `PA_15`, Value: (16*0 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 408, Align: `left`},
-            { Name: `PA_12`, Value: (16*0 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 434, Align: `left`},
-            { Name: `PA_11`, Value: (16*0 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 460, Align: `left`},
-            { Name: `PA_10`, Value: (16*0 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 486, Align: `left`},
-            { Name: `PA_9`,  Value: (16*0 + 9 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 512, Align: `left`},
-            { Name: `PA_8`,  Value: (16*0 + 8 ), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 538, Align: `left`},
-            { Name: `PB_15`, Value: (16*1 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 564, Align: `left`},
-            { Name: `PB_14`, Value: (16*1 + 14), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 590, Align: `left`},
-            { Name: `PB_13`, Value: (16*1 + 13), Digital: true , Analog: false, PWM: true , OverlayX: 844, OverlayY: 616, Align: `left`},
-            { Name: `PB_12`, Value: (16*1 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 844, OverlayY: 642, Align: `left`},
+            { Name: `PC_13`, Value: (16*2 + 13), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 174, Align: `right`},
+            { Name: `PC_14`, Value: (16*2 + 14), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 200, Align: `right`},
+            { Name: `PC_15`, Value: (16*2 + 15), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 226, Align: `right`},
+            { Name: `PA_0`,  Value: (16*0 + 0 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 844, OverlayY: 252, Align: `right`},
+            { Name: `PA_1`,  Value: (16*0 + 1 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 278, Align: `right`},
+            { Name: `PA_2`,  Value: (16*0 + 2 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 304, Align: `right`},
+            { Name: `PA_3`,  Value: (16*0 + 3 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 330, Align: `right`},
+            { Name: `PA_4`,  Value: (16*0 + 4 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 844, OverlayY: 356, Align: `right`},
+            { Name: `PA_5`,  Value: (16*0 + 5 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 844, OverlayY: 382, Align: `right`},
+            { Name: `PA_6`,  Value: (16*0 + 6 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 408, Align: `right`},
+            { Name: `PA_7`,  Value: (16*0 + 7 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 434, Align: `right`},
+            { Name: `PB_0`,  Value: (16*1 + 0 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 460, Align: `right`},
+            { Name: `PB_1`,  Value: (16*1 + 1 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 844, OverlayY: 486, Align: `right`},
+            { Name: `PB_10`, Value: (16*1 + 10), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 512, Align: `right`},
+            { Name: `PB_11`, Value: (16*1 + 11), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 538, Align: `right`},
+            { Name: `PB_9`,  Value: (16*1 + 9 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 226, Align: `left`},
+            { Name: `PB_8`,  Value: (16*1 + 8 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 252, Align: `left`},
+            { Name: `PB_7`,  Value: (16*1 + 7 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 278, Align: `left`},
+            { Name: `PB_6`,  Value: (16*1 + 6 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 304, Align: `left`},
+            { Name: `PB_5`,  Value: (16*1 + 5 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 330, Align: `left`},
+            { Name: `PB_4`,  Value: (16*1 + 4 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 356, Align: `left`},
+            { Name: `PB_3`,  Value: (16*1 + 3 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 382, Align: `left`},
+            { Name: `PA_15`, Value: (16*0 + 15), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 408, Align: `left`},
+            { Name: `PA_12`, Value: (16*0 + 12), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 434, Align: `left`},
+            { Name: `PA_11`, Value: (16*0 + 11), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 460, Align: `left`},
+            { Name: `PA_10`, Value: (16*0 + 10), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 486, Align: `left`},
+            { Name: `PA_9`,  Value: (16*0 + 9 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 512, Align: `left`},
+            { Name: `PA_8`,  Value: (16*0 + 8 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 538, Align: `left`},
+            { Name: `PB_15`, Value: (16*1 + 15), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 564, Align: `left`},
+            { Name: `PB_14`, Value: (16*1 + 14), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 590, Align: `left`},
+            { Name: `PB_13`, Value: (16*1 + 13), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 844, OverlayY: 616, Align: `left`},
+            { Name: `PB_12`, Value: (16*1 + 12), SupportedModes: `digital digitalinterrupt`, OverlayX: 844, OverlayY: 642, Align: `left`},
         ]
     },
     STM32F401C : { 
@@ -70,38 +70,38 @@ PinOuts = {
         OverlayWidth: 577,
         OverlayElementHeight: 22,
         Pins: [
-            { Name: `PC_13`, Value: (16*2 + 13), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 132, Align: `right`},
-            { Name: `PC_14`, Value: (16*2 + 14), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 154, Align: `right`},
-            { Name: `PC_15`, Value: (16*2 + 15), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 176, Align: `right`},
-            { Name: `PA_0`,  Value: (16*0 + 0 ), Digital: true , Analog: true , PWM: false, OverlayX: 577, OverlayY: 220, Align: `right`},
-            { Name: `PA_1`,  Value: (16*0 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 242, Align: `right`},
-            { Name: `PA_2`,  Value: (16*0 + 2 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 264, Align: `right`},
-            { Name: `PA_3`,  Value: (16*0 + 3 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 286, Align: `right`},
-            { Name: `PA_4`,  Value: (16*0 + 4 ), Digital: true , Analog: true , PWM: false, OverlayX: 577, OverlayY: 308, Align: `right`},
-            { Name: `PA_5`,  Value: (16*0 + 5 ), Digital: true , Analog: true , PWM: false, OverlayX: 577, OverlayY: 330, Align: `right`},
-            { Name: `PA_6`,  Value: (16*0 + 6 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 352, Align: `right`},
-            { Name: `PA_7`,  Value: (16*0 + 7 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 374, Align: `right`},
-            { Name: `PB_0`,  Value: (16*1 + 0 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 396, Align: `right`},
-            { Name: `PB_1`,  Value: (16*1 + 1 ), Digital: true , Analog: true , PWM: true , OverlayX: 577, OverlayY: 418, Align: `right`},
-            { Name: `PB_2`,  Value: (16*1 + 2 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 440, Align: `right`},
-            { Name: `PB_10`, Value: (16*1 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 462, Align: `right`},
-            { Name: `PB_9`,  Value: (16*1 + 9 ), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 176, Align: `left`},
-            { Name: `PB_8`,  Value: (16*1 + 8 ), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 198, Align: `left`},
-            { Name: `PB_7`,  Value: (16*1 + 7 ), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 220, Align: `left`},
-            { Name: `PB_6`,  Value: (16*1 + 6 ), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 242, Align: `left`},
-            { Name: `PB_5`,  Value: (16*1 + 5 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 264, Align: `left`},
-            { Name: `PB_4`,  Value: (16*1 + 4 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 286, Align: `left`},
-            { Name: `PB_3`,  Value: (16*1 + 3 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 308, Align: `left`},
-            { Name: `PA_15`, Value: (16*0 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 330, Align: `left`},
-            { Name: `PA_12`, Value: (16*0 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 352, Align: `left`},
-            { Name: `PA_11`, Value: (16*0 + 11), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 374, Align: `left`},
-            { Name: `PA_10`, Value: (16*0 + 10), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 396, Align: `left`},
-            { Name: `PA_9`,  Value: (16*0 + 9 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 418, Align: `left`},
-            { Name: `PA_8`,  Value: (16*0 + 8 ), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 440, Align: `left`},
-            { Name: `PB_15`, Value: (16*1 + 15), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 462, Align: `left`},
-            { Name: `PB_14`, Value: (16*1 + 14), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 484, Align: `left`},
-            { Name: `PB_13`, Value: (16*1 + 13), Digital: true , Analog: false, PWM: true , OverlayX: 577, OverlayY: 506, Align: `left`},
-            { Name: `PB_12`, Value: (16*1 + 12), Digital: true , Analog: false, PWM: false, OverlayX: 577, OverlayY: 528, Align: `left`},
+            { Name: `PC_13`, Value: (16*2 + 13), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 132, Align: `right`},
+            { Name: `PC_14`, Value: (16*2 + 14), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 154, Align: `right`},
+            { Name: `PC_15`, Value: (16*2 + 15), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 176, Align: `right`},
+            { Name: `PA_0`,  Value: (16*0 + 0 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 577, OverlayY: 220, Align: `right`},
+            { Name: `PA_1`,  Value: (16*0 + 1 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 242, Align: `right`},
+            { Name: `PA_2`,  Value: (16*0 + 2 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 264, Align: `right`},
+            { Name: `PA_3`,  Value: (16*0 + 3 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 286, Align: `right`},
+            { Name: `PA_4`,  Value: (16*0 + 4 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 577, OverlayY: 308, Align: `right`},
+            { Name: `PA_5`,  Value: (16*0 + 5 ), SupportedModes: `digital digitalinterrupt analog`, OverlayX: 577, OverlayY: 330, Align: `right`},
+            { Name: `PA_6`,  Value: (16*0 + 6 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 352, Align: `right`},
+            { Name: `PA_7`,  Value: (16*0 + 7 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 374, Align: `right`},
+            { Name: `PB_0`,  Value: (16*1 + 0 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 396, Align: `right`},
+            { Name: `PB_1`,  Value: (16*1 + 1 ), SupportedModes: `digital digitalinterrupt analog pwm` , OverlayX: 577, OverlayY: 418, Align: `right`},
+            { Name: `PB_2`,  Value: (16*1 + 2 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 440, Align: `right`},
+            { Name: `PB_10`, Value: (16*1 + 10), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 462, Align: `right`},
+            { Name: `PB_9`,  Value: (16*1 + 9 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 176, Align: `left`},
+            { Name: `PB_8`,  Value: (16*1 + 8 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 198, Align: `left`},
+            { Name: `PB_7`,  Value: (16*1 + 7 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 220, Align: `left`},
+            { Name: `PB_6`,  Value: (16*1 + 6 ), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 242, Align: `left`},
+            { Name: `PB_5`,  Value: (16*1 + 5 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 264, Align: `left`},
+            { Name: `PB_4`,  Value: (16*1 + 4 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 286, Align: `left`},
+            { Name: `PB_3`,  Value: (16*1 + 3 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 308, Align: `left`},
+            { Name: `PA_15`, Value: (16*0 + 15), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 330, Align: `left`},
+            { Name: `PA_12`, Value: (16*0 + 12), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 352, Align: `left`},
+            { Name: `PA_11`, Value: (16*0 + 11), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 374, Align: `left`},
+            { Name: `PA_10`, Value: (16*0 + 10), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 396, Align: `left`},
+            { Name: `PA_9`,  Value: (16*0 + 9 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 418, Align: `left`},
+            { Name: `PA_8`,  Value: (16*0 + 8 ), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 440, Align: `left`},
+            { Name: `PB_15`, Value: (16*1 + 15), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 462, Align: `left`},
+            { Name: `PB_14`, Value: (16*1 + 14), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 484, Align: `left`},
+            { Name: `PB_13`, Value: (16*1 + 13), SupportedModes: `digital digitalinterrupt pwm` , OverlayX: 577, OverlayY: 506, Align: `left`},
+            { Name: `PB_12`, Value: (16*1 + 12), SupportedModes: `digital digitalinterrupt`, OverlayX: 577, OverlayY: 528, Align: `left`},
         ]
     }
 };
@@ -112,12 +112,11 @@ function ParsePinSelectElements(pinSelectElements){
     var elements = [];
     if(pinSelectElements) {
         for(var i=0; i<pinSelectElements.length; i++) {
+            const pinSelectElementSelector = $(pinSelectElements[i]);
             elements.push({
                 name: GetNameFromPinSelectElement(pinSelectElements[i]),
-                digital: pinSelectElements[i].classList.contains(`digital`),
-                analog: pinSelectElements[i].classList.contains(`analog`),
-                pwm: pinSelectElements[i].classList.contains(`pwm`),
-                pin: parseInt($(pinSelectElements[i]).attr(`data-value`))
+                pinselectmode: pinSelectElementSelector.attr(`data-pinselectmode`),
+                pin: parseInt(pinSelectElementSelector.attr(`data-value`))
             });
         }
     }
@@ -165,9 +164,7 @@ function GenerateOverlay() {
                 selectCount++;
                 selected = true;
             }
-            if( (pinSelectElements[s].digital && !PinOut.Pins[i].Digital) ||
-                (pinSelectElements[s].analog && !PinOut.Pins[i].Analog) ||
-                (pinSelectElements[s].pwm && !PinOut.Pins[i].PWM)) {
+            if(PinOut.Pins[i].SupportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1) {
                 endsel += `<option value="${pinSelectElements[s].name}"${selected? ` class="incompatible" selected` : ``} disabled>${pinSelectElements[s].name}</option>`;
             } else {
                 sel += `<option value="${pinSelectElements[s].name}"${selected? ` selected` : ``}>${pinSelectElements[s].name}</option>`;            
@@ -545,11 +542,15 @@ class UIPinSelection extends UISelection {
         super(prop);
         this.SelectDisabled = prop.SelectDisabled ?? true;
         this.SelectValue = prop.SelectValue ?? 0xFFFF;
-        this.Class = !prop.Class? `${this.PinType} pinselect` : `${prop.Class} ${this.PinType} pinselect`;
+        this.Class = !prop.Class? `pinselect` : `${prop.Class} pinselect`;
         this.Options = this.GenerateOptionList();
         this.OnChange.push(function() {
             UpdateOverlay();
         })
+    }
+
+    GetHtml() {
+        return `<div data-pinselectmode="${this.PinType}"${super.GetHtml().substring(4)}`;
     }
 
     GenerateOptionList() {
@@ -557,9 +558,7 @@ class UIPinSelection extends UISelection {
         var endOptions = [];
         for(var i = 0; i < PinOut.Pins.length; i++) {
             const selected = this.Value === PinOut.Pins[i].Value;
-            if( (this.PinType === `digital` && !PinOut.Pins[i].Digital) ||
-                (this.PinType === `analog` && !PinOut.Pins[i].Analog) ||
-                (this.PinType === `pwm` && !PinOut.Pins[i].PWM)) {
+            if(PinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
                 endOptions.push({
                     Name: PinOut.Pins[i].Name,
                     Value: PinOut.Pins[i].Value,
@@ -659,7 +658,7 @@ class Input_DigitalRecord extends UITemplate {
         super();
         this.Pin = new UIPinSelection({
             Value: 0xFFFF,
-            PinType: `digital`
+            PinType: `digitalinterrupt`
         });
         this.Inverted = new UICheckbox();
         this.Length = new UINumber ({

@@ -538,6 +538,7 @@ class UISelection {
     GUID = generateGUID();
     OnChange = [];
     SelectDisabled = false;
+    SelectName = `select`;
 
     _hidden = false;
     get Hidden() {
@@ -635,7 +636,7 @@ class UISelection {
                 option.Options.forEach(option => {
                     var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
                     groupHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
-                        `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                        `${option.Class || option.Disabled? ` class="${option.Class ?? ``}${option.Disabled? ` disabled`: ``}"` : ``}` + 
                         `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
                 });
 
@@ -644,7 +645,7 @@ class UISelection {
             } else {
                 var stringOptionValue = UISelection.ParseValue(`string`, option.Value)
                 optionsHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
-                    `${option.Disabled? ` disabled`: ``}${option.Class? ` class="${option.Class}"` : ``}` + 
+                    `${option.Class || option.Disabled? ` class="${option.Class ?? ``}${option.Disabled? ` disabled`: ``}"` : ``}` + 
                     `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
             }
         });

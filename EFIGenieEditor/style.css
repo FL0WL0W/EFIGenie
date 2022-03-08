@@ -363,6 +363,10 @@ input[type="number"]:hover {
     border-top: 1px solid #505962;
     border-bottom: 1px solid transparent;
 }
+.select p.disabled {
+    color: #888;
+    background-color: #666; 
+}
 .select p:hover:not(.disabled) {
     background-color: #666; 
     border-color: #3590d0;
