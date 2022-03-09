@@ -23,7 +23,7 @@ var OperationArchitectureFactoryIDs = {
 }
 
 
-class Calculation_Static extends UINumberWithMeasurement {
+class Calculation_Static extends UI.NumberWithMeasurement {
     static Name = `Static`;
     static Output = `float`;
     static Inputs = [];
@@ -40,7 +40,7 @@ class Calculation_Static extends UINumberWithMeasurement {
 }
 GenericConfigs.push(Calculation_Static);
 
-//this could be refactored to use UITemplate, but it works well and i forsee no changes needed so leaving as is
+//this could be refactored to use UI.Template, but it works well and i forsee no changes needed so leaving as is
 class Calculation_Polynomial {
     static Name = `Polynomial`;
     static Output = `float`;
@@ -196,7 +196,7 @@ function TableGetType(tableValue) {
     return GetType(max);
 }
 
-class Calculation_LookupTable extends UITemplate {
+class Calculation_LookupTable extends UI.Template {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
@@ -252,9 +252,9 @@ class Calculation_LookupTable extends UITemplate {
 
         const thisClass = this;
         if(!this.ParameterSelection) {
-            this.ParameterSelection = new UISelection({
+            this.ParameterSelection = new UI.Selection({
                 Options: GetSelections(),
-                OnChange: function() {
+                onChange: function() {
                     thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
                 },
@@ -283,7 +283,7 @@ class Calculation_LookupTable extends UITemplate {
             BaseObj: true,
             YResolution: 1,
             YResolutionModifiable: false,
-            OnChange: function() {
+            onChange: function() {
                 if(thisClass.ParameterSelection) 
                     thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
             }
@@ -352,7 +352,7 @@ class Calculation_LookupTable extends UITemplate {
 }
 GenericConfigs.push(Calculation_LookupTable);
 
-class Calculation_2AxisTable extends UITemplate {
+class Calculation_2AxisTable extends UI.Template {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
@@ -438,10 +438,10 @@ class Calculation_2AxisTable extends UITemplate {
 
         const thisClass = this;
         if(!this.XSelection) {
-            this.XSelection = new UISelection({
+            this.XSelection = new UI.Selection({
                 SelectNotVisible: true,
                 Options: GetSelections(),
-                OnChange: function() {
+                onChange: function() {
                     thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
                     thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
                 }
@@ -449,10 +449,10 @@ class Calculation_2AxisTable extends UITemplate {
             this.Table.XLabel = this.XSelection.GetHtml();
         }
         if(!this.YSelection) {
-            this.YSelection = new UISelection({
+            this.YSelection = new UI.Selection({
                 SelectNotVisible: true,
                 Options: GetSelections(),
-                OnChange: function() {
+                onChange: function() {
                     thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
                     thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
                 }
@@ -484,7 +484,7 @@ class Calculation_2AxisTable extends UITemplate {
         });
         this.Table = new UITable({
             BaseObj: true,
-            OnChange: function() {
+            onChange: function() {
                 if(thisClass.XSelection) 
                     thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
                 if(thisClass.YSelection) 
@@ -637,7 +637,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
     return selections;
 }
 
-class CalculationOrVariableSelection extends UITemplate {
+class CalculationOrVariableSelection extends UI.Template {
     static Template = `<div><label>$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
     ConfigValues = [];
 
@@ -713,15 +713,15 @@ class CalculationOrVariableSelection extends UITemplate {
         if(this.Selection.Value) {
             let selections = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
             let match = false;
-            let stringValue = UISelection.ParseValue(`string`, this.Selection.Value)
+            let stringValue = UI.Selection.ParseValue(`string`, this.Selection.Value)
             selections.forEach(option => {
                 if(option.Group){
                     option.Options.forEach(option => {
-                        if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+                        if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
                             match = true;
                     });
                 } else {
-                    if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+                    if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
                         match = true;
                 }
             });
@@ -738,11 +738,11 @@ class CalculationOrVariableSelection extends UITemplate {
             Measurement: prop?.Measurement,
             MeasurementUnitName: prop?.MeasurementUnitName
         });
-        this.Selection = new UISelection({
+        this.Selection = new UI.Selection({
             Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
             SelectDisabled: false,
             SelectName: `None`,
-            OnChange: function () {
+            onChange: function () {
                 const subConfigIndex = thisClass.GetSubConfigIndex();
                 thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
                 $(`#${thisClass.GUID}-ConfigValue`).html(subConfigIndex === -1? `` : thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
@@ -918,7 +918,7 @@ class CalculationOrVariableSelection extends UITemplate {
     }
 }
 
-class Calculation_Operation extends UITemplate {
+class Calculation_Operation extends UI.Template {
     static Name=`Operation`
     static Template=`</br><div class="configContainer"><div><span style="float: right;">$LiveUpdate$</span>$Base$</div>$SubOperation$<span class="controladd">+ Add Operation</span></div`;
     static Output = `float`;
@@ -938,7 +938,7 @@ class Calculation_Operation extends UITemplate {
             MeasurementUnitName:   prop?.MeasurementUnitName,
             Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
         })];
-        this.OperationSelection = [new UISelection({
+        this.OperationSelection = [new UI.Selection({
             Options: [
                 { Name: `Adder`,        Value: 1 },
                 { Name: `Subtracter`,   Value: 2 },
@@ -948,9 +948,9 @@ class Calculation_Operation extends UITemplate {
             Class: `subOperationSelection`,
             SelectDisabled: true
         })];
-        this.OperationName = [new UIText({
+        this.OperationName = [new UI.Text({
             Class: `subOperationName`,
-            OnChange: function() {
+            onChange: function() {
                 thisClass.SubOperation[0].Label = thisClass.OperationName[0].Value;
             }
         })];

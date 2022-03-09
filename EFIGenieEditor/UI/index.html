@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <script type="module">
+            import UIText from "./UIText.js";
+            import UINumber from "./UINumber.js";
+            import UICheckbox from "./UICheckbox.js";
+            let text = new UIText({
+                value: `text`
+            });
+            let number = new UINumber({
+                value: 123,
+                min: 1,
+                max: 200,
+                step: 2
+            });
+            let checkbox = new UICheckbox({
+                value: true
+            });
+            window.addEventListener(`load`, function() {
+                document.body.appendChild(text.element);
+                document.body.appendChild(number.element);
+                document.body.appendChild(checkbox.element);
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

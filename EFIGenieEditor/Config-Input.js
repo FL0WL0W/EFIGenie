@@ -193,7 +193,7 @@ function UpdateOverlay() {
     $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
 }
 
-//if any changes are needed in ConfigInputs, refactor to use UITemplate
+//if any changes are needed in ConfigInputs, refactor to use UI.Template
 class ConfigInputs {
     static Template = getFileContents(`ConfigGui/Inputs.html`);
 
@@ -209,7 +209,7 @@ class ConfigInputs {
     NewInput() {
         const thisClass = this;
         return new ConfigInput({
-            OnChange: function() {$(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());}
+            onChange: function() {$(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());}
         });
     }
 
@@ -377,6 +377,8 @@ class ConfigInputs {
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
         });
+
+        UpdateOverlay();
     }
 
     GetInputsHtml() {
@@ -448,7 +450,7 @@ class ConfigInputs {
     }
 }
 
-class ConfigInput extends UITemplate {
+class ConfigInput extends UI.Template {
     static Template = `<div>$Name$</div>
 <div class="configContainer">
     $TranslationConfig$
@@ -478,7 +480,7 @@ class ConfigInput extends UITemplate {
             ReferenceName:      `Inputs.${prop.Name}`,
             NoParameterSelection: true,
             Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `Input\\$TranslationMeasurement\\$`),
-            OnChange: function() { 
+            onChange: function() { 
                 const subConfig = thisClass.TranslationConfig.GetSubConfig();
                 if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
                     $(`#${thisClass.GUID}-hr`).hide();
@@ -494,16 +496,16 @@ class ConfigInput extends UITemplate {
                 }
             }
         });
-        this.TranslationMeasurement = new UISelection({
+        this.TranslationMeasurement = new UI.Selection({
             Value:              `None`,
             SelectNotVisible:   true,
             Options:            options,
-            OnChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
+            onChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
-        prop.Name = new UIText({
+        prop.Name = new UI.Text({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
-            OnChange: function() { 
+            onChange: function() { 
                 thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
                 thisClass.TranslationConfig.Label = thisClass.Name.Value;
             }
@@ -537,14 +539,14 @@ class ConfigInput extends UITemplate {
     }
 }
 
-class UIPinSelection extends UISelection {
+class UIPinSelection extends UI.Selection {
     constructor(prop){
         super(prop);
         this.SelectDisabled = prop.SelectDisabled ?? true;
         this.SelectValue = prop.SelectValue ?? 0xFFFF;
         this.Class = !prop.Class? `pinselect` : `${prop.Class} pinselect`;
         this.Options = this.GenerateOptionList();
-        this.OnChange.push(function() {
+        this.onChange.push(function() {
             UpdateOverlay();
         })
     }
@@ -580,7 +582,7 @@ class UIPinSelection extends UISelection {
     }
 }
 
-class Input_Analog extends UITemplate {
+class Input_Analog extends UI.Template {
     static Name = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -612,7 +614,7 @@ class Input_Analog extends UITemplate {
 }
 RawInputConfigs.push(Input_Analog);
 
-class Input_Digital extends UITemplate {
+class Input_Digital extends UI.Template {
     static Name = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
@@ -625,7 +627,7 @@ class Input_Digital extends UITemplate {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UICheckbox();
+        this.Inverted = new UI.Checkbox();
         this.Setup(prop);
     }
 
@@ -646,7 +648,7 @@ class Input_Digital extends UITemplate {
 }
 RawInputConfigs.push(Input_Digital);
 
-class Input_DigitalRecord extends UITemplate {
+class Input_DigitalRecord extends UI.Template {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
@@ -660,8 +662,8 @@ class Input_DigitalRecord extends UITemplate {
             Value: 0xFFFF,
             PinType: `digitalinterrupt`
         });
-        this.Inverted = new UICheckbox();
-        this.Length = new UINumber ({
+        this.Inverted = new UI.Checkbox();
+        this.Length = new UI.Number ({
             Value: 2,
             Step: 1,
             Min: 1,
@@ -688,7 +690,7 @@ class Input_DigitalRecord extends UITemplate {
 }
 RawInputConfigs.push(Input_DigitalRecord);
 
-class Input_DutyCycle extends UITemplate {
+class Input_DutyCycle extends UI.Template {
     static Name = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -702,7 +704,7 @@ class Input_DutyCycle extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
@@ -729,7 +731,7 @@ class Input_DutyCycle extends UITemplate {
 }
 RawInputConfigs.push(Input_DutyCycle);
 
-class Input_Frequency extends UITemplate {
+class Input_Frequency extends UI.Template {
     static Name = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -743,7 +745,7 @@ class Input_Frequency extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
@@ -770,7 +772,7 @@ class Input_Frequency extends UITemplate {
 }
 RawInputConfigs.push(Input_Frequency);
 
-class Input_PulseWidth extends UITemplate {
+class Input_PulseWidth extends UI.Template {
     static Name = `Pulse Width Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -784,7 +786,7 @@ class Input_PulseWidth extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,

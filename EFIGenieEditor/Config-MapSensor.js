@@ -1,7 +1,7 @@
 var MapConfigs = [];
 InputConfigs.unshift({Group: `MAP Sensors`, Configs: MapConfigs});
 
-class Input_AnalogPolynomial extends UITemplate {
+class Input_AnalogPolynomial extends UI.Template {
     static Template = `<div><span style="float: right;">$VoltageLiveUpdate$</span>$AnalogInput$</div>`//$Polynomial$</div>`
     static Output = `float`;
     static Inputs = [];

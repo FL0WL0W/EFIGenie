@@ -1,6 +1,6 @@
 var BooleanOutputConfigs = [];
 
-class Output_Digital extends UITemplate {
+class Output_Digital extends UI.Template {
     static Name = `Digital Pin`;
     static Inputs = [`bool`];
     static Template = `<div><label>Pin:</label>$Pin$$Inverted$Inverted $HighZ$High Z</div>`
@@ -11,8 +11,8 @@ class Output_Digital extends UITemplate {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UICheckbox();
-        this.HighZ = new UICheckbox();
+        this.Inverted = new UI.Checkbox();
+        this.HighZ = new UI.Checkbox();
         this.Setup(prop);
     }
 

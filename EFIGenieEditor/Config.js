@@ -377,7 +377,7 @@ for(var index in STM32TypeAlignment) {
     }
 }
 
-class ConfigTop extends UITemplate {
+class ConfigTop extends UI.Template {
     static Template = getFileContents(`ConfigGui/Top.html`);
 
     constructor(prop){
@@ -561,7 +561,7 @@ class ConfigTop extends UITemplate {
     }
 }
 
-class ConfigFuel extends UITemplate {
+class ConfigFuel extends UI.Template {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
@@ -690,7 +690,7 @@ class ConfigFuel extends UITemplate {
     }
 }
 
-class ConfigIgnition extends UITemplate {
+class ConfigIgnition extends UI.Template {
     static Template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
@@ -812,7 +812,7 @@ class ConfigIgnition extends UITemplate {
     }
 }
 
-class ConfigEngine extends UITemplate {
+class ConfigEngine extends UI.Template {
     static Template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
@@ -951,7 +951,7 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
 
     constructor(prop) {
         super();
-        this.TDC = new UINumber({
+        this.TDC = new UI.Number({
             Value:  0,
             Step:   1,
             Min:    0,
@@ -961,7 +961,7 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
     }
 }
 
-class CylinderAirmass_SpeedDensity extends UITemplate {
+class CylinderAirmass_SpeedDensity extends UI.Template {
     static Name = `Speed Density`;
     static Measurement = `Mass`;
     static Output = `float`;
@@ -970,7 +970,7 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
 
     constructor(prop) {
         super();
-        this.CylinderVolume = new UINumberWithMeasurement({
+        this.CylinderVolume = new UI.NumberWithMeasurement({
             Value:              0.66594,
             Step:               0.001,
             Min:                0.001,
@@ -998,7 +998,7 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
 
-class InjectorPulseWidth_DeadTime extends UITemplate {
+class InjectorPulseWidth_DeadTime extends UI.Template {
     static Name = `Dead Time`;
     static Output = `float`;
     static Measurement = `Time`;
@@ -1021,7 +1021,7 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
             ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementUnitName:`ms`
         });
-        this.MinInjectorFuelMass = new UINumberWithMeasurement({
+        this.MinInjectorFuelMass = new UI.NumberWithMeasurement({
             Value:              0.005,
             Step:               0.001,
             Measurement:        `Mass`,
