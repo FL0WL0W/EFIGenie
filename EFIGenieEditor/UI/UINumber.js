@@ -1,6 +1,5 @@
 import UIElement from "./UIElement.js"
 export default class UINumber extends UIElement {
-    element = document.createElement(`input`);
     onChange = [];
 
     get min() {
@@ -53,7 +52,7 @@ export default class UINumber extends UIElement {
     }
 
     constructor(prop) {
-        super();
+        super(`input`);
         this.element.type = `number`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))

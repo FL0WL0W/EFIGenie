@@ -22,7 +22,12 @@ export default class UIElement {
         if(hidden) {
             this.element.style.display = `none`;
         } else {
-            this.element.style.display = `block`;
+            this.element.style.display = `inline-block`;
         }
+    }
+
+    constructor(tagName) {
+        this.element = document.createElement(tagName);
+        this.element.style.display = `inline-block`;
     }
 }

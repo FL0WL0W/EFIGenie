@@ -1,6 +1,5 @@
 import UIElement from "./UIElement.js"
 export default class UICheckbox extends UIElement {
-    element = document.createElement(`input`);
     onChange = [];
 
     get value() {
@@ -22,7 +21,7 @@ export default class UICheckbox extends UIElement {
     }
 
     constructor(prop) {
-        super();
+        super(`input`);
         this.element.type = `checkbox`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))

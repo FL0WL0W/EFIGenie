@@ -552,7 +552,7 @@ class UIPinSelection extends UI.Selection {
     }
 
     GetHtml() {
-        return `<div data-pinselectmode="${this.PinType}"${super.GetHtml().substring(4)}`;
+        return `<span data-pinselectmode="${this.PinType}"${super.GetHtml().substring(5)}`;
     }
 
     GenerateOptionList() {

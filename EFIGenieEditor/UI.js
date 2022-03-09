@@ -1,6 +1,7 @@
 import UINumber from "./UI/UINumber.js"
 import UICheckbox from "./UI/UICheckbox.js";
 import UIText from "./UI/UIText.js";
+import UISelection from "./UI/UISelection.js";
 
 class Template {
     GUID = generateGUID();
@@ -358,172 +359,72 @@ class Text extends UIText {
     }
 };
 
-class Selection {
-    static ParseValue(type, value) {
-        switch(type) {
-            case `number`:
-                return parseFloat(value);
-            case `boolean`:
-                if(typeof value === `number`)
-                    return value !== 0;
-                if(typeof value === `boolean`)
-                    return value;
-                if(typeof value === `string`)
-                    return value === `true` || value === `True` || value === `1`;
-                if(typeof value === `object`) {
-                    if(value)
-                        return true;
-                    return false;
-                }
-            case `string`:
-                if(typeof value === `number` || typeof value === `boolean`)
-                    return `${value}`;
-                if(typeof value === `string`)
-                    return value;
-                if(typeof value === `object`)
-                    return JSON.stringify(value);
-            case `object`:
-                if(typeof value === `number` || typeof value === `boolean` || typeof value === `object`)
-                    return value;
-                if(typeof value === `string`)
-                    return JSON.parse(value);
-                break;
-        }
-    }
-
+class Selection extends UISelection {
     GUID = generateGUID();
-    onChange = [];
-    SelectDisabled = false;
-    SelectName = `select`;
 
-    _hidden = false;
     get Hidden() {
-        return this._hidden;
+        return this.hidden;
     }
     set Hidden(hidden) {
-        if(this._hidden === hidden)
-            return;
-            
-        this._hidden = hidden;
-        if(hidden) {
-            $(`[id="${this.GUID}"]`).hide();
-        } else {
-            $(`[id="${this.GUID}"]`).show();
-            $(`[id="${this.GUID}"]`).attr(`style`, `display: inline-block;`)
-        }
+        this.hidden = hidden;
     }
 
-    _options = [];
+    set Class(pclass) {
+        this.class = pclass;
+    }
+
+    get SelectName() {
+        return this.selectName;
+    }
+    set SelectName(selectName) {
+        this.selectName = selectName;
+    }
+
+    get SelectValue() {
+        return this.selectValue;
+    }
+    set SelectValue(selectValue) {
+        this.selectValue = selectValue;
+    }
+
+    get SelectDisabled() {
+        return this.selectDisabled;
+    }
+    set SelectDisabled(selectDisabled) {
+        this.selectDisabled = selectDisabled;
+    }
+
     get Options() {
-        return this._options;
+        return this.options;
     }
     set Options(options) {
-        if(objectTester(this._options, options)) 
-            return;
-        
-        this._options = options;
+        this.options = options;
     }
 
-    _value = ``;
     get Value() {
-        return this._value;
+        return this.value;
     }
     set Value(value) {
-        if(this._value === value)
-            return;
-
-        this._value = value;
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.onChange.forEach(function(onChange) { onChange(); });
+        this.value = value;
     }
 
     constructor(prop) {
-        Object.assign(this, prop);
-        if(!Array.isArray(this.onChange))
-            this.onChange = [ this.onChange ];
+        super(prop);
     }
 
     get SaveValue() {
-        return this.Value;
+        return this.saveValue;
     }
     set SaveValue(saveValue){
-        this.Value = saveValue;
-    }
-
-    Detach() {
-        $(document).off(`click.${this.GUID}`);
-        $(document).off(`click.${this.GUID}-context`);
+        this.saveValue = saveValue;
     }
 
     Attach() {
-        this.Detach();
-        var thisClass = this;
-        let visible = false;
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e) {
-            if(visible) 
-                return;
-
-            $(`#${thisClass.GUID}`).append(`<div id="${thisClass.GUID}-options" class="context-menu">${thisClass.GetOptionsHtml()}</div>`);
-            $(document).on(`click.${thisClass.GUID}-context`, function(){
-                $(`#${thisClass.GUID}-options`).remove();
-                $(document).off(`click.${thisClass.GUID}-context`);
-                visible = false;
-            });
-            visible = true;
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-options p`, function(e) {
-            const t = $(this);
-            const type = t.attr(`data-type`);
-            if(type === undefined)
-                return;
-            const val = t.attr(`data-value`);
-            thisClass.Value = UI.Selection.ParseValue(type, val);
-            $(document).trigger(`change`);
-        });
-    }
-
-    GetOptionsHtml() {
-        var optionsHtml = ``;
-        this._options.forEach(option => {
-            if(option.Group){
-                var groupHtml = ``;
-                option.Options.forEach(option => {
-                    var stringOptionValue = UI.Selection.ParseValue(`string`, option.Value)
-                    groupHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
-                        `${option.Class || option.Disabled? ` class="${option.Class ?? ``}${option.Disabled? ` disabled`: ``}"` : ``}` + 
-                        `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
-                });
-
-                if(groupHtml) 
-                    optionsHtml += `<div class="selectgroup">${option.Group}</div><div>${groupHtml}</div>`;
-            } else {
-                var stringOptionValue = UI.Selection.ParseValue(`string`, option.Value)
-                optionsHtml += `<p data-type="${typeof option.Value}" data-value='${stringOptionValue}'` + 
-                    `${option.Class || option.Disabled? ` class="${option.Class ?? ``}${option.Disabled? ` disabled`: ``}"` : ``}` + 
-                    `>${option.Name}${option.Info !== undefined? ` ${option.Info}` : ``}</p>`;
-            }
-        });
-        if(!this.SelectNotVisible) {
-            optionsHtml = `<p ${this.SelectDisabled? ` class="disabled"` : ``}${this.SelectValue !== undefined? ` data-type="${typeof this.SelectValue}" data-value="${this.SelectValue}"` : ``}` +
-                `>${this.SelectName}</p>${optionsHtml}`;
-        }
-        return optionsHtml;
+        $(`#${this.GUID}`).append(this.element);
     }
 
     GetHtml() {
-        var html = `<div id="${this.GUID}" style="display: ${this._hidden? `none` : `inline-block`};" class="select`;
-
-        if(this.Class !== undefined)
-            html += ` ${this.Class}`;
-
-        var stringValue = UI.Selection.ParseValue(`string`, this.Value);
-        var selectedOption = this._options.find(x => UI.Selection.ParseValue(`string`, x.Value) === stringValue || x.Options?.findIndex(x => UI.Selection.ParseValue(`string`, x.Value) === stringValue) > -1)
-        if(selectedOption?.Group)
-            selectedOption = selectedOption.Options.find(x => UI.Selection.ParseValue(`string`, x.Value) === stringValue);
-
-        return `${html}" data-value="${stringValue}">${selectedOption?.Name ?? this.SelectName}<div style="float: right;">▼</div></div>`;
+        return `<span id="${this.GUID}"></span>`
     }
 };
 
