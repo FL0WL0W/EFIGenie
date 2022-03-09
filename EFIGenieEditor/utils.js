@@ -215,12 +215,7 @@ function IsBrowserSupported() {
 }
 
 function GetClassProperty(cl, prop) {
-    if(cl === undefined)
-        return undefined;
-    if(cl[prop] !== undefined)
-        return cl[prop];
-    else
-        return cl.constructor[prop];
+    return cl?.[prop] ?? cl?.constructor?.[prop];
 }
 
 // Helper to return a value's internal object [[Class]]

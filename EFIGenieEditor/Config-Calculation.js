@@ -23,7 +23,7 @@ var OperationArchitectureFactoryIDs = {
 }
 
 
-class Calculation_Static extends UI.NumberWithMeasurement {
+class Calculation_Static extends UI.OldNumberWithMeasurement {
     static Name = `Static`;
     static Output = `float`;
     static Inputs = [];
@@ -40,7 +40,7 @@ class Calculation_Static extends UI.NumberWithMeasurement {
 }
 GenericConfigs.push(Calculation_Static);
 
-//this could be refactored to use UI.Template, but it works well and i forsee no changes needed so leaving as is
+//this could be refactored to use UI.OldTemplate, but it works well and i forsee no changes needed so leaving as is
 class Calculation_Polynomial {
     static Name = `Polynomial`;
     static Output = `float`;
@@ -196,7 +196,7 @@ function TableGetType(tableValue) {
     return GetType(max);
 }
 
-class Calculation_LookupTable extends UI.Template {
+class Calculation_LookupTable extends UI.OldTemplate {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
@@ -252,7 +252,7 @@ class Calculation_LookupTable extends UI.Template {
 
         const thisClass = this;
         if(!this.ParameterSelection) {
-            this.ParameterSelection = new UI.Selection({
+            this.ParameterSelection = new UI.OldSelection({
                 Options: GetSelections(),
                 onChange: function() {
                     thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
@@ -352,7 +352,7 @@ class Calculation_LookupTable extends UI.Template {
 }
 GenericConfigs.push(Calculation_LookupTable);
 
-class Calculation_2AxisTable extends UI.Template {
+class Calculation_2AxisTable extends UI.OldTemplate {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
@@ -438,7 +438,7 @@ class Calculation_2AxisTable extends UI.Template {
 
         const thisClass = this;
         if(!this.XSelection) {
-            this.XSelection = new UI.Selection({
+            this.XSelection = new UI.OldSelection({
                 SelectNotVisible: true,
                 Options: GetSelections(),
                 onChange: function() {
@@ -449,7 +449,7 @@ class Calculation_2AxisTable extends UI.Template {
             this.Table.XLabel = this.XSelection.GetHtml();
         }
         if(!this.YSelection) {
-            this.YSelection = new UI.Selection({
+            this.YSelection = new UI.OldSelection({
                 SelectNotVisible: true,
                 Options: GetSelections(),
                 onChange: function() {
@@ -637,7 +637,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
     return selections;
 }
 
-class CalculationOrVariableSelection extends UI.Template {
+class CalculationOrVariableSelection extends UI.OldTemplate {
     static Template = `<div><label>$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
     ConfigValues = [];
 
@@ -713,15 +713,15 @@ class CalculationOrVariableSelection extends UI.Template {
         if(this.Selection.Value) {
             let selections = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
             let match = false;
-            let stringValue = UI.Selection.ParseValue(`string`, this.Selection.Value)
+            let stringValue = UI.OldSelection.ParseValue(`string`, this.Selection.Value)
             selections.forEach(option => {
                 if(option.Group){
                     option.Options.forEach(option => {
-                        if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
+                        if(UI.OldSelection.ParseValue(`string`, option.Value) === stringValue)
                             match = true;
                     });
                 } else {
-                    if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
+                    if(UI.OldSelection.ParseValue(`string`, option.Value) === stringValue)
                         match = true;
                 }
             });
@@ -738,7 +738,7 @@ class CalculationOrVariableSelection extends UI.Template {
             Measurement: prop?.Measurement,
             MeasurementUnitName: prop?.MeasurementUnitName
         });
-        this.Selection = new UI.Selection({
+        this.Selection = new UI.OldSelection({
             Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
             SelectDisabled: false,
             SelectName: `None`,
@@ -918,7 +918,7 @@ class CalculationOrVariableSelection extends UI.Template {
     }
 }
 
-class Calculation_Operation extends UI.Template {
+class Calculation_Operation extends UI.OldTemplate {
     static Name=`Operation`
     static Template=`</br><div class="configContainer"><div><span style="float: right;">$LiveUpdate$</span>$Base$</div>$SubOperation$<span class="controladd">+ Add Operation</span></div`;
     static Output = `float`;
@@ -938,7 +938,7 @@ class Calculation_Operation extends UI.Template {
             MeasurementUnitName:   prop?.MeasurementUnitName,
             Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
         })];
-        this.OperationSelection = [new UI.Selection({
+        this.OperationSelection = [new UI.OldSelection({
             Options: [
                 { Name: `Adder`,        Value: 1 },
                 { Name: `Subtracter`,   Value: 2 },
@@ -948,7 +948,7 @@ class Calculation_Operation extends UI.Template {
             Class: `subOperationSelection`,
             SelectDisabled: true
         })];
-        this.OperationName = [new UI.Text({
+        this.OperationName = [new UI.OldText({
             Class: `subOperationName`,
             onChange: function() {
                 thisClass.SubOperation[0].Label = thisClass.OperationName[0].Value;

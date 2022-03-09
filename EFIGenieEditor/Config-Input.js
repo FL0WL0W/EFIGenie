@@ -193,7 +193,7 @@ function UpdateOverlay() {
     $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
 }
 
-//if any changes are needed in ConfigInputs, refactor to use UI.Template
+//if any changes are needed in ConfigInputs, refactor to use UI.OldTemplate
 class ConfigInputs {
     static Template = getFileContents(`ConfigGui/Inputs.html`);
 
@@ -450,7 +450,7 @@ class ConfigInputs {
     }
 }
 
-class ConfigInput extends UI.Template {
+class ConfigInput extends UI.OldTemplate {
     static Template = `<div>$Name$</div>
 <div class="configContainer">
     $TranslationConfig$
@@ -496,13 +496,13 @@ class ConfigInput extends UI.Template {
                 }
             }
         });
-        this.TranslationMeasurement = new UI.Selection({
+        this.TranslationMeasurement = new UI.OldSelection({
             Value:              `None`,
             SelectNotVisible:   true,
             Options:            options,
             onChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
-        prop.Name = new UI.Text({
+        prop.Name = new UI.OldText({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
             onChange: function() { 
@@ -539,23 +539,20 @@ class ConfigInput extends UI.Template {
     }
 }
 
-class UIPinSelection extends UI.Selection {
+class UIPinSelection extends UI.OldSelection {
     constructor(prop){
         super(prop);
         this.SelectDisabled = prop.SelectDisabled ?? true;
         this.SelectValue = prop.SelectValue ?? 0xFFFF;
-        this.Class = !prop.Class? `pinselect` : `${prop.Class} pinselect`;
-        this.Options = this.GenerateOptionList();
+        this.Options = this.#generateOptionList();
         this.onChange.push(function() {
             UpdateOverlay();
         })
+        this.selectedElement.dataset.pinselectmode = this.PinType;
+        this.selectedElement.classList.add(`pinselect`);
     }
 
-    GetHtml() {
-        return `<span data-pinselectmode="${this.PinType}"${super.GetHtml().substring(5)}`;
-    }
-
-    GenerateOptionList() {
+    #generateOptionList() {
         var options = []
         var endOptions = [];
         for(var i = 0; i < PinOut.Pins.length; i++) {
@@ -582,7 +579,7 @@ class UIPinSelection extends UI.Selection {
     }
 }
 
-class Input_Analog extends UI.Template {
+class Input_Analog extends UI.OldTemplate {
     static Name = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -614,7 +611,7 @@ class Input_Analog extends UI.Template {
 }
 RawInputConfigs.push(Input_Analog);
 
-class Input_Digital extends UI.Template {
+class Input_Digital extends UI.OldTemplate {
     static Name = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
@@ -627,7 +624,7 @@ class Input_Digital extends UI.Template {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UI.Checkbox();
+        this.Inverted = new UI.OldCheckbox();
         this.Setup(prop);
     }
 
@@ -648,7 +645,7 @@ class Input_Digital extends UI.Template {
 }
 RawInputConfigs.push(Input_Digital);
 
-class Input_DigitalRecord extends UI.Template {
+class Input_DigitalRecord extends UI.OldTemplate {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
@@ -662,8 +659,8 @@ class Input_DigitalRecord extends UI.Template {
             Value: 0xFFFF,
             PinType: `digitalinterrupt`
         });
-        this.Inverted = new UI.Checkbox();
-        this.Length = new UI.Number ({
+        this.Inverted = new UI.OldCheckbox();
+        this.Length = new UI.OldNumber ({
             Value: 2,
             Step: 1,
             Min: 1,
@@ -690,7 +687,7 @@ class Input_DigitalRecord extends UI.Template {
 }
 RawInputConfigs.push(Input_DigitalRecord);
 
-class Input_DutyCycle extends UI.Template {
+class Input_DutyCycle extends UI.OldTemplate {
     static Name = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -704,7 +701,7 @@ class Input_DutyCycle extends UI.Template {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.NumberWithMeasurement({
+        this.MinFrequency = new UI.OldNumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
@@ -731,7 +728,7 @@ class Input_DutyCycle extends UI.Template {
 }
 RawInputConfigs.push(Input_DutyCycle);
 
-class Input_Frequency extends UI.Template {
+class Input_Frequency extends UI.OldTemplate {
     static Name = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -745,7 +742,7 @@ class Input_Frequency extends UI.Template {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.NumberWithMeasurement({
+        this.MinFrequency = new UI.OldNumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,
@@ -772,7 +769,7 @@ class Input_Frequency extends UI.Template {
 }
 RawInputConfigs.push(Input_Frequency);
 
-class Input_PulseWidth extends UI.Template {
+class Input_PulseWidth extends UI.OldTemplate {
     static Name = `Pulse Width Pin`;
     static Output = `float`;
     static Inputs = [];
@@ -786,7 +783,7 @@ class Input_PulseWidth extends UI.Template {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.NumberWithMeasurement({
+        this.MinFrequency = new UI.OldNumberWithMeasurement({
             Value: 1000,
             Step: 1,
             Min: 0,

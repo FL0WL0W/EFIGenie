@@ -377,7 +377,7 @@ for(var index in STM32TypeAlignment) {
     }
 }
 
-class ConfigTop extends UI.Template {
+class ConfigTop extends UI.OldTemplate {
     static Template = getFileContents(`ConfigGui/Top.html`);
 
     constructor(prop){
@@ -561,7 +561,7 @@ class ConfigTop extends UI.Template {
     }
 }
 
-class ConfigFuel extends UI.Template {
+class ConfigFuel extends UI.OldTemplate {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
@@ -690,7 +690,7 @@ class ConfigFuel extends UI.Template {
     }
 }
 
-class ConfigIgnition extends UI.Template {
+class ConfigIgnition extends UI.OldTemplate {
     static Template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
@@ -812,7 +812,7 @@ class ConfigIgnition extends UI.Template {
     }
 }
 
-class ConfigEngine extends UI.Template {
+class ConfigEngine extends UI.OldTemplate {
     static Template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
@@ -951,7 +951,7 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
 
     constructor(prop) {
         super();
-        this.TDC = new UI.Number({
+        this.TDC = new UI.OldNumber({
             Value:  0,
             Step:   1,
             Min:    0,
@@ -961,7 +961,7 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
     }
 }
 
-class CylinderAirmass_SpeedDensity extends UI.Template {
+class CylinderAirmass_SpeedDensity extends UI.OldTemplate {
     static Name = `Speed Density`;
     static Measurement = `Mass`;
     static Output = `float`;
@@ -970,7 +970,7 @@ class CylinderAirmass_SpeedDensity extends UI.Template {
 
     constructor(prop) {
         super();
-        this.CylinderVolume = new UI.NumberWithMeasurement({
+        this.CylinderVolume = new UI.OldNumberWithMeasurement({
             Value:              0.66594,
             Step:               0.001,
             Min:                0.001,
@@ -998,7 +998,7 @@ class CylinderAirmass_SpeedDensity extends UI.Template {
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
 
-class InjectorPulseWidth_DeadTime extends UI.Template {
+class InjectorPulseWidth_DeadTime extends UI.OldTemplate {
     static Name = `Dead Time`;
     static Output = `float`;
     static Measurement = `Time`;
@@ -1021,7 +1021,7 @@ class InjectorPulseWidth_DeadTime extends UI.Template {
             ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementUnitName:`ms`
         });
-        this.MinInjectorFuelMass = new UI.NumberWithMeasurement({
+        this.MinInjectorFuelMass = new UI.OldNumberWithMeasurement({
             Value:              0.005,
             Step:               0.001,
             Measurement:        `Mass`,

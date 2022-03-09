@@ -53,14 +53,14 @@ class Reluctor_Universal1x extends Reluctor_Template {
                         `<div><label for="$FallingPosition.GUID$">Falling Edge Position:</label>$FallingPosition$</div>`;
     constructor(prop){
         super();
-        this.RisingPosition = new UI.NumberWithMeasurement({
+        this.RisingPosition = new UI.OldNumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        this.FallingPosition = new UI.NumberWithMeasurement({
+        this.FallingPosition = new UI.OldNumberWithMeasurement({
             Value: 180,
             Step: 0.1,
             Min: 0,
@@ -99,25 +99,25 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
 
     constructor(prop){
         super()
-        this.FirstToothPosition = new UI.NumberWithMeasurement({
+        this.FirstToothPosition = new UI.OldNumberWithMeasurement({
             Value: 0,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        this.ToothWidth = new UI.NumberWithMeasurement({
+        this.ToothWidth = new UI.OldNumberWithMeasurement({
             Value: 5,
             Step: 0.1,
             Min: 0,
             Max: 360,
             Measurement: `Angle`
         });
-        this.NumberOfTeeth = new UI.Number({
+        this.NumberOfTeeth = new UI.OldNumber({
             Value: 36,
             Min: 2
         });
-        this.NumberOfTeethMissing = new UI.Number({
+        this.NumberOfTeethMissing = new UI.OldNumber({
             Value: 1,
             Min: 1
         });

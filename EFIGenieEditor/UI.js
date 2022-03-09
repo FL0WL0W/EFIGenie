@@ -2,6 +2,7 @@ import UINumber from "./UI/UINumber.js"
 import UICheckbox from "./UI/UICheckbox.js";
 import UIText from "./UI/UIText.js";
 import UISelection from "./UI/UISelection.js";
+import UITemplate from "./UI/UITemplate.js";
 
 class Template {
     GUID = generateGUID();
@@ -526,7 +527,7 @@ class NumberWithMeasurement extends Template {
                 thisClass.UpdateDisplayValue()
             }
         });
-        this.DisplayValue = new UI.Number({
+        this.DisplayValue = new UI.OldNumber({
             ExcludeFromonChange: true,
             onChange: function() {
                 if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
@@ -577,10 +578,15 @@ class NumberWithMeasurement extends Template {
 }
 
 export default { UI: {
-    Template,
-    Number,
-    Checkbox,
-    Text,
-    Selection,
-    NumberWithMeasurement,
+    Template: UITemplate,
+    OldTemplate: Template,
+    Number: UINumber,
+    OldNumber: Number,
+    Checkbox: UICheckbox,
+    OldCheckbox: Checkbox,
+    Text: UIText,
+    OldText: Text,
+    Selection: UISelection,
+    OldSelection: Selection,
+    OldNumberWithMeasurement : NumberWithMeasurement,
 }}

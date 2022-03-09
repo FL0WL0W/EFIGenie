@@ -1,6 +1,5 @@
 import UIElement from "./UIElement.js"
 export default class UIText extends UIElement {
-    element = document.createElement(`input`);
     onChange = [];
 
     get value() {
@@ -22,7 +21,7 @@ export default class UIText extends UIElement {
     }
 
     constructor(prop) {
-        super();
+        super(`input`);
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];

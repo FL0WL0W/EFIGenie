@@ -231,7 +231,7 @@ class UIMeasurement {
     }
 }
 
-class DisplayNumberWithMeasurement extends UI.Template {
+class DisplayNumberWithMeasurement extends UI.OldTemplate {
     static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
 
     get MeasurementUnitName() {
