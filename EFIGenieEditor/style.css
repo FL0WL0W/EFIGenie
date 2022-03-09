@@ -351,9 +351,12 @@ input[type="number"]:hover {
     border-color: #3590d0;
 }
 .context-menu .selectgroup {
-    background-color: #3590d0;
+    background-color: #505962;
     border-top: 1px solid #505962;
     border-bottom: 1px solid transparent;
+}
+.context-menu .selectoption.selected {
+    background-color: #3590d0;
 }
 .context-menu .selectoption {
     padding: 0 0 0 1em;

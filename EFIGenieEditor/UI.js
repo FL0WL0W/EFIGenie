@@ -394,6 +394,13 @@ class Selection extends UISelection {
         this.selectDisabled = selectDisabled;
     }
 
+    get SelectNotVisible(){
+        return this.selectNotVisible
+    }
+    set SelectNotVisible(selectNotVisible) {
+        this.selectNotVisible = selectNotVisible;
+    }
+
     get Options() {
         return this.options;
     }
