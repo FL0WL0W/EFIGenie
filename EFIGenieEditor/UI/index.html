@@ -6,8 +6,9 @@
             import UICheckbox from "./UICheckbox.js";
             import UITemplate from "./UITemplate.js"
             import UISelection from "./UISelection.js"
+            import UITable from "./UITable.js"
             let template = new UITemplate({
-                Template: `<div data-element="text"></div><div data-element="number"></div><div data-element="checkbox"></div><div data-element="selection"></div>`,
+                Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="selection"></div><hr/><div data-element="table2D"></div>`,
                 text: new UIText({
                     value: `text`
                 }),
@@ -24,6 +25,12 @@
                     options: [
                         { Name: `Selection Test`, Value: 1 }
                     ]
+                }),
+                table2D: new UITable({
+                    xAxis: [ 1, 2, 3, 4, 5 ],
+                    yAxis: [ 1, 2, 3, 4, 5, 6 ],
+                    xLabel: `xLabel`,
+                    yLabel: `yLabel`,
                 })
             });
             window.addEventListener(`load`, function() {
