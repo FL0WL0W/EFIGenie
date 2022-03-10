@@ -4,22 +4,30 @@
             import UIText from "./UIText.js";
             import UINumber from "./UINumber.js";
             import UICheckbox from "./UICheckbox.js";
-            let text = new UIText({
-                value: `text`
-            });
-            let number = new UINumber({
-                value: 123,
-                min: 1,
-                max: 200,
-                step: 2
-            });
-            let checkbox = new UICheckbox({
-                value: true
+            import UITemplate from "./UITemplate.js"
+            import UISelection from "./UISelection.js"
+            let template = new UITemplate({
+                Template: `<div data-element="text"></div><div data-element="number"></div><div data-element="checkbox"></div><div data-element="selection"></div>`,
+                text: new UIText({
+                    value: `text`
+                }),
+                number: new UINumber({
+                    value: 123,
+                    min: 1,
+                    max: 200,
+                    step: 2
+                }),
+                checkbox: new UICheckbox({
+                    value: true
+                }),
+                selection: new UISelection({
+                    options: [
+                        { Name: `Selection Test`, Value: 1 }
+                    ]
+                })
             });
             window.addEventListener(`load`, function() {
-                document.body.appendChild(text.element);
-                document.body.appendChild(number.element);
-                document.body.appendChild(checkbox.element);
+                document.body.appendChild(template.element)
             });
         </script>
     </head>

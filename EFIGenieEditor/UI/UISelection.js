@@ -116,9 +116,6 @@ export default class UISelection extends UIElement {
         return this.#options;
     }
     set options(options) {
-        if(objectTester(this.#options, options)) 
-            return;
-        
         this.#options = options;
 
         const thisClass = this;

@@ -1,6 +1,5 @@
 import UIElement from "./UIElement.js"
 export default class UITemplate extends UIElement {
-    element = document.createElement(`input`);
     onChange = [];
 
     constructor(prop) {
@@ -15,7 +14,7 @@ export default class UITemplate extends UIElement {
             this.onChange = [ this.onChange ];
         var thisClass = this;
         var thisEntries = Object.entries(this);
-        thisEntries.forEach(function(elementName, element) {
+        thisEntries.forEach(function([elementName, element]) {
             if(element?.onChange !== undefined && !element?.excludeFromOnChange) {
                 element.onChange.push(function() {
                     thisClass.onChange.forEach(function(onChange) { onChange(); });
@@ -25,16 +24,16 @@ export default class UITemplate extends UIElement {
 
         const template = this.Template ?? this.constructor.Template;
         this.element.innerHTML = template;
-        this.element.querySelectorAll(`span[data-element]`).forEach(function(element){
-            let matchingUI = thisEntries.find(function(elementName) { return element.dataset.element === elementName; });
-            element.replaceWith(matchingUI.element);
+        this.element.querySelectorAll(`[data-element]`).forEach(function(element){
+            let [matchingUIName, matchingUI] = thisEntries.find(function([elementName, e]) { return element.dataset.element === elementName; });
+            element.replaceWith(matchingUI?.element);
         });
     }
     
     get saveValue() {
         let saveValue = {};
 
-        Object.entries(this).forEach(function(elementName, element) {
+        Object.entries(this).forEach(function([elementName, element]) {
             if(element.saveValue !== undefined)
                 saveValue[elementName] = element.saveValue;
         });
@@ -49,7 +48,7 @@ export default class UITemplate extends UIElement {
         if(saveValue === undefined)
             return;
 
-        Object.entries(this).forEach(function(elementName, element) {
+        Object.entries(this).forEach(function([elementName, element]) {
             if(saveValue[elementName] !== undefined && typeof element === `object`) {
                 element.saveValue = saveValue[elementName];
             }
