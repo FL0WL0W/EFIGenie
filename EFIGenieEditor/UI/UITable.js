@@ -41,6 +41,18 @@ export default class UITable extends HTMLDivElement {
             this.#zLabelElement.append(zLabel);
     }
 
+    #trailXY = [];
+    trailTime = 2000;
+    trail(x, y = 0, z) {
+        const thisClass = this;
+        this.#trailXY.unshift([x, y]);
+        setTimeout(function() {
+            thisClass.#trailXY.pop();
+            // thisClass.UpdateTrailHtml();
+        }, this.TrailTime);
+        // this.UpdateTrailHtml();
+    }
+
     get #valueMin() {
         return this.style.getPropertyValue('--valuemin') ?? 18000000000000000000;
     }
@@ -54,7 +66,8 @@ export default class UITable extends HTMLDivElement {
         this.style.setProperty('--valuemax', valueMin);
     }
 
-    #valueElement = document.createElement(`div`);
+    #valueElement       = document.createElement(`div`);
+    #valueInputElement  = document.createElement(`input`);
     get value() {
         return [...this.#valueElement.children].map(x => x.value);
     }
@@ -63,16 +76,27 @@ export default class UITable extends HTMLDivElement {
             return;
         if(value.length !== this.xResolution * this.yResolution)
             throw `Value length does not match table length. Set xResolution and yResolution before setting value`;
-        for(let i = 0; i < this.#valueElement.children.length; i++) {
-            this.#valueElement.children[i].value = parseFloat(value[i]);
-            UITable.#formatElementForDisplay(this.#valueElement.children[i]);
-        }
+        for(let i = 0; i < this.#valueElement.children.length; i++)
+            this.#valueElement.children[i].value = value[i];
         this.dispatchEvent(new Event(`change`));
     }
 
+    static #formatElementForDisplay(value, precision = 6) {
+        let formattedVaue = parseFloat(parseFloat(parseFloat(value).toFixed(precision -1)).toPrecision(precision));
+        if(isNaN(formattedVaue))
+            formattedVaue = `&nbsp;`;
+        return formattedVaue;
+    }
     static #numberValueGetterSetter = {
-        get: function() { return this.dataset.value; },
-        set: function(value) { this.dataset.value = value; this.style.setProperty(`--data-value`, value); }
+        get: function() { return parseFloat(this.querySelector(`input`)?.value ??  this.dataset.value); },
+        set: function(value) { 
+            value = parseFloat(value);
+            this.dataset.value = value; 
+            const inputElement = this.querySelector(`input`);
+            if(inputElement) inputElement.value = value;
+            else this.innerHTML = UITable.#formatElementForDisplay(value);
+            this.style.setProperty(`--data-value`, value); 
+        }
     }
     #resolutionChanged() {
         this.style.setProperty('--xresolution', this.xResolution);
@@ -82,8 +106,8 @@ export default class UITable extends HTMLDivElement {
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
             Object.defineProperty(valueElement, 'value', UITable.#numberValueGetterSetter);
             valueElement.dataset.x = i % this.xResolution;
-            valueElement.dataset.x = parseInt(i/this.yResolution);
-            UITable.#formatElementForDisplay(valueElement);
+            valueElement.dataset.y = parseInt(i/this.yResolution);
+            valueElement.value = valueElement.value;
         }
         if(this.xResolution > 1) {
             if(this.yResolution > 1)
@@ -137,14 +161,13 @@ export default class UITable extends HTMLDivElement {
         for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
             const xAxisElement = this.#xAxisElement.appendChild(document.createElement(`div`)); 
             Object.defineProperty(xAxisElement, 'value', UITable.#numberValueGetterSetter);
-            const xAxisMinus1 = parseFloat(this.#xAxisElement.children[i-1]?.dataset?.value);
-            const xAxisMinus2 = parseFloat(this.#xAxisElement.children[i-2]?.dataset?.value);
+            const xAxisMinus1 = this.#xAxisElement.children[i-1]?.value;
+            const xAxisMinus2 = this.#xAxisElement.children[i-2]?.value;
             let xAxisMinus0 = 0;
             if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined)
                 xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
             xAxisElement.value = xAxisMinus0;
             xAxisElement.dataset.x = i;
-            UITable.#formatElementForDisplay(xAxisElement);
         }
         this.#resolutionChanged();
         //interpolation
@@ -184,14 +207,13 @@ export default class UITable extends HTMLDivElement {
         for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
             const yAxisElement = this.#yAxisElement.appendChild(document.createElement(`div`)); 
             Object.defineProperty(yAxisElement, 'value', UITable.#numberValueGetterSetter);
-            const yAxisMinus1 = parseFloat(this.#yAxisElement.children[i-1]?.dataset?.value);
-            const yAxisMinus2 = parseFloat(this.#yAxisElement.children[i-2]?.dataset?.value);
+            const yAxisMinus1 = this.#yAxisElement.children[i-1]?.value;
+            const yAxisMinus2 = this.#yAxisElement.children[i-2]?.value;
             let yAxisMinus0 = 0;
             if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined)
                 yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
             yAxisElement.value = yAxisMinus0;
             yAxisElement.dataset.y = i;
-            UITable.#formatElementForDisplay(yAxisElement);
         }
         this.#resolutionChanged();
         //interpolation
@@ -201,24 +223,24 @@ export default class UITable extends HTMLDivElement {
 
     #xAxisElement = document.createElement(`div`);
     get xAxis() {
-        return [...this.#xAxisElement.children].map(x => x.dataset.value);
+        return [...this.#xAxisElement.children].map(x => x.value);
     }
     set xAxis(xAxis) {
         this.xResolution = xAxis.length;
         const thisClass = this;
-        xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.dataset.value = xAxisValue; UITable.#formatElementForDisplay(xAxisElement); });
+        xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.value = xAxisValue; });
         //interpolation
         this.dispatchEvent(new Event(`change`));
     }
     
     #yAxisElement = document.createElement(`div`);
     get yAxis() {
-        return [...this.#yAxisElement.children].map(x => x.dataset.value);
+        return [...this.#yAxisElement.children].map(x => x.value);
     }
     set yAxis(yAxis) {
         this.yResolution = yAxis.length;
         const thisClass = this;
-        yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.dataset.value = yAxisValue; UITable.#formatElementForDisplay(yAxisElement); });
+        yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.value = yAxisValue; });
         //interpolation
         this.dispatchEvent(new Event(`change`));
     }
@@ -392,6 +414,7 @@ export default class UITable extends HTMLDivElement {
         this.#xAxisElement.class  = `xAxis`;
         this.#yAxisElement.class  = `yAxis`;
         this.#valueElement.class  = `value`;
+        this.#valueInputElement.type = `number`;
         this.#xResolutionDragElement.class = `xdrag`;
         this.#xResolutionDragElement.rowSpan = 2;
         this.#yResolutionDragElement.class = `ydrag`;
@@ -426,10 +449,12 @@ export default class UITable extends HTMLDivElement {
         this.addEventListener(`change`, calculateMinMaxValue);
         calculateMinMaxValue();
 
-        this.constructTableEventListeners();
+        this.#constructTableEventListeners();
+        this.#constructModifyEventListeners();
+        this.#constructInterpolateEventListeners();
     }
 
-    constructTableEventListeners() {
+    #constructTableEventListeners() {
         const thisClass = this;
         this.#pasteOptionsElement.addEventListener(`click`, function(event) {
             let target = event.target;
@@ -446,12 +471,12 @@ export default class UITable extends HTMLDivElement {
             thisClass.yResolution = parseInt(event.target.value);
         });
         this.#tableElement.addEventListener(`change`, function(event){
-            var x = event.target.dataset.x;
-            var y = event.target.dataset.y;
-            var value = parseFloat(event.target.value);
-            if(isNaN(value))
+            let x = parseInt(event.target.parentElement.dataset.x);
+            let y = parseInt(event.target.parentElement.dataset.y);
+            let value = event.target.value;
+            if(isNaN(value) || (x==undefined && y==undefined))
                 return;
-            
+
             if(x === undefined) {
                 thisClass.#yAxisElement.children[y].value = value;
                 for(let ya=y; ya<thisClass.yResolution; ya++)
@@ -483,42 +508,6 @@ export default class UITable extends HTMLDivElement {
                     else
                         selectedElement.value = value;
                 });
-            }
-        });
-        this.#tableElement.addEventListener(`keypress`, function(event){
-            //plus
-            if(e.which === 43) {
-                e.preventDefault();
-                thisClass.#modifyValueElement.select();
-                thisClass.#modifyAddElement.classList.add(`selected`)
-            }
-            //minus
-            if(e.which === 45) {
-                e.preventDefault();
-                thisClass.#modifyAddElement.hidden = true;
-                thisClass.#modifySubtractElement.hidden = false;
-                thisClass.#modifyValueElement.select();
-                thisClass.#modifySubtractElement.classList.add(`selected`)
-            }
-            //aterisk
-            if(e.which === 42) {
-                e.preventDefault();
-                thisClass.#modifyValueElement.select();
-                thisClass.#modifyMultiplyElement.classList.add(`selected`)
-            }
-            //divide
-            if(e.which === 47) {
-                e.preventDefault();
-                thisClass.#modifyMultiplyElement.hidden = true;
-                thisClass.#modifyDivideElement.hidden = false;
-                thisClass.#modifyValueElement.select();
-                thisClass.#modifyDivideElement.classList.add(`selected`)
-            }
-            //forward slash
-            if(e.which === 61) {
-                e.preventDefault();
-                thisClass.#modifyValueElement.select();
-                thisClass.#modifyEqualElement.classList.add(`selected`)
             }
         });
 
@@ -602,10 +591,19 @@ export default class UITable extends HTMLDivElement {
             thisClass.dispatchEvent(new Event(`change`));
         });
 
-        var dragX = false;
-        var dragY = false;
-        var pointX;
-        var pointY;
+        let dragX = false;
+        let dragY = false;
+        let selecting = false;
+        let pointX;
+        let pointY;
+
+        function mouseMoveEvent(event) {
+            move(event.pageX, event.pageY);
+        }
+        function touchMoveEvent(event) {
+            var touch = event.touches[event.touches.length - 1];
+            move(touch.pageX, touch.pageY);
+        }
 
         function move(pageX, pageY) {
             if(dragX) {
@@ -628,7 +626,7 @@ export default class UITable extends HTMLDivElement {
                     yResolution = 2;
                 thisClass.yResolution = yResolution;
             }
-            // if(thisClass._selecting){
+            if(selecting) {
             //     thisClass._minSelectX = thisClass._xResolution;
             //     thisClass._minSelectY = thisClass._yResolution;
             //     thisClass._maxSelectX = 0;
@@ -682,15 +680,15 @@ export default class UITable extends HTMLDivElement {
             //             $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
             //         }
             //     }
-            // }
+            }
         }
 
-        function up() {
+        function up(event) {
             dragX = false;
             dragY = false;
+            selecting = false;
             document.removeEventListener(`mousemove`, mouseMoveEvent);
 
-            // thisClass._selecting = false;
             // $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
             //     cell=$(cell);
             //     if(cell.is(`:input`))
@@ -701,67 +699,29 @@ export default class UITable extends HTMLDivElement {
         }
 
         document.addEventListener(`mouseup`, up);
+        document.addEventListener(`touchend`, up);
 
-        function mouseMoveEvent(event) {
-            move(event.pageX, event.pageY);
-        }
-        thisClass.#xyResolutionDragElement.addEventListener(`mousedown`, function(event) {
-            dragX = [event.pageX, thisClass.xResolution];
-            dragY = [event.pageY, thisClass.yResolution];
+        function down(event) {
+            if(event.target.type !== `number`) {
+                thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
+                thisClass.#tableElement.querySelectorAll(`input`)?.forEach(function(element) { element.parentElement.innerHTML = UITable.#formatElementForDisplay(element.parentElement.value); });
+                if(event.target.dataset.x !== undefined || event.target.dataset.y !== undefined) {
+                    event.target.classList.add(`selected`)
+                    event.target.innerHTML = ``;
+                    thisClass.#valueInputElement.value = event.target.value;
+                    event.target.append(thisClass.#valueInputElement);
+                    thisClass.#valueInputElement.select();
+                }
+            }
+
+            thisClass.selecting = [
+                event.target.offsetLeft - thisClass.#tableElement.offsetLeft,
+                event.target.offsetTop - thisClass.#tableElement.offsetTop,
+            ];
+            document.addEventListener(`touchmove`, touchMoveEvent);
             document.addEventListener(`mousemove`, mouseMoveEvent);
-        });
-        thisClass.#xResolutionDragElement.addEventListener(`mousedown`, function(event) {
-            dragX = [event.pageX, thisClass.xResolution];
-            document.addEventListener(`mousemove`, mouseMoveEvent);
-        });
-        thisClass.#yResolutionDragElement.addEventListener(`mousedown`, function(event) {
-            dragY = [event.pageY, thisClass.yResolution];
-            document.addEventListener(`mousemove`, mouseMoveEvent);
-        });
-    }
-
-    static #formatElementForDisplay(element, precision = 6) {
-        // let formattedVaue = parseFloat(parseFloat(parseFloat(element.value).toFixed(precision -1)).toPrecision(precision));
-        // if(isNaN(formattedVaue))
-        //     formattedVaue = `&nbsp;`;
-        element.innerHTML = element.value;
-    }
-}
-customElements.define('ui-table', UITable, { extends: 'div' });
-// class TableOld {
-//     ReverseY = false;
-
-//     _trailXY = [];
-//     TrailTime = 2000;
-//     Trail(x, y = 0, z) {
-//         const thisClass = this;
-//         this._trailXY.unshift([x, y]);
-//         setTimeout(function() {
-//             thisClass._trailXY.pop();
-//             thisClass.UpdateTrailHtml();
-//         }, this.TrailTime);
-//         this.UpdateTrailHtml();
-//     }
-
-//     _attachTable() {
-//         var dragX = false;
-//         var dragY = false;
-//         var pointX;
-//         var pointY;
 
 
-//         function down() {
-//             $(document).on(`touchmove.${thisClass.GUID}`, function(e){
-//                 var touch = e.touches[e.touches.length - 1];
-//                 move(touch.pageX, touch.pageY);
-//             });
-//             $(document).on(`mousemove.${thisClass.GUID}`, function(e){
-//                 move(e.pageX, e.pageY);
-//             });
-
-//             const downElement = $(this);
-
-//             downElement.focus();
 //             $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
 //                 cell=$(cell);
 //                 if(cell.attr(`data-x`) === downElement.attr(`data-x`) && cell.attr(`data-y`) === downElement.attr(`data-y`))
@@ -786,281 +746,252 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             x = parseInt(x);
 //             y = parseInt(y);
 
-//             thisClass._selecting = true;
 //             thisClass._minSelectX = x;
 //             thisClass._minSelectY = y;
 //             thisClass._maxSelectX = x;
 //             thisClass._maxSelectY = y;
 //             let circleSelector = $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`);
 //             circleSelector.addClass(`selected`);
+        }
 
-//             pointX =  downElement.offset().left - downElement.closest(`table`).offset()?.left;
-//             pointY =  downElement.offset().top - downElement.closest(`table`).offset()?.top;
-//         }
+        this.#tableElement.addEventListener(`mousedown`, function(event) {
+            if(event.button === 2) {
+                down(event);
+                event.target.select();
+                up(event);
+                event.preventDefault();
+            } else if(event.button == 0) {
+                down(event);
+            }
+        });
+        this.#tableElement.addEventListener(`contextmenu`, function(event) {
+            down(event);
+            event.preventDefault();
+        });
 
-//         $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
-//             down.call(this);
-//             e.preventDefault();
-//         });
-//         $(document).on(`mousedown.${this.GUID}`, `#${this.GUID}-table div.number`, function(e){
-//             if(e.which === 3) {
-//                 down.call(this);
-//                 $(`#${$(this).attr(`id`)}`).select();
-//                 up.call(this);
-//                 e.preventDefault();
-//             } else if(e.which == 1) {
-//                 down.call(this);
-//             }
-//         });
-        
-//         $(document).on(`touchend.${this.GUID}`, function(e){
-//             up.call(this);
-//         });
-//         $(document).on(`mouseup.${this.GUID}`, function(e){
-//             up.call(this);
-//         });
+        this.#xyResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragX = [event.pageX, thisClass.xResolution];
+            dragY = [event.pageY, thisClass.yResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
+        this.#xResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragX = [event.pageX, thisClass.xResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
+        this.#yResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragY = [event.pageY, thisClass.yResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
 
-//     }
+    }
 
+    #constructModifyEventListeners() {
+        const thisClass = this;
+        this.#tableElement.addEventListener(`keypress`, function(event){
+            //plus
+            if(event.key === 43) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyAddElement.classList.add(`selected`)
+            }
+            //minus
+            if(event.key === 45) {
+                e.preventDefault();
+                thisClass.#modifyAddElement.hidden = true;
+                thisClass.#modifySubtractElement.hidden = false;
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifySubtractElement.classList.add(`selected`)
+            }
+            //aterisk
+            if(event.key === 42) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyMultiplyElement.classList.add(`selected`)
+            }
+            //divide
+            if(event.key === 47) {
+                e.preventDefault();
+                thisClass.#modifyMultiplyElement.hidden = true;
+                thisClass.#modifyDivideElement.hidden = false;
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyDivideElement.classList.add(`selected`)
+            }
+            //forward slash
+            if(event.key === 61) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyEqualElement.classList.add(`selected`)
+            }
+        });
+        function modify(operation) {
+            const value = parseFloat(thisClass.#modifyValueElement.value);
+            if(isNaN(value))
+                return;
+            const element = thisClass.#modifyElement.querySelector(`input`);
+            if(!element)
+                return;
+            const origValue = parseFloat(element.value) ?? 0;
 
-//     _attachModify() {
-//         const thisClass = this;
-//         $(document).on(`blur.${this.GUID}`, `#${this.GUID}-modifyvalue`, function(){
-//             $(`#${thisClass.GUID}-add`).show();
-//             $(`#${thisClass.GUID}-subtract`).hide();
-//             $(`#${thisClass.GUID}-multiply`).show();
-//             $(`#${thisClass.GUID}-divide`).hide();
-//             $(`#${thisClass.GUID}-add`).removeClass(`selected`);
-//             $(`#${thisClass.GUID}-subtract`).removeClass(`selected`);
-//             $(`#${thisClass.GUID}-multiply`).removeClass(`selected`);
-//             $(`#${thisClass.GUID}-divide`).removeClass(`selected`);
-//             $(`#${thisClass.GUID}-equal`).removeClass(`selected`);
-//         });
-//         $(document).on(`keypress.${this.GUID}`, `#${this.GUID}-modifyvalue`, function(e){
-//             if(e.which !== 13)
-//                 return;
-//             if($(`#${thisClass.GUID}-add`).hasClass(`selected`))
-//                 $(`#${thisClass.GUID}-add`).trigger(`click`);
-//             if($(`#${thisClass.GUID}-subtract`).hasClass(`selected`))
-//                 $(`#${thisClass.GUID}-subtract`).trigger(`click`);
-//             if($(`#${thisClass.GUID}-multiply`).hasClass(`selected`))
-//                 $(`#${thisClass.GUID}-multiply`).trigger(`click`);
-//             if($(`#${thisClass.GUID}-divide`).hasClass(`selected`))
-//                 $(`#${thisClass.GUID}-divide`).trigger(`click`);
-//             if($(`#${thisClass.GUID}-equal`).hasClass(`selected`))
-//                 $(`#${thisClass.GUID}-equal`).trigger(`click`);
-//             $(`#${thisClass.GUID}-modifyvalue`).blur();
-//             $(`#${thisClass.GUID}-table .origselect`).select();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-equal`, function(){
-//             var value = parseFloat($(`#${thisClass.GUID}-modifyvalue`).val());
-//             if(isNaN(value))
-//                 return;
-//             $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] = value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-add`, function(){
-//             var value = parseFloat($(`#${thisClass.GUID}-modifyvalue`).val());
-//             if(isNaN(value))
-//                 return;
-//             $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] += value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-subtract`, function(){
-//             var value = parseFloat($(`#${thisClass.GUID}-modifyvalue`).val());
-//             if(isNaN(value))
-//                 return;
-//             $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] -= value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-multiply`, function(){
-//             var value = parseFloat($(`#${thisClass.GUID}-modifyvalue`).val());
-//             if(isNaN(value))
-//                 return;
-//             $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] *= value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-divide`, function(){
-//             var value = parseFloat($(`#${thisClass.GUID}-modifyvalue`).val());
-//             if(isNaN(value))
-//                 return;
-//             $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] /= value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//     }
+            switch(operation) {
+                case `equal`:
+                    element.value = value;
+                    break;
+                case `add`:
+                    element.value = origValue + value;
+                    break;
+                case `subtract`:
+                    element.value = origValue - value;
+                    break;
+                case `multiply`:
+                    element.value = origValue * value;
+                    break;
+                case `divide`:
+                    element.value = origValue / value;
+                    break;
+                default:
+                    return;
+            }
 
-//     _attachInterpolate() {
-//         const thisClass = this;
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-interpolatexy`, function(){
-//             const selected = $(`#${thisClass.GUID}-table .number.selected`);
-//             if(selected.length === 0)
-//                 return
-//             let xMin = 10000000000;
-//             let xMax = -10000000000;
-//             let yMin = 10000000000;
-//             let yMax = -10000000000;
-//             $.each(selected, function(index, cell) {
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx < xMin)
-//                     xMin = cellx;
-//                 if(cellx > xMax)
-//                     xMax = cellx;
-//                 if(celly < yMin)
-//                     yMin = celly;
-//                 if(celly > yMax)
-//                     yMax = celly;
-//             });
-//             $.each(selected, function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx > -1 && celly > -1) {
-//                     const xMinVal = thisClass._value[xMin + celly * thisClass._xResolution];
-//                     const yMinVal = thisClass._value[cellx + yMin * thisClass._xResolution];
-//                     const xMag = (thisClass._value[xMax + celly * thisClass._xResolution] - xMinVal) / (thisClass.XAxis[xMax] - thisClass.XAxis[xMin]);
-//                     const yMag = (thisClass._value[cellx + yMax * thisClass._xResolution] - yMinVal) / (thisClass.YAxis[yMax] - thisClass.YAxis[yMin]);
-//                     let value = xMinVal + xMag * (thisClass.XAxis[cellx]-thisClass.XAxis[xMin]) + yMinVal + yMag * (thisClass.YAxis[celly]-thisClass.YAxis[yMin])
-//                     value /= 2;
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] = value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-interpolatex`, function(){
-//             const selected = $(`#${thisClass.GUID}-table .number.selected`);
-//             if(selected.length === 0)
-//                 return
-//             let xMin = 10000000000;
-//             let xMax = -10000000000;
-//             $.each(selected, function(index, cell) {
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 if(cellx < xMin)
-//                     xMin = cellx;
-//                 if(cellx > xMax)
-//                     xMax = cellx;
-//             });
-//             $.each(selected, function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(cellx === xMin || cellx === xMax)
-//                     return;
-//                 if(cellx > -1 && celly > -1) {
-//                     const xMinVal = thisClass._value[xMin + celly * thisClass._xResolution];
-//                     const xMag = (thisClass._value[xMax + celly * thisClass._xResolution] - xMinVal) / (thisClass.XAxis[xMax] - thisClass.XAxis[xMin]);
-//                     let value = xMinVal + xMag * (thisClass.XAxis[cellx]-thisClass.XAxis[xMin]);
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] = value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//         $(document).on(`click.${this.GUID}`, `#${this.GUID}-interpolatey`, function(){
-//             const selected = $(`#${thisClass.GUID}-table .number.selected`);
-//             if(selected.length === 0)
-//                 return
-//             let yMin = 10000000000;
-//             let yMax = -10000000000;
-//             $.each(selected, function(index, cell) {
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(celly < yMin)
-//                     yMin = celly;
-//                 if(celly > yMax)
-//                     yMax = celly;
-//             });
-//             $.each(selected, function(index, cell) {
-//                 const id = $(cell).attr(`id`);
-//                 const cellx = parseInt($(cell).attr(`data-x`));
-//                 const celly = parseInt($(cell).attr(`data-y`));
-//                 if(celly === yMin || celly === yMax)
-//                     return;
-//                 if(cellx > -1 && celly > -1) {
-//                     const yMinVal = thisClass._value[cellx + yMin * thisClass._xResolution];
-//                     const yMag = (thisClass._value[cellx + yMax * thisClass._xResolution] - yMinVal) / (thisClass.YAxis[yMax] - thisClass.YAxis[yMin]);
-//                     let value = yMinVal + yMag * (thisClass.YAxis[celly]-thisClass.YAxis[yMin])
-//                     index = cellx + celly * thisClass._xResolution;
-//                     thisClass._value[index] = value;
-//                     $(cell).parent().replaceWith(thisClass._formatNumberForDisplay(id, cellx, celly, thisClass._value[index]));
-//                 }
-//             });
-//             thisClass._onChange();
-//         });
-//     }
-// }
+            element.dispatchEvent(new Event(`click`));
+        }
+        function blur() {
+            thisClass.#modifyAddElement.hidden      = false;
+            thisClass.#modifySubtractElement.hidden = true;
+            thisClass.#modifyMultiplyElement.hidden = false;
+            thisClass.#modifyDivideElement.hidden   = true;
+            thisClass.#modifyElement.children.forEach(function(element) { element.classList.remove(`selected`) });
+        }
+        this.#modifyValueElement.addEventListener(`keypress`, function(event) {
+            if(event.key !== 13)
+                return;
+            thisClass.#modifyElement.querySelector(`.selected`)?.dispatchEvent(new Event(`click`));
+            blur();
+            thisClass.#tableElement.querySelector(`input`)?.select();
+        });
+        this.#modifyEqualElement.addEventListener(`click`, function() {
+            modify(`equal`);
+        });
+        this.#modifyAddElement.addEventListener(`click`, function() {
+            modify(`add`);
+        });
+        this.#modifySubtractElement.addEventListener(`click`, function() {
+            modify(`subtract`);
+        });
+        this.#modifyMultiplyElement.addEventListener(`click`, function() {
+            modify(`multiply`);
+        });
+        this.#modifyDivideElement.addEventListener(`click`, function() {
+            modify(`divide`);
+        });
+    }
 
-// var pastetype = `equal`;
-
-// function AttachPasteOptions() {
-//     DetachPasteOptions();
-//     $(document).on(`click.pasteoptions`, `#pasteoptions .paste-button`, function(){
-//         pastetype = $(this).attr(`data-pastetype`);
-//         $(`#pasteoptions div`).removeClass(`selected`);
-//         $(`#pasteoptions div[data-pastetype="${pastetype}"`).addClass(`selected`);
-//     });
-// }
-
-// function DetachPasteOptions() {
-//     $(document).off(`click.pasteoptions`);
-// }
-
-
-// document.addEventListener(`dragstart`, function(e){
-//     if($(e.target).hasClass(`selected`) || $(e.target).hasClass(`row_expand`) || $(e.target).hasClass(`col_expand`))
-//         e.preventDefault();
-// });//disable dragging of selected items
-
-
-
-
+    #constructInterpolateEventListeners() {
+        const thisClass = this;
+        this.#interpolateXYElement.addEventListener(`click`, function() {
+            const selectedElements = thisClass.#valueElement.querySelectorAll(`.selected`);
+            if(selectedElements.length === 0)
+                return
+            let xMin = 18000000000000000000;
+            let xMax = -9000000000000000000;
+            let yMin = 18000000000000000000;
+            let yMax = -9000000000000000000;
+            selectedElements.forEach(function(element) {
+                const x = parseInt(element.dataset.x);
+                const y = parseInt(element.dataset.y);
+                if(x < xMin)
+                    xMin = x;
+                if(x > xMax)
+                    xMax = x;
+                if(y < yMin)
+                    yMin = y;
+                if(y > yMax)
+                    yMax = y;
+            });
+            const xAxis = thisClass.xAxis;
+            const yAxis = thisClass.yAxis;
+            const xDiff = xAxis[xMax] - xAxis[xMin];
+            const yDiff = yAxis[yMax] - yAxis[yMin];
+            const xResolution = thisClass.xResolution;
+            selected.foreach(function(element) {
+                const x = parseInt(element.dataset.x);
+                const y = parseInt(element.dataset.y);
+                const tableValue = thisClass.value;
+                if(x > -1 && y > -1) {
+                    const xMinVal = tableValue[xMin + y * xResolution];
+                    const yMinVal = tableValue[x + yMin * xResolution];
+                    const xMag = (tableValue[xMax + y * xResolution] - xMinVal) / xDiff;
+                    const yMag = (tableValue[x + yMax * xResolution] - yMinVal) / yDiff;
+                    let value = xMinVal + xMag * (xAxis[x]-xAxis[xMin]) + yMinVal + yMag * (yAxis[y]-yAxis[yMin]);
+                    value /= 2;
+                    element.value = value;
+                }
+            });
+            thisClass.dispatchEvent(new Event(`change`));
+        });
+        this.#interpolateXElement.addEventListener(`click`, function() {
+            const selectedElements = thisClass.#valueElement.querySelectorAll(`.selected`);
+            if(selectedElements.length === 0)
+                return
+            let xMin = 18000000000000000000;
+            let xMax = -9000000000000000000;
+            selectedElements.forEach(function(element) {
+                const x = parseInt(element.dataset.x);
+                if(x < xMin)
+                    xMin = x;
+                if(x > xMax)
+                    xMax = x;
+            });
+            const xAxis = thisClass.xAxis;
+            const xDiff = xAxis[xMax] - xAxis[xMin];
+            const xResolution = thisClass.xResolution;
+            selected.foreach(function(element) {
+                const x = parseInt(element.dataset.x);
+                const y = parseInt(element.dataset.y);
+                const tableValue = thisClass.value;
+                if(x > -1 && y > -1) {
+                    const xMinVal = tableValue[xMin + y * xResolution];
+                    const xMag = (tableValue[xMax + y * xResolution] - xMinVal) / xDiff;
+                    let value = xMinVal + xMag * (xAxis[x]-xAxis[xMin]);
+                    value /= 2;
+                    element.value = value;
+                }
+            });
+            thisClass.dispatchEvent(new Event(`change`));
+        });
+        this.#interpolateYElement.addEventListener(`click`, function() {
+            const selectedElements = thisClass.#valueElement.querySelectorAll(`.selected`);
+            if(selectedElements.length === 0)
+                return
+            let yMin = 18000000000000000000;
+            let yMax = -9000000000000000000;
+            selectedElements.forEach(function(element) {
+                const y = parseInt(element.dataset.y);
+                if(y < yMin)
+                    yMin = y;
+                if(y > yMax)
+                    yMax = y;
+            });
+            const yAxis = thisClass.yAxis;
+            const yDiff = yAxis[yMax] - yAxis[yMin];
+            const xResolution = thisClass.xResolution;
+            selected.foreach(function(element) {
+                const x = parseInt(element.dataset.x);
+                const y = parseInt(element.dataset.y);
+                const tableValue = thisClass.value;
+                if(x > -1 && y > -1) {
+                    const yMinVal = tableValue[x + yMin * xResolution];
+                    const yMag = (tableValue[x + yMax * xResolution] - yMinVal) / yDiff;
+                    let value = yMinVal + yMag * (yAxis[y]-yAxis[yMin]);
+                    value /= 2;
+                    element.value = value;
+                }
+            });
+            thisClass.dispatchEvent(new Event(`change`));
+        });
+    }
+}
+customElements.define('ui-table', UITable, { extends: 'div' });
+//     ReverseY = false;
 
 //svg stuff
 //     _table3DDisplayWidth=800; 

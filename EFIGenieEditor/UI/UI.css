@@ -131,9 +131,18 @@
     --cell-width: calc(var(--precision) * 0.7em);
     border-spacing: 0px;
     border-style: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .uitable table.numerictable td {
     padding: 0px;
+}
+.uitable table.numerictable input{
+    width: 100%;
 }
 
 .uitable table.numerictable tr td div.xaxis {
@@ -154,12 +163,6 @@
 .uitable table.numerictable tr td.xdrag,
 .uitable table.numerictable tr td.ydrag {
     background-color: var(--border-color);
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 .uitable table.numerictable tr td.xydrag {
     cursor: nwse-resize;
@@ -183,6 +186,21 @@
     border: var(--border-width) solid var(--border-color);
     margin: 0px;
     padding: 0px;
+}
+.uitable table.numerictable tr td div.value div.selected input,
+.uitable table.numerictable tr td div.yaxis div.selected input,
+.uitable table.numerictable tr td div.xaxis div.selected input,
+.uitable table.numerictable tr td div.value div.selected,
+.uitable table.numerictable tr td div.yaxis div.selected,
+.uitable table.numerictable tr td div.xaxis div.selected {
+    border-color: var(--border-select-color) !important;
+    background-color: var(--background-selected-color) !important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .uitable table.numerictable tr td div.value div {
     background-color: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
