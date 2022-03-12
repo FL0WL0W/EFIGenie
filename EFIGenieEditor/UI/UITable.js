@@ -41,37 +41,98 @@ export default class UITable extends HTMLDivElement {
             this.#zLabelElement.append(zLabel);
     }
 
-    #xAxisElement = document.createElement(`td`);
+    get value() {
+        return [...this.#valueElement.children].map(x => x.dataset.value);
+    }
+    set value(value) {
+        if(value === undefined)
+            return;
+        if(value.length !== this.xResolution * this.yResolution)
+            throw `Value length does not match table length. Set xResolution and yResolution before setting value`;
+        for(let i = 0; i < this.#valueElement.children.length; i++) {
+            this.#valueElement.children[i].dataset.value = parseFloat(value[i]);
+        }
+    }
+
+    #resolutionChanged() {
+        this.#valueElement.style.setProperty('--xresolution', this.xResolution);
+        for(let i = this.xResolution * this.yResolution; i < this.#valueElement.children.length; i++) { this.#valueElement.removeChild(this.#valueElement.children[i]); }
+        for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
+            const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
+            valueElement.dataset.x = i % this.xResolution;
+            valueElement.dataset.x = parseInt(i/this.yResolution);
+            valueElement.dataset.value ??= 0;
+        }
+    }
+
+    get xResolution() {
+        return this.#xAxisElement.children.length;
+    }
+    set xResolution(xResolution) {
+        if(xResolution === this.xResolution)
+            return;
+
+        for(let i = xResolution; i < this.#xAxisElement.children.length; i++) { this.#xAxisElement.removeChild(this.#xAxisElement.children[i]); }
+        for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
+            const xAxisElement = this.#xAxisElement.appendChild(document.createElement(`div`)); 
+            const xAxisMinus1 = this.#xAxisElement.children[i-1]?.dataset?.value;
+            const xAxisMinus2 = this.#xAxisElement.children[i-2]?.dataset?.value;
+            let xAxisMinus0 = 0;
+            if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined)
+                xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
+            xAxisElement.dataset.value = xAxisMinus0;
+            xAxisElement.dataset.x = i;
+        }
+        this.#resolutionChanged();
+        //interpolation
+        this.#buildTableElement();
+    }
+
+    get yResolution() {
+        return this.#yAxisElement.children.length;
+    }
+    set yResolution(yResolution) {
+        if(yResolution === this.yResolution)
+            return;
+        for(let i = yResolution; i < this.#yAxisElement.children.length; i++) { this.#yAxisElement.removeChild(this.#yAxisElement.children[i]); }
+        for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
+            const yAxisElement = this.#yAxisElement.appendChild(document.createElement(`div`)); 
+            const yAxisMinus1 = this.#yAxisElement.children[i-1]?.dataset?.value;
+            const yAxisMinus2 = this.#yAxisElement.children[i-2]?.dataset?.value;
+            let yAxisMinus0 = 0;
+            if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined)
+                yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
+            yAxisElement.dataset.value = yAxisMinus0;
+            yAxisElement.dataset.y = i;
+        }
+        this.#resolutionChanged();
+        //interpolation
+        this.#buildTableElement();
+    }
+
+    #xAxisElement = document.createElement(`div`);
     get xAxis() {
         return [...this.#xAxisElement.children].map(x => x.dataset.value);
     }
     set xAxis(xAxis) {
-        for(let i = xAxis.length; i < this.#xAxisElement.children.length; i++) { this.#xAxisElement.removeChild(this.#xAxisElement.children[i]); }
-        this.#valueElement.colSpan = this.#xAxisElement.colSpan = xAxis.length;
-        let thisClass = this;
-        xAxis.forEach(function(xAxisValue, xAxisIndex) {
-            let xAxisElement = thisClass.#xAxisElement[xAxisIndex] ?? thisClass.#xAxisElement.appendChild(document.createElement(`div`));
-            xAxisElement.innerHTML = xAxisElement.dataset.value = xAxisValue;
-        });
-        this.#buildTableElement();
+        this.xResolution = xAxis.length;
+        const thisClass = this;
+        xAxis.forEach(function(xAxisValue, xAxisIndex) { thisClass.#xAxisElement.children[xAxisIndex].dataset.value = xAxisValue; });
+        //interpolation
     }
     
-    #yAxisElement = document.createElement(`td`);
+    #yAxisElement = document.createElement(`div`);
     get yAxis() {
         return [...this.#yAxisElement.children].map(x => x.dataset.value);
     }
     set yAxis(yAxis) {
-        for(let i = yAxis.length; i < this.#yAxisElement.children.length; i++) { this.#yAxisElement.removeChild(this.#yAxisElement.children[i]); }
-        this.#valueElement.rowSpan = this.#yAxisElement.rowSpan = yAxis.length;
-        let thisClass = this;
-        yAxis.forEach(function(yAxisValue, yAxisIndex) {
-            let yAxisElement = thisClass.#yAxisElement[yAxisIndex] ?? thisClass.#yAxisElement.appendChild(document.createElement(`div`));
-            yAxisElement.innerHTML = yAxisElement.dataset.value = yAxisValue;
-        });
-        this.#buildTableElement();
+        this.yResolution = yAxis.length;
+        const thisClass = this;
+        yAxis.forEach(function(yAxisValue, yAxisIndex) { thisClass.#yAxisElement.children[yAxisIndex].dataset.value = yAxisValue; });
+        //interpolation
     }
 
-    #valueElement = document.createElement(`td`);
+    #valueElement = document.createElement(`div`);
 
     #tableElement = document.createElement(`table`);
     #buildTableElement() {
@@ -85,7 +146,6 @@ export default class UITable extends HTMLDivElement {
             xLabelBlank.colSpan = 3;
             const xLabelTd      = row0.appendChild(document.createElement(`td`));
             xLabelTd.class      = `xtrans`;
-            xLabelTd.colSpan    = this.#xAxisElement.children.length;
             xLabelTd.append(this.#xLabelElement);
         }
         //row1
@@ -99,7 +159,8 @@ export default class UITable extends HTMLDivElement {
             } else {
                 xzAxisLabel.append(this.#xLabelElement);
             }
-            row1.append(this.#xAxisElement);
+            const xAxis = row1.appendChild(document.createElement(`td`));
+            xAxis.append(this.#xAxisElement);
         } else if (yResolution > 1) {
             const ylabel        = row1.appendChild(document.createElement(`td`));
             yAxislabel.append(this.#yLabelElement);
@@ -110,19 +171,20 @@ export default class UITable extends HTMLDivElement {
         const row2 = this.#tableElement.appendChild(document.createElement(`tr`));
         if (yResolution > 1) {
             if(xResolution > 1) {
-                row2.appendChild(document.createElement(`td`)).rowSpan = yResolution;//auto width to take up zlabel slack
+                row2.appendChild(document.createElement(`td`));//auto width to take up zlabel slack
                 const yAxisLabel = row2.appendChild(document.createElement(`td`));
                 yAxisLabel.class = `ytrans`;
-                yAxisLabel.rowSpan = yResolution;
                 yAxisLabel.append(this.#yLabelElement);
             }
-            row2.append(this.#yAxisElement);
+            const yAxis = row2.appendChild(document.createElement(`td`));
+            yAxis.append(this.#yAxisElement)
         } else if (xResolution > 1) {
             const xAxisLabel    = row2.appendChild(document.createElement(`td`));
             xAxisLabel.class    = `xztrans`
             xAxisLabel.append(this.#xLabelElement);
         }
-        row2.append(this.#valueElement);
+        const value = row2.appendChild(document.createElement(`td`));
+        value.append(this.#valueElement);
     }
 
     onChange = [];
@@ -135,11 +197,22 @@ export default class UITable extends HTMLDivElement {
         this.#zLabelElement.class = `zlabel`;
         this.#xAxisElement.class  = `xAxis`;
         this.#yAxisElement.class  = `yAxis`;
+        this.#valueElement.class  = `value`;
         this.#tableElement.class  = `numerictable`;
+        const propValue = prop.value;
+        delete prop.value;
         Object.assign(this, prop);
+        this.value = propValue;
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         this.#buildTableElement();
+    }
+
+    static #formatNumberForDisplay(number, precision = 6) {
+        var ret = parseFloat(parseFloat(parseFloat(number).toFixed(precision -1)).toPrecision(precision));
+        if(isNaN(ret))
+            return `&nbsp;`;
+        return ret;
     }
 }
 customElements.define('ui-table', UITable, { extends: 'div' });

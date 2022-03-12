@@ -26,7 +26,6 @@ export default class UITemplate extends HTMLDivElement {
         this.innerHTML = template;
         this.querySelectorAll(`[data-element]`).forEach(function(element){
             let [matchingUIName, matchingUI] = thisEntries.find(function([elementName, e]) { return element.dataset.element === elementName; });
-            console.log(matchingUI)
             element.replaceWith(matchingUI);
         });
     }

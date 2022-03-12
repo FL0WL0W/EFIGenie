@@ -11,19 +11,39 @@ table.numerictable td {
     padding: 0px;
 }
 
-table.numerictable tr td.yaxis div,
-table.numerictable tr td.xaxis div {
+table.numerictable tr td div.xaxis {
+    display: flex;
+}
+table.numerictable tr td div.yaxis {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: calc(var(--cell-width) + var(--border-width) + var(--border-axis-width));
+}
+table.numerictable tr td div.value {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: calc(calc(var(--cell-width) + 2 * var(--border-width)) * var(--xresolution));
+}
+
+table.numerictable tr td div.value div,
+table.numerictable tr td div.yaxis div,
+table.numerictable tr td div.xaxis div {
     min-width: var(--cell-width);
     max-width: var(--cell-width);
     border: var(--border-width) solid var(--border-color);
     margin: 0px;
     padding: 0px;
 }
-table.numerictable tr td.xaxis div {
-    display: inline-block;
+
+table.numerictable tr td div.value div:not(.origselect)::after,
+table.numerictable tr td div.xaxis div:not(.origselect)::after,
+table.numerictable tr td div.yaxis div:not(.origselect)::after {
+    content: attr(data-value);
+}
+table.numerictable tr td div.xaxis div {
     border-bottom-width: var(--border-axis-width);
 }
-table.numerictable tr td.yaxis div {
+table.numerictable tr td div.yaxis div {
     text-align: right;
     border-right-width: var(--border-axis-width);
 }
