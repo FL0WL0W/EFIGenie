@@ -54,6 +54,7 @@ export default class UITable extends HTMLDivElement {
         this.style.setProperty('--valuemax', valueMin);
     }
 
+    #valueElement = document.createElement(`div`);
     get value() {
         return [...this.#valueElement.children].map(x => x.value);
     }
@@ -69,25 +70,37 @@ export default class UITable extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
 
+    static #numberValueGetterSetter = {
+        get: function() { return this.dataset.value; },
+        set: function(value) { this.dataset.value = value; this.style.setProperty(`--data-value`, value); }
+    }
     #resolutionChanged() {
         this.style.setProperty('--xresolution', this.xResolution);
         this.style.setProperty('--yresolution', this.yResolution);
-        for(let i = this.xResolution * this.yResolution; i < this.#valueElement.children.length; i++) { this.#valueElement.removeChild(this.#valueElement.children[i]); }
+        while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
+            Object.defineProperty(valueElement, 'value', UITable.#numberValueGetterSetter);
             valueElement.dataset.x = i % this.xResolution;
             valueElement.dataset.x = parseInt(i/this.yResolution);
-            Object.defineProperty(valueElement, 'value', {
-                get: function() {
-                    return this.dataset.value;
-                },
-                set: function(value) {
-                    this.dataset.value = value;
-                    this.style.setProperty(`--data-value`, value);
-                }
-            })
             UITable.#formatElementForDisplay(valueElement);
         }
+        if(this.xResolution > 1) {
+            if(this.yResolution > 1)
+                this.#interpolateXYElement.hidden = false;
+            else
+                this.#interpolateXYElement.hidden = true;
+            this.#interpolateXElement.hidden = false;
+        }
+        else {
+            this.#interpolateXYElement.hidden = true;
+            this.#interpolateXElement.hidden = true;
+
+        }
+        if(this.yResolution > 1)
+            this.#interpolateYElement.hidden = false;
+        else
+            this.#interpolateYElement.hidden = true;
     }
 
     #xResolutionDragElement = document.createElement(`td`);
@@ -96,6 +109,15 @@ export default class UITable extends HTMLDivElement {
     }
     set xResolutionModifiable(xResolutionModifiable) {
         this.#xResolutionDragElement.hidden = !xResolutionModifiable;
+        this.#xResolutionElement.hidden = !xResolutionModifiable;
+        if(this.yResolutionModifiable && xResolutionModifiable)
+            this.#resolutionTextElement.hidden = false;
+        else 
+            this.#resolutionTextElement.hidden = true;
+        if(this.yResolutionModifiable || xResolutionModifiable)
+            this.#resolutionElement.hidden = false;
+        else 
+            this.#resolutionElement.hidden = true;
     }
 
     get xResolution() {
@@ -105,15 +127,18 @@ export default class UITable extends HTMLDivElement {
         if(xResolution === this.xResolution)
             return;
 
-        for(let i = xResolution; i < this.#xAxisElement.children.length; i++) { this.#xAxisElement.removeChild(this.#xAxisElement.children[i]); }
+        this.#xResolutionElement.value = xResolution;
+
+        while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
         for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
             const xAxisElement = this.#xAxisElement.appendChild(document.createElement(`div`)); 
-            const xAxisMinus1 = this.#xAxisElement.children[i-1]?.dataset?.value;
-            const xAxisMinus2 = this.#xAxisElement.children[i-2]?.dataset?.value;
+            Object.defineProperty(xAxisElement, 'value', UITable.#numberValueGetterSetter);
+            const xAxisMinus1 = parseFloat(this.#xAxisElement.children[i-1]?.dataset?.value);
+            const xAxisMinus2 = parseFloat(this.#xAxisElement.children[i-2]?.dataset?.value);
             let xAxisMinus0 = 0;
             if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined)
                 xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
-            xAxisElement.dataset.value = xAxisMinus0;
+            xAxisElement.value = xAxisMinus0;
             xAxisElement.dataset.x = i;
             UITable.#formatElementForDisplay(xAxisElement);
         }
@@ -129,6 +154,15 @@ export default class UITable extends HTMLDivElement {
     }
     set yResolutionModifiable(yResolutionModifiable) {
         this.#yResolutionDragElement.hidden = !yResolutionModifiable;
+        this.#yResolutionElement.hidden = !yResolutionModifiable;
+        if(this.xResolutionModifiable && yResolutionModifiable)
+            this.#resolutionTextElement.hidden = false;
+        else 
+            this.#resolutionTextElement.hidden = true;
+        if(this.xResolutionModifiable || yResolutionModifiable)
+            this.#resolutionElement.hidden = false;
+        else 
+            this.#resolutionElement.hidden = true;
     }
 
     get yResolution() {
@@ -137,15 +171,18 @@ export default class UITable extends HTMLDivElement {
     set yResolution(yResolution) {
         if(yResolution === this.yResolution)
             return;
-        for(let i = yResolution; i < this.#yAxisElement.children.length; i++) { this.#yAxisElement.removeChild(this.#yAxisElement.children[i]); }
+
+        this.#yResolutionElement.value = yResolution;
+        while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
         for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
             const yAxisElement = this.#yAxisElement.appendChild(document.createElement(`div`)); 
-            const yAxisMinus1 = this.#yAxisElement.children[i-1]?.dataset?.value;
-            const yAxisMinus2 = this.#yAxisElement.children[i-2]?.dataset?.value;
+            Object.defineProperty(yAxisElement, 'value', UITable.#numberValueGetterSetter);
+            const yAxisMinus1 = parseFloat(this.#yAxisElement.children[i-1]?.dataset?.value);
+            const yAxisMinus2 = parseFloat(this.#yAxisElement.children[i-2]?.dataset?.value);
             let yAxisMinus0 = 0;
             if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined)
                 yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
-            yAxisElement.dataset.value = yAxisMinus0;
+            yAxisElement.value = yAxisMinus0;
             yAxisElement.dataset.y = i;
             UITable.#formatElementForDisplay(yAxisElement);
         }
@@ -179,7 +216,6 @@ export default class UITable extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
 
-    #valueElement = document.createElement(`div`);
 
     #tableElement = document.createElement(`table`);
     #buildTableElement() {
@@ -238,10 +274,102 @@ export default class UITable extends HTMLDivElement {
         valueTd.append(this.#valueElement);
     }
 
+    #modifyElement          = document.createElement(`div`);
+    #modifyAddElement       = document.createElement(`div`);
+    #modifySubtractElement  = document.createElement(`div`);
+    #modifyMultiplyElement  = document.createElement(`div`);
+    #modifyDivideElement    = document.createElement(`div`);
+    #modifyEqualElement     = document.createElement(`div`);
+    #modifyValueElement     = document.createElement(`input`);
+
+    #interpolateElement     = document.createElement(`div`);
+    #interpolateXElement    = document.createElement(`div`);
+    #interpolateYElement    = document.createElement(`div`);
+    #interpolateXYElement   = document.createElement(`div`);
+
+    #resolutionElement      = document.createElement(`div`);
+    #xResolutionElement     = document.createElement(`input`);
+    #yResolutionElement     = document.createElement(`input`);
+    #resolutionTextElement  = document.createElement(`span`);
+
+    #pasteOptionsElement    = document.createElement(`div`);
+    #pasteEqualElement      = document.createElement(`div`);
+    #pasteAddElement        = document.createElement(`div`);
+    #pasteSubtractElement   = document.createElement(`div`);
+    #pasteMultiplyElement   = document.createElement(`div`);
+    #pasteMultiplyPElement  = document.createElement(`div`);
+    #pasteMultiplyP2Element = document.createElement(`div`);
+    
+    #toolbarElement         = document.createElement(`div`);
+    #rightToolbarElement    = document.createElement(`div`);
+    #leftToolbarElement     = document.createElement(`div`);
+
     onChange = [];
     constructor(prop) {
         super();
-        this.style.display = `inline-block`;
+        this.class = `uitable`;
+        //toolbar
+        this.append(this.#toolbarElement);
+        this.#toolbarElement.class = `toolbar`;
+        this.#toolbarElement.append(this.#leftToolbarElement);
+        this.#leftToolbarElement.class = `lefttoolbar`;
+        this.#toolbarElement.append(this.#rightToolbarElement);
+        this.#rightToolbarElement.class = `righttoolbar`;
+        //resolution toolbar
+        this.#leftToolbarElement.append(this.#resolutionElement);
+        this.#resolutionElement.class = `resolution container`;
+        this.#resolutionElement.append(this.#xResolutionElement);
+        this.#resolutionElement.append(this.#resolutionTextElement);
+        this.#resolutionElement.append(this.#yResolutionElement);
+        this.#xResolutionElement.type       = `number`;
+        this.#xResolutionElement.class      = `resolution-value`;
+        this.#yResolutionElement.type       = `number`;
+        this.#yResolutionElement.class      = `resolution-value`;
+        this.#resolutionTextElement.innerHTML = `X`;
+        //paste options toolbar
+        this.#leftToolbarElement.append(this.#pasteOptionsElement);
+        this.#pasteOptionsElement.class = `paste container`;
+        this.#pasteOptionsElement.append(this.#pasteEqualElement);
+        this.#pasteOptionsElement.append(this.#pasteAddElement);
+        this.#pasteOptionsElement.append(this.#pasteSubtractElement);
+        this.#pasteOptionsElement.append(this.#pasteMultiplyElement);
+        this.#pasteOptionsElement.append(this.#pasteMultiplyPElement);
+        this.#pasteOptionsElement.append(this.#pasteMultiplyP2Element);
+        this.#pasteEqualElement.class       = `paste-button equal`;
+        this.#pasteAddElement.class         = `paste-button add`;
+        this.#pasteSubtractElement.class    = `paste-button subtract`;
+        this.#pasteMultiplyElement.class    = `paste-button multiply`;
+        this.#pasteMultiplyPElement.class   = `paste-button multiplyp`;
+        this.#pasteMultiplyP2Element.class  = `paste-button multiplyp2`;
+        this.#pasteMultiplyP2Element.innerHTML = `<sup>%</sup>&frasl;<sub>2</sub>`;
+        //modify toolbar
+        this.#rightToolbarElement.append(this.#modifyElement);
+        this.#modifyElement.class = `modify container`;
+        this.#modifyElement.append(this.#modifyValueElement);
+        this.#modifyElement.append(this.#modifyAddElement);
+        this.#modifyElement.append(this.#modifySubtractElement);
+        this.#modifyElement.append(this.#modifyMultiplyElement);
+        this.#modifyElement.append(this.#modifyDivideElement);
+        this.#modifyElement.append(this.#modifyEqualElement);
+        this.#modifyValueElement.type       = `number`;
+        this.#modifyValueElement.class      = `modify-value`;
+        this.#modifyAddElement.class        = `modify-button add`;
+        this.#modifySubtractElement.class   = `modify-button subtract`;
+        this.#modifyMultiplyElement.class   = `modify-button multiply`;
+        this.#modifyDivideElement.class     = `modify-button divide`;
+        this.#modifyEqualElement.class      = `modify-button equal`;
+        this.#modifySubtractElement.hidden  = true;
+        this.#modifyDivideElement.hidden    = true;
+        //interpolate toolbar
+        this.#rightToolbarElement.append(this.#interpolateElement);
+        this.#interpolateElement.class = `interpolate container`;
+        this.#interpolateElement.append(this.#interpolateXElement);
+        this.#interpolateElement.append(this.#interpolateYElement);
+        this.#interpolateElement.append(this.#interpolateXYElement);
+        this.#interpolateXElement.class     = `modify-button interpolatex`;
+        this.#interpolateYElement.class     = `modify-button interpolatey`;
+        this.#interpolateXYElement.class    = `modify-button interpolatexy`;
+        //table
         this.append(this.#tableElement);
         this.#tableElement.class  = `numerictable`;
         this.#xLabelElement.class = `xlabel`;
@@ -260,9 +388,12 @@ export default class UITable extends HTMLDivElement {
         this.value = propValue;
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
+        const thisClass = this;
+        this.addEventListener(`change`, function(event) {
+            thisClass.onChange.forEach(function(onChange) { onChange(); });
+        });
         this.#buildTableElement();
 
-        const thisClass = this;
         function calculateMinMaxValue() {
             thisClass.#valueMin = 10000000000;
             thisClass.#valueMax = -10000000000;
@@ -276,39 +407,242 @@ export default class UITable extends HTMLDivElement {
             }
             if(thisClass.#valueMax === thisClass.#valueMin)
                 thisClass.#valueMax = thisClass.#valueMin + 1;
-
         }
         this.addEventListener(`change`, calculateMinMaxValue);
         calculateMinMaxValue();
+
+        this.constructTableEventListeners();
+    }
+
+    constructTableEventListeners() {
+        const thisClass = this;
+        this.#xResolutionElement.addEventListener(`change`, function(event) {
+            thisClass.xResolution = parseInt(event.target.value);
+        });
+        this.#yResolutionElement.addEventListener(`change`, function(event) {
+            thisClass.yResolution = parseInt(event.target.value);
+        });
+        this.#tableElement.addEventListener(`change`, function(event){
+            var x = event.target.dataset.x;
+            var y = event.target.dataset.y;
+            var value = parseFloat(event.target.value);
+            if(isNaN(value))
+                return;
+            
+            if(x === undefined) {
+                thisClass.#yAxisElement.children[y].value = value;
+                for(let ya=y; ya<thisClass.yResolution; ya++)
+                    if(thisClass.#yAxisElement.children[ya].value < value) 
+                        thisClass.#yAxisElement.children[ya].value = value;
+                for(let ya=y; ya>=0; ya--) 
+                    if(thisClass.#yAxisElement.children[ya].value > value) 
+                        thisClass.#yAxisElement.children[ya].value = value;
+            } else if(y === undefined) {
+                thisClass.#xAxisElement.children[x].value = value;
+                for(let xa=x; xa<thisClass.xResolution; xa++)
+                    if(thisClass.#xAxisElement.children[xa].value < value) 
+                        thisClass.#xAxisElement.children[xa].value = value;
+                for(let xa=x; xa>=0; xa--) 
+                    if(thisClass.#xAxisElement.children[xa].value > value) 
+                        thisClass.#xAxisElement.children[xa].value = value;
+            } else {
+                let operation = `equal`;
+                if(value - thisClass.#valueElement.children[x + thisClass.xResolution * y].value === 1)
+                    operation = `increment`;
+                if(thisClass.#valueElement.children[x + thisClass.xResolution * y].value - value === 1)
+                    operation = `decrement`;
+                let selectedElements = thisClass.#valueElement.querySelectorAll(`.selected`)
+                selectedElements.forEach(function(selectedElement) {
+                    if(operation === `increment`)
+                        selectedElement.value++;
+                    else if(operation === `decrement`)
+                        selectedElement.value--;
+                    else
+                        selectedElement.value = value;
+                });
+            }
+        });
+        this.#tableElement.addEventListener(`keypress`, function(event){
+            //plus
+            if(e.which === 43) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyAddElement.classList.add(`selected`)
+            }
+            //minus
+            if(e.which === 45) {
+                e.preventDefault();
+                thisClass.#modifyAddElement.hidden = true;
+                thisClass.#modifySubtractElement.hidden = false;
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifySubtractElement.classList.add(`selected`)
+            }
+            //aterisk
+            if(e.which === 42) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyMultiplyElement.classList.add(`selected`)
+            }
+            //divide
+            if(e.which === 47) {
+                e.preventDefault();
+                thisClass.#modifyMultiplyElement.hidden = true;
+                thisClass.#modifyDivideElement.hidden = false;
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyDivideElement.classList.add(`selected`)
+            }
+            //forward slash
+            if(e.which === 61) {
+                e.preventDefault();
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyEqualElement.classList.add(`selected`)
+            }
+        });
+
+        this.#tableElement.addEventListener(`copy`, function(event){
+            let copyData = ``;
+
+            let currentY;
+            thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) {
+                let y = parseInt(element.dataset.y)
+                if(currentY !== undefined) {
+                    if(currentY !== y) {
+                        copyData += `\n`;
+                    } else {
+                        copyData += `\t`;
+                    }
+                }
+                copydata += element.value;
+                currentY = y;
+            })
+
+            event.originalEvent.clipboardData.setData(`text/plain`, copyData);
+            event.preventDefault();
+        });
+
+//         function pasteData(x,y,data,special) {
+//             thisClass._minSelectX = x;
+//             thisClass._minSelectY = y;
+//             thisClass._maxSelectX = x + data.split(`\n`).length;
+//             $.each(data.split(`\n`), function(yIndex, val) {
+//                 thisClass._maxSelectY = y + val.split(`\t`).length;
+//                 var yPos = y + yIndex;
+//                 if(yPos > thisClass._yResolution - 1)
+//                     return;
+//                 $.each(val.split(`\t`), function(xIndex, val) {
+//                     var xPos = x + xIndex;
+//                     if(xPos > thisClass._xResolution - 1)
+//                         return;
+
+//                     var v = parseFloat(val);
+
+//                     let numberSelector = $(`#${thisClass.GUID}-table .number[data-x='${xPos}'][data-y='${yPos}']`);
+//                     let newValue;
+//                     if(xPos > -1 && yPos > -1)
+//                         newValue = thisClass._value[xPos + yPos * thisClass._xResolution];
+//                     else if(xPos === -1)
+//                         newValue = thisClass.YAxis[yPos];
+//                     else if(yPos === -1)
+//                         newValue = thisClass.XAxis[xPos];
+//                     else
+//                         newValue = numberSelector.val() ?? numberSelector.html();
+
+//                     switch(special)
+//                     {
+//                         case `add`:
+//                             newValue += v;
+//                             break;
+//                         case `subtract`:
+//                             newValue -= v;
+//                             break;
+//                         case `multiply`:
+//                             newValue *= v;
+//                             break;
+//                         case `multiply%`:
+//                             newValue *= 1 + (v/100);
+//                             break;
+//                         case `multiply%/2`:
+//                             newValue *= 1 + (v/200);
+//                             break;
+//                         case `average`:
+//                             newValue += v;
+//                             newValue /= 2;
+//                             break;
+//                         default:
+//                             newValue = v;
+//                             break;
+//                     }
+
+//                     if(xPos > -1 && yPos > -1)
+//                         thisClass._value[xPos + yPos * thisClass._xResolution] = newValue;
+//                     else if(xPos === -1)
+//                         thisClass.YAxis[yPos] = newValue;
+//                     else if(yPos === -1)
+//                         thisClass.XAxis[xPos] = newValue;
+
+//                     numberSelector.addClass(`selected`);
+//                     const id = numberSelector.attr(`id`);
+//                     numberSelector.parent().replaceWith(thisClass._formatNumberForDisplay(id, xPos, yPos, newValue));
+//                     $(`#${id}`).select();
+//                 });
+//             });
+//             thisClass._onChange();
+//         }
+
+
+//         $(document).on(`paste.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
+//             if($(this).attr(`data-x`) === undefined || $(this).attr(`data-y`) === undefined)
+//                 return;
+//             var val = e.originalEvent.clipboardData.getData(`text/plain`);
+//             const lines = val.split(`\n`).length;
+//             const cols = val.split(`\t`).length;
+//             if(parseInt($(this).attr(`data-x`)) < 0 && cols > 1)
+//                 return;
+//             if(parseInt($(this).attr(`data-y`)) < 0 && lines > 1)
+//                 return;
+
+//             var selectedCell = $(`#${thisClass.GUID}-table .number.origselect`)
+//             var x = parseInt(selectedCell.attr(`data-x`));
+//             var y = parseInt(selectedCell.attr(`data-y`));
+//             if(x < 0 && cols > 1)
+//                 return;
+//             if(y < 0 && lines > 1)
+//                 return;
+
+//             pasteData(x,y,val,pastetype);
+
+//             if(x < 0){
+//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y}']`).trigger(`change`);
+
+//                 const cell = $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`);
+//                 cell.addClass(`origselect`);
+//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), -1, y+lines-1));
+//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`).trigger(`change`);
+//             }
+//             if(y < 0){
+//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x}']`).trigger(`change`);
+
+//                 const cell = $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`);
+//                 cell.addClass(`origselect`);
+//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x+cols-1, -1));
+//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`).trigger(`change`);
+//             }
+
+//             thisClass._selecting = false;
+//             e.preventDefault();
+//         });
     }
 
     static #formatElementForDisplay(element, precision = 6) {
-        let formattedVaue = parseFloat(parseFloat(parseFloat(element.dataset.value).toFixed(precision -1)).toPrecision(precision));
-        if(isNaN(formattedVaue))
-            formattedVaue = `&nbsp;`;
-        element.innerHTML = formattedVaue;
+        // let formattedVaue = parseFloat(parseFloat(parseFloat(element.value).toFixed(precision -1)).toPrecision(precision));
+        // if(isNaN(formattedVaue))
+        //     formattedVaue = `&nbsp;`;
+        element.innerHTML = element.value;
     }
 }
 customElements.define('ui-table', UITable, { extends: 'div' });
 // class TableOld {
-//     XAxisModifiable = true;
-//     YAxisModifiable = true;
-//     onChange = [];
 //     ReverseY = false;
-
-//     _onChange() {
-//         this.UpdateSvgHtml();
-//         const thisClass = this;
-//         $(`#${this.GUID}-table .number`).each(function() {
-//             const cellx = parseInt($(this).attr(`data-x`));
-//             const celly = parseInt($(this).attr(`data-y`));
-//             const index = cellx + celly * thisClass._xResolution;
-//             if(!isNaN(index) && cellx > -1 && celly > -1) {
-//                 $(this).parent().attr(`style`, `background-color: hsl(${thisClass._getHueFromValue(thisClass._value[index])},100%,50%);`);
-//             }
-//         });
-//         this.onChange.forEach(function(onChange) { onChange(); });
-//     }
 
 //     _trailXY = [];
 //     TrailTime = 2000;
@@ -324,111 +658,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 
 //     _attachTable() {
 //         const thisClass = this;
-//         $(document).on(`change.${this.GUID}`, `#${this.GUID}-yres`, function(e){
-//             let val = parseInt($(e.target).val());
-//             if(val > 1)
-//                 thisClass.YResolution = parseInt($(e.target).val());
-//             $(e.target).val(thisClass.YResolution);
-//         });
-//         $(document).on(`change.${this.GUID}`, `#${this.GUID}-xres`, function(e){
-//             let val = parseInt($(e.target).val());
-//             if(val > 1)
-//                 thisClass.XResolution = parseInt($(e.target).val());
-//             $(e.target).val(thisClass.XResolution);
-//         });
-//         $(document).on(`keypress.${this.GUID}`, `#${this.GUID}-table`, function(e){
-//             //minus
-//             if(e.which === 45) {
-//                 e.preventDefault();
-//                 $(`#${thisClass.GUID}-add`).hide();
-//                 $(`#${thisClass.GUID}-subtract`).show();
-//                 $(`#${thisClass.GUID}-modifyvalue`).select();
-//                 $(`#${thisClass.GUID}-subtract`).addClass(`selected`);
-//             }
-//             //add
-//             if(e.which === 43) {
-//                 e.preventDefault();
-//                 $(`#${thisClass.GUID}-modifyvalue`).select();
-//                 $(`#${thisClass.GUID}-add`).addClass(`selected`);
-//             }
-//             //multiply
-//             if(e.which === 42) {
-//                 e.preventDefault();
-//                 $(`#${thisClass.GUID}-modifyvalue`).select();
-//                 $(`#${thisClass.GUID}-multiply`).addClass(`selected`);
-//             }
-//             //divide
-//             if(e.which === 47) {
-//                 e.preventDefault();
-//                 $(`#${thisClass.GUID}-multiply`).hide();
-//                 $(`#${thisClass.GUID}-divide`).show();
-//                 $(`#${thisClass.GUID}-modifyvalue`).select();
-//                 $(`#${thisClass.GUID}-divide`).addClass(`selected`);
-//             }
-//             if(e.which === 61) {
-//                 $(`#${thisClass.GUID}-modifyvalue`).select();
-//                 $(`#${thisClass.GUID}-equal`).addClass(`selected`);
-//                 e.preventDefault();
-//             }
-//         });
-//         $(document).on(`change.${this.GUID}`, `#${this.GUID}-table`, function(e){
-//             var x = parseInt($(e.target).attr(`data-x`));
-//             var y = parseInt($(e.target).attr(`data-y`));
-//             var value = parseFloat($(e.target).val());
-//             if(isNaN(value))
-//                 return;
-            
-//             if(x === -1) {
-//                 thisClass.YAxis[y] = value;
-//                 for(let ya=y; ya<thisClass._yResolution; ya++) {
-//                     if(thisClass.YAxis[ya] < value) {
-//                         thisClass.YAxis[ya] = value;
-//                         $(`#${thisClass.GUID}-table .number[data-y='${ya}'][data-x='-1']`).html(Table._formatNumberForDisplay(value));
-//                     }
-//                 }
-//                 for(let ya=y; ya>=0; ya--) {
-//                     if(thisClass.YAxis[ya] > value) {
-//                         thisClass.YAxis[ya] = value;
-//                         $(`#${thisClass.GUID}-table .number[data-y='${ya}'][data-x='-1']`).html(Table._formatNumberForDisplay(value));
-//                     }
-//                 }
-//             } else if(y === -1) {
-//                 thisClass.XAxis[x] = value;
-//                 for(let xa=x; xa<thisClass._xResolution; xa++) {
-//                     if(thisClass.XAxis[xa] < value) {
-//                         thisClass.XAxis[xa] = value;
-//                         $(`#${thisClass.GUID}-table .number[data-x='${xa}'][data-y='-1']`).html(Table._formatNumberForDisplay(value));
-//                     }
-//                 }
-//                 for(let xa=x; xa>=0; xa--) {
-//                     if(thisClass.XAxis[xa] > value) {
-//                         thisClass.XAxis[xa] = value;
-//                         $(`#${thisClass.GUID}-table .number[data-x='${xa}'][data-y='-1']`).html(Table._formatNumberForDisplay(value));
-//                     }
-//                 }
-//             } else {
-//                 let operation = `equal`;
-//                 if(value - Table._formatNumberForDisplay(thisClass._value[x + thisClass._xResolution * y]) === 1)
-//                     operation = `increment`;
-//                 if(Table._formatNumberForDisplay(thisClass._value[x + thisClass._xResolution * y]) - value === 1)
-//                     operation = `decrement`;
-//                 $.each($(`#${thisClass.GUID}-table .number.selected`), function(index, cell) {
-//                     const cellx = parseInt($(cell).attr(`data-x`));
-//                     const celly = parseInt($(cell).attr(`data-y`));
-//                     index = cellx + celly * thisClass._xResolution;
-//                     if(operation === `increment`)
-//                         thisClass._value[index]++;
-//                     else if(operation === `decrement`)
-//                         thisClass._value[index]--;
-//                     else
-//                         thisClass._value[index] = value;
-//                     if(cellx !== x || celly !== y) {
-//                         $(cell).html(Table._formatNumberForDisplay(thisClass._value[index]));
-//                     }
-//                 });
-//             }
-//             thisClass._onChange();
-//         });
 
 //         var dragX = false;
 //         var dragY = false;
@@ -638,304 +867,8 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             up.call(this);
 //         });
 
-//         function getCopyData() {
-//             var copyData = ``;
-
-//             for(var y = -1; y < thisClass._yResolution; y++){
-//                 var rowSelected = false
-//                 for(var x = -1; x < thisClass._xResolution; x++){
-//                     let numberSelector = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
-//                     if(numberSelector.hasClass(`selected`)){
-//                         if(rowSelected){
-//                             copyData += `\t`;
-//                         }
-//                         let value = ``;
-//                         if(x > -1 && y > -1)
-//                             value = thisClass._value[x + y * thisClass._xResolution];
-//                         else if(x === -1)
-//                             value = thisClass.YAxis[y];
-//                         else if(y === -1)
-//                             value = thisClass.XAxis[x];
-//                         else
-//                             value = numberSelector.val() ?? numberSelector.html();
-//                         copyData += value;
-//                         rowSelected = true;
-//                     }
-//                 }
-//                 if(rowSelected){
-//                     copyData += `\n`;
-//                 }
-//             }
-
-//             if(copyData.length > 0){
-//                 copyData = copyData.substring(0, copyData.length -1);//remove last new line
-//             }
-
-//             return copyData;
-//         }
-
-//         function pasteData(x,y,data,special) {
-//             thisClass._minSelectX = x;
-//             thisClass._minSelectY = y;
-//             thisClass._maxSelectX = x + data.split(`\n`).length;
-//             $.each(data.split(`\n`), function(yIndex, val) {
-//                 thisClass._maxSelectY = y + val.split(`\t`).length;
-//                 var yPos = y + yIndex;
-//                 if(yPos > thisClass._yResolution - 1)
-//                     return;
-//                 $.each(val.split(`\t`), function(xIndex, val) {
-//                     var xPos = x + xIndex;
-//                     if(xPos > thisClass._xResolution - 1)
-//                         return;
-
-//                     var v = parseFloat(val);
-
-//                     let numberSelector = $(`#${thisClass.GUID}-table .number[data-x='${xPos}'][data-y='${yPos}']`);
-//                     let newValue;
-//                     if(xPos > -1 && yPos > -1)
-//                         newValue = thisClass._value[xPos + yPos * thisClass._xResolution];
-//                     else if(xPos === -1)
-//                         newValue = thisClass.YAxis[yPos];
-//                     else if(yPos === -1)
-//                         newValue = thisClass.XAxis[xPos];
-//                     else
-//                         newValue = numberSelector.val() ?? numberSelector.html();
-
-//                     switch(special)
-//                     {
-//                         case `add`:
-//                             newValue += v;
-//                             break;
-//                         case `subtract`:
-//                             newValue -= v;
-//                             break;
-//                         case `multiply`:
-//                             newValue *= v;
-//                             break;
-//                         case `multiply%`:
-//                             newValue *= 1 + (v/100);
-//                             break;
-//                         case `multiply%/2`:
-//                             newValue *= 1 + (v/200);
-//                             break;
-//                         case `average`:
-//                             newValue += v;
-//                             newValue /= 2;
-//                             break;
-//                         default:
-//                             newValue = v;
-//                             break;
-//                     }
-
-//                     if(xPos > -1 && yPos > -1)
-//                         thisClass._value[xPos + yPos * thisClass._xResolution] = newValue;
-//                     else if(xPos === -1)
-//                         thisClass.YAxis[yPos] = newValue;
-//                     else if(yPos === -1)
-//                         thisClass.XAxis[xPos] = newValue;
-
-//                     numberSelector.addClass(`selected`);
-//                     const id = numberSelector.attr(`id`);
-//                     numberSelector.parent().replaceWith(thisClass._formatNumberForDisplay(id, xPos, yPos, newValue));
-//                     $(`#${id}`).select();
-//                 });
-//             });
-//             thisClass._onChange();
-//         }
-
-//         $(document).on(`copy.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
-//             if($(this).attr(`data-x`) === undefined || $(this).attr(`data-y`) === undefined )
-//                 return;
-
-//             thisClass._selecting = false;
-//             e.originalEvent.clipboardData.setData(`text/plain`, getCopyData());
-//             e.preventDefault();
-//         });
-
-//         $(document).on(`paste.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
-//             if($(this).attr(`data-x`) === undefined || $(this).attr(`data-y`) === undefined)
-//                 return;
-//             var val = e.originalEvent.clipboardData.getData(`text/plain`);
-//             const lines = val.split(`\n`).length;
-//             const cols = val.split(`\t`).length;
-//             if(parseInt($(this).attr(`data-x`)) < 0 && cols > 1)
-//                 return;
-//             if(parseInt($(this).attr(`data-y`)) < 0 && lines > 1)
-//                 return;
-
-//             var selectedCell = $(`#${thisClass.GUID}-table .number.origselect`)
-//             var x = parseInt(selectedCell.attr(`data-x`));
-//             var y = parseInt(selectedCell.attr(`data-y`));
-//             if(x < 0 && cols > 1)
-//                 return;
-//             if(y < 0 && lines > 1)
-//                 return;
-
-//             pasteData(x,y,val,pastetype);
-
-//             if(x < 0){
-//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y}']`).trigger(`change`);
-
-//                 const cell = $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`);
-//                 cell.addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), -1, y+lines-1));
-//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`).trigger(`change`);
-//             }
-//             if(y < 0){
-//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x}']`).trigger(`change`);
-
-//                 const cell = $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`);
-//                 cell.addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x+cols-1, -1));
-//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`).trigger(`change`);
-//             }
-
-//             thisClass._selecting = false;
-//             e.preventDefault();
-//         });
 //     }
 
-//     _attachSvg() {
-//         const thisClass = this;
-//         let move3d = false;
-//         let drag = false;
-//         let dragValue = false;
-//         $(document).on(`mousedown.${this.GUID}-svg`, `#${this.GUID}-tablesvg g`, function(e){
-//             var relX = e.pageX - $(this).closest(`svg`).offset().left;
-//             var relY = e.pageY - $(this).closest(`svg`).offset().top;
-//             let circles = thisClass.svg.filter(x => x.circle).reverse();
-//             let closestCircle = undefined;
-//             circles.forEach(function(element, index) {
-//                 let l = element.circle.cx - relX;
-//                 let w = element.circle.cy - relY;
-//                 element.dist = Math.sqrt(l*l+w*w);
-//                 if(closestCircle === undefined || element.dist < closestCircle.dist)
-//                     closestCircle = element;
-//             });
-//             const axis = thisClass._yResolution < 2? thisClass.XAxis : thisClass.YAxis;
-//             if(closestCircle && e.which === 1) {
-//                 let x = closestCircle.x;
-//                 let y = closestCircle.y;
-//                 thisClass._minSelectX = x;
-//                 thisClass._minSelectY = y;
-//                 thisClass._maxSelectX = x;
-//                 thisClass._maxSelectY = y;
-//                 index = x + thisClass._xResolution * y;
-//                 dragValue=[
-//                     e.pageY,
-//                     x,
-//                     y,
-//                     thisClass._value[index],
-//                     (thisClass._valueMax - thisClass._valueMin) / (thisClass._table3DDisplayHeight-thisClass._padding2D*2-thisClass._valueOffset2D), 
-//                     `#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`, 
-//                     e.pageX,
-//                     (axis[axis.length - 1] - axis[0]) / (thisClass._table3DDisplayWidth-thisClass._padding2D*2-thisClass._axisOffset2D), 
-//                     axis[index],
-//                     thisClass._xResolution < 2 || thisClass._yResolution < 2? `#${thisClass.GUID}-table .number${thisClass.XAxis === axis? `[data-x='${x}'][data-y='-1']` : `[data-x='-1'][data-y='${y}']`}` : undefined];
-//                 $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`);
-//                 $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-//                 $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
-//                     cell=$(cell);
-//                     cell.removeClass(`selected`);
-//                     cell.removeClass(`origselect`);
-//                     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
-//                 });
-//                 $(`#${thisClass.GUID}-table .number`).removeClass(`selected`).removeClass(`origselect`);
-//                 var cell = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
-//                 cell.addClass(`selected`).addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x, y, thisClass._value[index]));
-//                 $(dragValue[9]).addClass(`origselect`);
-//                 let closestCircleSelector = $(dragValue[5]);
-//                 closestCircleSelector.addClass(`selected`);
-//             } else if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
-//                 if(e.which === 2) {
-//                     move3d=[e.pageX,e.pageY,thisClass._table3DOffsetX,thisClass._table3DOffsetY];
-//                     e.preventDefault();
-//                 } else if(e.which === 3) {
-//                     drag=[e.pageX,e.pageY,thisClass.Table3DYaw,thisClass.Table3DPitch];
-//                     e.preventDefault();
-//                 }
-//             }
-
-//             if((closestCircle && e.which === 1) || ((e.which === 2 || e.which === 3) && thisClass._xResolution > 1 && thisClass._yResolution > 1)) {
-//                 $(document).on(`mousemove.${thisClass.GUID}-svg`, function(e){
-//                     if(drag){          
-//                         const yaw=drag[2]-(e.pageX-drag[0]);
-//                         let pitch=drag[3]+(e.pageY-drag[1]);
-//                         pitch=Math.max(-90,Math.min(90,pitch));
-//                         if(yaw === thisClass.Table3DYaw && pitch === thisClass.Table3DPitch)
-//                             return;
-//                         thisClass.Table3DYaw = yaw;
-//                         thisClass.Table3DPitch = pitch;
-//                         thisClass.UpdateSvgHtml(true);
-//                     } else if(move3d) {
-//                         const xdiff=e.pageX-move3d[0];
-//                         const ydiff=e.pageY-move3d[1];
-//                         thisClass._table3DOffsetX = move3d[2] + xdiff;
-//                         thisClass._table3DOffsetY = move3d[3] + ydiff;
-//                         thisClass.UpdateSvgHtml(true);
-//                     }else if(dragValue) {
-//                         const xdiff=e.pageX-dragValue[6];
-//                         const xmag=dragValue[7];
-//                         const diff = dragValue[0] - e.pageY;
-//                         let mag = dragValue[4]
-//                         const index = dragValue[1] + thisClass._xResolution * dragValue[2];
-//                         let value = thisClass._value[index] = dragValue[3] + diff * mag;
-//                         if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
-//                             mag = thisClass._table3DDisplayHeight / 2;
-//                             value = mag * (0.5 - (value - thisClass._valueMin) / (thisClass._valueMax - thisClass._valueMin));
-//                             const xMin = thisClass.XAxis[0];
-//                             const xMag = thisClass.XAxis[thisClass._xResolution-1] - xMin;
-//                             const yMin = thisClass.YAxis[0];
-//                             const yMag = thisClass.YAxis[thisClass._yResolution-1] - yMin;
-//                             let point = thisClass._transformPoint([
-//                                 (thisClass.XAxis[dragValue[1]]-xMin-xMag/2)/(xMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom, 
-//                                 value*thisClass._table3DZoom, 
-//                                 (thisClass.ReverseY? 1 : -1) * (thisClass.YAxis[dragValue[2]]-yMin-yMag/2)/(yMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom
-//                             ]);
-//                             $(dragValue[5]).attr(`cy`, point[1]+thisClass._table3DDisplayHeight/2+thisClass._table3DOffsetY);
-//                         } else {
-//                             axis[index] = dragValue[8] + xdiff * xmag;
-//                             $(dragValue[9]).html(Table._formatNumberForDisplay(axis[index]));
-//                             thisClass.UpdateSvgHtml();
-//                         }
-//                         var cell = $(`#${thisClass.GUID}-table .number[data-x='${dragValue[1]}'][data-y='${dragValue[2]}']`);
-//                         cell.val(Table._formatNumberForDisplay(thisClass._value[index]));
-//                     }
-//                 });
-//                 $(document).on(`mouseup.${thisClass.GUID}-svg`,function(){
-//                     drag=false;
-//                     if(dragValue) {
-//                         $(dragValue[9]).trigger(`change`);
-//                         thisClass._onChange();
-//                     } else {
-//                         thisClass.UpdateSvgHtml();
-//                     }
-//                     dragValue = false;
-//                     move3d = false
-//                     $(document).off(`mouseup.${thisClass.GUID}-svg`);
-//                     $(document).off(`mousemove.${thisClass.GUID}-svg`);
-//                 });
-//             }
-//         });
-//         document.addEventListener('wheel', function(e){
-//             if( thisClass._xResolution < 2 || thisClass._yResolution < 2)
-//                 return;
-
-//             if($(e.target).parents(`#${thisClass.GUID}-tablesvg`).length > 0) {
-//                 if(e.wheelDelta /120 > 0) {
-//                     thisClass._table3DZoom *= 1.01;
-//                 }
-//                 else{
-//                     thisClass._table3DZoom *= 0.99;
-//                 }
-//                 thisClass.UpdateSvgHtml();
-//                 e.preventDefault();
-//                 e.stopPropagation()
-//                 return false;
-//             }
-//         }, {passive: false});
-//     }
 
 //     _attachModify() {
 //         const thisClass = this;
@@ -1149,67 +1082,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             thisClass._onChange();
 //         });
 //     }
-
-//     GetHtml() {
-//         return `<div id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``} class="configtable"> 
-//     ${this.GetSvgHtml()}
-//     <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content:space-between">
-//         <div>
-//             ${this.XResolutionModifiable || this.YResolutionModifiable? `<div style="display:inline-block; position: relative;">
-//                 <div style="width: 100; position: absolute; top: -10; left: ${this.XResolutionModifiable && this.YResolutionModifiable? `32` : `0`}px;z-index:1">Table Size</div>
-//                 <div class="container">
-//                     ${this.XResolutionModifiable? `<input id="${this.GUID}-xres" class="xres" type="number" value="${this._xResolution}"></input>` : ``}
-//                     ${this.XResolutionModifiable && this.YResolutionModifiable? `X` : ``}
-//                     ${this.YResolutionModifiable? `<input id="${this.GUID}-yres" class="xres" type="number" value="${this._yResolution}"></input>` : ``}
-//                 </div>
-//             </div>` : ``}
-//             ${GetPasteOptions()}
-//         </div>
-//         <div>
-//             <div style="display:inline-block; position: relative;">
-//                 <div style="width: 100; position: absolute; top: -10; left: 32px;z-index:1">Modify</div>
-//                 <div class="container">
-//                     <input id="${this.GUID}-modifyvalue" class="modify-value" type="number"></input>
-//                     <div id="${this.GUID}-equal" class="modify-button"><h3>&nbsp;=&nbsp;</h3></div>
-//                     <div id="${this.GUID}-add" class="modify-button"><h3>&nbsp;+&nbsp;</h3></div>
-//                     <div id="${this.GUID}-subtract" style="display: none;" class="modify-button"><h3>&nbsp;-&nbsp;</h3></div>
-//                     <div id="${this.GUID}-multiply" class="modify-button"><h3>&nbsp;x&nbsp;</h3></div>
-//                     <div id="${this.GUID}-divide" style="display: none;" class="modify-button"><h3>&nbsp;÷&nbsp;</h3></div>
-//                 </div>
-//             </div>
-//             <div style="display:inline-block; position: relative;">
-//                 ${this._xResolution > 1 && this._yResolution > 1? `<div style="width: 100; position: absolute; top: -10; left: 32px;z-index:1">Interpolate</div>` : ``}
-//                 <div class="container">
-//                     ${this._xResolution > 1? `<div id="${this.GUID}-interpolatex" class="modify-button interpolate-x-button"><h3>&nbsp;☰&nbsp;</h3></div>` : ``}
-//                     ${this._yResolution > 1? `<div id="${this.GUID}-interpolatey" class="modify-button interpolate-y-button"><h3>&nbsp;☰&nbsp;</h3></div>` : ``}
-//                     ${this._xResolution > 1 && this._yResolution > 1? `<div id="${this.GUID}-interpolatexy" class="modify-button interpolate-xy-button"><h3>&nbsp;&#9632;&nbsp;</h3></div>` : ``}
-//                 </div>
-//             </div>
-//         </div>
-//     </div>
-//     <div style="display: flex; justify-content: center;">
-//         <div>${this.GetTrailHtml()}
-//     </div>
-// </div>`;
-//     }
-
-//     _formatNumberForDisplay(id, x, y, value) {
-//         var rowClass = $(`#${id}`).attr(`class`)
-//         if(rowClass)
-//             rowClass = `class="${rowClass}"`;
-//         else
-//             rowClass = `class="number"`;
-        
-//         x ??=  parseInt($(`#${id}`).attr(`data-x`));
-//         y ??=  parseInt($(`#${id}`).attr(`data-y`));
-//         value ??= $(`#${id}`).val();
-//         if(value === ``)
-//             value = $(`#${id}`).html();
-
-//         if(rowClass.indexOf(`origselect`) === -1)
-//             return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><div ${rowClass} id="${id}" data-x="${x}" data-y="${y}">${Table._formatNumberForDisplay(value)}</div></div>`;
-//         return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><input ${rowClass} id="${id}" data-x="${x}" data-y="${y}" value="${Table._formatNumberForDisplay(value)}" type="number"/></div>`;
-//     }
 // }
 
 // var pastetype = `equal`;
@@ -1227,18 +1099,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //     $(document).off(`click.pasteoptions`);
 // }
 
-// function GetPasteOptions() {
-//     return `<div style="display:inline-block; position: relative;"><div style="width: 150; position: absolute; top: -10; left: 32px;z-index:1">Paste Options</div>
-//     <div id="pasteoptions" class="container">
-//         <div data-pastetype="equal"       class="paste-button${pastetype==`equal`? ` selected` : ``         }" style="position: relative;"><h3>📋</h3><span>=</span></div>
-//         <div data-pastetype="add"         class="paste-button${pastetype==`add`? ` selected` : ``           }" style="position: relative;"><h3>📋</h3><span>+</span></div>
-//         <div data-pastetype="subtract"    class="paste-button${pastetype==`subtract`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>-</span></div>
-//         <div data-pastetype="multiply"    class="paste-button${pastetype==`multiply`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>x</span></div>
-//         <div data-pastetype="multiply%"   class="paste-button${pastetype==`multiply%`? ` selected` : ``     }" style="position: relative;"><h3>📋</h3><span>%</span></div>
-//         <div data-pastetype="multiply%/2" class="paste-button${pastetype==`multiply%/2`? ` selected` : ``   }" style="position: relative;"><h3>📋</h3><span><sup>%</sup>&frasl;<sub>2</sub></span></div>
-//     </div>
-// </div>`;
-// }
 
 // document.addEventListener(`dragstart`, function(e){
 //     if($(e.target).hasClass(`selected`) || $(e.target).hasClass(`row_expand`) || $(e.target).hasClass(`col_expand`))
@@ -1952,4 +1812,146 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             }
 //         }
 //         this._trailSvg.reverse();
+//     }
+
+//     _attachSvg() {
+//         const thisClass = this;
+//         let move3d = false;
+//         let drag = false;
+//         let dragValue = false;
+//         $(document).on(`mousedown.${this.GUID}-svg`, `#${this.GUID}-tablesvg g`, function(e){
+//             var relX = e.pageX - $(this).closest(`svg`).offset().left;
+//             var relY = e.pageY - $(this).closest(`svg`).offset().top;
+//             let circles = thisClass.svg.filter(x => x.circle).reverse();
+//             let closestCircle = undefined;
+//             circles.forEach(function(element, index) {
+//                 let l = element.circle.cx - relX;
+//                 let w = element.circle.cy - relY;
+//                 element.dist = Math.sqrt(l*l+w*w);
+//                 if(closestCircle === undefined || element.dist < closestCircle.dist)
+//                     closestCircle = element;
+//             });
+//             const axis = thisClass._yResolution < 2? thisClass.XAxis : thisClass.YAxis;
+//             if(closestCircle && e.which === 1) {
+//                 let x = closestCircle.x;
+//                 let y = closestCircle.y;
+//                 thisClass._minSelectX = x;
+//                 thisClass._minSelectY = y;
+//                 thisClass._maxSelectX = x;
+//                 thisClass._maxSelectY = y;
+//                 index = x + thisClass._xResolution * y;
+//                 dragValue=[
+//                     e.pageY,
+//                     x,
+//                     y,
+//                     thisClass._value[index],
+//                     (thisClass._valueMax - thisClass._valueMin) / (thisClass._table3DDisplayHeight-thisClass._padding2D*2-thisClass._valueOffset2D), 
+//                     `#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`, 
+//                     e.pageX,
+//                     (axis[axis.length - 1] - axis[0]) / (thisClass._table3DDisplayWidth-thisClass._padding2D*2-thisClass._axisOffset2D), 
+//                     axis[index],
+//                     thisClass._xResolution < 2 || thisClass._yResolution < 2? `#${thisClass.GUID}-table .number${thisClass.XAxis === axis? `[data-x='${x}'][data-y='-1']` : `[data-x='-1'][data-y='${y}']`}` : undefined];
+//                 $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`);
+//                 $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
+//                 $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
+//                     cell=$(cell);
+//                     cell.removeClass(`selected`);
+//                     cell.removeClass(`origselect`);
+//                     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
+//                 });
+//                 $(`#${thisClass.GUID}-table .number`).removeClass(`selected`).removeClass(`origselect`);
+//                 var cell = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
+//                 cell.addClass(`selected`).addClass(`origselect`);
+//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x, y, thisClass._value[index]));
+//                 $(dragValue[9]).addClass(`origselect`);
+//                 let closestCircleSelector = $(dragValue[5]);
+//                 closestCircleSelector.addClass(`selected`);
+//             } else if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
+//                 if(e.which === 2) {
+//                     move3d=[e.pageX,e.pageY,thisClass._table3DOffsetX,thisClass._table3DOffsetY];
+//                     e.preventDefault();
+//                 } else if(e.which === 3) {
+//                     drag=[e.pageX,e.pageY,thisClass.Table3DYaw,thisClass.Table3DPitch];
+//                     e.preventDefault();
+//                 }
+//             }
+
+//             if((closestCircle && e.which === 1) || ((e.which === 2 || e.which === 3) && thisClass._xResolution > 1 && thisClass._yResolution > 1)) {
+//                 $(document).on(`mousemove.${thisClass.GUID}-svg`, function(e){
+//                     if(drag){          
+//                         const yaw=drag[2]-(e.pageX-drag[0]);
+//                         let pitch=drag[3]+(e.pageY-drag[1]);
+//                         pitch=Math.max(-90,Math.min(90,pitch));
+//                         if(yaw === thisClass.Table3DYaw && pitch === thisClass.Table3DPitch)
+//                             return;
+//                         thisClass.Table3DYaw = yaw;
+//                         thisClass.Table3DPitch = pitch;
+//                         thisClass.UpdateSvgHtml(true);
+//                     } else if(move3d) {
+//                         const xdiff=e.pageX-move3d[0];
+//                         const ydiff=e.pageY-move3d[1];
+//                         thisClass._table3DOffsetX = move3d[2] + xdiff;
+//                         thisClass._table3DOffsetY = move3d[3] + ydiff;
+//                         thisClass.UpdateSvgHtml(true);
+//                     }else if(dragValue) {
+//                         const xdiff=e.pageX-dragValue[6];
+//                         const xmag=dragValue[7];
+//                         const diff = dragValue[0] - e.pageY;
+//                         let mag = dragValue[4]
+//                         const index = dragValue[1] + thisClass._xResolution * dragValue[2];
+//                         let value = thisClass._value[index] = dragValue[3] + diff * mag;
+//                         if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
+//                             mag = thisClass._table3DDisplayHeight / 2;
+//                             value = mag * (0.5 - (value - thisClass._valueMin) / (thisClass._valueMax - thisClass._valueMin));
+//                             const xMin = thisClass.XAxis[0];
+//                             const xMag = thisClass.XAxis[thisClass._xResolution-1] - xMin;
+//                             const yMin = thisClass.YAxis[0];
+//                             const yMag = thisClass.YAxis[thisClass._yResolution-1] - yMin;
+//                             let point = thisClass._transformPoint([
+//                                 (thisClass.XAxis[dragValue[1]]-xMin-xMag/2)/(xMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom, 
+//                                 value*thisClass._table3DZoom, 
+//                                 (thisClass.ReverseY? 1 : -1) * (thisClass.YAxis[dragValue[2]]-yMin-yMag/2)/(yMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom
+//                             ]);
+//                             $(dragValue[5]).attr(`cy`, point[1]+thisClass._table3DDisplayHeight/2+thisClass._table3DOffsetY);
+//                         } else {
+//                             axis[index] = dragValue[8] + xdiff * xmag;
+//                             $(dragValue[9]).html(Table._formatNumberForDisplay(axis[index]));
+//                             thisClass.UpdateSvgHtml();
+//                         }
+//                         var cell = $(`#${thisClass.GUID}-table .number[data-x='${dragValue[1]}'][data-y='${dragValue[2]}']`);
+//                         cell.val(Table._formatNumberForDisplay(thisClass._value[index]));
+//                     }
+//                 });
+//                 $(document).on(`mouseup.${thisClass.GUID}-svg`,function(){
+//                     drag=false;
+//                     if(dragValue) {
+//                         $(dragValue[9]).trigger(`change`);
+//                         thisClass._onChange();
+//                     } else {
+//                         thisClass.UpdateSvgHtml();
+//                     }
+//                     dragValue = false;
+//                     move3d = false
+//                     $(document).off(`mouseup.${thisClass.GUID}-svg`);
+//                     $(document).off(`mousemove.${thisClass.GUID}-svg`);
+//                 });
+//             }
+//         });
+//         document.addEventListener('wheel', function(e){
+//             if( thisClass._xResolution < 2 || thisClass._yResolution < 2)
+//                 return;
+
+//             if($(e.target).parents(`#${thisClass.GUID}-tablesvg`).length > 0) {
+//                 if(e.wheelDelta /120 > 0) {
+//                     thisClass._table3DZoom *= 1.01;
+//                 }
+//                 else{
+//                     thisClass._table3DZoom *= 0.99;
+//                 }
+//                 thisClass.UpdateSvgHtml();
+//                 e.preventDefault();
+//                 e.stopPropagation()
+//                 return false;
+//             }
+//         }, {passive: false});
 //     }

@@ -1,45 +1,161 @@
-
-table.numerictable {
+.uitable {
+    display: inline-block;
     --border-color: #666;
-    --border-width: 0.1em;
-    --border-axis-width: 0.25em;
+    --border-hover-color: #3590d0;
+    --border-width: 0.3rem;
+    --border-radius: 6px;
     --precision: 6;
+}
+.uitable table {
+    --border-width: 0.1rem;
+    --border-axis-width: 0.25rem;
+}
+
+.uitable .toolbar {
+    display: flex; 
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    justify-content:space-between;
+}
+
+.uitable .container.resolution::before,
+.uitable .container.paste::before,
+.uitable .container.modify::before,
+.uitable .container.interpolate::before {
+    font-size: 1.3rem;
+    position: absolute; 
+    top: -1rem; 
+    left: 0px;
+    z-index:1;
+}
+.uitable .container.resolution::before { content: "TableSize"; }
+.uitable .container.paste::before { content: "Paste Options"; }
+.uitable .container.modify::before { content: "Modify"; }
+.uitable .container.interpolate::before { content: "Interpolate"; }
+.uitable .container{
+    position: relative;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    vertical-align:top; 
+    padding: 0.1rem;
+    margin: 0.1rem;
+    display: inline-flex;
+    justify-content: center;  
+    align-items: center;
+}
+
+.uitable .resolution-value,
+.uitable .modify-value,
+.uitable .modify-button,
+.uitable .paste-button {
+    font-size: 2rem;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    margin: 2px;
+    width: 2rem;    
+    height: 2rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;  
+}
+.uitable .paste-button {
+    font-size: 1.5rem;
+}
+.uitable .resolution-value,
+.uitable .modify-value {
+    cursor: default;
+    font-size: 1.5rem;
+    height: 2.6rem;
+    width: 7rem;
+}
+.uitable .resolution-value {
+    width: 5rem;
+}
+.uitable .resolution-value:hover,
+.uitable .modify-value:hover,
+.uitable .modify-button:hover,
+.uitable .paste-button:hover {
+    border-color: var(--border-hover-color);
+}
+.uitable .modify-button.add::before { position: absolute; content: "+"; }
+.uitable .modify-button.subtract::before { position: absolute; content: "-"; }
+.uitable .modify-button.multiply::before { position: absolute; content: "-"; }
+.uitable .modify-button.divide::before { position: absolute; content: "-"; }
+.uitable .modify-button.equal::before { position: absolute; content: "="; }
+
+.uitable .paste-button::before { z-index: -1; position: absolute; content: "📋"; }
+.uitable .paste-button.equal:after { position: absolute; content: "="; }
+.uitable .paste-button.add:after { position: absolute; content: "+"; }
+.uitable .paste-button.subtract:after { position: absolute; content: "-"; }
+.uitable .paste-button.multiply:after { position: absolute; content: "x"; }
+.uitable .paste-button.multiplyP:after { position: absolute; content: "%"; }
+.uitable .paste-button sub,
+.uitable .paste-button sup {font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+.uitable .paste-button sub {bottom:-0.25em}
+.uitable .paste-button sup {top:-0.5em}
+
+
+.uitable .modify-button.interpolatex::before,
+.uitable .modify-button.interpolatey::before {
+    position: absolute;
+    background: linear-gradient(-90deg, #ff0000 10%, #ffff00 37%, #00ff00 63%, #00ffff 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    content: "☰"
+}
+.uitable .modify-button.interpolatey {
+    transform: rotate(90deg);
+}
+.uitable .modify-button.interpolatexy::before {
+    position: absolute;
+    background: linear-gradient(-45deg, #ff0000 20%, #ffff00 40%, #00ff00 60%, #00ffff 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    transform: scale(1.5);
+    content: "■";
+}
+
+
+.uitable table.numerictable {
     --cell-width: calc(var(--precision) * 0.7em);
     border-spacing: 0px;
     border-style: none;
 }
-table.numerictable td {
+.uitable table.numerictable td {
     padding: 0px;
 }
 
-table.numerictable tr td div.xaxis {
+.uitable table.numerictable tr td div.xaxis {
     display: flex;
 }
-table.numerictable tr td div.yaxis {
+.uitable table.numerictable tr td div.yaxis {
     display: flex;
     flex-wrap: wrap;
     max-width: calc(var(--cell-width) + var(--border-width) + var(--border-axis-width));
 }
-table.numerictable tr td div.value {
+.uitable table.numerictable tr td div.value {
     display: flex;
     flex-wrap: wrap;
     max-width: calc(calc(var(--cell-width) + 2 * var(--border-width)) * var(--xresolution));
 }
 
-table.numerictable tr td.xdrag,
-table.numerictable tr td.ydrag {
+.uitable table.numerictable tr td.xdrag,
+.uitable table.numerictable tr td.ydrag {
     background-color: var(--border-color);
 }
-table.numerictable tr td.xdrag {
+.uitable table.numerictable tr td.xdrag {
     width: 0.3em;
 }
-table.numerictable tr td.ydrag {
+.uitable table.numerictable tr td.ydrag {
     height: 0.3em;
 }
 
-table.numerictable tr td div.value div,
-table.numerictable tr td div.yaxis div,
-table.numerictable tr td div.xaxis div {
+.uitable table.numerictable tr td div.value div,
+.uitable table.numerictable tr td div.yaxis div,
+.uitable table.numerictable tr td div.xaxis div {
     cursor: default;
     min-width: var(--cell-width);
     max-width: var(--cell-width);
@@ -47,41 +163,41 @@ table.numerictable tr td div.xaxis div {
     margin: 0px;
     padding: 0px;
 }
-table.numerictable tr td div.value div {
+.uitable table.numerictable tr td div.value div {
     background-color: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
     /* height: calc(180 - (180 * (attr(data-value number) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))); */
 }
-table.numerictable tr td div.xaxis div {
+.uitable table.numerictable tr td div.xaxis div {
     border-bottom-width: var(--border-axis-width);
 }
-table.numerictable tr td div.yaxis div {
+.uitable table.numerictable tr td div.yaxis div {
     text-align: right;
     border-right-width: var(--border-axis-width);
 }
 
-table.numerictable tr td.xtrans {
+.uitable table.numerictable tr td.xtrans {
     white-space: nowrap;
 }
-table.numerictable tr td.xtrans div {
+.uitable table.numerictable tr td.xtrans div {
     display: flex;
     flex-direction: column; 
     align-items: center;
 }
-table.numerictable tr td.xztrans {
+.uitable table.numerictable tr td.xztrans {
     vertical-align: bottom;
 }
-table.numerictable tr td.xztrans div {
+.uitable table.numerictable tr td.xztrans div {
     display: flex;
     flex-direction: column; 
     align-items: end;
 }
-table.numerictable tr td.ytrans {
+.uitable table.numerictable tr td.ytrans {
     white-space: nowrap;
     vertical-align: middle; 
     width: 2em;
     padding: 5px;
 }
-table.numerictable tr td.ytrans div {
+.uitable table.numerictable tr td.ytrans div {
     position: absolute;
     transform-origin: 50% 50%;
     transform: translateX(-50%) rotate(-90deg) translateY(100%)
