@@ -150,14 +150,27 @@
     max-width: calc(calc(var(--cell-width) + 2 * var(--border-width)) * var(--xresolution));
 }
 
+.uitable table.numerictable tr td.xydrag,
 .uitable table.numerictable tr td.xdrag,
 .uitable table.numerictable tr td.ydrag {
     background-color: var(--border-color);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.uitable table.numerictable tr td.xydrag {
+    cursor: nwse-resize;
+    width: 0.3em;
 }
 .uitable table.numerictable tr td.xdrag {
+    cursor: ew-resize;
     width: 0.3em;
 }
 .uitable table.numerictable tr td.ydrag {
+    cursor: ns-resize;
     height: 0.3em;
 }
 

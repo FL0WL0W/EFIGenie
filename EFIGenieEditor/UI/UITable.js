@@ -103,6 +103,7 @@ export default class UITable extends HTMLDivElement {
             this.#interpolateYElement.hidden = true;
     }
 
+    #xyResolutionDragElement = document.createElement(`td`);
     #xResolutionDragElement = document.createElement(`td`);
     get xResolutionModifiable() {
         return !this.#xResolutionDragElement.hidden;
@@ -114,10 +115,13 @@ export default class UITable extends HTMLDivElement {
             this.#resolutionTextElement.hidden = false;
         else 
             this.#resolutionTextElement.hidden = true;
-        if(this.yResolutionModifiable || xResolutionModifiable)
+        if(this.yResolutionModifiable || xResolutionModifiable) {
+            this.#xyResolutionDragElement.hidden = false;
             this.#resolutionElement.hidden = false;
-        else 
+        } else {
+            this.#xyResolutionDragElement.hidden = true;
             this.#resolutionElement.hidden = true;
+        }
     }
 
     get xResolution() {
@@ -159,10 +163,13 @@ export default class UITable extends HTMLDivElement {
             this.#resolutionTextElement.hidden = false;
         else 
             this.#resolutionTextElement.hidden = true;
-        if(this.xResolutionModifiable || yResolutionModifiable)
+        if(this.xResolutionModifiable || yResolutionModifiable) {
+            this.#xyResolutionDragElement.hidden = false;
             this.#resolutionElement.hidden = false;
-        else 
+        } else {
+            this.#xyResolutionDragElement.hidden = true;
             this.#resolutionElement.hidden = true;
+        }
     }
 
     get yResolution() {
@@ -265,6 +272,7 @@ export default class UITable extends HTMLDivElement {
             const yAxisTd = row2.appendChild(document.createElement(`td`));
             yAxisTd.append(this.#yAxisElement)
             row3.append(this.#yResolutionDragElement);
+            row3.append(this.#xyResolutionDragElement);
         } else if (xResolution > 1) {
             const xAxisLabel    = row2.appendChild(document.createElement(`td`));
             xAxisLabel.class    = `xztrans`
@@ -388,6 +396,7 @@ export default class UITable extends HTMLDivElement {
         this.#xResolutionDragElement.rowSpan = 2;
         this.#yResolutionDragElement.class = `ydrag`;
         this.#yResolutionDragElement.colSpan = 2;
+        this.#xyResolutionDragElement.class = `xydrag`;
         const propValue = prop.value;
         delete prop.value;
         Object.assign(this, prop);
@@ -592,6 +601,123 @@ export default class UITable extends HTMLDivElement {
             e.preventDefault();
             thisClass.dispatchEvent(new Event(`change`));
         });
+
+        var dragX = false;
+        var dragY = false;
+        var pointX;
+        var pointY;
+
+        function move(pageX, pageY) {
+            if(dragX) {
+                var width = thisClass.#xAxisElement.children[0].offsetWidth;
+                let diff = (pageX-dragX[0])/width;
+                const polarity = diff / Math.abs(diff);
+                diff = parseInt((Math.abs(diff) + 1/2) * polarity);
+                let xResolution = dragX[1] + diff;
+                if(xResolution < 2)
+                    xResolution = 2;
+                thisClass.xResolution = xResolution;
+            }
+            if(dragY) {
+                var height = thisClass.#yAxisElement.children[0].offsetHeight;
+                let diff = (pageY-dragY[0])/height;
+                const polarity = diff / Math.abs(diff);
+                diff = parseInt((Math.abs(diff) + 1/2) * polarity);
+                let yResolution = dragY[1] + diff;
+                if(yResolution < 2)
+                    yResolution = 2;
+                thisClass.yResolution = yResolution;
+            }
+            // if(thisClass._selecting){
+            //     thisClass._minSelectX = thisClass._xResolution;
+            //     thisClass._minSelectY = thisClass._yResolution;
+            //     thisClass._maxSelectX = 0;
+            //     thisClass._maxSelectY = 0;
+            //     let loopNumbers = `#${thisClass.GUID}-table .number`;
+            //     if(parseInt($(`#${thisClass.GUID}-table .origselect`).attr(`data-x`)) === -1)
+            //         loopNumbers += `[data-x=-1]`;
+            //     if(parseInt($(`#${thisClass.GUID}-table .origselect`).attr(`data-y`)) === -1)
+            //         loopNumbers += `[data-y=-1]`;
+            //     $.each($(loopNumbers), function(index, cell) {
+            //         var cellElement = $(cell);
+            //         let x = parseInt(cellElement.attr(`data-x`));
+            //         let y = parseInt(cellElement.attr(`data-y`));
+            //         if(x === undefined || y === undefined)
+            //             return;
+
+            //         x = parseInt(x);
+            //         y = parseInt(y);
+        
+            //         const cellOffset = cellElement.offset();
+            //         const relX = pageX - thisClass.#tableElement.offsetLeft;
+            //         const elX = cellOffset.left - thisClass.#tableElement.offsetLeft;
+            //         const relY = pageY - thisClass.#tableElement.offsetTop;
+            //         const elY = cellOffset.top - thisClass.#tableElement.offsetTop;
+            //         if(((elX <= relX && elX >= pointX) || (elX >= (relX - cellElement.width()) && elX <= pointX) || (pointX == cellOffset.left - thisClass.#tableElement.offsetLeft)) &&
+            //             ((elY <= relY && elY >= pointY) || (elY >= (relY - cellElement.height()) && elY <= pointY) || (pointY == cellOffset.top - thisClass.#tableElement.offsetTop))) {
+            //             if(thisClass._selecting) {
+            //                 if(x < thisClass._minSelectX)
+            //                     thisClass._minSelectX = x;
+            //                 if(x > thisClass._maxSelectX)
+            //                     thisClass._maxSelectX = x;
+            //                 if(y < thisClass._minSelectY)
+            //                     thisClass._minSelectY = y;
+            //                 if(y > thisClass._maxSelectY)
+            //                     thisClass._maxSelectY = y;
+            //                 cellElement.addClass(`selected`);
+            //             }
+            //         } else if(thisClass._selecting) {
+            //             cellElement.removeClass(`selected`);
+            //         }
+            //     });
+            //     $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`)
+            //     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX; x++) {
+            //         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY; y++) {
+            //             $(`#${thisClass.GUID}-tablesvg g path[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+            //         }
+            //     }
+            //     $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
+            //     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX+1; x++) {
+            //         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY+1; y++) {
+            //             $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+            //         }
+            //     }
+            // }
+        }
+
+        function up() {
+            dragX = false;
+            dragY = false;
+            document.removeEventListener(`mousemove`, mouseMoveEvent);
+
+            // thisClass._selecting = false;
+            // $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
+            //     cell=$(cell);
+            //     if(cell.is(`:input`))
+            //         return;
+            //     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
+            //     $(`#${thisClass.GUID}-table .origselect`).select();
+            // });
+        }
+
+        document.addEventListener(`mouseup`, up);
+
+        function mouseMoveEvent(event) {
+            move(event.pageX, event.pageY);
+        }
+        thisClass.#xyResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragX = [event.pageX, thisClass.xResolution];
+            dragY = [event.pageY, thisClass.yResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
+        thisClass.#xResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragX = [event.pageX, thisClass.xResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
+        thisClass.#yResolutionDragElement.addEventListener(`mousedown`, function(event) {
+            dragY = [event.pageY, thisClass.yResolution];
+            document.addEventListener(`mousemove`, mouseMoveEvent);
+        });
     }
 
     static #formatElementForDisplay(element, precision = 6) {
@@ -618,40 +744,11 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //     }
 
 //     _attachTable() {
-//         const thisClass = this;
-
 //         var dragX = false;
 //         var dragY = false;
 //         var pointX;
 //         var pointY;
 
-//         $(document).on(`mousedown.${this.GUID}`, `#${this.GUID}-table .rowcol_expand`, function(e){
-//             dragY = true;
-//             dragX = true;
-//             $(`#overlay`).addClass(`rowcol_expand`);
-//             $(`#overlay`).show();
-//             $(document).on(`mousemove.${thisClass.GUID}`, function(e){
-//                 move(e.pageX, e.pageY);
-//             });
-//         });
-
-//         $(document).on(`mousedown.${this.GUID}`, `#${this.GUID}-table .col_expand`, function(e){
-//             dragX = true;
-//             $(`#overlay`).addClass(`col_expand`);
-//             $(`#overlay`).show();
-//             $(document).on(`mousemove.${thisClass.GUID}`, function(e){
-//                 move(e.pageX, e.pageY);
-//             });
-//         });
-
-//         $(document).on(`mousedown.${this.GUID}`, `#${this.GUID}-table .row_expand`, function(e){
-//             dragY = true;
-//             $(`#overlay`).addClass(`row_expand`);
-//             $(`#overlay`).show();
-//             $(document).on(`mousemove.${thisClass.GUID}`, function(e){
-//                 move(e.pageX, e.pageY);
-//             });
-//         });
 
 //         function down() {
 //             $(document).on(`touchmove.${thisClass.GUID}`, function(e){
@@ -699,111 +796,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 
 //             pointX =  downElement.offset().left - downElement.closest(`table`).offset()?.left;
 //             pointY =  downElement.offset().top - downElement.closest(`table`).offset()?.top;
-//         }
-
-//         function up() {
-//             $(document).off(`touchmove.${thisClass.GUID}`);
-//             $(document).off(`mousemove.${thisClass.GUID}`);
-
-//             thisClass._selecting = false;
-//             $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
-//                 cell=$(cell);
-//                 if(cell.is(`:input`))
-//                     return;
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
-//                 $(`#${thisClass.GUID}-table .origselect`).select();
-//             });
-//             dragX = false;
-//             dragY = false;
-//             $(`#overlay`).removeClass(`col_expand`);
-//             $(`#overlay`).removeClass(`row_expand`);
-//             $(`#overlay`).removeClass(`rowcol_expand`);
-//             $(`#overlay`).hide();
-//         }
-
-//         var selectOnMove = false;
-//         function move(pageX, pageY) {
-//             var tableElement = $(`#${thisClass.GUID}-table`);
-//             const tableOffset = tableElement.offset();
-//             if(dragX) {
-//                 var cellElement = $(`#${thisClass.GUID}-${thisClass._xResolution - 1}-axis`);
-//                 var relX = pageX - tableOffset.left;
-//                 var elX = cellElement.offset().left - tableOffset.left;
-//                 var comp = relX - elX;
-//                 if(comp > (cellElement.width() * 3/2))
-//                     thisClass.XResolution += 1;
-//                 if(comp < 0 && thisClass._xResolution > 2)
-//                     thisClass.XResolution -= 1;
-//             }
-//             if(dragY) {
-//                 var cellElement = $(`#${thisClass.GUID}-axis-${thisClass._yResolution - 1}`);
-//                 var relY = pageY - tableOffset.top;
-//                 var elY = cellElement.offset().top - tableOffset.top;
-//                 var comp = relY - elY;
-//                 if(comp > (cellElement.height() * 3/2))
-//                     thisClass.YResolution += 1;
-//                 if(comp < 0 && thisClass._yResolution > 2)
-//                     thisClass.YResolution-= 1;
-//             }
-//             if(thisClass._selecting || selectOnMove){
-//                 thisClass._minSelectX = thisClass._xResolution;
-//                 thisClass._minSelectY = thisClass._yResolution;
-//                 thisClass._maxSelectX = 0;
-//                 thisClass._maxSelectY = 0;
-//                 let loopNumbers = `#${thisClass.GUID}-table .number`;
-//                 if(parseInt($(`#${thisClass.GUID}-table .origselect`).attr(`data-x`)) === -1)
-//                     loopNumbers += `[data-x=-1]`;
-//                 if(parseInt($(`#${thisClass.GUID}-table .origselect`).attr(`data-y`)) === -1)
-//                     loopNumbers += `[data-y=-1]`;
-//                 $.each($(loopNumbers), function(index, cell) {
-//                     var cellElement = $(cell);
-//                     let x = parseInt(cellElement.attr(`data-x`));
-//                     let y = parseInt(cellElement.attr(`data-y`));
-//                     if(x === undefined || y === undefined)
-//                         return;
-
-//                     x = parseInt(x);
-//                     y = parseInt(y);
-        
-//                     const cellOffset = cellElement.offset();
-//                     const relX = pageX - tableOffset.left;
-//                     const elX = cellOffset.left - tableOffset.left;
-//                     const relY = pageY - tableOffset.top;
-//                     const elY = cellOffset.top - tableOffset.top;
-//                     if(((elX <= relX && elX >= pointX) || (elX >= (relX - cellElement.width()) && elX <= pointX) || (pointX == cellOffset.left - tableOffset.left)) &&
-//                         ((elY <= relY && elY >= pointY) || (elY >= (relY - cellElement.height()) && elY <= pointY) || (pointY == cellOffset.top - tableOffset.top))) {
-//                         if(thisClass._selecting) {
-//                             if(x < thisClass._minSelectX)
-//                                 thisClass._minSelectX = x;
-//                             if(x > thisClass._maxSelectX)
-//                                 thisClass._maxSelectX = x;
-//                             if(y < thisClass._minSelectY)
-//                                 thisClass._minSelectY = y;
-//                             if(y > thisClass._maxSelectY)
-//                                 thisClass._maxSelectY = y;
-//                             cellElement.addClass(`selected`);
-//                         }
-//                         else if (selectOnMove && !cellElement.hasClass(`origselect`)) {
-//                             selectOnMove = false;
-//                             thisClass._selecting = true;
-//                         }
-//                     } else if(thisClass._selecting) {
-//                         cellElement.removeClass(`selected`);
-//                     }
-//                 });
-//                 $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`)
-//                 for(let x=thisClass._minSelectX; x<thisClass._maxSelectX; x++) {
-//                     for(let y=thisClass._minSelectY; y<thisClass._maxSelectY; y++) {
-//                         $(`#${thisClass.GUID}-tablesvg g path[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
-//                     }
-//                 }
-//                 $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-//                 for(let x=thisClass._minSelectX; x<thisClass._maxSelectX+1; x++) {
-//                     for(let y=thisClass._minSelectY; y<thisClass._maxSelectY+1; y++) {
-//                         $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
-//                     }
-//                 }
-//             }
 //         }
 
 //         $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
