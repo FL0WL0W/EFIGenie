@@ -1,15 +1,14 @@
-import UIElement from "./UIElement.js"
-export default class UIText extends UIElement {
+export default class UIText extends HTMLInputElement {
     onChange = [];
 
     get value() {
-        return this.element.value;
+        return super.value;
     }
     set value(value) {
-        if(this.element.value === value)
+        if(super.value === value)
             return;
 
-        this.element.value = value;
+        super.value = value;
         this.onChange.forEach(function(onChange) { onChange(); });
     }
 
@@ -21,13 +20,15 @@ export default class UIText extends UIElement {
     }
 
     constructor(prop) {
-        super(`input`);
+        super();
+        this.style.display = `inline-block`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         const thisClass = this;
-        this.element.addEventListener(`change`, function() {
+        this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
 }
+customElements.define('ui-text', UIText, { extends: 'input' });

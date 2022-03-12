@@ -1,31 +1,4 @@
-export default class UITable {
-    set class(pclass) {
-        const thisClass = this;
-        pclass.split(` `).forEach(function(pclass) { thisClass.addClass(pclass); });
-    }
-    addClass(pclass) {
-        this.element.classList.add(pclass);
-    }
-    removeClass(pclass) {
-        this.element.classList.add(pclass);
-    }
-
-    #hidden = false;
-    get hidden() {
-        return this.#hidden;
-    }
-    set hidden(hidden) {
-        if(this.#hidden === hidden)
-            return;
-            
-        this.#hidden = hidden;
-        if(hidden) {
-            this.element.style.display = `none`;
-        } else {
-            this.element.style.display = `inline-block`;
-        }
-    }
-
+export default class UITable extends HTMLDivElement {
     #xLabelElement = document.createElement(`div`);
     get xLabel() {
         return this.#xLabelElement.innerHTML;
@@ -130,17 +103,18 @@ export default class UITable {
         row2.append(this.#valueElement);
     }
 
-    element = document.createElement(`div`);
     onChange = [];
     constructor(prop) {
-        this.element.style.display = `inline-block`;
-        this.element.append(this.#tableElement);
+        super();
+        this.style.display = `inline-block`;
+        this.append(this.#tableElement);
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         this.#buildTableElement();
     }
 }
+customElements.define('ui-table', UITable, { extends: 'div' });
 // class TableOld {
 //     XAxisModifiable = true;
 //     YAxisModifiable = true;

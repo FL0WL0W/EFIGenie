@@ -1,9 +1,9 @@
-import UIElement from "./UIElement.js"
-export default class UITemplate extends UIElement {
+export default class UITemplate extends HTMLDivElement {
     onChange = [];
 
     constructor(prop) {
-        super(`div`);
+        super();
+        this.style.display = `inline-block`;
         if(prop)
             this.Setup(prop);
     }
@@ -23,10 +23,11 @@ export default class UITemplate extends UIElement {
         });
 
         const template = this.Template ?? this.constructor.Template;
-        this.element.innerHTML = template;
-        this.element.querySelectorAll(`[data-element]`).forEach(function(element){
+        this.innerHTML = template;
+        this.querySelectorAll(`[data-element]`).forEach(function(element){
             let [matchingUIName, matchingUI] = thisEntries.find(function([elementName, e]) { return element.dataset.element === elementName; });
-            element.replaceWith(matchingUI?.element);
+            console.log(matchingUI)
+            element.replaceWith(matchingUI);
         });
     }
     
@@ -55,3 +56,4 @@ export default class UITemplate extends UIElement {
         });
     }
 }
+customElements.define('ui-template', UITemplate, { extends: 'div' });

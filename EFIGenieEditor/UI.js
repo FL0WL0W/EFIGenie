@@ -270,13 +270,14 @@ class Number extends UINumber {
     }
 
     Attach() {
-        $(`#${this.GUID}`).append(this.element);
+        $(`#${this.GUID}`).append(this);
     }
 
     GetHtml() {
         return `<span id="${this.GUID}"></span>`
     }
 };
+customElements.define('ui-number-wrapper', Number, { extends: `input` });
 
 class Checkbox extends UICheckbox {
     GUID = generateGUID();
@@ -311,13 +312,14 @@ class Checkbox extends UICheckbox {
     }
 
     Attach() {
-        $(`#${this.GUID}`).append(this.element);
+        $(`#${this.GUID}`).append(this);
     }
 
     GetHtml() {
         return `<span id="${this.GUID}"></span>`
     }
 };
+customElements.define('ui-checkbox-wrapper', Checkbox, { extends: `input` });
 
 class Text extends UIText {
     GUID = generateGUID();
@@ -352,14 +354,14 @@ class Text extends UIText {
     }
 
     Attach() {
-        $(`#${this.GUID}`).append(this.element);
+        $(`#${this.GUID}`).append(this);
     }
 
     GetHtml() {
         return `<span id="${this.GUID}"></span>`
     }
 };
-
+customElements.define('ui-text-wrapper', Text, { extends: `input` });
 class Selection extends UISelection {
     GUID = generateGUID();
 
@@ -428,13 +430,14 @@ class Selection extends UISelection {
     }
 
     Attach() {
-        $(`#${this.GUID}`).append(this.element);
+        $(`#${this.GUID}`).append(this);
     }
 
     GetHtml() {
         return `<span id="${this.GUID}"></span>`
     }
 };
+customElements.define('ui-selection-wrapper', Selection, { extends: `div` });
 
 class NumberWithMeasurement extends Template {
     static Template = `$DisplayValue$$DisplayMeasurement$`

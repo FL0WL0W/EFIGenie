@@ -1,16 +1,15 @@
-import UIElement from "./UIElement.js"
-export default class UICheckbox extends UIElement {
+export default class UICheckbox extends HTMLInputElement {
     onChange = [];
 
     get value() {
-        return this.element.checked;
+        return this.checked;
     }
     set value(value) {
-        if(this.element.checked === value)
+        if(this.checked === value)
             return;
 
-        this.element.checked = value;
-        this.onChange.forEach(function(onChange) { onChange(); });
+        this.checked = value;
+        super.dispatchEvent(new Event(`change`));
     }
 
     get saveValue() {
@@ -21,14 +20,15 @@ export default class UICheckbox extends UIElement {
     }
 
     constructor(prop) {
-        super(`input`);
-        this.element.type = `checkbox`;
+        super();
+        this.type = `checkbox`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         const thisClass = this;
-        this.element.addEventListener(`change`, function() {
+        this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
 }
+customElements.define('ui-checkbox', UICheckbox, { extends: 'input' });

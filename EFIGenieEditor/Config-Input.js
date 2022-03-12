@@ -578,6 +578,7 @@ class UIPinSelection extends UI.OldSelection {
         return options;
     }
 }
+customElements.define('ui-pinselection', UIPinSelection, { extends: `div` });
 
 class Input_Analog extends UI.OldTemplate {
     static Name = `Analog Pin`;

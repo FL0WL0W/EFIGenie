@@ -303,4 +303,19 @@ function objectTester(a, b) {
     }
   
     return true;
-  }
+}
+
+Object.defineProperty(HTMLDivElement.prototype, 'hidder', {
+    enumerable: true,
+    get: function() {
+        return this.style.display === `none`;
+    },
+    set: function(hidden) {
+        if(hidden) {
+            this.style.display = `none`;
+        } else if(this.style.display === `none`) {
+            this.style.display = this._previousDisplayValue ?? `default`;
+            delete this._previousDisplayValue;
+        }
+    }
+})

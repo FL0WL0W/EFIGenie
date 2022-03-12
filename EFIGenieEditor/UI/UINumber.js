@@ -1,47 +1,16 @@
-import UIElement from "./UIElement.js"
-export default class UINumber extends UIElement {
+export default class UINumber extends HTMLInputElement {
     onChange = [];
 
-    get min() {
-        return this.element.min;
-    }
-    set min(min) {
-        if(this.element.min === min)
-            return;
-
-        this.element.min = min;
-    }
-
-    get max() {
-        return this.element.max;
-    }
-    set max(max) {
-        if(this.element.max === max)
-            return;
-
-        this.element.max = max;
-    }
-
-    get step() {
-        return this.element.step;
-    }
-    set step(step) {
-        if(this.element.step === step)
-            return;
-
-        this.element.step = step;
-    }
-
     get value() {
-        return parseFloat(this.element.value);
+        return parseFloat(super.value);
     }
     set value(value) {
         value = parseFloat(value);
-        if(parseFloat(this.element.value) === value)
+        if(parseFloat(super.value) === value)
             return;
 
-        this.element.value = value;
-        this.onChange.forEach(function(onChange) { onChange(); });
+        super.value = value;
+        super.dispatchEvent(new Event(`change`));
     }
 
     get saveValue() {
@@ -52,14 +21,16 @@ export default class UINumber extends UIElement {
     }
 
     constructor(prop) {
-        super(`input`);
-        this.element.type = `number`;
+        super();
+        this.type = `number`;
+        this.style.display = `inline-block`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         const thisClass = this;
-        this.element.addEventListener(`change`, function(event) {
+        this.addEventListener(`change`, function(event) {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
 }
+customElements.define('ui-number', UINumber, { extends: 'input' });

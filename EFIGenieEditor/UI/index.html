@@ -1,5 +1,6 @@
 <html>
     <head>
+        <script src="UIUtils.js"></script>
         <script type="module">
             import UIText from "./UIText.js";
             import UINumber from "./UINumber.js";
@@ -7,7 +8,7 @@
             import UITemplate from "./UITemplate.js"
             import UISelection from "./UISelection.js"
             import UITable from "./UITable.js"
-            let template = new UITemplate({
+            window.template = new UITemplate({
                 Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="selection"></div><hr/><div data-element="table2D"></div>`,
                 text: new UIText({
                     value: `text`
@@ -34,7 +35,7 @@
                 })
             });
             window.addEventListener(`load`, function() {
-                document.body.appendChild(template.element)
+                document.body.appendChild(window.template)
             });
         </script>
     </head>

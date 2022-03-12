@@ -1,5 +1,4 @@
-import UIElement from "./UIElement.js"
-export default class UISelection extends UIElement {
+export default class UISelection extends HTMLDivElement {
     static ParseValue(type, value) {
         switch(type) {
             case `number`:
@@ -159,7 +158,7 @@ export default class UISelection extends UIElement {
         selectedElement.dataset.type = typeof value;
         selectedElement.dataset.value = UISelection.ParseValue(`string`, value);
         this.#updateSelectElement();
-        this.onChange.forEach(function(onChange) { onChange(); });
+        this.dispatchEvent(new Event(`change`));
     }
 
     get saveValue() {
@@ -170,8 +169,9 @@ export default class UISelection extends UIElement {
     }
 
     constructor(prop) {
-        super(`div`);
-        this.selectedElement = this.element.appendChild(document.createElement(`div`));
+        super();
+        this.style.display = `inline-block`;
+        this.selectedElement = this.appendChild(document.createElement(`div`));
         this.selectedElement.classList.add(`select`);
         this.contextMenuElement = document.createElement(`div`);
         this.contextMenuElement.classList.add(`context-menu`);
@@ -181,8 +181,11 @@ export default class UISelection extends UIElement {
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
-
         const thisClass = this;
+        this.addEventListener(`change`, function(event) {
+            thisClass.onChange.forEach(function(onChange) { onChange(); });
+        });
+
         let visible = false;
         this.selectedElement.addEventListener(`click`, function(event) {
             if(visible) 
@@ -191,12 +194,12 @@ export default class UISelection extends UIElement {
             function clickHandler() {
                 if(!visible) 
                     return;
-                thisClass.element.removeChild(thisClass.contextMenuElement);
+                thisClass.removeChild(thisClass.contextMenuElement);
                 document.removeEventListener(`click`, clickHandler);
                 visible = false;
             }
             document.addEventListener(`click`, clickHandler);
-            window.setTimeout(function() { thisClass.element.append(thisClass.contextMenuElement); visible = true; }, 1);
+            window.setTimeout(function() { thisClass.append(thisClass.contextMenuElement); visible = true; }, 1);
         });
         this.contextMenuElement.addEventListener(`click`, function(event) {
             if(event.target.classList.contains(`selectdisabled`))
@@ -231,3 +234,4 @@ function setElementOption(element, option) {
         element.innerHTML = option.Name + (option.Info? ` ${option.Info}` : ``);
     }
 }
+customElements.define(`ui-selection`, UISelection, { extends: `div` });

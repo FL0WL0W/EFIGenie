@@ -4,6 +4,7 @@
         <script src="jquery-ui.min.js"></script>
         <script src="utils.js"></script>
         <script src="JavascriptTable/Table.js"></script>
+        <script src="UIUtils.js"></script>
         <script type="module">
             import ui from "./UI.js"
             window.UI = ui.UI;
@@ -22,8 +23,8 @@
         <link rel = "stylesheet" type = "text/css" href = "JavascriptTable/Table.css" />
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "jquery-ui.css" />
-        <script type="module">
-            var b = new ConfigTop();
+        <script defer>
+            var b;
             var configJsonName = `tune.json`
             $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
@@ -32,6 +33,7 @@
                 $(`#btnLoad`).val(undefined);
             };
             $(document).ready(function() {
+                b = new ConfigTop();
                 const lastConfig = window.localStorage.getItem(`config`);
                 if (lastConfig) {
                     loadConfig(lastConfig);
