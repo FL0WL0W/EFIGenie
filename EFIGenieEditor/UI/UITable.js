@@ -1,26 +1,44 @@
 export default class UITable extends HTMLDivElement {
     #xLabelElement = document.createElement(`div`);
+    #xLabel = undefined;
     get xLabel() {
-        return this.#xLabelElement.innerHTML;
+        return this.#xLabel;
     }
     set xLabel(xLabel) {
-        this.#xLabelElement.innerHTML = xLabel;
+        if(this.#xLabel === xLabel)
+            return;
+        this.#xLabel = xLabel;
+        this.#xLabelElement.innerHTML = ``;
+        if(xLabel !== undefined)
+            this.#xLabelElement.append(xLabel);
     }
 
     #yLabelElement = document.createElement(`div`);
+    #yLabel = undefined;
     get yLabel() {
-        return this.#yLabelElement.innerHTML;
+        return this.#yLabel;
     }
     set yLabel(yLabel) {
-        this.#yLabelElement.innerHTML = yLabel;
+        if(this.#yLabel === yLabel)
+            return;
+        this.#yLabel = yLabel;
+        this.#yLabelElement.innerHTML = ``;
+        if(yLabel !== undefined)
+            this.#yLabelElement.append(yLabel);
     }
 
     #zLabelElement = document.createElement(`div`);
+    #zLabel = undefined;
     get zLabel() {
-        return this.#zLabelElement.innerHTML;
+        return this.#zLabel;
     }
     set zLabel(zLabel) {
-        this.#zLabelElement.innerHTML = zLabel;
+        if(this.#zLabel === zLabel)
+            return;
+        this.#zLabel = zLabel;
+        this.#zLabelElement.innerHTML = ``;
+        if(zLabel !== undefined)
+            this.#zLabelElement.append(zLabel);
     }
 
     #xAxisElement = document.createElement(`td`);
@@ -66,6 +84,7 @@ export default class UITable extends HTMLDivElement {
             const xLabelBlank   = row0.appendChild(document.createElement(`td`));
             xLabelBlank.colSpan = 3;
             const xLabelTd      = row0.appendChild(document.createElement(`td`));
+            xLabelTd.class      = `xtrans`;
             xLabelTd.colSpan    = this.#xAxisElement.children.length;
             xLabelTd.append(this.#xLabelElement);
         }
@@ -73,6 +92,7 @@ export default class UITable extends HTMLDivElement {
         const row1 = this.#tableElement.appendChild(document.createElement(`tr`));
         if(xResolution > 1) {
             const xzAxisLabel   = row1.appendChild(document.createElement(`td`));
+            xzAxisLabel.class   = `xztrans`;
             if(yResolution > 1) {
                 xzAxisLabel.colSpan = 3;
                 xzAxisLabel.append(this.#zLabelElement);
@@ -92,12 +112,14 @@ export default class UITable extends HTMLDivElement {
             if(xResolution > 1) {
                 row2.appendChild(document.createElement(`td`)).rowSpan = yResolution;//auto width to take up zlabel slack
                 const yAxisLabel = row2.appendChild(document.createElement(`td`));
+                yAxisLabel.class = `ytrans`;
                 yAxisLabel.rowSpan = yResolution;
                 yAxisLabel.append(this.#yLabelElement);
             }
             row2.append(this.#yAxisElement);
         } else if (xResolution > 1) {
             const xAxisLabel    = row2.appendChild(document.createElement(`td`));
+            xAxisLabel.class    = `xztrans`
             xAxisLabel.append(this.#xLabelElement);
         }
         row2.append(this.#valueElement);
@@ -108,6 +130,12 @@ export default class UITable extends HTMLDivElement {
         super();
         this.style.display = `inline-block`;
         this.append(this.#tableElement);
+        this.#xLabelElement.class = `xlabel`;
+        this.#yLabelElement.class = `ylabel`;
+        this.#zLabelElement.class = `zlabel`;
+        this.#xAxisElement.class  = `xAxis`;
+        this.#yAxisElement.class  = `yAxis`;
+        this.#tableElement.class  = `numerictable`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];

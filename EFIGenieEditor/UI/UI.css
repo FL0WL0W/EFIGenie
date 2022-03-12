@@ -1,0 +1,57 @@
+
+table.numerictable {
+    --border-color: #666;
+    --border-width: 2px;
+    --border-axis-width: 5px;
+    --cell-width: 80px;
+    border-spacing: 0px;
+    border-style: none;
+}
+table.numerictable td {
+    padding: 0px;
+}
+
+table.numerictable tr td.yaxis div,
+table.numerictable tr td.xaxis div {
+    min-width: var(--cell-width);
+    max-width: var(--cell-width);
+    border: var(--border-width) solid var(--border-color);
+    margin: 0px;
+    padding: 0px;
+}
+table.numerictable tr td.xaxis div {
+    display: inline-block;
+    border-bottom-width: var(--border-axis-width);
+}
+table.numerictable tr td.yaxis div {
+    text-align: right;
+    border-right-width: var(--border-axis-width);
+}
+
+table.numerictable tr td.xtrans {
+    white-space: nowrap;
+}
+table.numerictable tr td.xtrans div {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+}
+table.numerictable tr td.xztrans {
+    vertical-align: bottom;
+}
+table.numerictable tr td.xztrans div {
+    display: flex;
+    flex-direction: column; 
+    align-items: end;
+}
+table.numerictable tr td.ytrans {
+    white-space: nowrap;
+    vertical-align: middle; 
+    width: 2em;
+    padding: 5px;
+}
+table.numerictable tr td.ytrans div {
+    position: absolute;
+    transform-origin: 50% 50%;
+    transform: translateX(-50%) rotate(-90deg) translateY(100%)
+}
