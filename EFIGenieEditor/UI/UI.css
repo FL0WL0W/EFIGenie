@@ -2,6 +2,8 @@
     display: inline-block;
     --border-color: #666;
     --border-hover-color: #3590d0;
+    --border-select-color: #3590d0;
+    --background-selected-color: #3590d080;
     --border-width: 0.3rem;
     --border-radius: 6px;
     --precision: 6;
@@ -78,18 +80,24 @@
 .uitable .paste-button:hover {
     border-color: var(--border-hover-color);
 }
+.uitable .modify-button.selected,
+.uitable .paste-button.selected {
+    border-color: var(--border-selected-color);
+    background-color: var(--background-selected-color);
+}
 .uitable .modify-button.add::before { position: absolute; content: "+"; }
 .uitable .modify-button.subtract::before { position: absolute; content: "-"; }
 .uitable .modify-button.multiply::before { position: absolute; content: "-"; }
 .uitable .modify-button.divide::before { position: absolute; content: "-"; }
 .uitable .modify-button.equal::before { position: absolute; content: "="; }
 
-.uitable .paste-button::before { z-index: -1; position: absolute; content: "📋"; }
+.uitable .paste-button::before { position: absolute; content: "📋"; }
 .uitable .paste-button.equal:after { position: absolute; content: "="; }
 .uitable .paste-button.add:after { position: absolute; content: "+"; }
 .uitable .paste-button.subtract:after { position: absolute; content: "-"; }
 .uitable .paste-button.multiply:after { position: absolute; content: "x"; }
 .uitable .paste-button.multiplyP:after { position: absolute; content: "%"; }
+.uitable .paste-button span {z-index: 1;}
 .uitable .paste-button sub,
 .uitable .paste-button sup {font-size:75%;line-height:0;position:relative;vertical-align:baseline}
 .uitable .paste-button sub {bottom:-0.25em}

@@ -335,13 +335,19 @@ export default class UITable extends HTMLDivElement {
         this.#pasteOptionsElement.append(this.#pasteMultiplyElement);
         this.#pasteOptionsElement.append(this.#pasteMultiplyPElement);
         this.#pasteOptionsElement.append(this.#pasteMultiplyP2Element);
-        this.#pasteEqualElement.class       = `paste-button equal`;
-        this.#pasteAddElement.class         = `paste-button add`;
-        this.#pasteSubtractElement.class    = `paste-button subtract`;
-        this.#pasteMultiplyElement.class    = `paste-button multiply`;
-        this.#pasteMultiplyPElement.class   = `paste-button multiplyp`;
-        this.#pasteMultiplyP2Element.class  = `paste-button multiplyp2`;
-        this.#pasteMultiplyP2Element.innerHTML = `<sup>%</sup>&frasl;<sub>2</sub>`;
+        this.#pasteEqualElement.class               = `paste-button equal selected`;
+        this.#pasteEqualElement.dataset.value       = `equal`;
+        this.#pasteAddElement.class                 = `paste-button add`;
+        this.#pasteAddElement.dataset.value         = `add`;
+        this.#pasteSubtractElement.class            = `paste-button subtract`;
+        this.#pasteSubtractElement.dataset.value    = `subtract`;
+        this.#pasteMultiplyElement.class            = `paste-button multiply`;
+        this.#pasteMultiplyElement.dataset.value    = `multiply`;
+        this.#pasteMultiplyPElement.class           = `paste-button multiplyp`;
+        this.#pasteMultiplyPElement.dataset.value   = `multiply%`;
+        this.#pasteMultiplyP2Element.class          = `paste-button multiplyp2`;
+        this.#pasteMultiplyP2Element.dataset.value  = `multiply%/2`;
+        this.#pasteMultiplyP2Element.innerHTML      = `<span><sup>%</sup>&frasl;<sub>2</sub></span>`;
         //modify toolbar
         this.#rightToolbarElement.append(this.#modifyElement);
         this.#modifyElement.class = `modify container`;
@@ -416,6 +422,14 @@ export default class UITable extends HTMLDivElement {
 
     constructTableEventListeners() {
         const thisClass = this;
+        this.#pasteOptionsElement.addEventListener(`click`, function(event) {
+            let target = event.target;
+            for(let i=0; i < 2; i++) if(!target.dataset.value) target = event.target.parentElement;
+            if(target.dataset.value) {
+                thisClass.#pasteOptionsElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+                target.classList.add(`selected`);
+            }
+        });
         this.#xResolutionElement.addEventListener(`change`, function(event) {
             thisClass.xResolution = parseInt(event.target.value);
         });
@@ -504,7 +518,7 @@ export default class UITable extends HTMLDivElement {
 
             let currentY;
             thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) {
-                let y = parseInt(element.dataset.y)
+                let y = parseInt(element.dataset.y) ?? -1;
                 if(currentY !== undefined) {
                     if(currentY !== y) {
                         copyData += `\n`;
@@ -520,117 +534,64 @@ export default class UITable extends HTMLDivElement {
             event.preventDefault();
         });
 
-//         function pasteData(x,y,data,special) {
-//             thisClass._minSelectX = x;
-//             thisClass._minSelectY = y;
-//             thisClass._maxSelectX = x + data.split(`\n`).length;
-//             $.each(data.split(`\n`), function(yIndex, val) {
-//                 thisClass._maxSelectY = y + val.split(`\t`).length;
-//                 var yPos = y + yIndex;
-//                 if(yPos > thisClass._yResolution - 1)
-//                     return;
-//                 $.each(val.split(`\t`), function(xIndex, val) {
-//                     var xPos = x + xIndex;
-//                     if(xPos > thisClass._xResolution - 1)
-//                         return;
+        this.#tableElement.addEventListener(`paste`, function(event){
+            var val = event.clipboardData.getData(`text/plain`);
+            const lines = val.split(`\n`).length;
+            const cols = val.split(`\t`).length;
+            const x = parseInt(event.target.dataset.x);
+            const y = parseInt(event.target.dataset.y);
+            if(x === undefined && cols > 1)
+                return;
+            if(y === undefined && lines > 1)
+                return;
 
-//                     var v = parseFloat(val);
+            let special = thisClass.#pasteOptionsElement.querySelector(`.selected`)?.dataset?.value;
 
-//                     let numberSelector = $(`#${thisClass.GUID}-table .number[data-x='${xPos}'][data-y='${yPos}']`);
-//                     let newValue;
-//                     if(xPos > -1 && yPos > -1)
-//                         newValue = thisClass._value[xPos + yPos * thisClass._xResolution];
-//                     else if(xPos === -1)
-//                         newValue = thisClass.YAxis[yPos];
-//                     else if(yPos === -1)
-//                         newValue = thisClass.XAxis[xPos];
-//                     else
-//                         newValue = numberSelector.val() ?? numberSelector.html();
+            thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
+            val.split(`\n`).each(function(val, yIndex) {
+                var yPos = y + yIndex;
+                if(yPos > thisClass.yResolution - 1)
+                    return;
+                val.split(`\t`).each(function(val, xIndex) {
+                    var xPos = x + xIndex;
+                    if(xPos > thisClass.xResolution - 1)
+                        return;
 
-//                     switch(special)
-//                     {
-//                         case `add`:
-//                             newValue += v;
-//                             break;
-//                         case `subtract`:
-//                             newValue -= v;
-//                             break;
-//                         case `multiply`:
-//                             newValue *= v;
-//                             break;
-//                         case `multiply%`:
-//                             newValue *= 1 + (v/100);
-//                             break;
-//                         case `multiply%/2`:
-//                             newValue *= 1 + (v/200);
-//                             break;
-//                         case `average`:
-//                             newValue += v;
-//                             newValue /= 2;
-//                             break;
-//                         default:
-//                             newValue = v;
-//                             break;
-//                     }
+                    var v = parseFloat(val);
 
-//                     if(xPos > -1 && yPos > -1)
-//                         thisClass._value[xPos + yPos * thisClass._xResolution] = newValue;
-//                     else if(xPos === -1)
-//                         thisClass.YAxis[yPos] = newValue;
-//                     else if(yPos === -1)
-//                         thisClass.XAxis[xPos] = newValue;
+                    let numberElement = thisClass.#valueElement.children[xPos + yPos * thisClass.xResolution];
+                    switch(special)
+                    {
+                        case `add`:
+                            numberElement.value += v;
+                            break;
+                        case `subtract`:
+                            numberElement.value -= v;
+                            break;
+                        case `multiply`:
+                            numberElement.value *= v;
+                            break;
+                        case `multiply%`:
+                            numberElement.value *= 1 + (v/100);
+                            break;
+                        case `multiply%/2`:
+                            numberElement.value *= 1 + (v/200);
+                            break;
+                        case `average`:
+                            numberElement.value += v;
+                            numberElement.value /= 2;
+                            break;
+                        default:
+                            numberElement.value = v;
+                            break;
+                    }
 
-//                     numberSelector.addClass(`selected`);
-//                     const id = numberSelector.attr(`id`);
-//                     numberSelector.parent().replaceWith(thisClass._formatNumberForDisplay(id, xPos, yPos, newValue));
-//                     $(`#${id}`).select();
-//                 });
-//             });
-//             thisClass._onChange();
-//         }
-
-
-//         $(document).on(`paste.${this.GUID}`, `#${this.GUID}-table .number`, function(e){
-//             if($(this).attr(`data-x`) === undefined || $(this).attr(`data-y`) === undefined)
-//                 return;
-//             var val = e.originalEvent.clipboardData.getData(`text/plain`);
-//             const lines = val.split(`\n`).length;
-//             const cols = val.split(`\t`).length;
-//             if(parseInt($(this).attr(`data-x`)) < 0 && cols > 1)
-//                 return;
-//             if(parseInt($(this).attr(`data-y`)) < 0 && lines > 1)
-//                 return;
-
-//             var selectedCell = $(`#${thisClass.GUID}-table .number.origselect`)
-//             var x = parseInt(selectedCell.attr(`data-x`));
-//             var y = parseInt(selectedCell.attr(`data-y`));
-//             if(x < 0 && cols > 1)
-//                 return;
-//             if(y < 0 && lines > 1)
-//                 return;
-
-//             pasteData(x,y,val,pastetype);
-
-//             if(x < 0){
-//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y}']`).trigger(`change`);
-
-//                 const cell = $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`);
-//                 cell.addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), -1, y+lines-1));
-//                 $(`#${thisClass.GUID}-table .number[data-x='-1'][data-y='${y+lines-1}']`).trigger(`change`);
-//             }
-//             if(y < 0){
-//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x}']`).trigger(`change`);
-
-//                 const cell = $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`);
-//                 cell.addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x+cols-1, -1));
-//                 $(`#${thisClass.GUID}-table .number[data-y='-1'][data-x='${x+cols-1}']`).trigger(`change`);
-//             }
-
-//             thisClass._selecting = false;
-//             e.preventDefault();
-//         });
+                    numberElement.classList.add(`selected`);
+                });
+            });
+            e.preventDefault();
+            thisClass.dispatchEvent(new Event(`change`));
+        });
     }
 
     static #formatElementForDisplay(element, precision = 6) {
