@@ -1,9 +1,10 @@
 
 table.numerictable {
     --border-color: #666;
-    --border-width: 2px;
-    --border-axis-width: 5px;
-    --cell-width: 80px;
+    --border-width: 0.1em;
+    --border-axis-width: 0.25em;
+    --precision: 6;
+    --cell-width: calc(var(--precision) * 0.7em);
     border-spacing: 0px;
     border-style: none;
 }
@@ -25,20 +26,30 @@ table.numerictable tr td div.value {
     max-width: calc(calc(var(--cell-width) + 2 * var(--border-width)) * var(--xresolution));
 }
 
+table.numerictable tr td.xdrag,
+table.numerictable tr td.ydrag {
+    background-color: var(--border-color);
+}
+table.numerictable tr td.xdrag {
+    width: 0.3em;
+}
+table.numerictable tr td.ydrag {
+    height: 0.3em;
+}
+
 table.numerictable tr td div.value div,
 table.numerictable tr td div.yaxis div,
 table.numerictable tr td div.xaxis div {
+    cursor: default;
     min-width: var(--cell-width);
     max-width: var(--cell-width);
     border: var(--border-width) solid var(--border-color);
     margin: 0px;
     padding: 0px;
 }
-
-table.numerictable tr td div.value div:not(.origselect)::after,
-table.numerictable tr td div.xaxis div:not(.origselect)::after,
-table.numerictable tr td div.yaxis div:not(.origselect)::after {
-    content: attr(data-value);
+table.numerictable tr td div.value div {
+    background-color: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
+    /* height: calc(180 - (180 * (attr(data-value number) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))); */
 }
 table.numerictable tr td div.xaxis div {
     border-bottom-width: var(--border-axis-width);

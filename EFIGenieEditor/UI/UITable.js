@@ -41,8 +41,21 @@ export default class UITable extends HTMLDivElement {
             this.#zLabelElement.append(zLabel);
     }
 
+    get #valueMin() {
+        return this.style.getPropertyValue('--valuemin') ?? 18000000000000000000;
+    }
+    set #valueMin(valueMin) {
+        this.style.setProperty('--valuemin', valueMin);
+    }
+    get #valueMax() {
+        return this.style.getPropertyValue('--valuemax') ?? -9000000000000000000;
+    }
+    set #valueMax(valueMin) {
+        this.style.setProperty('--valuemax', valueMin);
+    }
+
     get value() {
-        return [...this.#valueElement.children].map(x => x.dataset.value);
+        return [...this.#valueElement.children].map(x => x.value);
     }
     set value(value) {
         if(value === undefined)
@@ -50,19 +63,39 @@ export default class UITable extends HTMLDivElement {
         if(value.length !== this.xResolution * this.yResolution)
             throw `Value length does not match table length. Set xResolution and yResolution before setting value`;
         for(let i = 0; i < this.#valueElement.children.length; i++) {
-            this.#valueElement.children[i].dataset.value = parseFloat(value[i]);
+            this.#valueElement.children[i].value = parseFloat(value[i]);
+            UITable.#formatElementForDisplay(this.#valueElement.children[i]);
         }
+        this.dispatchEvent(new Event(`change`));
     }
 
     #resolutionChanged() {
-        this.#valueElement.style.setProperty('--xresolution', this.xResolution);
+        this.style.setProperty('--xresolution', this.xResolution);
+        this.style.setProperty('--yresolution', this.yResolution);
         for(let i = this.xResolution * this.yResolution; i < this.#valueElement.children.length; i++) { this.#valueElement.removeChild(this.#valueElement.children[i]); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
             valueElement.dataset.x = i % this.xResolution;
             valueElement.dataset.x = parseInt(i/this.yResolution);
-            valueElement.dataset.value ??= 0;
+            Object.defineProperty(valueElement, 'value', {
+                get: function() {
+                    return this.dataset.value;
+                },
+                set: function(value) {
+                    this.dataset.value = value;
+                    this.style.setProperty(`--data-value`, value);
+                }
+            })
+            UITable.#formatElementForDisplay(valueElement);
         }
+    }
+
+    #xResolutionDragElement = document.createElement(`td`);
+    get xResolutionModifiable() {
+        return !this.#xResolutionDragElement.hidden;
+    }
+    set xResolutionModifiable(xResolutionModifiable) {
+        this.#xResolutionDragElement.hidden = !xResolutionModifiable;
     }
 
     get xResolution() {
@@ -82,10 +115,20 @@ export default class UITable extends HTMLDivElement {
                 xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
             xAxisElement.dataset.value = xAxisMinus0;
             xAxisElement.dataset.x = i;
+            UITable.#formatElementForDisplay(xAxisElement);
         }
         this.#resolutionChanged();
         //interpolation
         this.#buildTableElement();
+        this.dispatchEvent(new Event(`change`));
+    }
+
+    #yResolutionDragElement = document.createElement(`td`);
+    get yResolutionModifiable() {
+        return !this.#yResolutionDragElement.hidden;
+    }
+    set yResolutionModifiable(yResolutionModifiable) {
+        this.#yResolutionDragElement.hidden = !yResolutionModifiable;
     }
 
     get yResolution() {
@@ -104,10 +147,12 @@ export default class UITable extends HTMLDivElement {
                 yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
             yAxisElement.dataset.value = yAxisMinus0;
             yAxisElement.dataset.y = i;
+            UITable.#formatElementForDisplay(yAxisElement);
         }
         this.#resolutionChanged();
         //interpolation
         this.#buildTableElement();
+        this.dispatchEvent(new Event(`change`));
     }
 
     #xAxisElement = document.createElement(`div`);
@@ -117,8 +162,9 @@ export default class UITable extends HTMLDivElement {
     set xAxis(xAxis) {
         this.xResolution = xAxis.length;
         const thisClass = this;
-        xAxis.forEach(function(xAxisValue, xAxisIndex) { thisClass.#xAxisElement.children[xAxisIndex].dataset.value = xAxisValue; });
+        xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.dataset.value = xAxisValue; UITable.#formatElementForDisplay(xAxisElement); });
         //interpolation
+        this.dispatchEvent(new Event(`change`));
     }
     
     #yAxisElement = document.createElement(`div`);
@@ -128,8 +174,9 @@ export default class UITable extends HTMLDivElement {
     set yAxis(yAxis) {
         this.yResolution = yAxis.length;
         const thisClass = this;
-        yAxis.forEach(function(yAxisValue, yAxisIndex) { thisClass.#yAxisElement.children[yAxisIndex].dataset.value = yAxisValue; });
+        yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.dataset.value = yAxisValue; UITable.#formatElementForDisplay(yAxisElement); });
         //interpolation
+        this.dispatchEvent(new Event(`change`));
     }
 
     #valueElement = document.createElement(`div`);
@@ -159,32 +206,36 @@ export default class UITable extends HTMLDivElement {
             } else {
                 xzAxisLabel.append(this.#xLabelElement);
             }
-            const xAxis = row1.appendChild(document.createElement(`td`));
-            xAxis.append(this.#xAxisElement);
+            const xAxisTd = row1.appendChild(document.createElement(`td`));
+            xAxisTd.append(this.#xAxisElement);
+            row1.append(this.#xResolutionDragElement);
         } else if (yResolution > 1) {
-            const ylabel        = row1.appendChild(document.createElement(`td`));
-            yAxislabel.append(this.#yLabelElement);
-            const zlabel        = row1.appendChild(document.createElement(`td`));
-            zAxislabel.append(this.#zLabelElement);
+            const ylabelTd      = row1.appendChild(document.createElement(`td`));
+            ylabelTd.append(this.#yLabelElement);
+            const zlabelTd      = row1.appendChild(document.createElement(`td`));
+            zlabelTd.append(this.#zLabelElement);
         }
-        //row2
+        //row2/3
         const row2 = this.#tableElement.appendChild(document.createElement(`tr`));
+        const row3 = this.#tableElement.appendChild(document.createElement(`tr`));
         if (yResolution > 1) {
             if(xResolution > 1) {
                 row2.appendChild(document.createElement(`td`));//auto width to take up zlabel slack
                 const yAxisLabel = row2.appendChild(document.createElement(`td`));
                 yAxisLabel.class = `ytrans`;
                 yAxisLabel.append(this.#yLabelElement);
+                row3.appendChild(document.createElement(`td`)).colSpan = 2;// pick up slack for ydrag
             }
-            const yAxis = row2.appendChild(document.createElement(`td`));
-            yAxis.append(this.#yAxisElement)
+            const yAxisTd = row2.appendChild(document.createElement(`td`));
+            yAxisTd.append(this.#yAxisElement)
+            row3.append(this.#yResolutionDragElement);
         } else if (xResolution > 1) {
             const xAxisLabel    = row2.appendChild(document.createElement(`td`));
             xAxisLabel.class    = `xztrans`
             xAxisLabel.append(this.#xLabelElement);
         }
-        const value = row2.appendChild(document.createElement(`td`));
-        value.append(this.#valueElement);
+        const valueTd = row2.appendChild(document.createElement(`td`));
+        valueTd.append(this.#valueElement);
     }
 
     onChange = [];
@@ -192,13 +243,17 @@ export default class UITable extends HTMLDivElement {
         super();
         this.style.display = `inline-block`;
         this.append(this.#tableElement);
+        this.#tableElement.class  = `numerictable`;
         this.#xLabelElement.class = `xlabel`;
         this.#yLabelElement.class = `ylabel`;
         this.#zLabelElement.class = `zlabel`;
         this.#xAxisElement.class  = `xAxis`;
         this.#yAxisElement.class  = `yAxis`;
         this.#valueElement.class  = `value`;
-        this.#tableElement.class  = `numerictable`;
+        this.#xResolutionDragElement.class = `xdrag`;
+        this.#xResolutionDragElement.rowSpan = 2;
+        this.#yResolutionDragElement.class = `ydrag`;
+        this.#yResolutionDragElement.colSpan = 2;
         const propValue = prop.value;
         delete prop.value;
         Object.assign(this, prop);
@@ -206,93 +261,40 @@ export default class UITable extends HTMLDivElement {
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         this.#buildTableElement();
+
+        const thisClass = this;
+        function calculateMinMaxValue() {
+            thisClass.#valueMin = 10000000000;
+            thisClass.#valueMax = -10000000000;
+            const arrayValue = thisClass.value;
+            for(let i = 0; i < arrayValue.length; i++) {
+                let value = arrayValue[i];
+                if(value < thisClass.#valueMin)
+                    thisClass.#valueMin = value;
+                if(value > thisClass.#valueMax)
+                    thisClass.#valueMax = value;
+            }
+            if(thisClass.#valueMax === thisClass.#valueMin)
+                thisClass.#valueMax = thisClass.#valueMin + 1;
+
+        }
+        this.addEventListener(`change`, calculateMinMaxValue);
+        calculateMinMaxValue();
     }
 
-    static #formatNumberForDisplay(number, precision = 6) {
-        var ret = parseFloat(parseFloat(parseFloat(number).toFixed(precision -1)).toPrecision(precision));
-        if(isNaN(ret))
-            return `&nbsp;`;
-        return ret;
+    static #formatElementForDisplay(element, precision = 6) {
+        let formattedVaue = parseFloat(parseFloat(parseFloat(element.dataset.value).toFixed(precision -1)).toPrecision(precision));
+        if(isNaN(formattedVaue))
+            formattedVaue = `&nbsp;`;
+        element.innerHTML = formattedVaue;
     }
 }
 customElements.define('ui-table', UITable, { extends: 'div' });
 // class TableOld {
 //     XAxisModifiable = true;
 //     YAxisModifiable = true;
-//     XResolutionModifiable = true;
-//     YResolutionModifiable = true;
 //     onChange = [];
 //     ReverseY = false;
-
-//     _table3DDisplayWidth=800; 
-//     _table3DDisplayHeight=450;
-//     _table3DZoom=1;
-  
-//     _table3DtransformPrecalc=[];
-//     _table3DOffsetX = 0;
-//     _table3DOffsetY = 0
-//     _table3DPitch = 0;
-//     get Table3DPitch() {
-//       return this._table3DPitch
-//     }
-//     set Table3DPitch(pitch) {
-//       if(pitch === this._table3DPitch)
-//         return;
-//       this._table3DPitch = pitch;
-//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
-//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
-//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
-//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
-//       this._table3DtransformPrecalc[0]=cosB;
-//       this._table3DtransformPrecalc[1]=0;
-//       this._table3DtransformPrecalc[2]=sinB;
-//       this._table3DtransformPrecalc[3]=sinA*sinB;
-//       this._table3DtransformPrecalc[4]=cosA;
-//       this._table3DtransformPrecalc[5]=-sinA*cosB;
-//       this._table3DtransformPrecalc[6]=-sinB*cosA;
-//       this._table3DtransformPrecalc[7]=sinA;
-//       this._table3DtransformPrecalc[8]=cosA*cosB;
-//     }
-//     _table3DYaw = 0;
-//     get Table3DYaw() {
-//       return this._table3DYaw
-//     }
-//     set Table3DYaw(yaw) {
-//       if(yaw === this._table3DYaw)
-//         return;
-//       this._table3DYaw = yaw;
-//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
-//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
-//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
-//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
-//       this._table3DtransformPrecalc[0]=cosB;
-//       this._table3DtransformPrecalc[1]=0;
-//       this._table3DtransformPrecalc[2]=sinB;
-//       this._table3DtransformPrecalc[3]=sinA*sinB;
-//       this._table3DtransformPrecalc[4]=cosA;
-//       this._table3DtransformPrecalc[5]=-sinA*cosB;
-//       this._table3DtransformPrecalc[6]=-sinB*cosA;
-//       this._table3DtransformPrecalc[7]=sinA;
-//       this._table3DtransformPrecalc[8]=cosA*cosB;
-//     }
-//     _transformPoint(point){
-//         let x=this._table3DtransformPrecalc[0]*point[0]+this._table3DtransformPrecalc[1]*point[1]+this._table3DtransformPrecalc[2]*point[2];
-//         let y=this._table3DtransformPrecalc[3]*point[0]+this._table3DtransformPrecalc[4]*point[1]+this._table3DtransformPrecalc[5]*point[2];
-//         let z=this._table3DtransformPrecalc[6]*point[0]+this._table3DtransformPrecalc[7]*point[1]+this._table3DtransformPrecalc[8]*point[2];
-//         return [x,y,z];
-//     };
-
-//     _value = [0];
-//     get Value() {
-//         return this._value;
-//     }
-//     set Value(value) {
-//         this._value = value;
-//         for(let i=0; i<this._value.length; i++) {
-//             this._value[i] = parseFloat(this._value[i]);
-//         }
-//         this.UpdateHtml();
-//     }
 
 //     _onChange() {
 //         this.UpdateSvgHtml();
@@ -318,44 +320,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             thisClass.UpdateTrailHtml();
 //         }, this.TrailTime);
 //         this.UpdateTrailHtml();
-//     }
-    
-//     constructor(GUID, copyObject){
-//         this.GUID = GUID;
-//         if(copyObject)
-//             Object.assign(this, copyObject);
-//         if(!Array.isArray(this.onChange))
-//             this.onChange = [ this.onChange ];
-//         this.Table3DPitch = 17;
-//         this.Table3DYaw = 30;
-//     }
-
-//     Detach() {
-//         $(document).off(`keypress.${this.GUID}`);
-//         $(document).off(`blur.${this.GUID}`);
-//         $(document).off(`change.${this.GUID}`);
-//         $(document).off(`click.${this.GUID}`);
-//         $(document).off(`mousedown.${this.GUID}`);
-//         $(document).off(`mouseup.${this.GUID}`);
-//         $(document).off(`mousemove.${this.GUID}`);
-//         $(document).off(`copy.${this.GUID}`);
-//         $(document).off(`paste.${this.GUID}`);
-//         $(document).off(`contextmenu.${this.GUID}`);
-//         $(document).off(`touchstart.${this.GUID}`);
-//         $(document).off(`touchend.${this.GUID}`);
-//         $(document).off(`touchmove.${this.GUID}`);
-//         $(document).off(`mousedown.${this.GUID}-svg`);
-//         $(document).off(`mouseup.${this.GUID}-svg`);
-//         $(document).off(`mousemove.${this.GUID}-svg`);
-//         $(document).off(`mousewheel.${this.GUID}-svg`);
-//     }
-
-//     Attach() {
-//         this.Detach();
-//         this._attachTable();
-//         this._attachSvg();
-//         this._attachModify();
-//         this._attachInterpolate();
 //     }
 
 //     _attachTable() {
@@ -1225,15 +1189,126 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //     </div>
 //     <div style="display: flex; justify-content: center;">
 //         <div>${this.GetTrailHtml()}
-//         ${this.GetTableHtml()}</div>
 //     </div>
 // </div>`;
 //     }
 
-//     UpdateHtml() {
-//         $(`#${this.GUID}`).replaceWith(this.GetHtml());
+//     _formatNumberForDisplay(id, x, y, value) {
+//         var rowClass = $(`#${id}`).attr(`class`)
+//         if(rowClass)
+//             rowClass = `class="${rowClass}"`;
+//         else
+//             rowClass = `class="number"`;
+        
+//         x ??=  parseInt($(`#${id}`).attr(`data-x`));
+//         y ??=  parseInt($(`#${id}`).attr(`data-y`));
+//         value ??= $(`#${id}`).val();
+//         if(value === ``)
+//             value = $(`#${id}`).html();
+
+//         if(rowClass.indexOf(`origselect`) === -1)
+//             return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><div ${rowClass} id="${id}" data-x="${x}" data-y="${y}">${Table._formatNumberForDisplay(value)}</div></div>`;
+//         return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><input ${rowClass} id="${id}" data-x="${x}" data-y="${y}" value="${Table._formatNumberForDisplay(value)}" type="number"/></div>`;
 //     }
+// }
+
+// var pastetype = `equal`;
+
+// function AttachPasteOptions() {
+//     DetachPasteOptions();
+//     $(document).on(`click.pasteoptions`, `#pasteoptions .paste-button`, function(){
+//         pastetype = $(this).attr(`data-pastetype`);
+//         $(`#pasteoptions div`).removeClass(`selected`);
+//         $(`#pasteoptions div[data-pastetype="${pastetype}"`).addClass(`selected`);
+//     });
+// }
+
+// function DetachPasteOptions() {
+//     $(document).off(`click.pasteoptions`);
+// }
+
+// function GetPasteOptions() {
+//     return `<div style="display:inline-block; position: relative;"><div style="width: 150; position: absolute; top: -10; left: 32px;z-index:1">Paste Options</div>
+//     <div id="pasteoptions" class="container">
+//         <div data-pastetype="equal"       class="paste-button${pastetype==`equal`? ` selected` : ``         }" style="position: relative;"><h3>📋</h3><span>=</span></div>
+//         <div data-pastetype="add"         class="paste-button${pastetype==`add`? ` selected` : ``           }" style="position: relative;"><h3>📋</h3><span>+</span></div>
+//         <div data-pastetype="subtract"    class="paste-button${pastetype==`subtract`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>-</span></div>
+//         <div data-pastetype="multiply"    class="paste-button${pastetype==`multiply`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>x</span></div>
+//         <div data-pastetype="multiply%"   class="paste-button${pastetype==`multiply%`? ` selected` : ``     }" style="position: relative;"><h3>📋</h3><span>%</span></div>
+//         <div data-pastetype="multiply%/2" class="paste-button${pastetype==`multiply%/2`? ` selected` : ``   }" style="position: relative;"><h3>📋</h3><span><sup>%</sup>&frasl;<sub>2</sub></span></div>
+//     </div>
+// </div>`;
+// }
+
+// document.addEventListener(`dragstart`, function(e){
+//     if($(e.target).hasClass(`selected`) || $(e.target).hasClass(`row_expand`) || $(e.target).hasClass(`col_expand`))
+//         e.preventDefault();
+// });//disable dragging of selected items
+
+
+
+
+
+//svg stuff
+//     _table3DDisplayWidth=800; 
+//     _table3DDisplayHeight=450;
+//     _table3DZoom=1;
   
+//     _table3DtransformPrecalc=[];
+//     _table3DOffsetX = 0;
+//     _table3DOffsetY = 0
+//     _table3DPitch = 0;
+//     get Table3DPitch() {
+//       return this._table3DPitch
+//     }
+//     set Table3DPitch(pitch) {
+//       if(pitch === this._table3DPitch)
+//         return;
+//       this._table3DPitch = pitch;
+//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
+//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
+//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
+//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
+//       this._table3DtransformPrecalc[0]=cosB;
+//       this._table3DtransformPrecalc[1]=0;
+//       this._table3DtransformPrecalc[2]=sinB;
+//       this._table3DtransformPrecalc[3]=sinA*sinB;
+//       this._table3DtransformPrecalc[4]=cosA;
+//       this._table3DtransformPrecalc[5]=-sinA*cosB;
+//       this._table3DtransformPrecalc[6]=-sinB*cosA;
+//       this._table3DtransformPrecalc[7]=sinA;
+//       this._table3DtransformPrecalc[8]=cosA*cosB;
+//     }
+//     _table3DYaw = 0;
+//     get Table3DYaw() {
+//       return this._table3DYaw
+//     }
+//     set Table3DYaw(yaw) {
+//       if(yaw === this._table3DYaw)
+//         return;
+//       this._table3DYaw = yaw;
+//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
+//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
+//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
+//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
+//       this._table3DtransformPrecalc[0]=cosB;
+//       this._table3DtransformPrecalc[1]=0;
+//       this._table3DtransformPrecalc[2]=sinB;
+//       this._table3DtransformPrecalc[3]=sinA*sinB;
+//       this._table3DtransformPrecalc[4]=cosA;
+//       this._table3DtransformPrecalc[5]=-sinA*cosB;
+//       this._table3DtransformPrecalc[6]=-sinB*cosA;
+//       this._table3DtransformPrecalc[7]=sinA;
+//       this._table3DtransformPrecalc[8]=cosA*cosB;
+//     }
+//     _transformPoint(point){
+//         let x=this._table3DtransformPrecalc[0]*point[0]+this._table3DtransformPrecalc[1]*point[1]+this._table3DtransformPrecalc[2]*point[2];
+//         let y=this._table3DtransformPrecalc[3]*point[0]+this._table3DtransformPrecalc[4]*point[1]+this._table3DtransformPrecalc[5]*point[2];
+//         let z=this._table3DtransformPrecalc[6]*point[0]+this._table3DtransformPrecalc[7]*point[1]+this._table3DtransformPrecalc[8]*point[2];
+//         return [x,y,z];
+//     };
+
+
 //     GetSvgHtml(){
 //         if(this._xResolution > 1 && this._yResolution > 1) {
 //             this._calculateSvg3D();
@@ -1371,142 +1446,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //                 t.removeAttr(`class`);
 //             }
 //         });
-//     }
-
-//     GetTableHtml() {
-//         this._calculateValueMinMax();
-//         var row = ``;
-//         var table = `<table id="${this.GUID}-table">`;
-
-//         var xstart = -1;
-//         var y = -1;
-//         if(this._yResolution > 1 && this._xResolution > 1) {
-//             xstart = -2;
-//             y = -2;
-//         }
-
-//         while(true) {
-//             var row = `<tr>`;
-//             for(var x = xstart; x < this._xResolution + 1; x++) {
-//                 if(y === -2){
-//                     if(x == -2) {
-//                         // X-X - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         row += `<td colspan="3"></td>`;
-//                     } else if(x === 0){
-//                         // - - X---X
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         row += `<td colspan="${this._xResolution}" class="xaxislabel"><div class="xrot" id="${this.GUID}-xlabel">${this._xLabel}</div></td>`;
-//                     }
-//                 } else if(y === -1) {
-//                     if(x === -2) {
-//                     } else if(x === -1) {
-//                         // - - - - -
-//                         // - X - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         if(this._yResolution === 1) {
-//                             row += `<td class="yaxis" id="${this.GUID}-xlabel">${this._xLabel}</td>`;
-//                         } else if(this._xResolution === 1) {
-//                             row += `<td class="xaxis" id="${this.GUID}-ylabel">${this._yLabel}</td>`;
-//                         } else {
-//                             row += `<td colspan="3" class="zlabel" id="${this.GUID}-zlabel">${this._zLabel}</td>`;
-//                         }
-//                     } else if(x === -2) {
-//                     } else if(x < this._xResolution) {
-//                         // - - - - -
-//                         // - - X X X
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - - - -
-//                         if(this._xResolution === 1) {
-//                             row += `<td class="xaxis" id="${this.GUID}-zlabel">${this._zLabel}</td>`;
-//                         } else {
-//                             if(this.XAxisModifiable)
-//                                 row += `<td class="xaxis">${this._formatNumberForDisplay(`${this.GUID}-${x}-axis`, x, y, this.XAxis[x])}</td>`;
-//                             else
-//                                 row += `<td class="xaxis"><div class="number" id="${this.GUID}-${x}-axis" data-x="${x}" data-y="${y}">${Table._formatNumberForDisplay(this.XAxis[x])}</div></td>`;
-//                         }
-//                     } else {
-//                         if(this.XResolutionModifiable)
-//                             row += `<td class="col_expand" rowspan="${this._yResolution + (xstart === -1? 2 : 1)}"></td>`;
-//                     }
-//                 } else if(y < this._yResolution) {
-//                     if(x === -2) {
-//                         if(y === (this.ReverseY? this._yResolution-1 : 0)){
-//                             // - - - - -
-//                             // - - - - -
-//                             // X - - - -
-//                             // | - - - -
-//                             // X - - - -
-//                             row += `<td rowspan="${this._yResolution}" style="width: auto;"></td><td rowspan="${this._yResolution}" class="yaxislabel"><div id="${this.GUID}-ylabel" class="yrot">${this._yLabel}</div></td>`;
-//                         }
-//                     } else if(x === -1) {
-//                         // - - - - -
-//                         // - - - - -
-//                         // - X - - -
-//                         // - X - - -
-//                         // - X - - -
-//                         if(this._yResolution === 1) {
-//                             row += `<td class="yaxis" id="${this.GUID}-zlabel">${this._zLabel}</td>`;
-//                         } else {
-//                             if(this.YAxisModifiable)
-//                                 row += `<td class="yaxis">${this._formatNumberForDisplay(`${this.GUID}-axis-${y}`, x, y, this.YAxis[y])}</td>`;
-//                             else 
-//                                 row += `<td class="yaxis"><div class="number" id="${this.GUID}-axis-${y}"  data-x="${x}" data-y="${y}">${Table._formatNumberForDisplay(this.YAxis[y])}</div></td>`;
-//                         }
-//                     } else if(x < this._xResolution) {
-//                         // - - - - -
-//                         // - - - - -
-//                         // - - X X X
-//                         // - - X X X
-//                         // - - X X X
-//                         var valuesIndex = x + this._xResolution * y;
-//                         var inputId =  `${this.GUID}-${x}-${y}`;
-//                         row += `<td>${this._formatNumberForDisplay(inputId, x, y, this._value[valuesIndex])}</td>`;
-//                     }
-//                 } else {
-//                     if(this.YResolutionModifiable && x == xstart) {
-//                         row += `<td colspan="2"></td><td class="row_expand" colspan="${this._xResolution - xstart-1}"></td>`;
-//                         if(this.XResolutionModifiable)
-//                             row += `<td class="rowcol_expand"></td>`;
-//                     }
-//                 }
-//             }
-//             row += `</tr>`;
-//             table += row;
-
-//             if(this.ReverseY) {
-//                 if(y === -1)
-//                     y += this._yResolution;
-//                 else if(y === 0)
-//                     y = this._yResolution;
-//                 else if(y === this._yResolution)
-//                     break;
-//                 else if(y<0)
-//                     y++;
-//                 else
-//                     y--;
-//             } else {
-//                 y++;
-//                 if(y === this._yResolution + 1)
-//                     break;
-//             }
-                
-//         }
-
-//         return table + `</table>`;
-//     }
-
-//     UpdateTableHtml() {
-//         $(`#${this.GUID}-table`).replaceWith(this.GetTableHtml());
 //     }
 
 //     GetTrailHtml() {
@@ -2014,82 +1953,3 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //         }
 //         this._trailSvg.reverse();
 //     }
-
-//     _calculateValueMinMax() {
-//         this._valueMin = 10000000000;
-//         this._valueMax = -10000000000;
-//         for(let x=0;x<this._xResolution;x++){
-//             for(let y=0;y<this._yResolution;y++){
-//                 let value = this._value[x + this._xResolution * y];
-//                 if(value < this._valueMin)
-//                     this._valueMin = value;
-//                 if(value > this._valueMax)
-//                     this._valueMax = value;
-//             }
-//         }
-//         if(this._valueMax === this._valueMin)
-//             this._valueMax = this._valueMin + 1;
-//     }
-
-//     _getHueFromValue(value) {
-//         return 180 - (180 * (parseFloat(value) - this._valueMin) / (this._valueMax - this._valueMin));
-//     }
-
-//     _formatNumberForDisplay(id, x, y, value) {
-//         var rowClass = $(`#${id}`).attr(`class`)
-//         if(rowClass)
-//             rowClass = `class="${rowClass}"`;
-//         else
-//             rowClass = `class="number"`;
-        
-//         x ??=  parseInt($(`#${id}`).attr(`data-x`));
-//         y ??=  parseInt($(`#${id}`).attr(`data-y`));
-//         value ??= $(`#${id}`).val();
-//         if(value === ``)
-//             value = $(`#${id}`).html();
-
-//         if(rowClass.indexOf(`origselect`) === -1)
-//             return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><div ${rowClass} id="${id}" data-x="${x}" data-y="${y}">${Table._formatNumberForDisplay(value)}</div></div>`;
-//         return `<div${x>-1&&y>-1? ` style="background-color: hsl(${this._getHueFromValue(value)},100%,50%);"` : ``}><input ${rowClass} id="${id}" data-x="${x}" data-y="${y}" value="${Table._formatNumberForDisplay(value)}" type="number"/></div>`;
-//     }
-
-//     static _formatNumberForDisplay(number, precision = 6) {
-//         var ret = parseFloat(parseFloat(parseFloat(number).toFixed(precision -1)).toPrecision(precision));
-//         if(isNaN(ret))
-//             return `&nbsp;`;
-//         return ret;
-//     }
-// }
-
-// var pastetype = `equal`;
-
-// function AttachPasteOptions() {
-//     DetachPasteOptions();
-//     $(document).on(`click.pasteoptions`, `#pasteoptions .paste-button`, function(){
-//         pastetype = $(this).attr(`data-pastetype`);
-//         $(`#pasteoptions div`).removeClass(`selected`);
-//         $(`#pasteoptions div[data-pastetype="${pastetype}"`).addClass(`selected`);
-//     });
-// }
-
-// function DetachPasteOptions() {
-//     $(document).off(`click.pasteoptions`);
-// }
-
-// function GetPasteOptions() {
-//     return `<div style="display:inline-block; position: relative;"><div style="width: 150; position: absolute; top: -10; left: 32px;z-index:1">Paste Options</div>
-//     <div id="pasteoptions" class="container">
-//         <div data-pastetype="equal"       class="paste-button${pastetype==`equal`? ` selected` : ``         }" style="position: relative;"><h3>📋</h3><span>=</span></div>
-//         <div data-pastetype="add"         class="paste-button${pastetype==`add`? ` selected` : ``           }" style="position: relative;"><h3>📋</h3><span>+</span></div>
-//         <div data-pastetype="subtract"    class="paste-button${pastetype==`subtract`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>-</span></div>
-//         <div data-pastetype="multiply"    class="paste-button${pastetype==`multiply`? ` selected` : ``      }" style="position: relative;"><h3>📋</h3><span>x</span></div>
-//         <div data-pastetype="multiply%"   class="paste-button${pastetype==`multiply%`? ` selected` : ``     }" style="position: relative;"><h3>📋</h3><span>%</span></div>
-//         <div data-pastetype="multiply%/2" class="paste-button${pastetype==`multiply%/2`? ` selected` : ``   }" style="position: relative;"><h3>📋</h3><span><sup>%</sup>&frasl;<sub>2</sub></span></div>
-//     </div>
-// </div>`;
-// }
-
-// document.addEventListener(`dragstart`, function(e){
-//     if($(e.target).hasClass(`selected`) || $(e.target).hasClass(`row_expand`) || $(e.target).hasClass(`col_expand`))
-//         e.preventDefault();
-// });//disable dragging of selected items
