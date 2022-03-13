@@ -3,6 +3,7 @@
     --border-hover-color: #3590d0;
     --border-selected-color: #3590d0;
     --background-selected-color: #3590d0;
+    --background-hover-color: #666;
     --input-background-color: #505962;
     --border-width: 0.2em;
     --border-radius: 6px;
@@ -24,7 +25,7 @@
 .ui .container{
     position: relative;
     border-radius: var(--border-radius);
-    border: var(--border-width) solid #666;
+    border: var(--border-width) solid var(--background-hover-color);
     vertical-align:top; 
     padding: 0.1em;
     margin: 0.1em;
@@ -140,7 +141,7 @@
 }
 
 .ui table.numerictable {
-    --border-color: #666;
+    --border-color: var(--background-hover-color);
     --border-width: 0.1em;
     --border-axis-width: 0.25em;
     --cell-width: calc(var(--precision) * 0.78em);
@@ -281,6 +282,15 @@
     transform-origin: 50% 0%;
     transform: translateX(-50%) rotate(-90deg) translateY(-100%) translateX(-50%) translateX(5px); 
 }
+.ui .trail ellipse {
+    stroke: #3590d0aa !important;
+    stroke-width: 6;
+    fill: #3590d088 !important;
+}
+.ui .trail line {
+    stroke: #3590d0aa !important;
+    stroke-width: 6;
+}
 
 .ui.select {
     cursor: default;
@@ -289,7 +299,6 @@
     padding: 1px 2px;
     display: inline-block;    
 }
-
 .ui.select .ui.selected {
     min-width: 200px;
     text-decoration: none;
@@ -302,16 +311,44 @@
     float: right;
     content: "▼";
 }
+.ui.select .ui.selected:hover {
+    border-color: var(--border-hover-color);
+}
 
-.ui.select:hover {
+.ui.number {
+    font: bold 16px Arial;
+    background-color: var(--input-background-color);
+    border-radius: 6px;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    margin: 1px;
+    padding: 1px 2px;
+}
+.ui.number:hover {
+    background-color: var(--background-hover-color);
     border-color: #3590d0;
+}
+
+.ui.checkbox {
+    font: bold 16px Arial;
+    margin: 5px;
+    border-radius: 6px;
+    border-color: var(--background-hover-color);
+}
+.ui.checkbox:hover {
+    background-color: var(--background-hover-color);
+    border-color: #3590d0;
+}
+
+.ui.text {
+    width: 200px;
 }
 
 .ui.context-menu {
     cursor: default;
     position: absolute;
     background: #222629;
-    border: 1px solid #505962;
+    border: 1px solid var(--input-background-color);
     min-width: 200px;
     max-height: 400px;
     overflow-y: auto;
@@ -335,9 +372,9 @@
 }
 .ui.context-menu .selectoption.selectdisabled {
     color: #888;
-    background-color: #666; 
+    background-color: var(--background-hover-color); 
 }
 .ui.context-menu .selectoption:hover:not(.disabled) {
-    background-color: #666; 
-    border-color: #3590d0;
+    background-color: var(--background-hover-color); 
+    border-color: var(--border-hover-color);
 }

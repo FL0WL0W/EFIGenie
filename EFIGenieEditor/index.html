@@ -8,7 +8,6 @@
             import ui from "./UI.js"
             window.UI = ui.UI;
         </script>
-        <script src="UIOld.js" defer></script>
         <script src="Config-Calculation.js" defer></script>
         <script src="Config-Input.js" defer></script>
         <script src="Config-MapSensor.js" defer></script>
@@ -27,7 +26,7 @@
             var configJsonName = `tune.json`
             $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
-                b.SaveValue = parseObject(config);
+                b.saveValue = parseObject(config);
                 $(`#workspace`).html(b.GetHtml());
                 $(`#btnLoad`).val(undefined);
             };
@@ -42,12 +41,12 @@
                 $(`#workspace`).html(b.GetHtml());
                 b.Attach();
                 $(`#btnSave`).click(function(){
-                    var cfg = b.SaveValue;
+                    var cfg = b.saveValue;
                     window.localStorage.setItem(`config`, stringifyObject(cfg));
                     downloadObject(cfg, configJsonName);
                 });
                 $(`#btnSaveCompressed`).click(function(){
-                    var cfg = b.SaveValue;
+                    var cfg = b.saveValue;
                     window.localStorage.setItem(`config`, stringifyObject(cfg));
                     downloadCompressedObject(cfg, configJsonName);
                 });

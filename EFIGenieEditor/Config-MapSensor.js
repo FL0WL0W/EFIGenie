@@ -36,8 +36,8 @@ class MAP_GM1Bar extends Input_AnalogPolynomial {
     static Name = `GM 1 Bar MAP`;
     static Measurement = `Pressure`;
 
-    get SaveValue() { return this.AnalogInput.SaveValue; }
-    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
+    get saveValue() { return this.AnalogInput.saveValue; }
+    set saveValue(saveValue) { return this.AnalogInput.saveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
@@ -55,8 +55,8 @@ class MAP_GM2Bar extends Input_AnalogPolynomial {
     static Name = `GM 2 Bar MAP`;
     static Measurement = `Pressure`;
 
-    get SaveValue() { return this.AnalogInput.SaveValue; }
-    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
+    get saveValue() { return this.AnalogInput.saveValue; }
+    set saveValue(saveValue) { return this.AnalogInput.saveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
@@ -74,8 +74,8 @@ class MAP_GM3Bar extends Input_AnalogPolynomial {
     static Name = `GM 3 Bar MAP`;
     static Measurement = `Pressure`;
 
-    get SaveValue() { return this.AnalogInput.SaveValue; }
-    set SaveValue(saveValue) { return this.AnalogInput.SaveValue = saveValue; }
+    get saveValue() { return this.AnalogInput.saveValue; }
+    set saveValue(saveValue) { return this.AnalogInput.saveValue = saveValue; }
 
     constructor(prop) {
         super(prop);

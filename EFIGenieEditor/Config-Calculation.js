@@ -23,7 +23,7 @@ var OperationArchitectureFactoryIDs = {
 }
 
 
-class Calculation_Static extends UI.OldNumberWithMeasurement {
+class Calculation_Static extends UI.NumberWithMeasurement {
     static Name = `Static`;
     static Output = `float`;
     static Inputs = [];
@@ -64,7 +64,7 @@ class Calculation_Polynomial {
     MaxValue = 1;
     Degree = 3;
 
-    get SaveValue() {
+    get saveValue() {
         return { 
             MinValue: this.MinValue,
             MaxValue: this.MaxValue,
@@ -73,7 +73,7 @@ class Calculation_Polynomial {
         };
     }
 
-    set SaveValue(saveValue) {
+    set saveValue(saveValue) {
         if(saveValue) {
             this.MinValue = saveValue.MinValue;
             this.MaxValue = saveValue.MaxValue;
@@ -223,18 +223,17 @@ class Calculation_LookupTable extends UI.OldTemplate {
             this.Table.xLabel = xLabel;
     }
 
-    get XOptions() {
+    get xOptions() {
         if(!this.ParameterSelection) 
             return;
 
-        return this.ParameterSelection.Options;
+        return this.ParameterSelection.options;
     }
-    set XOptions(options) {
-        if(!this.ParameterSelection || objectTester(this.ParameterSelection.Options, options)) 
+    set xOptions(options) {
+        if(!this.ParameterSelection || objectTester(this.ParameterSelection.options, options)) 
             return;
 
-        this.ParameterSelection.Options = options;
-        this.Table.xLabel = this.ParameterSelection;
+        this.ParameterSelection.options = options;
     }
 
     get NoParameterSelection() {
@@ -252,11 +251,10 @@ class Calculation_LookupTable extends UI.OldTemplate {
 
         const thisClass = this;
         if(!this.ParameterSelection) {
-            this.ParameterSelection = new UI.OldSelection({
-                Options: GetSelections(),
+            this.ParameterSelection = new UI.Selection({
+                options: GetSelections(),
                 onChange: function() {
                     thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.xLabel = thisClass.ParameterSelection;
                 },
                 Class: `TableParameterSelect`
             });
@@ -274,19 +272,15 @@ class Calculation_LookupTable extends UI.OldTemplate {
     constructor(prop) {
         super();
         const thisClass = this;
-        this.Dialog = new UIDialog({
+        this.Dialog = new UI.Dialog({
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
         this.Table = new UI.Table({
-            SelectNotVisible: true,
-            BaseObj: true,
-            YResolution: 1,
-            YResolutionModifiable: false,
-            onChange: function() {
-                if(thisClass.ParameterSelection) 
-                    thisClass.Table.xLabel = thisClass.ParameterSelection;
-            }
+            selectNotVisible: true,
+            yResolution: 1,
+            yResolutionModifiable: false,
+            BaseObj: true
         });
         this.NoParameterSelection = false;
         this.Label = `Value`;
@@ -300,7 +294,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
             if(thisClass.ParameterReference) { 
                 const parameterVariableId = VariableMetadata.GetVariableId(thisClass.ParameterReference);
                 if(CurrentVariableValues[parameterVariableId] !== undefined) {
-                    thisClass.Table.Trail(CurrentVariableValues[parameterVariableId])
+                    thisClass.Table.trail(CurrentVariableValues[parameterVariableId])
                 } 
             }
         };
@@ -345,7 +339,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
     }
 
     RegisterVariables() {
-        this.XOptions = GetSelections();
+        this.xOptions = GetSelections();
         if(VariablesToPoll.indexOf(this.ParameterReference) === -1)
             VariablesToPoll.push(this.ParameterReference);
     }
@@ -392,32 +386,30 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             this.Table.yLabel = yLabel;
     }
 
-    get XOptions() {
+    get xOptions() {
         if(!this.XSelection) 
             return;
 
-        return this.XSelection.Options;
+        return this.XSelection.options;
     }
-    set XOptions(options) {
-        if(!this.XSelection || objectTester(this.XSelection.Options, options)) 
+    set xOptions(options) {
+        if(!this.XSelection || objectTester(this.XSelection.options, options)) 
             return;
 
-        this.XSelection.Options = options;
-        this.Table.xLabel = this.XSelection;
+        this.XSelection.options = options;
     }
 
-    get YOptions() {
+    get yOptions() {
         if(!this.YSelection) 
             return;
 
-        return this.YSelection.Options;
+        return this.YSelection.options;
     }
-    set YOptions(options) {
-        if(!this.YSelection || objectTester(this.YSelection.Options, options)) 
+    set yOptions(options) {
+        if(!this.YSelection || objectTester(this.YSelection.options, options)) 
             return;
 
-        this.YSelection.Options = options;
-        this.Table.yLabel = this.YSelection;
+        this.YSelection.options = options;
     }
 
     get NoParameterSelection() {
@@ -438,23 +430,21 @@ class Calculation_2AxisTable extends UI.OldTemplate {
 
         const thisClass = this;
         if(!this.XSelection) {
-            this.XSelection = new UI.OldSelection({
-                SelectNotVisible: true,
-                Options: GetSelections(),
+            this.XSelection = new UI.Selection({
+                selectNotVisible: true,
+                options: GetSelections(),
                 onChange: function() {
                     thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.xLabel = thisClass.XSelection;
                 }
             });
             this.Table.xLabel = this.XSelection;
         }
         if(!this.YSelection) {
-            this.YSelection = new UI.OldSelection({
-                SelectNotVisible: true,
-                Options: GetSelections(),
+            this.YSelection = new UI.Selection({
+                selectNotVisible: true,
+                options: GetSelections(),
                 onChange: function() {
                     thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.yLabel = thisClass.YSelection;
                 }
             });
             this.Table.yLabel = this.YSelection;
@@ -478,18 +468,12 @@ class Calculation_2AxisTable extends UI.OldTemplate {
     constructor(prop) {
         super();
         const thisClass = this;
-        this.Dialog = new UIDialog({
+        this.Dialog = new UI.Dialog({
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
         this.Table = new UI.Table({
             BaseObj: true,
-            onChange: function() {
-                if(thisClass.XSelection) 
-                    thisClass.Table.xLabel = thisClass.XSelection;
-                if(thisClass.YSelection) 
-                    thisClass.Table.yLabel = thisClass.YSelection;
-            }
         });
         this.NoParameterSelection = false;
         this.Label = `Value`;
@@ -504,7 +488,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
                 const xVariableId = VariableMetadata.GetVariableId(thisClass.XReference);
                 const yVariableId = VariableMetadata.GetVariableId(thisClass.YReference);
                 if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
-                    thisClass.Table.Trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
+                    thisClass.Table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
                 } 
             }
         };
@@ -558,8 +542,8 @@ class Calculation_2AxisTable extends UI.OldTemplate {
     }
 
     RegisterVariables() {
-        this.XOptions = GetSelections();
-        this.YOptions = GetSelections();
+        this.xOptions = GetSelections();
+        this.yOptions = GetSelections();
         if(VariablesToPoll.indexOf(this.XReference) === -1)
             VariablesToPoll.push(this.XReference);
         if(VariablesToPoll.indexOf(this.YReference) === -1)
@@ -713,21 +697,21 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
         if(this.Selection.Value) {
             let selections = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
             let match = false;
-            let stringValue = UI.OldSelection.ParseValue(`string`, this.Selection.Value)
+            let stringValue = UI.Selection.ParseValue(`string`, this.Selection.Value)
             selections.forEach(option => {
                 if(option.Group){
                     option.Options.forEach(option => {
-                        if(UI.OldSelection.ParseValue(`string`, option.Value) === stringValue)
+                        if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
                             match = true;
                     });
                 } else {
-                    if(UI.OldSelection.ParseValue(`string`, option.Value) === stringValue)
+                    if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
                         match = true;
                 }
             });
 
             if(!match) 
-                this.Selection.Value = this.Selection.SelectValue;
+                this.Selection.Value = this.Selection.selectValue;
         }
     }
 
@@ -738,10 +722,10 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             Measurement: prop?.Measurement,
             MeasurementUnitName: prop?.MeasurementUnitName
         });
-        this.Selection = new UI.OldSelection({
-            Options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
-            SelectDisabled: false,
-            SelectName: `None`,
+        this.Selection = new UI.Selection({
+            options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
+            selectDisabled: false,
+            selectName: `None`,
             onChange: function () {
                 const subConfigIndex = thisClass.GetSubConfigIndex();
                 thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
@@ -756,14 +740,14 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
     }
 
     static SaveOnlyActive = false;
-    get SaveValue() {
-        var saveValue = super.SaveValue;
+    get saveValue() {
+        var saveValue = super.saveValue;
 
         if (this.ConfigValues) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
-                if(subConfig?.SaveValue !== undefined) {
-                    var configValue = subConfig.SaveValue;
+                if(subConfig?.saveValue !== undefined) {
+                    var configValue = subConfig.saveValue;
                     if(typeof configValue !== `object`)
                         configValue = { Value: configValue };
                     configValue.ClassName = subConfig.constructor.name;
@@ -772,7 +756,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             } else {
                 saveValue.Values = [];
                 for (var i = 0; i < this.ConfigValues.length; i++) {
-                    var configValue = this.ConfigValues[i].SaveValue;
+                    var configValue = this.ConfigValues[i].saveValue;
                     if(typeof configValue !== `object`)
                         configValue = { Value: configValue };
                     configValue.ClassName = this.ConfigValues[i].constructor.name
@@ -784,7 +768,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
         return saveValue;
     }
 
-    set SaveValue(saveValue) {
+    set saveValue(saveValue) {
         saveValue ??= {};
 
         if(saveValue.Values === undefined)
@@ -794,7 +778,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             var found = false;
             for (var t = 0; t < this.ConfigValues.length; t++) {
                 if (saveValue.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
-                    this.ConfigValues[t].SaveValue = saveValue.Values[i];
+                    this.ConfigValues[t].saveValue = saveValue.Values[i];
                     found = true;
                     break;
                 }
@@ -815,7 +799,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
                             ReferenceName: this.ReferenceName,
-                            SaveValue: saveValue.Values[i],
+                            saveValue: saveValue.Values[i],
                             Measurement: this._measurement,
                             MeasurementUnitName: this.MeasurementUnitName
                         }));
@@ -824,11 +808,11 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             }
         }
 
-        super.SaveValue = saveValue;
+        super.saveValue = saveValue;
     }
 
     RegisterVariables() {
-        this.Selection.Options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
+        this.Selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
         const selection = this.Selection.Value;
         if (selection && this.ReferenceName) {
             const thisReference = this.GetVariableReference();
@@ -938,17 +922,17 @@ class Calculation_Operation extends UI.OldTemplate {
             MeasurementUnitName:   prop?.MeasurementUnitName,
             Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
         })];
-        this.OperationSelection = [new UI.OldSelection({
-            Options: [
+        this.OperationSelection = [new UI.Selection({
+            options: [
                 { Name: `Adder`,        Value: 1 },
                 { Name: `Subtracter`,   Value: 2 },
                 { Name: `Multiplier`,   Value: 3 },
                 { Name: `Divider`,      Value: 4 }
             ],
             Class: `subOperationSelection`,
-            SelectDisabled: true
+            selectDisabled: true
         })];
-        this.OperationName = [new UI.OldText({
+        this.OperationName = [new UI.Text({
             Class: `subOperationName`,
             onChange: function() {
                 thisClass.SubOperation[0].Label = thisClass.OperationName[0].Value;
@@ -969,22 +953,22 @@ class Calculation_Operation extends UI.OldTemplate {
     }
 }
 
-class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
-    get SuperHidden() {
-        return super.Hidden;
+class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
+    get superHidden() {
+        return super.hidden;
     }
-    set SuperHidden(hidden) {
-        super.Hidden = hidden;
+    set superHidden(hidden) {
+        super.hidden = hidden;
     }
-    get Hidden() {
+    get hidden() {
         return this._stickyHidden;
     }
-    set Hidden(hidden) {
+    set hidden(hidden) {
         if(hidden === false)
             debugger;
         this._stickyHidden = hidden
         if(hidden)
-            super.Hidden = hidden;
+            super.hidden = hidden;
     }
 
     _variableReference = undefined;
@@ -1008,7 +992,7 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
         prop ??= {};
         prop.NumberClass = "livevalue";
         super(prop);
-        this.SuperHidden = true;
+        this.superHidden = true;
     }
 
     Attach() {
@@ -1022,20 +1006,20 @@ class DisplayLiveUpdate extends DisplayNumberWithMeasurement {
                     VariablesToPoll.push(thisClass.VariableReference)
                 const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
                 if(CurrentVariableValues[variableId] !== undefined) {
-                    thisClass.SuperHidden = false;
+                    thisClass.superHidden = false;
                     thisClass.Value = CurrentVariableValues[variableId];
-                    if(!thisClass.SuperHidden) {
-                        if(thisClass.SuperHidden)
-                            thisClass.SuperHidden = false;
+                    if(!thisClass.superHidden) {
+                        if(thisClass.superHidden)
+                            thisClass.superHidden = false;
                         if(thisClass.TimeoutHandle)
                             window.clearTimeout(thisClass.TimeoutHandle);
         
                         thisClass.TimeoutHandle = window.setTimeout(function() {
-                            thisClass.SuperHidden = true;
+                            thisClass.superHidden = true;
                         },5000);
                     }
                 } else {
-                    thisClass.SuperHidden = true;
+                    thisClass.superHidden = true;
                 }
             }
         };

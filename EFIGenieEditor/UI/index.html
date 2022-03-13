@@ -8,7 +8,7 @@
         <script type="module">
             import UIText from "./UIText.js";
             import UINumber from "./UINumber.js";
-            import UICheckbox from "./UICheckbox.js";
+            import UICheckBox from "./UICheckBox.js";
             import UITemplate from "./UITemplate.js"
             import UISelection from "./UISelection.js"
             import UITable from "./UITable.js"
@@ -23,7 +23,7 @@
                     max: 200,
                     step: 2
                 }),
-                checkbox: new UICheckbox({
+                checkbox: new UICheckBox({
                     value: true
                 }),
                 table2D: new UITable({
@@ -48,6 +48,7 @@
                 })
             });
             window.addEventListener(`load`, function() {
+                console.log(`wtf`);
                 document.body.appendChild(window.template)
             });
         </script>

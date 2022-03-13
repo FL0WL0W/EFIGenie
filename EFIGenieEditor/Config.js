@@ -389,12 +389,12 @@ class ConfigTop extends UI.OldTemplate {
         this.Setup(prop);
     }
 
-    get SaveValue() {
-        return super.SaveValue;
+    get saveValue() {
+        return super.saveValue;
     }
 
-    set SaveValue(saveValue) {
-        super.SaveValue = saveValue;
+    set saveValue(saveValue) {
+        super.saveValue = saveValue;
         this.RegisterVariables();
     }
 
@@ -600,16 +600,16 @@ class ConfigFuel extends UI.OldTemplate {
         this.Setup(prop);
     }
 
-    get SaveValue() {
-        var saveValue = super.SaveValue;
+    get saveValue() {
+        var saveValue = super.saveValue;
         saveValue.Outputs = [];
         for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].SaveValue;
+            saveValue.Outputs[i] = this.Outputs[i].saveValue;
         };
         return saveValue;
     }
 
-    set SaveValue(saveValue) {
+    set saveValue(saveValue) {
         this.Detach();
         if(saveValue?.ConfigInjectorOutputs)
             saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs;
@@ -623,11 +623,11 @@ class ConfigFuel extends UI.OldTemplate {
                         Label:          `Injector ${i+1}`,
                         Measurement:    `No Measurement`
                     });
-                this.Outputs[i].SaveValue = saveValue.Outputs[i];
+                this.Outputs[i].saveValue = saveValue.Outputs[i];
             }
         }
 
-        super.SaveValue = saveValue;
+        super.saveValue = saveValue;
     }
 
     RegisterVariables() {
@@ -730,16 +730,16 @@ class ConfigIgnition extends UI.OldTemplate {
         this.Setup(prop);
     }
 
-    get SaveValue() {
-        var saveValue = super.SaveValue;
+    get saveValue() {
+        var saveValue = super.saveValue;
         saveValue.Outputs = [];
         for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].SaveValue;
+            saveValue.Outputs[i] = this.Outputs[i].saveValue;
         };
         return saveValue;
     }
 
-    set SaveValue(saveValue) {
+    set saveValue(saveValue) {
         this.Detach();
 
         if(saveValue?.Outputs)
@@ -752,11 +752,11 @@ class ConfigIgnition extends UI.OldTemplate {
                         Label:              `Ignition ${i+1}`,
                         Measurement:        `No Measurement`
                     });
-                this.Outputs[i].SaveValue = saveValue.Outputs[i];
+                this.Outputs[i].saveValue = saveValue.Outputs[i];
             }
         }
 
-        super.SaveValue = saveValue;
+        super.saveValue = saveValue;
     }
 
     RegisterVariables() {
@@ -868,16 +868,16 @@ class ConfigEngine extends UI.OldTemplate {
             requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
         }
 
-        this.ManifoldAbsolutePressureConfigOrVariableSelection.Hidden = requirements?.indexOf(`Manifold Absolute Pressure`) < 0;
-        if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.Hidden) 
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = requirements?.indexOf(`Manifold Absolute Pressure`) < 0;
+        if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden) 
             this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables();
         
-        this.CylinderAirTemperatureConfigOrVariableSelection.Hidden = requirements?.indexOf(`Cylinder Air Temperature`) < 0;
-        if(!this.CylinderAirTemperatureConfigOrVariableSelection.Hidden) 
+        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = requirements?.indexOf(`Cylinder Air Temperature`) < 0;
+        if(!this.CylinderAirTemperatureConfigOrVariableSelection.hidden) 
             this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables();
         
-        this.VolumetricEfficiencyConfigOrVariableSelection.Hidden = requirements?.indexOf(`Volumetric Efficiency`) < 0;
-        if(!this.VolumetricEfficiencyConfigOrVariableSelection.Hidden) 
+        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = requirements?.indexOf(`Volumetric Efficiency`) < 0;
+        if(!this.VolumetricEfficiencyConfigOrVariableSelection.hidden) 
             this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables();
 
         this.CylinderAirmassConfigOrVariableSelection.RegisterVariables();
@@ -949,11 +949,11 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
 
     constructor(prop) {
         super();
-        this.TDC = new UI.OldNumber({
+        this.TDC = new UI.Number({
             Value:  0,
-            Step:   1,
-            Min:    0,
-            Max:    720
+            step:   1,
+            min:    0,
+            max:    720
         })
         this.Setup(prop);
     }
@@ -968,10 +968,10 @@ class CylinderAirmass_SpeedDensity extends UI.OldTemplate {
 
     constructor(prop) {
         super();
-        this.CylinderVolume = new UI.OldNumberWithMeasurement({
+        this.CylinderVolume = new UI.NumberWithMeasurement({
             Value:              0.66594,
-            Step:               0.001,
-            Min:                0.001,
+            step:               0.001,
+            min:                0.001,
             Measurement:        `Volume`,
             MeasurementUnitName:`mL`
         });
@@ -1019,9 +1019,9 @@ class InjectorPulseWidth_DeadTime extends UI.OldTemplate {
             ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementUnitName:`ms`
         });
-        this.MinInjectorFuelMass = new UI.OldNumberWithMeasurement({
+        this.MinInjectorFuelMass = new UI.NumberWithMeasurement({
             Value:              0.005,
-            Step:               0.001,
+            step:               0.001,
             Measurement:        `Mass`,
             MeasurementUnitName:`g`
         });

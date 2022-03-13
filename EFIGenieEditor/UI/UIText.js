@@ -21,7 +21,7 @@ export default class UIText extends HTMLInputElement {
 
     constructor(prop) {
         super();
-        this.style.display = `inline-block`;
+        this.class = `ui text`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];

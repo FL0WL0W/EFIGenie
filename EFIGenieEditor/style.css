@@ -306,31 +306,14 @@ label.w3-button {
     border-radius: 6px;
     margin: 1px;
 }
-input {
+.button {
     font: bold 16px Arial;
+    text-decoration: none;
     background-color: #505962;
+    color: #dfdfdf;
     border-radius: 6px;
     border: 2px solid #1A1A20;
-    color: #dfdfdf;
-    margin: 1px;
-    padding: 1px 2px;
-}
-input:hover {
-    background-color: #666;
-    border-color: #3590d0;
-}
-input[type="checkbox"] {
-    font: bold 16px Arial;
-    margin: 5px;
-    border-radius: 6px;
-    border-color: #666;
-}
-input[type="checkbox"]:hover {
-    background-color: #666;
-    border-color: #3590d0;
-}
-input[type="text"] {
-    width: 200px;
+    cursor: pointer;
 }
 select {
     font: bold 16px Arial;
@@ -343,17 +326,8 @@ select {
     padding: 1px 2px;
     display: inline-block;
 }
-.button {
-    font: bold 16px Arial;
-    text-decoration: none;
-    background-color: #505962;
-    color: #dfdfdf;
-    border-radius: 6px;
-    border: 2px solid #1A1A20;
-    cursor: pointer;
-}
-select:hover,
-.button:hover {
+.button:hovver,
+select:hover {
     background-color: #666;
     border-color: #3590d0;
 }

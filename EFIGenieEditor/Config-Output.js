@@ -11,8 +11,8 @@ class Output_Digital extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UI.OldCheckbox();
-        this.HighZ = new UI.OldCheckbox();
+        this.Inverted = new UI.CheckBox();
+        this.HighZ = new UI.CheckBox();
         this.Setup(prop);
     }
 

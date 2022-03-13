@@ -62,16 +62,51 @@ export default class UITable extends HTMLDivElement {
         this.#valueInputElement.max = max;
     }
 
-    #trailXY = [];
+    #trailElement = document.createElementNS(`http://www.w3.org/2000/svg`, `svg`);
     trailTime = 2000;
     trail(x, y = 0, z) {
+        const xAxis = this.xAxis;
+        const yAxis = this.yAxis;
+        const cellWidth = this.#valueElement.firstChild.offsetWidth;
+        const cellHeight = this.#valueElement.firstChild.offsetHeight;
+        const cellX = this.#valueElement.firstChild.offsetLeft;
+        const celly = this.#valueElement.firstChild.offsetTop;
+        let xAxisIndex = xAxis.findIndex(tx => tx>x);
+        if(xAxisIndex < 0) xAxisIndex = xAxis.length-1;
+        else if(xAxisIndex > 0 && xAxisIndex < xAxis.length-1) xAxisIndex += (x - xAxis[xAxisIndex-1])/ (xAxis[xAxisIndex] - xAxis[xAxisIndex-1]) - 1;
+        let yAxisIndex = yAxis.findIndex(ty => ty>y);
+        if(yAxisIndex < 0) yAxisIndex = yAxis.length-1;
+        else if(yAxisIndex > 0 && yAxisIndex < yAxis.length-1) yAxisIndex += (y - yAxis[yAxisIndex-1])/ (yAxis[yAxisIndex] - yAxis[yAxisIndex-1]) - 1;
+        x = cellX + xAxisIndex * cellWidth + cellWidth/2;
+        y = celly + yAxisIndex * cellHeight + cellHeight/2;
+
+        let ellipse;
+        if(this.#trailElement.children.length > 0) {
+            ellipse = this.#trailElement.firstChild;
+            let line = document.createElementNS('http://www.w3.org/2000/svg','line');
+            line.setAttribute(`x1`, ellipse.getAttribute(`cx`));
+            line.setAttribute(`y1`, ellipse.getAttribute(`cy`));
+            line.setAttribute(`x2`, x);
+            line.setAttribute(`y2`, y);
+            if(this.#trailElement.children.length > 1)
+                this.#trailElement.insertBefore(line, this.#trailElement.children[1]);
+            else
+                this.#trailElement.append(line);
+        } else {
+            ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+            this.#trailElement.append(ellipse);
+        }
+        ellipse.setAttribute(`rx`, cellWidth/2);
+        ellipse.setAttribute(`ry`, cellHeight/2);
+        ellipse.setAttribute(`cx`, x);
+        ellipse.setAttribute(`cy`, y);
+
         const thisClass = this;
-        this.#trailXY.unshift([x, y]);
         setTimeout(function() {
-            thisClass.#trailXY.pop();
-            // thisClass.UpdateTrailHtml();
-        }, this.TrailTime);
-        // this.UpdateTrailHtml();
+            let last = thisClass.#trailElement.lastChild;
+            if(last)
+                thisClass.#trailElement.removeChild(last);
+        }, this.trailTime);
     }
 
     get #valueMin() {
@@ -377,6 +412,7 @@ export default class UITable extends HTMLDivElement {
             xAxisLabel.append(this.#xLabelElement);
         }
         const valueTd = row2.appendChild(document.createElement(`td`));
+        valueTd.append(this.#trailElement);
         valueTd.append(this.#valueElement);
     }
 
@@ -485,6 +521,12 @@ export default class UITable extends HTMLDivElement {
         this.#interpolateXElement.class     = `modify-button interpolatex`;
         this.#interpolateYElement.class     = `modify-button interpolatey`;
         this.#interpolateXYElement.class    = `modify-button interpolatexy`;
+        //trail
+        this.#trailElement.style = `position:absolute; pointer-events: none;" z-index="100`;
+        this.#trailElement.setAttribute(`overflow`, `visible`);
+        this.#trailElement.setAttribute(`width`, 100);
+        this.#trailElement.setAttribute(`height`, 60);
+        this.#trailElement.classList.add(`trail`);
         //table
         this.append(this.#tableElement);
         this.#tableElement.class  = `numerictable`;
@@ -724,7 +766,7 @@ export default class UITable extends HTMLDivElement {
 
         function move(pageX, pageY) {
             if(dragX) {
-                var width = thisClass.#xAxisElement.children[0].offsetWidth;
+                var width = thisClass.#xAxisElement.firstChild.offsetWidth;
                 let diff = (pageX-dragX.startPageX)/width;
                 const polarity = diff / Math.abs(diff);
                 diff = parseInt((Math.abs(diff) + 1/2) * polarity);
@@ -734,7 +776,7 @@ export default class UITable extends HTMLDivElement {
                 thisClass.xResolution = xResolution;
             }
             if(dragY) {
-                var height = thisClass.#yAxisElement.children[0].offsetHeight;
+                var height = thisClass.#yAxisElement.firstChild.offsetHeight;
                 let diff = (pageY-dragY.startPageY)/height;
                 const polarity = diff / Math.abs(diff);
                 diff = parseInt((Math.abs(diff) + 1/2) * polarity);
@@ -1354,27 +1396,7 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //             }
 //         });
 //     }
-
-//     GetTrailHtml() {
-//         let html = ``;
-
-//         this._calculateSvgTrail();
-//         for(let i = 0; i < this._trailSvg.length; i++) {
-//             if(this._trailSvg[i].ellipse) {
-//                 html += `<ellipse cx="${this._trailSvg[i].ellipse.x}" cy="${this._trailSvg[i].ellipse.y}" rx="${this._trailSvg[i].ellipse.rx}" ry="${this._trailSvg[i].ellipse.ry}" class="trail"></ellipse>`;
-//             }
-//             if(this._trailSvg[i].line) {
-//                 html += `<line x1="${this._trailSvg[i].line.x1}" y1="${this._trailSvg[i].line.y1}" x2="${this._trailSvg[i].line.x2}" y2="${this._trailSvg[i].line.y2}" class="trail" stroke-width="1"></line>`
-//             }
-//         }
-
-//         return `<svg style="position:absolute; pointer-events: none;" z-index="100" overflow="visible" id="${this.GUID}-trailsvg" height="60" width="100"><g>${html}</g></svg>`;
-//     }
     
-//     UpdateTrailHtml() {
-//         if($(`#${this.GUID}-trailsvg`).is(":visible"))
-//             $(`#${this.GUID}-trailsvg`).replaceWith(this.GetTrailHtml());
-//     }
 
 //     _dataSvg=[];
 //     _xAxisSvg=[];
@@ -1818,49 +1840,6 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //         });
 //     }
 
-//     _trailSvg = [];
-//     _calculateSvgTrail() {
-//         if($(`#${this.GUID}-table`).length === 0)
-//             return;
-//         const number0x0Selector = $(`#${this.GUID}-table .number[data-x=0][data-y=${this.ReverseY? this._yResolution-1 : 0}]`).parent();
-//         const trailSvgSelector = $(`#${this.GUID}-trailsvg`);
-//         const trailSvgOffset = trailSvgSelector.offset();
-
-//         const number0x0Width = number0x0Selector.width();
-//         const number0x0Height = number0x0Selector.height();
-//         const number0x0Offset = number0x0Selector.offset()
-//         const x0 = number0x0Offset.left - trailSvgOffset.left + number0x0Width/2;
-//         const y0 = number0x0Offset.top - trailSvgOffset.top + number0x0Height/2;
-
-//         this._trailSvg.splice(this._trailXY.length);
-//         for(let i=0; i<this._trailXY.length; i++) {
-//             let xAxisIndex = this.XAxis.findIndex(x => x>this._trailXY[i][0]);
-//             if(xAxisIndex < 0) xAxisIndex = this._xResolution-1;
-//             else if(xAxisIndex > 0 && xAxisIndex < this._xResolution-1) xAxisIndex += (this._trailXY[i][0] - this.XAxis[xAxisIndex-1])/ (this.XAxis[xAxisIndex] - this.XAxis[xAxisIndex-1]) - 1;
-//             let yAxisIndex = this.YAxis.findIndex(y => y>this._trailXY[i][1]);
-//             if(yAxisIndex < 0) yAxisIndex = this._yResolution-1;
-//             else if(yAxisIndex > 0 && yAxisIndex < this._yResolution-1) yAxisIndex += (this._trailXY[i][1] - this.YAxis[yAxisIndex-1])/ (this.YAxis[yAxisIndex] - this.YAxis[yAxisIndex-1]) - 1;
-//             const x = x0 + xAxisIndex * number0x0Width;
-//             const y = y0 + (this.ReverseY? this._yResolution-yAxisIndex-1 : yAxisIndex) * number0x0Height;
-//             if(i === 0) {
-//                 this._trailSvg[0] = { ellipse: {
-//                     x: parseFloat(x.toFixed(10)),
-//                     y: parseFloat(y.toFixed(10)),
-//                     rx: parseFloat((number0x0Width/2).toFixed(10)),
-//                     ry: parseFloat((number0x0Height/2).toFixed(10))
-//                 }};
-//             } else {
-//                 this._trailSvg[i] = { line: {
-//                     x1: parseFloat(x.toFixed(10)),
-//                     y1: parseFloat(y.toFixed(10)),
-//                     x2: parseFloat(parseFloat(this._trailSvg[i-1].ellipse?.x ?? this._trailSvg[i-1].line?.x1).toFixed(10)),
-//                     y2: parseFloat(parseFloat(this._trailSvg[i-1].ellipse?.y ?? this._trailSvg[i-1].line?.y1).toFixed(10))
-//                 }}
-//             }
-//         }
-//         this._trailSvg.reverse();
-//     }
-
 //     _attachSvg() {
 //         const thisClass = this;
 //         let move3d = false;
@@ -2004,15 +1983,15 @@ customElements.define('ui-table', UITable, { extends: 'div' });
 //     }
 
 
-            //     $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`)
-            //     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX; x++) {
-            //         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY; y++) {
-            //             $(`#${thisClass.GUID}-tablesvg g path[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
-            //         }
-            //     }
-            //     $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-            //     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX+1; x++) {
-            //         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY+1; y++) {
-            //             $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
-            //         }
-            //     }
+//     $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`)
+//     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX; x++) {
+//         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY; y++) {
+//             $(`#${thisClass.GUID}-tablesvg g path[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+//         }
+//     }
+//     $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
+//     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX+1; x++) {
+//         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY+1; y++) {
+//             $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+//         }
+//     }

@@ -213,17 +213,17 @@ class ConfigInputs {
         });
     }
 
-    get SaveValue() {
+    get saveValue() {
         var saveValue = { Inputs: [], TargetDevice: this.TargetDevice };
 
         for(var i = 0; i < this.Inputs.length; i++){
-            saveValue.Inputs.push(this.Inputs[i].SaveValue);
+            saveValue.Inputs.push(this.Inputs[i].saveValue);
         }
 
         return saveValue;
     }
 
-    set SaveValue(saveValue) {
+    set saveValue(saveValue) {
         this.Detach();
 
         if(saveValue) {
@@ -238,7 +238,7 @@ class ConfigInputs {
             for(var i = 0; i < saveValue.Inputs.length; i++){
                 if(i >= this.Inputs.length)
                     this.Inputs.push(this.NewInput());
-                this.Inputs[i].SaveValue = saveValue.Inputs[i];
+                this.Inputs[i].saveValue = saveValue.Inputs[i];
             }
             this.Inputs = this.Inputs.slice(0, saveValue.Inputs.length)
         }
@@ -332,7 +332,7 @@ class ConfigInputs {
                 return;
             
             thisClass.Inputs.push(this.NewInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SaveValue = thisClass.Inputs[contextSelect].SaveValue;
+            thisClass.Inputs[thisClass.Inputs.length-1].saveValue = thisClass.Inputs[contextSelect].saveValue;
             $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
             $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
             thisClass.Attach();
@@ -496,13 +496,13 @@ class ConfigInput extends UI.OldTemplate {
                 }
             }
         });
-        this.TranslationMeasurement = new UI.OldSelection({
+        this.TranslationMeasurement = new UI.Selection({
             Value:              `None`,
-            SelectNotVisible:   true,
-            Options:            options,
+            selectNotVisible:   true,
+            options:            options,
             onChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
-        prop.Name = new UI.OldText({
+        prop.Name = new UI.Text({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
             onChange: function() { 
@@ -539,12 +539,12 @@ class ConfigInput extends UI.OldTemplate {
     }
 }
 
-class UIPinSelection extends UI.OldSelection {
+class UIPinSelection extends UI.Selection {
     constructor(prop){
         super(prop);
-        this.SelectDisabled = prop.SelectDisabled ?? true;
-        this.SelectValue = prop.SelectValue ?? 0xFFFF;
-        this.Options = this.#generateOptionList();
+        this.selectDisabled = prop.selectDisabled ?? true;
+        this.selectValue = prop.selectValue ?? 0xFFFF;
+        this.options = this.#generateOptionList();
         this.onChange.push(function() {
             UpdateOverlay();
         })
@@ -625,7 +625,7 @@ class Input_Digital extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UI.OldCheckbox();
+        this.Inverted = new UI.CheckBox();
         this.Setup(prop);
     }
 
@@ -660,12 +660,12 @@ class Input_DigitalRecord extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `digitalinterrupt`
         });
-        this.Inverted = new UI.OldCheckbox();
-        this.Length = new UI.OldNumber ({
+        this.Inverted = new UI.CheckBox();
+        this.Length = new UI.Number ({
             Value: 2,
-            Step: 1,
-            Min: 1,
-            Max: 1000
+            step: 1,
+            min: 1,
+            max: 1000
         });
         this.Setup(prop);
     }
@@ -702,11 +702,11 @@ class Input_DutyCycle extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.OldNumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
         this.Setup(prop);
@@ -743,11 +743,11 @@ class Input_Frequency extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.OldNumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
         this.Setup(prop);
@@ -784,11 +784,11 @@ class Input_PulseWidth extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UI.OldNumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
         this.Setup(prop);

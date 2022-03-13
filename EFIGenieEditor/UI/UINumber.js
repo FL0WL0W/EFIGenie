@@ -23,7 +23,7 @@ export default class UINumber extends HTMLInputElement {
     constructor(prop) {
         super();
         this.type = `number`;
-        this.style.display = `inline-block`;
+        this.class = `ui number`;
         Object.assign(this, prop);
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];

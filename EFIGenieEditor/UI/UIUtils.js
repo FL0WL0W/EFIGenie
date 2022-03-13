@@ -21,12 +21,6 @@ Object.defineProperty(HTMLElement.prototype, 'class', {
     enumerable: true,
     set: function(pclass) {
         const thisClass = this;
-        pclass.split(` `).forEach(function(pclass) { thisClass.addClass(pclass); });
+        pclass.split(` `).forEach(function(pclass) { thisClass.classList.add(pclass); });
     }
-})
-HTMLElement.prototype.addClass = function(pclass) {
-    this.classList.add(pclass);
-}
-HTMLElement.prototype.removeClass = function(pclass) {
-    this.classList.remove(pclass);
-}
+});
