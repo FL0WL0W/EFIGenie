@@ -54,7 +54,7 @@ export default class UISelection extends HTMLDivElement {
 
         this.#selectName = selectName;
         if(this.selectedOption === undefined)
-            this.selectedElement.innerHTML = `${this.selectName}<div style="float: right;">▼</div>`;
+            this.selectedElement.innerHTML = this.selectName;
         if(!this.selectNotVisible){
             setElementOption(this.#selectElement, { Name: this.selectName, Disabled: this.selectDisabled, Value: this.selectValue });
         }
@@ -107,7 +107,7 @@ export default class UISelection extends HTMLDivElement {
             else { element.classList.add(`selected`); selected = true;}
         });
         if(!selected) this.#selectElement.classList.add(`selected`);
-        selectedElement.innerHTML = `${this.selectedOption?.Name ?? this.selectName}<div style="float: right;">▼</div>`;
+        selectedElement.innerHTML = this.selectedOption?.Name ?? this.selectName;
     }
 
     #options = [];
@@ -170,11 +170,11 @@ export default class UISelection extends HTMLDivElement {
 
     constructor(prop) {
         super();
-        this.style.display = `inline-block`;
+        this.class = `ui select`;
         this.selectedElement = this.appendChild(document.createElement(`div`));
-        this.selectedElement.classList.add(`select`);
+        this.selectedElement.class = `ui selected`;
         this.contextMenuElement = document.createElement(`div`);
-        this.contextMenuElement.classList.add(`context-menu`);
+        this.contextMenuElement.class = `ui context-menu`;
         this.#selectElement = document.createElement(`div`);
         this.contextMenuElement.prepend(this.#selectElement)
         setElementOption(this.#selectElement, { Name: this.selectName, Disabled: this.selectDisabled, Value: this.selectValue });
