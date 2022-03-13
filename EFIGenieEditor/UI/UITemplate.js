@@ -54,5 +54,30 @@ export default class UITemplate extends HTMLDivElement {
             }
         });
     }
+    
+    get value() {
+        let value = {};
+
+        Object.entries(this).forEach(function([elementName, element]) {
+            if(element.value !== undefined)
+                value[elementName] = element.value;
+        });
+
+        if(Object.keys(value).length === 0)
+            return undefined;
+
+        return value;
+    }
+
+    set value(value) {
+        if(value === undefined)
+            return;
+
+        Object.entries(this).forEach(function([elementName, element]) {
+            if(value[elementName] !== undefined && typeof element === `object`) {
+                element.value = value[elementName];
+            }
+        });
+    }
 }
 customElements.define('ui-template', UITemplate, { extends: 'div' });
