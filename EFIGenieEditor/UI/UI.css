@@ -1,112 +1,137 @@
-.uitable {
-    display: inline-block;
+.ui {
     --border-color: #666;
     --border-hover-color: #3590d0;
-    --border-select-color: #3590d0;
+    --border-selected-color: #3590d0;
     --background-selected-color: #3590d080;
-    --border-width: 0.3rem;
+    --input-background-color: #505962;
+    --border-width: 0.2em;
     --border-radius: 6px;
     --precision: 6;
+    --text-color: #dfdfdf;
+    --font: bold 1em Verdana,sans-serif;
+    color: var(--text-color);
+    font: var(--font);
+    background-color: #1A1A20;
+    display: inline-block;
 }
-.uitable table {
-    --border-width: 0.1rem;
-    --border-axis-width: 0.25rem;
+.ui table {
+    color: var(--text-color);
+    font: var(--font);
+    display: inline-block;
+    --border-width: 0.1em;
+    --border-axis-width: 0.25em;
 }
 
-.uitable .toolbar {
+input[type="number"]:hover {
+    background-color: #666;
+    border-color: #3590d0;
+}
+
+.ui .toolbar {
     display: flex; 
     flex-direction: row; 
     flex-wrap: wrap; 
     justify-content:space-between;
 }
 
-.uitable .container.resolution::before,
-.uitable .container.paste::before,
-.uitable .container.modify::before,
-.uitable .container.interpolate::before {
-    font-size: 1.3rem;
+.ui .container.resolution::before,
+.ui .container.paste::before,
+.ui .container.modify::before,
+.ui .container.interpolate::before {
+    color: var(--text-color);
     position: absolute; 
-    top: -1rem; 
+    top: -1em; 
     left: 0px;
     z-index:1;
 }
-.uitable .container.resolution::before { content: "TableSize"; }
-.uitable .container.paste::before { content: "Paste Options"; }
-.uitable .container.modify::before { content: "Modify"; }
-.uitable .container.interpolate::before { content: "Interpolate"; }
-.uitable .container{
+.ui .container.resolution::before { content: "TableSize"; }
+.ui .container.paste::before { content: "Paste Options"; }
+.ui .container.modify::before { content: "Modify"; }
+.ui .container.interpolate::before { content: "Interpolate"; }
+.ui .container{
     position: relative;
     border-radius: var(--border-radius);
     border: var(--border-width) solid var(--border-color);
     vertical-align:top; 
-    padding: 0.1rem;
-    margin: 0.1rem;
+    padding: 0.1em;
+    margin: 0.1em;
     display: inline-flex;
     justify-content: center;  
     align-items: center;
 }
+.ui .container.resolution,
+.ui .container.paste,
+.ui .container.modify,
+.ui .container.interpolate {
+    margin-top: 0.8em;
+}
 
-.uitable .resolution-value,
-.uitable .modify-value,
-.uitable .modify-button,
-.uitable .paste-button {
-    font-size: 2rem;
+.ui .resolution-value,
+.ui .modify-value,
+.ui .modify-button,
+.ui .paste-button {
+    color: var(--text-color);
+    background-color: var(--input-background-color);
+    font-size: 1.5em;
     border-radius: var(--border-radius);
     border: var(--border-width) solid var(--border-color);
     margin: 2px;
-    width: 2rem;    
-    height: 2rem;
+    width: 1em;    
+    height: 1em;
+    box-sizing: content-box;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;  
+    padding: 0;
 }
-.uitable .paste-button {
-    font-size: 1.5rem;
+.ui .paste-button {
+    color: red;
 }
-.uitable .resolution-value,
-.uitable .modify-value {
+.ui .paste-button {
+    font-size: 1.5em;
+}
+.ui .resolution-value,
+.ui .modify-value {
     cursor: default;
-    font-size: 1.5rem;
-    height: 2.6rem;
-    width: 7rem;
+    width: 7em;
 }
-.uitable .resolution-value {
-    width: 5rem;
+.ui .resolution-value {
+    width: 5em;
 }
-.uitable .resolution-value:hover,
-.uitable .modify-value:hover,
-.uitable .modify-button:hover,
-.uitable .paste-button:hover {
+.ui .resolution-value:hover,
+.ui .modify-value:hover,
+.ui .modify-button:hover,
+.ui .paste-button:hover {
     border-color: var(--border-hover-color);
 }
-.uitable .modify-button.selected,
-.uitable .paste-button.selected {
+.ui .modify-button.selected,
+.ui .paste-button.selected {
     border-color: var(--border-selected-color);
     background-color: var(--background-selected-color);
 }
-.uitable .modify-button.add::before { position: absolute; content: "+"; }
-.uitable .modify-button.subtract::before { position: absolute; content: "-"; }
-.uitable .modify-button.multiply::before { position: absolute; content: "x"; }
-.uitable .modify-button.divide::before { position: absolute; content: "÷"; }
-.uitable .modify-button.percent::before { position: absolute; content: "%"; }
-.uitable .modify-button.equal::before { position: absolute; content: "="; }
+.ui .modify-button.add::before { position: absolute; content: "+"; }
+.ui .modify-button.subtract::before { position: absolute; content: "-"; }
+.ui .modify-button.multiply::before { position: absolute; content: "x"; }
+.ui .modify-button.divide::before { position: absolute; content: "÷"; }
+.ui .modify-button.percent::before { position: absolute; content: "%"; }
+.ui .modify-button.equal::before { position: absolute; content: "="; }
 
-.uitable .paste-button::before { position: absolute; content: "📋"; }
-.uitable .paste-button.equal:after { position: absolute; content: "="; }
-.uitable .paste-button.add:after { position: absolute; content: "+"; }
-.uitable .paste-button.subtract:after { position: absolute; content: "-"; }
-.uitable .paste-button.multiply:after { position: absolute; content: "x"; }
-.uitable .paste-button.multiplyP:after { position: absolute; content: "%"; }
-.uitable .paste-button span {z-index: 1;}
-.uitable .paste-button sub,
-.uitable .paste-button sup {font-size:75%;line-height:0;position:relative;vertical-align:baseline}
-.uitable .paste-button sub {bottom:-0.25em}
-.uitable .paste-button sup {top:-0.5em}
+.ui .paste-button::before { position: absolute; content: "📋"; }
+.ui .paste-button.equal:after { position: absolute; content: "="; }
+.ui .paste-button.add:after { position: absolute; content: "+"; }
+.ui .paste-button.subtract:after { position: absolute; content: "-"; }
+.ui .paste-button.multiply:after { position: absolute; content: "x"; }
+.ui .paste-button.multiplyP:after { position: absolute; content: "%"; }
+.ui .paste-button span {z-index: 1;}
+.ui .paste-button sub,
+.ui .paste-button sup {font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+.ui .paste-button sub {bottom:-0.25em}
+.ui .paste-button sup {top:-0.5em}
 
 
-.uitable .modify-button.interpolatex::before,
-.uitable .modify-button.interpolatey::before {
+.ui .modify-button.interpolatex::before,
+.ui .modify-button.interpolatey::before {
     position: absolute;
     background: linear-gradient(-90deg, #ff0000 10%, #ffff00 37%, #00ff00 63%, #00ffff 90%);
     -webkit-background-clip: text;
@@ -114,10 +139,10 @@
     font-weight: bold;
     content: "☰"
 }
-.uitable .modify-button.interpolatey {
+.ui .modify-button.interpolatey {
     transform: rotate(90deg);
 }
-.uitable .modify-button.interpolatexy::before {
+.ui .modify-button.interpolatexy::before {
     position: absolute;
     background: linear-gradient(-45deg, #ff0000 20%, #ffff00 40%, #00ff00 60%, #00ffff 80%);
     -webkit-background-clip: text;
@@ -128,8 +153,8 @@
 }
 
 
-.uitable table.numerictable {
-    --cell-width: calc(var(--precision) * 0.7em);
+.ui table.numerictable {
+    --cell-width: calc(var(--precision) * 0.9em);
     border-spacing: 0px;
     border-style: none;
     -webkit-touch-callout: none;
@@ -139,48 +164,54 @@
     -ms-user-select: none;
     user-select: none;
 }
-.uitable table.numerictable td {
+.ui table.numerictable td {
     padding: 0px;
 }
-.uitable table.numerictable input{
+.ui table.numerictable input,
+.ui table.numerictable div {
+    box-sizing: content-box;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
 }
 
-.uitable table.numerictable tr td div.xaxis {
+.ui table.numerictable tr td div.xaxis {
     display: flex;
 }
-.uitable table.numerictable tr td div.yaxis {
+.ui table.numerictable tr td div.yaxis {
     display: flex;
     flex-wrap: wrap;
     max-width: calc(var(--cell-width) + var(--border-width) + var(--border-axis-width));
 }
-.uitable table.numerictable tr td div.value {
+.ui table.numerictable tr td div.value {
     display: flex;
     flex-wrap: wrap;
     max-width: calc(calc(var(--cell-width) + 2 * var(--border-width)) * var(--xresolution));
 }
 
-.uitable table.numerictable tr td.xydrag,
-.uitable table.numerictable tr td.xdrag,
-.uitable table.numerictable tr td.ydrag {
+.ui table.numerictable tr td.xydrag,
+.ui table.numerictable tr td.xdrag,
+.ui table.numerictable tr td.ydrag {
     background-color: var(--border-color);
 }
-.uitable table.numerictable tr td.xydrag {
+.ui table.numerictable tr td.xydrag {
     cursor: nwse-resize;
     width: 0.3em;
 }
-.uitable table.numerictable tr td.xdrag {
+.ui table.numerictable tr td.xdrag {
     cursor: ew-resize;
     width: 0.3em;
 }
-.uitable table.numerictable tr td.ydrag {
+.ui table.numerictable tr td.ydrag {
     cursor: ns-resize;
     height: 0.3em;
 }
 
-.uitable table.numerictable tr td div.value div,
-.uitable table.numerictable tr td div.yaxis div,
-.uitable table.numerictable tr td div.xaxis div {
+.ui table.numerictable tr td div.value div,
+.ui table.numerictable tr td div.yaxis div,
+.ui table.numerictable tr td div.xaxis div {
     cursor: default;
     min-width: var(--cell-width);
     max-width: var(--cell-width);
@@ -188,12 +219,12 @@
     margin: 0px;
     padding: 0px;
 }
-.uitable table.numerictable tr td div.value div.selected input,
-.uitable table.numerictable tr td div.yaxis div.selected input,
-.uitable table.numerictable tr td div.xaxis div.selected input,
-.uitable table.numerictable tr td div.value div.selected,
-.uitable table.numerictable tr td div.yaxis div.selected,
-.uitable table.numerictable tr td div.xaxis div.selected {
+.ui table.numerictable tr td div.value div.selected input,
+.ui table.numerictable tr td div.yaxis div.selected input,
+.ui table.numerictable tr td div.xaxis div.selected input,
+.ui table.numerictable tr td div.value div.selected,
+.ui table.numerictable tr td div.yaxis div.selected,
+.ui table.numerictable tr td div.xaxis div.selected {
     border-color: var(--border-select-color) !important;
     background-color: var(--background-selected-color) !important;
     -webkit-touch-callout: none;
@@ -203,41 +234,41 @@
     -ms-user-select: none;
     user-select: none;
 }
-.uitable table.numerictable tr td div.value div {
+.ui table.numerictable tr td div.value div {
     background-color: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
     /* height: calc(180 - (180 * (attr(data-value number) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))); */
 }
-.uitable table.numerictable tr td div.xaxis div {
+.ui table.numerictable tr td div.xaxis div {
     border-bottom-width: var(--border-axis-width);
 }
-.uitable table.numerictable tr td div.yaxis div {
+.ui table.numerictable tr td div.yaxis div {
     text-align: right;
     border-right-width: var(--border-axis-width);
 }
 
-.uitable table.numerictable tr td.xtrans {
+.ui table.numerictable tr td.xtrans {
     white-space: nowrap;
 }
-.uitable table.numerictable tr td.xtrans div {
+.ui table.numerictable tr td.xtrans div {
     display: flex;
     flex-direction: column; 
     align-items: center;
 }
-.uitable table.numerictable tr td.xztrans {
+.ui table.numerictable tr td.xztrans {
     vertical-align: bottom;
 }
-.uitable table.numerictable tr td.xztrans div {
+.ui table.numerictable tr td.xztrans div {
     display: flex;
     flex-direction: column; 
     align-items: end;
 }
-.uitable table.numerictable tr td.ytrans {
+.ui table.numerictable tr td.ytrans {
     white-space: nowrap;
     vertical-align: middle; 
     width: 2em;
     padding: 5px;
 }
-.uitable table.numerictable tr td.ytrans div {
+.ui table.numerictable tr td.ytrans div {
     position: absolute;
     transform-origin: 50% 50%;
     transform: translateX(-50%) rotate(-90deg) translateY(100%)

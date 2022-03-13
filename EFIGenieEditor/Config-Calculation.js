@@ -278,7 +278,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
-        this.Table = new UITable({
+        this.Table = new UI.Table({
             SelectNotVisible: true,
             BaseObj: true,
             YResolution: 1,
@@ -482,7 +482,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             ButtonText: `Edit Table`,
             TemplateIdentifier: `Table`
         });
-        this.Table = new UITable({
+        this.Table = new UI.Table({
             BaseObj: true,
             onChange: function() {
                 if(thisClass.XSelection) 

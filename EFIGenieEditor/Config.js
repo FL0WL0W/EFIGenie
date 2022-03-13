@@ -400,14 +400,12 @@ class ConfigTop extends UI.OldTemplate {
 
     Detach() {
         super.Detach();
-        DetachPasteOptions();
 
         $(document).off(`click.${this.GUID}`);
     }
 
     Attach() {
         super.Attach();
-        AttachPasteOptions();
 
         var thisClass = this;
         $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){

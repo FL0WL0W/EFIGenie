@@ -41,6 +41,27 @@ export default class UITable extends HTMLDivElement {
             this.#zLabelElement.append(zLabel);
     }
 
+    get step() {
+        return this.#valueInputElement.step;
+    }
+    set step(step) {
+        this.#valueInputElement.step = step;
+    }
+
+    get min() {
+        return this.#valueInputElement.min;
+    }
+    set min(min) {
+        this.#valueInputElement.min = min;
+    }
+
+    get max() {
+        return this.#valueInputElement.max;
+    }
+    set max(max) {
+        this.#valueInputElement.max = max;
+    }
+
     #trailXY = [];
     trailTime = 2000;
     trail(x, y = 0, z) {
@@ -64,6 +85,53 @@ export default class UITable extends HTMLDivElement {
     }
     set #valueMax(valueMin) {
         this.style.setProperty('--valuemax', valueMin);
+    }
+
+    get saveValue() {
+        return {
+            Value: this.value,
+            XAxis: this.xAxis,
+            XResolution: this.xResolutionModifiable? this.xResolution : undefined,
+            YAxis: this.yAxis,
+            YResolution: this.yResolutionModifiable? this.yResolution : undefined,
+        };
+    }
+
+    set saveValue(saveValue) {
+        if(saveValue === undefined) 
+            return;
+
+        if(saveValue.XResolution !== undefined && this.xResolutionModifiable)
+            this.xResolution = saveValue.XResolution;
+        if(saveValue.YResolution !== undefined && this.yResolutionModifiable)
+            this.yResolution = saveValue.YResolution;
+        if(saveValue.Resolution !== undefined) {
+            if(this.xResolutionModifiable && !this.yResolutionModifiable)
+                this.xResolution = saveValue.Resolution;
+            if(this.yResolutionModifiable && !this.xResolutionModifiable)
+                this.yResolution = saveValue.Resolution;
+        }
+
+        if(saveValue.MaxX !== undefined && saveValue.MinX !== undefined) {
+            const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (this.XResolution - 1);
+            for(let x=0; x<this.XResolution; x++){
+                this.xAxis[x] = saveValue.MinX + xAxisAdd * x;
+            }
+        }
+        if(saveValue.MaxY !== undefined && saveValue.MinY !== undefined) {
+            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (this.YResolution - 1);
+            for(let y=0; y<this.YResolution; y++){
+                this.yAxis[y] = saveValue.MinY + yAxisAdd * y;
+            }
+        }
+
+        if(saveValue.XAxis !== undefined)
+            this.xAxis = saveValue.XAxis;
+        if(saveValue.YAxis !== undefined)
+            this.yAxis = saveValue.YAxis;
+
+        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
+            this.value = saveValue.Value;
     }
 
     #valueElement       = document.createElement(`div`);
@@ -338,7 +406,7 @@ export default class UITable extends HTMLDivElement {
     onChange = [];
     constructor(prop) {
         super();
-        this.class = `uitable`;
+        this.class = `ui`;
         //toolbar
         this.append(this.#toolbarElement);
         this.#toolbarElement.class = `toolbar`;
@@ -499,15 +567,16 @@ export default class UITable extends HTMLDivElement {
                         thisClass.#xAxisElement.children[xa].value = value;
             } else {
                 let operation = `equal`;
-                if(value - thisClass.#valueElement.children[x + thisClass.xResolution * y].value === 1)
+                const oldVal = parseFloat(thisClass.#valueElement.children[x + thisClass.xResolution * y].dataset.value);
+                if(value - oldVal === Math.floor(oldVal+1) - oldVal)
                     operation = `increment`;
-                if(thisClass.#valueElement.children[x + thisClass.xResolution * y].value - value === 1)
+                if(value - oldVal === Math.ceil(oldVal-1) - oldVal)
                     operation = `decrement`;
                 thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(selectedElement) {
                     if(operation === `increment`)
-                        selectedElement.value++;
+                        selectedElement.value = parseFloat(selectedElement.dataset.value) + 1
                     else if(operation === `decrement`)
-                        selectedElement.value--;
+                        selectedElement.value = parseFloat(selectedElement.dataset.value) - 1;
                     else
                         selectedElement.value = value;
                 });

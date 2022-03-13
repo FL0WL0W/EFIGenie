@@ -3,6 +3,7 @@ import UICheckbox from "./UI/UICheckbox.js";
 import UIText from "./UI/UIText.js";
 import UISelection from "./UI/UISelection.js";
 import UITemplate from "./UI/UITemplate.js";
+import UITable from "./UI/UITable.js";
 
 class Template {
     GUID = generateGUID();
@@ -439,6 +440,49 @@ class Selection extends UISelection {
 };
 customElements.define('ui-selection-wrapper', Selection, { extends: `div` });
 
+class Table extends UITable {
+    GUID = generateGUID();
+
+    get Hidden() {
+        return this.hidden;
+    }
+    set Hidden(hidden) {
+        this.hidden = hidden;
+    }
+
+    set Class(pclass) {
+        this.class = pclass;
+    }
+
+    get Value() {
+        return this.value;
+    }
+    set Value(value) {
+        this.value = value;
+    }
+
+    constructor(prop) {
+        super(prop);
+    }
+
+    get SaveValue() {
+        return this.saveValue;
+    }
+
+    set SaveValue(saveValue) {
+        this.saveValue = saveValue;
+    }
+
+    Attach() {
+        $(`#${this.GUID}`).append(this);
+    }
+
+    GetHtml() {
+        return `<span id="${this.GUID}"></span>`
+    }
+}
+customElements.define('ui-table-wrapper', Table, { extends: `div` });
+
 class NumberWithMeasurement extends Template {
     static Template = `$DisplayValue$$DisplayMeasurement$`
 
@@ -592,4 +636,5 @@ export default { UI: {
     Selection: UISelection,
     OldSelection: Selection,
     OldNumberWithMeasurement : NumberWithMeasurement,
+    Table: Table,
 }}
