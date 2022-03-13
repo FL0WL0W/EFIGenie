@@ -309,6 +309,7 @@ export default class UITable extends HTMLDivElement {
     #modifySubtractElement  = document.createElement(`div`);
     #modifyMultiplyElement  = document.createElement(`div`);
     #modifyDivideElement    = document.createElement(`div`);
+    #modifyPercentElement   = document.createElement(`div`);
     #modifyEqualElement     = document.createElement(`div`);
     #modifyValueElement     = document.createElement(`input`);
 
@@ -386,6 +387,7 @@ export default class UITable extends HTMLDivElement {
         this.#modifyElement.append(this.#modifySubtractElement);
         this.#modifyElement.append(this.#modifyMultiplyElement);
         this.#modifyElement.append(this.#modifyDivideElement);
+        this.#modifyElement.append(this.#modifyPercentElement);
         this.#modifyElement.append(this.#modifyEqualElement);
         this.#modifyValueElement.type       = `number`;
         this.#modifyValueElement.class      = `modify-value`;
@@ -393,9 +395,11 @@ export default class UITable extends HTMLDivElement {
         this.#modifySubtractElement.class   = `modify-button subtract`;
         this.#modifyMultiplyElement.class   = `modify-button multiply`;
         this.#modifyDivideElement.class     = `modify-button divide`;
+        this.#modifyPercentElement.class    = `modify-button percent`;
         this.#modifyEqualElement.class      = `modify-button equal`;
         this.#modifySubtractElement.hidden  = true;
         this.#modifyDivideElement.hidden    = true;
+        this.#modifyPercentElement.hidden    = true;
         //interpolate toolbar
         this.#rightToolbarElement.append(this.#interpolateElement);
         this.#interpolateElement.class = `interpolate container`;
@@ -499,8 +503,7 @@ export default class UITable extends HTMLDivElement {
                     operation = `increment`;
                 if(thisClass.#valueElement.children[x + thisClass.xResolution * y].value - value === 1)
                     operation = `decrement`;
-                let selectedElements = thisClass.#valueElement.querySelectorAll(`.selected`)
-                selectedElements.forEach(function(selectedElement) {
+                thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(selectedElement) {
                     if(operation === `increment`)
                         selectedElement.value++;
                     else if(operation === `decrement`)
@@ -738,38 +741,47 @@ export default class UITable extends HTMLDivElement {
 
     #constructModifyEventListeners() {
         const thisClass = this;
-        this.#tableElement.addEventListener(`keypress`, function(event){
+        this.#valueInputElement.addEventListener(`keypress`, function(event){
             //plus
-            if(event.key === 43) {
-                e.preventDefault();
+            console.log(event.key)
+            if(event.key === `+`) {
+                event.preventDefault();
                 thisClass.#modifyValueElement.select();
                 thisClass.#modifyAddElement.classList.add(`selected`)
             }
             //minus
-            if(event.key === 45) {
-                e.preventDefault();
+            if(event.key === `-`) {
+                event.preventDefault();
                 thisClass.#modifyAddElement.hidden = true;
                 thisClass.#modifySubtractElement.hidden = false;
                 thisClass.#modifyValueElement.select();
                 thisClass.#modifySubtractElement.classList.add(`selected`)
             }
             //aterisk
-            if(event.key === 42) {
-                e.preventDefault();
+            if(event.key === `*`) {
+                event.preventDefault();
                 thisClass.#modifyValueElement.select();
                 thisClass.#modifyMultiplyElement.classList.add(`selected`)
             }
-            //divide
-            if(event.key === 47) {
-                e.preventDefault();
+            //forward slash
+            if(event.key === `/`) {
+                event.preventDefault();
                 thisClass.#modifyMultiplyElement.hidden = true;
                 thisClass.#modifyDivideElement.hidden = false;
                 thisClass.#modifyValueElement.select();
                 thisClass.#modifyDivideElement.classList.add(`selected`)
             }
-            //forward slash
-            if(event.key === 61) {
-                e.preventDefault();
+            //percent
+            if(event.key === `%`) {
+                event.preventDefault();
+                thisClass.#modifyMultiplyElement.hidden = true;
+                thisClass.#modifyPercentElement.hidden = false;
+                thisClass.#modifyValueElement.select();
+                thisClass.#modifyPercentElement.classList.add(`selected`)
+            }
+            //equals
+            if(event.key === `=`) {
+                event.preventDefault();
                 thisClass.#modifyValueElement.select();
                 thisClass.#modifyEqualElement.classList.add(`selected`)
             }
@@ -778,46 +790,47 @@ export default class UITable extends HTMLDivElement {
             const value = parseFloat(thisClass.#modifyValueElement.value);
             if(isNaN(value))
                 return;
-            const element = thisClass.#modifyElement.querySelector(`input`);
-            if(!element)
-                return;
-            const origValue = parseFloat(element.value) ?? 0;
 
-            switch(operation) {
-                case `equal`:
-                    element.value = value;
-                    break;
-                case `add`:
-                    element.value = origValue + value;
-                    break;
-                case `subtract`:
-                    element.value = origValue - value;
-                    break;
-                case `multiply`:
-                    element.value = origValue * value;
-                    break;
-                case `divide`:
-                    element.value = origValue / value;
-                    break;
-                default:
-                    return;
-            }
-
-            element.dispatchEvent(new Event(`click`));
+            thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(selectedElement) {
+                switch(operation) {
+                    case `equal`:
+                        selectedElement.value = value;
+                        break;
+                    case `add`:
+                        selectedElement.value += value;
+                        break;
+                    case `subtract`:
+                        selectedElement.value -= value;
+                        break;
+                    case `multiply`:
+                        selectedElement.value *= value;
+                        break;
+                    case `divide`:
+                        selectedElement.value /= value;
+                        break;
+                    case `percent`:
+                        selectedElement.value *= 1 + (value/100);
+                        break;
+                    default:
+                        return;
+                }
+            });
         }
         function blur() {
             thisClass.#modifyAddElement.hidden      = false;
             thisClass.#modifySubtractElement.hidden = true;
             thisClass.#modifyMultiplyElement.hidden = false;
             thisClass.#modifyDivideElement.hidden   = true;
+            thisClass.#modifyPercentElement.hidden   = true;
             for(let i=0; i<thisClass.#modifyElement.children.length; i++) thisClass.#modifyElement.children[i].classList.remove(`selected`);
         }
+        this.#modifyValueElement.addEventListener(`blur`, blur);
         this.#modifyValueElement.addEventListener(`keypress`, function(event) {
-            if(event.key !== 13)
+            if(event.key !== `Enter`)
                 return;
             thisClass.#modifyElement.querySelector(`.selected`)?.dispatchEvent(new Event(`click`));
             blur();
-            thisClass.#tableElement.querySelector(`input`)?.select();
+            thisClass.#valueInputElement.select();
         });
         this.#modifyEqualElement.addEventListener(`click`, function() {
             modify(`equal`);
@@ -833,6 +846,9 @@ export default class UITable extends HTMLDivElement {
         });
         this.#modifyDivideElement.addEventListener(`click`, function() {
             modify(`divide`);
+        });
+        this.#modifyPercentElement.addEventListener(`click`, function() {
+            modify(`percent`);
         });
     }
 

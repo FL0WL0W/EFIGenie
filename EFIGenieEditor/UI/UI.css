@@ -87,8 +87,9 @@
 }
 .uitable .modify-button.add::before { position: absolute; content: "+"; }
 .uitable .modify-button.subtract::before { position: absolute; content: "-"; }
-.uitable .modify-button.multiply::before { position: absolute; content: "-"; }
-.uitable .modify-button.divide::before { position: absolute; content: "-"; }
+.uitable .modify-button.multiply::before { position: absolute; content: "x"; }
+.uitable .modify-button.divide::before { position: absolute; content: "÷"; }
+.uitable .modify-button.percent::before { position: absolute; content: "%"; }
 .uitable .modify-button.equal::before { position: absolute; content: "="; }
 
 .uitable .paste-button::before { position: absolute; content: "📋"; }

@@ -8,7 +8,7 @@ Object.defineProperty(HTMLElement.prototype, 'hidden', {
             if(this.style.display)
                 this._previousDisplayValue = this.style.display;
             this.style.display = `none`;
-        } else if(this.style.display === `none`) {
+        } else if(!hidden && this.style.display === `none`) {
             if(this._previousDisplayValue)
                 this.style.display = this._previousDisplayValue;
             else 
