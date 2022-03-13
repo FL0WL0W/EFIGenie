@@ -154,7 +154,7 @@ input[type="number"]:hover {
 
 
 .ui table.numerictable {
-    --cell-width: calc(var(--precision) * 0.9em);
+    --cell-width: calc(var(--precision) * 0.78em);
     border-spacing: 0px;
     border-style: none;
     -webkit-touch-callout: none;
