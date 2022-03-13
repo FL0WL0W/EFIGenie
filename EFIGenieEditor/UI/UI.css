@@ -1,8 +1,8 @@
 .ui {
-    --border-color: #666;
+    --border-color: #1A1A20;
     --border-hover-color: #3590d0;
     --border-selected-color: #3590d0;
-    --background-selected-color: #3590d080;
+    --background-selected-color: #3590d0;
     --input-background-color: #505962;
     --border-width: 0.2em;
     --border-radius: 6px;
@@ -11,20 +11,7 @@
     --font: bold 1em Verdana,sans-serif;
     color: var(--text-color);
     font: var(--font);
-    background-color: #1A1A20;
     display: inline-block;
-}
-.ui table {
-    color: var(--text-color);
-    font: var(--font);
-    display: inline-block;
-    --border-width: 0.1em;
-    --border-axis-width: 0.25em;
-}
-
-input[type="number"]:hover {
-    background-color: #666;
-    border-color: #3590d0;
 }
 
 .ui .toolbar {
@@ -34,6 +21,17 @@ input[type="number"]:hover {
     justify-content:space-between;
 }
 
+.ui .container{
+    position: relative;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid #666;
+    vertical-align:top; 
+    padding: 0.1em;
+    margin: 0.1em;
+    display: inline-flex;
+    justify-content: center;  
+    align-items: center;
+}
 .ui .container.resolution::before,
 .ui .container.paste::before,
 .ui .container.modify::before,
@@ -47,18 +45,7 @@ input[type="number"]:hover {
 .ui .container.resolution::before { content: "TableSize"; }
 .ui .container.paste::before { content: "Paste Options"; }
 .ui .container.modify::before { content: "Modify"; }
-.ui .container.interpolate::before { content: "Interpolate"; }
-.ui .container{
-    position: relative;
-    border-radius: var(--border-radius);
-    border: var(--border-width) solid var(--border-color);
-    vertical-align:top; 
-    padding: 0.1em;
-    margin: 0.1em;
-    display: inline-flex;
-    justify-content: center;  
-    align-items: center;
-}
+.ui .container.interpolatexy::before { content: "Interpolate"; }
 .ui .container.resolution,
 .ui .container.paste,
 .ui .container.modify,
@@ -94,10 +81,10 @@ input[type="number"]:hover {
 .ui .resolution-value,
 .ui .modify-value {
     cursor: default;
-    width: 7em;
+    width: 5em;
 }
 .ui .resolution-value {
-    width: 5em;
+    width: 2em;
 }
 .ui .resolution-value:hover,
 .ui .modify-value:hover,
@@ -152,9 +139,14 @@ input[type="number"]:hover {
     content: "■";
 }
 
-
 .ui table.numerictable {
+    --border-color: #666;
+    --border-width: 0.1em;
+    --border-axis-width: 0.25em;
     --cell-width: calc(var(--precision) * 0.78em);
+    color: var(--text-color);
+    font: var(--font);
+    display: inline-block;
     border-spacing: 0px;
     border-style: none;
     -webkit-touch-callout: none;
@@ -167,14 +159,22 @@ input[type="number"]:hover {
 .ui table.numerictable td {
     padding: 0px;
 }
-.ui table.numerictable input,
-.ui table.numerictable div {
-    box-sizing: content-box;
+.ui table.numerictable input {
     width: 100%;
+    height: 100%;
+    box-sizing: content-box;
     margin: 0;
     padding: 0;
     border: none;
     border-radius: 0;
+    border-color: var(--border-select-color) !important;
+    background-color: var(--background-selected-color) !important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .ui table.numerictable tr td div.xaxis {
@@ -209,6 +209,10 @@ input[type="number"]:hover {
     height: 0.3em;
 }
 
+.ui table.numerictable tr td.yaxis {
+    width: var(--cell-width);
+}
+
 .ui table.numerictable tr td div.value div,
 .ui table.numerictable tr td div.yaxis div,
 .ui table.numerictable tr td div.xaxis div {
@@ -219,24 +223,27 @@ input[type="number"]:hover {
     margin: 0px;
     padding: 0px;
 }
-.ui table.numerictable tr td div.value div.selected input,
-.ui table.numerictable tr td div.yaxis div.selected input,
-.ui table.numerictable tr td div.xaxis div.selected input,
 .ui table.numerictable tr td div.value div.selected,
 .ui table.numerictable tr td div.yaxis div.selected,
 .ui table.numerictable tr td div.xaxis div.selected {
-    border-color: var(--border-select-color) !important;
+    border-color: var(--border-selected-color) !important;
+}
+.ui table.numerictable tr td div.value div.selected::before,
+.ui table.numerictable tr td div.xaxis div.selected::before,
+.ui table.numerictable tr td div.yaxis div.selected::before {
+    z-index: -1;
+    border-color: var(--border-selected-color) !important;
     background-color: var(--background-selected-color) !important;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    content:"\A";
+    width: var(--cell-width);
+    height: 1.4em; /* this is a hack. can't figure out a better way cause css sucks */
+    position:absolute;
 }
 .ui table.numerictable tr td div.value div {
-    background-color: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
-    /* height: calc(180 - (180 * (attr(data-value number) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))); */
+    background-color: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%, 100%);
+}
+.ui table.numerictable tr td div.value div.selected {
+    background-color: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 50%, 50%, 50%);
 }
 .ui table.numerictable tr td div.xaxis div {
     border-bottom-width: var(--border-axis-width);
@@ -247,29 +254,90 @@ input[type="number"]:hover {
 }
 
 .ui table.numerictable tr td.xtrans {
-    white-space: nowrap;
 }
-.ui table.numerictable tr td.xtrans div {
+.ui table.numerictable tr td.xtrans .xlabel {
     display: flex;
     flex-direction: column; 
-    align-items: center;
+    align-items: start;
+    padding: 1px 5px;
 }
 .ui table.numerictable tr td.xztrans {
     vertical-align: bottom;
 }
-.ui table.numerictable tr td.xztrans div {
+.ui table.numerictable tr td.xztrans .xlabel,
+.ui table.numerictable tr td.xztrans .zlabel {
     display: flex;
     flex-direction: column; 
     align-items: end;
+    padding: 1px 5px;
 }
 .ui table.numerictable tr td.ytrans {
-    white-space: nowrap;
-    vertical-align: middle; 
-    width: 2em;
+    vertical-align: top; 
+    width: 0;
     padding: 5px;
 }
-.ui table.numerictable tr td.ytrans div {
+.ui table.numerictable tr td.ytrans .ylabel {
     position: absolute;
-    transform-origin: 50% 50%;
-    transform: translateX(-50%) rotate(-90deg) translateY(100%)
+    transform-origin: 50% 0%;
+    transform: translateX(-50%) rotate(-90deg) translateY(-100%) translateX(-50%) translateX(5px); 
+}
+
+.ui.select {
+    cursor: default;
+    font: var(--font);
+    margin: 1px;
+    padding: 1px 2px;
+    display: inline-block;    
+}
+
+.ui.select .ui.selected {
+    min-width: 200px;
+    text-decoration: none;
+    background-color: var(--input-background-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+}
+.ui.select .ui.selected::after {
+    float: right;
+    content: "▼";
+}
+
+.ui.select:hover {
+    border-color: #3590d0;
+}
+
+.ui.context-menu {
+    cursor: default;
+    position: absolute;
+    background: #222629;
+    border: 1px solid #505962;
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: normal;
+    inline-size: 200px;
+    z-index: 10;
+    display: block;
+}
+.ui.context-menu .selectgroup {
+    background-color: var(--input-background-color);
+    border-top: 1px solid var(--input-background-color);
+    border-bottom: 1px solid transparent;
+}
+.ui.context-menu .selectoption.selected {
+    background-color: var(--background-selected-color);
+}
+.ui.context-menu .selectoption {
+    padding: 0 0 0 1em;
+    border-top: 1px solid var(--input-background-color);
+    border-bottom: 1px solid transparent;
+}
+.ui.context-menu .selectoption.selectdisabled {
+    color: #888;
+    background-color: #666; 
+}
+.ui.context-menu .selectoption:hover:not(.disabled) {
+    background-color: #666; 
+    border-color: #3590d0;
 }

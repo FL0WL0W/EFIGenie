@@ -1,6 +1,9 @@
 <html>
     <head>
         <link rel = "stylesheet" type = "text/css" href = "UI.css" />
+        <style> 
+            body {background-color: #222629; color: #eee; font-weight:bold;}
+        </style>
         <script src="UIUtils.js"></script>
         <script type="module">
             import UIText from "./UIText.js";
@@ -10,7 +13,7 @@
             import UISelection from "./UISelection.js"
             import UITable from "./UITable.js"
             window.template = new UITemplate({
-                Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="selection"></div><hr/><div data-element="table2D"></div>`,
+                Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="table2D"></div>`,
                 text: new UIText({
                     value: `text`
                 }),
@@ -23,11 +26,6 @@
                 checkbox: new UICheckbox({
                     value: true
                 }),
-                selection: new UISelection({
-                    options: [
-                        { Name: `Selection Test`, Value: 1 }
-                    ]
-                }),
                 table2D: new UITable({
                     value: [ 0.0000234, 2, 3, 4, 5,
                              2, 3, 4, 5, 6,
@@ -35,8 +33,17 @@
                              4, 5, 6, 7, 8],
                     xAxis: [ 1, 2, 3, 4, 5 ],
                     yAxis: [ 1, 2, 3, 4 ],
+                    yLabel: new UISelection({
+                        options: [
+                            { Name: `Selection label Test`, Value: 1 },
+                            { Name: `Selection label Test1`, Value: 2 },
+                            { Name: `Selection label Test2`, Value: 3 },
+                            { Name: `Selection label Test3`, Value: 4 },
+                            { Name: `Selection label Test4`, Value: 5 },
+                            { Name: `Selection label Test5`, Value: 6 }
+                        ]
+                    }),
                     xLabel: `xLabel`,
-                    yLabel: `yLabel`,
                     zLabel: `zLabel`
                 })
             });

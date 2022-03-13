@@ -332,34 +332,7 @@ input[type="checkbox"]:hover {
 input[type="text"] {
     width: 200px;
 }
-.context-menu .selectgroup {
-    background-color: #505962;
-    border-top: 1px solid #505962;
-    border-bottom: 1px solid transparent;
-}
-.context-menu .selectoption.selected {
-    background-color: #3590d0;
-}
-.context-menu .selectoption {
-    padding: 0 0 0 1em;
-    border-top: 1px solid #505962;
-    border-bottom: 1px solid transparent;
-}
-.context-menu .selectoption.selectdisabled {
-    color: #888;
-    background-color: #666; 
-}
-.context-menu .selectoption:hover:not(.disabled) {
-    background-color: #666; 
-    border-color: #3590d0;
-}
-.select {
-    font: bold 16px Arial;
-    min-width: 200px;
-    cursor: default;
-}
-select,
-.select {
+select {
     font: bold 16px Arial;
     text-decoration: none;
     background-color: #505962;
@@ -380,8 +353,7 @@ select,
     cursor: pointer;
 }
 select:hover,
-.button:hover,
-.select:hover {
+.button:hover {
     background-color: #666;
     border-color: #3590d0;
 }

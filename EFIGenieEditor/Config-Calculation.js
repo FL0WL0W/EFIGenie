@@ -203,24 +203,24 @@ class Calculation_LookupTable extends UI.OldTemplate {
     static Template = `$Dialog$`
 
     get Label() {
-        return this.Table.ZLabel;
+        return this.Table.zLabel;
     }
     set Label(label){
-        this.Table.ZLabel = label;
+        this.Table.zLabel = label;
         this.Dialog.Title = label;
     }
 
     _xLabel = `X`
-    get XLabel() {
+    get xLabel() {
         return this._xLabel;
     }
-    set XLabel(xLabel) {
+    set xLabel(xLabel) {
         if(this._xLabel === xLabel)
             return;
 
         this._xLabel = xLabel;
         if(!this.ParameterSelection)
-            this.Table.XLabel = xLabel;
+            this.Table.xLabel = xLabel;
     }
 
     get XOptions() {
@@ -234,7 +234,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
             return;
 
         this.ParameterSelection.Options = options;
-        this.Table.XLabel = this.ParameterSelection.GetHtml();
+        this.Table.xLabel = this.ParameterSelection;
     }
 
     get NoParameterSelection() {
@@ -246,7 +246,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
         if(noParameterSelection) {
             this.ParameterReference = undefined;
             this.ParameterSelection = undefined;
-            this.Table.XLabel = this.XLabel;
+            this.Table.xLabel = this.xLabel;
             return;
         }
 
@@ -256,11 +256,11 @@ class Calculation_LookupTable extends UI.OldTemplate {
                 Options: GetSelections(),
                 onChange: function() {
                     thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
+                    thisClass.Table.xLabel = thisClass.ParameterSelection;
                 },
                 Class: `TableParameterSelect`
             });
-            this.Table.XLabel = this.ParameterSelection.GetHtml();
+            this.Table.xLabel = this.ParameterSelection;
         }
     }
 
@@ -285,7 +285,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
             YResolutionModifiable: false,
             onChange: function() {
                 if(thisClass.ParameterSelection) 
-                    thisClass.Table.XLabel = thisClass.ParameterSelection.GetHtml();
+                    thisClass.Table.xLabel = thisClass.ParameterSelection;
             }
         });
         this.NoParameterSelection = false;
@@ -359,37 +359,37 @@ class Calculation_2AxisTable extends UI.OldTemplate {
     static Template = `$Dialog$`
 
     get Label() {
-        return this.Table.ZLabel;
+        return this.Table.zLabel;
     }
     set Label(label){
-        this.Table.ZLabel = label;
+        this.Table.zLabel = label;
         this.Dialog.Title = label;
     }
 
     _xLabel = `X`
-    get XLabel() {
+    get xLabel() {
         return this._xLabel;
     }
-    set XLabel(xLabel) {
+    set xLabel(xLabel) {
         if(this._xLabel === xLabel)
             return;
 
         this._xLabel = xLabel;
         if(!this.XSelection)
-            this.Table.XLabel = xLabel;
+            this.Table.xLabel = xLabel;
     }
 
     _yLabel = `Y`
     get yLabel() {
         return this._yLabel;
     }
-    set YLabel(yLabel) {
+    set yLabel(yLabel) {
         if(this._yLabel === yLabel)
             return;
 
         this._yLabel = yLabel;
         if(!this.YSelection)
-            this.Table.YLabel = yLabel;
+            this.Table.yLabel = yLabel;
     }
 
     get XOptions() {
@@ -403,7 +403,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             return;
 
         this.XSelection.Options = options;
-        this.Table.XLabel = this.XSelection.GetHtml();
+        this.Table.xLabel = this.XSelection;
     }
 
     get YOptions() {
@@ -417,7 +417,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             return;
 
         this.YSelection.Options = options;
-        this.Table.YLabel = this.YSelection.GetHtml();
+        this.Table.yLabel = this.YSelection;
     }
 
     get NoParameterSelection() {
@@ -431,8 +431,8 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             this.YReference = undefined;
             this.XSelection = undefined;
             this.YSelection = undefined;
-            this.Table.XLabel = this.XLabel;
-            this.Table.YLabel = this.YLabel;
+            this.Table.xLabel = this.xLabel;
+            this.Table.yLabel = this.yLabel;
             return;
         }
 
@@ -443,10 +443,10 @@ class Calculation_2AxisTable extends UI.OldTemplate {
                 Options: GetSelections(),
                 onChange: function() {
                     thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
+                    thisClass.Table.xLabel = thisClass.XSelection;
                 }
             });
-            this.Table.XLabel = this.XSelection.GetHtml();
+            this.Table.xLabel = this.XSelection;
         }
         if(!this.YSelection) {
             this.YSelection = new UI.OldSelection({
@@ -454,10 +454,10 @@ class Calculation_2AxisTable extends UI.OldTemplate {
                 Options: GetSelections(),
                 onChange: function() {
                     thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
-                    thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
+                    thisClass.Table.yLabel = thisClass.YSelection;
                 }
             });
-            this.Table.YLabel = this.YSelection.GetHtml();
+            this.Table.yLabel = this.YSelection;
         }
     }
 
@@ -486,9 +486,9 @@ class Calculation_2AxisTable extends UI.OldTemplate {
             BaseObj: true,
             onChange: function() {
                 if(thisClass.XSelection) 
-                    thisClass.Table.XLabel = thisClass.XSelection.GetHtml();
+                    thisClass.Table.xLabel = thisClass.XSelection;
                 if(thisClass.YSelection) 
-                    thisClass.Table.YLabel = thisClass.YSelection.GetHtml();
+                    thisClass.Table.yLabel = thisClass.YSelection;
             }
         });
         this.NoParameterSelection = false;
@@ -655,29 +655,29 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
     }
 
     _xlabel = `X`;
-    get XLabel() {
+    get xLabel() {
         return this._xlabel;
     }
-    set XLabel(xlabel) {
+    set xLabel(xlabel) {
         if(this._xlabel === xlabel)
             return;
 
         this._xlabel = xlabel;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.XLabel = xlabel; });
+        this.ConfigValues.forEach(function(configValue) { configValue.xLabel = xlabel; });
     }
 
     _ylabel = `Y`;
-    get YLabel() {
+    get yLabel() {
         return this._xlabel;
     }
-    set YLabel(ylabel) {
+    set yLabel(ylabel) {
         if(this._ylabel === ylabel)
             return;
 
         this._ylabel = ylabel;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.YLabel = ylabel; });
+        this.ConfigValues.forEach(function(configValue) { configValue.yLabel = ylabel; });
     }
 
     _referenceName = undefined;
@@ -812,8 +812,8 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                         this.ConfigValues.push(new configs[t]({
                             NoParameterSelection: this.NoParameterSelection,
                             Label: this.Label,
-                            XLabel: this.XLabel,
-                            YLabel: this.YLabel,
+                            xLabel: this.xLabel,
+                            yLabel: this.yLabel,
                             ReferenceName: this.ReferenceName,
                             SaveValue: saveValue.Values[i],
                             Measurement: this._measurement,
@@ -889,8 +889,8 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                 this.ConfigValues.push(new configs[i]({
                     NoParameterSelection: this.NoParameterSelection,
                     Label: this.Label,
-                    XLabel: this.XLabel,
-                    YLabel: this.YLabel,
+                    xLabel: this.xLabel,
+                    yLabel: this.yLabel,
                     ReferenceName: this.ReferenceName,
                     Measurement: this._measurement,
                     MeasurementUnitName: this.MeasurementUnitName
