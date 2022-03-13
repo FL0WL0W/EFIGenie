@@ -106,7 +106,7 @@ export default class UITable extends HTMLDivElement {
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
             Object.defineProperty(valueElement, 'value', UITable.#numberValueGetterSetter);
             valueElement.dataset.x = i % this.xResolution;
-            valueElement.dataset.y = parseInt(i/(this.yResolution+1));
+            valueElement.dataset.y = Math.trunc(i/this.xResolution);
             valueElement.value = valueElement.value;
         }
         if(this.xResolution > 1) {
@@ -470,7 +470,7 @@ export default class UITable extends HTMLDivElement {
         this.#yResolutionElement.addEventListener(`change`, function(event) {
             thisClass.yResolution = parseInt(event.target.value);
         });
-        this.#tableElement.addEventListener(`change`, function(event){
+        this.#valueInputElement.addEventListener(`change`, function(event){
             let x = parseInt(event.target.parentElement.dataset.x);
             let y = parseInt(event.target.parentElement.dataset.y);
             let value = event.target.value;
@@ -640,28 +640,37 @@ export default class UITable extends HTMLDivElement {
                 yDiff = parseInt(yDiff/rect.height);
                 selecting.endX = Math.min(thisClass.xResolution-1, Math.max(0, selecting.startX + xDiff));
                 selecting.endY = Math.min(thisClass.yResolution-1, Math.max(0, selecting.startY + yDiff));
-                for(let i=0; i<thisClass.#valueElement.children.length; i++) {
-                    const element = thisClass.#valueElement.children[i];
-                    if( Math.min(selecting.endX, selecting.startX) > parseInt(element.dataset.x) ||
-                        Math.max(selecting.endX, selecting.startX) < parseInt(element.dataset.x) ||
-                        Math.min(selecting.endY, selecting.startY) > parseInt(element.dataset.y) ||
-                        Math.max(selecting.endY, selecting.startY) < parseInt(element.dataset.y)){
-                        element.classList.remove(`selected`);
-                        continue;
+                if(Math.abs(xDiff) > 0 || Math.abs(yDiff) > 0)
+                    selecting.selectOnMove = false;
+                if(!selecting.selectOnMove) {
+                    thisClass.selecting = {
+                        startX: selecting.startX,
+                        startY: selecting.startY,
+                        endX: selecting.endX,
+                        endY: selecting.endY
                     }
-
-                    element.classList.add(`selected`); 
-                };
+                }
             }
+            for(let i=0; i<thisClass.#valueElement.children.length; i++) {
+                const element = thisClass.#valueElement.children[i];
+                if( Math.min(thisClass.selecting.endX, thisClass.selecting.startX) > parseInt(element.dataset.x) ||
+                    Math.max(thisClass.selecting.endX, thisClass.selecting.startX) < parseInt(element.dataset.x) ||
+                    Math.min(thisClass.selecting.endY, thisClass.selecting.startY) > parseInt(element.dataset.y) ||
+                    Math.max(thisClass.selecting.endY, thisClass.selecting.startY) < parseInt(element.dataset.y)){
+                    element.classList.remove(`selected`);
+                    continue;
+                }
+                element.classList.add(`selected`); 
+            };
         }
 
+        let addSelectNumber = false;
         function up(event) {
             dragX = false;
             dragY = false;
             if(selecting) {
                 const targetIsDataValue = selecting.startElement.dataset.x !== undefined || selecting.startElement.dataset.y !== undefined;
-                if(selecting.startElement.type !== `number`) {
-                    thisClass.#tableElement.querySelectorAll(`input`)?.forEach(function(element) { element.parentElement.innerHTML = UITable.#formatElementForDisplay(element.parentElement.value); });
+                if(addSelectNumber) {
                     if(targetIsDataValue) {
                         selecting.startElement.classList.add(`selected`)
                         selecting.startElement.innerHTML = ``;
@@ -675,22 +684,27 @@ export default class UITable extends HTMLDivElement {
             document.removeEventListener(`mousemove`, mouseMoveEvent);
 
         }
-
         document.addEventListener(`mouseup`, up);
         document.addEventListener(`touchend`, up);
 
         function down(event) {
-            thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
+            addSelectNumber = false;
             const targetIsDataValue = event.target.dataset.x !== undefined || event.target.dataset.y !== undefined;
-            if(targetIsDataValue || event.target.parentElement.dataset.x !== undefined || event.target.parentElement.dataset.y !== undefined) {
-                selecting = { startElement: targetIsDataValue? event.target : event.target.parentElement };
+            const parentIsDataValue = event.target.parentElement.dataset.x !== undefined || event.target.parentElement.dataset.y !== undefined;
+            if(targetIsDataValue || parentIsDataValue) {
+                if(targetIsDataValue)
+                    thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
+                selecting = { startElement: targetIsDataValue? event.target : event.target.parentElement, selectOnMove: parentIsDataValue };
                 selecting.startX = parseInt(selecting.startElement.dataset.x);
                 selecting.startY = parseInt(selecting.startElement.dataset.y);
+                if(event.target.type !== `number`) {
+                    addSelectNumber = true;
+                    thisClass.#tableElement.querySelectorAll(`input`)?.forEach(function(element) { element.parentElement.innerHTML = UITable.#formatElementForDisplay(element.parentElement.value); });
+                }
             }
             document.addEventListener(`touchmove`, touchMoveEvent);
             document.addEventListener(`mousemove`, mouseMoveEvent);
         }
-
         this.#tableElement.addEventListener(`mousedown`, function(event) {
             if(event.button === 2) {
                 down(event);
