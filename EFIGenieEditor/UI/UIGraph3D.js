@@ -207,8 +207,8 @@ export default class UIGraph3D extends HTMLDivElement {
     }
     set #transformPrecalc(transformPrecalc) {
         this.#transformPrecalcPrivate = transformPrecalc;
-        const r = transformPrecalc.zoom/(5 * Math.max(this.xResolution, this.yResolution));
-        [...this.#valueElement.children].forEach(element => element.setAttribute(`r`, r));
+        const r = transformPrecalc.zoom/(7.5 * Math.max(this.xResolution, this.yResolution));
+        [...this.#valueElement.children].forEach(element => element.setAttribute(`r`, r.toFixed(10)));
     }
     #yaw;
     #pitch;
@@ -268,7 +268,7 @@ export default class UIGraph3D extends HTMLDivElement {
             cosPitchcosYaw: cosPitch*cosYaw,
             offsetX: width/2 - cameraX,
             offsetY: height/2 - cameraY,
-            zoom: 0.5*width*zoom
+            zoom: 0.7*width*zoom
         }
     }
     static transformPoint(point, transformPrecalc){
@@ -282,7 +282,7 @@ export default class UIGraph3D extends HTMLDivElement {
     #cellToPoint(x, y, value) {
         y = this.yResolution-y-1;
         let valueMax = this.#valueMax === this.#valueMin? this.#valueMin + 1 : this.#valueMax;
-        return UIGraph3D.transformPoint([x/this.xResolution-0.5, -(value/(valueMax-this.#valueMin)-0.5), y/this.yResolution-0.5], this.#transformPrecalc);
+        return UIGraph3D.transformPoint([x/(this.xResolution-1)-0.5, -(value/(valueMax-this.#valueMin)-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y/(this.yResolution-1)-0.5], this.#transformPrecalc);
     }
 
     #resolutionChanged() {
@@ -319,7 +319,7 @@ export default class UIGraph3D extends HTMLDivElement {
                 this.dataset.depth = depth;
                 thisClass.#valueElement.removeChild(this);
                 const valueElement = [...thisClass.#valueElement.children];
-                const after = valueElement.find(element => element.depth>depth)
+                const after = valueElement.find(element => element.depth<depth)
                 if(!after)
                     thisClass.#valueElement.append(this);
                 else
@@ -334,8 +334,8 @@ export default class UIGraph3D extends HTMLDivElement {
                     return;
                 this.dataset.p = dataP;
                 this.depth = p[2];
-                this.setAttribute(`cx`, p[0]);
-                this.setAttribute(`cy`, p[1]);
+                this.setAttribute(`cx`, p[0].toFixed(10));
+                this.setAttribute(`cy`, p[1].toFixed(10));
             }
         }
         let pathValueGetterSetter = {
@@ -351,7 +351,7 @@ export default class UIGraph3D extends HTMLDivElement {
                 this.dataset.depth = depth;
                 thisClass.#valuePathElement.removeChild(this);
                 const valuePathElements = [...thisClass.#valuePathElement.children];
-                const after = valuePathElements.find(element => element.depth>depth)
+                const after = valuePathElements.find(element => element.depth<depth)
                 if(!after)
                     thisClass.#valuePathElement.append(this);
                 else
@@ -427,7 +427,7 @@ export default class UIGraph3D extends HTMLDivElement {
             valueElement.x = i % this.xResolution;
             valueElement.y = Math.trunc(i/this.xResolution);
             if(this.#transformPrecalc)
-                valueElement.setAttribute(`r`, this.#transformPrecalc.width);
+                valueElement.setAttribute(`r`, this.#transformPrecalc.width.toFixed(10));
         }
     }
 
