@@ -70,8 +70,8 @@ export default class UISelection extends HTMLDivElement {
             
         this.#selectValue = selectValue;
         if(this.selectedOption === undefined) {
-            this.selectedElement.dataset.value = UISelection.ParseValue(`string`, selectValue)
-            this.selectedElement.dataset.type = typeof selectValue;
+            this.selectedElement.value = UISelection.ParseValue(`string`, selectValue)
+            this.selectedElement.type = typeof selectValue;
         }
         if(!this.selectNotVisible){
             setElementOption(this.#selectElement, { Name: this.selectName, Disabled: this.selectDisabled, Value: this.selectValue });
@@ -100,10 +100,10 @@ export default class UISelection extends HTMLDivElement {
         let selected = false;
         [...this.contextMenuElement.children].forEach(function(element) { 
             [...element.children].forEach(function(element) { 
-                if(element.dataset.value !== selectedElement.dataset.value) element.classList.remove(`selected`);
+                if(element.value !== selectedElement.value) element.classList.remove(`selected`);
                 else { element.classList.add(`selected`); selected = true;}
             });
-            if(element.dataset.value !== selectedElement.dataset.value) element.classList.remove(`selected`);
+            if(element.value !== selectedElement.value) element.classList.remove(`selected`);
             else { element.classList.add(`selected`); selected = true;}
         });
         if(!selected) this.#selectElement.classList.add(`selected`);
@@ -137,7 +137,7 @@ export default class UISelection extends HTMLDivElement {
     }
 
     get selectedOption() {
-        const stringValue = this.selectedElement.dataset.value;
+        const stringValue = this.selectedElement.value;
         let selectedOption = this.options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue || x.Options?.findIndex(x => UISelection.ParseValue(`string`, x.Value) === stringValue) > -1)
         if(selectedOption?.Group) 
             selectedOption = selectedOption.Options.find(x => UISelection.ParseValue(`string`, x.Value) === stringValue);
@@ -148,15 +148,15 @@ export default class UISelection extends HTMLDivElement {
     }
 
     get value() {
-        return UISelection.ParseValue(this.selectedElement.dataset.type, this.selectedElement.dataset.value);
+        return UISelection.ParseValue(this.selectedElement.type, this.selectedElement.value);
     }
     set value(value) {
         if(this.value === value)
             return;
 
         const selectedElement = this.selectedElement;
-        selectedElement.dataset.type = typeof value;
-        selectedElement.dataset.value = UISelection.ParseValue(`string`, value);
+        selectedElement.type = typeof value;
+        selectedElement.value = UISelection.ParseValue(`string`, value);
         this.#updateSelectElement();
         this.dispatchEvent(new Event(`change`));
     }
@@ -207,7 +207,7 @@ export default class UISelection extends HTMLDivElement {
             if(!event.target.classList.contains(`selectoption`))
                 return;
             
-            thisClass.value = UISelection.ParseValue(event.target.dataset.type, event.target.dataset.value);
+            thisClass.value = UISelection.ParseValue(event.target.type, event.target.value);
         })
     }
 }
@@ -215,8 +215,8 @@ export default class UISelection extends HTMLDivElement {
 function setElementOption(element, option) {
     element.removeAttribute("class")
     if(option.Group) {
-        delete element.dataset.type;
-        delete element.dataset.value;
+        delete element.type;
+        delete element.value;
         element.innerHTML = ``;
         let selectGroupElement = element.appendChild(document.createElement(`div`));
         selectGroupElement.classList.add(`selectgroup`);
@@ -229,8 +229,8 @@ function setElementOption(element, option) {
         element.classList.add(`selectoption`);
         if(option.Disabled)
             element.classList.add(`selectdisabled`)
-        element.dataset.type = typeof option.Value;
-        element.dataset.value =  UISelection.ParseValue(`string`, option.Value);
+        element.type = typeof option.Value;
+        element.value =  UISelection.ParseValue(`string`, option.Value);
         element.innerHTML = option.Name + (option.Info? ` ${option.Info}` : ``);
     }
 }

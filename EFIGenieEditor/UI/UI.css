@@ -378,3 +378,9 @@
     background-color: var(--background-hover-color); 
     border-color: var(--border-hover-color);
 }
+path {
+    fill: grey;
+}
+circle {
+    fill: green;
+}

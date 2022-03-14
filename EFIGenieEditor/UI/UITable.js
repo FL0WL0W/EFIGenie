@@ -98,14 +98,14 @@ export default class UITable extends HTMLDivElement {
         while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
         for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
             const xAxisElement = this.#xAxisElement.appendChild(document.createElement(`div`)); 
-            Object.defineProperty(xAxisElement, 'value', UITable.#numberValueGetterSetter);
+            Object.defineProperty(xAxisElement, 'value', UITable.#cellValueGetterSetter);
             const xAxisMinus1 = this.#xAxisElement.children[i-1]?.value;
             const xAxisMinus2 = this.#xAxisElement.children[i-2]?.value;
             let xAxisMinus0 = 0;
             if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined)
                 xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
             xAxisElement.value = xAxisMinus0;
-            xAxisElement.dataset.x = i;
+            xAxisElement.x = i;
         }
         this.#resolutionChanged();
         //interpolation
@@ -151,14 +151,14 @@ export default class UITable extends HTMLDivElement {
         while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
         for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
             const yAxisElement = this.#yAxisElement.appendChild(document.createElement(`div`)); 
-            Object.defineProperty(yAxisElement, 'value', UITable.#numberValueGetterSetter);
+            Object.defineProperty(yAxisElement, 'value', UITable.#cellValueGetterSetter);
             const yAxisMinus1 = this.#yAxisElement.children[i-1]?.value;
             const yAxisMinus2 = this.#yAxisElement.children[i-2]?.value;
             let yAxisMinus0 = 0;
             if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined)
                 yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
             yAxisElement.value = yAxisMinus0;
-            yAxisElement.dataset.y = i;
+            yAxisElement.y = i;
         }
         this.#resolutionChanged();
         //interpolation
@@ -314,19 +314,19 @@ export default class UITable extends HTMLDivElement {
         this.#pasteOptionsElement.append(this.#pasteMultiplyElement);
         this.#pasteOptionsElement.append(this.#pasteMultiplyPElement);
         this.#pasteOptionsElement.append(this.#pasteMultiplyP2Element);
-        this.#pasteEqualElement.class               = `paste-button equal selected`;
-        this.#pasteEqualElement.dataset.value       = `equal`;
-        this.#pasteAddElement.class                 = `paste-button add`;
-        this.#pasteAddElement.dataset.value         = `add`;
-        this.#pasteSubtractElement.class            = `paste-button subtract`;
-        this.#pasteSubtractElement.dataset.value    = `subtract`;
-        this.#pasteMultiplyElement.class            = `paste-button multiply`;
-        this.#pasteMultiplyElement.dataset.value    = `multiply`;
-        this.#pasteMultiplyPElement.class           = `paste-button multiplyp`;
-        this.#pasteMultiplyPElement.dataset.value   = `multiply%`;
-        this.#pasteMultiplyP2Element.class          = `paste-button multiplyp2`;
-        this.#pasteMultiplyP2Element.dataset.value  = `multiply%/2`;
-        this.#pasteMultiplyP2Element.innerHTML      = `<span><sup>%</sup>&frasl;<sub>2</sub></span>`;
+        this.#pasteEqualElement.class           = `paste-button equal selected`;
+        this.#pasteEqualElement.value           = `equal`;
+        this.#pasteAddElement.class             = `paste-button add`;
+        this.#pasteAddElement.value             = `add`;
+        this.#pasteSubtractElement.class        = `paste-button subtract`;
+        this.#pasteSubtractElement.value        = `subtract`;
+        this.#pasteMultiplyElement.class        = `paste-button multiply`;
+        this.#pasteMultiplyElement.value        = `multiply`;
+        this.#pasteMultiplyPElement.class       = `paste-button multiplyp`;
+        this.#pasteMultiplyPElement.value       = `multiply%`;
+        this.#pasteMultiplyP2Element.class      = `paste-button multiplyp2`;
+        this.#pasteMultiplyP2Element.value      = `multiply%/2`;
+        this.#pasteMultiplyP2Element.innerHTML  = `<span><sup>%</sup>&frasl;<sub>2</sub></span>`;
         //modify toolbar
         this.#rightToolbarElement.append(this.#modifyElement);
         this.#modifyElement.class = `modify container`;
@@ -396,17 +396,11 @@ export default class UITable extends HTMLDivElement {
         this.#constructModifyEventListeners();
         this.#constructInterpolateEventListeners();
     }
-    static #formatElementForDisplay(value, precision = 6) {
-        let formattedVaue = parseFloat(parseFloat(parseFloat(value).toFixed(precision -1)).toPrecision(precision));
-        if(isNaN(formattedVaue))
-            formattedVaue = `&nbsp;`;
-        return formattedVaue;
-    }
-    static #numberValueGetterSetter = {
-        get: function() { return parseFloat(this.querySelector(`input`)?.value ??  this.dataset.value); },
+    static #cellValueGetterSetter = {
+        get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
         set: function(value) { 
             value = parseFloat(value);
-            this.dataset.value = value; 
+            this.style.setProperty(`--data-value`, value);
             const inputElement = this.querySelector(`input`);
             if(inputElement) inputElement.value = value;
             else {
@@ -414,8 +408,13 @@ export default class UITable extends HTMLDivElement {
                 if(this.innerHTML !== innerHTML)
                     this.innerHTML = innerHTML;
             }
-            this.style.setProperty(`--data-value`, value); 
         }
+    }
+    static #formatElementForDisplay(value, precision = 6) {
+        let formattedVaue = parseFloat(parseFloat(parseFloat(value).toFixed(precision -1)).toPrecision(precision));
+        if(isNaN(formattedVaue))
+            formattedVaue = `&nbsp;`;
+        return formattedVaue;
     }
 
     trail(x, y = 0, z) {
@@ -541,10 +540,9 @@ export default class UITable extends HTMLDivElement {
         while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
-            Object.defineProperty(valueElement, 'value', UITable.#numberValueGetterSetter);
-            valueElement.dataset.x = i % this.xResolution;
-            valueElement.dataset.y = Math.trunc(i/this.xResolution);
-            valueElement.value = valueElement.value;
+            Object.defineProperty(valueElement, 'value', UITable.#cellValueGetterSetter);
+            valueElement.x = i % this.xResolution;
+            valueElement.y = Math.trunc(i/this.xResolution);
         }
         if(this.xResolution > 1) {
             if(this.yResolution > 1) {
@@ -614,8 +612,8 @@ export default class UITable extends HTMLDivElement {
         calculateMinMaxValue();
         this.#pasteOptionsElement.addEventListener(`click`, function(event) {
             let target = event.target;
-            for(let i=0; i < 2; i++) if(!target.dataset.value) target = target.parentElement;
-            if(target.dataset.value) {
+            for(let i=0; i < 2; i++) if(!target.value) target = target.parentElement;
+            if(target.value) {
                 thisClass.#pasteOptionsElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
                 target.classList.add(`selected`);
             }
@@ -629,9 +627,9 @@ export default class UITable extends HTMLDivElement {
         function valueInputChange(){
             if(!thisClass.#valueInputElement.parentElement)
                 return;
-            let x = parseInt(thisClass.#valueInputElement.parentElement.dataset.x);
-            let y = parseInt(thisClass.#valueInputElement.parentElement.dataset.y);
-            const oldVal = parseFloat(thisClass.#valueInputElement.parentElement.dataset.value);
+            let x = parseInt(thisClass.#valueInputElement.parentElement.x);
+            let y = parseInt(thisClass.#valueInputElement.parentElement.y);
+            const oldVal = parseFloat(thisClass.#valueInputElement.value);
             let value = parseFloat(thisClass.#valueInputElement.value);
             if(isNaN(value) || value === oldVal || (x==undefined && y==undefined))
                 return;
@@ -652,9 +650,9 @@ export default class UITable extends HTMLDivElement {
             // }
             element.querySelectorAll(`.selected`).forEach(function(selectedElement) {
                 if(operation === `increment`)
-                    selectedElement.value = parseFloat(selectedElement.dataset.value) + 1
+                    selectedElement.value = parseFloat(selectedElement.value) + 1
                 else if(operation === `decrement`)
-                    selectedElement.value = parseFloat(selectedElement.dataset.value) - 1;
+                    selectedElement.value = parseFloat(selectedElement.value) - 1;
                 else
                     selectedElement.value = value;
             });
@@ -668,7 +666,9 @@ export default class UITable extends HTMLDivElement {
 
             let currentY;
             thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) {
-                let y = parseInt(element.dataset.y ?? -1);
+                if(element.value === undefined)
+                    return;
+                let y = parseInt(element.y ?? -1);
                 if(currentY !== undefined) {
                     if(currentY !== y) {
                         copyData += `\n`;
@@ -688,8 +688,8 @@ export default class UITable extends HTMLDivElement {
             var val = event.clipboardData.getData(`text/plain`);
             const lines = val.split(`\n`).length;
             const cols = val.split(`\t`).length;
-            let x = parseInt(event.target.parentElement.dataset.x);
-            let y = parseInt(event.target.parentElement.dataset.y);
+            let x = parseInt(event.target.parentElement.x);
+            let y = parseInt(event.target.parentElement.y);
             let element = thisClass.#valueElement;
             if(isNaN(x)) {
                 if(cols > 1)
@@ -704,7 +704,7 @@ export default class UITable extends HTMLDivElement {
                 element = thisClass.#xAxisElement;
             }
 
-            let special = thisClass.#pasteOptionsElement.querySelector(`.selected`)?.dataset?.value;
+            let special = thisClass.#pasteOptionsElement.querySelector(`.selected`)?.value;
 
             element.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
             val.split(`\n`).forEach(function(val, yIndex) {
@@ -829,10 +829,10 @@ export default class UITable extends HTMLDivElement {
                 for(let i=0; i<elementArray.length; i++) {
                     let element = elementArray[i];
                     if( thisClass.selecting === undefined || 
-                        Math.min(thisClass.selecting.endX, thisClass.selecting.startX) > parseInt(element.dataset.x) ||
-                        Math.max(thisClass.selecting.endX, thisClass.selecting.startX) < parseInt(element.dataset.x) ||
-                        Math.min(thisClass.selecting.endY, thisClass.selecting.startY) > parseInt(element.dataset.y) ||
-                        Math.max(thisClass.selecting.endY, thisClass.selecting.startY) < parseInt(element.dataset.y)){
+                        Math.min(thisClass.selecting.endX, thisClass.selecting.startX) > parseInt(element.x) ||
+                        Math.max(thisClass.selecting.endX, thisClass.selecting.startX) < parseInt(element.x) ||
+                        Math.min(thisClass.selecting.endY, thisClass.selecting.startY) > parseInt(element.y) ||
+                        Math.max(thisClass.selecting.endY, thisClass.selecting.startY) < parseInt(element.y)){
                         element.classList.remove(`selected`);
                         continue;
                     }
@@ -846,7 +846,7 @@ export default class UITable extends HTMLDivElement {
             dragX = false;
             dragY = false;
             if(selecting) {
-                const targetIsDataValue = selecting.startElement.dataset.x !== undefined || selecting.startElement.dataset.y !== undefined;
+                const targetIsDataValue = selecting.startElement.x !== undefined || selecting.startElement.y !== undefined;
                 if(addSelectNumber) {
                     if(targetIsDataValue) {
                         selecting.startElement.classList.add(`selected`)
@@ -867,12 +867,12 @@ export default class UITable extends HTMLDivElement {
 
         function down(event) {
             addSelectNumber = false;
-            const targetIsDataValue = event.target.dataset.x !== undefined || event.target.dataset.y !== undefined;
-            const parentIsDataValue = event.target.parentElement.dataset.x !== undefined || event.target.parentElement.dataset.y !== undefined;
+            const targetIsDataValue = event.target.x !== undefined || event.target.y !== undefined;
+            const parentIsDataValue = event.target.parentElement.x !== undefined || event.target.parentElement.y !== undefined;
             if(targetIsDataValue || parentIsDataValue) {
                 selecting = { startElement: targetIsDataValue? event.target : event.target.parentElement, selectOnMove: parentIsDataValue };
-                selecting.startX = parseInt(selecting.startElement.dataset.x);
-                selecting.startY = parseInt(selecting.startElement.dataset.y);
+                selecting.startX = parseInt(selecting.startElement.x);
+                selecting.startY = parseInt(selecting.startElement.y);
                 if(targetIsDataValue) {
                     valueInputChange();
                     thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
@@ -982,9 +982,9 @@ export default class UITable extends HTMLDivElement {
                 return;
             
             let element = thisClass.#valueElement;
-            if(thisClass.#modifyValueElement.parentElement.dataset.x === undefined)
+            if(thisClass.#modifyValueElement.parentElement.x === undefined)
                 element = thisClass.#yAxisElement;
-            if(thisClass.#modifyValueElement.parentElement.dataset.y === undefined)
+            if(thisClass.#modifyValueElement.parentElement.y === undefined)
                 element = thisClass.#xAxisElement;
             element.querySelectorAll(`.selected`).forEach(function(selectedElement) {
                 switch(operation) {
@@ -1061,7 +1061,7 @@ export default class UITable extends HTMLDivElement {
             let xMin = 18000000000000000000;
             let xMax = -9000000000000000000;
             selectedElements.forEach(function(element) {
-                const x = parseInt(element.dataset.x);
+                const x = parseInt(element.x);
                 if(x < xMin)
                     xMin = x;
                 if(x > xMax)
@@ -1073,8 +1073,8 @@ export default class UITable extends HTMLDivElement {
                 const xResolution = thisClass.xResolution;
                 const tableValue = thisClass.value;
                 selectedElements.forEach(function(element) {
-                    const x = parseInt(element.dataset.x);
-                    const y = parseInt(element.dataset.y);
+                    const x = parseInt(element.x);
+                    const y = parseInt(element.y);
                     if(!isNaN(x) && !isNaN(y)) {
                         const xMinVal = tableValue[xMin + y * xResolution];
                         const xMaxVal = tableValue[xMax + y * xResolution];
@@ -1086,7 +1086,7 @@ export default class UITable extends HTMLDivElement {
             } else {
                 const xMag = xDiff / (xMax - xMin);
                 selectedElements.forEach(function(element) {
-                    const x = parseInt(element.dataset.x);
+                    const x = parseInt(element.x);
                     element.value = xAxis[xMin] + xMag * (x-xMin);
                 });
             }
@@ -1102,7 +1102,7 @@ export default class UITable extends HTMLDivElement {
             let yMin = 18000000000000000000;
             let yMax = -9000000000000000000;
             selectedElements.forEach(function(element) {
-                const y = parseInt(element.dataset.y);
+                const y = parseInt(element.y);
                 if(y < yMin)
                     yMin = y;
                 if(y > yMax)
@@ -1114,8 +1114,8 @@ export default class UITable extends HTMLDivElement {
                 const xResolution = thisClass.xResolution;
                 const tableValue = thisClass.value;
                 selectedElements.forEach(function(element) {
-                    const x = parseInt(element.dataset.x);
-                    const y = parseInt(element.dataset.y);
+                    const x = parseInt(element.x);
+                    const y = parseInt(element.y);
                     if(!isNaN(x) && !isNaN(y)) {
                         const yMinVal = tableValue[x + yMin * xResolution];
                         const yMaxVal = tableValue[x + yMax * xResolution];
@@ -1127,7 +1127,7 @@ export default class UITable extends HTMLDivElement {
             } else {
                 const yMag = yDiff / (yMax - yMin);
                 selectedElements.forEach(function(element) {
-                    const y = parseInt(element.dataset.y);
+                    const y = parseInt(element.y);
                     element.value = yAxis[yMin] + yMag * (y-yMin);
                 });
             }
@@ -1146,8 +1146,8 @@ export default class UITable extends HTMLDivElement {
             let yMin = 18000000000000000000;
             let yMax = -9000000000000000000;
             selectedElements.forEach(function(element) {
-                const x = parseInt(element.dataset.x);
-                const y = parseInt(element.dataset.y);
+                const x = parseInt(element.x);
+                const y = parseInt(element.y);
                 if(x < xMin)
                     xMin = x;
                 if(x > xMax)
@@ -1164,8 +1164,8 @@ export default class UITable extends HTMLDivElement {
             const xResolution = thisClass.xResolution;
             const tableValue = thisClass.value;
             selectedElements.forEach(function(element) {
-                const x = parseInt(element.dataset.x);
-                const y = parseInt(element.dataset.y);
+                const x = parseInt(element.x);
+                const y = parseInt(element.y);
                 if(y !== yMin && y !== yMax)
                     return
                 if(!isNaN(x) && !isNaN(y)) {
@@ -1177,8 +1177,8 @@ export default class UITable extends HTMLDivElement {
                 }
             });
             selectedElements.forEach(function(element) {
-                const x = parseInt(element.dataset.x);
-                const y = parseInt(element.dataset.y);
+                const x = parseInt(element.x);
+                const y = parseInt(element.y);
                 if(x !== xMin && x !== xMax)
                     return
                 if(!isNaN(x) && !isNaN(y)) {
@@ -1190,8 +1190,8 @@ export default class UITable extends HTMLDivElement {
                 }
             });
             selectedElements.forEach(function(element) {
-                const x = parseInt(element.dataset.x);
-                const y = parseInt(element.dataset.y);
+                const x = parseInt(element.x);
+                const y = parseInt(element.y);
                 if(!isNaN(x) && !isNaN(y)) {
                     const xMinVal = tableValue[xMin + y * xResolution];
                     const xMaxVal = tableValue[xMax + y * xResolution];

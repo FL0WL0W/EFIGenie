@@ -1,10 +1,8 @@
-export default class UIGraph3D extends SVGElement {
+export default class UIGraph3D extends HTMLDivElement {
     onChange = [];
-
-    #valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
-    #valuePathElement   = document.createElementNS('http://www.w3.org/2000/svg','g');
     get value() {
-        return [...this.#valueElement.children].map(x => x.value);
+        const thisClass = this;
+        return [...this.#valueElement.children].sort(function(a, b) {(a.x - b.x) + thisClass.xResolution * (a.y - b.y)}).map(x => x.value);
     }
     set value(value) {
         if(value === undefined)
@@ -12,91 +10,361 @@ export default class UIGraph3D extends SVGElement {
         if(value.length !== this.xResolution * this.yResolution)
             throw `Value length does not match table length. Set xResolution and yResolution before setting value`;
         let same = true;
-        for(let i = 0; i < this.#valueElement.children.length; i++){
-            if(this.#valueElement.children[i].value === value[i])
+        let prevValue = this.value;
+        for(let i = 0; i < prevValue.length; i++){
+            if(prevValue[i] === value[i])
                 continue;
             same = false;
             break;
         }
         if(same)
             return;
-        for(let i = 0; i < this.#valueElement.children.length; i++)
-            this.#valueElement.children[i].value = value[i];
+        const thisClass = this;
+        let childElements = [...this.#valueElement.children].sort(function(a, b) {(a.x - b.x) + thisClass.xResolution * (a.y - b.y)});
+        for(let i = 0; i < childElements.length; i++)
+            childElements[i].value = value[i];
+        this.dispatchEvent(new Event(`change`));
+    }
+    get saveValue() {
+        return {
+            Value: this.value,
+            XAxis: this.xAxis,
+            XResolution: this.xResolution,
+            YAxis: this.yAxis,
+            YResolution: this.yResolution,
+        };
+    }
+    set saveValue(saveValue) {
+        if(saveValue === undefined) 
+            return;
+
+        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
+            this.value = saveValue.Value;
+        if(saveValue.XResolution !== undefined)
+            this.xResolution = saveValue.XResolution;
+        if(saveValue.XAxis !== undefined)
+            this.xAxis = saveValue.XAxis;
+        if(saveValue.YResolution !== undefined)
+            this.yResolution = saveValue.YResolution;
+        if(saveValue.YAxis !== undefined)
+            this.yAxis = saveValue.YAxis;
+    }
+
+    //axis properties
+    get xResolution() {
+        return this.#xAxisElement.children.length;
+    }
+    set xResolution(xResolution) {
+        if(isNaN(xResolution) || xResolution === this.xResolution)
+            return;
+
+        while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
+        for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
+            const xAxisElement = this.#xAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
+            // Object.defineProperty(xAxisElement, 'value', UITable.#cellValueGetterSetter);
+            const xAxisMinus1 = this.#xAxisElement.children[i-1]?.value;
+            const xAxisMinus2 = this.#xAxisElement.children[i-2]?.value;
+            let xAxisMinus0 = 0;
+            if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined)
+                xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
+            xAxisElement.value = xAxisMinus0;
+            xAxisElement.x = i;
+        }
+        this.#resolutionChanged();
+        //interpolation
+        this.dispatchEvent(new Event(`change`));
+    }
+    get xAxis() {
+        return [...this.#xAxisElement.children].map(x => x.value);
+    }
+    set xAxis(xAxis) {
+        this.xResolution = xAxis.length;
+        const thisClass = this;
+        xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.value = xAxisValue; });
+        //interpolation
+        this.dispatchEvent(new Event(`change`));
+    }
+    get yResolution() {
+        return this.#yAxisElement.children.length;
+    }
+    set yResolution(yResolution) {
+        if(isNaN(yResolution) || yResolution === this.yResolution)
+            return;
+
+        while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
+        for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
+            const yAxisElement = this.#yAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
+            // Object.defineProperty(yAxisElement, 'value', UITable.#cellValueGetterSetter);
+            const yAxisMinus1 = this.#yAxisElement.children[i-1]?.value;
+            const yAxisMinus2 = this.#yAxisElement.children[i-2]?.value;
+            let yAxisMinus0 = 0;
+            if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined)
+                yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
+            yAxisElement.value = yAxisMinus0;
+            yAxisElement.y = i;
+        }
+        this.#resolutionChanged();
+        //interpolation
+        this.dispatchEvent(new Event(`change`));
+    }
+    get yAxis() {
+        return [...this.#yAxisElement.children].map(x => x.value);
+    }
+    set yAxis(yAxis) {
+        this.yResolution = yAxis.length;
+        const thisClass = this;
+        yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.value = yAxisValue; });
+        //interpolation
         this.dispatchEvent(new Event(`change`));
     }
 
-    get saveValue() {
-        return this.value;
+    get pitch() {
+        return this.#pitch;
     }
-    set saveValue(saveValue){
-        this.value = saveValue;
+    set pitch(pitch) {
+        pitch = parseFloat(pitch);
+        this.#pitch = pitch;
+        this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
+    get yaw() {
+        return this.#yaw;
+    }
+    set yaw(yaw) {
+        yaw = parseFloat(yaw);
+        this.#yaw = yaw;
+        this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
+    }
+    get width() {
+        return this.#svgElement.getAttribute(`width`) ?? this.offsetWidth;
+    }
+    set width(width) {
+        this.#svgElement.setAttribute(`width`, width);
+    }
+    get height() {
+        return this.#svgElement.getAttribute(`height`) ?? this.offsetHeight;
+    }
+    set height(height) {
+        this.#svgElement.setAttribute(`height`, height);
+    }
+
+    #xAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    #yAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    #valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    #valuePathElement   = document.createElementNS('http://www.w3.org/2000/svg','g');
+    #svgElement         = document.createElementNS('http://www.w3.org/2000/svg','svg');
+
+    #transformPrecalcPrivate;
+    get #transformPrecalc() {
+        return this.#transformPrecalcPrivate;
+    }
+    set #transformPrecalc(transformPrecalc) {
+        this.#transformPrecalcPrivate = transformPrecalc;
+        const r = transformPrecalc.zoom/(5 * Math.max(this.xResolution, this.yResolution));
+        [...this.#valueElement.children].forEach(element => element.setAttribute(`r`, r));
+    }
+    #yaw;
+    #pitch;
 
     constructor(prop) {
         super();
         this.class = `ui graph3d`;
+        this.append(this.#svgElement);
+        this.#svgElement.setAttribute(`overflow`, `visible`)
+        this.#svgElement.append(this.#valuePathElement);
+        this.#svgElement.append(this.#valueElement);
+        const propValue = prop.value;
+        delete prop.value;
+        Object.assign(this, prop);
+        if(prop?.pitch === undefined)
+            this.pitch = 17;
+        if(prop?.yaw === undefined)
+            this.yaw = 30;
+        this.value = propValue;
+        //delete onchange and migrate to addEventListener(`change`)
+        if(!Array.isArray(this.onChange))
+            this.onChange = [ this.onChange ];
+        const thisClass = this;
+        this.addEventListener(`change`, function() {
+            thisClass.onChange.forEach(function(onChange) { onChange(); });
+        });
+    }
+    static transformPrecalc({width = 0, height = 0, pitch = 0, yaw = 0, cameraX = 0, cameraY = 0, zoom = 1}) {
+        let cosPitch=Math.cos(pitch * (Math.PI / 180));
+        let sinPitch=Math.sin(pitch * (Math.PI / 180));
+        let cosYaw=Math.cos(yaw * (Math.PI / 180));
+        let sinYaw=Math.sin(yaw * (Math.PI / 180));
+        return {
+            cosPitch,
+            sinPitch,
+            cosYaw,
+            sinYaw,
+            sinPitchSinYaw: sinPitch*sinYaw,
+            nSinPitchCosYaw: -sinPitch*cosYaw,
+            nCosPitchSinYaw: -cosPitch*sinYaw,
+            cosPitchcosYaw: cosPitch*cosYaw,
+            offsetX: width/2 - cameraX,
+            offsetY: height/2 - cameraY,
+            zoom: 0.5*width*zoom
+        }
+    }
+    static transformPoint(point, transformPrecalc){
+        let x=(transformPrecalc.cosYaw*point[0]+transformPrecalc.sinYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetX;
+        let y=(transformPrecalc.sinPitchSinYaw*point[0]+transformPrecalc.cosPitch*point[1]+transformPrecalc.nSinPitchCosYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetY;
+        let depth=(transformPrecalc.nCosPitchSinYaw*point[0]+transformPrecalc.sinPitch*point[1]+transformPrecalc.cosPitchcosYaw*point[2])*transformPrecalc.zoom;
+        return [x,y,depth];
+    }
+    #cellToPoint(x, y, value) {
+        return UIGraph3D.transformPoint([x/this.xResolution-0.5, -value/8+0.5, -(this.yResolution-y-1)/this.yResolution+0.5], this.#transformPrecalc);
+    }
+
+    #resolutionChanged() {
+        const thisClass = this;
+        let circleValueGetterSetter = {
+            get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
+            set: function(value) { 
+                value = parseFloat(value);
+                if(this.value === value)
+                    return;
+                this.style.setProperty(`--data-value`, value); 
+                const valuePathElements = [...thisClass.#valuePathElement.children];
+                let vp1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
+                let vp2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
+                let vp3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
+                let vp4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
+                if(vp1) vp1.v1 = value;
+                if(vp2) vp2.v2 = value;
+                if(vp3) vp3.v3 = value;
+                if(vp4) vp4.v4 = value;
+                this.p = thisClass.#cellToPoint(this.x, this.y, value);
+            }
+        }
+        let circleDepthGetterSetter = {
+            get: function() { return parseFloat(this.dataset.depth); },
+            set: function(depth) { 
+                depth = parseFloat(depth);
+                if(this.depth === depth)
+                    return;
+                this.dataset.depth = depth;
+                thisClass.#valueElement.removeChild(this);
+                const valueElement = [...thisClass.#valueElement.children];
+                const after = valueElement.find(element => element.depth>depth)
+                if(!after)
+                    thisClass.#valueElement.append(this);
+                else
+                    thisClass.#valueElement.insertBefore(this, after);
+            }
+        }
+        let circlePGetterSetter = {
+            get: function() { return this.dataset.p? JSON.parse(this.dataset.p) : undefined; },
+            set: function(p) {
+                let dataP = JSON.stringify(p);
+                if(this.dataset.p === dataP)
+                    return;
+                this.dataset.p = dataP;
+                this.depth = p[2];
+                this.setAttribute(`cx`, p[0]);
+                this.setAttribute(`cy`, p[1]);
+            }
+        }
+        let pathValueGetterSetter = {
+            get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
+            set: function(value) { this.style.setProperty(`--data-value`, value); }
+        }
+        let pathDepthGetterSetter = {
+            get: function() { return parseFloat(this.dataset.depth); },
+            set: function(depth) { 
+                depth = parseFloat(depth);
+                if(this.depth === depth)
+                    return;
+                this.dataset.depth = depth;
+                thisClass.#valuePathElement.removeChild(this);
+                const valuePathElements = [...thisClass.#valuePathElement.children];
+                const after = valuePathElements.find(element => element.depth>depth)
+                if(!after)
+                    thisClass.#valuePathElement.append(this);
+                else
+                    thisClass.#valuePathElement.insertBefore(this, after);
+            }
+        }
+        function pathPSetter() {
+            if(!this.p1 || !this.p2 || !this.p3 || !this.p4)
+                return;
+            this.depth = (parseFloat(this.p1[2]) + parseFloat(this.p2[2]) + parseFloat(this.p3[2]) + parseFloat(this.p4[2]))/4;
+            this.setAttribute(`d`, 
+                            `M${this.p1[0].toFixed(10)},${this.p1[1].toFixed(10)}`+
+                            `L${this.p2[0].toFixed(10)},${this.p2[1].toFixed(10)}`+
+                            `L${this.p3[0].toFixed(10)},${this.p3[1].toFixed(10)}`+
+                            `L${this.p4[0].toFixed(10)},${this.p4[1].toFixed(10)}Z`)
+        }
+        function getPathPGetterSetter(index) {
+            let pi = `p${index}`;
+            return {
+                get: function() { return this.dataset[pi]? JSON.parse(this.dataset[pi]) : undefined; },
+                set: function(p) { 
+                    let dataP = JSON.stringify(p);
+                    if(this.dataset[pi] === dataP)
+                        return;
+                    this.dataset[pi] = dataP;
+                    pathPSetter.call(this);
+                }
+            }
+        }
+        function getPathVGetterSetter(index) {
+            let xi = `x${index}`;
+            let yi = `y${index}`;
+            let vi = `v${index}`;
+            let pi = `p${index}`;
+            return {
+                get: function() { return parseFloat(this.dataset[vi]); },
+                set: function(v) { 
+                    v = parseFloat(v);
+                    if(this[vi] === v)
+                        return;
+                    this.dataset[vi] = v;
+                    this[pi] = thisClass.#cellToPoint(this[xi], this[yi], v);
+                    this.value = (parseFloat(this.v1) + parseFloat(this.v2) + parseFloat(this.v3) + parseFloat(this.v4))/4;
+                }
+            }
+        }
+        this.style.setProperty('--xresolution', this.xResolution);
+        this.style.setProperty('--yresolution', this.yResolution);
+        // while((this.xResolution-1) * (this.yResolution-1) < this.#valuePathElement.children.length) { this.#valuePathElement.removeChild(this.#valuePathElement.children[(this.xResolution-1) * (this.yResolution-1)]); }
+        for(let i = 0; i < (this.xResolution-1) * (this.yResolution-1); i++) { 
+            const valuepathElement = this.#valuePathElement.children[i] ?? this.#valuePathElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','path'));
+            Object.defineProperty(valuepathElement, 'value', pathValueGetterSetter);
+            Object.defineProperty(valuepathElement, 'v1', getPathVGetterSetter(1));
+            Object.defineProperty(valuepathElement, 'v2', getPathVGetterSetter(2));
+            Object.defineProperty(valuepathElement, 'v3', getPathVGetterSetter(3));
+            Object.defineProperty(valuepathElement, 'v4', getPathVGetterSetter(4));
+            Object.defineProperty(valuepathElement, 'p1', getPathPGetterSetter(1));
+            Object.defineProperty(valuepathElement, 'p2', getPathPGetterSetter(2));
+            Object.defineProperty(valuepathElement, 'p3', getPathPGetterSetter(3));
+            Object.defineProperty(valuepathElement, 'p4', getPathPGetterSetter(4));
+            Object.defineProperty(valuepathElement, 'depth', pathDepthGetterSetter);
+            valuepathElement.x1 = valuepathElement.x4 = i % (this.xResolution-1);
+            valuepathElement.y1 = valuepathElement.y2 = Math.trunc(i/(this.xResolution-1));
+            valuepathElement.x2 = valuepathElement.x3 = valuepathElement.x1 + 1;
+            valuepathElement.y3 = valuepathElement.y4 = valuepathElement.y1 + 1;
+        }
+        while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
+        for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
+            const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
+            Object.defineProperty(valueElement, 'value', circleValueGetterSetter);
+            Object.defineProperty(valueElement, 'p', circlePGetterSetter);
+            Object.defineProperty(valueElement, 'depth', circleDepthGetterSetter);
+            valueElement.x = i % this.xResolution;
+            valueElement.y = Math.trunc(i/this.xResolution);
+            if(this.#transformPrecalc)
+                valueElement.setAttribute(`r`, this.#transformPrecalc.width);
+        }
     }
 }
-customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `svg` });
+customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
 
 //svg stuff
 //     _table3DDisplayWidth=800; 
 //     _table3DDisplayHeight=450;
 //     _table3DZoom=1;
-  
-//     _table3DtransformPrecalc=[];
-//     _table3DOffsetX = 0;
-//     _table3DOffsetY = 0
-//     _table3DPitch = 0;
-//     get Table3DPitch() {
-//       return this._table3DPitch
-//     }
-//     set Table3DPitch(pitch) {
-//       if(pitch === this._table3DPitch)
-//         return;
-//       this._table3DPitch = pitch;
-//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
-//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
-//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
-//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
-//       this._table3DtransformPrecalc[0]=cosB;
-//       this._table3DtransformPrecalc[1]=0;
-//       this._table3DtransformPrecalc[2]=sinB;
-//       this._table3DtransformPrecalc[3]=sinA*sinB;
-//       this._table3DtransformPrecalc[4]=cosA;
-//       this._table3DtransformPrecalc[5]=-sinA*cosB;
-//       this._table3DtransformPrecalc[6]=-sinB*cosA;
-//       this._table3DtransformPrecalc[7]=sinA;
-//       this._table3DtransformPrecalc[8]=cosA*cosB;
-//     }
-//     _table3DYaw = 0;
-//     get Table3DYaw() {
-//       return this._table3DYaw
-//     }
-//     set Table3DYaw(yaw) {
-//       if(yaw === this._table3DYaw)
-//         return;
-//       this._table3DYaw = yaw;
-//       var cosA=Math.cos(this._table3DPitch * (Math.PI / 180));
-//       var sinA=Math.sin(this._table3DPitch * (Math.PI / 180));
-//       var cosB=Math.cos(this._table3DYaw * (Math.PI / 180));
-//       var sinB=Math.sin(this._table3DYaw * (Math.PI / 180));
-//       this._table3DtransformPrecalc[0]=cosB;
-//       this._table3DtransformPrecalc[1]=0;
-//       this._table3DtransformPrecalc[2]=sinB;
-//       this._table3DtransformPrecalc[3]=sinA*sinB;
-//       this._table3DtransformPrecalc[4]=cosA;
-//       this._table3DtransformPrecalc[5]=-sinA*cosB;
-//       this._table3DtransformPrecalc[6]=-sinB*cosA;
-//       this._table3DtransformPrecalc[7]=sinA;
-//       this._table3DtransformPrecalc[8]=cosA*cosB;
-//     }
-//     _transformPoint(point){
-//         let x=this._table3DtransformPrecalc[0]*point[0]+this._table3DtransformPrecalc[1]*point[1]+this._table3DtransformPrecalc[2]*point[2];
-//         let y=this._table3DtransformPrecalc[3]*point[0]+this._table3DtransformPrecalc[4]*point[1]+this._table3DtransformPrecalc[5]*point[2];
-//         let z=this._table3DtransformPrecalc[6]*point[0]+this._table3DtransformPrecalc[7]*point[1]+this._table3DtransformPrecalc[8]*point[2];
-//         return [x,y,z];
-//     };
 
 
 //     GetSvgHtml(){
