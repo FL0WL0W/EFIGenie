@@ -396,6 +396,27 @@ export default class UITable extends HTMLDivElement {
         this.#constructModifyEventListeners();
         this.#constructInterpolateEventListeners();
     }
+    static #formatElementForDisplay(value, precision = 6) {
+        let formattedVaue = parseFloat(parseFloat(parseFloat(value).toFixed(precision -1)).toPrecision(precision));
+        if(isNaN(formattedVaue))
+            formattedVaue = `&nbsp;`;
+        return formattedVaue;
+    }
+    static #numberValueGetterSetter = {
+        get: function() { return parseFloat(this.querySelector(`input`)?.value ??  this.dataset.value); },
+        set: function(value) { 
+            value = parseFloat(value);
+            this.dataset.value = value; 
+            const inputElement = this.querySelector(`input`);
+            if(inputElement) inputElement.value = value;
+            else {
+                const innerHTML = UITable.#formatElementForDisplay(value);
+                if(this.innerHTML !== innerHTML)
+                    this.innerHTML = innerHTML;
+            }
+            this.style.setProperty(`--data-value`, value); 
+        }
+    }
 
     trail(x, y = 0, z) {
         const xAxis = this.xAxis;
@@ -501,27 +522,6 @@ export default class UITable extends HTMLDivElement {
         valueTd.append(this.#valueElement);
     }
 
-    static #formatElementForDisplay(value, precision = 6) {
-        let formattedVaue = parseFloat(parseFloat(parseFloat(value).toFixed(precision -1)).toPrecision(precision));
-        if(isNaN(formattedVaue))
-            formattedVaue = `&nbsp;`;
-        return formattedVaue;
-    }
-    static #numberValueGetterSetter = {
-        get: function() { return parseFloat(this.querySelector(`input`)?.value ??  this.dataset.value); },
-        set: function(value) { 
-            value = parseFloat(value);
-            this.dataset.value = value; 
-            const inputElement = this.querySelector(`input`);
-            if(inputElement) inputElement.value = value;
-            else {
-                const innerHTML = UITable.#formatElementForDisplay(value);
-                if(this.innerHTML !== innerHTML)
-                    this.innerHTML = innerHTML;
-            }
-            this.style.setProperty(`--data-value`, value); 
-        }
-    }
     get #valueMin() {
         return this.style.getPropertyValue('--valuemin') ?? 18000000000000000000;
     }
