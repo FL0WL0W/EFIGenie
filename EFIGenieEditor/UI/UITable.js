@@ -108,8 +108,8 @@ export default class UITable extends HTMLDivElement {
                 } else {
                     newValue[newValuesIndex] = oldValue[oldValuesIndex];
                 }
-                if(isNaN(newValue[valuesIndex]))
-                    newValue[valuesIndex] = 0;
+                if(isNaN(newValue[newValuesIndex]))
+                    newValue[newValuesIndex] = 0;
             }
         }
         this.#xResolutionElement.value = xResolution;
