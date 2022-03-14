@@ -20,6 +20,8 @@ export default class UIGraph3D extends HTMLDivElement {
         if(same)
             return;
 
+        this.#valueMin = 18000000000000000000;
+        this.#valueMax = -9000000000000000000;
         for(let i = 0; i < value.length; i++) {
             if(value[i] < this.#valueMin)
                 this.#valueMin = value[i];
@@ -67,6 +69,25 @@ export default class UIGraph3D extends HTMLDivElement {
         if(isNaN(xResolution) || xResolution === this.xResolution)
             return;
 
+        const oldValue = this.value;
+        let newValue = new Array(xResolution * this.yResolution);
+        for(let x=0; x<xResolution; x++){
+            for(let y=0; y<this.yResolution; y++){
+                let oldValuesIndex = x + this.xResolution * y;
+                let newValuesIndex = x + xResolution * y;
+                if(x >= this.xResolution){
+                    let newValuesIndexMinus1 = (x-1) + xResolution * y;
+                    let newValuesIndexMinus2 = (x-2) + xResolution * y;
+                    if(x>1){
+                        newValue[newValuesIndex] = newValue[newValuesIndexMinus1] + (newValue[newValuesIndexMinus1] - newValue[newValuesIndexMinus2]);
+                    }
+                } else {
+                    newValue[newValuesIndex] = oldValue[oldValuesIndex];
+                }
+                if(isNaN(newValue[valuesIndex]))
+                    newValue[valuesIndex] = 0;
+            }
+        }
         while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
         for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
             const xAxisElement = this.#xAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
@@ -80,7 +101,7 @@ export default class UIGraph3D extends HTMLDivElement {
             xAxisElement.x = i;
         }
         this.#resolutionChanged();
-        //interpolation
+        this.value = newValue;
         this.dispatchEvent(new Event(`change`));
     }
     get xAxis() {
@@ -100,6 +121,24 @@ export default class UIGraph3D extends HTMLDivElement {
         if(isNaN(yResolution) || yResolution === this.yResolution)
             return;
 
+        const oldValue = this.value;
+        let newValue = new Array(this.xResolution * yResolution);
+        for(let x=0; x<this.xResolution; x++){
+            for(let y=0; y<yResolution; y++){
+                let valuesIndex = x + this.xResolution * y;
+                if(y >= this.yResolution){
+                    let valuesIndexMinus1 = x + this.xResolution * (y-1);
+                    let valuesIndexMinus2 = x + this.xResolution * (y-2);
+                    if(y>1){
+                        newValue[valuesIndex] = newValue[valuesIndexMinus1] + (newValue[valuesIndexMinus1] - newValue[valuesIndexMinus2]);
+                    }
+                } else {
+                    newValue[valuesIndex] = oldValue[valuesIndex];
+                }
+                if(isNaN(newValue[valuesIndex]))
+                    newValue[valuesIndex] = 0;
+            }
+        }
         while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
         for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
             const yAxisElement = this.#yAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
@@ -113,7 +152,7 @@ export default class UIGraph3D extends HTMLDivElement {
             yAxisElement.y = i;
         }
         this.#resolutionChanged();
-        //interpolation
+        this.value = newValue;
         this.dispatchEvent(new Event(`change`));
     }
     get yAxis() {
@@ -199,11 +238,11 @@ export default class UIGraph3D extends HTMLDivElement {
         const propValue = prop.value;
         delete prop.value;
         Object.assign(this, prop);
+        this.#createEventListeners();
         if(prop?.pitch === undefined)
             this.pitch = 17;
         if(prop?.yaw === undefined)
             this.yaw = 30;
-        this.#createEventListeners();
         this.value = propValue;
         //delete onchange and migrate to addEventListener(`change`)
         if(!Array.isArray(this.onChange))
@@ -213,7 +252,7 @@ export default class UIGraph3D extends HTMLDivElement {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
-    static transformPrecalc({width = 0, height = 0, pitch = 0, yaw = 0, cameraX = 0, cameraY = 0, zoom = 1}) {
+    static transformPrecalc({width = 0, height = 0, pitch = 0, yaw = 0, cameraX = 0, cameraY = 0, zoom = 1} = {}) {
         let cosPitch=Math.cos(pitch * (Math.PI / 180));
         let sinPitch=Math.sin(pitch * (Math.PI / 180));
         let cosYaw=Math.cos(yaw * (Math.PI / 180));
@@ -233,6 +272,8 @@ export default class UIGraph3D extends HTMLDivElement {
         }
     }
     static transformPoint(point, transformPrecalc){
+        if(!transformPrecalc)
+            transformPrecalc = UIGraph3D.transformPrecalc();
         let x=(transformPrecalc.cosYaw*point[0]+transformPrecalc.sinYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetX;
         let y=(transformPrecalc.sinPitchSinYaw*point[0]+transformPrecalc.cosPitch*point[1]+transformPrecalc.nSinPitchCosYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetY;
         let depth=(transformPrecalc.nCosPitchSinYaw*point[0]+transformPrecalc.sinPitch*point[1]+transformPrecalc.cosPitchcosYaw*point[2])*transformPrecalc.zoom;
@@ -393,6 +434,8 @@ export default class UIGraph3D extends HTMLDivElement {
     #createEventListeners() {
         const thisClass = this;
         function calculateMinMaxValue() {
+            thisClass.#valueMin = 18000000000000000000;
+            thisClass.#valueMax = -9000000000000000000;
             const arrayValue = thisClass.value;
             for(let i = 0; i < arrayValue.length; i++) {
                 let value = arrayValue[i];
