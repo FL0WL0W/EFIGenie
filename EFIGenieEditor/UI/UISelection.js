@@ -182,12 +182,12 @@ export default class UISelection extends HTMLDivElement {
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         const thisClass = this;
-        this.addEventListener(`change`, function(event) {
+        this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
 
         let visible = false;
-        this.selectedElement.addEventListener(`click`, function(event) {
+        this.selectedElement.addEventListener(`click`, function() {
             if(visible) 
                 return;
 

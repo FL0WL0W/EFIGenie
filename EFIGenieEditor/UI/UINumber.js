@@ -28,7 +28,7 @@ export default class UINumber extends HTMLInputElement {
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         const thisClass = this;
-        this.addEventListener(`change`, function(event) {
+        this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
