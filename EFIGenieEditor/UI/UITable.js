@@ -520,18 +520,20 @@ export default class UITable extends HTMLDivElement {
         valueTd.append(this.#trailElement);
         valueTd.append(this.#valueElement);
     }
-
+    
     get #valueMin() {
-        return this.style.getPropertyValue('--valuemin') ?? 18000000000000000000;
+        let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
+        return isNaN(valuemin)? 18000000000000000000 : valuemin;
     }
     set #valueMin(valueMin) {
         this.style.setProperty('--valuemin', valueMin);
     }
     get #valueMax() {
-        return this.style.getPropertyValue('--valuemax') ?? -9000000000000000000;
+        let valuemax = parseFloat(this.style.getPropertyValue('--valuemax'));
+        return isNaN(valuemax)? -9000000000000000000 : valuemax;
     }
-    set #valueMax(valueMin) {
-        this.style.setProperty('--valuemax', valueMin);
+    set #valueMax(valueMax) {
+        this.style.setProperty('--valuemax', valueMax);
     }
 
     #resolutionChanged() {
@@ -595,8 +597,6 @@ export default class UITable extends HTMLDivElement {
     #constructTableEventListeners() {
         const thisClass = this;
         function calculateMinMaxValue() {
-            thisClass.#valueMin = 10000000000;
-            thisClass.#valueMax = -10000000000;
             const arrayValue = thisClass.value;
             for(let i = 0; i < arrayValue.length; i++) {
                 let value = arrayValue[i];

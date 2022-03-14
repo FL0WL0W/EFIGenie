@@ -19,6 +19,15 @@ export default class UIGraph3D extends HTMLDivElement {
         }
         if(same)
             return;
+
+        for(let i = 0; i < value.length; i++) {
+            if(value[i] < this.#valueMin)
+                this.#valueMin = value[i];
+            if(value[i] > this.#valueMax)
+                this.#valueMax = value[i];
+        }
+        if(this.#valueMax === this.#valueMin)
+            this.#valueMax = this.#valueMin + 1;
         const thisClass = this;
         let childElements = [...this.#valueElement.children].sort(function(a, b) {(a.x - b.x) + thisClass.xResolution * (a.y - b.y)});
         for(let i = 0; i < childElements.length; i++)
@@ -164,6 +173,21 @@ export default class UIGraph3D extends HTMLDivElement {
     }
     #yaw;
     #pitch;
+    
+    get #valueMin() {
+        let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
+        return isNaN(valuemin)? 18000000000000000000 : valuemin;
+    }
+    set #valueMin(valueMin) {
+        this.style.setProperty('--valuemin', valueMin);
+    }
+    get #valueMax() {
+        let valuemax = parseFloat(this.style.getPropertyValue('--valuemax'));
+        return isNaN(valuemax)? -9000000000000000000 : valuemax;
+    }
+    set #valueMax(valueMax) {
+        this.style.setProperty('--valuemax', valueMax);
+    }
 
     constructor(prop) {
         super();
@@ -179,6 +203,7 @@ export default class UIGraph3D extends HTMLDivElement {
             this.pitch = 17;
         if(prop?.yaw === undefined)
             this.yaw = 30;
+        this.#createEventListeners();
         this.value = propValue;
         //delete onchange and migrate to addEventListener(`change`)
         if(!Array.isArray(this.onChange))
@@ -214,7 +239,9 @@ export default class UIGraph3D extends HTMLDivElement {
         return [x,y,depth];
     }
     #cellToPoint(x, y, value) {
-        return UIGraph3D.transformPoint([x/this.xResolution-0.5, -value/8+0.5, -(this.yResolution-y-1)/this.yResolution+0.5], this.#transformPrecalc);
+        y = this.yResolution-y-1;
+        let valueMax = this.#valueMax === this.#valueMin? this.#valueMin + 1 : this.#valueMax;
+        return UIGraph3D.transformPoint([x/this.xResolution-0.5, -(value/(valueMax-this.#valueMin)-0.5), y/this.yResolution-0.5], this.#transformPrecalc);
     }
 
     #resolutionChanged() {
@@ -225,6 +252,10 @@ export default class UIGraph3D extends HTMLDivElement {
                 value = parseFloat(value);
                 if(this.value === value)
                     return;
+                if(value < thisClass.#valueMin)
+                    thisClass.#valueMin = value;
+                if(value > thisClass.#valueMax)
+                    thisClass.#valueMax = value;
                 this.style.setProperty(`--data-value`, value); 
                 const valuePathElements = [...thisClass.#valuePathElement.children];
                 let vp1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
@@ -357,6 +388,24 @@ export default class UIGraph3D extends HTMLDivElement {
             if(this.#transformPrecalc)
                 valueElement.setAttribute(`r`, this.#transformPrecalc.width);
         }
+    }
+
+    #createEventListeners() {
+        const thisClass = this;
+        function calculateMinMaxValue() {
+            const arrayValue = thisClass.value;
+            for(let i = 0; i < arrayValue.length; i++) {
+                let value = arrayValue[i];
+                if(value < thisClass.#valueMin)
+                    thisClass.#valueMin = value;
+                if(value > thisClass.#valueMax)
+                    thisClass.#valueMax = value;
+            }
+            if(thisClass.#valueMax === thisClass.#valueMin)
+                thisClass.#valueMax = thisClass.#valueMin + 1;
+        }
+        this.addEventListener(`change`, calculateMinMaxValue);
+        calculateMinMaxValue();
     }
 }
 customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });

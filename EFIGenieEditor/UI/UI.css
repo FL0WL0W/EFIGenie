@@ -378,9 +378,9 @@
     background-color: var(--background-hover-color); 
     border-color: var(--border-hover-color);
 }
-path {
-    fill: grey;
+.ui.graph3d path {
+    fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
 }
-circle {
-    fill: green;
+.ui.graph3d circle {
+    fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
 }
