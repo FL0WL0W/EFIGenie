@@ -167,24 +167,74 @@ export default class UIGraph3D extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
 
+    get selecting() {
+        return this.#selecting;
+    }
+    set selecting(selecting) {
+        if(JSON.stringify(this.#selecting) === JSON.stringify(selecting))
+            return;
+        this.#selecting = selecting;
+        this.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        // this.#xAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        // this.#yAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        if(selecting) {
+            let elementArray = this.#valueElement.children;
+            // if(isNaN(this.selecting.startX))
+            //     elementArray = this.#yAxisElement.children;
+            // if(isNaN(this.selecting.startY))
+            //     elementArray = this.#xAxisElement.children;
+            for(let i=0; i<elementArray.length; i++) {
+                let element = elementArray[i];
+                if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x) ||
+                    Math.max(selecting.endX, selecting.startX) < parseInt(element.x) ||
+                    Math.min(selecting.endY, selecting.startY) > parseInt(element.y) ||
+                    Math.max(selecting.endY, selecting.startY) < parseInt(element.y)){
+                    continue;
+                }
+                element.classList.add(`selected`); 
+            };
+        }
+        this.dispatchEvent(new Event(`select`))
+    }
+
     get pitch() {
-        return this.#pitch;
+        return this.#pitch ?? 0;
     }
     set pitch(pitch) {
-        pitch = parseFloat(pitch);
-        if(this.#pitch === pitch)
+        pitch = Math.max(-90,Math.min(90,parseFloat(pitch)));
+        if(this.pitch === pitch)
             return;
         this.#pitch = pitch;
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
     get yaw() {
-        return this.#yaw;
+        return this.#yaw ?? 0;
     }
     set yaw(yaw) {
         yaw = parseFloat(yaw);
-        if(this.#yaw === yaw)
+        if(this.yaw === yaw)
             return;
         this.#yaw = yaw;
+        this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
+    }
+    get cameraX() {
+        return this.#cameraX ?? 0;
+    }
+    set cameraX(cameraX) {
+        cameraX = parseFloat(cameraX);
+        if(this.cameraX === cameraX)
+            return;
+        this.#cameraX = cameraX;
+        this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
+    }
+    get cameraY() {
+        return this.#cameraY ?? 0;
+    }
+    set cameraY(cameraY) {
+        cameraY = parseFloat(cameraY);
+        if(this.cameraY === cameraY)
+            return;
+        this.#cameraY = cameraY;
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
     get zoom() {
@@ -192,7 +242,7 @@ export default class UIGraph3D extends HTMLDivElement {
     }
     set zoom(zoom) {
         zoom = parseFloat(zoom);
-        if(this.#zoom === zoom)
+        if(this.zoom === zoom)
             return;
         this.#zoom = zoom;
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
@@ -215,6 +265,7 @@ export default class UIGraph3D extends HTMLDivElement {
     #valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
     #valuePathElement   = document.createElementNS('http://www.w3.org/2000/svg','g');
     #svgElement         = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    #selecting;
 
     #transformPrecalcPrivate;
     get #transformPrecalc() {
@@ -231,6 +282,8 @@ export default class UIGraph3D extends HTMLDivElement {
     #yaw;
     #pitch;
     #zoom;
+    #cameraX;
+    #cameraY;
     
     get #valueMin() {
         let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
@@ -308,15 +361,6 @@ export default class UIGraph3D extends HTMLDivElement {
         const thisClass = this;
         function circleUpdater() {
             let p = this.p = thisClass.#cellToPoint(this.x, this.y, this.value);
-            const valuePathElements = [...thisClass.#valuePathElement.children];
-            let p1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
-            let p2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
-            let p3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
-            let p4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
-            if(p1) p1.p1 = p;
-            if(p2) p2.p2 = p;
-            if(p3) p3.p3 = p;
-            if(p4) p4.p4 = p;
         }
         let circleValueGetterSetter = {
             get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
@@ -366,6 +410,15 @@ export default class UIGraph3D extends HTMLDivElement {
                 this.depth = p[2];
                 this.setAttribute(`cx`, p[0].toFixed(10));
                 this.setAttribute(`cy`, p[1].toFixed(10));
+                const valuePathElements = [...thisClass.#valuePathElement.children];
+                let p1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
+                let p2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
+                let p3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
+                let p4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
+                if(p1) p1.p1 = p;
+                if(p2) p2.p2 = p;
+                if(p3) p3.p3 = p;
+                if(p4) p4.p4 = p;
             }
         }
         let pathValueGetterSetter = {
@@ -411,10 +464,7 @@ export default class UIGraph3D extends HTMLDivElement {
             }
         }
         function getPathVGetterSetter(index) {
-            let xi = `x${index}`;
-            let yi = `y${index}`;
             let vi = `v${index}`;
-            let pi = `p${index}`;
             return {
                 get: function() { return parseFloat(this.dataset[vi]); },
                 set: function(v) { 
@@ -422,7 +472,6 @@ export default class UIGraph3D extends HTMLDivElement {
                     if(this[vi] === v)
                         return;
                     this.dataset[vi] = v;
-                    this[pi] = thisClass.#cellToPoint(this[xi], this[yi], v);
                     this.value = (parseFloat(this.v1) + parseFloat(this.v2) + parseFloat(this.v3) + parseFloat(this.v4))/4;
                 }
             }
@@ -480,17 +529,154 @@ export default class UIGraph3D extends HTMLDivElement {
         }
         this.addEventListener(`change`, calculateMinMaxValue);
         calculateMinMaxValue();
-        this.#svgElement.addEventListener('wheel', function(e){
-            if(e.wheelDelta /120 > 0) {
+        this.#svgElement.addEventListener('wheel', function(event){
+            if(event.wheelDelta /120 > 0) {
                 thisClass.zoom *= 1.1;
             }
             else{
                 thisClass.zoom *= 0.9;
             }
-            e.preventDefault();
-            e.stopPropagation()
+            event.preventDefault();
+            event.stopPropagation()
             return false;
         }, {passive: false});
+        this.#svgElement.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
+        this.#svgElement.addEventListener('mousedown', function(event){
+            var relX = event.pageX - thisClass.offsetLeft;
+            var relY = event.pageY - thisClass.offsetTop;
+            let circles = [...thisClass.#valueElement.children].reverse();;
+            let closestCircle = undefined;
+            let rotate;
+            let move;
+            let dragValue;
+            circles.forEach(function(element, index) {
+                let l = element.p[0] - relX;
+                let w = element.p[1] - relY;
+                element.dist = Math.sqrt(l*l+w*w);
+                if(closestCircle === undefined || element.dist < closestCircle.dist)
+                    closestCircle = element;
+            });
+            if(closestCircle && event.button === 0) {
+                let x = closestCircle.x;
+                let y = closestCircle.y;
+                thisClass.selecting = {
+                    startX: x,
+                    startY: y,
+                    endX: x,
+                    endY: y
+                }
+                // let index = x + thisClass._xResolution * y;
+                // dragValue=[
+                //     event.pageY,
+                //     x,
+                //     y,
+                //     thisClass._value[index],
+                //     (thisClass._valueMax - thisClass._valueMin) / (thisClass._table3DDisplayHeight-thisClass._padding2D*2-thisClass._valueOffset2D), 
+                //     `#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`, 
+                //     event.pageX,
+                //     (axis[axis.length - 1] - axis[0]) / (thisClass._table3DDisplayWidth-thisClass._padding2D*2-thisClass._axisOffset2D), 
+                //     axis[index],
+                //     thisClass._xResolution < 2 || thisClass._yResolution < 2? `#${thisClass.GUID}-table .number${thisClass.XAxis === axis? `[data-x='${x}'][data-y='-1']` : `[data-x='-1'][data-y='${y}']`}` : undefined];
+                // $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`);
+                // $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
+                // $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
+                //     cell=$(cell);
+                //     cell.removeClass(`selected`);
+                //     cell.removeClass(`origselect`);
+                //     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
+                // });
+                // $(`#${thisClass.GUID}-table .number`).removeClass(`selected`).removeClass(`origselect`);
+                // var cell = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
+                // cell.addClass(`selected`).addClass(`origselect`);
+                // cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x, y, thisClass._value[index]));
+                // $(dragValue[9]).addClass(`origselect`);
+                // let closestCircleSelector = $(dragValue[5]);
+                // closestCircleSelector.addClass(`selected`);
+            } else  if(event.button === 1) {
+                move={
+                    pageXCameraX: thisClass.cameraX + event.pageX,
+                    pageYCameraY: thisClass.cameraY + event.pageY
+                }
+                event.preventDefault();
+            } else if(event.button === 2) {
+                rotate = {
+                    pageXYaw: thisClass.yaw + event.pageX,
+                    pageYPitch: thisClass.pitch - event.pageY,
+                };
+                event.preventDefault();
+            }
+
+            //dragValue
+            if(dragValue) {
+                function mouseMove(event) {
+                    //         const xdiff=event.pageX-dragValue[6];
+                    //         const xmag=dragValue[7];
+                    //         const diff = dragValue[0] - event.pageY;
+                    //         let mag = dragValue[4]
+                    //         const index = dragValue[1] + thisClass._xResolution * dragValue[2];
+                    //         let value = thisClass._value[index] = dragValue[3] + diff * mag;
+                    //         if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
+                    //             mag = thisClass._table3DDisplayHeight / 2;
+                    //             value = mag * (0.5 - (value - thisClass._valueMin) / (thisClass._valueMax - thisClass._valueMin));
+                    //             const xMin = thisClass.XAxis[0];
+                    //             const xMag = thisClass.XAxis[thisClass._xResolution-1] - xMin;
+                    //             const yMin = thisClass.YAxis[0];
+                    //             const yMag = thisClass.YAxis[thisClass._yResolution-1] - yMin;
+                    //             let point = thisClass._transformPoint([
+                    //                 (thisClass.XAxis[dragValue[1]]-xMin-xMag/2)/(xMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom, 
+                    //                 value*thisClass._table3DZoom, 
+                    //                 (thisClass.ReverseY? 1 : -1) * (thisClass.YAxis[dragValue[2]]-yMin-yMag/2)/(yMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom
+                    //             ]);
+                    //             $(dragValue[5]).attr(`cy`, point[1]+thisClass._table3DDisplayHeight/2+thisClass._table3DOffsetY);
+                    //         } else {
+                    //             axis[index] = dragValue[8] + xdiff * xmag;
+                    //             $(dragValue[9]).html(Table._formatNumberForDisplay(axis[index]));
+                    //             thisClass.UpdateSvgHtml();
+                    //         }
+                    //         var cell = $(`#${thisClass.GUID}-table .number[data-x='${dragValue[1]}'][data-y='${dragValue[2]}']`);
+                    //         cell.val(Table._formatNumberForDisplay(thisClass._value[index]));
+                }
+                function mouseUp() {
+                    document.removeEventListener(`mousemove`, mouseMove);
+                    document.removeEventListener(`mouseup`, mouseUp);
+                }
+
+                document.addEventListener(`mousemove`, mouseMove);
+                document.addEventListener(`mouseup`, mouseUp);
+            }
+
+            //move
+            if(move) {
+                function mouseMove(event) {
+                    thisClass.cameraX = move.pageXCameraX - event.pageX;
+                    thisClass.cameraY = move.pageYCameraY - event.pageY;
+                }
+                function mouseUp() {
+                    document.removeEventListener(`mousemove`, mouseMove);
+                    document.removeEventListener(`mouseup`, mouseUp);
+                }
+
+                document.addEventListener(`mousemove`, mouseMove);
+                document.addEventListener(`mouseup`, mouseUp);
+            }
+
+            //rotate
+            if(rotate) {
+                function mouseMove(event) {
+                    thisClass.yaw = rotate.pageXYaw-event.pageX;
+                    thisClass.pitch = rotate.pageYPitch+event.pageY;
+                }
+                function mouseUp() {
+                    document.removeEventListener(`mousemove`, mouseMove);
+                    document.removeEventListener(`mouseup`, mouseUp);
+                }
+
+                document.addEventListener(`mousemove`, mouseMove);
+                document.addEventListener(`mouseup`, mouseUp);
+            }
+        });
     }
 }
 customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
@@ -805,132 +991,6 @@ customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
 //             color: this.Table3DPitch > 0? `#80808080` : `transparent`
 //         });
 //     }
-
-//     _attachSvg() {
-//         const thisClass = this;
-//         let move3d = false;
-//         let drag = false;
-//         let dragValue = false;
-//         $(document).on(`mousedown.${this.GUID}-svg`, `#${this.GUID}-tablesvg g`, function(e){
-//             var relX = e.pageX - $(this).closest(`svg`).offset().left;
-//             var relY = e.pageY - $(this).closest(`svg`).offset().top;
-//             let circles = thisClass.svg.filter(x => x.circle).reverse();
-//             let closestCircle = undefined;
-//             circles.forEach(function(element, index) {
-//                 let l = element.circle.cx - relX;
-//                 let w = element.circle.cy - relY;
-//                 element.dist = Math.sqrt(l*l+w*w);
-//                 if(closestCircle === undefined || element.dist < closestCircle.dist)
-//                     closestCircle = element;
-//             });
-//             const axis = thisClass._yResolution < 2? thisClass.XAxis : thisClass.YAxis;
-//             if(closestCircle && e.which === 1) {
-//                 let x = closestCircle.x;
-//                 let y = closestCircle.y;
-//                 thisClass._minSelectX = x;
-//                 thisClass._minSelectY = y;
-//                 thisClass._maxSelectX = x;
-//                 thisClass._maxSelectY = y;
-//                 index = x + thisClass._xResolution * y;
-//                 dragValue=[
-//                     e.pageY,
-//                     x,
-//                     y,
-//                     thisClass._value[index],
-//                     (thisClass._valueMax - thisClass._valueMin) / (thisClass._table3DDisplayHeight-thisClass._padding2D*2-thisClass._valueOffset2D), 
-//                     `#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`, 
-//                     e.pageX,
-//                     (axis[axis.length - 1] - axis[0]) / (thisClass._table3DDisplayWidth-thisClass._padding2D*2-thisClass._axisOffset2D), 
-//                     axis[index],
-//                     thisClass._xResolution < 2 || thisClass._yResolution < 2? `#${thisClass.GUID}-table .number${thisClass.XAxis === axis? `[data-x='${x}'][data-y='-1']` : `[data-x='-1'][data-y='${y}']`}` : undefined];
-//                 $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`);
-//                 $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-//                 $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
-//                     cell=$(cell);
-//                     cell.removeClass(`selected`);
-//                     cell.removeClass(`origselect`);
-//                     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
-//                 });
-//                 $(`#${thisClass.GUID}-table .number`).removeClass(`selected`).removeClass(`origselect`);
-//                 var cell = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
-//                 cell.addClass(`selected`).addClass(`origselect`);
-//                 cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x, y, thisClass._value[index]));
-//                 $(dragValue[9]).addClass(`origselect`);
-//                 let closestCircleSelector = $(dragValue[5]);
-//                 closestCircleSelector.addClass(`selected`);
-//             } else if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
-//                 if(e.which === 2) {
-//                     move3d=[e.pageX,e.pageY,thisClass._table3DOffsetX,thisClass._table3DOffsetY];
-//                     e.preventDefault();
-//                 } else if(e.which === 3) {
-//                     drag=[e.pageX,e.pageY,thisClass.Table3DYaw,thisClass.Table3DPitch];
-//                     e.preventDefault();
-//                 }
-//             }
-
-//             if((closestCircle && e.which === 1) || ((e.which === 2 || e.which === 3) && thisClass._xResolution > 1 && thisClass._yResolution > 1)) {
-//                 $(document).on(`mousemove.${thisClass.GUID}-svg`, function(e){
-//                     if(drag){          
-//                         const yaw=drag[2]-(e.pageX-drag[0]);
-//                         let pitch=drag[3]+(e.pageY-drag[1]);
-//                         pitch=Math.max(-90,Math.min(90,pitch));
-//                         if(yaw === thisClass.Table3DYaw && pitch === thisClass.Table3DPitch)
-//                             return;
-//                         thisClass.Table3DYaw = yaw;
-//                         thisClass.Table3DPitch = pitch;
-//                         thisClass.UpdateSvgHtml(true);
-//                     } else if(move3d) {
-//                         const xdiff=e.pageX-move3d[0];
-//                         const ydiff=e.pageY-move3d[1];
-//                         thisClass._table3DOffsetX = move3d[2] + xdiff;
-//                         thisClass._table3DOffsetY = move3d[3] + ydiff;
-//                         thisClass.UpdateSvgHtml(true);
-//                     }else if(dragValue) {
-//                         const xdiff=e.pageX-dragValue[6];
-//                         const xmag=dragValue[7];
-//                         const diff = dragValue[0] - e.pageY;
-//                         let mag = dragValue[4]
-//                         const index = dragValue[1] + thisClass._xResolution * dragValue[2];
-//                         let value = thisClass._value[index] = dragValue[3] + diff * mag;
-//                         if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
-//                             mag = thisClass._table3DDisplayHeight / 2;
-//                             value = mag * (0.5 - (value - thisClass._valueMin) / (thisClass._valueMax - thisClass._valueMin));
-//                             const xMin = thisClass.XAxis[0];
-//                             const xMag = thisClass.XAxis[thisClass._xResolution-1] - xMin;
-//                             const yMin = thisClass.YAxis[0];
-//                             const yMag = thisClass.YAxis[thisClass._yResolution-1] - yMin;
-//                             let point = thisClass._transformPoint([
-//                                 (thisClass.XAxis[dragValue[1]]-xMin-xMag/2)/(xMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom, 
-//                                 value*thisClass._table3DZoom, 
-//                                 (thisClass.ReverseY? 1 : -1) * (thisClass.YAxis[dragValue[2]]-yMin-yMag/2)/(yMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom
-//                             ]);
-//                             $(dragValue[5]).attr(`cy`, point[1]+thisClass._table3DDisplayHeight/2+thisClass._table3DOffsetY);
-//                         } else {
-//                             axis[index] = dragValue[8] + xdiff * xmag;
-//                             $(dragValue[9]).html(Table._formatNumberForDisplay(axis[index]));
-//                             thisClass.UpdateSvgHtml();
-//                         }
-//                         var cell = $(`#${thisClass.GUID}-table .number[data-x='${dragValue[1]}'][data-y='${dragValue[2]}']`);
-//                         cell.val(Table._formatNumberForDisplay(thisClass._value[index]));
-//                     }
-//                 });
-//                 $(document).on(`mouseup.${thisClass.GUID}-svg`,function(){
-//                     drag=false;
-//                     if(dragValue) {
-//                         $(dragValue[9]).trigger(`change`);
-//                         thisClass._onChange();
-//                     } else {
-//                         thisClass.UpdateSvgHtml();
-//                     }
-//                     dragValue = false;
-//                     move3d = false
-//                     $(document).off(`mouseup.${thisClass.GUID}-svg`);
-//                     $(document).off(`mousemove.${thisClass.GUID}-svg`);
-//                 });
-//             }
-//         });
-//     }
-
 
 //     _dataSvg=[];
 //     _xAxisSvg=[];

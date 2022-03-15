@@ -212,6 +212,36 @@ export default class UITable extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
 
+    get selecting() {
+        return this.#selecting;
+    }
+    set selecting(selecting) {
+        if(JSON.stringify(this.#selecting) === JSON.stringify(selecting))
+            return;
+        this.#selecting = selecting;
+        this.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        this.#xAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        this.#yAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        if(selecting) {
+            let elementArray = this.#valueElement.children;
+            if(isNaN(selecting.startX))
+                elementArray = this.#yAxisElement.children;
+            if(isNaN(selecting.startY))
+                elementArray = this.#xAxisElement.children;
+            for(let i=0; i<elementArray.length; i++) {
+                let element = elementArray[i];
+                if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x) ||
+                    Math.max(selecting.endX, selecting.startX) < parseInt(element.x) ||
+                    Math.min(selecting.endY, selecting.startY) > parseInt(element.y) ||
+                    Math.max(selecting.endY, selecting.startY) < parseInt(element.y)){
+                    continue;
+                }
+                element.classList.add(`selected`); 
+            };
+        }
+        this.dispatchEvent(new Event(`select`))
+    }
+
     //Label properties
     get xLabel() {
         return this.#xLabel;
@@ -317,6 +347,7 @@ export default class UITable extends HTMLDivElement {
     #yAxisElement = document.createElement(`div`);
     #valueElement       = document.createElement(`div`);
     #valueInputElement  = document.createElement(`input`);
+    #selecting;
 
     //delete onchange and migrate to addEventListener(`change`)
     onChange = [];
@@ -744,7 +775,6 @@ export default class UITable extends HTMLDivElement {
 
             let special = thisClass.#pasteOptionsElement.querySelector(`.selected`)?.value;
 
-            element.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
             val.split(`\n`).forEach(function(val, yIndex) {
                 var yPos = y + yIndex;
                 if(yPos > thisClass.yResolution - 1)
@@ -784,10 +814,14 @@ export default class UITable extends HTMLDivElement {
                             numberElement.value = v;
                             break;
                     }
-
-                    numberElement.classList.add(`selected`);
                 });
             });
+            thisClass.selecting = {
+                startX: x,
+                startY: y,
+                endX: x + val.split(`\n`)[0].split(`\t`).length,
+                endY: y + val.split(`\n`).length
+            }
             event.preventDefault();
             thisClass.#boundAxis(element);
             thisClass.dispatchEvent(new Event(`change`));
@@ -844,38 +878,14 @@ export default class UITable extends HTMLDivElement {
                 selecting.endY = Math.min(thisClass.yResolution-1, Math.max(0, selecting.startY + yDiff));
                 if(Math.abs(xDiff) > 0 || Math.abs(yDiff) > 0)
                     selecting.selectOnMove = false;
-                if(!selecting.selectOnMove && (
-                    thisClass.selecting?.startX !== selecting.startX ||
-                    thisClass.selecting?.startY !== selecting.startY ||
-                    thisClass.selecting?.endX !== selecting.endX ||
-                    thisClass.selecting?.endY !== selecting.endY )) {
+                if(!selecting.selectOnMove) {
                     thisClass.selecting = {
                         startX: selecting.startX,
                         startY: selecting.startY,
                         endX: selecting.endX,
                         endY: selecting.endY
                     }
-                    thisClass.dispatchEvent(new Event(`select`));
                 }
-            }
-            if(thisClass.selecting) {
-                let elementArray = thisClass.#valueElement.children;
-                if(isNaN(thisClass.selecting.startX))
-                    elementArray = thisClass.#yAxisElement.children;
-                if(isNaN(thisClass.selecting.startY))
-                    elementArray = thisClass.#xAxisElement.children;
-                for(let i=0; i<elementArray.length; i++) {
-                    let element = elementArray[i];
-                    if( thisClass.selecting === undefined || 
-                        Math.min(thisClass.selecting.endX, thisClass.selecting.startX) > parseInt(element.x) ||
-                        Math.max(thisClass.selecting.endX, thisClass.selecting.startX) < parseInt(element.x) ||
-                        Math.min(thisClass.selecting.endY, thisClass.selecting.startY) > parseInt(element.y) ||
-                        Math.max(thisClass.selecting.endY, thisClass.selecting.startY) < parseInt(element.y)){
-                        element.classList.remove(`selected`);
-                        continue;
-                    }
-                    element.classList.add(`selected`); 
-                };
             }
         }
 
@@ -887,7 +897,6 @@ export default class UITable extends HTMLDivElement {
                 const targetIsDataValue = selecting.startElement.x !== undefined || selecting.startElement.y !== undefined;
                 if(addSelectNumber) {
                     if(targetIsDataValue) {
-                        selecting.startElement.classList.add(`selected`)
                         selecting.startElement.innerHTML = ``;
                         thisClass.#valueInputElement.value = selecting.startElement.value;
                         selecting.startElement.append(thisClass.#valueInputElement);
@@ -913,21 +922,13 @@ export default class UITable extends HTMLDivElement {
                 selecting.startY = parseInt(selecting.startElement.y);
                 if(targetIsDataValue) {
                     valueInputChange();
-                    thisClass.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
-                    thisClass.#xAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
-                    thisClass.#yAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) })
-                    if(!selecting.selectOnMove && (
-                        thisClass.selecting?.startX !== selecting.startX ||
-                        thisClass.selecting?.startY !== selecting.startY ||
-                        thisClass.selecting?.endX !== selecting.startX ||
-                        thisClass.selecting?.endY !== selecting.startX )) {
+                    if(!selecting.selectOnMove) {
                         thisClass.selecting = {
                             startX: selecting.startX,
                             startY: selecting.startY,
                             endX: selecting.startX,
                             endY: selecting.startY
                         }
-                        thisClass.dispatchEvent(new Event(`select`));
                     }
                 }
                 if(event.target.type !== `number`) {
