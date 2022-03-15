@@ -4,6 +4,7 @@ import UIText from "./UI/UIText.js";
 import UISelection from "./UI/UISelection.js";
 import UITemplate from "./UI/UITemplate.js";
 import UITable from "./UI/UITable.js";
+import UIGraph3D from "./UI/UIGraph3D.js"
 
 //adapt new ui modules to old garbage GetHtml/Attach structure
 Object.defineProperty(HTMLElement.prototype, 'Class', {
@@ -790,6 +791,7 @@ export default { UI: {
     Selection: UISelection,
     NumberWithMeasurement : NumberWithMeasurement,
     Table: UITable,
+    Graph3D: UIGraph3D,
     Dialog: UIDialog,
     DisplayNumberWithMeasurement
 }}

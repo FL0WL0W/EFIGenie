@@ -50,8 +50,6 @@ export default class UIGraph3D extends HTMLDivElement {
         if(saveValue === undefined) 
             return;
 
-        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
-            this.value = saveValue.Value;
         if(saveValue.XResolution !== undefined)
             this.xResolution = saveValue.XResolution;
         if(saveValue.XAxis !== undefined)
@@ -60,6 +58,8 @@ export default class UIGraph3D extends HTMLDivElement {
             this.yResolution = saveValue.YResolution;
         if(saveValue.YAxis !== undefined)
             this.yAxis = saveValue.YAxis;
+        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
+            this.value = saveValue.Value;
     }
 
     //axis properties
@@ -248,13 +248,13 @@ export default class UIGraph3D extends HTMLDivElement {
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
     get width() {
-        return this.#svgElement.getAttribute(`width`) ?? this.offsetWidth;
+        return this.#svgElement.getAttribute(`width`) ?? this.offsetWidth ?? 300;
     }
     set width(width) {
         this.#svgElement.setAttribute(`width`, width);
     }
     get height() {
-        return this.#svgElement.getAttribute(`height`) ?? this.offsetHeight;
+        return this.#svgElement.getAttribute(`height`) ?? this.offsetHeight ?? 150;
     }
     set height(height) {
         this.#svgElement.setAttribute(`height`, height);
@@ -276,14 +276,21 @@ export default class UIGraph3D extends HTMLDivElement {
             return;
         this.#transformPrecalcPrivate = transformPrecalc;
         const r = transformPrecalc.zoom/(7.5 * Math.max(this.xResolution, this.yResolution));
-        [...this.#valueElement.children].forEach(function(element) { element.setAttribute(`r`, r.toFixed(10)); element.update(); });
-        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
+        this.#updateDepth = false;
+        const valueChildren = [...this.#valueElement.children];
+        const valuePathChildren = [...this.#valuePathElement.children];
+        valueChildren.forEach(function(element) { element.setAttribute(`r`, r.toFixed(10)); element.update(); });
+        valuePathChildren.forEach(function(element) { element.update(); });
+        valuePathChildren.sort(function(a, b) { return b.depth-a.depth; }).forEach(element => this.#valuePathElement.append(element));
+        this.#updateDepth = true;
     }
     #yaw;
     #pitch;
     #zoom;
     #cameraX;
     #cameraY;
+
+    trail(x, y = 0, z) { }
     
     get #valueMin() {
         let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
@@ -357,10 +364,11 @@ export default class UIGraph3D extends HTMLDivElement {
         return UIGraph3D.transformPoint([x/(this.xResolution-1)-0.5, -(value/(valueMax-this.#valueMin)-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y/(this.yResolution-1)-0.5], this.#transformPrecalc);
     }
 
+    #updateDepth = true;
     #resolutionChanged() {
         const thisClass = this;
         function circleUpdater() {
-            let p = this.p = thisClass.#cellToPoint(this.x, this.y, this.value);
+            this.p = thisClass.#cellToPoint(this.x, this.y, this.value);
         }
         let circleValueGetterSetter = {
             get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
@@ -373,16 +381,11 @@ export default class UIGraph3D extends HTMLDivElement {
                 if(value > thisClass.#valueMax)
                     thisClass.#valueMax = value;
                 this.style.setProperty(`--data-value`, value); 
-                const valuePathElements = [...thisClass.#valuePathElement.children];
-                let vp1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
-                let vp2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
-                let vp3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
-                let vp4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
-                if(vp1) vp1.v1 = value;
-                if(vp2) vp2.v2 = value;
-                if(vp3) vp3.v3 = value;
-                if(vp4) vp4.v4 = value;
                 this.update();
+                if(this.vp1) this.vp1.v1 = value;
+                if(this.vp2) this.vp2.v2 = value;
+                if(this.vp3) this.vp3.v3 = value;
+                if(this.vp4) this.vp4.v4 = value;
             }
         }
         let circleDepthGetterSetter = {
@@ -392,12 +395,6 @@ export default class UIGraph3D extends HTMLDivElement {
                 if(this.depth === depth)
                     return;
                 this.dataset.depth = depth;
-                thisClass.#valueElement.removeChild(this);
-                const after = [...thisClass.#valueElement.children].find(element => element.depth<depth)
-                if(!after)
-                    thisClass.#valueElement.append(this);
-                else
-                    thisClass.#valueElement.insertBefore(this, after);
             }
         }
         let circlePGetterSetter = {
@@ -410,15 +407,10 @@ export default class UIGraph3D extends HTMLDivElement {
                 this.depth = p[2];
                 this.setAttribute(`cx`, p[0].toFixed(10));
                 this.setAttribute(`cy`, p[1].toFixed(10));
-                const valuePathElements = [...thisClass.#valuePathElement.children];
-                let p1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
-                let p2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
-                let p3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
-                let p4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
-                if(p1) p1.p1 = p;
-                if(p2) p2.p2 = p;
-                if(p3) p3.p3 = p;
-                if(p4) p4.p4 = p;
+                if(this.vp1) this.vp1.p1 = p;
+                if(this.vp2) this.vp2.p2 = p;
+                if(this.vp3) this.vp3.p3 = p;
+                if(this.vp4) this.vp4.p4 = p;
             }
         }
         let pathValueGetterSetter = {
@@ -432,12 +424,13 @@ export default class UIGraph3D extends HTMLDivElement {
                 if(this.depth === depth)
                     return;
                 this.dataset.depth = depth;
-                thisClass.#valuePathElement.removeChild(this);
-                const after = [...thisClass.#valuePathElement.children].find(element => element.depth<depth)
-                if(!after)
-                    thisClass.#valuePathElement.append(this);
-                else
-                    thisClass.#valuePathElement.insertBefore(this, after);
+                if(thisClass.#updateDepth) {
+                    const after = [...thisClass.#valuePathElement.children].find(element => element.depth<depth)
+                    if(!after)
+                        thisClass.#valuePathElement.append(this);
+                    else if(after !== this.nextSibling)
+                        thisClass.#valuePathElement.insertBefore(this, after);
+                }
             }
         }
         function pathUpdater() {
@@ -459,7 +452,6 @@ export default class UIGraph3D extends HTMLDivElement {
                     if(this.dataset[pi] === dataP)
                         return;
                     this.dataset[pi] = dataP;
-                    this.update();
                 }
             }
         }
@@ -473,6 +465,7 @@ export default class UIGraph3D extends HTMLDivElement {
                         return;
                     this.dataset[vi] = v;
                     this.value = (parseFloat(this.v1) + parseFloat(this.v2) + parseFloat(this.v3) + parseFloat(this.v4))/4;
+                    this.update();
                 }
             }
         }
@@ -497,6 +490,7 @@ export default class UIGraph3D extends HTMLDivElement {
             valuepathElement.x2 = valuepathElement.x3 = valuepathElement.x1 + 1;
             valuepathElement.y3 = valuepathElement.y4 = valuepathElement.y1 + 1;
         }
+        const valuePathElements = [...thisClass.#valuePathElement.children];
         while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
@@ -506,8 +500,10 @@ export default class UIGraph3D extends HTMLDivElement {
             Object.defineProperty(valueElement, 'depth', circleDepthGetterSetter);
             valueElement.x = i % this.xResolution;
             valueElement.y = Math.trunc(i/this.xResolution);
-            if(this.#transformPrecalc)
-                valueElement.setAttribute(`r`, this.#transformPrecalc.width.toFixed(10));
+            valueElement.vp1 = valuePathElements.find(element => element.x1 === valueElement.x && element.y1 === valueElement.y);
+            valueElement.vp2 = valuePathElements.find(element => element.x2 === valueElement.x && element.y2 === valueElement.y);
+            valueElement.vp3 = valuePathElements.find(element => element.x3 === valueElement.x && element.y3 === valueElement.y);
+            valueElement.vp4 = valuePathElements.find(element => element.x4 === valueElement.x && element.y4 === valueElement.y);
         }
     }
 
@@ -544,9 +540,10 @@ export default class UIGraph3D extends HTMLDivElement {
             event.preventDefault();
         });
         this.#svgElement.addEventListener('mousedown', function(event){
-            var relX = event.pageX - thisClass.offsetLeft;
-            var relY = event.pageY - thisClass.offsetTop;
-            let circles = [...thisClass.#valueElement.children].reverse();;
+            var rect = thisClass.#svgElement.getBoundingClientRect();
+            var relX = event.pageX - rect.left;
+            var relY = event.pageY - rect.top;
+            let circles = [...thisClass.#valueElement.children].sort(function(a, b) { return a.depth-b.depth; });
             let closestCircle = undefined;
             let rotate;
             let move;
@@ -622,8 +619,14 @@ export default class UIGraph3D extends HTMLDivElement {
             //rotate
             if(rotate) {
                 function mouseMove(event) {
-                    thisClass.yaw = rotate.yaw + rotate.pageX - event.pageX;
-                    thisClass.pitch = rotate.pitch + event.pageY - rotate.pageY;
+                    let yaw = rotate.yaw + rotate.pageX - event.pageX;
+                    let pitch = rotate.pitch + event.pageY - rotate.pageY;
+                    if(yaw === thisClass.yaw && pitch === thisClass.pitch)
+                        return;
+
+                    thisClass.#yaw = yaw;
+                    thisClass.#pitch = pitch;
+                    thisClass.#transformPrecalc = UIGraph3D.transformPrecalc(thisClass);
                 }
                 function mouseUp() {
                     document.removeEventListener(`mousemove`, mouseMove);
