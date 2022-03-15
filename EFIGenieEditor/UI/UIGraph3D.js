@@ -559,41 +559,20 @@ export default class UIGraph3D extends HTMLDivElement {
                     closestCircle = element;
             });
             if(closestCircle && event.button === 0) {
-                let x = closestCircle.x;
-                let y = closestCircle.y;
+                const x = closestCircle.x;
+                const y = closestCircle.y;
                 thisClass.selecting = {
                     startX: x,
                     startY: y,
                     endX: x,
                     endY: y
                 }
-                // let index = x + thisClass._xResolution * y;
-                // dragValue=[
-                //     event.pageY,
-                //     x,
-                //     y,
-                //     thisClass._value[index],
-                //     (thisClass._valueMax - thisClass._valueMin) / (thisClass._table3DDisplayHeight-thisClass._padding2D*2-thisClass._valueOffset2D), 
-                //     `#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`, 
-                //     event.pageX,
-                //     (axis[axis.length - 1] - axis[0]) / (thisClass._table3DDisplayWidth-thisClass._padding2D*2-thisClass._axisOffset2D), 
-                //     axis[index],
-                //     thisClass._xResolution < 2 || thisClass._yResolution < 2? `#${thisClass.GUID}-table .number${thisClass.XAxis === axis? `[data-x='${x}'][data-y='-1']` : `[data-x='-1'][data-y='${y}']`}` : undefined];
-                // $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`);
-                // $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-                // $(`#${thisClass.GUID}-table .origselect`).each(function(index, cell) { 
-                //     cell=$(cell);
-                //     cell.removeClass(`selected`);
-                //     cell.removeClass(`origselect`);
-                //     cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`)));
-                // });
-                // $(`#${thisClass.GUID}-table .number`).removeClass(`selected`).removeClass(`origselect`);
-                // var cell = $(`#${thisClass.GUID}-table .number[data-x='${x}'][data-y='${y}']`);
-                // cell.addClass(`selected`).addClass(`origselect`);
-                // cell.parent().replaceWith(thisClass._formatNumberForDisplay(cell.attr(`id`), x, y, thisClass._value[index]));
-                // $(dragValue[9]).addClass(`origselect`);
-                // let closestCircleSelector = $(dragValue[5]);
-                // closestCircleSelector.addClass(`selected`);
+                dragValue = {
+                    pageY: event.pageY,
+                    closestCircle,
+                    value: closestCircle.value,
+                    mag: (thisClass.#valueMax - thisClass.#valueMin) / thisClass.height, 
+                }
             } else  if(event.button === 1) {
                 move={
                     pageXCameraX: thisClass.cameraX + event.pageX,
@@ -611,38 +590,13 @@ export default class UIGraph3D extends HTMLDivElement {
             //dragValue
             if(dragValue) {
                 function mouseMove(event) {
-                    //         const xdiff=event.pageX-dragValue[6];
-                    //         const xmag=dragValue[7];
-                    //         const diff = dragValue[0] - event.pageY;
-                    //         let mag = dragValue[4]
-                    //         const index = dragValue[1] + thisClass._xResolution * dragValue[2];
-                    //         let value = thisClass._value[index] = dragValue[3] + diff * mag;
-                    //         if(thisClass._xResolution > 1 && thisClass._yResolution > 1) {
-                    //             mag = thisClass._table3DDisplayHeight / 2;
-                    //             value = mag * (0.5 - (value - thisClass._valueMin) / (thisClass._valueMax - thisClass._valueMin));
-                    //             const xMin = thisClass.XAxis[0];
-                    //             const xMag = thisClass.XAxis[thisClass._xResolution-1] - xMin;
-                    //             const yMin = thisClass.YAxis[0];
-                    //             const yMag = thisClass.YAxis[thisClass._yResolution-1] - yMin;
-                    //             let point = thisClass._transformPoint([
-                    //                 (thisClass.XAxis[dragValue[1]]-xMin-xMag/2)/(xMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom, 
-                    //                 value*thisClass._table3DZoom, 
-                    //                 (thisClass.ReverseY? 1 : -1) * (thisClass.YAxis[dragValue[2]]-yMin-yMag/2)/(yMag*2)*thisClass._table3DDisplayWidth*thisClass._table3DZoom
-                    //             ]);
-                    //             $(dragValue[5]).attr(`cy`, point[1]+thisClass._table3DDisplayHeight/2+thisClass._table3DOffsetY);
-                    //         } else {
-                    //             axis[index] = dragValue[8] + xdiff * xmag;
-                    //             $(dragValue[9]).html(Table._formatNumberForDisplay(axis[index]));
-                    //             thisClass.UpdateSvgHtml();
-                    //         }
-                    //         var cell = $(`#${thisClass.GUID}-table .number[data-x='${dragValue[1]}'][data-y='${dragValue[2]}']`);
-                    //         cell.val(Table._formatNumberForDisplay(thisClass._value[index]));
+                    dragValue.closestCircle.value = dragValue.value+(dragValue.pageY - event.pageY)*dragValue.mag 
+                    thisClass.dispatchEvent(new Event(`change`));
                 }
                 function mouseUp() {
                     document.removeEventListener(`mousemove`, mouseMove);
                     document.removeEventListener(`mouseup`, mouseUp);
                 }
-
                 document.addEventListener(`mousemove`, mouseMove);
                 document.addEventListener(`mouseup`, mouseUp);
             }
@@ -657,7 +611,6 @@ export default class UIGraph3D extends HTMLDivElement {
                     document.removeEventListener(`mousemove`, mouseMove);
                     document.removeEventListener(`mouseup`, mouseUp);
                 }
-
                 document.addEventListener(`mousemove`, mouseMove);
                 document.addEventListener(`mouseup`, mouseUp);
             }
@@ -672,7 +625,6 @@ export default class UIGraph3D extends HTMLDivElement {
                     document.removeEventListener(`mousemove`, mouseMove);
                     document.removeEventListener(`mouseup`, mouseUp);
                 }
-
                 document.addEventListener(`mousemove`, mouseMove);
                 document.addEventListener(`mouseup`, mouseUp);
             }
