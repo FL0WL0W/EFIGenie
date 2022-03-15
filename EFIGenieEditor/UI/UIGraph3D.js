@@ -2,7 +2,7 @@ export default class UIGraph3D extends HTMLDivElement {
     onChange = [];
     get value() {
         const thisClass = this;
-        return [...this.#valueElement.children].sort(function(a, b) {(a.x - b.x) + thisClass.xResolution * (a.y - b.y)}).map(x => x.value);
+        return [...this.#valueElement.children].sort(function(a, b) { return (a.x - b.x) + thisClass.xResolution * (a.y - b.y); }).map(x => x.value);
     }
     set value(value) {
         if(value === undefined)
@@ -31,9 +31,10 @@ export default class UIGraph3D extends HTMLDivElement {
         if(this.#valueMax === this.#valueMin)
             this.#valueMax = this.#valueMin + 1;
         const thisClass = this;
-        let childElements = [...this.#valueElement.children].sort(function(a, b) {(a.x - b.x) + thisClass.xResolution * (a.y - b.y)});
-        for(let i = 0; i < childElements.length; i++)
+        let childElements = [...this.#valueElement.children].sort(function(a, b) { return (a.x - b.x) + thisClass.xResolution * (a.y - b.y); });
+        for(let i = 0; i < childElements.length; i++) {
             childElements[i].value = value[i];
+        }
         this.dispatchEvent(new Event(`change`));
     }
     get saveValue() {
@@ -171,6 +172,8 @@ export default class UIGraph3D extends HTMLDivElement {
     }
     set pitch(pitch) {
         pitch = parseFloat(pitch);
+        if(this.#pitch === pitch)
+            return;
         this.#pitch = pitch;
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
@@ -179,7 +182,19 @@ export default class UIGraph3D extends HTMLDivElement {
     }
     set yaw(yaw) {
         yaw = parseFloat(yaw);
+        if(this.#yaw === yaw)
+            return;
         this.#yaw = yaw;
+        this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
+    }
+    get zoom() {
+        return this.#zoom ?? 1;
+    }
+    set zoom(zoom) {
+        zoom = parseFloat(zoom);
+        if(this.#zoom === zoom)
+            return;
+        this.#zoom = zoom;
         this.#transformPrecalc = UIGraph3D.transformPrecalc(this);
     }
     get width() {
@@ -206,12 +221,16 @@ export default class UIGraph3D extends HTMLDivElement {
         return this.#transformPrecalcPrivate;
     }
     set #transformPrecalc(transformPrecalc) {
+        if(JSON.stringify(this.#transformPrecalcPrivate) === JSON.stringify(transformPrecalc))
+            return;
         this.#transformPrecalcPrivate = transformPrecalc;
         const r = transformPrecalc.zoom/(7.5 * Math.max(this.xResolution, this.yResolution));
-        [...this.#valueElement.children].forEach(element => element.setAttribute(`r`, r.toFixed(10)));
+        [...this.#valueElement.children].forEach(function(element) { element.setAttribute(`r`, r.toFixed(10)); element.update(); });
+        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
     }
     #yaw;
     #pitch;
+    #zoom;
     
     get #valueMin() {
         let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
@@ -239,10 +258,6 @@ export default class UIGraph3D extends HTMLDivElement {
         delete prop.value;
         Object.assign(this, prop);
         this.#createEventListeners();
-        if(prop?.pitch === undefined)
-            this.pitch = 17;
-        if(prop?.yaw === undefined)
-            this.yaw = 30;
         this.value = propValue;
         //delete onchange and migrate to addEventListener(`change`)
         if(!Array.isArray(this.onChange))
@@ -251,6 +266,10 @@ export default class UIGraph3D extends HTMLDivElement {
         this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
+        if(prop?.pitch === undefined)
+            this.pitch = 17;
+        if(prop?.yaw === undefined)
+            this.yaw = 30;
     }
     static transformPrecalc({width = 0, height = 0, pitch = 0, yaw = 0, cameraX = 0, cameraY = 0, zoom = 1} = {}) {
         let cosPitch=Math.cos(pitch * (Math.PI / 180));
@@ -287,6 +306,18 @@ export default class UIGraph3D extends HTMLDivElement {
 
     #resolutionChanged() {
         const thisClass = this;
+        function circleUpdater() {
+            let p = this.p = thisClass.#cellToPoint(this.x, this.y, this.value);
+            const valuePathElements = [...thisClass.#valuePathElement.children];
+            let p1 = valuePathElements.find(element => element.x1 === this.x && element.y1 === this.y);
+            let p2 = valuePathElements.find(element => element.x2 === this.x && element.y2 === this.y);
+            let p3 = valuePathElements.find(element => element.x3 === this.x && element.y3 === this.y);
+            let p4 = valuePathElements.find(element => element.x4 === this.x && element.y4 === this.y);
+            if(p1) p1.p1 = p;
+            if(p2) p2.p2 = p;
+            if(p3) p3.p3 = p;
+            if(p4) p4.p4 = p;
+        }
         let circleValueGetterSetter = {
             get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
             set: function(value) { 
@@ -307,7 +338,7 @@ export default class UIGraph3D extends HTMLDivElement {
                 if(vp2) vp2.v2 = value;
                 if(vp3) vp3.v3 = value;
                 if(vp4) vp4.v4 = value;
-                this.p = thisClass.#cellToPoint(this.x, this.y, value);
+                this.update();
             }
         }
         let circleDepthGetterSetter = {
@@ -318,8 +349,7 @@ export default class UIGraph3D extends HTMLDivElement {
                     return;
                 this.dataset.depth = depth;
                 thisClass.#valueElement.removeChild(this);
-                const valueElement = [...thisClass.#valueElement.children];
-                const after = valueElement.find(element => element.depth<depth)
+                const after = [...thisClass.#valueElement.children].find(element => element.depth<depth)
                 if(!after)
                     thisClass.#valueElement.append(this);
                 else
@@ -350,15 +380,14 @@ export default class UIGraph3D extends HTMLDivElement {
                     return;
                 this.dataset.depth = depth;
                 thisClass.#valuePathElement.removeChild(this);
-                const valuePathElements = [...thisClass.#valuePathElement.children];
-                const after = valuePathElements.find(element => element.depth<depth)
+                const after = [...thisClass.#valuePathElement.children].find(element => element.depth<depth)
                 if(!after)
                     thisClass.#valuePathElement.append(this);
                 else
                     thisClass.#valuePathElement.insertBefore(this, after);
             }
         }
-        function pathPSetter() {
+        function pathUpdater() {
             if(!this.p1 || !this.p2 || !this.p3 || !this.p4)
                 return;
             this.depth = (parseFloat(this.p1[2]) + parseFloat(this.p2[2]) + parseFloat(this.p3[2]) + parseFloat(this.p4[2]))/4;
@@ -377,7 +406,7 @@ export default class UIGraph3D extends HTMLDivElement {
                     if(this.dataset[pi] === dataP)
                         return;
                     this.dataset[pi] = dataP;
-                    pathPSetter.call(this);
+                    this.update();
                 }
             }
         }
@@ -403,6 +432,7 @@ export default class UIGraph3D extends HTMLDivElement {
         // while((this.xResolution-1) * (this.yResolution-1) < this.#valuePathElement.children.length) { this.#valuePathElement.removeChild(this.#valuePathElement.children[(this.xResolution-1) * (this.yResolution-1)]); }
         for(let i = 0; i < (this.xResolution-1) * (this.yResolution-1); i++) { 
             const valuepathElement = this.#valuePathElement.children[i] ?? this.#valuePathElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','path'));
+            valuepathElement.update = pathUpdater;
             Object.defineProperty(valuepathElement, 'value', pathValueGetterSetter);
             Object.defineProperty(valuepathElement, 'v1', getPathVGetterSetter(1));
             Object.defineProperty(valuepathElement, 'v2', getPathVGetterSetter(2));
@@ -421,6 +451,7 @@ export default class UIGraph3D extends HTMLDivElement {
         while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
+            valueElement.update = circleUpdater;
             Object.defineProperty(valueElement, 'value', circleValueGetterSetter);
             Object.defineProperty(valueElement, 'p', circlePGetterSetter);
             Object.defineProperty(valueElement, 'depth', circleDepthGetterSetter);
@@ -449,287 +480,21 @@ export default class UIGraph3D extends HTMLDivElement {
         }
         this.addEventListener(`change`, calculateMinMaxValue);
         calculateMinMaxValue();
+        this.#svgElement.addEventListener('wheel', function(e){
+            if(e.wheelDelta /120 > 0) {
+                thisClass.zoom *= 1.1;
+            }
+            else{
+                thisClass.zoom *= 0.9;
+            }
+            e.preventDefault();
+            e.stopPropagation()
+            return false;
+        }, {passive: false});
     }
 }
 customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
 
-//svg stuff
-//     _table3DDisplayWidth=800; 
-//     _table3DDisplayHeight=450;
-//     _table3DZoom=1;
-
-
-//     GetSvgHtml(){
-//         if(this._xResolution > 1 && this._yResolution > 1) {
-//             this._calculateSvg3D();
-//         } else {
-//             this._calculateSvg2D();
-//         }
-
-//         let html = ``;
-
-//         for(let i = 0; i < this.svg.length; i++) {
-//             let svg = this.svg[i];
-//             if(svg?.line && !isNaN(svg.line.x1) && !isNaN(svg.line.y1) && !isNaN(svg.line.x2) && !isNaN(svg.line.y2)) {
-//                 html += Table._getSvgLineHtml(svg);
-//             }
-//         }
-
-//         for(let i = 0; i < this.svg.length; i++) {
-//             let svg = this.svg[i];
-//             if(svg?.text) {
-//                 html += `<text x="${svg.text.x}" y="${svg.text.y}"`+
-//                     (svg.text.alignmentbaseline !== undefined? ` alignment-baseline="${svg.text.alignmentbaseline}"` : ``)+
-//                     (svg.text.anchor !== undefined? ` text-anchor="${svg.text.anchor}"` : ``)+
-//                     (svg.text.size !== undefined? ` font-size="${svg.text.size}"` : ``)+
-//                     (svg.text.transform !== undefined? ` transform="${svg.text.transform}"` : ``)+
-//                     (svg.hue !== undefined? ` style="fill:hsl(${svg.hue},60%,50%);"` : (svg.color !== undefined? ` style="fill:${svg.color};"` : ``))+
-//                     ` transform-origin="${svg.text.x} ${svg.text.y}">${svg.text.text}</text>`;
-//             }
-//         }
-
-//         for(let i = 0; i < this.svg.length; i++) {
-//             let svg = this.svg[i];
-//             if(svg?.path) {
-//                 let pathSelected = this._minSelectX !== undefined && svg.x >= this._minSelectX && svg.x < this._maxSelectX && svg.y >= this._minSelectY && svg.y < this._maxSelectY;
-//                 html += `<path${pathSelected? ` class="selected"` : ``} data-x="${svg.x}" data-y="${svg.y}" d="${svg.path}"${svg.hue !== undefined? ` style="fill:hsla(${svg.hue},60%,50%,90%);"` : (svg.color !== undefined? ` style="fill:${svg.color};"` : ``)}></path>`;
-//             }
-//         }
-
-//         for(let i = 0; i < this.svg.length; i++) {
-//             let svg = this.svg[i];
-//             if(svg?.circle) {
-//                 let pointSelected = this._minSelectX !== undefined && svg.x >= this._minSelectX && svg.x <= this._maxSelectX && svg.y >= this._minSelectY && svg.y <= this._maxSelectY;
-//                 html += `<circle${pointSelected? ` class="selected"` : ``} data-x="${svg.x}" data-y="${svg.y}" cx="${svg.circle.cx}" cy="${svg.circle.cy}" r="${svg.circle.r}" ${svg.hue !== undefined? ` style="fill:hsl(${svg.hue},60%,50%);"` : (svg.color !== undefined? ` style="fill:${svg.color};"` : ``)}></circle>`;
-//             }
-//         }
-
-//         return `<svg${this._xResolution > 1 && this._yResolution > 1? ` class="hidecircles"` : ``} overflow="visible" id="${this.GUID}-tablesvg" height="${this._table3DDisplayHeight}" width="${this._table3DDisplayWidth}"><g oncontextmenu="return false;">${html}</g></svg>`;
-//     };
-
-//     static _getSvgLineHtml(line) {
-//         return `<line x1="${line.line.x1}" y1="${line.line.y1}" x2="${line.line.x2}" y2="${line.line.y2}"${line.hue !== undefined? ` style="stroke:hsl(${line.hue},100%,50%);"` : (line.color !== undefined? ` style="stroke:${line.color};"` : ``)}></line>`;
-//     }
-
-//     UpdateSvgHtml(drag){
-//         if(this._xResolution > 1 && this._yResolution > 1) {
-//             this._calculateSvg3D();
-//         } else {
-//             this._calculateSvg2D();
-//         }
-//         const thisClass = this;
-//         const lines = this.svg.filter(x => x.line);
-//         const lineSelector = $(`#${this.GUID}-tablesvg g line`);
-//         if(lines.length !== lineSelector.length)
-//             return $(`#${this.GUID}-tablesvg`).replaceWith(this.GetSvgHtml());
-//         const texts = this.svg.filter(x => x.text);
-//         const paths = this.svg.filter(x => x.path);
-//         const circles = this.svg.filter(x => x.circle);
-//         const textSelector = $(`#${this.GUID}-tablesvg g text`);
-//         const pathSelector = $(`#${this.GUID}-tablesvg g path`);
-//         const circleSelector = $(`#${this.GUID}-tablesvg g circle${drag? `:visible` : ``}`)
-//         lines.forEach(function(line, index) {
-//             const t = $(lineSelector[index]);
-//             t.attr(`x1`, line.line.x1)
-//                 .attr(`y1`, line.line.y1)
-//                 .attr(`x2`, line.line.x2)
-//                 .attr(`y2`, line.line.y2)
-//                 .attr(`style`, line.hue !== undefined? `stroke:hsl(${line.hue},60%,50%);` : `stroke:${line.color};`);
-//             if(line.hue === undefined && line.color === undefined)
-//                 t.removeAttr(`style`);
-//         });
-//         textSelector.each(function(index) {
-//             const t = $(this);
-//             t.attr(`x`, texts[index].text.x)
-//                 .attr(`y`, texts[index].text.y)
-//                 .attr(`alignment-baseline`, texts[index].text.alignmentbaseline)
-//                 .attr(`text-anchor`, texts[index].text.anchor)
-//                 .attr(`style`, texts[index].hue !== undefined? `fill:hsl(${texts[index].hue},60%,50%)` : `fill:${texts[index].color};`)
-//                 .attr(`font-size`, texts[index].text.size)
-//                 .attr(`transform`, texts[index].text.transform)
-//                 .attr(`transform-origin`, `${texts[index].text.x} ${texts[index].text.y}`)
-//                 .html(texts[index].text.text);
-//             if(texts[index].hue === undefined && texts[index].color === undefined)
-//                 t.removeAttr(`style`);
-//             if(texts[index].text.transform === undefined)
-//                 t.removeAttr(`transform`);
-//             if(texts[index].text.size === undefined)
-//                 t.removeAttr(`font-size`);
-//         });
-//         pathSelector.each(function(index) { 
-//             const pathSelected = thisClass._minSelectX !== undefined && paths[index].x >= thisClass._minSelectX && paths[index].x < thisClass._maxSelectX && paths[index].y >= thisClass._minSelectY && paths[index].y < thisClass._maxSelectY;
-//             const t = $(this);
-//             t.attr(`data-x`, paths[index].x)
-//                 .attr(`data-y`, paths[index].y)
-//                 .attr(`d`, paths[index].path)
-//                 .attr(`style`, paths[index].hue !== undefined? `fill:hsl(${paths[index].hue},60%,50%,90%)` : `fill:${paths[index].color};`);
-//             if(paths[index].hue === undefined && paths[index].color === undefined)
-//                 t.removeAttr(`style`);
-
-//             if(pathSelected) {
-//                 t.attr(`class`, `selected`)
-//             } else {
-//                 t.removeAttr(`class`);
-//             }
-//         });
-//         circleSelector.each(function(index) { 
-//             const t = $(this);
-//             let circle = circles[index];
-//             if(drag) {
-//                 let datax = parseInt(t.attr('data-x'));
-//                 let datay = parseInt(t.attr('data-y'));
-//                 circle = circles.filter(function(x) { return x.x === datax && x.y === datay; })[0];
-//             }
-//             const pointSelected = thisClass._minSelectX !== undefined && circle.x >= thisClass._minSelectX && circle.x <= thisClass._maxSelectX && circle.y >= thisClass._minSelectY && circle.y <= thisClass._maxSelectY;
-//             t.attr(`data-x`, circle.x)
-//                 .attr(`data-y`, circle.y)
-//                 .attr(`cx`, circle.circle.cx)
-//                 .attr(`cy`, circle.circle.cy)
-//                 .attr(`r`, circle.circle.r)
-//                 .attr(`style`, circle.hue !== undefined? `fill:hsl(${circle.hue},60%,50%)` : `fill:${circle.color};`);
-//             if(circle.hue === undefined && circle.color === undefined)
-//                 t.removeAttr(`style`);
-
-//             if(pointSelected) {
-//                 t.attr(`class`, `selected`)
-//             } else {
-//                 t.removeAttr(`class`);
-//             }
-//         });
-//     }
-    
-
-//     _dataSvg=[];
-//     _xAxisSvg=[];
-//     _yAxisSvg=[];
-//     _padding2D = 25;
-//     _axisOffset2D = 100;
-//     _valueOffset2D = 25;
-//     _calculateSvg2D() {
-//         this._calculateValueMinMax();
-//         this.svg=[];
-//         const axis = this._yResolution < 2? this.XAxis : this.YAxis;
-//         if(axis.length === 0)
-//             return;
-//         let axisMin = 10000000000;
-//         let axisMax = -10000000000;
-//         for(let i=0; i<axis.length; i++) {
-//             let a = axis[i];
-//             if(a < axisMin)
-//                 axisMin = a;
-//             if(a > axisMax)
-//                 axisMax = a;
-//         }
-//         let valueaxis = new Array(parseInt(1.5+axis.length * this._table3DDisplayHeight/this._table3DDisplayWidth));
-//         for(let i=0; i<valueaxis.length; i++) {
-//             valueaxis[i] = i*(this._valueMax-this._valueMin)/(valueaxis.length-1) + this._valueMin;
-//         }
-//         const axisMag = (this._table3DDisplayWidth-this._axisOffset2D-this._padding2D*2) / (axisMax-axisMin);
-//         const r = parseFloat((1/(axis.length*2)*this._table3DDisplayWidth/10).toFixed(10));
-//         const valueMag = (this._table3DDisplayHeight-this._valueOffset2D-this._padding2D*2) / (this._valueMax-this._valueMin);
-
-//         for(let i=0; i<axis.length; i++) {
-//             if(this._value[i] === undefined)
-//                 continue;
-
-//             let x = this._yResolution < 2? i : 0;
-//             let y = this._yResolution < 2? 0 : i;
-
-//             this.svg[i+axis.length-1] ={
-//                 circle: { 
-//                     cx: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     cy: parseFloat(((this._table3DDisplayHeight-this._valueOffset2D-this._padding2D)-((parseFloat(this._value[i])-this._valueMin) * valueMag)).toFixed(10)), 
-//                     r },
-//                 x: x,
-//                 y: y,
-//                 midPointValue: this._value[i],
-//                 hue: this._getHueFromValue(this._value[i])
-//             };
-//             if(i !== 0) {
-//                 const midPointValue = (this._value[i] + this._value[i-1])/2
-//                 this.svg[i-1] = {
-//                     line: {
-//                         x1: this.svg[i+axis.length-1].circle.cx, 
-//                         y1: this.svg[i+axis.length-1].circle.cy,
-//                         x2: this.svg[i+axis.length-2].circle.cx, 
-//                         y2: this.svg[i+axis.length-2].circle.cy
-//                     },
-//                     midPointValue: midPointValue,
-//                     hue: this._getHueFromValue(midPointValue)
-//                 };
-//             }
-//         }
-//         let axis0found = false;
-//         for(let i=0; i<axis.length; i++) {
-//             if(parseFloat(axis[i])===0)
-//                 axis0found = true;
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     y1: this._padding2D,
-//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
-//                 },
-//                 color: parseFloat(axis[i])===0? undefined : `dimgrey`
-//             });
-//             this.svg.unshift({
-//                 text: {
-//                     x: this.svg[0].line.x2,
-//                     y: this.svg[0].line.y2 + r,
-//                     alignmentbaseline: `hanging`,
-//                     text: Table._formatNumberForDisplay(axis[i])
-//                 }
-//             })
-//         }
-//         let value0found = false;
-//         for(let i=0; i<valueaxis.length; i++) {
-//             if(parseFloat(valueaxis[i])===0)
-//                 value0found = true;
-//             this.svg.unshift({
-//                 line: {
-//                     x1: this._axisOffset2D+this._padding2D,
-//                     y1: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10)),
-//                     x2: this._table3DDisplayWidth-this._padding2D, 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10))
-//                 },
-//                 color: parseFloat(valueaxis[i])===0? undefined : `dimgrey`
-//             });
-//             this.svg.unshift({
-//                 text: {
-//                     x: this.svg[0].line.x1-r,
-//                     y: this.svg[0].line.y1,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `end`,
-//                     text: Table._formatNumberForDisplay(valueaxis[i])
-//                 }
-//             })
-//         }
-
-//         //xy origin
-//         if(axisMin <= 0 && axisMax >= 0 && !axis0found) {
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
-//                     y1: this._padding2D,
-//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
-//                 }
-//             });
-//         }
-//         let liney0 = this._table3DDisplayHeight-this._valueOffset2D-this._padding2D;
-//         if(this._valueMin <= 0 && this._valueMax >= 0) liney0 = parseFloat(((liney0)-(0-this._valueMin) * valueMag).toFixed(10));
-//         else if(this._valueMax < 0) liney0 = this._padding2D;
-//         if(!value0found) {
-//             this.svg.unshift({
-//                 line: {
-//                     x1: this._axisOffset2D+this._padding2D, 
-//                     y1: liney0,
-//                     x2: this._table3DDisplayWidth-this._padding2D, 
-//                     y2: liney0
-//                 }
-//             });
-//         }
-//     }
 //     _calculateSvg3D() {
 //         this._calculateValueMinMax();
 //         this.svg=[];
@@ -1164,35 +929,137 @@ customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
 //                 });
 //             }
 //         });
-//         document.addEventListener('wheel', function(e){
-//             if( thisClass._xResolution < 2 || thisClass._yResolution < 2)
-//                 return;
-
-//             if($(e.target).parents(`#${thisClass.GUID}-tablesvg`).length > 0) {
-//                 if(e.wheelDelta /120 > 0) {
-//                     thisClass._table3DZoom *= 1.01;
-//                 }
-//                 else{
-//                     thisClass._table3DZoom *= 0.99;
-//                 }
-//                 thisClass.UpdateSvgHtml();
-//                 e.preventDefault();
-//                 e.stopPropagation()
-//                 return false;
-//             }
-//         }, {passive: false});
 //     }
 
 
-//     $(`#${thisClass.GUID}-tablesvg g path`).removeClass(`selected`)
-//     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX; x++) {
-//         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY; y++) {
-//             $(`#${thisClass.GUID}-tablesvg g path[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+//     _dataSvg=[];
+//     _xAxisSvg=[];
+//     _yAxisSvg=[];
+//     _padding2D = 25;
+//     _axisOffset2D = 100;
+//     _valueOffset2D = 25;
+//     _calculateSvg2D() {
+//         this._calculateValueMinMax();
+//         this.svg=[];
+//         const axis = this._yResolution < 2? this.XAxis : this.YAxis;
+//         if(axis.length === 0)
+//             return;
+//         let axisMin = 10000000000;
+//         let axisMax = -10000000000;
+//         for(let i=0; i<axis.length; i++) {
+//             let a = axis[i];
+//             if(a < axisMin)
+//                 axisMin = a;
+//             if(a > axisMax)
+//                 axisMax = a;
 //         }
-//     }
-//     $(`#${thisClass.GUID}-tablesvg g circle`).removeClass(`selected`);
-//     for(let x=thisClass._minSelectX; x<thisClass._maxSelectX+1; x++) {
-//         for(let y=thisClass._minSelectY; y<thisClass._maxSelectY+1; y++) {
-//             $(`#${thisClass.GUID}-tablesvg g circle[data-x='${x}'][data-y='${y}']`).addClass(`selected`);
+//         let valueaxis = new Array(parseInt(1.5+axis.length * this._table3DDisplayHeight/this._table3DDisplayWidth));
+//         for(let i=0; i<valueaxis.length; i++) {
+//             valueaxis[i] = i*(this._valueMax-this._valueMin)/(valueaxis.length-1) + this._valueMin;
+//         }
+//         const axisMag = (this._table3DDisplayWidth-this._axisOffset2D-this._padding2D*2) / (axisMax-axisMin);
+//         const r = parseFloat((1/(axis.length*2)*this._table3DDisplayWidth/10).toFixed(10));
+//         const valueMag = (this._table3DDisplayHeight-this._valueOffset2D-this._padding2D*2) / (this._valueMax-this._valueMin);
+
+//         for(let i=0; i<axis.length; i++) {
+//             if(this._value[i] === undefined)
+//                 continue;
+
+//             let x = this._yResolution < 2? i : 0;
+//             let y = this._yResolution < 2? 0 : i;
+
+//             this.svg[i+axis.length-1] ={
+//                 circle: { 
+//                     cx: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
+//                     cy: parseFloat(((this._table3DDisplayHeight-this._valueOffset2D-this._padding2D)-((parseFloat(this._value[i])-this._valueMin) * valueMag)).toFixed(10)), 
+//                     r },
+//                 x: x,
+//                 y: y,
+//                 midPointValue: this._value[i],
+//                 hue: this._getHueFromValue(this._value[i])
+//             };
+//             if(i !== 0) {
+//                 const midPointValue = (this._value[i] + this._value[i-1])/2
+//                 this.svg[i-1] = {
+//                     line: {
+//                         x1: this.svg[i+axis.length-1].circle.cx, 
+//                         y1: this.svg[i+axis.length-1].circle.cy,
+//                         x2: this.svg[i+axis.length-2].circle.cx, 
+//                         y2: this.svg[i+axis.length-2].circle.cy
+//                     },
+//                     midPointValue: midPointValue,
+//                     hue: this._getHueFromValue(midPointValue)
+//                 };
+//             }
+//         }
+//         let axis0found = false;
+//         for(let i=0; i<axis.length; i++) {
+//             if(parseFloat(axis[i])===0)
+//                 axis0found = true;
+//             this.svg.unshift({
+//                 line: {
+//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
+//                     y1: this._padding2D,
+//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
+//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
+//                 },
+//                 color: parseFloat(axis[i])===0? undefined : `dimgrey`
+//             });
+//             this.svg.unshift({
+//                 text: {
+//                     x: this.svg[0].line.x2,
+//                     y: this.svg[0].line.y2 + r,
+//                     alignmentbaseline: `hanging`,
+//                     text: Table._formatNumberForDisplay(axis[i])
+//                 }
+//             })
+//         }
+//         let value0found = false;
+//         for(let i=0; i<valueaxis.length; i++) {
+//             if(parseFloat(valueaxis[i])===0)
+//                 value0found = true;
+//             this.svg.unshift({
+//                 line: {
+//                     x1: this._axisOffset2D+this._padding2D,
+//                     y1: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10)),
+//                     x2: this._table3DDisplayWidth-this._padding2D, 
+//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10))
+//                 },
+//                 color: parseFloat(valueaxis[i])===0? undefined : `dimgrey`
+//             });
+//             this.svg.unshift({
+//                 text: {
+//                     x: this.svg[0].line.x1-r,
+//                     y: this.svg[0].line.y1,
+//                     alignmentbaseline: `middle`,
+//                     anchor: `end`,
+//                     text: Table._formatNumberForDisplay(valueaxis[i])
+//                 }
+//             })
+//         }
+
+//         //xy origin
+//         if(axisMin <= 0 && axisMax >= 0 && !axis0found) {
+//             this.svg.unshift({
+//                 line: {
+//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
+//                     y1: this._padding2D,
+//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
+//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
+//                 }
+//             });
+//         }
+//         let liney0 = this._table3DDisplayHeight-this._valueOffset2D-this._padding2D;
+//         if(this._valueMin <= 0 && this._valueMax >= 0) liney0 = parseFloat(((liney0)-(0-this._valueMin) * valueMag).toFixed(10));
+//         else if(this._valueMax < 0) liney0 = this._padding2D;
+//         if(!value0found) {
+//             this.svg.unshift({
+//                 line: {
+//                     x1: this._axisOffset2D+this._padding2D, 
+//                     y1: liney0,
+//                     x2: this._table3DDisplayWidth-this._padding2D, 
+//                     y2: liney0
+//                 }
+//             });
 //         }
 //     }

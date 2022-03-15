@@ -379,8 +379,12 @@
     border-color: var(--border-hover-color);
 }
 .ui.graph3d path {
-    fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
+    fill: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%, 90%);
 }
 .ui.graph3d circle {
+    display: none;
     fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
+}
+.ui.graph3d circle.selected {
+    display: default;
 }
