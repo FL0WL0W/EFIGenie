@@ -575,14 +575,18 @@ export default class UIGraph3D extends HTMLDivElement {
                 }
             } else  if(event.button === 1) {
                 move={
-                    pageXCameraX: thisClass.cameraX + event.pageX,
-                    pageYCameraY: thisClass.cameraY + event.pageY
+                    pageX: event.pageX,
+                    pageY: event.pageY,
+                    cameraX: thisClass.cameraX,
+                    cameraY: thisClass.cameraY
                 }
                 event.preventDefault();
             } else if(event.button === 2) {
                 rotate = {
-                    pageXYaw: thisClass.yaw + event.pageX,
-                    pageYPitch: thisClass.pitch - event.pageY,
+                    pageX: event.pageX,
+                    pageY: event.pageY,
+                    yaw: thisClass.yaw,
+                    pitch: thisClass.pitch
                 };
                 event.preventDefault();
             }
@@ -590,7 +594,7 @@ export default class UIGraph3D extends HTMLDivElement {
             //dragValue
             if(dragValue) {
                 function mouseMove(event) {
-                    dragValue.closestCircle.value = dragValue.value+(dragValue.pageY - event.pageY)*dragValue.mag 
+                    dragValue.closestCircle.value = dragValue.value + (dragValue.pageY - event.pageY) * dragValue.mag 
                     thisClass.dispatchEvent(new Event(`change`));
                 }
                 function mouseUp() {
@@ -604,8 +608,8 @@ export default class UIGraph3D extends HTMLDivElement {
             //move
             if(move) {
                 function mouseMove(event) {
-                    thisClass.cameraX = move.pageXCameraX - event.pageX;
-                    thisClass.cameraY = move.pageYCameraY - event.pageY;
+                    thisClass.cameraX = move.cameraX + move.pageX - event.pageX;
+                    thisClass.cameraY = move.cameraY + move.pageY - event.pageY;
                 }
                 function mouseUp() {
                     document.removeEventListener(`mousemove`, mouseMove);
@@ -618,8 +622,8 @@ export default class UIGraph3D extends HTMLDivElement {
             //rotate
             if(rotate) {
                 function mouseMove(event) {
-                    thisClass.yaw = rotate.pageXYaw-event.pageX;
-                    thisClass.pitch = rotate.pageYPitch+event.pageY;
+                    thisClass.yaw = rotate.yaw + rotate.pageX - event.pageX;
+                    thisClass.pitch = rotate.pitch + event.pageY - rotate.pageY;
                 }
                 function mouseUp() {
                     document.removeEventListener(`mousemove`, mouseMove);
