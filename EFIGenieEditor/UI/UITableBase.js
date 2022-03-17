@@ -9,7 +9,7 @@ export default class UITableBase extends HTMLDivElement {
             throw `Value length does not match table length. Set xResolution and yResolution before setting value\ncurrent:${value.length}\nnew:${this.xResolution * this.yResolution}`;
         let same = true;
         for(let i = 0; i < this._valueElement.children.length; i++){
-            if(this._valueElement.children[i].value === value[i])
+            if((isNaN(this._valueElement.children[i].value) && isNaN(value[i])) || this._valueElement.children[i].value === value[i])
                 continue;
             same = false;
             break;

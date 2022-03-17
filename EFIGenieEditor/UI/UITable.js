@@ -977,6 +977,7 @@ export default class UITable extends UITableBase {
                     interpolateX();
                 if(thisClass._yAxisElement.querySelectorAll(`.selected`).length > 2)
                     interpolateY();
+                return;
             }
             let xMin = 18000000000000000000;
             let xMax = -9000000000000000000;
