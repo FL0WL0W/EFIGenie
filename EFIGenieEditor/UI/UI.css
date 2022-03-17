@@ -381,6 +381,10 @@
 .ui.graph3d path {
     fill: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%, 90%);
 }
+.ui.graph3d line {
+    stroke: white;
+    stroke-width: 1;
+}
 .ui.graph3d circle {
     display: none;
     fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);

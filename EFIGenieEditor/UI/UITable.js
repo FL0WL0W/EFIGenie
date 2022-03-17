@@ -113,7 +113,7 @@ export default class UITable extends HTMLDivElement {
             }
         }
         this.#xResolutionElement.value = xResolution;
-        while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
+        while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.lastChild); }
         for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
             const xAxisElement = this.#xAxisElement.appendChild(document.createElement(`div`)); 
             Object.defineProperty(xAxisElement, 'value', UITable.#cellValueGetterSetter);
@@ -137,7 +137,7 @@ export default class UITable extends HTMLDivElement {
         this.xResolution = xAxis.length;
         const thisClass = this;
         xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.value = xAxisValue; });
-        //interpolation
+        ///*TODO*/interpolation
         this.dispatchEvent(new Event(`change`));
     }
     get yResolutionModifiable() {
@@ -184,7 +184,7 @@ export default class UITable extends HTMLDivElement {
             }
         }
         this.#yResolutionElement.value = yResolution;
-        while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
+        while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.lastChild); }
         for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
             const yAxisElement = this.#yAxisElement.appendChild(document.createElement(`div`)); 
             Object.defineProperty(yAxisElement, 'value', UITable.#cellValueGetterSetter);
@@ -208,7 +208,7 @@ export default class UITable extends HTMLDivElement {
         this.yResolution = yAxis.length;
         const thisClass = this;
         yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.value = yAxisValue; });
-        //interpolation
+        ///*TODO*/interpolation
         this.dispatchEvent(new Event(`change`));
     }
 
@@ -606,7 +606,7 @@ export default class UITable extends HTMLDivElement {
     #resolutionChanged() {
         this.style.setProperty('--xresolution', this.xResolution);
         this.style.setProperty('--yresolution', this.yResolution);
-        while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.children[this.xResolution * this.yResolution]); }
+        while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.lastChild); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
             const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElement(`div`));
             Object.defineProperty(valueElement, 'value', UITable.#cellValueGetterSetter);
