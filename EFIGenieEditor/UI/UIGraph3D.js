@@ -116,7 +116,6 @@ export default class UIGraph3D extends UITableBase {
             return;
         this.#transformPrecalcPrivate = transformPrecalc;
         const r = transformPrecalc.zoom/(7.5 * Math.max(this.xResolution, this.yResolution));
-        this.#updateDepth = false;
         const valueChildren = [...this._valueElement.children];
         const valuePathChildren = [...this.#valuePathElement.children];
         valueChildren.forEach(function(element) { element.setAttribute(`r`, r.toFixed(10)); element.update(); });
@@ -124,7 +123,6 @@ export default class UIGraph3D extends UITableBase {
         valuePathChildren.sort(function(a, b) { return b.depth-a.depth; }).forEach(element => this.#valuePathElement.append(element));
         [...this._xAxisElement.children].forEach(function(element) { element.update(); });
         [...this._yAxisElement.children].forEach(function(element) { element.update(); });
-        this.#updateDepth = true;
     }
     #yaw;
     #pitch;
@@ -199,7 +197,7 @@ export default class UIGraph3D extends UITableBase {
             transformPrecalc = UIGraph3D.transformPrecalc();
         let x=(transformPrecalc.cosYaw*point[0]+transformPrecalc.sinYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetX;
         let y=(transformPrecalc.sinPitchSinYaw*point[0]+transformPrecalc.cosPitch*point[1]+transformPrecalc.nSinPitchCosYaw*point[2])*transformPrecalc.zoom+transformPrecalc.offsetY;
-        let depth=(transformPrecalc.nCosPitchSinYaw*point[0]+transformPrecalc.sinPitch*point[1]+transformPrecalc.cosPitchcosYaw*point[2])*transformPrecalc.zoom;
+        let depth=(transformPrecalc.nCosPitchSinYaw*point[0]+transformPrecalc.sinPitch*point[1])*transformPrecalc.zoom;
         return [x,y,depth];
     }
     #cellToPoint(x, y, value) {
@@ -253,7 +251,6 @@ export default class UIGraph3D extends UITableBase {
         ]];
     }
 
-    #updateDepth = true;
     _resolutionChanged(axisElements, axisResolution) {
         const thisClass = this;
         while(axisResolution < axisElements.children.length) { axisElements.removeChild(axisElements.lastChild); }
@@ -335,22 +332,6 @@ export default class UIGraph3D extends UITableBase {
                 get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
                 set: function(value) { this.style.setProperty(`--data-value`, value); }
             });
-            Object.defineProperty(valuepathElement, 'depth',  {
-                get: function() { return parseFloat(this.dataset.depth); },
-                set: function(depth) { 
-                    depth = parseFloat(depth);
-                    if(this.depth === depth)
-                        return;
-                    this.dataset.depth = depth;
-                    if(thisClass.#updateDepth) {
-                        const after = [...thisClass.#valuePathElement.children].find(element => element.depth<depth)
-                        if(!after)
-                            thisClass.#valuePathElement.append(this);
-                        else if(after !== this.nextSibling)
-                            thisClass.#valuePathElement.insertBefore(this, after);
-                    }
-                }
-            });
             valuepathElement.update = function() {
                 if(!this.p1 || !this.p2 || !this.p3 || !this.p4)
                     return;
@@ -408,15 +389,6 @@ export default class UIGraph3D extends UITableBase {
                     if(this.vp2) this.vp2.p2 = p;
                     if(this.vp3) this.vp3.p3 = p;
                     if(this.vp4) this.vp4.p4 = p;
-                }
-            });
-            Object.defineProperty(valueElement, 'depth', {
-                get: function() { return parseFloat(this.dataset.depth); },
-                set: function(depth) { 
-                    depth = parseFloat(depth);
-                    if(this.depth === depth)
-                        return;
-                    this.dataset.depth = depth;
                 }
             });
             valueElement.update = function circleUpdater() {
@@ -539,7 +511,7 @@ export default class UIGraph3D extends UITableBase {
             if(rotate) {
                 function mouseMove(event) {
                     let yaw = rotate.yaw + rotate.pageX - event.pageX;
-                    let pitch = rotate.pitch + event.pageY - rotate.pageY;
+                    let pitch = Math.max(-90,Math.min(90,rotate.pitch + event.pageY - rotate.pageY));
                     if(yaw === thisClass.yaw && pitch === thisClass.pitch)
                         return;
 
