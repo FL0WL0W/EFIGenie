@@ -409,6 +409,7 @@
     display: none;
     fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
 }
+.ui.graph3d path.selected,
 .ui.graph3d circle.selected {
     fill: var(--background-selected-color) !important;
     display: block !important;

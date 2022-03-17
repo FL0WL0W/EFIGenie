@@ -470,13 +470,19 @@ class Calculation_2AxisTable extends UI.OldTemplate {
         const thisClass = this;
         this.Dialog = new UI.Dialog({
             ButtonText: `Edit Table`,
-            TemplateIdentifier: `Table`
+            TemplateIdentifier: `TableGroup`
         });
-        this.Table = new UI.Graph3D({
+        this.TableGroup = `$Graph$</br>$Table$`;
+        this.Table = new UI.Table({
             BaseObj: true,
+        });
+        this.Graph = new UI.Graph3D({
             width: 800,
             height: 450
         });
+        delete this.Graph.saveValue;
+        this.Table.attachToTable(this.Graph);
+        this.Graph.attachToTable(this.Table);
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);

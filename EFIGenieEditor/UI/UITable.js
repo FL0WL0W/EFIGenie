@@ -1,6 +1,25 @@
 import UITableBase from "./UITableBase.js"
 
 export default class UITable extends UITableBase {
+    get selecting() {
+        return super.selecting;
+    }
+    set selecting(selecting) {
+        if(JSON.stringify(this.selecting) === JSON.stringify(selecting))
+            return;
+        this.#tableElement.querySelectorAll(`input`)?.forEach(function(element) { element.parentElement.innerHTML = formatNumberForDisplay(element.parentElement.value); });
+        let startElement = [...this._valueElement.children].find(element => element.x===selecting.startX && element.y===selecting.startY);
+        if(isNaN(selecting.startX))
+            startElement = [...this._yAxisElement.children].find(element => element.y===selecting.startY);
+        if(isNaN(selecting.startY))
+            startElement = [...this._xAxisElement.children].find(element => element.x===selecting.startX);
+        if(startElement && this.#valueInputElement.parentElement !== startElement) {
+            startElement.innerHTML = ``;
+            this.#valueInputElement.value = startElement.value;
+            startElement.append(this.#valueInputElement);
+        }
+        super.selecting = selecting;
+    }
     //axis properties
     get xResolutionModifiable() {
         return !this.#xResolutionDragElement.hidden;
@@ -144,7 +163,6 @@ export default class UITable extends UITableBase {
     _yAxisElement = document.createElement(`div`);
     _valueElement       = document.createElement(`div`);
     #valueInputElement  = document.createElement(`input`);
-    _selecting;
 
     //delete onchange and migrate to addEventListener(`change`)
     onChange = [];
@@ -482,7 +500,7 @@ export default class UITable extends UITableBase {
                 return;
             let x = parseInt(thisClass.#valueInputElement.parentElement.x);
             let y = parseInt(thisClass.#valueInputElement.parentElement.y);
-            const oldVal = parseFloat(thisClass.#valueInputElement.value);
+            const oldVal = parseFloat(thisClass.#valueInputElement.parentElement.value);
             let value = parseFloat(thisClass.#valueInputElement.value);
             if(isNaN(value) || value === oldVal || (x==undefined && y==undefined))
                 return;
@@ -514,7 +532,7 @@ export default class UITable extends UITableBase {
         }
         this.#valueInputElement.addEventListener(`change`, valueInputChange); 
 
-        thisClass.#valueInputElement.addEventListener(`copy`, function(event){
+        this.#valueInputElement.addEventListener(`copy`, function(event){
             let copyData = ``;
 
             let currentY;
@@ -537,7 +555,7 @@ export default class UITable extends UITableBase {
             event.preventDefault();
         });
 
-        thisClass.#valueInputElement.addEventListener(`paste`, function(event){
+        this.#valueInputElement.addEventListener(`paste`, function(event){
             var val = event.clipboardData.getData(`text/plain`);
             const lines = val.split(`\n`).length;
             const cols = val.split(`\t`).length;
@@ -681,9 +699,6 @@ export default class UITable extends UITableBase {
                 const targetIsDataValue = selecting.startElement.x !== undefined || selecting.startElement.y !== undefined;
                 if(addSelectNumber) {
                     if(targetIsDataValue) {
-                        selecting.startElement.innerHTML = ``;
-                        thisClass.#valueInputElement.value = selecting.startElement.value;
-                        selecting.startElement.append(thisClass.#valueInputElement);
                         thisClass.#valueInputElement.select();
                     }
                 }
@@ -717,7 +732,6 @@ export default class UITable extends UITableBase {
                 }
                 if(event.target.type !== `number`) {
                     addSelectNumber = true;
-                    thisClass.#tableElement.querySelectorAll(`input`)?.forEach(function(element) { element.parentElement.innerHTML = formatNumberForDisplay(element.parentElement.value); });
                 }
             }
             document.addEventListener(`touchmove`, touchMoveEvent);
@@ -805,9 +819,9 @@ export default class UITable extends UITableBase {
                 return;
             
             let element = thisClass._valueElement;
-            if(thisClass.#modifyValueElement.parentElement.x === undefined)
+            if(thisClass.#valueInputElement.parentElement.x === undefined)
                 element = thisClass._yAxisElement;
-            if(thisClass.#modifyValueElement.parentElement.y === undefined)
+            if(thisClass.#valueInputElement.parentElement.y === undefined)
                 element = thisClass._xAxisElement;
             element.querySelectorAll(`.selected`).forEach(function(selectedElement) {
                 switch(operation) {
@@ -892,7 +906,7 @@ export default class UITable extends UITableBase {
             });
             const xAxis = thisClass.xAxis;
             const xDiff = xAxis[xMax] - xAxis[xMin];
-            if(selectedElements === thisClass._valueElement) {
+            if(!isNaN(selectedElements[0].y)) {
                 const xResolution = thisClass.xResolution;
                 const tableValue = thisClass.value;
                 selectedElements.forEach(function(element) {
@@ -933,7 +947,7 @@ export default class UITable extends UITableBase {
             });
             const yAxis = thisClass.yAxis;
             const yDiff = yAxis[yMax] - yAxis[yMin];
-            if(selectedElements === thisClass._valueElement) {
+            if(!isNaN(selectedElements[0].x)) {
                 const xResolution = thisClass.xResolution;
                 const tableValue = thisClass.value;
                 selectedElements.forEach(function(element) {

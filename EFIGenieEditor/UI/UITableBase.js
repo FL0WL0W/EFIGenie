@@ -33,27 +33,20 @@ export default class UITableBase extends HTMLDivElement {
         if(saveValue === undefined) 
             return;
 
-        if(saveValue.XResolution !== undefined && this.xResolutionModifiable)
-            this.xResolution = saveValue.XResolution;
-        if(saveValue.YResolution !== undefined && this.yResolutionModifiable)
-            this.yResolution = saveValue.YResolution;
-        if(saveValue.Resolution !== undefined) {
-            if(this.xResolutionModifiable && !this.yResolutionModifiable)
-                this.xResolution = saveValue.Resolution;
-            if(this.yResolutionModifiable && !this.xResolutionModifiable)
-                this.yResolution = saveValue.Resolution;
-        }
-
-        if(saveValue.MaxX !== undefined && saveValue.MinX !== undefined) {
-            const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (this.XResolution - 1);
-            for(let x=0; x<this.XResolution; x++){
-                this.xAxis[x] = saveValue.MinX + xAxisAdd * x;
+        const xResolution = saveValue.XResolution ?? saveValue.Resolution;
+        const yResolution = saveValue.YResolution ?? saveValue.Resolution;
+        if(xResolution && saveValue.MaxX !== undefined && saveValue.MinX !== undefined && saveValue.MaxX !== null && saveValue.MinX !== null) {
+            saveValue.XAxis = new Array(xResolution);
+            const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (xResolution - 1);
+            for(let x=0; x<xResolution; x++){
+                saveValue.XAxis[x] = saveValue.MinX + xAxisAdd * x;
             }
         }
-        if(saveValue.MaxY !== undefined && saveValue.MinY !== undefined) {
-            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (this.YResolution - 1);
-            for(let y=0; y<this.YResolution; y++){
-                this.yAxis[y] = saveValue.MinY + yAxisAdd * y;
+        if(yResolution && saveValue.MaxY !== undefined && saveValue.MinY !== undefined && saveValue.MaxY !== null && saveValue.MinY !== null) {
+            saveValue.YAxis = new Array(yResolution);
+            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (yResolution - 1);
+            for(let y=0; y<yResolution; y++){
+                saveValue.YAxis[y] = saveValue.MinY + yAxisAdd * y;
             }
         }
 
@@ -100,6 +93,8 @@ export default class UITableBase extends HTMLDivElement {
         return [...this._xAxisElement.children].map(x => x.value);
     }
     set xAxis(xAxis) {
+        if(JSON.stringify(xAxis) === JSON.stringify(this.xAxis))
+            return;
         this.xResolution = xAxis.length;
         const thisClass = this;
         xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass._xAxisElement.children[xAxisIndex]; xAxisElement.value = xAxisValue; });
@@ -140,6 +135,8 @@ export default class UITableBase extends HTMLDivElement {
         return [...this._yAxisElement.children].map(x => x.value);
     }
     set yAxis(yAxis) {
+        if(JSON.stringify(yAxis) === JSON.stringify(this.yAxis))
+            return;
         this.yResolution = yAxis.length;
         const thisClass = this;
         yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass._yAxisElement.children[yAxisIndex]; yAxisElement.value = yAxisValue; });
@@ -147,13 +144,12 @@ export default class UITableBase extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
 
+    #selecting;
     get selecting() {
-        return this._selecting;
+        return this.#selecting;
     }
     set selecting(selecting) {
-        if(JSON.stringify(this._selecting) === JSON.stringify(selecting))
-            return;
-        this._selecting = selecting;
+        this.#selecting = selecting;
         this._valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
         this._xAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
         this._yAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
@@ -190,5 +186,17 @@ export default class UITableBase extends HTMLDivElement {
     }
     set _valueMax(valueMax) {
         this.style.setProperty('--valuemax', valueMax);
+    }
+
+    attachToTable(table) {
+        const thisClass = this;
+        table.addEventListener(`change`, function(){
+            thisClass.xAxis = table.xAxis;
+            thisClass.yAxis = table.yAxis;
+            thisClass.value = table.value;
+        });
+        table.addEventListener(`select`, function() {
+            thisClass.selecting = table.selecting;
+        })
     }
 }

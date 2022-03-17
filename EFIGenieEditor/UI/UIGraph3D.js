@@ -15,6 +15,27 @@ export default class UIGraph3D extends UITableBase {
         [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
         [...this._yAxisElement.children].forEach(function(element) { element.update(); });
     }
+    get selecting() {
+        return super.selecting;
+    }
+    set selecting(selecting) {
+        if(JSON.stringify(this.selecting) === JSON.stringify(selecting))
+            return;
+        this.#valuePathElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
+        if(selecting) {
+            for(let i=0; i<this.#valuePathElement.children.length; i++) {
+                let element = this.#valuePathElement.children[i];
+                if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x1) ||
+                    Math.max(selecting.endX, selecting.startX) < parseInt(element.x2) ||
+                    Math.min(selecting.endY, selecting.startY) > parseInt(element.y1) ||
+                    Math.max(selecting.endY, selecting.startY) < parseInt(element.y3)){
+                    continue;
+                }
+                element.classList.add(`selected`); 
+            };
+        }
+        super.selecting = selecting;
+    }
     get pitch() {
         return this.#pitch ?? 0;
     }
@@ -85,7 +106,6 @@ export default class UIGraph3D extends UITableBase {
     _valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
     #valuePathElement   = document.createElementNS('http://www.w3.org/2000/svg','g');
     #svgElement         = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    _selecting;
 
     #transformPrecalcPrivate;
     get #transformPrecalc() {
