@@ -1,6 +1,20 @@
 import UITableBase from "./UITableBase.js"
 
 export default class UIGraph3D extends UITableBase {
+    get xAxis() { return super.xAxis; }
+    set xAxis(xAxis) {
+        super.xAxis = xAxis;
+        [...this._valueElement.children].forEach(function(element) { element.update(); });
+        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
+        [...this._xAxisElement.children].forEach(function(element) { element.update(); });
+    }
+    get yAxis() { return super.yAxis; }
+    set yAxis(yAxis) {
+        super.yAxis = yAxis;
+        [...this._valueElement.children].forEach(function(element) { element.update(); });
+        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
+        [...this._yAxisElement.children].forEach(function(element) { element.update(); });
+    }
     get pitch() {
         return this.#pitch ?? 0;
     }
