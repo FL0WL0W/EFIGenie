@@ -475,7 +475,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
         this.Table = new UI.Graph3D({
             BaseObj: true,
             width: 800,
-            height: 600
+            height: 450
         });
         this.NoParameterSelection = false;
         this.Label = `Value`;

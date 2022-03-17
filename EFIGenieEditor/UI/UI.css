@@ -378,11 +378,31 @@
     background-color: var(--background-hover-color); 
     border-color: var(--border-hover-color);
 }
+.ui.graph3d svg {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.ui.graph3d svg g{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 .ui.graph3d path {
     fill: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%, 90%);
 }
 .ui.graph3d line {
-    stroke: white;
+    stroke: var(--text-color);
     stroke-width: 1;
 }
 .ui.graph3d circle {
@@ -390,6 +410,9 @@
     fill: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
 }
 .ui.graph3d circle.selected {
-    fill: #3590d0 !important;
-    display: block !important;;
+    fill: var(--background-selected-color) !important;
+    display: block !important;
+}
+.ui.graph3d text {
+    fill: var(--text-color);
 }

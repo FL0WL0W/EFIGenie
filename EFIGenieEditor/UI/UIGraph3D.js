@@ -1,220 +1,6 @@
-export default class UIGraph3D extends HTMLDivElement {
-    onChange = [];
-    get value() {
-        const thisClass = this;
-        return [...this.#valueElement.children].sort(function(a, b) { return (a.x - b.x) + thisClass.xResolution * (a.y - b.y); }).map(x => x.value);
-    }
-    set value(value) {
-        if(value === undefined)
-            return;
-        if(value.length !== this.xResolution * this.yResolution)
-            throw `Value length does not match table length. Set xResolution and yResolution before setting value`;
-        let same = true;
-        let prevValue = this.value;
-        for(let i = 0; i < prevValue.length; i++){
-            if(prevValue[i] === value[i])
-                continue;
-            same = false;
-            break;
-        }
-        if(same)
-            return;
+import UITableBase from "./UITableBase.js"
 
-        this.#valueMin = 18000000000000000000;
-        this.#valueMax = -9000000000000000000;
-        for(let i = 0; i < value.length; i++) {
-            if(value[i] < this.#valueMin)
-                this.#valueMin = value[i];
-            if(value[i] > this.#valueMax)
-                this.#valueMax = value[i];
-        }
-        if(this.#valueMax === this.#valueMin)
-            this.#valueMax = this.#valueMin + 1;
-        const thisClass = this;
-        let childElements = [...this.#valueElement.children].sort(function(a, b) { return (a.x - b.x) + thisClass.xResolution * (a.y - b.y); });
-        for(let i = 0; i < childElements.length; i++) {
-            childElements[i].value = value[i];
-        }
-        this.dispatchEvent(new Event(`change`));
-    }
-    get saveValue() {
-        return {
-            Value: this.value,
-            XAxis: this.xAxis,
-            XResolution: this.xResolution,
-            YAxis: this.yAxis,
-            YResolution: this.yResolution,
-        };
-    }
-    set saveValue(saveValue) {
-        if(saveValue === undefined) 
-            return;
-
-        if(saveValue.XResolution !== undefined)
-            this.xResolution = saveValue.XResolution;
-        if(saveValue.XAxis !== undefined)
-            this.xAxis = saveValue.XAxis;
-        if(saveValue.YResolution !== undefined)
-            this.yResolution = saveValue.YResolution;
-        if(saveValue.YAxis !== undefined)
-            this.yAxis = saveValue.YAxis;
-        if(saveValue.Value !== undefined && Array.isArray(saveValue.Value))
-            this.value = saveValue.Value;
-    }
-
-    //axis properties
-    get xResolution() {
-        return this.#xAxisElement.children.length;
-    }
-    set xResolution(xResolution) {
-        if(isNaN(xResolution) || xResolution === this.xResolution)
-            return;
-
-        const oldValue = this.value;
-        let newValue = new Array(xResolution * this.yResolution);
-        for(let x=0; x<xResolution; x++){
-            for(let y=0; y<this.yResolution; y++){
-                let oldValuesIndex = x + this.xResolution * y;
-                let newValuesIndex = x + xResolution * y;
-                if(x >= this.xResolution){
-                    let newValuesIndexMinus1 = (x-1) + xResolution * y;
-                    let newValuesIndexMinus2 = (x-2) + xResolution * y;
-                    if(x>1){
-                        newValue[newValuesIndex] = newValue[newValuesIndexMinus1] + (newValue[newValuesIndexMinus1] - newValue[newValuesIndexMinus2]);
-                    }
-                } else {
-                    newValue[newValuesIndex] = oldValue[oldValuesIndex];
-                }
-                if(isNaN(newValue[newValuesIndex]))
-                    newValue[newValuesIndex] = 0;
-            }
-        }
-        while(xResolution < this.#xAxisElement.children.length) { this.#xAxisElement.removeChild(this.#xAxisElement.children[xResolution]); }
-        const thisClass = this;
-        for(let i = this.#xAxisElement.children.length; i < xResolution; i++) { 
-            const xAxisElement = this.#xAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
-            xAxisElement.update = function() {
-                const line = thisClass.#axisToLine(this.x, undefined);
-                this.setAttribute(`x1`, line[0][0]);
-                this.setAttribute(`y1`, line[0][1]);
-                this.setAttribute(`x2`, line[1][0]);
-                this.setAttribute(`y2`, line[1][1]);
-            }
-            const xAxisMinus1 = this.#xAxisElement.children[i-1]?.value;
-            const xAxisMinus2 = this.#xAxisElement.children[i-2]?.value;
-            let xAxisMinus0 = 0;
-            if(xAxisMinus1 !== undefined && xAxisMinus2 !== undefined) 
-                xAxisMinus0 = xAxisMinus1 + (xAxisMinus1 - xAxisMinus2);
-            xAxisElement.value = xAxisMinus0;
-            xAxisElement.x = i;
-        }
-        this.#resolutionChanged();
-        this.value = newValue;
-        this.dispatchEvent(new Event(`change`));
-    }
-    get xAxis() {
-        return [...this.#xAxisElement.children].map(x => x.value);
-    }
-    set xAxis(xAxis) {
-        this.xResolution = xAxis.length;
-        const thisClass = this;
-        xAxis.forEach(function(xAxisValue, xAxisIndex) { const xAxisElement = thisClass.#xAxisElement.children[xAxisIndex]; xAxisElement.value = xAxisValue; });
-        [...this.#valueElement.children].forEach(function(element) { element.update(); });
-        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
-        [...this.#xAxisElement.children].forEach(function(element) { element.update(); });
-        this.dispatchEvent(new Event(`change`));
-    }
-    get yResolution() {
-        return this.#yAxisElement.children.length;
-    }
-    set yResolution(yResolution) {
-        if(isNaN(yResolution) || yResolution === this.yResolution)
-            return;
-
-        const oldValue = this.value;
-        let newValue = new Array(this.xResolution * yResolution);
-        for(let x=0; x<this.xResolution; x++){
-            for(let y=0; y<yResolution; y++){
-                let valuesIndex = x + this.xResolution * y;
-                if(y >= this.yResolution){
-                    let valuesIndexMinus1 = x + this.xResolution * (y-1);
-                    let valuesIndexMinus2 = x + this.xResolution * (y-2);
-                    if(y>1){
-                        newValue[valuesIndex] = newValue[valuesIndexMinus1] + (newValue[valuesIndexMinus1] - newValue[valuesIndexMinus2]);
-                    }
-                } else {
-                    newValue[valuesIndex] = oldValue[valuesIndex];
-                }
-                if(isNaN(newValue[valuesIndex]))
-                    newValue[valuesIndex] = 0;
-            }
-        }
-        while(yResolution < this.#yAxisElement.children.length) { this.#yAxisElement.removeChild(this.#yAxisElement.children[yResolution]); }
-        const thisClass = this;
-        for(let i = this.#yAxisElement.children.length; i < yResolution; i++) { 
-            const yAxisElement = this.#yAxisElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line')); 
-            yAxisElement.update = function() {
-                const line = thisClass.#axisToLine(undefined, this.y);
-                this.setAttribute(`x1`, line[0][0]);
-                this.setAttribute(`y1`, line[0][1]);
-                this.setAttribute(`x2`, line[1][0]);
-                this.setAttribute(`y2`, line[1][1]);
-            }
-            const yAxisMinus1 = this.#yAxisElement.children[i-1]?.value;
-            const yAxisMinus2 = this.#yAxisElement.children[i-2]?.value;
-            let yAxisMinus0 = 0;
-            if(yAxisMinus1 !== undefined && yAxisMinus2 !== undefined) 
-                yAxisMinus0 = yAxisMinus1 + (yAxisMinus1 - yAxisMinus2);
-            yAxisElement.value = yAxisMinus0;
-            yAxisElement.y = i;
-        }
-        this.#resolutionChanged();
-        this.value = newValue;
-        this.dispatchEvent(new Event(`change`));
-    }
-    get yAxis() {
-        return [...this.#yAxisElement.children].map(x => x.value);
-    }
-    set yAxis(yAxis) {
-        this.yResolution = yAxis.length;
-        const thisClass = this;
-        yAxis.forEach(function(yAxisValue, yAxisIndex) { const yAxisElement = thisClass.#yAxisElement.children[yAxisIndex]; yAxisElement.value = yAxisValue; });
-        [...this.#valueElement.children].forEach(function(element) { element.update(); });
-        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
-        [...this.#yAxisElement.children].forEach(function(element) { element.update(); });
-        this.dispatchEvent(new Event(`change`));
-    }
-
-    get selecting() {
-        return this.#selecting;
-    }
-    set selecting(selecting) {
-        if(JSON.stringify(this.#selecting) === JSON.stringify(selecting))
-            return;
-        this.#selecting = selecting;
-        this.#valueElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
-        // this.#xAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
-        // this.#yAxisElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
-        if(selecting) {
-            let elementArray = this.#valueElement.children;
-            // if(isNaN(this.selecting.startX))
-            //     elementArray = this.#yAxisElement.children;
-            // if(isNaN(this.selecting.startY))
-            //     elementArray = this.#xAxisElement.children;
-            for(let i=0; i<elementArray.length; i++) {
-                let element = elementArray[i];
-                if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x) ||
-                    Math.max(selecting.endX, selecting.startX) < parseInt(element.x) ||
-                    Math.min(selecting.endY, selecting.startY) > parseInt(element.y) ||
-                    Math.max(selecting.endY, selecting.startY) < parseInt(element.y)){
-                    continue;
-                }
-                element.classList.add(`selected`); 
-            };
-        }
-        this.dispatchEvent(new Event(`select`))
-    }
-
+export default class UIGraph3D extends UITableBase {
     get pitch() {
         return this.#pitch ?? 0;
     }
@@ -280,12 +66,12 @@ export default class UIGraph3D extends HTMLDivElement {
 
     #floorElement       = document.createElementNS('http://www.w3.org/2000/svg','path');
     #zAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
-    #xAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
-    #yAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
-    #valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    _xAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    _yAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
+    _valueElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
     #valuePathElement   = document.createElementNS('http://www.w3.org/2000/svg','g');
     #svgElement         = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    #selecting;
+    _selecting;
 
     #transformPrecalcPrivate;
     get #transformPrecalc() {
@@ -297,13 +83,13 @@ export default class UIGraph3D extends HTMLDivElement {
         this.#transformPrecalcPrivate = transformPrecalc;
         const r = transformPrecalc.zoom/(7.5 * Math.max(this.xResolution, this.yResolution));
         this.#updateDepth = false;
-        const valueChildren = [...this.#valueElement.children];
+        const valueChildren = [...this._valueElement.children];
         const valuePathChildren = [...this.#valuePathElement.children];
         valueChildren.forEach(function(element) { element.setAttribute(`r`, r.toFixed(10)); element.update(); });
         valuePathChildren.forEach(function(element) { element.update(); });
         valuePathChildren.sort(function(a, b) { return b.depth-a.depth; }).forEach(element => this.#valuePathElement.append(element));
-        [...this.#xAxisElement.children].forEach(function(element) { element.update(); });
-        [...this.#yAxisElement.children].forEach(function(element) { element.update(); });
+        [...this._xAxisElement.children].forEach(function(element) { element.update(); });
+        [...this._yAxisElement.children].forEach(function(element) { element.update(); });
         this.#updateDepth = true;
     }
     #yaw;
@@ -314,30 +100,30 @@ export default class UIGraph3D extends HTMLDivElement {
 
     trail(x, y = 0, z) {/*TODO*/}
     
-    get #valueMin() {
-        let valuemin = parseFloat(this.style.getPropertyValue('--valuemin'));
-        return isNaN(valuemin)? 18000000000000000000 : valuemin;
+    get _valueMin() { return super._valueMin; }
+    set _valueMin(valueMin) {
+        super._valueMin = valueMin;
+        [...this._valueElement.children].forEach(function(element) { element.update(); });
+        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
     }
-    set #valueMin(valueMin) {
-        this.style.setProperty('--valuemin', valueMin);
-    }
-    get #valueMax() {
-        let valuemax = parseFloat(this.style.getPropertyValue('--valuemax'));
-        return isNaN(valuemax)? -9000000000000000000 : valuemax;
-    }
-    set #valueMax(valueMax) {
-        this.style.setProperty('--valuemax', valueMax);
+    get _valueMax() { return super._valueMax; }
+    set _valueMax(valueMax) {
+        super._valueMax = valueMax;
+        [...this._valueElement.children].forEach(function(element) { element.update(); });
+        [...this.#valuePathElement.children].forEach(function(element) { element.update(); });
     }
 
+    //delete onchange and migrate to addEventListener(`change`)
+    onChange = [];
     constructor(prop) {
         super();
         this.class = `ui graph3d`;
         this.append(this.#svgElement);
         this.#svgElement.setAttribute(`overflow`, `visible`)
-        this.#svgElement.append(this.#xAxisElement);
-        this.#svgElement.append(this.#yAxisElement);
+        this.#svgElement.append(this._xAxisElement);
+        this.#svgElement.append(this._yAxisElement);
         this.#svgElement.append(this.#valuePathElement);
-        this.#svgElement.append(this.#valueElement);
+        this.#svgElement.append(this._valueElement);
         const propValue = prop.value;
         delete prop.value;
         Object.assign(this, prop);
@@ -383,6 +169,8 @@ export default class UIGraph3D extends HTMLDivElement {
         return [x,y,depth];
     }
     #cellToPoint(x, y, value) {
+        if(isNaN(value))
+            return;
         const xAxis = this.xAxis;
         const yAxis = this.yAxis;
         y = this.yResolution-y-1;
@@ -392,8 +180,8 @@ export default class UIGraph3D extends HTMLDivElement {
         y = (yAxis[y]-yAxis[0])/(yAxis[yAxis.length-1]-yAxis[0]);
         if(isNaN(y))
             y = 0;
-        const valueMax = this.#valueMax === this.#valueMin? this.#valueMin + 1 : this.#valueMax;
-        value = (value-this.#valueMin)/(valueMax-this.#valueMin);
+        const valueMax = this._valueMax === this._valueMin? this._valueMin + 1 : this._valueMax;
+        value = (value-this._valueMin)/(valueMax-this._valueMin);
         return UIGraph3D.transformPoint([x-0.5, -(value-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc);
     }
     #axisToLine(x, y) {
@@ -401,13 +189,13 @@ export default class UIGraph3D extends HTMLDivElement {
         const yAxis = this.yAxis;
         y = this.yResolution-y-1;
         if(x === undefined || isNaN(x))
-            x = this.#transformPrecalc.sinYaw > 0? 0 : 1;
+            x = this.#transformPrecalc?.sinYaw > 0? 0 : 1;
         else
             x = (xAxis[x]-xAxis[0])/(xAxis[xAxis.length-1]-xAxis[0]);
         if(isNaN(x))
             x = 0;
         if(y === undefined || isNaN(y))
-            y = this.#transformPrecalc.cosYaw > 0? 1 : 0;
+            y = this.#transformPrecalc?.cosYaw > 0? 1 : 0;
         else
             y = (yAxis[y]-yAxis[0])/(yAxis[yAxis.length-1]-yAxis[0]);
         if(isNaN(y))
@@ -420,8 +208,8 @@ export default class UIGraph3D extends HTMLDivElement {
     #zaxisToLines(z) {
         const x = this.#transformPrecalc.sinYaw > 0? 0 : 1;
         const y = this.#transformPrecalc.cosYaw > 0? 1 : 0;
-        const valueMax = this.#valueMax === this.#valueMin? this.#valueMin + 1 : this.#valueMax;
-        z = (z-this.#valueMin)/(valueMax-this.#valueMin);
+        const valueMax = this._valueMax === this._valueMin? this._valueMin + 1 : this._valueMax;
+        z = (z-this._valueMin)/(valueMax-this._valueMin);
         return [[
             UIGraph3D.transformPoint([x-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), -0.5], this.#transformPrecalc),
             UIGraph3D.transformPoint([x-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)),  0.5], this.#transformPrecalc)
@@ -432,19 +220,63 @@ export default class UIGraph3D extends HTMLDivElement {
     }
 
     #updateDepth = true;
-    #resolutionChanged() {
+    _resolutionChanged(axisElements, axisResolution) {
         const thisClass = this;
-        function getPathPGetterSetter(index) {
-            let pi = `p${index}`;
-            return {
-                get: function() { return this.dataset[pi]? JSON.parse(this.dataset[pi]) : undefined; },
-                set: function(p) { 
-                    let dataP = JSON.stringify(p);
-                    if(this.dataset[pi] === dataP)
-                        return;
-                    this.dataset[pi] = dataP;
-                }
+        while(axisResolution < axisElements.children.length) { axisElements.removeChild(axisElements.lastChild); }
+        for(let i = axisElements.children.length; i < axisResolution; i++) { 
+            const axisElement = axisElements.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
+            axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
+            const textTop = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
+            textTop.setAttribute(`alignment-baseline`, `middle`);
+            const textBottom = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
+            textBottom.setAttribute(`alignment-baseline`, `middle`);
+            axisElement.update = function() {
+                if(!thisClass.#transformPrecalc)
+                    return;
+                const line = thisClass.#axisToLine(this.x, this.y);
+                this.children[0].setAttribute(`x1`, line[0][0]);
+                this.children[0].setAttribute(`y1`, line[0][1]);
+                this.children[0].setAttribute(`x2`, line[1][0]);
+                this.children[0].setAttribute(`y2`, line[1][1]);
+
+                const textsize = (0.4/Math.max(thisClass.xResolution, thisClass.yResolution)) * thisClass.#transformPrecalc.zoom;
+                const scalextext = Math.abs(this.x !== undefined? thisClass.#transformPrecalc.cosYaw : thisClass.#transformPrecalc.sinYaw);
+                const scaleytext = Math.abs(thisClass.#transformPrecalc.cosPitch);
+                let xoffset = 0;
+                if(this.x === 0)
+                    xoffset = thisClass.#transformPrecalc.sinYaw<0? 0 : thisClass.#transformPrecalc.cosYaw * textsize/2;
+                if(this.x === axisResolution-1)
+                    xoffset = thisClass.#transformPrecalc.sinYaw>0? 0 : -thisClass.#transformPrecalc.cosYaw * textsize/2;
+                if(this.y === 0)
+                    xoffset = thisClass.#transformPrecalc.cosYaw<0? 0 : -thisClass.#transformPrecalc.sinYaw * textsize/2;
+                if(this.y === axisResolution-1)
+                    xoffset = thisClass.#transformPrecalc.cosYaw>0? 0 : thisClass.#transformPrecalc.sinYaw * textsize/2;
+                line[0][0]+=xoffset;
+                line[1][0]+=xoffset;
+                this.children[1].setAttribute(`x`, line[0][0]);
+                this.children[1].setAttribute(`y`, line[0][1]);
+                this.children[1].setAttribute(`transform-origin`, `${line[0][0]} ${line[0][1]}`);
+                this.children[1].setAttribute(`transform`, `scale(${scalextext} ${scaleytext}) rotate(-90)`);
+                this.children[1].setAttribute(`text-anchor`, `end`);
+                this.children[1].setAttribute(`font-size`, textsize);
+                this.children[2].setAttribute(`x`, line[1][0]);
+                this.children[2].setAttribute(`y`, line[1][1]);
+                this.children[2].setAttribute(`transform-origin`, `${line[1][0]} ${line[1][1]}`);
+                this.children[2].setAttribute(`transform`, `scale(${scalextext} ${scaleytext}) rotate(-90)`);
+                this.children[2].setAttribute(`text-anchor`, `start`);
+                this.children[2].setAttribute(`font-size`, textsize);
+                this.children[1].innerHTML = this.children[2].innerHTML = formatNumberForDisplay(this.value);
             }
+            const axisMinus1 = axisElements.children[i-1]?.value;
+            const axisMinus2 = axisElements.children[i-2]?.value;
+            let axisMinus0 = 0;
+            if(axisMinus1 !== undefined && axisMinus2 !== undefined) 
+                axisMinus0 = axisMinus1 + (axisMinus1 - axisMinus2);
+            axisElement.value = axisMinus0;
+            if(axisElements === this._xAxisElement)
+                axisElement.x = i;
+            else
+                axisElement.y = i;
         }
         function getPathVGetterSetter(index) {
             let vi = `v${index}`;
@@ -488,17 +320,13 @@ export default class UIGraph3D extends HTMLDivElement {
             valuepathElement.update = function() {
                 if(!this.p1 || !this.p2 || !this.p3 || !this.p4)
                     return;
-                this.depth = (parseFloat(this.p1[2]) + parseFloat(this.p2[2]) + parseFloat(this.p3[2]) + parseFloat(this.p4[2]))/4;
+                this.depth = (this.p1[2] + this.p2[2] + this.p3[2] + this.p4[2])/4;
                 this.setAttribute(`d`, 
-                                `M${this.p1[0].toFixed(10)},${this.p1[1].toFixed(10)}`+
-                                `L${this.p2[0].toFixed(10)},${this.p2[1].toFixed(10)}`+
-                                `L${this.p3[0].toFixed(10)},${this.p3[1].toFixed(10)}`+
-                                `L${this.p4[0].toFixed(10)},${this.p4[1].toFixed(10)}Z`)
+                                `M${this.p1[0]},${this.p1[1]}`+
+                                `L${this.p2[0]},${this.p2[1]}`+
+                                `L${this.p3[0]},${this.p3[1]}`+
+                                `L${this.p4[0]},${this.p4[1]}Z`)
             };
-            Object.defineProperty(valuepathElement, 'p1', getPathPGetterSetter(1));
-            Object.defineProperty(valuepathElement, 'p2', getPathPGetterSetter(2));
-            Object.defineProperty(valuepathElement, 'p3', getPathPGetterSetter(3));
-            Object.defineProperty(valuepathElement, 'p4', getPathPGetterSetter(4));
             Object.defineProperty(valuepathElement, 'v1', getPathVGetterSetter(1));
             Object.defineProperty(valuepathElement, 'v2', getPathVGetterSetter(2));
             Object.defineProperty(valuepathElement, 'v3', getPathVGetterSetter(3));
@@ -509,19 +337,19 @@ export default class UIGraph3D extends HTMLDivElement {
             valuepathElement.y3 = valuepathElement.y4 = valuepathElement.y1 + 1;
         }
         const valuePathElements = [...thisClass.#valuePathElement.children];
-        while(this.xResolution * this.yResolution < this.#valueElement.children.length) { this.#valueElement.removeChild(this.#valueElement.lastChild); }
+        while(this.xResolution * this.yResolution < this._valueElement.children.length) { this._valueElement.removeChild(this._valueElement.lastChild); }
         for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
-            const valueElement = this.#valueElement.children[i] ?? this.#valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
+            const valueElement = this._valueElement.children[i] ?? this._valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
             Object.defineProperty(valueElement, 'value', {
                 get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
                 set: function(value) { 
                     value = parseFloat(value);
-                    if(this.value === value)
+                    if(this.value === value )
                         return;
-                    if(value < thisClass.#valueMin)
-                        thisClass.#valueMin = value;
-                    if(value > thisClass.#valueMax)
-                        thisClass.#valueMax = value;
+                    if(value < thisClass._valueMin)
+                        thisClass._valueMin = value;
+                    if(value > thisClass._valueMax)
+                        thisClass._valueMax = value;
                     this.style.setProperty(`--data-value`, value); 
                     this.update();
                     if(this.vp1) this.vp1.v1 = value;
@@ -533,13 +361,15 @@ export default class UIGraph3D extends HTMLDivElement {
             Object.defineProperty(valueElement, 'p', {
                 get: function() { return this.dataset.p? JSON.parse(this.dataset.p) : undefined; },
                 set: function(p) {
-                    let dataP = JSON.stringify(p);
-                    if(this.dataset.p === dataP)
+                    if(!p) 
                         return;
-                    this.dataset.p = dataP;
+                    const jsonP = JSON.stringify(p);
+                    if(jsonP === this.dataset.p)
+                        return;
+                    this.dataset.p = jsonP;
+                    p[0] = p[0].toFixed(10);
+                    p[1] = p[1].toFixed(10);
                     this.depth = p[2];
-                    this.setAttribute(`cx`, p[0].toFixed(10));
-                    this.setAttribute(`cy`, p[1].toFixed(10));
                     if(this.vp1) this.vp1.p1 = p;
                     if(this.vp2) this.vp2.p2 = p;
                     if(this.vp3) this.vp3.p3 = p;
@@ -556,7 +386,11 @@ export default class UIGraph3D extends HTMLDivElement {
                 }
             });
             valueElement.update = function circleUpdater() {
-                this.p = thisClass.#cellToPoint(this.x, this.y, this.value);
+                if(!(this.p = thisClass.#cellToPoint(this.x, this.y, this.value)))
+                    return;
+                const p = this.p;
+                this.setAttribute(`cx`, p[0]);
+                this.setAttribute(`cy`, p[1]);
             };
             valueElement.x = i % this.xResolution;
             valueElement.y = Math.trunc(i/this.xResolution);
@@ -569,22 +403,13 @@ export default class UIGraph3D extends HTMLDivElement {
 
     #createEventListeners() {
         const thisClass = this;
-        function calculateMinMaxValue() {
-            thisClass.#valueMin = 18000000000000000000;
-            thisClass.#valueMax = -9000000000000000000;
-            const arrayValue = thisClass.value;
-            for(let i = 0; i < arrayValue.length; i++) {
-                let value = arrayValue[i];
-                if(value < thisClass.#valueMin)
-                    thisClass.#valueMin = value;
-                if(value > thisClass.#valueMax)
-                    thisClass.#valueMax = value;
-            }
-            if(thisClass.#valueMax === thisClass.#valueMin)
-                thisClass.#valueMax = thisClass.#valueMin + 1;
+        function minmax() {
+            const minmax = calculateMinMaxValue(thisClass.value);
+            thisClass._valueMin = minmax[0];
+            thisClass._valueMax = minmax[1];
         }
-        this.addEventListener(`change`, calculateMinMaxValue);
-        calculateMinMaxValue();
+        this.addEventListener(`change`, minmax);
+        minmax();
         this.#svgElement.addEventListener('wheel', function(event){
             if(event.wheelDelta /120 > 0) {
                 thisClass.zoom *= 1.1;
@@ -603,7 +428,7 @@ export default class UIGraph3D extends HTMLDivElement {
             var rect = thisClass.#svgElement.getBoundingClientRect();
             var relX = event.pageX - rect.left;
             var relY = event.pageY - rect.top;
-            let circles = [...thisClass.#valueElement.children].sort(function(a, b) { return a.depth-b.depth; });
+            let circles = [...thisClass._valueElement.children].sort(function(a, b) { return a.depth-b.depth; });
             let closestCircle = undefined;
             let rotate;
             let move;
@@ -628,7 +453,7 @@ export default class UIGraph3D extends HTMLDivElement {
                     pageY: event.pageY,
                     closestCircle,
                     value: closestCircle.value,
-                    mag: (thisClass.#valueMax - thisClass.#valueMin) / thisClass.height, 
+                    mag: (thisClass._valueMax - thisClass._valueMin) / thisClass.height, 
                 }
             } else  if(event.button === 1) {
                 move={
@@ -699,446 +524,3 @@ export default class UIGraph3D extends HTMLDivElement {
     }
 }
 customElements.define(`ui-graph-3d`, UIGraph3D, { extends: `div` });
-
-//     _calculateSvg3D() {
-//         this._calculateValueMinMax();
-//         this.svg=[];
-//         this._dataSvg.splice(this._xResolution);
-//         const xMin = this.XAxis[0];
-//         const xMag = this.XAxis[this._xResolution-1] - xMin;
-//         const yMin = this.YAxis[0];
-//         const yMag = this.YAxis[this._yResolution-1] - yMin;
-//         const mag = this._table3DDisplayHeight / 2;
-//         const textsize = (256/Math.max(this.XAxis.length, this.YAxis.length)) * this._table3DZoom;
-//         let valueaxis = new Array(parseInt(1.5+Math.max(this.XAxis.length, this.YAxis.length) * this._table3DDisplayHeight/this._table3DDisplayWidth));
-//         for(let i=0; i<valueaxis.length; i++) {
-//             valueaxis[i] = i*(this._valueMax-this._valueMin)/(valueaxis.length-1) + this._valueMin;
-//         }
-//         for(let x=0;x<this._xResolution;x++){
-//             let t = this._dataSvg[x];
-//             if(!t) {
-//                 t = [];
-//                 this._dataSvg.push(t);
-//             }
-//             t.splice(this._yResolution);
-//             for(let y=0;y<this._yResolution;y++){
-//                 let valueY = this.ReverseY? y : (this.YResolution - y - 1);
-//                 let value = this._value[x + this._xResolution * valueY];
-//                 value = mag * (0.5 - (value - this._valueMin) / (this._valueMax - this._valueMin));
-//                 t[y] = this._transformPoint([
-//                     ((this.XAxis[x]-xMin-xMag/2)/(xMag*2))*this._table3DDisplayWidth*this._table3DZoom, 
-//                     value*this._table3DZoom, 
-//                     (this.ReverseY? 1 : -1) * ((this.YAxis[valueY]-yMin-yMag/2)/(yMag*2))*this._table3DDisplayWidth*this._table3DZoom
-//                 ]);
-//             }
-//         }
-//         this._xAxisSvg.splice(this._xResolution);
-//         for(let x=0;x<this._xResolution;x++){
-//             let t = this._xAxisSvg[x];
-//             if(!t) {
-//                 t = [];
-//                 this._xAxisSvg.push(t);
-//             }
-//             for(let y=0;y<2;y++){
-//                 t[y] = [];
-//                 let vy = 0;
-//                 if(y > 0)
-//                     vy = this._yResolution - 1;
-//                 let valueY = this.ReverseY? vy : (this.YResolution - vy - 1);
-
-//                 const xMin = this.XAxis[0];
-//                 const xMag = this.XAxis[this._xResolution-1] - xMin;
-//                 const yMin = this.YAxis[0];
-//                 const yMag = this.YAxis[this._yResolution-1] - yMin;
-//                 for(let z=0;z<2;z++) {
-//                     let value = this._valueMin;
-//                     if(z > 0)
-//                         value = this._valueMax;
-//                     value = mag * (0.5 - (value - this._valueMin) / (this._valueMax - this._valueMin));
-//                     t[y][z] = this._transformPoint([
-//                         ((this.XAxis[x]-xMin-xMag/2)/(xMag*2))*this._table3DDisplayWidth*this._table3DZoom, 
-//                         value*this._table3DZoom, 
-//                         (this.ReverseY? 1 : -1) * ((this.YAxis[valueY]-yMin-yMag/2)/(yMag*2))*this._table3DDisplayWidth*this._table3DZoom
-//                     ]);
-//                 }
-//             }
-//         }
-//         this._yAxisSvg.splice(this._yResolution);
-//         for(let x=0;x<2;x++){
-//             let t = this._yAxisSvg[x];
-//             if(!t) {
-//                 t = [];
-//                 this._yAxisSvg.push(t);
-//             }
-//             let vx = 0;
-//             if(x > 0)
-//                 vx = this._xResolution - 1;
-                
-//             for(let y=0;y<this._yResolution;y++){
-//                 t[y] = [];
-//                 let valueY = this.ReverseY? y : (this.YResolution - y - 1);
-
-//                 const xMin = this.XAxis[0];
-//                 const xMag = this.XAxis[this._xResolution-1] - xMin;
-//                 const yMin = this.YAxis[0];
-//                 const yMag = this.YAxis[this._yResolution-1] - yMin;
-//                 for(let z=0;z<2;z++) {
-//                     let value = this._valueMin;
-//                     if(z > 0)
-//                         value = this._valueMax;
-//                     value = mag * (0.5 - (value - this._valueMin) / (this._valueMax - this._valueMin));
-//                     t[y][z] = this._transformPoint([
-//                         ((this.XAxis[vx]-xMin-xMag/2)/(xMag*2))*this._table3DDisplayWidth*this._table3DZoom, 
-//                         value*this._table3DZoom, 
-//                         (this.ReverseY? 1 : -1) * ((this.YAxis[valueY]-yMin-yMag/2)/(yMag*2))*this._table3DDisplayWidth*this._table3DZoom
-//                     ]);
-//                 }
-//             }
-//         }
-//         for(let x=0;x<this._xResolution;x++){
-//             for(let y=0;y<this._yResolution;y++){
-//                 let valueY = this.ReverseY? y : (this.YResolution - y - 1);
-                
-//                 let depth=this._dataSvg[x][y][2];
-//                 let midPointValue = this._value[x + this._xResolution * valueY];
-//                 this.svg.push({
-//                     circle: {cx:parseFloat((this._dataSvg[x][y][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), cy: parseFloat((this._dataSvg[x][y][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)), r:(1/(this._xResolution*2)*this._table3DDisplayWidth*this._table3DZoom/10).toFixed(10) },
-//                     depth: depth, 
-//                     x: x,
-//                     y: valueY,
-//                     midPointValue: midPointValue,
-//                     hue: this._getHueFromValue(midPointValue)
-//                 });
-
-//                 if(y < this._yResolution - 1 && x < this._xResolution - 1) {
-//                     if(!this.ReverseY)
-//                         valueY -= 1;
-//                     depth=(this._dataSvg[x][y][2]+this._dataSvg[x+1][y][2]+this._dataSvg[x+1][y+1][2]+this._dataSvg[x][y+1][2])/4;
-//                     midPointValue = (this._value[x + this._xResolution * valueY] + this._value[x + this._xResolution * valueY + this._xResolution] + this._value[x + 1 + this._xResolution * valueY] + this._value[x + 1 + this._xResolution * valueY + this._xResolution])/4;
-//                     this.svg.push({
-//                         path:
-//                             `M${(this._dataSvg[x][y][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._dataSvg[x][y][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                             `L${(this._dataSvg[x+1][y][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._dataSvg[x+1][y][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                             `L${(this._dataSvg[x+1][y+1][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._dataSvg[x+1][y+1][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                             `L${(this._dataSvg[x][y+1][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._dataSvg[x][y+1][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}Z`,
-//                         depth: depth, 
-//                         x: x,
-//                         y: valueY,
-//                         midPointValue: midPointValue,
-//                         hue: this._getHueFromValue(midPointValue)
-//                     });
-//                 }
-//             }
-//         }
-//         this.svg.sort(function(a, b){return b.depth-a.depth});
-//         const xaxisRearY = this._table3DtransformPrecalc[0] > 0? (this.ReverseY? 0 : 1) : (this.ReverseY? 1 : 0);
-//         const xaxisFrontY = xaxisRearY === 1? 0 : 1; 
-//         const yaxisRearX = this._table3DtransformPrecalc[2] > 0? 0 : 1;
-//         const yaxisFrontX = yaxisRearX === 1? 0 : 1; 
-//         const xyaxisRearZ = this.Table3DPitch > 0? 0 : 1
-//         const scalextext = Math.abs(this._table3DtransformPrecalc[0]);
-//         const scaleytext = Math.abs(this._table3DtransformPrecalc[2]);
-//         const scaleztext = Math.abs(this._table3DtransformPrecalc[4]);
-//         //xlines
-//         for(let x=0; x<this._xResolution; x++) {
-//             const coord = this._xAxisSvg[x][xaxisRearY];
-//             const line = {
-//                 line: {
-//                     x1: parseFloat((coord[0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y1: parseFloat((coord[0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)), 
-//                     x2: parseFloat((coord[1][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y2: parseFloat((coord[1][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10))
-//                 }
-//             }
-//             this.svg.unshift(line);
-//             let xoffset = 0;
-//             if(x === 0)
-//                 xoffset = this._table3DtransformPrecalc[2]<0? 0 : this._table3DtransformPrecalc[0] * textsize/2;
-//             if(x === this._xResolution-1)
-//                 xoffset = this._table3DtransformPrecalc[2]>0? 0 : -this._table3DtransformPrecalc[0] * textsize/2;
-//             this.svg.unshift({
-//                 text: {
-//                     x: line.line.x2 + xoffset,
-//                     y: line.line.y2 - textsize/2 * scaleztext,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `start`,
-//                     transform: `scale(${scalextext} ${scaleztext}) rotate(-90)`,
-//                     text: Table._formatNumberForDisplay(this.XAxis[x]),
-//                     size: textsize
-//                 }
-//             })
-//             this.svg.unshift({
-//                 text: {
-//                     x: line.line.x1 + xoffset,
-//                     y: line.line.y1 + textsize/2 * scaleztext,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `end`,
-//                     transform: `scale(${scalextext} ${scaleztext}) rotate(-90)`,
-//                     text: Table._formatNumberForDisplay(this.XAxis[x]),
-//                     size: textsize
-//                 }
-//             })
-//         }
-//         //ylines
-//         for(let y=0; y<this._yResolution; y++) {
-//             const coord = this._yAxisSvg[yaxisRearX][y];
-//             const line = {
-//                 line: {
-//                     x1: parseFloat((coord[0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y1: parseFloat((coord[0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)), 
-//                     x2: parseFloat((coord[1][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y2: parseFloat((coord[1][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10))
-//                 }
-//             };
-//             this.svg.unshift(line);
-//             let xoffset = 0;
-//             if(y === 0)
-//                 xoffset = this._table3DtransformPrecalc[0]>0? 0 : this._table3DtransformPrecalc[2] * textsize/2;
-//             if(y === this._yResolution-1)
-//                 xoffset = this._table3DtransformPrecalc[0]<0? 0 : -this._table3DtransformPrecalc[2] * textsize/2;
-//             this.svg.unshift({
-//                 text: {
-//                     x: line.line.x2 + xoffset,
-//                     y: line.line.y2 - textsize/2 * scaleztext,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `start`,
-//                     transform: `scale(${scaleytext} ${scaleztext}) rotate(-90)`,
-//                     text: Table._formatNumberForDisplay(this.YAxis[y]),
-//                     size: textsize
-//                 }
-//             })
-//             this.svg.unshift({
-//                 text: {
-//                     x: line.line.x1 + xoffset,
-//                     y: line.line.y1 + textsize/2 * scaleztext,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `end`,
-//                     transform: `scale(${scaleytext} ${scaleztext}) rotate(-90)`,
-//                     text: Table._formatNumberForDisplay(this.YAxis[y]),
-//                     size: textsize
-//                 }
-//             })
-//         }
-//         //z lines
-//         let zhmag = (this._xAxisSvg[0][xaxisRearY][0][1] - this._xAxisSvg[0][xaxisRearY][1][1]) / (valueaxis.length-1);
-//         const rotatex = Math.atan((this._xAxisSvg[0][xaxisRearY][0][1]-this._xAxisSvg[this._xResolution-1][xaxisRearY][0][1])/(this._xAxisSvg[0][xaxisRearY][0][0] - this._xAxisSvg[this._xResolution-1][xaxisRearY][0][0])) * 180 / Math.PI;
-//         const rotatey = Math.atan((this._yAxisSvg[yaxisRearX][0][0][1]-this._yAxisSvg[yaxisRearX][this._yResolution-1][0][1])/(this._yAxisSvg[yaxisRearX][0][0][0]-this._yAxisSvg[yaxisRearX][this._yResolution-1][0][0])) * 180 / Math.PI;
-//         for(let z=0; z<valueaxis.length; z++){
-//             let zh = zhmag * z;
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._xAxisSvg[0][xaxisRearY][0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y1: parseFloat((this._xAxisSvg[0][xaxisRearY][0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY-zh).toFixed(10)), 
-//                     x2: parseFloat((this._xAxisSvg[this._xResolution-1][xaxisRearY][0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y2: parseFloat((this._xAxisSvg[this._xResolution-1][xaxisRearY][0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY-zh).toFixed(10))
-//                 }
-//             });
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._yAxisSvg[yaxisRearX][0][0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y1: parseFloat((this._yAxisSvg[yaxisRearX][0][0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY-zh).toFixed(10)), 
-//                     x2: parseFloat((this._yAxisSvg[yaxisRearX][this._yResolution-1][0][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                     y2: parseFloat((this._yAxisSvg[yaxisRearX][this._yResolution-1][0][1]+this._table3DDisplayHeight/2+this._table3DOffsetY-zh).toFixed(10))
-//                 }
-//             });
-//             let mincoord = [this.svg[0].line.x1, this.svg[0].line.y1, scaleytext, rotatey];
-//             let maxcoord = [this.svg[0].line.x1, this.svg[0].line.y1, scaleytext, rotatey];
-
-//             if(this.svg[0].line.x2 < this.svg[0].line.x1)
-//                 mincoord = [this.svg[0].line.x2, this.svg[0].line.y2, scaleytext, rotatey];
-//             else 
-//                 maxcoord = [this.svg[0].line.x2, this.svg[0].line.y2, scaleytext, rotatey];
-
-//             if(this.svg[1].line.x1 < mincoord[0])
-//                 mincoord = [this.svg[1].line.x1, this.svg[1].line.y1, scalextext, rotatex];
-//             if(this.svg[1].line.x1 > maxcoord[0])
-//                 maxcoord = [this.svg[1].line.x1, this.svg[1].line.y1, scalextext, rotatex];
-
-//             if(this.svg[1].line.x2 < mincoord[0])
-//                 mincoord = [this.svg[1].line.x2, this.svg[1].line.y2, scalextext, rotatex];
-//             if(this.svg[1].line.x2 > maxcoord[0])
-//                 maxcoord = [this.svg[1].line.x2, this.svg[1].line.y2, scalextext, rotatex];
-
-//             this.svg.unshift({
-//                 text: {
-//                     x: mincoord[0] - textsize/2 * mincoord[2],
-//                     y: mincoord[1],
-//                     alignmentbaseline: `middle`,
-//                     anchor: `end`,
-//                     transform: `skewY(${mincoord[3]}) scale(${mincoord[2]} ${scaleztext})`,
-//                     text: Table._formatNumberForDisplay(valueaxis[z]),
-//                     size: textsize
-//                 }
-//             })
-//             this.svg.unshift({
-//                 text: {
-//                     x: maxcoord[0] + textsize/2 * maxcoord[2],
-//                     y: maxcoord[1],
-//                     alignmentbaseline: `middle`,
-//                     anchor: `start`,
-//                     transform: `skewY(${maxcoord[3]}) scale(${maxcoord[2]} ${scaleztext})`,
-//                     text: Table._formatNumberForDisplay(valueaxis[z]),
-//                     size: textsize
-//                 }
-//             })
-//         }
-
-//         //front axis lines
-//         this.svg.unshift({
-//             line: {
-//                 x1: parseFloat((this._yAxisSvg[yaxisFrontX][0][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                 y1: parseFloat((this._yAxisSvg[yaxisFrontX][0][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)), 
-//                 x2: parseFloat((this._yAxisSvg[yaxisFrontX][this._yResolution-1][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                 y2: parseFloat((this._yAxisSvg[yaxisFrontX][this._yResolution-1][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10))
-//             }
-//         });
-//         this.svg.unshift({
-//             line: {
-//                 x1: parseFloat((this._xAxisSvg[0][xaxisFrontY][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                 y1: parseFloat((this._xAxisSvg[0][xaxisFrontY][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)), 
-//                 x2: parseFloat((this._xAxisSvg[this._xResolution-1][xaxisFrontY][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)), 
-//                 y2: parseFloat((this._xAxisSvg[this._xResolution-1][xaxisFrontY][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10))
-//             }
-//         });
-//         //bottom
-//         this.svg.unshift({
-//             path:
-//                 `M${(this._yAxisSvg[yaxisFrontX][0][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._yAxisSvg[yaxisFrontX][0][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                 `L${(this._yAxisSvg[yaxisFrontX][this._yResolution-1][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._yAxisSvg[yaxisFrontX][this._yResolution-1][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                 `L${(this._yAxisSvg[yaxisRearX][this._yResolution-1][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._yAxisSvg[yaxisRearX][this._yResolution-1][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}`+
-//                 `L${(this._yAxisSvg[yaxisRearX][0][xyaxisRearZ][0]+this._table3DDisplayWidth/2+this._table3DOffsetX).toFixed(10)},${(this._yAxisSvg[yaxisRearX][0][xyaxisRearZ][1]+this._table3DDisplayHeight/2+this._table3DOffsetY).toFixed(10)}Z`,
-//             color: this.Table3DPitch > 0? `#80808080` : `transparent`
-//         });
-//     }
-
-//     _dataSvg=[];
-//     _xAxisSvg=[];
-//     _yAxisSvg=[];
-//     _padding2D = 25;
-//     _axisOffset2D = 100;
-//     _valueOffset2D = 25;
-//     _calculateSvg2D() {
-//         this._calculateValueMinMax();
-//         this.svg=[];
-//         const axis = this._yResolution < 2? this.XAxis : this.YAxis;
-//         if(axis.length === 0)
-//             return;
-//         let axisMin = 10000000000;
-//         let axisMax = -10000000000;
-//         for(let i=0; i<axis.length; i++) {
-//             let a = axis[i];
-//             if(a < axisMin)
-//                 axisMin = a;
-//             if(a > axisMax)
-//                 axisMax = a;
-//         }
-//         let valueaxis = new Array(parseInt(1.5+axis.length * this._table3DDisplayHeight/this._table3DDisplayWidth));
-//         for(let i=0; i<valueaxis.length; i++) {
-//             valueaxis[i] = i*(this._valueMax-this._valueMin)/(valueaxis.length-1) + this._valueMin;
-//         }
-//         const axisMag = (this._table3DDisplayWidth-this._axisOffset2D-this._padding2D*2) / (axisMax-axisMin);
-//         const r = parseFloat((1/(axis.length*2)*this._table3DDisplayWidth/10).toFixed(10));
-//         const valueMag = (this._table3DDisplayHeight-this._valueOffset2D-this._padding2D*2) / (this._valueMax-this._valueMin);
-
-//         for(let i=0; i<axis.length; i++) {
-//             if(this._value[i] === undefined)
-//                 continue;
-
-//             let x = this._yResolution < 2? i : 0;
-//             let y = this._yResolution < 2? 0 : i;
-
-//             this.svg[i+axis.length-1] ={
-//                 circle: { 
-//                     cx: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     cy: parseFloat(((this._table3DDisplayHeight-this._valueOffset2D-this._padding2D)-((parseFloat(this._value[i])-this._valueMin) * valueMag)).toFixed(10)), 
-//                     r },
-//                 x: x,
-//                 y: y,
-//                 midPointValue: this._value[i],
-//                 hue: this._getHueFromValue(this._value[i])
-//             };
-//             if(i !== 0) {
-//                 const midPointValue = (this._value[i] + this._value[i-1])/2
-//                 this.svg[i-1] = {
-//                     line: {
-//                         x1: this.svg[i+axis.length-1].circle.cx, 
-//                         y1: this.svg[i+axis.length-1].circle.cy,
-//                         x2: this.svg[i+axis.length-2].circle.cx, 
-//                         y2: this.svg[i+axis.length-2].circle.cy
-//                     },
-//                     midPointValue: midPointValue,
-//                     hue: this._getHueFromValue(midPointValue)
-//                 };
-//             }
-//         }
-//         let axis0found = false;
-//         for(let i=0; i<axis.length; i++) {
-//             if(parseFloat(axis[i])===0)
-//                 axis0found = true;
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     y1: this._padding2D,
-//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(parseFloat(axis[i])-axisMin) * axisMag).toFixed(10)), 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
-//                 },
-//                 color: parseFloat(axis[i])===0? undefined : `dimgrey`
-//             });
-//             this.svg.unshift({
-//                 text: {
-//                     x: this.svg[0].line.x2,
-//                     y: this.svg[0].line.y2 + r,
-//                     alignmentbaseline: `hanging`,
-//                     text: Table._formatNumberForDisplay(axis[i])
-//                 }
-//             })
-//         }
-//         let value0found = false;
-//         for(let i=0; i<valueaxis.length; i++) {
-//             if(parseFloat(valueaxis[i])===0)
-//                 value0found = true;
-//             this.svg.unshift({
-//                 line: {
-//                     x1: this._axisOffset2D+this._padding2D,
-//                     y1: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10)),
-//                     x2: this._table3DDisplayWidth-this._padding2D, 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D-parseFloat(((parseFloat(valueaxis[i])-this._valueMin) * valueMag).toFixed(10))
-//                 },
-//                 color: parseFloat(valueaxis[i])===0? undefined : `dimgrey`
-//             });
-//             this.svg.unshift({
-//                 text: {
-//                     x: this.svg[0].line.x1-r,
-//                     y: this.svg[0].line.y1,
-//                     alignmentbaseline: `middle`,
-//                     anchor: `end`,
-//                     text: Table._formatNumberForDisplay(valueaxis[i])
-//                 }
-//             })
-//         }
-
-//         //xy origin
-//         if(axisMin <= 0 && axisMax >= 0 && !axis0found) {
-//             this.svg.unshift({
-//                 line: {
-//                     x1: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
-//                     y1: this._padding2D,
-//                     x2: parseFloat((this._axisOffset2D+this._padding2D+(0-axisMin) * axisMag).toFixed(10)), 
-//                     y2: this._table3DDisplayHeight-this._valueOffset2D-this._padding2D
-//                 }
-//             });
-//         }
-//         let liney0 = this._table3DDisplayHeight-this._valueOffset2D-this._padding2D;
-//         if(this._valueMin <= 0 && this._valueMax >= 0) liney0 = parseFloat(((liney0)-(0-this._valueMin) * valueMag).toFixed(10));
-//         else if(this._valueMax < 0) liney0 = this._padding2D;
-//         if(!value0found) {
-//             this.svg.unshift({
-//                 line: {
-//                     x1: this._axisOffset2D+this._padding2D, 
-//                     y1: liney0,
-//                     x2: this._table3DDisplayWidth-this._padding2D, 
-//                     y2: liney0
-//                 }
-//             });
-//         }
-//     }
