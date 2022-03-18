@@ -58,6 +58,8 @@
                     height: 480
                 })
             });
+            window.template.table2D.attachToTable(window.template.graph3D);
+            window.template.graph3D.attachToTable(window.template.table2D);
             window.addEventListener(`load`, function() {
                 document.body.appendChild(window.template)
             });
