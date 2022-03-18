@@ -39,6 +39,7 @@ class Calculation_Static extends UI.NumberWithMeasurement {
     }
 }
 GenericConfigs.push(Calculation_Static);
+customElements.define(`calculation-static`, Calculation_Static, { extends: `div` });
 
 //this could be refactored to use UI.OldTemplate, but it works well and i forsee no changes needed so leaving as is
 class Calculation_Polynomial {

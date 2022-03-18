@@ -88,6 +88,7 @@ export default class UITableBase extends HTMLDivElement {
             this._xResolutionElement.value = xResolution;
         this._resolutionChanged(this._xAxisElement, xResolution);
         this.value = newValue;
+        this.dispatchEvent(new Event(`change`));
     }
     get xAxis() {
         return [...this._xAxisElement.children].map(x => x.value);
@@ -130,6 +131,7 @@ export default class UITableBase extends HTMLDivElement {
             this._yResolutionElement.value = yResolution;
         this._resolutionChanged(this._yAxisElement, yResolution);
         this.value = newValue;
+        this.dispatchEvent(new Event(`change`));
     }
     get yAxis() {
         return [...this._yAxisElement.children].map(x => x.value);

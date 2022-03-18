@@ -287,8 +287,8 @@ class UIMeasurement extends UISelection {
 }
 customElements.define(`ui-measurement`, UIMeasurement, { extends: `div` });
 
-class NumberWithMeasurement extends Template {
-    static Template = `$DisplayValue$$DisplayMeasurement$`
+class NumberWithMeasurement extends UITemplate {
+    static Template = `<div data-element="DisplayValue"></div><div data-element="DisplayMeasurement"></div>`
 
     get MeasurementUnitName() {
         return this.DisplayMeasurement.value;
@@ -378,7 +378,7 @@ class NumberWithMeasurement extends Template {
                 thisClass.UpdateDisplayValue()
             }
         });
-        this.DisplayValue = new UI.Number({
+        this.DisplayValue = new UINumber({
             ExcludeFromonChange: true,
             onChange: function() {
                 if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
@@ -427,6 +427,7 @@ class NumberWithMeasurement extends Template {
             return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
     }
 }
+customElements.define(`ui-numberwithmeasurement`, NumberWithMeasurement, { extends: `div` });
 
 class DisplayNumberWithMeasurement extends Template {
     static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
