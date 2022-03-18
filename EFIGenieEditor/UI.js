@@ -245,28 +245,8 @@ class Template {
     }
 };
 
-class UIMeasurement {
-    GUID = generateGUID();
-    onChange = [];
-    
-    _hidden = false;
-    get hidden() {
-        return this._hidden;
-    }
-    set hidden(hidden) {
-        if(this._hidden === hidden)
-            return;
-            
-        this._hidden = hidden;
-        if(hidden) {
-            $(`[id="${this.GUID}"]`).hide();
-        } else {
-            $(`[id="${this.GUID}"]`).css('display', 'inline-block');
-            $(`[id="${this.GUID}"]`).show();
-        }
-    }
-
-    _measurement = undefined;
+class UIMeasurement extends UISelection {
+    _measurement;
     get Measurement() {
         return this._measurement;
     }
@@ -275,97 +255,49 @@ class UIMeasurement {
             return;
 
         this._measurement = measurement;
-        this.Default = GetDefaultUnitIndex(this.Measurement);
-        this._value ??= this.Default;
-        $(`[id="${this.GUID}"]`).html(GetUnitDisplay(this._measurement, this._value));
-        this.onChange.forEach(function(onChange) { onChange(); });
-    }
-
-    _value = undefined;
-    get Value() {
-        return this._value;
-    }
-    set Value(value) {
-        if(value === undefined)
-            return;
-        if(this._value === value)
-            return;
-
-        this._value = value;
-        $(`[id="${this.GUID}"]`).html(GetUnitDisplay(this._measurement, this._value));
-        this.onChange.forEach(function(onChange) { onChange(); });
-    }
-
-    constructor(prop) {
-        if(prop?.Measurement && prop?.MeasurementUnitName !== undefined) {
-            this.Measurement = prop.Measurement;
-            this.MeasurementUnitName = prop.MeasurementUnitName;
-            this.Default = this.MeasurementUnitName;
-        }
-        Object.assign(this, prop);
-        if(!Array.isArray(this.onChange))
-            this.onChange = [ this.onChange ];
+        this.Default = Measurements[measurement]?.[GetDefaultUnitIndex(measurement)]?.Name;
+        this.options = Measurements[measurement]?.map(unit => { return { Name: unit.Name, Value: unit.Name }; })
+        if(this.value === undefined || this.value === ``) 
+            this.value = this.Default;
+        if(this.options.length === 0)
+            this.hidden = true;
+        else
+            this.hidden = false;
     }
 
     get saveValue() {
-        if(this.Value !== this.Default){
-            return this.Value;
+        if(this.value === this.Default)
+            return;
+        return super.saveValue;
+    }
+    set saveValue(saveValue) {
+        if(saveValue === undefined || saveValue === ``)
+            return;
+        super.saveValue = saveValue;
+    }
+
+    constructor(prop) {
+        super(prop);
+        if(prop?.Measurement && prop?.value !== undefined) {
+            this.Default = this.value;
         }
-    }
-    set saveValue(saveValue){
-        this.Value = saveValue;
-    }
-
-    Attach() {
-        this.Detach();
-        const thisClass = this;
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}`, function(e){
-            $(`[id="${thisClass.GUID}-contextmenu"]`).show();
-            $(document).on(`mouseup.${this.GUID}`, function(e){
-                $(document).off(`mouseup.${thisClass.GUID}`)
-                $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
-            });
-            e.preventDefault();
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-contextmenu div`, function(e){
-            thisClass.Value = $(this).data(`unitname`);
-            $(`[id="${thisClass.GUID}-contextmenu"]`).hide();
-        });
-    }
-
-    Detach() {
-        $(document).off(`click.${this.GUID}`);
-        $(document).off(`mouseup.${this.GUID}`);
-    }
-
-    GetHtml() {
-        let html = `<div style="display: inline-block"><div style="display: ${this._hidden? `none` : `inline-block`};${Measurements[this._measurement]?.length > 1? ` cursor: pointer;` : ``}" id="${this.GUID}">${GetUnitDisplay(this._measurement, this._value)}</div>
-<div id="${this.GUID}-contextmenu" style="display: none;" class="context-menu w3-bar-block">`;
-
-        if(Measurements[this._measurement]?.length > 1) {
-            for(let i=0; i<Measurements[this._measurement]?.length; i++) {
-                const measurementName = Measurements[this._measurement][i].Name;
-                html += `<div class="w3-bar-item w3-button" data-unitname="${measurementName}">${measurementName}</div>`;
-            }
-        }
-
-        return `${html}</div></div>`
+        this.class = `ui measurement`;
+        this.selectNotVisible = true;
     }
 }
+customElements.define(`ui-measurement`, UIMeasurement, { extends: `div` });
 
 class NumberWithMeasurement extends Template {
     static Template = `$DisplayValue$$DisplayMeasurement$`
 
     get MeasurementUnitName() {
-        return this.DisplayMeasurement.Value;
+        return this.DisplayMeasurement.value;
     }
     set MeasurementUnitName(measurementUnitName) {
-        if(this.DisplayMeasurement.Value = measurementUnitName)
+        if(measurementUnitName === undefined || this.DisplayMeasurement.value === measurementUnitName)
             return;
 
-        this.DisplayMeasurement.Value = measurementUnitName;
+        this.DisplayMeasurement.value = measurementUnitName;
         this.UpdateDisplayValue();
     }
 
@@ -441,7 +373,7 @@ class NumberWithMeasurement extends Template {
         var thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
-            MeasurementUnitName: prop?.MeasurementUnitName,
+            value: prop?.MeasurementUnitName,
             onChange: function() {
                 thisClass.UpdateDisplayValue()
             }
@@ -500,10 +432,10 @@ class DisplayNumberWithMeasurement extends Template {
     static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
 
     get MeasurementUnitName() {
-        return this.DisplayMeasurement.Value;
+        return this.DisplayMeasurement.value;
     }
     set MeasurementUnitName(measurementUnitName) {
-        this.DisplayMeasurement.Value = measurementUnitName;
+        this.DisplayMeasurement.value = measurementUnitName;
         if(this.Unit)
             this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
     }
@@ -533,7 +465,7 @@ class DisplayNumberWithMeasurement extends Template {
         var thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
-            MeasurementUnitName: prop?.MeasurementUnitName,
+            value: prop?.MeasurementUnitName,
             onChange: function() {
                 thisClass.UpdateDisplayValue();
                 thisClass.ZeroesToAdd = 10000000;
@@ -638,147 +570,6 @@ class UIDialog {
             modal:true, 
             title: dialogSelector.data(`title`)
         });
-    }
-}
-
-class DisplayGauge {
-    GUID = generateGUID();
-
-    _hidden = false;
-    get hidden() {
-        return this._hidden;
-    }
-    set hidden(hidden) {
-        if(this._hidden === hidden)
-            return;
-            
-        this._hidden = hidden;
-        if(hidden) {
-            $(`[id="${this.GUID}"]`).hide();
-        } else {
-            $(`[id="${this.GUID}"]`).show();
-        }
-    }
-
-    _class = undefined;
-    get Class() {
-        return this._class
-    }
-    set Class(pclass) {
-        if(this._class === pclass)
-            return;
-
-        this._class = pclass;
-        $(`[id="${this.GUID}"]`).removeClass();
-        $(`[id="${this.GUID}"]`).addClass(pclass);
-    }
-
-    _min = 0;
-    get Min() {
-        return this._min
-    }
-    set Min(min) {
-        if(this._min === min)
-            return;
-
-        this._min = min;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    _label = ``;
-    get Label() {
-        return this._label
-    }
-    set Label(label) {
-        if(this._label === label)
-            return;
-
-        this._label = label;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    _max = 100;
-    get Max() {
-        return this._max
-    }
-    set Max(max) {
-        if(this._max === max)
-            return;
-
-        this._max = max;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    _step = 10;
-    get Step() {
-        return this._step
-    }
-    set Step(step) {
-        if(this._step === step)
-            return;
-            
-        this._step = step;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    _value = 0;
-    get Value() {
-        return this._value;
-    }
-    set Value(value) {
-        if(value === undefined)
-            return;
-
-        var val = parseFloat(value);
-        if(this._value === val) 
-            return;
-
-        this._value = val;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    _gaugeHTML;
-    get GaugeHTML() {
-        return this._gaugeHTML;
-    }
-    set GaugeHTML(gaugeHTML) {
-        if(objectTester(gaugeHTML, this._gaugeHTML))
-            return;
-
-        this._gaugeHTML = gaugeHTML;
-        $(`[id="${this.GUID}"]`).html(this.GaugeHTML?.(this));
-    }
-
-    constructor(prop) {
-        Object.assign(this, prop);
-    }
-
-    GetHtml() {
-        var html = `<div id="${this.GUID}"${this._hidden? ` style="display: none;"` : ``}`;
-
-        if(this._class !== undefined)
-            html += ` class="${this._class}"`;
-
-        return `${html}>${this.GaugeHTML?.(this)}</div>`;
-    }
-}
-
-var Gauges = {
-    Dial: function({Label, Value, Step, Min, Max}) { 
-        let gauge = `<div class="gauge">
-<div class="tick-circle"><div class="tick-circle-inner"></div></div>`;
-        let steps = (Max - Min) / Step;
-        gauge += `<div class="tick min" style="--gauge-tick-deg:0deg;"></div>`
-        gauge += `<div class="text" style="--gauge-text-deg:0deg;">${Min}</div>`
-        for(let i = 1; (i+0.01) < steps; i++) {
-            gauge += `<div class="tick" style="--gauge-tick-deg:${270 * i / steps}deg;"></div>`
-            gauge += `<div class="text" style="--gauge-text-deg:${270 * i / steps}deg;">${Step * i + Min}</div>`
-        }
-        gauge += `<div class="tick max" style="--gauge-tick-deg:270deg;"></div>`
-        gauge += `<div class="text" style="--gauge-text-deg:270deg;">${Max}</div>`
-        gauge += `<div class="needle" style="--gauge-value-deg:${Value * 270 / (Max - Min)}deg;"></div>`
-        gauge += `<div class="value">${Label}</div>`
-        return `${gauge}</div>`;
     }
 }
 

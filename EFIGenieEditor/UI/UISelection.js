@@ -115,6 +115,9 @@ export default class UISelection extends HTMLDivElement {
         return this.#options;
     }
     set options(options) {
+        if(options === undefined)
+            options = [];
+        
         this.#options = options;
 
         const thisClass = this;
@@ -189,6 +192,8 @@ export default class UISelection extends HTMLDivElement {
         let visible = false;
         this.selectedElement.addEventListener(`click`, function() {
             if(visible) 
+                return;
+            if(thisClass.selectNotVisible && thisClass.options.length < 2)
                 return;
 
             function clickHandler() {

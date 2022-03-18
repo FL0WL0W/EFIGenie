@@ -315,6 +315,17 @@
     border-color: var(--border-hover-color);
 }
 
+.ui.select.measurement .ui.selected {
+    min-width: 0px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+}
+.ui.select.measurement .ui.selected::after {
+    float: right;
+    content: "";
+}
+
 .ui.number {
     font: bold 16px Arial;
     background-color: var(--input-background-color);
