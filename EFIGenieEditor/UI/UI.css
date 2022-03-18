@@ -401,6 +401,9 @@
 .ui.graph3d path {
     fill: hsla(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%, 90%);
 }
+.ui.graph3d path.floor {
+    fill: #80808080;
+}
 .ui.graph3d line {
     stroke: var(--text-color);
     stroke-width: 1;

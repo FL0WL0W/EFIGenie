@@ -182,6 +182,8 @@ export default class UITableBase extends HTMLDivElement {
     }
     get _valueMax() {
         let valuemax = parseFloat(this.style.getPropertyValue('--valuemax'));
+        if(valuemax - this._valueMin === 0)
+            return 1;
         return isNaN(valuemax)? -9000000000000000000 : valuemax;
     }
     set _valueMax(valueMax) {
