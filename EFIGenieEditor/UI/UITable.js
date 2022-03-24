@@ -537,7 +537,7 @@ export default class UITable extends UITableBase {
 
             let currentY;
             thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) {
-                if(element.value === undefined)
+                if(isNaN(parseFloat(element.value)))
                     return;
                 let y = parseInt(element.y ?? -1);
                 if(currentY !== undefined) {
@@ -621,8 +621,8 @@ export default class UITable extends UITableBase {
             thisClass.selecting = {
                 startX: x,
                 startY: y,
-                endX: x + val.split(`\n`)[0].split(`\t`).length,
-                endY: y + val.split(`\n`).length
+                endX: x + val.split(`\n`)[0].split(`\t`).length - 1,
+                endY: y + val.split(`\n`).length - 1
             }
             event.preventDefault();
             thisClass.#boundAxis(element);
