@@ -539,6 +539,8 @@ export default class UITable extends UITableBase {
             thisClass.#tableElement.querySelectorAll(`.selected`).forEach(function(element) {
                 if(isNaN(parseFloat(element.value)))
                     return;
+                if(element.y === undefined && element.x === undefined)
+                    return;
                 let y = parseInt(element.y ?? -1);
                 if(currentY !== undefined) {
                     if(currentY !== y) {
