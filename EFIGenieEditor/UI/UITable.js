@@ -979,70 +979,8 @@ export default class UITable extends UITableBase {
                     interpolateY();
                 return;
             }
-            let xMin = 18000000000000000000;
-            let xMax = -9000000000000000000;
-            let yMin = 18000000000000000000;
-            let yMax = -9000000000000000000;
-            selectedElements.forEach(function(element) {
-                const x = parseInt(element.x);
-                const y = parseInt(element.y);
-                if(x < xMin)
-                    xMin = x;
-                if(x > xMax)
-                    xMax = x;
-                if(y < yMin)
-                    yMin = y;
-                if(y > yMax)
-                    yMax = y;
-            });
-            const xAxis = thisClass.xAxis;
-            const yAxis = thisClass.yAxis;
-            const xDiff = xAxis[xMax] - xAxis[xMin];
-            const yDiff = yAxis[yMax] - yAxis[yMin];
-            const xResolution = thisClass.xResolution;
-            const tableValue = thisClass.value;
-            selectedElements.forEach(function(element) {
-                const x = parseInt(element.x);
-                const y = parseInt(element.y);
-                if(y !== yMin && y !== yMax)
-                    return
-                if(!isNaN(x) && !isNaN(y)) {
-                    const xMinVal = tableValue[xMin + y * xResolution];
-                    const xMaxVal = tableValue[xMax + y * xResolution];
-                    const xMag = (xMaxVal - xMinVal) / xDiff;
-                    let value = xMinVal + xMag * (xAxis[x]-xAxis[xMin]);
-                    element.value = value;
-                }
-            });
-            selectedElements.forEach(function(element) {
-                const x = parseInt(element.x);
-                const y = parseInt(element.y);
-                if(x !== xMin && x !== xMax)
-                    return
-                if(!isNaN(x) && !isNaN(y)) {
-                    const yMinVal = tableValue[x + yMin * xResolution];
-                    const yMaxVal = tableValue[x + yMax * xResolution];
-                    const yMag = (yMaxVal - yMinVal) / yDiff;
-                    let value = yMinVal + yMag * (yAxis[y]-yAxis[yMin]);
-                    element.value = value;
-                }
-            });
-            selectedElements.forEach(function(element) {
-                const x = parseInt(element.x);
-                const y = parseInt(element.y);
-                if(!isNaN(x) && !isNaN(y)) {
-                    const xMinVal = tableValue[xMin + y * xResolution];
-                    const xMaxVal = tableValue[xMax + y * xResolution];
-                    const xMag = (xMaxVal - xMinVal) / xDiff;
-                    const yMinVal = tableValue[x + yMin * xResolution];
-                    const yMaxVal = tableValue[x + yMax * xResolution];
-                    const yMag = (yMaxVal - yMinVal) / yDiff;
-                    let value = xMinVal + xMag * (xAxis[x]-xAxis[xMin]) + yMinVal + yMag * (yAxis[y]-yAxis[yMin]);
-                    value /= 2;
-                    element.value = value;
-                }
-            });
-            thisClass.dispatchEvent(new Event(`change`));
+            interpolateX();
+            interpolateY();
         });
         this.#interpolateXElement.addEventListener(`click`, interpolateX);
         this.#interpolateYElement.addEventListener(`click`, interpolateY);
