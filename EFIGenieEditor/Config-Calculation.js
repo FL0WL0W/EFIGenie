@@ -703,25 +703,23 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
         if(!this._measurement)
             return;
 
-        if(this.Selection.Value) {
-            let selections = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
-            let match = false;
-            let stringValue = UI.Selection.ParseValue(`string`, this.Selection.Value)
-            selections.forEach(option => {
-                if(option.Group){
-                    option.Options.forEach(option => {
-                        if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
-                            match = true;
-                    });
-                } else {
+        this.Selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
+        let match = false;
+        let stringValue = UI.Selection.ParseValue(`string`, this.Selection.value)
+        this.Selection.options.forEach(option => {
+            if(option.Group){
+                option.Options.forEach(option => {
                     if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
                         match = true;
-                }
-            });
+                });
+            } else {
+                if(UI.Selection.ParseValue(`string`, option.Value) === stringValue)
+                    match = true;
+            }
+        });
 
-            if(!match) 
-                this.Selection.Value = this.Selection.selectValue;
-        }
+        if(!match) 
+            this.Selection.value = this.Selection.selectValue;
     }
 
     constructor(prop) {
