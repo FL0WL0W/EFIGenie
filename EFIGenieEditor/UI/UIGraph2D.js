@@ -19,16 +19,14 @@ export default class UIGraph2D extends UITableBase {
     }
     get axis() {
         if(this.xResolution < 2)
-            return this.xAxis;
-        else if(this.yResolution < 2)
             return this.yAxis;
-        return undefined;
+        return this.xAxis;
     }
     set axis(axis) {
         if(this.xResolution < 2)
-            this.xAxis = axis;
-        else if(this.yResolution < 2)
             this.yAxis = axis;
+        else
+            this.xAxis = axis;
     }
     get selecting() {
         return super.selecting;
@@ -123,7 +121,7 @@ export default class UIGraph2D extends UITableBase {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
-    // #cellToPoint(x, y, value) {
+    #cellToPoint(x, y, value) {
     //     if(isNaN(value))
     //         return;
     //     const xAxis = this.xAxis;
@@ -137,8 +135,8 @@ export default class UIGraph2D extends UITableBase {
     //         y = 0;
     //     value = (value-this._valueMin)/(this._valueMax-this._valueMin);
     //     return UIGraph3D.transformPoint([x-0.5, -(value-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc);
-    // }
-    // #axisToLine(x, y) {
+    }
+    #axisToLine(x, y) {
     //     const xAxis = this.xAxis;
     //     const yAxis = this.yAxis;
     //     y = this.yResolution-y-1;
@@ -158,8 +156,8 @@ export default class UIGraph2D extends UITableBase {
     //         UIGraph3D.transformPoint([x-0.5,  0.5*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc),
     //         UIGraph3D.transformPoint([x-0.5, -0.5*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc)
     //     ];
-    // }
-    // #zAxisToLines(z) {
+    }
+    #zAxisToLine(z) {
     //     const x = this.#transformPrecalc.sinYaw > 0? 0 : 1;
     //     const y = this.#transformPrecalc.cosYaw > 0? 1 : 0;
     //     z = (z-this._valueMin)/(this._valueMax-this._valueMin);
@@ -170,236 +168,169 @@ export default class UIGraph2D extends UITableBase {
     //         UIGraph3D.transformPoint([-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc),
     //         UIGraph3D.transformPoint([ 0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc)
     //     ]];
-    // }
+    }
 
     _resolutionChanged(axisElements, axisResolution) {
-        // const thisClass = this;
-        // const textSize = (0.45/Math.max(this.xResolution, this.yResolution, axisResolution));
-        // while(axisResolution < axisElements.children.length) { axisElements.removeChild(axisElements.lastChild); }
-        // for(let i = axisElements.children.length; i < axisResolution; i++) { 
-        //     const axisElement = axisElements.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
-        //     axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
-        //     const textTop = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-        //     textTop.setAttribute(`alignment-baseline`, `middle`);
-        //     textTop.setAttribute(`text-anchor`, `end`);
-        //     const textBottom = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-        //     textBottom.setAttribute(`alignment-baseline`, `middle`);
-        //     textBottom.setAttribute(`text-anchor`, `start`);
-        //     axisElement.update = function() {
-        //         if(!thisClass.#transformPrecalc)
-        //             return;
-        //         const line = thisClass.#axisToLine(this.x, this.y);
-        //         this.children[0].setAttribute(`x1`, line[0][0]);
-        //         this.children[0].setAttribute(`y1`, line[0][1]);
-        //         this.children[0].setAttribute(`x2`, line[1][0]);
-        //         this.children[0].setAttribute(`y2`, line[1][1]);
+        const thisClass = this;
+        const textSize = (0.45/Math.max(this.xResolution, this.yResolution, axisResolution));
+        while(axisResolution < axisElements.children.length) { axisElements.removeChild(axisElements.lastChild); }
+        for(let i = axisElements.children.length; i < axisResolution; i++) { 
+            const axisElement = axisElements.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
+            axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
+            const textLabel = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
+            textLabel.setAttribute(`alignment-baseline`, `middle`);
+            textLabel.setAttribute(`text-anchor`, `end`);
+            axisElement.update = function() {
+                const line = thisClass.#axisToLine(this.x, this.y);
+                this.children[0].setAttribute(`x1`, line[0][0]);
+                this.children[0].setAttribute(`y1`, line[0][1]);
+                this.children[0].setAttribute(`x2`, line[1][0]);
+                this.children[0].setAttribute(`y2`, line[1][1]);
 
-        //         const textSize = this.textSize * thisClass.#transformPrecalc.zoom;
-        //         const scalextext = Math.abs(this.x !== undefined? thisClass.#transformPrecalc.cosYaw : thisClass.#transformPrecalc.sinYaw);
-        //         const scaleytext = Math.abs(thisClass.#transformPrecalc.cosPitch);
-        //         let xoffset = 0;
-        //         if(this.x === 0)
-        //             xoffset = thisClass.#transformPrecalc.sinYaw<0? 0 : thisClass.#transformPrecalc.cosYaw * textSize/2;
-        //         if(this.x === axisResolution-1)
-        //             xoffset = thisClass.#transformPrecalc.sinYaw>0? 0 : -thisClass.#transformPrecalc.cosYaw * textSize/2;
-        //         if(this.y === 0)
-        //             xoffset = thisClass.#transformPrecalc.cosYaw<0? 0 : -thisClass.#transformPrecalc.sinYaw * textSize/2;
-        //         if(this.y === axisResolution-1)
-        //             xoffset = thisClass.#transformPrecalc.cosYaw>0? 0 : thisClass.#transformPrecalc.sinYaw * textSize/2;
-        //         line[0][0]+=xoffset;
-        //         line[1][0]+=xoffset;
-        //         this.children[1].setAttribute(`x`, line[0][0]);
-        //         this.children[1].setAttribute(`y`, line[0][1]);
-        //         this.children[1].setAttribute(`transform-origin`, `${line[0][0]} ${line[0][1]}`);
-        //         this.children[1].setAttribute(`transform`, `scale(${scalextext} ${scaleytext}) rotate(-90)`);
-        //         this.children[1].setAttribute(`font-size`, textSize);
-        //         this.children[2].setAttribute(`x`, line[1][0]);
-        //         this.children[2].setAttribute(`y`, line[1][1]);
-        //         this.children[2].setAttribute(`transform-origin`, `${line[1][0]} ${line[1][1]}`);
-        //         this.children[2].setAttribute(`transform`, `scale(${scalextext} ${scaleytext}) rotate(-90)`);
-        //         this.children[2].setAttribute(`font-size`, textSize);
-        //         this.children[1].innerHTML = this.children[2].innerHTML = formatNumberForDisplay(this.value);
-        //     }
-        //     const axisMinus1 = axisElements.children[i-1]?.value;
-        //     const axisMinus2 = axisElements.children[i-2]?.value;
-        //     let axisMinus0 = 0;
-        //     if(axisMinus1 !== undefined && axisMinus2 !== undefined) 
-        //         axisMinus0 = axisMinus1 + (axisMinus1 - axisMinus2);
-        //     axisElement.value = axisMinus0;
-        //     if(axisElements === this._xAxisElement)
-        //         axisElement.x = i;
-        //     else
-        //         axisElement.y = i;
-        // }
-        // for(let i = 0; i < this.xResolution; i++) { this._xAxisElement.children[i].textSize = textSize; }
-        // for(let i = 0; i < this.yResolution; i++) { this._yAxisElement.children[i].textSize = textSize; }
-        // const zResolution = parseInt(1.5+Math.max(this.xResolution, this.yResolution));
-        // while(zResolution < this.#zAxisElement.children.length) { this.#zAxisElement.removeChild(this.#zAxisElement.lastChild); }
-        // for(let i = 0; i < zResolution; i++) {
-        //     let axisElement = this.#zAxisElement.children[i];
-        //     if(!axisElement) {
-        //         axisElement = this.#zAxisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
-        //         axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
-        //         axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
-        //         const textLeft = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-        //         textLeft.setAttribute(`alignment-baseline`, `middle`);
-        //         textLeft.setAttribute(`text-anchor`, `end`);
-        //         const textRight = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-        //         textRight.setAttribute(`alignment-baseline`, `middle`);
-        //         textRight.setAttribute(`text-anchor`, `start`);
-        //         axisElement.update = function() {
-        //             if(!thisClass.#transformPrecalc)
-        //                 return;
-        //             const zMag = (thisClass._valueMax - thisClass._valueMin)/(this.zResolution-1);
-        //             let zValue = zMag * this.z + thisClass._valueMin;
-        //             if(this.z === (this.zResolution-1))
-        //                 zValue = thisClass._valueMax;
-        //             let lines = thisClass.#zAxisToLines(zValue);
-        //             lines[0] = lines[0].sort(function(a,b) { return a[0]-b[0]});
-        //             lines[0][2] = Math.abs(thisClass.#transformPrecalc.sinYaw);
-        //             lines[1] = lines[1].sort(function(a,b) { return a[0]-b[0]});
-        //             lines[1][2] = Math.abs(thisClass.#transformPrecalc.cosYaw);
-        //             lines = lines.sort(function(a,b) { return a[0][0]-b[0][0]});
-        //             this.children[0].setAttribute(`x1`, lines[0][0][0]);
-        //             this.children[0].setAttribute(`y1`, lines[0][0][1]);
-        //             this.children[0].setAttribute(`x2`, lines[0][1][0]);
-        //             this.children[0].setAttribute(`y2`, lines[0][1][1]);
-        //             this.children[1].setAttribute(`x1`, lines[1][0][0]);
-        //             this.children[1].setAttribute(`y1`, lines[1][0][1]);
-        //             this.children[1].setAttribute(`x2`, lines[1][1][0]);
-        //             this.children[1].setAttribute(`y2`, lines[1][1][1]);
-        //             this.children[2].innerHTML = this.children[3].innerHTML = formatNumberForDisplay(zValue);
+                this.children[1].setAttribute(`x`, line[0][0]);
+                this.children[1].setAttribute(`y`, line[0][1]);
+                this.children[1].setAttribute(`font-size`, this.textSize);
+                this.children[1].innerHTML = formatNumberForDisplay(this.value);
+            }
+            const axisMinus1 = axisElements.children[i-1]?.value;
+            const axisMinus2 = axisElements.children[i-2]?.value;
+            let axisMinus0 = 0;
+            if(axisMinus1 !== undefined && axisMinus2 !== undefined) 
+                axisMinus0 = axisMinus1 + (axisMinus1 - axisMinus2);
+            axisElement.value = axisMinus0;
+            if(axisElements === this._xAxisElement)
+                axisElement.x = i;
+            else
+                axisElement.y = i;
+        }
+        for(let i = 0; i < this.xResolution; i++) { this._xAxisElement.children[i].textSize = textSize; }
+        for(let i = 0; i < this.yResolution; i++) { this._yAxisElement.children[i].textSize = textSize; }
+        const zResolution = parseInt(1.5+Math.max(this.xResolution, this.yResolution));
+        while(zResolution < this.#zAxisElement.children.length) { this.#zAxisElement.removeChild(this.#zAxisElement.lastChild); }
+        for(let i = 0; i < zResolution; i++) {
+            let axisElement = this.#zAxisElement.children[i];
+            if(!axisElement) {
+                axisElement = this.#zAxisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
+                axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
+                const textLabel = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
+                textLabel.setAttribute(`alignment-baseline`, `middle`);
+                textLabel.setAttribute(`text-anchor`, `end`);
+                axisElement.update = function() {
+                    const zMag = (thisClass._valueMax - thisClass._valueMin)/(this.zResolution-1);
+                    let zValue = zMag * this.z + thisClass._valueMin;
+                    if(this.z === (this.zResolution-1))
+                        zValue = thisClass._valueMax;
+                    let line = thisClass.#zAxisToLine(zValue);
+                    this.children[0].setAttribute(`x1`, line[0][0]);
+                    this.children[0].setAttribute(`y1`, line[0][1]);
+                    this.children[0].setAttribute(`x2`, line[1][0]);
+                    this.children[0].setAttribute(`y2`, line[1][1]);
 
-        //             const textSize = this.textSize * thisClass.#transformPrecalc.zoom;
-        //             const scaleZText = Math.abs(thisClass.#transformPrecalc.cosPitch);
-        //             const skewLeftText = Math.atan((lines[0][1][1]-lines[0][0][1])/(lines[0][1][0]-lines[0][0][0])) * 180 / Math.PI;
-        //             const skewRightText = Math.atan((lines[1][0][1]-lines[1][1][1])/(lines[1][0][0]-lines[1][1][0])) * 180 / Math.PI;
-        //             let yOffset = 0;
-        //             if(this.z === 0)
-        //                 yOffset = -textSize/2;
-        //             if(this.z === this.zResolution-1)
-        //                 yOffset = textSize/2;
-                    
-        //             this.children[2].setAttribute(`x`, lines[0][0][0]);
-        //             this.children[2].setAttribute(`y`, lines[0][0][1]+yOffset);
-        //             this.children[2].setAttribute(`transform-origin`, `${lines[0][0][0]} ${lines[0][0][1]}`);
-        //             this.children[2].setAttribute(`transform`, `skewY(${skewLeftText}) scale(${lines[0][2]} ${scaleZText})`);
-        //             axisElement.children[2].setAttribute(`font-size`, textSize);
+                    this.children[1].setAttribute(`x`, line[0][0]);
+                    this.children[1].setAttribute(`y`, line[0][1]);
+                    this.children[1].setAttribute(`font-size`, this.textSize);
+                    this.children[1].innerHTML = formatNumberForDisplay(zValue);
+                }
+            }
+            axisElement.textSize = textSize;
+            axisElement.zResolution = zResolution;
+            axisElement.z = i;
+        }
 
-        //             this.children[3].setAttribute(`x`, lines[1][1][0]);
-        //             this.children[3].setAttribute(`y`, lines[1][1][1]+yOffset);
-        //             this.children[3].setAttribute(`transform-origin`, `${lines[1][1][0]} ${lines[1][1][1]}`);
-        //             this.children[3].setAttribute(`transform`, `skewY(${skewRightText}) scale(${lines[1][2]} ${scaleZText})`);
-        //             axisElement.children[3].setAttribute(`font-size`, textSize);
-        //         }
-        //     }
-        //     axisElement.zResolution = zResolution;
-        //     axisElement.textSize = textSize;
-        //     axisElement.z = i;
-        // }
-
-        // function getPathVGetterSetter(index) {
-        //     let vi = `v${index}`;
-        //     return {
-        //         get: function() { return parseFloat(this.dataset[vi]); },
-        //         set: function(v) { 
-        //             v = parseFloat(v);
-        //             if(this[vi] === v)
-        //                 return;
-        //             this.dataset[vi] = v;
-        //             this.value = (parseFloat(this.v1) + parseFloat(this.v2) + parseFloat(this.v3) + parseFloat(this.v4))/4;
-        //             // this.update();
-        //         }
-        //     }
-        // }
-        // this.style.setProperty('--xresolution', this.xResolution);
-        // this.style.setProperty('--yresolution', this.yResolution);
-        // while(Math.max(0, (this.xResolution-1) * (this.yResolution-1)) < this.#valuePathElement.children.length) { this.#valuePathElement.removeChild(this.#valuePathElement.lastChild); }
-        // for(let i = 0; i < (this.xResolution-1) * (this.yResolution-1); i++) { 
-        //     let valuePathElement = this.#valuePathElement.children[i];
-        //     if(!valuePathElement) {
-        //         valuePathElement = this.#valuePathElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','path'));
-        //         Object.defineProperty(valuePathElement, 'value', {
-        //             get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
-        //             set: function(value) { this.style.setProperty(`--data-value`, value); }
-        //         });
-        //         valuePathElement.update = function() {
-        //             if(!this.p1 || !this.p2 || !this.p3 || !this.p4)
-        //                 return;
-        //             this.depth = (this.p1[2] + this.p2[2] + this.p3[2] + this.p4[2])/4;
-        //             this.setAttribute(`d`, 
-        //                             `M${this.p1[0]},${this.p1[1]}`+
-        //                             `L${this.p2[0]},${this.p2[1]}`+
-        //                             `L${this.p3[0]},${this.p3[1]}`+
-        //                             `L${this.p4[0]},${this.p4[1]}Z`)
-        //         };
-        //         Object.defineProperty(valuePathElement, 'v1', getPathVGetterSetter(1));
-        //         Object.defineProperty(valuePathElement, 'v2', getPathVGetterSetter(2));
-        //         Object.defineProperty(valuePathElement, 'v3', getPathVGetterSetter(3));
-        //         Object.defineProperty(valuePathElement, 'v4', getPathVGetterSetter(4));
-        //     }
-        //     valuePathElement.x1 = valuePathElement.x4 = i % (this.xResolution-1);
-        //     valuePathElement.y1 = valuePathElement.y2 = Math.trunc(i/(this.xResolution-1));
-        //     valuePathElement.x2 = valuePathElement.x3 = valuePathElement.x1 + 1;
-        //     valuePathElement.y3 = valuePathElement.y4 = valuePathElement.y1 + 1;
-        // }
-        // const valuePathElements = [...thisClass.#valuePathElement.children];
-        // while(this.xResolution * this.yResolution < this._valueElement.children.length) { this._valueElement.removeChild(this._valueElement.lastChild); }
-        // for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
-        //     let valueElement = this._valueElement.children[i] 
-        //     if(!valueElement) {
-        //         valueElement = this._valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
-        //         Object.defineProperty(valueElement, 'value', {
-        //             get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
-        //             set: function(value) { 
-        //                 value = parseFloat(value);
-        //                 if(this.value === value )
-        //                     return;
-        //                 if(value < thisClass._valueMin)
-        //                     thisClass._valueMin = value;
-        //                 if(value > thisClass._valueMax)
-        //                     thisClass._valueMax = value;
-        //                 this.style.setProperty(`--data-value`, value); 
-        //                 this.update();
-        //                 if(this.vp1) this.vp1.v1 = value;
-        //                 if(this.vp2) this.vp2.v2 = value;
-        //                 if(this.vp3) this.vp3.v3 = value;
-        //                 if(this.vp4) this.vp4.v4 = value;
-        //             }
-        //         });
-        //         Object.defineProperty(valueElement, 'p', {
-        //             get: function() { return this.dataset.p? JSON.parse(this.dataset.p) : undefined; },
-        //             set: function(p) {
-        //                 if(!p) 
-        //                     return;
-        //                 const jsonP = JSON.stringify(p);
-        //                 if(jsonP === this.dataset.p)
-        //                     return;
-        //                 this.dataset.p = jsonP;
-        //                 p[0] = p[0].toFixed(10);
-        //                 p[1] = p[1].toFixed(10);
-        //                 this.depth = p[2];
-        //                 if(this.vp1) { this.vp1.p1 = p; this.vp1.v1 = this.value; }
-        //                 if(this.vp2) { this.vp2.p2 = p; this.vp2.v2 = this.value; }
-        //                 if(this.vp3) { this.vp3.p3 = p; this.vp3.v3 = this.value; }
-        //                 if(this.vp4) { this.vp4.p4 = p; this.vp4.v4 = this.value; }
-        //             }
-        //         });
-        //         valueElement.update = function circleUpdater() {
-        //             if(!(this.p = thisClass.#cellToPoint(this.x, this.y, this.value)))
-        //                 return;
-        //             const p = this.p;
-        //             this.setAttribute(`cx`, p[0]);
-        //             this.setAttribute(`cy`, p[1]);
-        //         };
-        //     }
-        //     valueElement.x = i % this.xResolution;
-        //     valueElement.y = Math.trunc(i/this.xResolution);
-        //     valueElement.vp1 = valuePathElements.find(element => element.x1 === valueElement.x && element.y1 === valueElement.y);
-        //     valueElement.vp2 = valuePathElements.find(element => element.x2 === valueElement.x && element.y2 === valueElement.y);
-        //     valueElement.vp3 = valuePathElements.find(element => element.x3 === valueElement.x && element.y3 === valueElement.y);
-        //     valueElement.vp4 = valuePathElements.find(element => element.x4 === valueElement.x && element.y4 === valueElement.y);
-        // }
+        function getLineVGetterSetter(index) {
+            let vi = `v${index}`;
+            return {
+                get: function() { return parseFloat(this.dataset[vi]); },
+                set: function(v) { 
+                    v = parseFloat(v);
+                    if(this[vi] === v)
+                        return;
+                    this.dataset[vi] = v;
+                    this.value = (parseFloat(this.v1) + parseFloat(this.v2))/2;
+                    // this.update();
+                }
+            }
+        }
+        this.style.setProperty('--xresolution', this.xResolution);
+        this.style.setProperty('--yresolution', this.yResolution);
+        while(Math.max(0, (this.xResolution-1) * (this.yResolution-1)) < this.#valueLineElement.children.length) { this.#valueLineElement.removeChild(this.#valueLineElement.lastChild); }
+        for(let i = 0; i < (this.xResolution-1) * (this.yResolution-1); i++) { 
+            let valueLineElement = this.#valueLineElement.children[i];
+            if(!valueLineElement) {
+                valueLineElement = this.#valueLineElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line'));
+                Object.defineProperty(valueLineElement, 'value', {
+                    get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
+                    set: function(value) { this.style.setProperty(`--data-value`, value); }
+                });
+                valueLineElement.update = function() {
+                    if(!this.p1 || !this.p2)
+                        return;
+                        
+                    this.setAttribute(`x1`, this.p1[0]);
+                    this.setAttribute(`y1`, this.p1[1]);
+                    this.setAttribute(`x2`, this.p2[0]);
+                    this.setAttribute(`y2`, this.p2[1]);
+                };
+                Object.defineProperty(valueLineElement, 'v1', getLineVGetterSetter(1));
+                Object.defineProperty(valueLineElement, 'v2', getLineVGetterSetter(2));
+            }
+            valueLineElement.x1 = valueLineElement.x2 = i % (this.xResolution-1);
+            if(valueLineElement.x1 + 1 < this.xResolution)
+                valueLineElement.x2++;
+            valueLineElement.y1 = valueLineElement.y2 = Math.trunc(i/(this.xResolution-1));
+            if(valueLineElement.y1 + 1 < this.yResolution)
+                valueLineElement.y2++;
+        }
+        const valueLineElements = [...thisClass.#valueLineElement.children];
+        while(this.xResolution * this.yResolution < this._valueElement.children.length) { this._valueElement.removeChild(this._valueElement.lastChild); }
+        for(let i = 0; i < this.xResolution * this.yResolution; i++) { 
+            let valueElement = this._valueElement.children[i] 
+            if(!valueElement) {
+                valueElement = this._valueElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','circle'));
+                Object.defineProperty(valueElement, 'value', {
+                    get: function() { return parseFloat(this.style.getPropertyValue(`--data-value`)); },
+                    set: function(value) { 
+                        value = parseFloat(value);
+                        if(this.value === value )
+                            return;
+                        if(value < thisClass._valueMin)
+                            thisClass._valueMin = value;
+                        if(value > thisClass._valueMax)
+                            thisClass._valueMax = value;
+                        this.style.setProperty(`--data-value`, value); 
+                        this.update();
+                        if(this.vl1) this.vl1.v1 = value;
+                        if(this.vl2) this.vl2.v2 = value;
+                    }
+                });
+                Object.defineProperty(valueElement, 'p', {
+                    get: function() { return this.dataset.p? JSON.parse(this.dataset.p) : undefined; },
+                    set: function(p) {
+                        if(!p) 
+                            return;
+                        const jsonP = JSON.stringify(p);
+                        if(jsonP === this.dataset.p)
+                            return;
+                        this.dataset.p = jsonP;
+                        p[0] = p[0].toFixed(10);
+                        p[1] = p[1].toFixed(10);
+                        if(this.vl1) { this.vl1.p1 = p; this.vl1.v1 = this.value; }
+                        if(this.vl2) { this.vl2.p2 = p; this.vl2.v2 = this.value; }
+                    }
+                });
+                valueElement.update = function circleUpdater() {
+                    if(!(this.p = thisClass.#cellToPoint(this.x, this.y, this.value)))
+                        return;
+                    const p = this.p;
+                    this.setAttribute(`cx`, p[0]);
+                    this.setAttribute(`cy`, p[1]);
+                };
+            }
+            valueElement.x = i % this.xResolution;
+            valueElement.y = Math.trunc(i/this.xResolution);
+            valueElement.vl1 = valueLineElements.find(element => element.x1 === valueElement.x && element.y1 === valueElement.y);
+            valueElement.vl2 = valueLineElements.find(element => element.x2 === valueElement.x && element.y2 === valueElement.y);
+        }
     }
 
     #createEventListeners() {
