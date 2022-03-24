@@ -25,16 +25,19 @@ export default class UIGraph3D extends UITableBase {
             return;
         this.#valuePathElement.querySelectorAll(`.selected`).forEach(function(element) { element.classList.remove(`selected`) });
         if(selecting) {
-            for(let i=0; i<this.#valuePathElement.children.length; i++) {
-                let element = this.#valuePathElement.children[i];
-                if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x1) ||
-                    Math.max(selecting.endX, selecting.startX) < parseInt(element.x2) ||
-                    Math.min(selecting.endY, selecting.startY) > parseInt(element.y1) ||
-                    Math.max(selecting.endY, selecting.startY) < parseInt(element.y3)){
-                    continue;
+            if( selecting.startX !== undefined && selecting.endX !== undefined &&
+                selecting.startY !== undefined && selecting.endY !== undefined) {
+                for(let i=0; i<this.#valuePathElement.children.length; i++) {
+                    let element = this.#valuePathElement.children[i];
+                    if( Math.min(selecting.endX, selecting.startX) > parseInt(element.x1) ||
+                        Math.max(selecting.endX, selecting.startX) < parseInt(element.x2) ||
+                        Math.min(selecting.endY, selecting.startY) > parseInt(element.y1) ||
+                        Math.max(selecting.endY, selecting.startY) < parseInt(element.y3)){
+                        continue;
+                    }
+                    element.classList.add(`selected`); 
                 }
-                element.classList.add(`selected`); 
-            };
+            }
         }
         super.selecting = selecting;
     }
