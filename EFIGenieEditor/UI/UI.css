@@ -326,6 +326,7 @@
     content: "";
 }
 
+.ui.text,
 .ui.number {
     font: bold 16px Arial;
     background-color: var(--input-background-color);
@@ -335,6 +336,7 @@
     margin: 1px;
     padding: 1px 2px;
 }
+.ui.text:hover,
 .ui.number:hover {
     background-color: var(--background-hover-color);
     border-color: #3590d0;

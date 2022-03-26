@@ -286,7 +286,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputSpacer {
     height: 25px;
 }
-.inputName {
+.ui.text.inputName {
     border: 0;
     outline: 0;
     background: transparent;
