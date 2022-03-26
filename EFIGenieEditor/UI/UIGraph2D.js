@@ -162,6 +162,8 @@ export default class UIGraph2D extends UITableBase {
     _resolutionChanged(axisElements, axisResolution) {
         const thisClass = this;
         const textSize = this.width/(7.5 * Math.max(this.xResolution, this.yResolution, axisResolution));
+        if(!textSize)
+            debugger;
         const r = textSize/2;
         this.#paddingLeft = textSize * 5;
         this.#paddingBottom = r + textSize;
@@ -196,13 +198,13 @@ export default class UIGraph2D extends UITableBase {
             else
                 axisElement.y = i;
         }
-        for(let i = 0; i < this.xResolution; i++) { 
+        for(let i = 0; i < this._xAxisElement.children.length; i++) { 
             const axisElement = this._xAxisElement.children[i];
             axisElement.textSize = textSize; 
             axisElement.children[1]?.setAttribute(`text-anchor`, `middle`);
             axisElement.r = r;
         }
-        for(let i = 0; i < this.yResolution; i++) { 
+        for(let i = 0; i < this._yAxisElement.children.length; i++) { 
             const axisElement = this._yAxisElement.children[i];
             axisElement.textSize = textSize; 
             axisElement.children[1]?.setAttribute(`text-anchor`, `middle`); 
@@ -386,18 +388,27 @@ export default class UIGraph2D extends UITableBase {
                     endX: x,
                     endY: y
                 }
+                const axis = thisClass.axis;
+                const axisElement = thisClass.xResolution < 2? thisClass._yAxisElement.children[closestCircle.y] : thisClass._xAxisElement.children[closestCircle.x];
                 dragValue = {
+                    pageX: event.pageX,
                     pageY: event.pageY,
                     closestCircle,
                     value: closestCircle.value,
-                    mag: (thisClass._valueMax - thisClass._valueMin) / thisClass.height, 
+                    mag: (thisClass._valueMax - thisClass._valueMin) / (thisClass.height - thisClass.#paddingTop - thisClass.#paddingBottom), 
+                    axisElement,
+                    axisValue: axisElement.value,
+                    axisMag: (axis[axis.length - 1] - axis[0]) / (thisClass.width - thisClass.#paddingLeft - thisClass.#paddingRight)
                 }
             }
 
             //dragValue
             if(dragValue) {
                 function mouseMove(event) {
-                    dragValue.closestCircle.value = dragValue.value + (dragValue.pageY - event.pageY) * dragValue.mag 
+                    dragValue.closestCircle.value = dragValue.value + (dragValue.pageY - event.pageY) * dragValue.mag;
+                    dragValue.axisElement.value = dragValue.axisValue + (event.pageX - dragValue.pageX) * dragValue.axisMag;
+
+                    thisClass._boundAxis(dragValue.axisElement.parentElement);
                     thisClass.dispatchEvent(new Event(`change`));
                 }
                 function mouseUp() {

@@ -6,7 +6,7 @@ export default class UITableBase extends HTMLDivElement {
         if(value === undefined)
             return;
         if(value.length !== this.xResolution * this.yResolution)
-            throw `Value length does not match table length. Set xResolution and yResolution before setting value\ncurrent:${value.length}\nnew:${this.xResolution * this.yResolution}`;
+            throw `Value length does not match table length. Set xResolution and yResolution before setting value\ncurrent:${this.xResolution * this.yResolution}\nnew:${value.length}`;
         let same = true;
         for(let i = 0; i < this._valueElement.children.length; i++){
             if((isNaN(this._valueElement.children[i].value) && isNaN(value[i])) || this._valueElement.children[i].value === value[i])
@@ -34,18 +34,19 @@ export default class UITableBase extends HTMLDivElement {
             return;
 
         const xResolution = saveValue.XResolution ?? saveValue.Resolution;
-        const yResolution = saveValue.YResolution ?? saveValue.Resolution;
-        if(xResolution && saveValue.MaxX !== undefined && saveValue.MinX !== undefined && saveValue.MaxX !== null && saveValue.MinX !== null) {
+        const maxX = saveValue.MaxX ?? saveValue.Max;
+        const minX = saveValue.MinX ?? saveValue.Min;
+        if(xResolution && maxX !== undefined && minX !== undefined && maxX !== null && minX !== null) {
             saveValue.XAxis = new Array(xResolution);
-            const xAxisAdd = (saveValue.MaxX - saveValue.MinX) / (xResolution - 1);
+            const xAxisAdd = (maxX - minX) / (xResolution - 1);
             for(let x=0; x<xResolution; x++){
-                saveValue.XAxis[x] = saveValue.MinX + xAxisAdd * x;
+                saveValue.XAxis[x] = minX + xAxisAdd * x;
             }
         }
-        if(yResolution && saveValue.MaxY !== undefined && saveValue.MinY !== undefined && saveValue.MaxY !== null && saveValue.MinY !== null) {
-            saveValue.YAxis = new Array(yResolution);
-            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (yResolution - 1);
-            for(let y=0; y<yResolution; y++){
+        if(saveValue.YResolution && saveValue.MaxY !== undefined && saveValue.MinY !== undefined && saveValue.MaxY !== null && saveValue.MinY !== null) {
+            saveValue.YAxis = new Array(saveValue.YResolution);
+            const yAxisAdd = (saveValue.MaxY - saveValue.MinY) / (saveValue.YResolution - 1);
+            for(let y=0; y<saveValue.YResolution; y++){
                 saveValue.YAxis[y] = saveValue.MinY + yAxisAdd * y;
             }
         }
@@ -59,7 +60,7 @@ export default class UITableBase extends HTMLDivElement {
             this.value = saveValue.Value;
     }
     get xResolution() {
-        return this._xAxisElement.children.length;
+        return Math.max(1,this._xAxisElement.children.length);
     }
     set xResolution(xResolution) {
         if(isNaN(xResolution) || xResolution === this.xResolution)
@@ -103,7 +104,7 @@ export default class UITableBase extends HTMLDivElement {
         this.dispatchEvent(new Event(`change`));
     }
     get yResolution() {
-        return this._yAxisElement.children.length;
+        return Math.max(1, this._yAxisElement.children.length);
     }
     set yResolution(yResolution) {
         if(isNaN(yResolution) || yResolution === this.yResolution)
@@ -190,6 +191,32 @@ export default class UITableBase extends HTMLDivElement {
     }
     set _valueMax(valueMax) {
         this.style.setProperty('--valuemax', valueMax);
+    }
+    _boundAxis(element) {
+        if(element !== this._xAxisElement && element !== this._yAxisElement)
+            return;
+        let amin;
+        let amax;
+        if(element === this._xAxisElement) {
+            amin=Math.max(this.selecting.endX, this.selecting.startX);
+            amax=Math.max(this.selecting.endX, this.selecting.startX);
+        } else {
+            amin=Math.max(this.selecting.endY, this.selecting.startY);
+            amax=Math.max(this.selecting.endY, this.selecting.startY);
+        }
+
+        let mima = element.children[amax].value;
+        for(let a=amax+1; a<element.children.length; a++) {
+            if(element.children[a].value < mima) 
+                element.children[a].value = mima;
+            mima = element.children[a].value;
+        }
+        mima = element.children[amin].value;
+        for(let a=amin-1; a>=0; a--) {
+            if(element.children[a].value > mima) 
+                element.children[a].value = mima;
+            mima = element.children[a].value;
+        }
     }
 
     attachToTable(table) {

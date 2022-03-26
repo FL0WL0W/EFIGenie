@@ -371,8 +371,8 @@ export default class UIGraph3D extends UITableBase {
             else
                 axisElement.y = i;
         }
-        for(let i = 0; i < this.xResolution; i++) { this._xAxisElement.children[i].textSize = textSize; }
-        for(let i = 0; i < this.yResolution; i++) { this._yAxisElement.children[i].textSize = textSize; }
+        for(let i = 0; i < this._xAxisElement.children.length; i++) { this._xAxisElement.children[i].textSize = textSize; }
+        for(let i = 0; i < this._yAxisElement.children.length; i++) { this._yAxisElement.children[i].textSize = textSize; }
         const zResolution = parseInt(1.5+Math.max(this.xResolution, this.yResolution));
         while(zResolution < this.#zAxisElement.children.length) { this.#zAxisElement.removeChild(this.#zAxisElement.lastChild); }
         for(let i = 0; i < zResolution; i++) {

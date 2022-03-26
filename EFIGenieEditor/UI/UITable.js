@@ -444,32 +444,6 @@ export default class UITable extends UITableBase {
             
         this.#buildTableElement();
     }
-    #boundAxis(element) {
-        if(element !== this._xAxisElement && element !== this._yAxisElement)
-            return;
-        let amin;
-        let amax;
-        if(element === this._xAxisElement) {
-            amin=Math.max(this.selecting.endX, this.selecting.startX);
-            amax=Math.max(this.selecting.endX, this.selecting.startX);
-        } else {
-            amin=Math.max(this.selecting.endY, this.selecting.startY);
-            amax=Math.max(this.selecting.endY, this.selecting.startY);
-        }
-
-        let mima = element.children[amax].value;
-        for(let a=amax+1; a<element.children.length; a++) {
-            if(element.children[a].value < mima) 
-                element.children[a].value = mima;
-            mima = element.children[a].value;
-        }
-        mima = element.children[amin].value;
-        for(let a=amin-1; a>=0; a--) {
-            if(element.children[a].value > mima) 
-                element.children[a].value = mima;
-            mima = element.children[a].value;
-        }
-    }
 
     //event listeners
     #constructTableEventListeners() {
@@ -528,7 +502,7 @@ export default class UITable extends UITableBase {
                     selectedElement.value = value;
             });
 
-            thisClass.#boundAxis(element);
+            thisClass._boundAxis(element);
         }
         this.#valueInputElement.addEventListener(`change`, valueInputChange); 
 
@@ -627,7 +601,7 @@ export default class UITable extends UITableBase {
                 endY: y + val.split(`\n`).length - 1
             }
             event.preventDefault();
-            thisClass.#boundAxis(element);
+            thisClass._boundAxis(element);
             thisClass.dispatchEvent(new Event(`change`));
         });
 
@@ -850,7 +824,7 @@ export default class UITable extends UITableBase {
                 }
             });
 
-            thisClass.#boundAxis(element);
+            thisClass._boundAxis(element);
             thisClass.dispatchEvent(new Event(`change`));
         }
         function blur() {

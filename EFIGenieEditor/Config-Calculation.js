@@ -264,10 +264,10 @@ class Calculation_LookupTable extends UI.OldTemplate {
     }
 
     get Resolution() {
-        return this.Table.XResolution;
+        return this.Table.xResolution;
     }
     set Resolution(res){
-        this.Table.XResolution = res;
+        this.Table.xResolution = res;
     }
 
     constructor(prop) {
@@ -322,9 +322,9 @@ class Calculation_LookupTable extends UI.OldTemplate {
         var obj = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-                { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
-                { type: `FLOAT`, value: table.XAxis[table.XResolution-1] }, //MaxXValue
-                { type: `UINT8`, value: table.XResolution }, //XResolution
+                { type: `FLOAT`, value: table.xAxis[0] }, //MinXValue
+                { type: `FLOAT`, value: table.xAxis[table.xResolution-1] }, //MaxXValue
+                { type: `UINT8`, value: table.xResolution }, //xResolution
                 { type: `UINT8`, value: typeId }, //Type
                 { type: type, value: tableValue }, //Table
             ]
@@ -461,10 +461,10 @@ class Calculation_2AxisTable extends UI.OldTemplate {
     }
 
     get XResolution() {
-        return this.Table.XResolution;
+        return this.Table.xResolution;
     }
     set XResolution(xRes){
-        this.Table.XResolution = xRes;
+        this.Table.xResolution = xRes;
     }
 
     get YResolution() {
@@ -524,12 +524,12 @@ class Calculation_2AxisTable extends UI.OldTemplate {
         var obj = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-                { type: `FLOAT`, value: table.XAxis[0] }, //MinXValue
-                { type: `FLOAT`, value: table.XAxis[table.XResolution-1] }, //MaxXValue
-                { type: `FLOAT`, value: table.YAxis[0] }, //MinYValue
-                { type: `FLOAT`, value: table.YAxis[table.YResolution-1] }, //MaxYValue
-                { type: `UINT8`, value: table.XResolution }, //XResolution
-                { type: `UINT8`, value: table.YResolution }, //YResolution
+                { type: `FLOAT`, value: table.xAxis[0] }, //MinXValue
+                { type: `FLOAT`, value: table.xAxis[table.xResolution-1] }, //MaxXValue
+                { type: `FLOAT`, value: table.yAxis[0] }, //MinYValue
+                { type: `FLOAT`, value: table.yAxis[table.yResolution-1] }, //MaxYValue
+                { type: `UINT8`, value: table.xResolution }, //xResolution
+                { type: `UINT8`, value: table.yResolution }, //yResolution
                 { type: `UINT8`, value: typeId }, //Type
                 { type: type, value: tableValue }, //Table
             ]
