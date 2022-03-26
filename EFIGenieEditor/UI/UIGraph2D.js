@@ -57,12 +57,26 @@ export default class UIGraph2D extends UITableBase {
     }
     set width(width) {
         this.#svgElement.setAttribute(`width`, width);
+        const textSize = width/(7.5 * Math.max(this.xResolution, this.yResolution));
+        const r = textSize/2;
+        this.#paddingLeft = textSize * 5;
+        this.#paddingBottom = r + textSize;
+        this.#paddingTop = r;
+        this.#paddingRight = r;
+        [...this._valueElement.children].forEach(function(element) { element.textSize = textSize; element.setAttribute(`r`, r.toFixed(10)); element.update(); });
+        [...this._xAxisElement.children].forEach(function(element) { element.textSize = textSize; element.r = r; element.update(); });
+        [...this._yAxisElement.children].forEach(function(element) { element.textSize = textSize; element.r = r; element.update(); });
+        [...this.#zAxisElement.children].forEach(function(element) { element.textSize = textSize; element.r = r; element.update(); });
     }
     get height() {
         return this.#svgElement.getAttribute(`height`) ?? this.offsetHeight ?? 150;
     }
     set height(height) {
         this.#svgElement.setAttribute(`height`, height);
+        [...this._valueElement.children].forEach(function(element) { element.update(); });
+        [...this._xAxisElement.children].forEach(function(element) { element.update(); });
+        [...this._yAxisElement.children].forEach(function(element) { element.update(); });
+        [...this.#zAxisElement.children].forEach(function(element) { element.update(); });
     }
 
     #zAxisElement       = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -139,8 +153,8 @@ export default class UIGraph2D extends UITableBase {
         return [axisX, valueY];
     }
     #axisToLine(x, y) {
-        const axis = this.axis;
-        const axisIndex = this.xResolution < 2? y : x;
+        const axis = x === undefined? this.yAxis : this.xAxis;
+        const axisIndex = x === undefined? y : x;
         const axisMax = axis[axis.length - 1];
         const axisMin = axis[0];
         const axisX = this.#paddingLeft + (this.width-this.#paddingLeft-this.#paddingRight) * (axis[axisIndex] - axisMin)/(axisMax-axisMin);
@@ -162,8 +176,6 @@ export default class UIGraph2D extends UITableBase {
     _resolutionChanged(axisElements, axisResolution) {
         const thisClass = this;
         const textSize = this.width/(7.5 * Math.max(this.xResolution, this.yResolution, axisResolution));
-        if(!textSize)
-            debugger;
         const r = textSize/2;
         this.#paddingLeft = textSize * 5;
         this.#paddingBottom = r + textSize;
@@ -275,8 +287,8 @@ export default class UIGraph2D extends UITableBase {
         }
         this.style.setProperty('--xresolution', this.xResolution);
         this.style.setProperty('--yresolution', this.yResolution);
-        while(Math.max(0, (this.xResolution-1) * (this.yResolution-1)) < this.#valueLineElement.children.length) { this.#valueLineElement.removeChild(this.#valueLineElement.lastChild); }
-        for(let i = 0; i < (this.xResolution-1) * (this.yResolution-1); i++) { 
+        while(Math.max(0, (this.xResolution-1) * (this.yResolution)) < this.#valueLineElement.children.length) { this.#valueLineElement.removeChild(this.#valueLineElement.lastChild); }
+        for(let i = 0; i < (this.xResolution-1) * (this.yResolution); i++) { 
             let valueLineElement = this.#valueLineElement.children[i];
             if(!valueLineElement) {
                 valueLineElement = this.#valueLineElement.appendChild(document.createElementNS('http://www.w3.org/2000/svg','line'));
@@ -296,12 +308,10 @@ export default class UIGraph2D extends UITableBase {
                 Object.defineProperty(valueLineElement, 'v1', getLineVGetterSetter(1));
                 Object.defineProperty(valueLineElement, 'v2', getLineVGetterSetter(2));
             }
-            valueLineElement.x1 = valueLineElement.x2 = i % (this.xResolution-1);
-            if(valueLineElement.x1 + 1 < this.xResolution)
-                valueLineElement.x2++;
-            valueLineElement.y1 = valueLineElement.y2 = Math.trunc(i/(this.xResolution-1));
-            if(valueLineElement.y1 + 1 < this.yResolution)
-                valueLineElement.y2++;
+            valueLineElement.xp1 = valueLineElement.xp2 = i % (this.xResolution-1);
+            if(valueLineElement.xp1 + 1 < this.xResolution)
+                valueLineElement.xp2++;
+            valueLineElement.yp1 = valueLineElement.yp2 = Math.trunc(i/(this.xResolution-1));
         }
         const valueLineElements = [...thisClass.#valueLineElement.children];
         while(this.xResolution * this.yResolution < this._valueElement.children.length) { this._valueElement.removeChild(this._valueElement.lastChild); }
@@ -350,8 +360,8 @@ export default class UIGraph2D extends UITableBase {
             }
             valueElement.x = i % this.xResolution;
             valueElement.y = Math.trunc(i/this.xResolution);
-            valueElement.vl1 = valueLineElements.find(element => element.x1 === valueElement.x && element.y1 === valueElement.y);
-            valueElement.vl2 = valueLineElements.find(element => element.x2 === valueElement.x && element.y2 === valueElement.y);
+            valueElement.vl1 = valueLineElements.find(element => element.xp1 === valueElement.x && element.yp1 === valueElement.y);
+            valueElement.vl2 = valueLineElements.find(element => element.xp2 === valueElement.x && element.yp2 === valueElement.y);
             valueElement.setAttribute(`r`, r.toFixed(10));
         }
     }

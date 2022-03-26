@@ -14,8 +14,9 @@
             import UISelection from "./UISelection.js"
             import UITable from "./UITable.js"
             import UIGraph3D from "./UIGraph3D.js"
+            import UIGraph2D from "./UIGraph2D.js"
             window.template = new UITemplate({
-                Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="graph3D"></div><hr/><div data-element="table2D"></div>`,
+                Template: `<div data-element="text"></div><hr/><div data-element="number"></div><hr/><div data-element="checkbox"></div><hr/><div data-element="graph2D"></div><hr/><div data-element="graph3D"></div><hr/><div data-element="table2D"></div>`,
                 text: new UIText({
                     value: `text`
                 }),
@@ -57,10 +58,22 @@
                     yAxis: [ 1, 2, 3, 4 ],
                     width: 640,
                     height: 480
+                }),
+                graph2D: new UIGraph2D({
+                    value: [ 0.0000234, 2, 3, 4, 5,
+                             2, 3, 4, 5, 6,
+                             3, 4, 5, 6, 7,
+                             4, 5, 6, 7, 8],
+                    xAxis: [ 1, 2, 3, 4, 5 ],
+                    yAxis: [ 1, 2, 3, 4 ],
+                    width: 640,
+                    height: 480
                 })
             });
             window.template.table2D.attachToTable(window.template.graph3D);
             window.template.graph3D.attachToTable(window.template.table2D);
+            window.template.table2D.attachToTable(window.template.graph2D);
+            window.template.graph2D.attachToTable(window.template.table2D);
             window.addEventListener(`load`, function() {
                 document.body.appendChild(window.template)
             });

@@ -419,7 +419,8 @@
 }
 .ui.graph2d line,
 .ui.graph3d line {
-    stroke: var(--text-color);
+    --linecolor: hsl(calc(180 - (180 * (var(--data-value) - var(--valuemin)) / (var(--valuemax) - var(--valuemin)))), 60%, 50%);
+    stroke: var(--linecolor, var(--text-color));
     stroke-width: 1;
 }
 .ui.graph2d circle,
