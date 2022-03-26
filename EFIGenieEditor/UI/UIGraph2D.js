@@ -93,7 +93,7 @@ export default class UIGraph2D extends UITableBase {
     onChange = [];
     constructor(prop) {
         super();
-        this.class = `ui graphd`;
+        this.class = `ui graph2d`;
         this.append(this.#svgElement);
         this.#svgElement.setAttribute(`overflow`, `visible`)
         this.#svgElement.append(this._xAxisElement);
@@ -115,71 +115,64 @@ export default class UIGraph2D extends UITableBase {
         this.#createEventListeners();
         this.value = propValue;
         //delete onchange and migrate to addEventListener(`change`)
+        const thisClass = this;
         if(!Array.isArray(this.onChange))
             this.onChange = [ this.onChange ];
         this.addEventListener(`change`, function() {
             thisClass.onChange.forEach(function(onChange) { onChange(); });
         });
     }
+    #paddingLeft = 75;
+    #paddingBottom = 25;
+    #paddingRight = 25;
+    #paddingTop = 25;
     #cellToPoint(x, y, value) {
-    //     if(isNaN(value))
-    //         return;
-    //     const xAxis = this.xAxis;
-    //     const yAxis = this.yAxis;
-    //     y = this.yResolution-y-1;
-    //     x = (xAxis[x]-xAxis[0])/(xAxis[xAxis.length-1]-xAxis[0]);
-    //     if(isNaN(x))
-    //         x = 0;
-    //     y = (yAxis[y]-yAxis[0])/(yAxis[yAxis.length-1]-yAxis[0]);
-    //     if(isNaN(y))
-    //         y = 0;
-    //     value = (value-this._valueMin)/(this._valueMax-this._valueMin);
-    //     return UIGraph3D.transformPoint([x-0.5, -(value-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc);
+        if(isNaN(value))
+            return;
+        const axis = this.axis;
+        const axisIndex = this.xResolution < 2? y : x;
+        const axisMax = axis[axis.length - 1];
+        const axisMin = axis[0];
+        const axisX = this.#paddingLeft + (this.width-this.#paddingLeft-this.#paddingRight) * (axis[axisIndex] - axisMin)/(axisMax-axisMin);
+
+        const valueY = this.height - (this.#paddingBottom + (this.height-this.#paddingBottom-this.#paddingTop) * (value - this._valueMin)/(this._valueMax-this._valueMin));
+        return [axisX, valueY];
     }
     #axisToLine(x, y) {
-    //     const xAxis = this.xAxis;
-    //     const yAxis = this.yAxis;
-    //     y = this.yResolution-y-1;
-    //     if(x === undefined || isNaN(x))
-    //         x = this.#transformPrecalc?.sinYaw > 0? 0 : 1;
-    //     else
-    //         x = (xAxis[x]-xAxis[0])/(xAxis[xAxis.length-1]-xAxis[0]);
-    //     if(isNaN(x))
-    //         x = 0;
-    //     if(y === undefined || isNaN(y))
-    //         y = this.#transformPrecalc?.cosYaw > 0? 1 : 0;
-    //     else
-    //         y = (yAxis[y]-yAxis[0])/(yAxis[yAxis.length-1]-yAxis[0]);
-    //     if(isNaN(y))
-    //         y = 0;
-    //     return [
-    //         UIGraph3D.transformPoint([x-0.5,  0.5*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc),
-    //         UIGraph3D.transformPoint([x-0.5, -0.5*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc)
-    //     ];
+        const axis = this.axis;
+        const axisIndex = this.xResolution < 2? y : x;
+        const axisMax = axis[axis.length - 1];
+        const axisMin = axis[0];
+        const axisX = this.#paddingLeft + (this.width-this.#paddingLeft-this.#paddingRight) * (axis[axisIndex] - axisMin)/(axisMax-axisMin);
+
+        const axisY1 = this.height-this.#paddingBottom;
+        const axisY2 = this.#paddingTop;
+
+        return [[axisX, axisY1], [axisX, axisY2]];
     }
-    #zAxisToLine(z) {
-    //     const x = this.#transformPrecalc.sinYaw > 0? 0 : 1;
-    //     const y = this.#transformPrecalc.cosYaw > 0? 1 : 0;
-    //     z = (z-this._valueMin)/(this._valueMax-this._valueMin);
-    //     return [[
-    //         UIGraph3D.transformPoint([x-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), -0.5], this.#transformPrecalc),
-    //         UIGraph3D.transformPoint([x-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)),  0.5], this.#transformPrecalc)
-    //     ],[
-    //         UIGraph3D.transformPoint([-0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc),
-    //         UIGraph3D.transformPoint([ 0.5, -(z-0.5)*Math.max(1,this.height)/(Math.max(1, this.width)), y-0.5], this.#transformPrecalc)
-    //     ]];
+    #zAxisToLine(zValue) {
+        const axisX1 = this.#paddingLeft;
+        const axisX2 = this.width-this.#paddingRight;
+        
+        const axisY = this.height - (this.#paddingBottom + (this.height-this.#paddingBottom-this.#paddingTop) * (zValue - this._valueMin)/(this._valueMax-this._valueMin));
+
+        return [[axisX1, axisY], [axisX2, axisY]];
     }
 
     _resolutionChanged(axisElements, axisResolution) {
         const thisClass = this;
-        const textSize = (0.45/Math.max(this.xResolution, this.yResolution, axisResolution));
+        const textSize = this.width/(7.5 * Math.max(this.xResolution, this.yResolution, axisResolution));
+        const r = textSize/2;
+        this.#paddingLeft = textSize * 5;
+        this.#paddingBottom = r + textSize;
+        this.#paddingTop = r;
+        this.#paddingRight = r;
         while(axisResolution < axisElements.children.length) { axisElements.removeChild(axisElements.lastChild); }
         for(let i = axisElements.children.length; i < axisResolution; i++) { 
             const axisElement = axisElements.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
             axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
             const textLabel = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-            textLabel.setAttribute(`alignment-baseline`, `middle`);
-            textLabel.setAttribute(`text-anchor`, `end`);
+            textLabel.setAttribute(`alignment-baseline`, `hanging`);
             axisElement.update = function() {
                 const line = thisClass.#axisToLine(this.x, this.y);
                 this.children[0].setAttribute(`x1`, line[0][0]);
@@ -188,8 +181,8 @@ export default class UIGraph2D extends UITableBase {
                 this.children[0].setAttribute(`y2`, line[1][1]);
 
                 this.children[1].setAttribute(`x`, line[0][0]);
-                this.children[1].setAttribute(`y`, line[0][1]);
-                this.children[1].setAttribute(`font-size`, this.textSize);
+                this.children[1].setAttribute(`y`, line[0][1] + this.r);
+                this.children[1].setAttribute(`font-size`, this.textSize.toFixed(10));
                 this.children[1].innerHTML = formatNumberForDisplay(this.value);
             }
             const axisMinus1 = axisElements.children[i-1]?.value;
@@ -203,8 +196,29 @@ export default class UIGraph2D extends UITableBase {
             else
                 axisElement.y = i;
         }
-        for(let i = 0; i < this.xResolution; i++) { this._xAxisElement.children[i].textSize = textSize; }
-        for(let i = 0; i < this.yResolution; i++) { this._yAxisElement.children[i].textSize = textSize; }
+        for(let i = 0; i < this.xResolution; i++) { 
+            const axisElement = this._xAxisElement.children[i];
+            axisElement.textSize = textSize; 
+            axisElement.children[1]?.setAttribute(`text-anchor`, `middle`);
+            axisElement.r = r;
+        }
+        for(let i = 0; i < this.yResolution; i++) { 
+            const axisElement = this._yAxisElement.children[i];
+            axisElement.textSize = textSize; 
+            axisElement.children[1]?.setAttribute(`text-anchor`, `middle`); 
+            axisElement.r = r;
+        }
+        this._xAxisElement.lastChild?.children[1]?.setAttribute(`text-anchor`, `end`);
+        this._yAxisElement.lastChild?.children[1]?.setAttribute(`text-anchor`, `end`);
+        this._xAxisElement.firstChild?.children[1]?.setAttribute(`text-anchor`, `start`);
+        this._yAxisElement.firstChild?.children[1]?.setAttribute(`text-anchor`, `start`);
+        if(this.xResolution < 2) {
+            this._xAxisElement.hidden = true;
+            this._yAxisElement.hidden = false;
+        } else {
+            this._yAxisElement.hidden = true;
+            this._xAxisElement.hidden = false;
+        }
         const zResolution = parseInt(1.5+Math.max(this.xResolution, this.yResolution));
         while(zResolution < this.#zAxisElement.children.length) { this.#zAxisElement.removeChild(this.#zAxisElement.lastChild); }
         for(let i = 0; i < zResolution; i++) {
@@ -213,7 +227,6 @@ export default class UIGraph2D extends UITableBase {
                 axisElement = this.#zAxisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`g`)); 
                 axisElement.append(document.createElementNS(`http://www.w3.org/2000/svg`,`line`));
                 const textLabel = axisElement.appendChild(document.createElementNS(`http://www.w3.org/2000/svg`,`text`));
-                textLabel.setAttribute(`alignment-baseline`, `middle`);
                 textLabel.setAttribute(`text-anchor`, `end`);
                 axisElement.update = function() {
                     const zMag = (thisClass._valueMax - thisClass._valueMin)/(this.zResolution-1);
@@ -226,14 +239,21 @@ export default class UIGraph2D extends UITableBase {
                     this.children[0].setAttribute(`x2`, line[1][0]);
                     this.children[0].setAttribute(`y2`, line[1][1]);
 
-                    this.children[1].setAttribute(`x`, line[0][0]);
+                    this.children[1].setAttribute(`x`, line[0][0] - this.r);
                     this.children[1].setAttribute(`y`, line[0][1]);
-                    this.children[1].setAttribute(`font-size`, this.textSize);
+                    this.children[1].setAttribute(`font-size`, this.textSize.toFixed(10));
                     this.children[1].innerHTML = formatNumberForDisplay(zValue);
                 }
             }
+            if(i===0)
+                axisElement.children[1].setAttribute(`alignment-baseline`, `normal`);
+            else if(i===zResolution-1)
+                axisElement.children[1].setAttribute(`alignment-baseline`, `hanging`);
+            else
+                axisElement.children[1].setAttribute(`alignment-baseline`, `middle`);
             axisElement.textSize = textSize;
             axisElement.zResolution = zResolution;
+            axisElement.r = r;
             axisElement.z = i;
         }
 
@@ -330,6 +350,7 @@ export default class UIGraph2D extends UITableBase {
             valueElement.y = Math.trunc(i/this.xResolution);
             valueElement.vl1 = valueLineElements.find(element => element.x1 === valueElement.x && element.y1 === valueElement.y);
             valueElement.vl2 = valueLineElements.find(element => element.x2 === valueElement.x && element.y2 === valueElement.y);
+            valueElement.setAttribute(`r`, r.toFixed(10));
         }
     }
 

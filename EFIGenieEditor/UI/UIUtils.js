@@ -1,4 +1,4 @@
-Object.defineProperty(HTMLElement.prototype, 'hidden', {
+let hiddenGetterSetter = {
     enumerable: true,
     get: function() {
         return this.style.display === `none`;
@@ -16,7 +16,9 @@ Object.defineProperty(HTMLElement.prototype, 'hidden', {
             delete this._previousDisplayValue;
         }
     }
-});
+}
+Object.defineProperty(HTMLElement.prototype, 'hidden', hiddenGetterSetter);
+Object.defineProperty(SVGElement.prototype, 'hidden', hiddenGetterSetter);
 Object.defineProperty(HTMLElement.prototype, 'class', {
     enumerable: true,
     set: function(pclass) {

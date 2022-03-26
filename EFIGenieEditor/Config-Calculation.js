@@ -275,14 +275,22 @@ class Calculation_LookupTable extends UI.OldTemplate {
         const thisClass = this;
         this.Dialog = new UI.Dialog({
             ButtonText: `Edit Table`,
-            TemplateIdentifier: `Table`
+            TemplateIdentifier: `TableGroup`
         });
+        this.TableGroup = `$Graph$</br>$Table$`;
         this.Table = new UI.Table({
             selectNotVisible: true,
             yResolution: 1,
             yResolutionModifiable: false,
             BaseObj: true
         });
+        this.Graph = new UI.Graph2D({
+            width: 800,
+            height: 450
+        });
+        delete this.Graph.saveValue;
+        this.Table.attachToTable(this.Graph);
+        this.Graph.attachToTable(this.Table);
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);
