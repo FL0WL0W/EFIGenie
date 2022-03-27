@@ -1,11 +1,11 @@
-import UINumber from "./UI/UINumber.js"
-import UICheckBox from "./UI/UICheckBox.js";
-import UIText from "./UI/UIText.js";
-import UISelection from "./UI/UISelection.js";
-import UITemplate from "./UI/UITemplate.js";
-import UITable from "./UI/UITable.js";
-import UIGraph3D from "./UI/UIGraph3D.js"
-import UIGraph2D from "./UI/UIGraph2D.js"
+import UINumber from "./JavascriptUI/UINumber.js"
+import UICheckBox from "./JavascriptUI/UICheckBox.js";
+import UIText from "./JavascriptUI/UIText.js";
+import UISelection from "./JavascriptUI/UISelection.js";
+import UITemplate from "./JavascriptUI/UITemplate.js";
+import UITable from "./JavascriptUI/UITable.js";
+import UIGraph3D from "./JavascriptUI/UIGraph3D.js"
+import UIGraph2D from "./JavascriptUI/UIGraph2D.js"
 
 //adapt new ui modules to old garbage GetHtml/Attach structure
 Object.defineProperty(HTMLElement.prototype, 'Class', {
