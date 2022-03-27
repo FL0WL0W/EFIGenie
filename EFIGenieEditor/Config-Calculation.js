@@ -197,18 +197,18 @@ function TableGetType(tableValue) {
     return GetType(max);
 }
 
-class Calculation_LookupTable extends UI.OldTemplate {
+class Calculation_LookupTable extends UI.Template {
     static Name = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Template = `$Dialog$`
+    static Template = `<div data-element="Dialog"></div>`
 
     get Label() {
         return this.Table.zLabel;
     }
     set Label(label){
         this.Table.zLabel = label;
-        this.Dialog.Title = label;
+        this.Dialog.title = label;
     }
 
     _xLabel = `X`
@@ -274,8 +274,7 @@ class Calculation_LookupTable extends UI.OldTemplate {
         super();
         const thisClass = this;
         this.Dialog = new UI.Dialog({
-            ButtonText: `Edit Table`,
-            TemplateIdentifier: `TableGroup`
+            buttonLabel: `Edit Table`,
         });
         this.TableGroup = `$Graph$</br>$Table$`;
         this.Table = new UI.Table({
@@ -291,6 +290,9 @@ class Calculation_LookupTable extends UI.OldTemplate {
         delete this.Graph.saveValue;
         this.Table.attachToTable(this.Graph);
         this.Graph.attachToTable(this.Table);
+        this.Dialog.content.append(this.Graph);
+        this.Dialog.content.append(document.createElement(`br`));
+        this.Dialog.content.append(this.Table);
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);
@@ -354,19 +356,20 @@ class Calculation_LookupTable extends UI.OldTemplate {
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
+customElements.define(`calculation-lookuptable`, Calculation_LookupTable, { extends: `div` });
 
-class Calculation_2AxisTable extends UI.OldTemplate {
+class Calculation_2AxisTable extends UI.Template {
     static Name = `2 Axis Table`;
     static Output = `float`;
     static Inputs = [`float`, `float`];
-    static Template = `$Dialog$`
+    static Template = `<div data-element="Dialog"></div>`
 
     get Label() {
         return this.Table.zLabel;
     }
     set Label(label){
         this.Table.zLabel = label;
-        this.Dialog.Title = label;
+        this.Dialog.title = label;
     }
 
     _xLabel = `X`
@@ -476,12 +479,9 @@ class Calculation_2AxisTable extends UI.OldTemplate {
 
     constructor(prop) {
         super();
-        const thisClass = this;
         this.Dialog = new UI.Dialog({
-            ButtonText: `Edit Table`,
-            TemplateIdentifier: `TableGroup`
+            buttonLabel: `Edit Table`,
         });
-        this.TableGroup = `$Graph$</br>$Table$`;
         this.Table = new UI.Table({
             BaseObj: true,
         });
@@ -492,6 +492,9 @@ class Calculation_2AxisTable extends UI.OldTemplate {
         delete this.Graph.saveValue;
         this.Table.attachToTable(this.Graph);
         this.Graph.attachToTable(this.Table);
+        this.Dialog.content.append(this.Graph);
+        this.Dialog.content.append(document.createElement(`br`));
+        this.Dialog.content.append(this.Table);
         this.NoParameterSelection = false;
         this.Label = `Value`;
         this.Setup(prop);
@@ -568,6 +571,7 @@ class Calculation_2AxisTable extends UI.OldTemplate {
     }
 }
 GenericConfigs.push(Calculation_2AxisTable);
+customElements.define(`calculation-2axistable`, Calculation_2AxisTable, { extends: `div` });
 
 function GetSelections(measurement, output, inputs, configs, configsOnly) {
     var selections = [];

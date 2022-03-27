@@ -6,6 +6,7 @@ import UITemplate from "./JavascriptUI/UITemplate.js";
 import UITable from "./JavascriptUI/UITable.js";
 import UIGraph3D from "./JavascriptUI/UIGraph3D.js"
 import UIGraph2D from "./JavascriptUI/UIGraph2D.js"
+import UIDialog from "./JavascriptUI/UIDialog.js"
 
 //adapt new ui modules to old garbage GetHtml/Attach structure
 Object.defineProperty(HTMLElement.prototype, 'Class', {
@@ -32,6 +33,11 @@ HTMLElement.prototype.Attach = function() {
     if(this.GUID === undefined)
         return;
     $(`[id="${this.GUID}"]`).append(this);
+}
+HTMLElement.prototype.Detach = function() {
+    if(this.GUID === undefined)
+        return;
+    $(`[id="${this.GUID}"]`).html(``);
 }
 
 class Template {
@@ -504,76 +510,6 @@ class DisplayNumberWithMeasurement extends UITemplate {
     }
 }
 customElements.define(`ui-displaynumberwithmeasurement`, DisplayNumberWithMeasurement, { extends: `div` });
-
-class UIDialog {
-    GUID = generateGUID();
-    TemplateIdentifier = undefined;
-    Title = `Dialog`;
-    ButtonText = `Open`;
-    Opened = false
-
-    _hidden = false;
-    get hidden() {
-        return this._hidden;
-    }
-    set hidden(hidden) {
-        if(this._hidden === hidden)
-            return;
-            
-        this._hidden = hidden;
-        if(hidden) {
-            $(`[id="${this.GUID}-open"]`).hide();
-        } else {
-            $(`[id="${this.GUID}-open"]`).show();
-        }
-    }
-
-    constructor(prop) {
-        Object.assign(this, prop);
-    }
-
-    Detach() {
-        $(document).off(`click.${this.GUID}`);
-        $(document).off(`dialogclose.${this.GUID}`);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-open`, function(){
-            thisClass.Open();
-        });
-        $(document).on('dialogclose', `[id="${this.GUID}-dialog"]`, function(event) {
-            thisClass.Close();
-        });
-    }
-
-    GetHtml() {
-        return  `<input id="${this.GUID}-open"${this._hidden? ` style="display: none;"` : ``} type="button" class="button" value="${this.ButtonText}"></input>` +
-                `<div data-title="${this.Title}" id="${this.GUID}-dialog" style="display: none;">$${this.TemplateIdentifier}$</div>`;
-    }
-    
-    Close() {
-        if(!this.Opened)
-            return;
-        this.Opened = false;
-        $(`[id="${this.GUID}-dialog"]`).dialog(`close`);
-    }
-
-    Open() {
-        if(this.Opened)
-            return;
-        this.Opened = true;
-        var dialogSelector = $(`[id="${this.GUID}-dialog"]`);
-        dialogSelector.dialog({ 
-            resizable: false, 
-            width:`auto`, 
-            modal:true, 
-            title: dialogSelector.data(`title`)
-        });
-    }
-}
 
 export default { UI: {
     Template: UITemplate,
