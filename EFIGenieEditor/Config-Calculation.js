@@ -583,7 +583,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
                 if (output !== undefined && configs[i].Output !== output) 
                     continue;
 
-                if(measurement !== undefined && configs[i].Measurement !== undefined && measurement !== configs[i].Measurement)
+                if(measurement !== undefined && ((configs[i].Measurement !== undefined && measurement !== configs[i].Measurement) || (MeasurementType[measurement] !== undefined && MeasurementType[measurement] !== configs[i].Output)))
                     continue;
                 
                 if(inputs !== undefined) {
@@ -747,7 +747,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                 $(`#${thisClass.GUID}-ConfigValue`).html(subConfigIndex === -1? `` : thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
                 thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
                 var subConfig = thisClass.GetSubConfig();
-                subConfig?.Attach?.();
+                thisClass.Attach();
                 thisClass.LiveUpdate.Measurement = thisClass.Measurement;
             }
         });
@@ -1005,9 +1005,9 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
 
     constructor(prop) {
         prop ??= {};
-        prop.NumberClass = "livevalue";
         super(prop);
         this.superHidden = true;
+        this.DisplayValue.class = `livevalue`;
     }
 
     Attach() {
@@ -1040,7 +1040,7 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
         };
     }
     Detach() {
-        super.Detach();
         delete LiveUpdateEvents[this.GUID];
     }
 }
+customElements.define(`ui-displayliveupdate`, DisplayLiveUpdate, { extends: `div` });

@@ -31,7 +31,7 @@ HTMLElement.prototype.GetHtml = function() {
 HTMLElement.prototype.Attach = function() {
     if(this.GUID === undefined)
         return;
-    $(`#${this.GUID}`).append(this);
+    $(`[id="${this.GUID}"]`).append(this);
 }
 
 class Template {
@@ -252,13 +252,13 @@ class UIMeasurement extends UISelection {
         return this._measurement;
     }
     set Measurement(measurement){
-        if(!measurement || this._measurement === measurement)
+        if(!measurement)
             return;
 
         this._measurement = measurement;
         this.Default = Measurements[measurement]?.[GetDefaultUnitIndex(measurement)]?.Name;
         this.options = Measurements[measurement]?.map(unit => { return { Name: unit.Name, Value: unit.Name }; })
-        if(this.value === undefined || this.value === ``) 
+        if(this.value === undefined || this.value === `` || this.value === null) 
             this.value = this.Default;
         if(this.options.length === 0)
             this.hidden = true;
@@ -313,55 +313,55 @@ class NumberWithMeasurement extends UITemplate {
         this.UpdateDisplayValue();
     }
 
-    set Class(pclass) {
-        this.DisplayValue.Class = pclass;
+    set class(pclass) {
+        this.DisplayValue.class = pclass;
     }
 
-    _min = undefined;
+    #min = undefined;
     get min() {
-        return this._min;
+        return this.#min;
     }
     set min(min) {
-        if(this._min === min)
+        if(this.#min === min)
             return;
 
-        this._min = min;
+        this.#min = min;
         this.UpdateDisplayValue();
     }
 
-    _max = undefined;
+    #max = undefined;
     get max() {
-        return this._max;
+        return this.#max;
     }
     set max(max) {
-        if(this._max === max)
+        if(this.#max === max)
             return;
 
-        this._max = max;
+        this.#max = max;
         this.UpdateDisplayValue();
     }
 
-    _step = undefined;
+    #step = undefined;
     get step() {
-        return this._step;
+        return this.#step;
     }
     set step(step) {
-        if(this._step === step)
+        if(this.#step === step)
             return;
 
-        this._step = step;
+        this.#step = step;
         this.UpdateDisplayValue();
     }
 
-    _value = 0;
-    get Value() {
-        return this._value;
+    #value;
+    get value() {
+        return this.#value;
     }
-    set Value(value) {
-        if(this._value === value)
+    set value(value) {
+        if(this.#value === value)
             return;
 
-        this._value = value;
+        this.#value = value;
         this.UpdateDisplayValue();
     }
 
@@ -392,33 +392,33 @@ class NumberWithMeasurement extends UITemplate {
 
     get saveValue() {
         if(this.DisplayMeasurement.saveValue === undefined)
-            return this.Value;
+            return this.value;
 
         return {
             MeasurementUnitName: this.DisplayMeasurement.saveValue,
-            Value: this.Value
+            Value: this.value
         };
     }
     set saveValue(saveValue){
         if(typeof saveValue === `object`) {
             this.DisplayMeasurement.saveValue = saveValue?.MeasurementUnitName;
-            this.Value = saveValue?.Value;
+            this.value = saveValue?.Value;
         } else {
-            this.Value = saveValue;
+            this.value = saveValue;
         }
     }
 
     UpdateDisplayValue() {
-        const displayValue = this.ValueToDisplayValue(this._value);
+        const displayValue = this.ValueToDisplayValue(this.value);
         if(displayValue !== undefined)
             this.DisplayValue.Value = displayValue;
-        const displayMin = this.ValueToDisplayValue(this._min);
+        const displayMin = this.ValueToDisplayValue(this.min);
         if(displayMin !== undefined)
             this.DisplayValue.min = displayMin;
-        const displayMax = this.ValueToDisplayValue(this._max);
+        const displayMax = this.ValueToDisplayValue(this.max);
         if(displayMax !== undefined)
             this.DisplayValue.max = displayMax;
-        const displayStep = this.ValueToDisplayValue(this._step);
+        const displayStep = this.ValueToDisplayValue(this.step);
         if(displayStep !== undefined)
             this.DisplayValue.step = displayStep;
     }
@@ -430,16 +430,15 @@ class NumberWithMeasurement extends UITemplate {
 }
 customElements.define(`ui-numberwithmeasurement`, NumberWithMeasurement, { extends: `div` });
 
-class DisplayNumberWithMeasurement extends Template {
-    static Template = `<span class="monospace $NumberClass$" id="$GUID$-DisplayValue">$DisplayValue$</span> <div style="display:inline-block; min-width:50px;">$DisplayMeasurement$</div>`
+class DisplayNumberWithMeasurement extends UITemplate {
+    static Template = `<div data-element="DisplayValue"></div><div data-element="DisplayMeasurement"></div>`
 
     get MeasurementUnitName() {
         return this.DisplayMeasurement.value;
     }
     set MeasurementUnitName(measurementUnitName) {
         this.DisplayMeasurement.value = measurementUnitName;
-        if(this.Unit)
-            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+        this.UpdateDisplayValue();
     }
 
     get Measurement() {
@@ -447,34 +446,33 @@ class DisplayNumberWithMeasurement extends Template {
     }
     set Measurement(measurement) {
         this.DisplayMeasurement.Measurement = measurement;
-        if(this.Unit)
-            this.DisplayValue.Value = (this._value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset);
+        this.UpdateDisplayValue();
     }
 
-    get Value() { 
-        return this._value;
+    #value;
+    get value() {
+        return this.#value;
     }
-    set Value(value) {
-        if(value === this._value)
-            return;
-
-        this._value = value;
+    set value(value) {
+        this.#value = value;
         this.UpdateDisplayValue();
     }
 
     constructor(prop) {
         super();
-        var thisClass = this;
+        const thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
             value: prop?.MeasurementUnitName,
             onChange: function() {
-                thisClass.UpdateDisplayValue();
                 thisClass.ZeroesToAdd = 10000000;
+                thisClass.UpdateDisplayValue();
             }
         });
+        this.DisplayValue = document.createElement(`div`);
+        this.DisplayValue.style.display = this.DisplayMeasurement.style.display = `inline-block`;
+        
         this.Setup(prop);
-        this.UpdateDisplayValue();
         this.ZeroesToAdd = 10000000;
     }
 
@@ -489,9 +487,9 @@ class DisplayNumberWithMeasurement extends Template {
         let unit = GetUnit(this.Measurement, this.MeasurementUnitName)
         if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
-
-        this.DisplayValue = this.Value * unit.DisplayMultiplier + unit.DisplayOffset;
-        var displayValue = `${parseFloat(parseFloat(parseFloat(this.DisplayValue).toFixed(5)).toPrecision(6))}`;
+            
+        let displayValue = this.value * unit.DisplayMultiplier + unit.DisplayOffset;
+        displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`;
         const indexOfPoint = displayValue.indexOf(`.`);
         var zeroesToAdd = 6-(displayValue.length - indexOfPoint);
         if(indexOfPoint === -1)
@@ -500,10 +498,12 @@ class DisplayNumberWithMeasurement extends Template {
             this.ZeroesToAdd = zeroesToAdd;
         zeroesToAdd -= this.ZeroesToAdd;
         for(var i = 0; i < zeroesToAdd; i++)
-            displayValue += `0`
-        $(`[id="${this.GUID}-DisplayValue"]`).html(displayValue);
+            displayValue += `0`;
+
+        this.DisplayValue.innerHTML = displayValue;
     }
 }
+customElements.define(`ui-displaynumberwithmeasurement`, DisplayNumberWithMeasurement, { extends: `div` });
 
 class UIDialog {
     GUID = generateGUID();

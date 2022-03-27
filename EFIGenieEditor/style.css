@@ -271,7 +271,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     padding: 2.5px;
     margin: 2.5px;
     display: inline-block;
-    min-width: 700px;
+    min-width: 750px;
 }
 .mathContainer {
     vertical-align:top; 

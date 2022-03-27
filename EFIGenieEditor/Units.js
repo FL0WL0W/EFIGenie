@@ -41,6 +41,28 @@ var Measurements = {
     Bool: Bool
 }
 
+var MeasurementType = {
+    None: `float`,
+    Reluctor: `ReluctorResult`,
+    Voltage: `float`,
+    Temperature: `float`,
+    Pressure: `float`,
+    Mass: `float`,
+    MassFlow: `float`,
+    Volume: `float`,
+    Speed: `float`,
+    Time: `float`,
+    Frequency: `float`,
+    Percentage: `float`,
+    PercentageAcceleration: `float`,
+    Lambda: `float`,
+    Angle: `float`,
+    AngularSpeed: `float`,
+    Ratio: `float`,
+    Resistance: `float`,
+    Bool: `bool`
+}
+
 function GetMeasurementDisplay(measurement, index) {
     var measurementString;
     if(typeof measurement === `string`) {

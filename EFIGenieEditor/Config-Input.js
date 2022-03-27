@@ -116,7 +116,7 @@ function ParsePinSelectElements(pinSelectElements){
             elements.push({
                 name: GetNameFromPinSelectElement(pinSelectElements[i]),
                 pinselectmode: pinSelectElementSelector.attr(`data-pinselectmode`),
-                pin: parseInt(pinSelectElementSelector.attr(`data-value`))
+                pin: pinSelectElements[i].value
             });
         }
     }
@@ -545,11 +545,17 @@ class UIPinSelection extends UI.Selection {
         this.selectDisabled = prop.selectDisabled ?? true;
         this.selectValue = prop.selectValue ?? 0xFFFF;
         this.options = this.#generateOptionList();
+        const thisClass = this;
         this.onChange.push(function() {
             UpdateOverlay();
         })
         this.selectedElement.dataset.pinselectmode = this.PinType;
         this.selectedElement.classList.add(`pinselect`);
+    }
+
+    Attach() {
+        super.Attach();
+        UpdateOverlay();
     }
 
     #generateOptionList() {
