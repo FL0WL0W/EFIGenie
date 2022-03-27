@@ -500,7 +500,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
         for(var i = 0; i < zeroesToAdd; i++)
             displayValue += `0`;
 
-        this.DisplayValue.innerHTML = displayValue;
+        this.DisplayValue.textContent = displayValue;
     }
 }
 customElements.define(`ui-displaynumberwithmeasurement`, DisplayNumberWithMeasurement, { extends: `div` });
