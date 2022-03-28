@@ -12,7 +12,7 @@ class Reluctor_Template extends Input_DigitalRecord {
     static Output = `ReluctorResult`;
     static Measurement = `Reluctor`;
     static Inputs = [];
-    static Template = Input_DigitalRecord.Template.substring(0, Input_DigitalRecord.Template.indexOf(`Inverted</div>`) + 14)
+    static Template = Input_DigitalRecord.Template.substring(0, Input_DigitalRecord.Template.lastIndexOf(`Inverted`) + 8)
 
     GetObjOperation(objOperation) {
         return { type: `Group`, value: [
@@ -21,6 +21,7 @@ class Reluctor_Template extends Input_DigitalRecord {
         ]};
     }
 }
+customElements.define(`reluctor-template`, Reluctor_Template, { extends: `div` });
 
 class Reluctor_GM24x extends Reluctor_Template {
     static Name = `Reluctor GM 24X`;
@@ -45,22 +46,23 @@ class Reluctor_GM24x extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_GM24x);
+customElements.define(`reluctor-gm24x`, Reluctor_GM24x, { extends: `div` });
 
 class Reluctor_Universal1x extends Reluctor_Template {
     static Name = `Reluctor Universal 1X`;
     static Template =   Reluctor_Template.Template +
-                        `<div><label for="$RisingPosition.GUID$">Rising Edge Position:</label>$RisingPosition$</div>` +
-                        `<div><label for="$FallingPosition.GUID$">Falling Edge Position:</label>$FallingPosition$</div>`;
+                        `<br/><label>Rising Edge Position:</label><div data-element="RisingPosition"></div>` +
+                        `<br/><label>Falling Edge Position:</label><div data-element="FallingPosition"></div>`;
     constructor(prop){
         super();
-        this.RisingPosition = new UI.NumberWithMeasurement({
+        prop.RisingPosition = new UI.NumberWithMeasurement({
             Value: 0,
             step: 0.1,
             min: 0,
             max: 360,
             Measurement: `Angle`
         });
-        this.FallingPosition = new UI.NumberWithMeasurement({
+        prop.FallingPosition = new UI.NumberWithMeasurement({
             Value: 180,
             step: 0.1,
             min: 0,
@@ -88,14 +90,15 @@ class Reluctor_Universal1x extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);
+customElements.define(`reluctor-universal1x`, Reluctor_Universal1x, { extends: `div` });
 
 class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     static Name = `Reluctor Universal Missing Teeth`;
     static Template =   Reluctor_Template.Template +
-                        `<div><label for="$FirstToothPosition.GUID$">First Tooth Position:</label>$FirstToothPosition$(Falling Edge)</div>` +
-                        `<div><label for="$ToothWidth.GUID$">Tooth Width:</label>$ToothWidth$</div>` +
-                        `<div><label for="$NumberOfTeeth.GUID$">Number of Teeth:</label>$NumberOfTeeth$</div>` +
-                        `<div><label for="$NumberOfTeethMissing.GUID$">Number of Teeth Missing:</label>$NumberOfTeethMissing$</div>`;
+                        `<br/><label>First Tooth Position:</label><div data-element="FirstToothPosition"></div>(Falling Edge)` +
+                        `<br/><label>Tooth Width:</label><div data-element="ToothWidth"></div>` +
+                        `<br/><label>Number of Teeth:</label><div data-element="NumberOfTeeth"></div>` +
+                        `<br/><label>Number of Teeth Missing:</label><div data-element="NumberOfTeethMissing"></div>`;
 
     constructor(prop){
         super()
@@ -144,3 +147,4 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);
+customElements.define(`reluctor-universalmissingteeth`, Reluctor_UniversalMissingTeeth, { extends: `div` });

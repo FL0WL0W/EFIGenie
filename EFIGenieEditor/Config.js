@@ -514,6 +514,7 @@ class ConfigTop extends UI.OldTemplate {
 
     RegisterVariables() {
         VariableRegister.Clear();
+        LiveUpdateEvents = [];
         this.Inputs.RegisterVariables();
         this.Engine.RegisterVariables();
         this.Fuel.RegisterVariables();
@@ -566,26 +567,26 @@ class ConfigFuel extends UI.OldTemplate {
         super();
         this.AFRConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            AFRConfigs,
-            Label:              `Air Fuel Ratio`,
+            label:              `Air Fuel Ratio`,
             Measurement:        `Ratio`,
             ReferenceName:      `FuelParameters.Air Fuel Ratio`
         });
         this.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorEnableConfigs,
-            Label:              `Injector Enable`,
+            label:              `Injector Enable`,
             Measurement:        `Bool`,
             ReferenceName:      `FuelParameters.Injector Enable`
         });
         this.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
-            Label:              `Injector Pulse Width`,
+            label:              `Injector Pulse Width`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Pulse Width`,
             MeasurementUnitName:`ms`
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector End Position(BTDC)`,
+            label:              `Injector End Position(BTDC)`,
             Measurement:        `Angle`,
             ReferenceName:      `FuelParameters.Injector End Position`
         });
@@ -593,7 +594,7 @@ class ConfigFuel extends UI.OldTemplate {
         for(var i = 0; i < 8; i++){
             this.Outputs[i] = new ConfigTDCOutput({
                 Configs:        BooleanOutputConfigs,
-                Label:          `Injector ${i+1}`,
+                label:          `Injector ${i+1}`,
                 Measurement:    `No Measurement`
             });
         }
@@ -620,7 +621,7 @@ class ConfigFuel extends UI.OldTemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:        BooleanOutputConfigs,
-                        Label:          `Injector ${i+1}`,
+                        label:          `Injector ${i+1}`,
                         Measurement:    `No Measurement`
                     });
                 this.Outputs[i].saveValue = saveValue.Outputs[i];
@@ -628,6 +629,11 @@ class ConfigFuel extends UI.OldTemplate {
         }
 
         super.saveValue = saveValue;
+    }
+
+    Attach() {
+        super.Attach();
+        UpdateOverlay();
     }
 
     RegisterVariables() {
@@ -695,26 +701,26 @@ class ConfigIgnition extends UI.OldTemplate {
         super();
         this.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
-            Label:              `Ignition Enable`,
+            label:              `Ignition Enable`,
             Measurement:        `Bool`,
             ReferenceName:      `IgnitionParameters.Ignition Enable`
         });
         this.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
-            Label:              `Ignition Advance`,
+            label:              `Ignition Advance`,
             Measurement:        `Angle`,
             ReferenceName:      `IgnitionParameters.Ignition Advance`
         });
         this.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              `Ignition Dwell`,
+            label:              `Ignition Dwell`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell`,
             MeasurementUnitName:`ms`
         });
         this.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              `Ignition Dwell Deviation`,
+            label:              `Ignition Dwell Deviation`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
             MeasurementUnitName:`ms`
@@ -723,7 +729,7 @@ class ConfigIgnition extends UI.OldTemplate {
         for(var i = 0; i < 8; i++){
             this.Outputs[i] = new ConfigTDCOutput({
                 Configs:            BooleanOutputConfigs,
-                Label:              `Ignition ${i+1}`,
+                label:              `Ignition ${i+1}`,
                 Measurement:        `No Measurement`
             });
         }
@@ -739,6 +745,11 @@ class ConfigIgnition extends UI.OldTemplate {
         return saveValue;
     }
 
+    Attach() {
+        super.Attach();
+        UpdateOverlay();
+    }
+
     set saveValue(saveValue) {
         this.Detach();
 
@@ -749,7 +760,7 @@ class ConfigIgnition extends UI.OldTemplate {
                 if(!this.Outputs[i])
                     this.Outputs[i] = new ConfigTDCOutput({
                         Configs:            BooleanOutputConfigs,
-                        Label:              `Ignition ${i+1}`,
+                        label:              `Ignition ${i+1}`,
                         Measurement:        `No Measurement`
                     });
                 this.Outputs[i].saveValue = saveValue.Outputs[i];
@@ -817,37 +828,37 @@ class ConfigEngine extends UI.OldTemplate {
         super();
         this.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
-            Label:              `Crank Position`,
+            label:              `Crank Position`,
             Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Crank Position`
         });
         this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
-            Label:              `Cam Position`,
+            label:              `Cam Position`,
             Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Cam Position`
         });
         this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
-            Label:              `Cylinder Air Mass`,
+            label:              `Cylinder Air Mass`,
             Measurement:        `Mass`,
             ReferenceName:      `EngineParameters.Cylinder Air Mass`
         });
         this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
-            Label:              `Cylinder Air Temperature`,
+            label:              `Cylinder Air Temperature`,
             Measurement:        `Temperature`,
             ReferenceName:      `EngineParameters.Cylinder Air Temperature`
         });
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
-            Label:              `Manifold Absolute Pressure`,
+            label:              `Manifold Absolute Pressure`,
             Measurement:        `Pressure`,
             ReferenceName:      `EngineParameters.Manifold Absolute Pressure`
         });
         this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
-            Label:              `Volumetric Efficiency`,
+            label:              `Volumetric Efficiency`,
             Measurement:        `Percentage`,
             ReferenceName:      `EngineParameters.Volumetric Efficiency`
         });
@@ -945,26 +956,31 @@ class ConfigEngine extends UI.OldTemplate {
 }
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
-    static Template = CalculationOrVariableSelection.Template.replace(`>$Label$:`, ` for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$°`)
-
     constructor(prop) {
         super();
+        let span = document.createElement(`span`);
         this.TDC = new UI.Number({
             Value:  0,
             step:   1,
             min:    0,
             max:    720
-        })
+        });
+        span.append(`\xa0\xa0\xa0\xa0\xa0\xa0TDC:`);
+        span.append(this.TDC)
+        span.append(`°`);
         this.Setup(prop);
+        this.labelElement.parentElement.append(span);
+        this.labelElement.class = `pinselectname`;
     }
 }
+customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `div` });
 
-class CylinderAirmass_SpeedDensity extends UI.OldTemplate {
+class CylinderAirmass_SpeedDensity extends UI.Template {
     static Name = `Speed Density`;
     static Measurement = `Mass`;
     static Output = `float`;
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`];
-    static Template = `<div><label for="$CylinderVolume.GUID$">Cylinder Volume:</label>$CylinderVolume$</div>`;
+    static Template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`;
 
     constructor(prop) {
         super();
@@ -975,6 +991,7 @@ class CylinderAirmass_SpeedDensity extends UI.OldTemplate {
             Measurement:        `Volume`,
             MeasurementUnitName:`mL`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -995,26 +1012,27 @@ class CylinderAirmass_SpeedDensity extends UI.OldTemplate {
     }
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
+customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensity, { extends: `div` });
 
-class InjectorPulseWidth_DeadTime extends UI.OldTemplate {
+class InjectorPulseWidth_DeadTime extends UI.Template {
     static Name = `Dead Time`;
     static Output = `float`;
     static Measurement = `Time`;
-    static Template =   `<div>$FlowRateConfigOrVariableSelection$</div>` +
-                        `<div>$DeadTimeConfigOrVariableSelection$</div>` +
-                        `<div><label for="$MinInjectorFuelMass.GUID$">Min Injector Fuel Mass:</label>$MinInjectorFuelMass$</div>`;
+    static Template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
+                        `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
+                        `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 
     constructor(prop) {
         super();
         this.FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector Flow Rate`,
+            label:              `Injector Flow Rate`,
             Measurement:        `MassFlow`,
             ReferenceName:      `FuelParameters.Injector Flow Rate`
         });
         this.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector Dead Time`,
+            label:              `Injector Dead Time`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementUnitName:`ms`
@@ -1025,6 +1043,7 @@ class InjectorPulseWidth_DeadTime extends UI.OldTemplate {
             Measurement:        `Mass`,
             MeasurementUnitName:`g`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -1069,3 +1088,4 @@ class InjectorPulseWidth_DeadTime extends UI.OldTemplate {
     }
 }
 InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime);
+customElements.define(`injectorpulsewidth-deadtime`, InjectorPulseWidth_DeadTime, { extends: `div` });

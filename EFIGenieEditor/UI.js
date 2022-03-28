@@ -73,7 +73,7 @@ class Template {
         var thisClass = this;
         Object.entries(this).forEach(e => {
             var [elementname, element] = e;
-            if(element?.onChange !== undefined && !element?.ExcludeFromonChange) {
+            if(element?.onChange !== undefined) {
                 element.onChange.push(function() {
                     thisClass.onChange.forEach(function(onChange) { onChange(); });
                 });
@@ -253,6 +253,19 @@ class Template {
 };
 
 class UIMeasurement extends UISelection {
+    _hidden = false;
+    get hidden() {
+        return this._hidden;
+    }
+    set hidden(hidden) {
+        this._hidden = hidden;
+        if(hidden || this.options.length === 0) {
+            super.hidden = true;
+        } else {
+            super.hidden = false;
+        }
+    }
+
     _measurement;
     get Measurement() {
         return this._measurement;
@@ -267,9 +280,9 @@ class UIMeasurement extends UISelection {
         if(this.value === undefined || this.value === `` || this.value === null) 
             this.value = this.Default;
         if(this.options.length === 0)
-            this.hidden = true;
-        else
-            this.hidden = false;
+            super.hidden = true;
+        else if(!this.hidden)
+            super.hidden = false;
     }
 
     get saveValue() {
@@ -377,20 +390,20 @@ class NumberWithMeasurement extends UITemplate {
 
     constructor(prop) {
         super();
-        var thisClass = this;
+        const thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
             value: prop?.MeasurementUnitName,
-            onChange: function() {
-                thisClass.UpdateDisplayValue()
-            }
         });
-        this.DisplayValue = new UINumber({
-            ExcludeFromonChange: true,
-            onChange: function() {
-                if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
-                    thisClass.Value = (thisClass.DisplayValue.Value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
-            }
+        this.DisplayMeasurement.addEventListener(`change`, function() {
+            thisClass.UpdateDisplayValue();
+            thisClass.dispatchEvent(new Event(`change`));
+        });
+        this.DisplayValue = new UINumber();
+        this.DisplayValue.addEventListener(`change`, function() {
+            if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
+                thisClass.Value = (thisClass.DisplayValue.Value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
+            thisClass.dispatchEvent(new Event(`change`));
         });
         this.DisplayValue.GUID = this.GUID;
         this.Setup(prop);
@@ -469,11 +482,12 @@ class DisplayNumberWithMeasurement extends UITemplate {
         const thisClass = this;
         this.DisplayMeasurement = new UIMeasurement({
             Measurement : prop?.Measurement,
-            value: prop?.MeasurementUnitName,
-            onChange: function() {
-                thisClass.ZeroesToAdd = 10000000;
-                thisClass.UpdateDisplayValue();
-            }
+            value: prop?.MeasurementUnitName
+        });
+        this.DisplayMeasurement.addEventListener(`change`, function() {
+            thisClass.ZeroesToAdd = 10000000;
+            thisClass.UpdateDisplayValue();
+            thisClass.dispatchEvent(new Event(`change`));
         });
         this.DisplayValue = document.createElement(`div`);
         this.DisplayValue.style.display = this.DisplayMeasurement.style.display = `inline-block`;

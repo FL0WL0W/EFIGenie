@@ -41,124 +41,157 @@ class Calculation_Static extends UI.NumberWithMeasurement {
 GenericConfigs.push(Calculation_Static);
 customElements.define(`calculation-static`, Calculation_Static, { extends: `div` });
 
-//this could be refactored to use UI.OldTemplate, but it works well and i forsee no changes needed so leaving as is
-class Calculation_Polynomial {
+//the commented sections need to be implemented. since this is just behind the scenes for now, do this later
+class Calculation_Polynomial extends HTMLDivElement {
     static Name = `Polynomial`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Template = getFileContents(`ConfigGui/Operation_Polynomial.html`);
 
-    A = [0, 0, 0];
-    get Value() {
-        return this.A.slice(0, this.Degree);
+    get Measurement() {
+        return this.#valueElement.firstChild.Measurement;
     }
-    set Value(value) {
-        this.A = value;
-        this.Degree = value.length;
+    set Measurement(measurement) {
+        this.#valueElement.firstChild.Measurement = measurement;
     }
 
-    constructor(){
-        this.GUID = generateGUID();
+    get MeasurementUnitName() {
+        return this.#valueElement.firstChild.MeasurementUnitName;
+    }
+    set MeasurementUnitName(measurementUnitName) {
+        this.#valueElement.firstChild.MeasurementUnitName = measurementUnitName;
+    }
+
+    #valueElement = document.createElement(`div`);
+    get value() {
+        let value = [...this.#valueElement.children].map(x => x.value);
+        //convert to base value
+        return value;
+    }
+    set value(value) {
+        this.degree = value.length;
+        this.#valueElement.firstChild.MeasurementUnitName = value[0];
+        //convert to display value
     }
     
-    MinValue = 0;
-    MaxValue = 1;
-    Degree = 3;
+    #minValueElement = new UI.NumberWithMeasurement({
+        value: 0
+    });
+    get minValue() {
+        return this.#minValueElement.value;
+    }
+    set minValue(minValue) {
+        this.#minValueElement.value = minValue;
+    }
+    
+    #maxValueElement = new UI.NumberWithMeasurement({
+        value: 1
+    });
+    get maxValue() {
+        return this.#maxValueElement.value;
+    }
+    set maxValue(maxValue) {
+        this.#maxValueElement.value = maxValue;
+    }
+
+    #degreeElement = new UI.Number({
+        min: 2,
+        max: 100,
+        step: 1,
+        value: 0
+    });
+    get degree() {
+        return this.#degreeElement.value;
+    }
+    set degree(degree) {
+        this.#degreeElement.value = degree;
+    }
+
+    constructor(prop) {
+        super();
+        const minValueLabel = document.createElement(`label`);
+        minValueLabel.textContent = `Minimum Value:`
+        this.append(minValueLabel);
+        this.#minValueElement.DisplayMeasurement.hidden = true;
+        this.append(this.#minValueElement);
+        this.append(document.createElement(`br`));
+        const maxValueLabel = document.createElement(`label`);
+        this.append(maxValueLabel);
+        this.#maxValueElement.DisplayMeasurement.hidden = true;
+        maxValueLabel.textContent = `Maximum Value:`
+        this.append(this.#maxValueElement);
+        this.append(document.createElement(`br`));
+        const degreeLabel = document.createElement(`label`);
+        degreeLabel.textContent = `Degree:`
+        this.append(degreeLabel);
+        this.append(this.#degreeElement);
+        this.append(document.createElement(`br`));
+        const thisClass = this;
+        this.#degreeElement.addEventListener(`change`, function() {
+            while(thisClass.#valueElement.children.length > thisClass.degree) { thisClass.#valueElement.removeChild(thisClass.#valueElement.lastChild); }
+            for(let i = thisClass.#valueElement.children.length; i < thisClass.degree; i++) {
+                let valueElement = thisClass.#valueElement.appendChild(document.createElement(`div`));
+                let number = valueElement.appendChild(i === 0? new UI.NumberWithMeasurement({ value: 0 }) : new UI.Number({ value: 0 }));
+                if(i !== 0) {
+                    let label = valueElement.appendChild(document.createElement(`span`));
+                    label.innerHTML = `x<sup>${i}</sup> +`;
+                } else {
+
+                    number.addEventListener(`change`, function() { valueElement.dispatchEvent(new Event(`change`)); });
+                }
+                valueElement.style.display = `inline`;
+                Object.defineProperty(valueElement, 'value', {
+                    get: function() { return this.firstChild.value; },
+                    set: function(value) { this.firstChild.value = value }
+                });
+                Object.defineProperty(valueElement, 'Measurement', {
+                    get: function() { return this.firstChild.Measurement; },
+                    set: function(value) { this.firstChild.Measurement = value }
+                });
+                Object.defineProperty(valueElement, 'MeasurementUnitName', {
+                    get: function() { return this.firstChild.MeasurementUnitName; },
+                    set: function(value) { this.firstChild.MeasurementUnitName = value }
+                });
+            }
+        });
+        this.degree = 2;
+        this.append(this.#valueElement);
+        this.#valueElement.style.display = `flex`;
+        this.#valueElement.style.flexDirection = `row-reverse`;
+        this.#valueElement.style.alignItems = `flex-start`;
+        this.#valueElement.style.justifyContent = `flex-end`;
+        this.#valueElement.firstChild.addEventListener(`change`, function() {
+            //convert value
+            thisClass.#minValueElement.Measurement = thisClass.Measurement;
+            thisClass.#maxValueElement.Measurement = thisClass.Measurement;
+            thisClass.#minValueElement.MeasurementUnitName = thisClass.MeasurementUnitName;
+            thisClass.#maxValueElement.MeasurementUnitName = thisClass.MeasurementUnitName;
+        });
+        Object.assign(this, prop);
+    }
 
     get saveValue() {
         return { 
-            MinValue: this.MinValue,
-            MaxValue: this.MaxValue,
-            Degree: this.Degree,
-            A: this.A.slice()
+            MinValue: this.minValue,
+            MaxValue: this.maxValue,
+            A: this.value
         };
     }
 
     set saveValue(saveValue) {
         if(saveValue) {
-            this.MinValue = saveValue.MinValue;
-            this.MaxValue = saveValue.MaxValue;
-            this.Degree = saveValue.Degree;
-            this.A = saveValue.A.slice();
+            this.minValue = saveValue.MinValue;
+            this.maxValue = saveValue.MaxValue;
+            this.value = saveValue.A;
         }
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.Attach();
-    }
-
-    Detach() {
-        $(document).off(`change.${this.GUID}`);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-min`, function(){
-            thisClass.MinValue = parseFloat($(this).val());
-        });
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-max`, function(){
-            thisClass.MaxValue = parseFloat($(this).val());
-        });
-
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-degree`, function(){
-            thisClass.Degree = parseInt($(this).val());
-
-            var oldA = thisClass.A;
-
-            thisClass.A = new Array(thisClass.Degree);
-            for(var i = 0; i < thisClass.A.length; i++){
-                if(i < oldA.length)
-                    thisClass.A[i] = oldA[i];
-                else
-                    thisClass.A[i] = 0;
-            }
-            $(`#${thisClass.GUID}-coefficients`).html(thisClass.GetCoefficientsHtml());
-        });
-        
-        $(document).on(`change.${this.GUID}`, `#${this.GUID}-A`, function(){
-            var index = $(this).data(`index`);
-            var val = parseFloat($(this).val());
-
-            thisClass.A[index] = val;
-        });
-    }
-
-    GetCoefficientsHtml() {
-        var coefficients = `<label>Coefficients:</label>`;
-        for(var i = this.Degree-1; i > 0; i--)
-        {
-            coefficients += `<input id="${this.GUID}-A" data-index="${i}" type="number" step="0.1" value="${this.A[i]}"/>`;
-            if(i > 1)
-                coefficients += ` x<sup>${i}</sup> + `;
-            else
-                coefficients += ` x + `;
-        }
-        coefficients += `<input id="${this.GUID}-A" data-index="0" type="number" step="0.1" value="${this.A[0]}"/>`;
-
-        return coefficients;
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, `Template`);
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        template = template.replace(/[$]min[$]/g, this.MinValue);
-        template = template.replace(/[$]max[$]/g, this.MaxValue);
-        template = template.replace(/[$]degree[$]/g, this.Degree);
-
-        template = template.replace(/[$]coefficients[$]/g, this.GetCoefficientsHtml());
-
-        return template;
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
         var obj = { value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
-            { type: `FLOAT`, value: this.MinValue}, //MinValue
-            { type: `FLOAT`, value: this.MaxValue}, //MaxValue
-            { type: `UINT8`, value: this.Degree}, //Degree
-            { type: `FLOAT`, value: this.Value}, //coefficients
+            { type: `FLOAT`, value: this.minValue}, //MinValue
+            { type: `FLOAT`, value: this.maxValue}, //MaxValue
+            { type: `UINT8`, value: this.degree}, //Degree
+            { type: `FLOAT`, value: this.value}, //coefficients
         ]};
 
         if (outputVariableId || inputVariableId) 
@@ -171,6 +204,7 @@ class Calculation_Polynomial {
     }
 }
 GenericConfigs.push(Calculation_Polynomial);
+customElements.define('ui-polynomial', Calculation_Polynomial, { extends: 'div' });
 
 function TableGetType(tableValue) {
     var min = 18446744073709551615;
@@ -203,10 +237,10 @@ class Calculation_LookupTable extends UI.Template {
     static Inputs = [`float`];
     static Template = `<div data-element="Dialog"></div>`
 
-    get Label() {
+    get label() {
         return this.Table.zLabel;
     }
-    set Label(label){
+    set label(label){
         this.Table.zLabel = label;
         this.Dialog.title = label;
     }
@@ -237,12 +271,12 @@ class Calculation_LookupTable extends UI.Template {
         this.ParameterSelection.options = options;
     }
 
-    get NoParameterSelection() {
+    get noParameterSelection() {
         if(this.ParameterSelection)
             return false;
         return true;
     }
-    set NoParameterSelection(noParameterSelection) {
+    set noParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
             this.ParameterReference = undefined;
             this.ParameterSelection = undefined;
@@ -261,13 +295,6 @@ class Calculation_LookupTable extends UI.Template {
             });
             this.Table.xLabel = this.ParameterSelection;
         }
-    }
-
-    get Resolution() {
-        return this.Table.xResolution;
-    }
-    set Resolution(res){
-        this.Table.xResolution = res;
     }
 
     constructor(prop) {
@@ -293,26 +320,9 @@ class Calculation_LookupTable extends UI.Template {
         this.Dialog.content.append(this.Graph);
         this.Dialog.content.append(document.createElement(`br`));
         this.Dialog.content.append(this.Table);
-        this.NoParameterSelection = false;
-        this.Label = `Value`;
+        this.noParameterSelection = false;
+        this.label = `Value`;
         this.Setup(prop);
-    }
-
-    Attach() {
-        super.Attach();
-        const thisClass = this
-        LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.ParameterReference) { 
-                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.ParameterReference);
-                if(CurrentVariableValues[parameterVariableId] !== undefined) {
-                    thisClass.Table.trail(CurrentVariableValues[parameterVariableId])
-                } 
-            }
-        };
-    }
-    Detach() {
-        super.Detach();
-        delete LiveUpdateEvents[this.GUID];
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
@@ -332,11 +342,11 @@ class Calculation_LookupTable extends UI.Template {
             ]
         };
 
-        if (!this.NoParameterSelection || outputVariableId || inputVariableId) {
+        if (!this.noParameterSelection || outputVariableId || inputVariableId) {
             var inputVariables;
             if(inputVariableId) {
                 inputVariables = [ inputVariableId ]; //inputVariable
-            } else if (!this.NoParameterSelection) {
+            } else if (!this.noParameterSelection) {
                 const parameterSelection = this.ParameterSelection.Value;
                 inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //inputVariable
             }
@@ -353,6 +363,16 @@ class Calculation_LookupTable extends UI.Template {
         this.xOptions = GetSelections();
         if(VariablesToPoll.indexOf(this.ParameterReference) === -1)
             VariablesToPoll.push(this.ParameterReference);
+        
+        const thisClass = this;
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.ParameterReference) { 
+                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.ParameterReference);
+                if(CurrentVariableValues[parameterVariableId] !== undefined) {
+                    thisClass.Table.trail(CurrentVariableValues[parameterVariableId])
+                } 
+            }
+        };
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
@@ -364,10 +384,10 @@ class Calculation_2AxisTable extends UI.Template {
     static Inputs = [`float`, `float`];
     static Template = `<div data-element="Dialog"></div>`
 
-    get Label() {
+    get label() {
         return this.Table.zLabel;
     }
-    set Label(label){
+    set label(label){
         this.Table.zLabel = label;
         this.Dialog.title = label;
     }
@@ -424,12 +444,12 @@ class Calculation_2AxisTable extends UI.Template {
         this.YSelection.options = options;
     }
 
-    get NoParameterSelection() {
+    get noParameterSelection() {
         if(this.XSelection || this.YSelection)
             return false;
         return true;
     }
-    set NoParameterSelection(noParameterSelection) {
+    set noParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
             this.XReference = undefined;
             this.YReference = undefined;
@@ -463,20 +483,6 @@ class Calculation_2AxisTable extends UI.Template {
         }
     }
 
-    get XResolution() {
-        return this.Table.xResolution;
-    }
-    set XResolution(xRes){
-        this.Table.xResolution = xRes;
-    }
-
-    get YResolution() {
-        return this.Table.YResolution;
-    }
-    set YResolution(yRes){
-        this.Table.YResolution = yRes;
-    }
-
     constructor(prop) {
         super();
         this.Dialog = new UI.Dialog({
@@ -495,27 +501,9 @@ class Calculation_2AxisTable extends UI.Template {
         this.Dialog.content.append(this.Graph);
         this.Dialog.content.append(document.createElement(`br`));
         this.Dialog.content.append(this.Table);
-        this.NoParameterSelection = false;
-        this.Label = `Value`;
+        this.noParameterSelection = false;
+        this.label = `Value`;
         this.Setup(prop);
-    }
-
-    Attach() {
-        super.Attach();
-        const thisClass = this
-        LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.XReference && thisClass.YReference) { 
-                const xVariableId = VariableMetadata.GetVariableId(thisClass.XReference);
-                const yVariableId = VariableMetadata.GetVariableId(thisClass.YReference);
-                if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
-                    thisClass.Table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
-                } 
-            }
-        };
-    }
-    Detach() {
-        super.Detach();
-        delete LiveUpdateEvents[this.GUID];
     }
 
     GetObjOperation(outputVariableId, xVariableId, yVariableId) {
@@ -538,17 +526,17 @@ class Calculation_2AxisTable extends UI.Template {
             ]
         };
 
-        if (!this.NoParameterSelection || outputVariableId || xVariableId || yVariableId) {
+        if (!this.noParameterSelection || outputVariableId || xVariableId || yVariableId) {
             var inputVariables;
             if(xVariableId) {
                 inputVariables = [ xVariableId ]; //inputVariable
-            } else if (!this.NoParameterSelection) {
+            } else if (!this.noParameterSelection) {
                 const parameterSelection = this.XSelection.Value;
                 inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //xVariable
             }
             if(yVariableId) {
                 inputVariables.push({ yVariableId }); //ytVariable
-            } else if (!this.NoParameterSelection) {
+            } else if (!this.noParameterSelection) {
                 const parameterSelection = this.YSelection.Value;
                 inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ); //yVariable
             }
@@ -568,6 +556,16 @@ class Calculation_2AxisTable extends UI.Template {
             VariablesToPoll.push(this.XReference);
         if(VariablesToPoll.indexOf(this.YReference) === -1)
             VariablesToPoll.push(this.YReference);
+        const thisClass = this;
+        LiveUpdateEvents[this.GUID] = function() {
+            if(thisClass.XReference && thisClass.YReference) { 
+                const xVariableId = VariableMetadata.GetVariableId(thisClass.XReference);
+                const yVariableId = VariableMetadata.GetVariableId(thisClass.YReference);
+                if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
+                    thisClass.Table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
+                } 
+            }
+        };
     }
 }
 GenericConfigs.push(Calculation_2AxisTable);
@@ -642,21 +640,22 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
     return selections;
 }
 
-class CalculationOrVariableSelection extends UI.OldTemplate {
-    static Template = `<div><label>$Label$:</label>$Selection$<span style="float: right;">$LiveUpdate$</span><span id="$GUID$-ConfigValue">$ConfigValue$</span></div>`;
+class CalculationOrVariableSelection extends UI.Template {
+    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="Selection"></div><span style="float: right;" data-element="LiveUpdate"></span><span data-element="CalculationContent"></span>`
+    CalculationContent = document.createElement(`span`);
     ConfigValues = [];
 
-    _label = `Value`;
-    get Label() {
-        return this._label;
+    labelElement = document.createElement(`span`);
+    get label() {
+        return this.labelElement.textContent;
     }
-    set Label(label) {
-        if(this._label === label)
+    set label(label) {
+        if(this.label === label)
             return;
 
-        this._label = label;
+        this.labelElement.textContent = label;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.Label = label; });
+        this.ConfigValues.forEach(function(configValue) { configValue.label = label; });
     }
 
     _xlabel = `X`;
@@ -746,15 +745,15 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             selectDisabled: false,
             selectName: `None`,
             onChange: function () {
-                const subConfigIndex = thisClass.GetSubConfigIndex();
-                thisClass.ConfigValue = `$ConfigValues.${subConfigIndex}$`;
-                $(`#${thisClass.GUID}-ConfigValue`).html(subConfigIndex === -1? `` : thisClass.ConfigValues[subConfigIndex]?.GetHtml?.());
-                thisClass.ConfigValues.forEach(function(val) { val.Detach?.(); });
-                var subConfig = thisClass.GetSubConfig();
-                thisClass.Attach();
+                const subConfig = thisClass.GetSubConfig();
+                if(!subConfig)
+                    thisClass.CalculationContent.innerHTML = ``;
+                else
+                    thisClass.CalculationContent.replaceChildren(subConfig);
                 thisClass.LiveUpdate.Measurement = thisClass.Measurement;
             }
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -813,8 +812,8 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                         if (saveValue.Values[i].ClassName !== configs[t].name)
                             continue;
                         this.ConfigValues.push(new configs[t]({
-                            NoParameterSelection: this.NoParameterSelection,
-                            Label: this.Label,
+                            noParameterSelection: this.noParameterSelection,
+                            label: this.label,
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
                             ReferenceName: this.ReferenceName,
@@ -880,18 +879,18 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
                 return i;
             }
         }
-        for (var i = 0; i < this.Configs.length; i++) {
-            var configGroups = this.Configs;
-            if(!this.Configs[0].Group && !this.Configs[0].Configs)
-                configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+        var configGroups = this.Configs;
+        if(!this.Configs[0].Group && !this.Configs[0].Configs)
+            configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+        for(var c = 0; c < configGroups.length; c++) {
+            const configs = configGroups[c].Configs;
     
-            for(var c = 0; c < configGroups.length; c++) {
-                const configs = configGroups[c].Configs;
+            for (var i = 0; i < configs.length; i++) {
                 if (configs[i] === undefined || configs[i].name !== selection.value)
                     continue;
                 this.ConfigValues.push(new configs[i]({
-                    NoParameterSelection: this.NoParameterSelection,
-                    Label: this.Label,
+                    noParameterSelection: this.noParameterSelection,
+                    label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
                     ReferenceName: this.ReferenceName,
@@ -920,57 +919,7 @@ class CalculationOrVariableSelection extends UI.OldTemplate {
             return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
     }
 }
-
-class Calculation_Operation extends UI.OldTemplate {
-    static Name=`Operation`
-    static Template=`</br><div class="configContainer"><div><span style="float: right;">$LiveUpdate$</span>$Base$</div>$SubOperation$<span class="controladd">+ Add Operation</span></div`;
-    static Output = `float`;
-
-    constructor(prop) {
-        super();
-        const thisClass = this
-        this.Base = new CalculationOrVariableSelection({
-            Configs:            prop.Configs,
-            Label:              `Base`,
-            Measurement:        prop?.Measurement,
-            MeasurementUnitName:   prop?.MeasurementUnitName
-        });
-        this.SubOperation = [new CalculationOrVariableSelection({
-            Configs:            prop.Configs,
-            Measurement:        prop?.Measurement,
-            MeasurementUnitName:   prop?.MeasurementUnitName,
-            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `\\$OperationName.0\\$  \\$OperationSelection.0\\$`)
-        })];
-        this.OperationSelection = [new UI.Selection({
-            options: [
-                { Name: `Adder`,        Value: 1 },
-                { Name: `Subtracter`,   Value: 2 },
-                { Name: `Multiplier`,   Value: 3 },
-                { Name: `Divider`,      Value: 4 }
-            ],
-            Class: `subOperationSelection`,
-            selectDisabled: true
-        })];
-        this.OperationName = [new UI.Text({
-            Class: `subOperationName`,
-            onChange: function() {
-                thisClass.SubOperation[0].Label = thisClass.OperationName[0].Value;
-            }
-        })];
-        this.LiveUpdate = new DisplayLiveUpdate({
-            Measurement: prop?.Measurement,
-            MeasurementUnitName: prop?.MeasurementUnitName
-        });
-        this.Setup(prop)
-    }
-
-    RegisterVariables() {
-        this.Base.RegisterVariables();
-        this.SubOperation.forEach(function(subOperation) {subOperation.RegisterVariables(); });
-        this.LiveUpdate.VariableReference = `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
-        this.LiveUpdate.Measurement = this.Measurement;
-    }
-}
+customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `div` });
 
 class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
     get superHidden() {

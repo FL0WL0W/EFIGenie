@@ -141,12 +141,14 @@ function GetNameFromPinSelectChildren(element){
     }
 }
 
-function GetNameFromPinSelectElement(element){    
+function GetNameFromPinSelectElement(element){
+    if(!element)
+        return;
     const name = GetNameFromPinSelectChildren(element);
     if(name)
         return name;
 
-    return GetNameFromPinSelectElement($(element).parent());
+    return GetNameFromPinSelectElement(element.parentElement);
 }
 
 //The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
@@ -467,19 +469,19 @@ class ConfigInput extends UI.OldTemplate {
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
         this.RawConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Source`,
+            label:              `Source`,
             Inputs:             [],
             ReferenceName:      `Inputs.${prop.Name}`,
-            NoParameterSelection: true
+            noParameterSelection: true
         });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              prop.Name ?? `Input`,
+            label:              prop.Name ?? `Input`,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
-            NoParameterSelection: true,
-            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `Input\\$TranslationMeasurement\\$`),
+            noParameterSelection: true,
+            Template: CalculationOrVariableSelection.Template.replace(`$label$`, `Input\\$TranslationMeasurement\\$`),
             onChange: function() { 
                 const subConfig = thisClass.TranslationConfig.GetSubConfig();
                 if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
@@ -507,7 +509,7 @@ class ConfigInput extends UI.OldTemplate {
             Class: `pinselectname inputName`,
             onChange: function() { 
                 thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
-                thisClass.TranslationConfig.Label = thisClass.Name.Value;
+                thisClass.TranslationConfig.label = thisClass.Name.Value;
             }
         })
         this.HRDisplay = `display: none; `;
@@ -545,19 +547,13 @@ class UIPinSelection extends UI.Selection {
         this.selectDisabled = prop.selectDisabled ?? true;
         this.selectValue = prop.selectValue ?? 0xFFFF;
         this.options = this.#generateOptionList();
-        const thisClass = this;
-        this.onChange.push(function() {
+        this.addEventListener(`change`, function() {
             UpdateOverlay();
-        })
+        });
         this.selectedElement.dataset.pinselectmode = this.PinType;
         this.selectedElement.classList.add(`pinselect`);
     }
-
-    Attach() {
-        super.Attach();
-        UpdateOverlay();
-    }
-
+    
     #generateOptionList() {
         var options = []
         var endOptions = [];
@@ -586,12 +582,12 @@ class UIPinSelection extends UI.Selection {
 }
 customElements.define('ui-pinselection', UIPinSelection, { extends: `div` });
 
-class Input_Analog extends UI.OldTemplate {
+class Input_Analog extends UI.Template {
     static Name = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Voltage`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>`
+    static Template = `<label>Pin:</label><div data-element="Pin"></div>`
 
     constructor(prop){
         super();
@@ -599,6 +595,7 @@ class Input_Analog extends UI.OldTemplate {
             Value: 0xFFFF,
             PinType: `analog`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -617,13 +614,14 @@ class Input_Analog extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_Analog);
+customElements.define(`input-analog`, Input_Analog, { extends: `div` });
 
-class Input_Digital extends UI.OldTemplate {
+class Input_Digital extends UI.Template {
     static Name = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
-    static Measurement = ``;
-    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>`
+    static Measurement = `Bool`;
+    static Template = `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted`
 
     constructor(prop){
         super();
@@ -632,6 +630,7 @@ class Input_Digital extends UI.OldTemplate {
             PinType: `digital`
         });
         this.Inverted = new UI.CheckBox();
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -651,14 +650,15 @@ class Input_Digital extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_Digital);
+customElements.define(`input-digital`, Input_Digital, { extends: `div` });
 
-class Input_DigitalRecord extends UI.OldTemplate {
+class Input_DigitalRecord extends UI.Template {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
     static Measurement = `Record`;
-    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>` +
-                        `<div><label for="$Length.GUID$">Length:</label>$Length$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted` +
+                        `<br/><label>Length:</label><div data-element="Length"></div>`
 
     constructor(prop){
         super();
@@ -673,6 +673,7 @@ class Input_DigitalRecord extends UI.OldTemplate {
             min: 1,
             max: 1000
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -693,14 +694,15 @@ class Input_DigitalRecord extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_DigitalRecord);
+customElements.define(`input-digitalrecord`, Input_DigitalRecord, { extends: `div` });
 
-class Input_DutyCycle extends UI.OldTemplate {
+class Input_DutyCycle extends UI.Template {
     static Name = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Percentage`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -715,6 +717,7 @@ class Input_DutyCycle extends UI.OldTemplate {
             max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -734,14 +737,15 @@ class Input_DutyCycle extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_DutyCycle);
+customElements.define(`input-dutycycle`, Input_DutyCycle, { extends: `div` });
 
-class Input_Frequency extends UI.OldTemplate {
+class Input_Frequency extends UI.Template {
     static Name = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Frequency`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -756,6 +760,7 @@ class Input_Frequency extends UI.OldTemplate {
             max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -775,14 +780,15 @@ class Input_Frequency extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_Frequency);
+customElements.define(`input-frequency`, Input_Frequency, { extends: `div` });
 
-class Input_PulseWidth extends UI.OldTemplate {
+class Input_PulseWidth extends UI.Template {
     static Name = `Pulse Width Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Time`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -797,6 +803,7 @@ class Input_PulseWidth extends UI.OldTemplate {
             max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -816,3 +823,4 @@ class Input_PulseWidth extends UI.OldTemplate {
     }
 }
 RawInputConfigs.push(Input_PulseWidth);
+customElements.define(`input-pulsewidth`, Input_PulseWidth, { extends: `div` });
