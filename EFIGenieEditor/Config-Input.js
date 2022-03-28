@@ -195,7 +195,6 @@ function UpdateOverlay() {
     $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
 }
 
-//if any changes are needed in ConfigInputs, refactor to use UI.OldTemplate
 class ConfigInputs {
     static Template = getFileContents(`ConfigGui/Inputs.html`);
 
