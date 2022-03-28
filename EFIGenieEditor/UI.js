@@ -43,7 +43,6 @@ HTMLElement.prototype.Detach = function() {
 class Template {
     GUID = generateGUID();
     Attached = false;
-    onChange = [];
 
     _hidden = false;
     get hidden() {
@@ -68,17 +67,6 @@ class Template {
 
     Setup(prop) {
         Object.assign(this, prop);
-        if(!Array.isArray(this.onChange))
-            this.onChange = [ this.onChange ];
-        var thisClass = this;
-        Object.entries(this).forEach(e => {
-            var [elementname, element] = e;
-            if(element?.onChange !== undefined) {
-                element.onChange.push(function() {
-                    thisClass.onChange.forEach(function(onChange) { onChange(); });
-                });
-            }
-        });
     }
 
     get saveValue() {

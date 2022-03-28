@@ -288,11 +288,11 @@ class Calculation_LookupTable extends UI.Template {
         if(!this.ParameterSelection) {
             this.ParameterSelection = new UI.Selection({
                 options: GetSelections(),
-                onChange: function() {
-                    thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
-                },
                 Class: `TableParameterSelect`
             });
+            this.ParameterSelection.addEventListener(`change`, function() {
+                thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
+            })
             this.Table.xLabel = this.ParameterSelection;
         }
     }
@@ -465,20 +465,20 @@ class Calculation_2AxisTable extends UI.Template {
             this.XSelection = new UI.Selection({
                 selectNotVisible: true,
                 options: GetSelections(),
-                onChange: function() {
-                    thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
-                }
             });
+            this.XSelection.addEventListener(`change`, function() {
+                thisClass.XReference = `${thisClass.XSelection.Value.reference}.${thisClass.XSelection.Value.value}${thisClass.XSelection.Value.measurement? `(${thisClass.XSelection.Value.measurement})` : ``}`;
+            })
             this.Table.xLabel = this.XSelection;
         }
         if(!this.YSelection) {
             this.YSelection = new UI.Selection({
                 selectNotVisible: true,
                 options: GetSelections(),
-                onChange: function() {
-                    thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
-                }
             });
+            this.YSelection.addEventListener(`change`, function() {
+                thisClass.YReference = `${thisClass.YSelection.Value.reference}.${thisClass.YSelection.Value.value}${thisClass.YSelection.Value.measurement? `(${thisClass.YSelection.Value.measurement})` : ``}`;
+            })
             this.Table.yLabel = this.YSelection;
         }
     }
@@ -743,15 +743,15 @@ class CalculationOrVariableSelection extends UI.Template {
         this.Selection = new UI.Selection({
             options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
             selectDisabled: false,
-            selectName: `None`,
-            onChange: function () {
-                const subConfig = thisClass.GetSubConfig();
-                if(!subConfig)
-                    thisClass.CalculationContent.innerHTML = ``;
-                else
-                    thisClass.CalculationContent.replaceChildren(subConfig);
-                thisClass.LiveUpdate.Measurement = thisClass.Measurement;
-            }
+            selectName: `None`
+        });
+        this.Selection.addEventListener(`change`, function() {
+            const subConfig = thisClass.GetSubConfig();
+            if(!subConfig)
+                thisClass.CalculationContent.innerHTML = ``;
+            else
+                thisClass.CalculationContent.replaceChildren(subConfig);
+            thisClass.LiveUpdate.Measurement = thisClass.Measurement;
         });
         this.style.display = `block`;
         this.Setup(prop);

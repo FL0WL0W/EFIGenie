@@ -209,9 +209,11 @@ class ConfigInputs {
 
     NewInput() {
         const thisClass = this;
-        return new ConfigInput({
-            onChange: function() {$(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());}
+        let input = new ConfigInput();
+        input.addEventListener(`change`, function() {
+            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
         });
+        return input;
     }
 
     get saveValue() {
@@ -520,7 +522,7 @@ class ConfigInput extends UI.Template {
         this.TranslationMeasurement.addEventListener(`change`, function() {
             thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value;
         });
-        this.TranslationConfig.labelElement.after(this.TranslationMeasurement);
+        this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
         this.Name = new UI.Text({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`
