@@ -451,14 +451,15 @@ class ConfigInputs {
     }
 }
 
-class ConfigInput extends UI.OldTemplate {
-    static Template = `<div>$Name$</div>
+class ConfigInput extends UI.Template {
+    static Template = `<div data-element="Name"></div>
 <div class="configContainer">
-    $TranslationConfig$
-    <hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
-    <div id="$GUID$-raw">$RawConfigReplacer$</div>
+    <div data-element="TranslationConfig"></div>
+    <div data-element="hr"></div>
+    <div data-element="RawConfig"></div>
 </div>`
 
+    hr = document.createElement(`hr`);
     constructor(prop) {
         super();
         const thisClass = this;
@@ -484,16 +485,11 @@ class ConfigInput extends UI.OldTemplate {
             onChange: function() { 
                 const subConfig = thisClass.TranslationConfig.GetSubConfig();
                 if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
-                    $(`#${thisClass.GUID}-hr`).hide();
-                    thisClass.HRDisplay = `display: none; `;
-                    $(`#${thisClass.GUID}-raw`).html(``);
-                    thisClass.RawConfigReplacer = ``
+                    thisClass.hr.hidden = true;
+                    thisClass.RawConfig.hidden = true;
                 } else {
-                    thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
-                    $(`#${thisClass.GUID}-hr`).show();
-                    thisClass.HRDisplay = ``;
-                    $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
-                    thisClass.RawConfigReplacer = `$RawConfig$`
+                    thisClass.hr.hidden = false;
+                    thisClass.RawConfig.hidden = false;
                 }
             }
         });
@@ -503,7 +499,7 @@ class ConfigInput extends UI.OldTemplate {
             options:            options,
             onChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
-        prop.Name = new UI.Text({
+        this.Name = new UI.Text({
             Value: prop.Name ?? `Input`,
             Class: `pinselectname inputName`,
             onChange: function() { 
@@ -511,7 +507,9 @@ class ConfigInput extends UI.OldTemplate {
                 thisClass.TranslationConfig.label = thisClass.Name.Value;
             }
         })
-        this.HRDisplay = `display: none; `;
+        this.Name.style.display = `block`;
+        this.hr.hidden = true;
+        this.hr.style.margin = `2px`;
         this.Setup(prop);
     }
 
@@ -539,6 +537,7 @@ class ConfigInput extends UI.OldTemplate {
         ]};
     }
 }
+customElements.define('config-input', ConfigInput, { extends: `div` });
 
 class UIPinSelection extends UI.Selection {
     constructor(prop){
