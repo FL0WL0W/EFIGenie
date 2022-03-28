@@ -474,39 +474,61 @@ class ConfigInput extends UI.Template {
             ReferenceName:      `Inputs.${prop.Name}`,
             noParameterSelection: true
         });
+        this.RawConfig.addEventListener(`change`, function() {
+            UpdateOverlay();
+            thisClass.dispatchEvent(new Event(`change`));
+        });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
             label:              prop.Name ?? `Input`,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
-            noParameterSelection: true,
-            Template: CalculationOrVariableSelection.Template.replace(`$label$`, `Input\\$TranslationMeasurement\\$`),
-            onChange: function() { 
-                const subConfig = thisClass.TranslationConfig.GetSubConfig();
-                if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
-                    thisClass.hr.hidden = true;
-                    thisClass.RawConfig.hidden = true;
-                } else {
-                    thisClass.hr.hidden = false;
-                    thisClass.RawConfig.hidden = false;
-                }
+            noParameterSelection: true
+        });
+        this.TranslationConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                thisClass.hr.hidden = true;
+                thisClass.RawConfig.hidden = true;
+                thisClass.RawConfig.Selection.value = undefined;
+            } else {
+                thisClass.hr.hidden = false;
+                thisClass.RawConfig.hidden = false;
+            }
+            UpdateOverlay();
+            thisClass.dispatchEvent(new Event(`change`));
+        });
+        this.RawConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                thisClass.hr.hidden = true;
+                thisClass.RawConfig.hidden = true;
+                thisClass.RawConfig.Selection.value = undefined;
+                UpdateOverlay();
+            } else {
+                thisClass.hr.hidden = false;
+                thisClass.RawConfig.hidden = false;
+                UpdateOverlay();
             }
         });
         this.TranslationMeasurement = new UI.Selection({
             Value:              `None`,
             selectNotVisible:   true,
             options:            options,
-            onChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
         });
+        this.TranslationMeasurement.addEventListener(`change`, function() {
+            thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value;
+        });
+        this.TranslationConfig.labelElement.after(this.TranslationMeasurement);
         this.Name = new UI.Text({
             Value: prop.Name ?? `Input`,
-            Class: `pinselectname inputName`,
-            onChange: function() { 
-                thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
-                thisClass.TranslationConfig.label = thisClass.Name.Value;
-            }
+            Class: `pinselectname inputName`
         })
+        this.Name.addEventListener(`change`, function() {
+            thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
+            thisClass.TranslationConfig.label = thisClass.Name.Value;
+        });
         this.Name.style.display = `block`;
         this.hr.hidden = true;
         this.hr.style.margin = `2px`;

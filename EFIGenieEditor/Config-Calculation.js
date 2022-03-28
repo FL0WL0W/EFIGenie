@@ -703,11 +703,11 @@ class CalculationOrVariableSelection extends UI.Template {
             return this._measurement;
 
         const selection = this.Selection.Value;
-        if (!selection.reference) {
+        if (!selection?.reference) {
             const subConfig = this.GetSubConfig();
             return GetClassProperty(subConfig, `Measurement`);
         }
-        return selection.measurement;
+        return selection?.measurement;
     }
     set Measurement(measurement) {
         this._measurement = measurement;
