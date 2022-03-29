@@ -136,7 +136,7 @@ class Calculation_Polynomial extends HTMLDivElement {
                     label.innerHTML = `x<sup>${i}</sup> +`;
                 } else {
 
-                    number.addEventListener(`change`, function() { valueElement.dispatchEvent(new Event(`change`)); });
+                    number.addEventListener(`change`, function() { valueElement.dispatchEvent(new Event(`change`, {bubbles: true})); });
                 }
                 valueElement.style.display = `inline`;
                 Object.defineProperty(valueElement, 'value', {

@@ -560,7 +560,7 @@ class ConfigTop extends UI.OldTemplate {
     }
 }
 
-class ConfigFuel extends UI.OldTemplate {
+class ConfigFuel extends UI.Template {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
@@ -590,43 +590,50 @@ class ConfigFuel extends UI.OldTemplate {
             Measurement:        `Angle`,
             ReferenceName:      `FuelParameters.Injector End Position`
         });
-        this.Outputs = [];
-        for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
-                Configs:        BooleanOutputConfigs,
-                label:          `Injector ${i+1}`,
-                Measurement:    `No Measurement`
-            });
-        }
+        this.Outputs = document.createElement(`div`)
+        Object.defineProperty(this.Outputs, 'saveValue', {
+            get: function() { return [this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].saveValue = saveValue[i];
+                }
+            }
+        });
+        Object.defineProperty(this.Outputs, 'value', {
+            get: function() { return [this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
+        });
+        this.Outputs.value = new Array(8);
         this.Setup(prop);
     }
 
     get saveValue() {
-        var saveValue = super.saveValue;
-        saveValue.Outputs = [];
-        for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].saveValue;
-        };
-        return saveValue;
+        return super.saveValue;
     }
 
     set saveValue(saveValue) {
-        this.Detach();
         if(saveValue?.ConfigInjectorOutputs)
             saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs;
-        if(saveValue?.Outputs)
-        {
-            this.Outputs = [];
-            for(var i = 0; i < saveValue.Outputs.length; i++){
-                if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput({
-                        Configs:        BooleanOutputConfigs,
-                        label:          `Injector ${i+1}`,
-                        Measurement:    `No Measurement`
-                    });
-                this.Outputs[i].saveValue = saveValue.Outputs[i];
-            }
-        }
 
         super.saveValue = saveValue;
     }
@@ -693,8 +700,9 @@ class ConfigFuel extends UI.OldTemplate {
         return group;
     }
 }
+customElements.define(`config-fuel`, ConfigFuel, { extends: `div` });
 
-class ConfigIgnition extends UI.OldTemplate {
+class ConfigIgnition extends UI.Template {
     static Template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
@@ -725,49 +733,46 @@ class ConfigIgnition extends UI.OldTemplate {
             ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
             MeasurementUnitName:`ms`
         });
-        this.Outputs = [];
-        for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
-                Configs:            BooleanOutputConfigs,
-                label:              `Ignition ${i+1}`,
-                Measurement:        `No Measurement`
-            });
-        }
+        this.Outputs = document.createElement(`div`)
+        Object.defineProperty(this.Outputs, 'saveValue', {
+            get: function() { return [this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].saveValue = saveValue[i];
+                }
+            }
+        });
+        Object.defineProperty(this.Outputs, 'value', {
+            get: function() { return [this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:            BooleanOutputConfigs,
+                            label:              `Ignition ${i+1}`,
+                            Measurement:        `No Measurement`
+                        }));
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
+        });
+        this.Outputs.value = new Array(8);
         this.Setup(prop);
-    }
-
-    get saveValue() {
-        var saveValue = super.saveValue;
-        saveValue.Outputs = [];
-        for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].saveValue;
-        };
-        return saveValue;
     }
 
     Attach() {
         super.Attach();
         UpdateOverlay();
-    }
-
-    set saveValue(saveValue) {
-        this.Detach();
-
-        if(saveValue?.Outputs)
-        {
-            this.Outputs = [];
-            for(var i = 0; i < saveValue.Outputs.length; i++){
-                if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput({
-                        Configs:            BooleanOutputConfigs,
-                        label:              `Ignition ${i+1}`,
-                        Measurement:        `No Measurement`
-                    });
-                this.Outputs[i].saveValue = saveValue.Outputs[i];
-            }
-        }
-
-        super.saveValue = saveValue;
     }
 
     RegisterVariables() {
@@ -820,8 +825,9 @@ class ConfigIgnition extends UI.OldTemplate {
         return group;
     }
 }
+customElements.define(`config-ignition`, ConfigIgnition, { extends: `div` });
 
-class ConfigEngine extends UI.OldTemplate {
+class ConfigEngine extends UI.Template {
     static Template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
@@ -879,15 +885,15 @@ class ConfigEngine extends UI.OldTemplate {
             requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
         }
 
-        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = requirements?.indexOf(`Manifold Absolute Pressure`) < 0;
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) < 0;
         if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden) 
             this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables();
         
-        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = requirements?.indexOf(`Cylinder Air Temperature`) < 0;
+        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) < 0;
         if(!this.CylinderAirTemperatureConfigOrVariableSelection.hidden) 
             this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables();
         
-        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = requirements?.indexOf(`Volumetric Efficiency`) < 0;
+        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) < 0;
         if(!this.VolumetricEfficiencyConfigOrVariableSelection.hidden) 
             this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables();
 
@@ -900,9 +906,9 @@ class ConfigEngine extends UI.OldTemplate {
         var veRequired  = false;
         if(!this.CylinderAirmassConfigOrVariableSelection.Selection?.reference) {
             var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
-            mapRequired = requirements && requirements.indexOf(`Manifold Absolute Pressure`) > -1;
-            catRequired = requirements && requirements.indexOf(`Cylinder Air Temperature`) > -1
-            veRequired = requirements && requirements.indexOf(`Volumetric Efficiency`) > -1;
+            mapRequired = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
+            catRequired = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1
+            veRequired  = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) > -1;
         }
 
         var group = { type: `Group`, value: [
@@ -954,6 +960,7 @@ class ConfigEngine extends UI.OldTemplate {
         return group;
     }
 }
+customElements.define(`config-engine`, ConfigEngine, { extends: `div` });
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
     constructor(prop) {

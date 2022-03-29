@@ -478,7 +478,7 @@ class ConfigInput extends UI.Template {
         });
         this.RawConfig.addEventListener(`change`, function() {
             UpdateOverlay();
-            thisClass.dispatchEvent(new Event(`change`));
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
@@ -499,7 +499,7 @@ class ConfigInput extends UI.Template {
                 thisClass.RawConfig.hidden = false;
             }
             UpdateOverlay();
-            thisClass.dispatchEvent(new Event(`change`));
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.RawConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.TranslationConfig.GetSubConfig();

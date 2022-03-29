@@ -385,13 +385,13 @@ class NumberWithMeasurement extends UITemplate {
         });
         this.DisplayMeasurement.addEventListener(`change`, function() {
             thisClass.UpdateDisplayValue();
-            thisClass.dispatchEvent(new Event(`change`));
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.DisplayValue = new UINumber();
         this.DisplayValue.addEventListener(`change`, function() {
             if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
                 thisClass.Value = (thisClass.DisplayValue.Value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
-            thisClass.dispatchEvent(new Event(`change`));
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.DisplayValue.GUID = this.GUID;
         this.Setup(prop);
@@ -475,7 +475,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
         this.DisplayMeasurement.addEventListener(`change`, function() {
             thisClass.ZeroesToAdd = 10000000;
             thisClass.UpdateDisplayValue();
-            thisClass.dispatchEvent(new Event(`change`));
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.DisplayValue = document.createElement(`div`);
         this.DisplayValue.style.display = this.DisplayMeasurement.style.display = `inline-block`;
