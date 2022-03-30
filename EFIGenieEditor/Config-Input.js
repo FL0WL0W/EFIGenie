@@ -190,250 +190,103 @@ function GenerateOverlay() {
     return `${ret}</div>`;
 }
 
+$(document).on(`change.${this.GUID}`, `.gpiooverlayselect`, function(){
+    var selected = $(this).val();
+
+    var pinSelectElements = $(`.pinselect`);
+    if(pinSelectElements) {
+        for(var i=0; i<pinSelectElements.length; i++) {
+            var name = GetNameFromPinSelectElement(pinSelectElements[i]);
+            if(selected == name)
+            {
+                $(pinSelectElements[i]).val($(this).data(`pin`));
+                $(pinSelectElements[i]).trigger(`change`);
+            }
+        }
+    }
+});
+
 function UpdateOverlay() {
     $(`.gpiooverlay`).html(GenerateOverlay());
-    $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
 }
 
-class ConfigInputs {
-    static Template = getFileContents(`ConfigGui/Inputs.html`);
+//todo, context menu, scroll into view, get rid of GetHtml and GetInputsHtml
+class ConfigInputs extends UI.Template {
+    static Template = `<div data-element="Inputs"></div><div data-element="newInputElement"></div>`
 
-    constructor(){
-        this.GUID = generateGUID();
-        this.Inputs = [this.NewInput()];
+    GetHtml() {
+        let html = super.GetHtml();
+        html += `<div class="gpiooverlay">${GenerateOverlay()}</div>`;
+        return html;
+    }
+    GetInputsHtml() {
+        var inputlist = ``;
+        for(var i = 0; i < this.Inputs.children.length; i++){
+            inputlist += `<div class="w3-bar-subitem w3-button">${this.Inputs.children[i].lastChild.Name.value}</div>`;
+        }
+        if(this.Inputs.children.length === 0){
+            // inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
+        }
+        return `<div>${inputlist}</div>`;
     }
 
     TargetDevice = `STM32F401C`;
-    Selected = 0;
-    ContextSelect;
-
-    NewInput() {
-        const thisClass = this;
-        let input = new ConfigInput();
-        input.addEventListener(`change`, function() {
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-        });
-        return input;
-    }
-
     get saveValue() {
-        var saveValue = { Inputs: [], TargetDevice: this.TargetDevice };
-
-        for(var i = 0; i < this.Inputs.length; i++){
-            saveValue.Inputs.push(this.Inputs[i].saveValue);
-        }
-
+        let saveValue = super.saveValue;
+        saveValue.TargetDevice = this.TargetDevice;
         return saveValue;
     }
 
     set saveValue(saveValue) {
-        this.Detach();
-
-        if(saveValue) {
-            if(saveValue.TargetDevice) {
-                this.TargetDevice = saveValue.TargetDevice;
-                PinOut = PinOuts[this.TargetDevice];
-            }
-            else if(!saveValue.Inputs) {
-                saveValue = { Inputs: saveValue };
-            }
-
-            for(var i = 0; i < saveValue.Inputs.length; i++){
-                if(i >= this.Inputs.length)
-                    this.Inputs.push(this.NewInput());
-                this.Inputs[i].saveValue = saveValue.Inputs[i];
-            }
-            this.Inputs = this.Inputs.slice(0, saveValue.Inputs.length)
+        if(!saveValue)
+            return;
+            
+        if(saveValue.TargetDevice) {
+            this.TargetDevice = saveValue.TargetDevice;
+            PinOut = PinOuts[this.TargetDevice];
+            delete saveValue.TargetDevice;
         }
 
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.Attach();
+        super.saveValue = saveValue;
     }
-
-    Detach() {
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].Detach();
-        }
-
-        $(document).off(`contextmenu.${this.GUID}`);
-        $(document).off(`change.${this.GUID}`);
-        $(document).off(`click.${this.GUID}`);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-        
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].Attach();
-        }
-
-        $(document).on(`change.${this.GUID}`, `.gpiooverlayselect`, function(){
-            var selected = $(this).val();
-
-            var pinSelectElements = $(`.pinselect`);
-            if(pinSelectElements) {
-                for(var i=0; i<pinSelectElements.length; i++) {
-                    var name = GetNameFromPinSelectElement(pinSelectElements[i]);
-                    if(selected == name)
-                    {
-                        $(pinSelectElements[i]).val($(this).data(`pin`));
-                        $(pinSelectElements[i]).trigger(`change`);
+    constructor(prop) {
+        super();
+        this.Inputs = document.createElement(`div`);
+        const thisClass = this;
+        Object.defineProperty(this.Inputs, 'saveValue', {
+            get: function() { return [...this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        thisClass.#appendInput();
                     }
+                    this.children[i].saveValue = saveValue[i];
                 }
             }
         });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-inputs div`, function(){
-            var selected = parseInt($(this).data(`index`));
-            if(isNaN(selected))
-                return;
-
-            $(`#${thisClass.GUID}-${selected}`)[0].scrollIntoView();
+        Object.defineProperty(this.Inputs, 'value', {
+            get: function() { return [...this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        thisClass.#appendInput();
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
         });
-                
-        $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-inputs div`, function(e){
-            var relativeX = (e.pageX - window.scrollX),
-                relativeY = (e.pageY - window.scrollY);
-
-            $(`#${thisClass.GUID}-contextmenu`).show();
-            $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${relativeX}px`);
-            $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${relativeY}px`);
-            thisClass.ContextSelect = $(this).data(`index`);
-            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
-            $(this).addClass(`active`);
-            
-            e.preventDefault();
-        });
-        $(document).on(`click.${this.GUID}`, function(){
-            $(`#${thisClass.GUID}-contextmenu`).hide();
-            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-add`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-
-            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, thisClass.NewInput());
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-delete`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-            
-            thisClass.Inputs.splice(thisClass.ContextSelect, 1);
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-duplicate`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-            
-            thisClass.Inputs.push(this.NewInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].saveValue = thisClass.Inputs[contextSelect].saveValue;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controladd`, function(){
-            var selected = $(this).data('i');
-            
-            thisClass.Inputs.splice(selected + 1, 0, thisClass.NewInput());
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldelete`, function(){
-            var selected = $(this).data('i');
-            
-            thisClass.Inputs.splice(selected, 1);
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controlup`, function(){
-            var selected = $(this).data('i');
-
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected - 1];
-            thisClass.Inputs[selected - 1] = temp;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldown`, function(){
-            var selected = $(this).data('i');
-
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected + 1];
-            thisClass.Inputs[selected + 1] = temp;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-
-        UpdateOverlay();
-    }
-
-    GetInputsHtml() {
-
-        var inputlist = ``;
-        for(var i = 0; i < this.Inputs.length; i++){
-            var liveUpdate = this.Inputs[i].TranslationConfig.LiveUpdate;
-            if(!this.Inputs[i].TranslationConfig.Selection.Value)
-                liveUpdate = this.Inputs[i].RawConfig.LiveUpdate;
-            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button">${this.Inputs[i].Name.Value}<span style="float: right;">${liveUpdate.GetHtml()}</span></div>`;
-        }
-        if(this.Inputs.length === 0){
-            this.ContextSelect = -1;
-            inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
-        }
-        return `<div id="${this.GUID}-inputs">${inputlist}</div>`;
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, `Template`);
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        
-
-        var configs = ``;
-        for(var i = 0; i < this.Inputs.length; i++)
-        {
-            configs += `<div id="${this.GUID}-${i}" class="inputconfig"><span style="float: right;">`;
-            configs += `<span class="controldelete" data-i="${i}">-</span>`;
-            if(i !== 0)
-                configs += `<span class="controlup" data-i="${i}">↑</span>`;
-            else
-                configs += `<span class="controldummy">&nbsp;</span>`;
-            if(i !== this.Inputs.length - 1)
-                configs += `<span class="controldown" data-i="${i}">↓</span>`;
-            else
-                configs += `<span class="controldummy">&nbsp;</span>`;
-
-            configs += `</span>${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
-        }
-        configs += `<span class="controladd" data-i="${this.Inputs.length-1}">+ New</span>`;
-
-        template = template.replace(/[$]inputconfig[$]/g, configs);
-        template = template.replace(/[$]overlay[$]/g, GenerateOverlay());
-
-        return template;
+        this.Inputs.saveValue = [{}];
+        this.newInputElement = new UI.Button({className: `controladd`});
+        this.newInputElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
+        this.Setup(prop);
     }
 
     RegisterVariables() {
         VariableRegister.CurrentTickId = VariableRegister.GenerateVariableId();
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].RegisterVariables();
+        for(var i = 0; i < this.Inputs.children.length; i++){
+            this.Inputs.children[i].RegisterVariables();
         }
     }
 
@@ -445,13 +298,80 @@ class ConfigInputs {
                 outputVariables: [`CurrentTickId`]
             }
         ]};
-        for(var i = 0; i < this.Inputs.length; i++){
-            group.value.push(this.Inputs[i].GetObjOperation());
+        for(var i = 0; i < this.Inputs.children.length; i++){
+            group.value.push(this.Inputs.children[i].GetObjOperation());
         }
 
         return group;
     }
+
+    #updateInputControls() {
+        for(let i = 0; i < this.Inputs.children.length; i++) {
+            let up = this.Inputs.children[i].firstChild.children[1];
+            let down = this.Inputs.children[i].firstChild.children[2];
+            if(i === 0) {
+                up.className = `controlDummy`;
+                up.disabled = true;
+            } else {
+                up.className = `controlUp`;
+                up.disabled = false;
+            }
+            if(i === this.Inputs.children.length-1) {
+                down.className = `controlDummy`;
+                down.disabled = true;
+            } else {
+                down.className = `controlDown`;
+                down.disabled = false;
+            }
+        }
+    }
+
+    #appendInput() {
+        this.Inputs.append(this.#newInput());
+        this.#updateInputControls();
+    }
+
+    #newInput() {
+        const thisClass = this;
+        let input = document.createElement(`div`);
+        let controlElement = input.appendChild(document.createElement(`span`));
+        controlElement.style.float = `right`;
+        let deleteElement = controlElement.appendChild(document.createElement(`span`));
+        deleteElement.className = `controldelete`;
+        deleteElement.addEventListener(`click`, function() {
+            this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        let upElement = controlElement.appendChild(document.createElement(`span`));
+        upElement.className = `controlup`;
+        upElement.addEventListener(`click`, function() {
+            if(upElement.disabled)
+                return;
+            this.parentElement.parentElement.previousSibling.before(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        let downElement = controlElement.appendChild(document.createElement(`span`));
+        downElement.className = `controldown`;
+        downElement.addEventListener(`click`, function() {
+            if(downElement.disabled)
+                return;
+            this.parentElement.parentElement.nextSibling.after(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        input.append(new ConfigInput());
+        input.RegisterVariables = function() {this.lastChild.RegisterVariables(); };
+        Object.defineProperty(input, 'saveValue', {
+            get: function() { return this.lastChild.saveValue; },
+            set: function(saveValue) { this.lastChild.saveValue = saveValue; }
+        });
+        Object.defineProperty(input, 'value', {
+            get: function() { return this.lastChild.value; },
+            set: function(value) { this.lastChild.saveValue = value; }
+        });
+        return input;
+    }
 }
+customElements.define('config-inputs', ConfigInputs, { extends: `div` });
 
 class ConfigInput extends UI.Template {
     static Template = `<div data-element="Name"></div>
@@ -463,9 +383,11 @@ class ConfigInput extends UI.Template {
 
     hr = document.createElement(`hr`);
     constructor(prop) {
-        super();
-        const thisClass = this;
-        prop ??= {};
+        super();;
+        prop ??= { };
+        prop.Name ??= `Input`;
+        this.style.display = `block`;
+        const thisClass = this
         const measurementKeys = Object.keys(Measurements)
         var options = [];
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
@@ -482,7 +404,7 @@ class ConfigInput extends UI.Template {
         });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            label:              prop.Name ?? `Input`,
+            label:              prop.Name,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
@@ -524,7 +446,7 @@ class ConfigInput extends UI.Template {
         });
         this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
         this.Name = new UI.Text({
-            Value: prop.Name ?? `Input`,
+            Value: prop.Name,
             Class: `pinselectname inputName`
         })
         this.Name.addEventListener(`change`, function() {
@@ -534,6 +456,7 @@ class ConfigInput extends UI.Template {
         this.Name.style.display = `block`;
         this.hr.hidden = true;
         this.hr.style.margin = `2px`;
+        delete prop.Name;
         this.Setup(prop);
     }
 

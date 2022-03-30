@@ -592,7 +592,7 @@ class ConfigFuel extends UI.Template {
         });
         this.Outputs = document.createElement(`div`)
         Object.defineProperty(this.Outputs, 'saveValue', {
-            get: function() { return [this.children].map(e => e.saveValue); },
+            get: function() { return [...this.children].map(e => e.saveValue); },
             set: function(saveValue) { 
                 while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
                 for(let i = 0; i < saveValue.length; i++){
@@ -608,7 +608,7 @@ class ConfigFuel extends UI.Template {
             }
         });
         Object.defineProperty(this.Outputs, 'value', {
-            get: function() { return [this.children].map(e => e.value); },
+            get: function() { return [...ythis.children].map(e => e.value); },
             set: function(value) { 
                 while(this.children.length > value.length) this.removeChild(this.lastChild);
                 for(let i = 0; i < value.length; i++){
@@ -735,7 +735,7 @@ class ConfigIgnition extends UI.Template {
         });
         this.Outputs = document.createElement(`div`)
         Object.defineProperty(this.Outputs, 'saveValue', {
-            get: function() { return [this.children].map(e => e.saveValue); },
+            get: function() { return [...this.children].map(e => e.saveValue); },
             set: function(saveValue) { 
                 while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
                 for(let i = 0; i < saveValue.length; i++){
@@ -751,7 +751,7 @@ class ConfigIgnition extends UI.Template {
             }
         });
         Object.defineProperty(this.Outputs, 'value', {
-            get: function() { return [this.children].map(e => e.value); },
+            get: function() { return [...this.children].map(e => e.value); },
             set: function(value) { 
                 while(this.children.length > value.length) this.removeChild(this.lastChild);
                 for(let i = 0; i < value.length; i++){

@@ -65,8 +65,8 @@ class MAP_GM2Bar extends Input_AnalogPolynomial {
     constructor(prop) {
         super(prop);
         // this.Polynomial.Hide();
-        this.Polynomial.MinValue = 0.088;
-        this.Polynomial.MaxValue = 2.08;
+        this.Polynomial.minValue = 0.088;
+        this.Polynomial.maxValue = 2.08;
         let value = [];
         value[0] = 0.082718614718615;
         value[1] = 0.398493506493506;
@@ -86,8 +86,8 @@ class MAP_GM3Bar extends Input_AnalogPolynomial {
     constructor(prop) {
         super(prop);
         // this.Polynomial.Hide();
-        this.Polynomial.MinValue = 0.036;
-        this.Polynomial.MaxValue = 3.15;
+        this.Polynomial.minValue = 0.036;
+        this.Polynomial.maxValue = 3.15;
         let value = [];
         value[0] = 0.016952380952381;
         value[1] = 0.628;

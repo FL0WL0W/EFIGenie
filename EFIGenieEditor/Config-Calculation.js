@@ -41,7 +41,7 @@ class Calculation_Static extends UI.NumberWithMeasurement {
 GenericConfigs.push(Calculation_Static);
 customElements.define(`calculation-static`, Calculation_Static, { extends: `div` });
 
-//the commented sections need to be implemented. since this is just behind the scenes for now, do this later
+//this still needs some complicated unit work. this is ok for now
 class Calculation_Polynomial extends HTMLDivElement {
     static Name = `Polynomial`;
     static Output = `float`;
@@ -63,14 +63,15 @@ class Calculation_Polynomial extends HTMLDivElement {
 
     #valueElement = document.createElement(`div`);
     get value() {
-        let value = [...this.#valueElement.children].map(x => x.value);
-        //convert to base value
-        return value;
+        const thisClass = this;
+        return [...this.#valueElement.children].map(function(value, index) { return thisClass.#toBaseValue(value, index); });
     }
     set value(value) {
         this.degree = value.length;
-        this.#valueElement.firstChild.MeasurementUnitName = value[0];
-        //convert to display value
+        this.#valueElement.firstChild.value = value[0];
+        for(let i = 1; i < this.#valueElement.children.length; i++) {
+            this.#valueElement.children[i].value = this.#toDisplayValue(value[i], i);
+        }
     }
     
     #minValueElement = new UI.NumberWithMeasurement({
@@ -201,6 +202,17 @@ class Calculation_Polynomial extends HTMLDivElement {
             });
 
         return obj;
+    }
+
+    #toDisplayValue(value, index) {
+        //todo
+        const unit = Measurements[this.Measurement]?.[this.MeasurementUnitName];
+        return value;
+    }
+    #toBaseValue(value, index) {
+        //todo
+        const unit = Measurements[this.Measurement]?.[this.MeasurementUnitName];
+        return value;
     }
 }
 GenericConfigs.push(Calculation_Polynomial);
@@ -759,7 +771,7 @@ class CalculationOrVariableSelection extends UI.Template {
 
     static SaveOnlyActive = false;
     get saveValue() {
-        var saveValue = super.saveValue;
+        let saveValue = super.saveValue ?? {};
 
         if (this.ConfigValues) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {

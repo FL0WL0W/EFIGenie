@@ -7,6 +7,7 @@ import UITable from "./JavascriptUI/UITable.js";
 import UIGraph3D from "./JavascriptUI/UIGraph3D.js"
 import UIGraph2D from "./JavascriptUI/UIGraph2D.js"
 import UIDialog from "./JavascriptUI/UIDialog.js"
+import UIButton from "./JavascriptUI/UIButton.js"
 
 //adapt new ui modules to old garbage GetHtml/Attach structure
 Object.defineProperty(HTMLElement.prototype, 'Class', {
@@ -525,5 +526,6 @@ export default { UI: {
     Graph3D: UIGraph3D,
     Graph2D: UIGraph2D,
     Dialog: UIDialog,
-    DisplayNumberWithMeasurement
+    DisplayNumberWithMeasurement,
+    Button: UIButton
 }}

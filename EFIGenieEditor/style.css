@@ -256,6 +256,21 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-radius: 6px;
     background-color: #666;
 }
+.controladd::after {
+    content: "+ New";
+}
+.controldelete::after {
+    content: "-";
+}
+.controlup::after {
+    content: "↑";
+}
+.controldown::after {
+    content: "↓";
+}
+.controldummy::after {
+    content: "\00a0";
+}
 .subOperationSelection {
     width: 110px;
 }
