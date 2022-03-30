@@ -154,7 +154,7 @@ function GetNameFromPinSelectElement(element){
 //The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
 function GenerateOverlay() {
     var pinSelectElements = ParsePinSelectElements($(`.pinselect`));
-    let scale = 700 / (PinOut.OverlayWidth + 300);
+    let scale = 750 / (PinOut.OverlayWidth + 300);
     var ret = `<div style="width: ${PinOut.OverlayWidth + 300}px; position: relative; transform-origin: top left; transform: scale(${scale}););"><img src="${PinOut.Overlay}" style="position: absolute; left: 150px;"></img><br>`;
     for(var i = 0; i < PinOut.Pins.length; i++) {
         var selectCount = 0;
