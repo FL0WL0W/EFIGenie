@@ -64,12 +64,11 @@ class Calculation_Polynomial extends HTMLDivElement {
     #valueElement = document.createElement(`div`);
     get value() {
         const thisClass = this;
-        return [...this.#valueElement.children].map(function(value, index) { return thisClass.#toBaseValue(value, index); });
+        return [...this.#valueElement.children].map(function(element, index) { return thisClass.#toBaseValue(element.value, index); });
     }
     set value(value) {
         this.degree = value.length;
-        this.#valueElement.firstChild.value = value[0];
-        for(let i = 1; i < this.#valueElement.children.length; i++) {
+        for(let i = 0; i < this.#valueElement.children.length; i++) {
             this.#valueElement.children[i].value = this.#toDisplayValue(value[i], i);
         }
     }

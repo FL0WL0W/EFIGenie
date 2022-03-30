@@ -222,7 +222,7 @@ class ConfigInputs extends UI.Template {
     GetInputsHtml() {
         var inputlist = ``;
         for(var i = 0; i < this.Inputs.children.length; i++){
-            inputlist += `<div class="w3-bar-subitem w3-button">${this.Inputs.children[i].lastChild.Name.value}</div>`;
+            inputlist += `<div class="w3-bar-subitem w3-button">${this.Inputs.children[i].Name}</div>`;
         }
         if(this.Inputs.children.length === 0){
             // inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
@@ -359,7 +359,8 @@ class ConfigInputs extends UI.Template {
             thisClass.#updateInputControls();
         });
         input.append(new ConfigInput());
-        input.RegisterVariables = function() {this.lastChild.RegisterVariables(); };
+        input.RegisterVariables = function() { this.lastChild.RegisterVariables(); };
+        input.GetObjOperation = function() { return this.lastChild.GetObjOperation(); };
         Object.defineProperty(input, 'saveValue', {
             get: function() { return this.lastChild.saveValue; },
             set: function(saveValue) { this.lastChild.saveValue = saveValue; }
@@ -367,6 +368,10 @@ class ConfigInputs extends UI.Template {
         Object.defineProperty(input, 'value', {
             get: function() { return this.lastChild.value; },
             set: function(value) { this.lastChild.saveValue = value; }
+        });
+        Object.defineProperty(input, 'Name', {
+            get: function() { return this.lastChild.Name.value; },
+            set: function(value) { this.lastChild.Name.value = value; }
         });
         return input;
     }
