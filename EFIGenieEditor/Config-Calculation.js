@@ -308,6 +308,13 @@ class Calculation_LookupTable extends UI.Template {
         }
     }
 
+    get saveValue() {
+        return this.Table.saveValue;
+    }
+    set saveValue(saveValue) {
+        this.Table.saveValue = saveValue;
+    }
+
     constructor(prop) {
         super();
         const thisClass = this;
@@ -494,14 +501,19 @@ class Calculation_2AxisTable extends UI.Template {
         }
     }
 
+    get saveValue() {
+        return this.Table.saveValue;
+    }
+    set saveValue(saveValue) {
+        this.Table.saveValue = saveValue;
+    }
+
     constructor(prop) {
         super();
         this.Dialog = new UI.Dialog({
             buttonLabel: `Edit Table`,
         });
-        this.Table = new UI.Table({
-            BaseObj: true,
-        });
+        this.Table = new UI.Table();
         this.Graph = new UI.Graph3D({
             width: 800,
             height: 450
