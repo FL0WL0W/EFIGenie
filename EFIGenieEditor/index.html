@@ -28,6 +28,7 @@
                 let workspace = document.querySelector(`#workspace`);
                 workspace.innerHtml = ``;
                 workspace.append(b);
+                UpdateOverlay();
                 let btnLoad = document.querySelector(`#btnLoad`);
                 btnLoad.value = ``;
             };
@@ -42,6 +43,7 @@
                 let workspace = document.querySelector(`#workspace`);
                 workspace.innerHtml = ``;
                 workspace.append(b);
+                UpdateOverlay();
                 let btnSave = document.querySelector(`#btnSave`);
                 btnSave.addEventListener(`click`, function(){
                     var cfg = b.saveValue;
