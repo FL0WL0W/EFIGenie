@@ -72,7 +72,7 @@
 
                 $(`#selectTarget`).change(function(evt){
                     b.Inputs.TargetDevice = $(this).val();
-                    PinOut = PinOuts[b.Inputs.TargetDevice];
+                    pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
                     UpdateOverlay();
                 });
                 var targets = ``;

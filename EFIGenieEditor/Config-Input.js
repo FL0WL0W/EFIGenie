@@ -106,124 +106,146 @@ PinOuts = {
     }
 };
 
-var PinOut = PinOuts.STM32F103C;
-
-function ParsePinSelectElements(pinSelectElements){
-    var elements = [];
-    if(pinSelectElements) {
-        for(var i=0; i<pinSelectElements.length; i++) {
-            const pinSelectElementSelector = $(pinSelectElements[i]);
-            elements.push({
-                name: GetNameFromPinSelectElement(pinSelectElements[i]),
-                pinselectmode: pinSelectElementSelector.attr(`data-pinselectmode`),
-                pin: pinSelectElements[i].value
-            });
-        }
-    }
-    return elements;
-}
-
-function GetNameFromPinSelectChildren(element){
-    const elementSelector = $(element);
-
-    if(elementSelector.hasClass(`pinselectname`)){
-        const name = elementSelector.val();
-        if(!name)
-            return elementSelector.text();
-        return name;
-    }
-
-    const elements = elementSelector.children();
-    for(var i = 0; i < elements?.length; i++) {
-        const name = GetNameFromPinSelectChildren(elements[i]);
-        if(name)
-            return name;
-    }
-}
-
-function GetNameFromPinSelectElement(element){
-    if(!element)
-        return;
-    const name = GetNameFromPinSelectChildren(element);
-    if(name)
-        return name;
-
-    return GetNameFromPinSelectElement(element.parentElement);
-}
-
-//The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
-function GenerateOverlay() {
-    var pinSelectElements = ParsePinSelectElements($(`.pinselect`));
-    let scale = 750 / (PinOut.OverlayWidth + 300);
-    var ret = `<div style="width: ${PinOut.OverlayWidth + 300}px; position: relative; transform-origin: top left; transform: scale(${scale}););"><img src="${PinOut.Overlay}" style="position: absolute; left: 150px;"></img><br>`;
-    for(var i = 0; i < PinOut.Pins.length; i++) {
-        var selectCount = 0;
-        var sel = ``;
-        var endsel = ``;
-        for(var s=0; s<pinSelectElements.length; s++) {
-            var selected = false;
-            if(pinSelectElements[s].pin == PinOut.Pins[i].Value) {
-                selectCount++;
-                selected = true;
+class PinOverlay extends HTMLDivElement {
+    get pinSelectElements() {
+        function getNameFromPinSelectChildren(element){
+            if(element.classList.contains(`pinselectname`)){
+                const name = element.value;
+                if(!name)
+                    return element.textContent;
+                return name;
             }
-            if(PinOut.Pins[i].SupportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1) {
-                endsel += `<option value="${pinSelectElements[s].name}"${selected? ` class="incompatible" selected` : ``} disabled>${pinSelectElements[s].name}</option>`;
-            } else {
-                sel += `<option value="${pinSelectElements[s].name}"${selected? ` selected` : ``}>${pinSelectElements[s].name}</option>`;            
-            }
-                
-        }
-        if(selectCount > 1)
-        {
-            sel = sel.replaceAll(`selected`, `class="pinconflict"`);
-            endsel = endsel.replaceAll(`" selected`, ` pinconflict"`);
-        }
-        sel += endsel;
-        sel = `<select class="gpiooverlayselect${selectCount > 1? ` pinconflict` : ``}" data-pin="${PinOut.Pins[i].Value}" style="` +
-            `; height: ${PinOut.OverlayElementHeight}` + 
-            `; top: ${PinOut.Pins[i].OverlayY - PinOut.OverlayElementHeight / 2}`+ 
-            `; left: ${PinOut.Pins[i].Align === `left`? PinOut.Pins[i].OverlayX + 150: PinOut.OverlayWidth - PinOut.Pins[i].OverlayX}px;">` +
-            `<option value="" disabled ${selectCount != 1? `selected` : ``}>select</option>${sel}</select>`;
-
-        ret += sel;
-    }
-    return `${ret}</div>`;
-}
-
-$(document).on(`change.${this.GUID}`, `.gpiooverlayselect`, function(){
-    var selected = $(this).val();
-
-    var pinSelectElements = $(`.pinselect`);
-    if(pinSelectElements) {
-        for(var i=0; i<pinSelectElements.length; i++) {
-            var name = GetNameFromPinSelectElement(pinSelectElements[i]);
-            if(selected == name)
-            {
-                $(pinSelectElements[i]).val($(this).data(`pin`));
-                $(pinSelectElements[i]).trigger(`change`);
+    
+            const elements = element.children;
+            for(var i = 0; i < elements?.length; i++) {
+                const name = getNameFromPinSelectChildren(elements[i]);
+                if(name)
+                    return name;
             }
         }
+        function getNameFromPinSelectElement(element){
+            if(!element)
+                return;
+            const name = getNameFromPinSelectChildren(element);
+            if(name)
+                return name;
+    
+            return getNameFromPinSelectElement(element.parentElement);
+        }
+
+        let pinSelectElements = [...document.querySelectorAll(`.pinselect`)];
+        var elements = [];
+        if(pinSelectElements) {
+            for(var i=0; i<pinSelectElements.length; i++) {
+                elements.push({
+                    name: getNameFromPinSelectElement(pinSelectElements[i]),
+                    pinselectmode: pinSelectElements[i].getAttribute(`data-pinselectmode`),
+                    pin: pinSelectElements[i].value,
+                    element: pinSelectElements[i]
+                });
+            }
+        }
+        return elements;
     }
-});
+
+    #pinOut;
+    get pinOut() {
+        return this.#pinOut;
+    }
+    set pinOut(pinOut) {
+        if(!pinOut)
+            return;
+        this.#pinOut = pinOut;
+        let scale = 750 / (pinOut.OverlayWidth + 300);
+        this.style.width = pinOut.OverlayWidth;
+        this.style.transform = `scale(${scale})`;
+        this.overlayImage.src = pinOut.Overlay;
+        while(pinOut.Pins.length < this.pinElements.children.length) this.pinElements.removeChild(this.pinElements.lastChild);
+        for(let i = 0; i < pinOut.Pins.length; i++) {
+            let pinElement = this.pinElements.children[i];
+            if(!pinElement) {
+                pinElement = this.pinElements.appendChild(new UI.Selection());
+                pinElement.firstChild.style.minWidth = `100px`;
+                pinElement.style.width = `150px`;
+                pinElement.style.position = `absolute`;
+                Object.defineProperty(pinElement, 'pinSelectElements', {
+                    set: function(pinSelectElements) { 
+                        this._pinSelectElements = pinSelectElements;
+                        let options = [];
+                        let selectedOption;
+                        for(let s=0; s<pinSelectElements.length; s++) {
+                            let option = {
+                                Name: pinSelectElements[s].name,
+                                Value: s,
+                                Disabled: this.supportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1
+                            };
+                            if(pinSelectElements[s].pin == this.pin) {
+                                if(selectedOption) {
+                                    option.Class = selectedOption.Class = `pinconflict`;
+                                    selectedOption = `conflict`;
+                                } else {
+                                    selectedOption = option;
+                                }
+                            }
+                            options.push(option);
+                        }
+                        this.options = options;
+                        if(!selectedOption) {
+                            this.value = undefined;
+                        } else if(selectedOption === `conflict`) {
+                            this.classList.add(`pinconflict`)
+                            this.value = undefined;
+                        }
+                        else {
+                            this.classList.remove(`pinconflict`)
+                            this.value = selectedOption.Value;
+                        }
+                    }
+                });
+                pinElement.addEventListener(`change`, function() {
+                    if(this.value !== undefined)
+                        this._pinSelectElements[this.value].element.parentElement.value = this.pin;
+                });
+            }
+            pinElement.pin = pinOut.Pins[i].Value;
+            pinElement.supportedModes = pinOut.Pins[i].SupportedModes;
+            pinElement.style.top = pinOut.Pins[i].OverlayY - pinOut.OverlayElementHeight / 2 + `px`;
+            pinElement.style.left = (pinOut.Pins[i].Align === `left`? pinOut.Pins[i].OverlayX + 150 : pinOut.OverlayWidth - pinOut.Pins[i].OverlayX) + `px`;
+        }
+        this.update();
+    }
+    update() {
+        let pinSelectElements = this.pinSelectElements;
+        [...this.pinElements.children].forEach(element => element.pinSelectElements = pinSelectElements);
+    }
+    pinElements = document.createElement(`div`);
+    overlayImage = document.createElement(`img`);
+    constructor() {
+        super();
+        this.class = `pinoverlay`;
+        this.overlayImage.style.position = `absolute`;
+        this.overlayImage.style.left = `150px`;
+        this.append(this.overlayImage);
+        this.append(this.pinElements);
+    }
+}
+customElements.define('config-pinoverlay', PinOverlay, { extends: `div` });
+
+let pinOverlay = new PinOverlay();
 
 function UpdateOverlay() {
-    $(`.gpiooverlay`).html(GenerateOverlay());
+    pinOverlay.update();
 }
 
 //todo, context menu
 class ConfigInputs extends UI.Template {
-    static Template = `<div data-element="Inputs"></div><div data-element="newInputElement"></div>`
+    static Template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="Inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
     inputListElement = document.createElement(`div`);
+    pinOverlay = pinOverlay;
 
     Attach() {
         super.Attach();
         this.inputListElement.Attach();
-    }
-
-    GetHtml() {
-        let html = super.GetHtml();
-        html += `<div class="gpiooverlay">${GenerateOverlay()}</div>`;
-        return html;
     }
 
     TargetDevice = `STM32F401C`;
@@ -239,7 +261,7 @@ class ConfigInputs extends UI.Template {
             
         if(saveValue.TargetDevice) {
             this.TargetDevice = saveValue.TargetDevice;
-            PinOut = PinOuts[this.TargetDevice];
+            pinOverlay.pinOut = PinOuts[this.TargetDevice];
             delete saveValue.TargetDevice;
         }
 
@@ -538,20 +560,21 @@ class UIPinSelection extends UI.Selection {
     #generateOptionList() {
         var options = []
         var endOptions = [];
-        for(var i = 0; i < PinOut.Pins.length; i++) {
-            const selected = this.Value === PinOut.Pins[i].Value;
-            if(PinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
+        let pinOut = pinOverlay.pinOut;
+        for(var i = 0; i < pinOut.Pins.length; i++) {
+            const selected = this.Value === pinOut.Pins[i].Value;
+            if(pinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
                 endOptions.push({
-                    Name: PinOut.Pins[i].Name,
-                    Value: PinOut.Pins[i].Value,
+                    Name: pinOut.Pins[i].Name,
+                    Value: pinOut.Pins[i].Value,
                     Selected: selected,
                     Class: selected? `incompatible` : undefined,
                     Disabled: true
                 });
             } else {
                 options.push({
-                    Name: PinOut.Pins[i].Name,
-                    Value: PinOut.Pins[i].Value,
+                    Name: pinOut.Pins[i].Name,
+                    Value: pinOut.Pins[i].Value,
                     Selected: selected
                 });
             }
