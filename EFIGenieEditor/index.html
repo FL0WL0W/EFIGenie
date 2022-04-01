@@ -22,13 +22,16 @@
         <script defer>
             var b;
             var configJsonName = `tune.json`
-            $(document).on(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
+            document.addEventListener(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
             const loadConfig = (config) => {
                 b.saveValue = parseObject(config);
-                $(`#workspace`).html(b.GetHtml());
-                $(`#btnLoad`).val(undefined);
+                let workspace = document.querySelector(`#workspace`);
+                workspace.innerHtml = ``;
+                workspace.append(b);
+                let btnLoad = document.querySelector(`#btnLoad`);
+                btnLoad.value = ``;
             };
-            $(document).ready(function() {
+            document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop();
                 const lastConfig = window.localStorage.getItem(`config`);
                 if (lastConfig) {
@@ -36,19 +39,23 @@
                 } else {
                     b.RegisterVariables();
                 }
-                $(`#workspace`).html(b.GetHtml());
-                b.Attach();
-                $(`#btnSave`).click(function(){
+                let workspace = document.querySelector(`#workspace`);
+                workspace.innerHtml = ``;
+                workspace.append(b);
+                let btnSave = document.querySelector(`#btnSave`);
+                btnSave.addEventListener(`click`, function(){
                     var cfg = b.saveValue;
                     window.localStorage.setItem(`config`, stringifyObject(cfg));
                     downloadObject(cfg, configJsonName);
                 });
-                $(`#btnSaveCompressed`).click(function(){
+                let btnSaveCompressed = document.querySelector(`#btnSaveCompressed`);
+                btnSaveCompressed.addEventListener(`click`, function(){
                     var cfg = b.saveValue;
                     window.localStorage.setItem(`config`, stringifyObject(cfg));
                     downloadCompressedObject(cfg, configJsonName);
                 });
-                $(`#btnLoad`).change(function(evt){
+                let btnLoad = document.querySelector(`#btnLoad`);
+                btnLoad.addEventListener(`click`, function(evt){
                     var test = new FileReader();
 
                     test.onload = function(evt) {
@@ -66,12 +73,14 @@
                     test.readAsText(evt.target.files[0]);
                     configJsonName = evt.target.files[0].name;
                 });
-                $(`#btnSaveBin`).click(function(){
+                let btnSaveBin = document.querySelector(`#btnSaveBin`);
+                btnSaveBin.addEventListener(`click`, function(){
                     downloadBin(b.GetArrayBuffer(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
 
-                $(`#selectTarget`).change(function(evt){
-                    b.Inputs.TargetDevice = $(this).val();
+                let selectTarget = document.querySelector(`#selectTarget`);
+                selectTarget.addEventListener(`change`, function(evt){
+                    b.Inputs.TargetDevice = this.value;
                     pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
                     UpdateOverlay();
                 });
@@ -80,7 +89,7 @@
                     const [key, value] = entry;
                     targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.Name}</option>`;
                 });
-                $(`#selectTarget`).html(targets);
+                selectTarget.innerHTML = targets;
             });
         </script>
         <meta name="viewport" content="width=750, initial-scale=1">

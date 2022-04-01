@@ -247,6 +247,7 @@ class Calculation_LookupTable extends UI.Template {
     static Output = `float`;
     static Inputs = [`float`];
     static Template = `<div data-element="Dialog"></div>`
+    GUID = generateGUID();
 
     get label() {
         return this.Table.zLabel;
@@ -403,6 +404,7 @@ class Calculation_2AxisTable extends UI.Template {
     static Output = `float`;
     static Inputs = [`float`, `float`];
     static Template = `<div data-element="Dialog"></div>`
+    GUID = generateGUID();
 
     get label() {
         return this.Table.zLabel;
@@ -949,6 +951,7 @@ class CalculationOrVariableSelection extends UI.Template {
 customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `div` });
 
 class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
+    GUID = generateGUID();
     get superHidden() {
         return super.hidden;
     }
@@ -973,6 +976,7 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
     set VariableReference(variableReference) {
         if(this._variableReference === variableReference)
             return;
+        delete LiveUpdateEvents[this.GUID];
 
         this._variableReference = variableReference;
 
@@ -981,17 +985,7 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
             measurement = measurement.substring(0, measurement.length - 1);
             this.Measurement = measurement;
         }
-    }
 
-    constructor(prop) {
-        prop ??= {};
-        super(prop);
-        this.superHidden = true;
-        this.DisplayValue.class = `livevalue`;
-    }
-
-    Attach() {
-        super.Attach();
         const thisClass = this
         if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
             VariablesToPoll.push(thisClass.VariableReference)
@@ -1019,8 +1013,12 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
             }
         };
     }
-    Detach() {
-        delete LiveUpdateEvents[this.GUID];
+
+    constructor(prop) {
+        prop ??= {};
+        super(prop);
+        this.superHidden = true;
+        this.DisplayValue.class = `livevalue`;
     }
 }
 customElements.define(`ui-displayliveupdate`, DisplayLiveUpdate, { extends: `div` });

@@ -509,3 +509,33 @@ select .pinconflict{
 .pinoverlay img {
     position: absolute; left: 150px;
 }
+
+.sidebaropenclose::after {
+    content: "☰"
+}
+.input-tab .expand::before {
+    font-family:monospace;
+    content: "►\00a0";
+}
+.input-tab .despand::before {
+    font-family:monospace;
+    content: "▼\00a0";
+}
+.engine-tab::before,
+.fuel-tab::before,
+.ignition-tab::before {
+    font-family:monospace;
+    content: "\00a0\00a0";
+}
+.input-tab::after {
+    content: "Inputs";
+}
+.engine-tab::after {
+    content: "Engine";
+}
+.fuel-tab::after {
+    content: "Fuel";
+}
+.ignition-tab::after {
+    content: "Ignition";
+}

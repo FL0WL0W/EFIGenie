@@ -1,26 +1,24 @@
-<div id="$GUID$-sidebar" class="w3-sidebar" style="display: none;">
+<div class="w3-sidebar" style="display: none;">
     <div class="w3-bar">
         <div class="w3-bar-item w3-padding-16">EFIGenie</div>
-        <button id="$GUID$-sidebar-close" class="w3-button w3-padding-16 w3-right" title="Toggle Sidebar">☰</button> 
+        <div data-element="sidebarClose"></div>
     </div>
     <div class="w3-bar-block">
-        <div id="$GUID$-inputstab" class="w3-bar-item w3-button active"><div class="w3-left monospace expand">▼&nbsp;</div>Inputs</div>
-        <div class="w3-bar-block" id="$GUID$-inputstablist">
-            %inputstablist%
-        </div>
-        <div id="$GUID$-enginetab" class="w3-bar-item w3-button"><div class="w3-left monospace">&nbsp;&nbsp;</div>Engine</div>
-        <div id="$GUID$-fueltab" class="w3-bar-item w3-button"><div class="w3-left monospace">&nbsp;&nbsp;</div>Fuel</div>
-        <div id="$GUID$-ignitiontab" class="w3-bar-item w3-button"><div class="w3-left monospace">&nbsp;&nbsp;</div>Ignition</div>
+        <div data-element="inputsTab"></div>
+        <div data-element="inputsTabList"></div>
+        <div data-element="engineTab"></div>
+        <div data-element="fuelTab"></div>
+        <div data-element="ignitionTab"></div>
     </div>
 </div>
-<div id="$GUID$-container" class="w3-container w3-display-container">
+<div class="w3-container w3-display-container">
     <span>
-        <button id="$GUID$-sidebar-open" class="w3-button w3-padding-16" title="Toggle Sidebar">☰</button> 
-        <span id="$GUID$-title" class="w3-padding-16" style="display:inline-block; margin:3px;">Inputs</span>
+        <div data-element="sidebarOpen"></div>
+        <div data-element="title"></div>
     </span>
     <hr style="margin: 0px 0px 5px 0px;">
-    <div id="$GUID$-inputs" class="$GUID$-content" %inputsstyle%>$Inputs$</div>
-    <div id="$GUID$-engine" class="$GUID$-content" %enginestyle%>$Engine$</div>
-    <div id="$GUID$-fuel" class="$GUID$-content" %fuelstyle%>$Fuel$</div>
-    <div id="$GUID$-ignition" class="$GUID$-content" %ignitionstyle%>$Ignition$</div>
+    <div data-element="Inputs"></div>
+    <div data-element="Engine"></div>
+    <div data-element="Fuel"></div>
+    <div data-element="Ignition"></div>
 </div>

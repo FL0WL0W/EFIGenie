@@ -243,11 +243,6 @@ class ConfigInputs extends UI.Template {
     inputListElement = document.createElement(`div`);
     pinOverlay = pinOverlay;
 
-    Attach() {
-        super.Attach();
-        this.inputListElement.Attach();
-    }
-
     TargetDevice = `STM32F401C`;
     get saveValue() {
         let saveValue = super.saveValue;

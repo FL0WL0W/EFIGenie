@@ -377,16 +377,138 @@ for(var index in STM32TypeAlignment) {
     }
 }
 
-class ConfigTop extends UI.OldTemplate {
+class ConfigTop extends UI.Template {
     static Template = getFileContents(`ConfigGui/Top.html`);
 
+    title = document.createElement(`div`);
+    inputsTabExpend = document.createElement(`span`);
+    inputsTab = document.createElement(`div`);
+    engineTab = document.createElement(`div`);
+    fuelTab = document.createElement(`div`);
+    ignitionTab = document.createElement(`div`);
     constructor(prop){
         super();
+        const thisClass = this;
         this.Inputs = new ConfigInputs();
         this.Engine = new ConfigEngine();
         this.Fuel = new ConfigFuel();
         this.Ignition = new ConfigIgnition();
+        this.sidebarClose = new UI.Button({className: `sidebaropenclose w3-button w3-padding-16 w3-right`});
+        this.sidebarOpen = new UI.Button({className: `sidebaropenclose w3-button w3-padding-16`});
+        this.sidebarOpen.addEventListener(`click`, function() {
+            var sidebarElement = thisClass.firstChild;
+            var containerElement = thisClass.lastChild;
+            sidebarElement.hidden = false;
+            var width = sidebarElement.offsetWidth;
+            var moveamount = 0.005 * width / 0.1;
+            var left = parseFloat(containerElement.style.left);
+            if(isNaN(left))
+                left = 0;
+            sidebarElement.style.left= `${left-width}px`;
+            var intervalId = setInterval(function() {
+                if (left >= width) {
+                    clearInterval(intervalId);
+                } else {
+                    left += moveamount;
+                    containerElement.style.marginRight = containerElement.style.left = `${left}px`;
+                    sidebarElement.style.left = `${left-width}px`;
+                    sidebarElement.style.opacity = left / width;
+                }
+            }, 5);
+            thisClass.sidebarOpen.hidden = true;
+        });
+        this.sidebarClose.addEventListener(`click`, function() {
+            var sidebarElement = thisClass.firstChild;
+            var containerElement = thisClass.lastChild;
+            var width = sidebarElement.offsetWidth;
+            var moveamount = 0.005 * width / 0.1;
+            var left = parseFloat(containerElement.style.left);
+            if(isNaN(left))
+                left = 0;
+            sidebarElement.style.left= `${left-width}px`;
+            var intervalId = setInterval(function() {
+                if (left <= 0) {
+                    clearInterval(intervalId);
+                    sidebarElement.hidden = true;
+                } else {
+                    left -= moveamount;
+                    containerElement.style.marginRight = containerElement.style.left = `${left}px`;
+                    sidebarElement.style.left = `${left-width}px`;
+                    sidebarElement.style.opacity = left / width;
+                }
+            }, 5);
+            thisClass.sidebarOpen.hidden = false;
+        });
+        this.title.class = `w3-padding-16`;
+        this.title.style.display = `inline-block`;
+        this.title.style.margin = `3px`;
+        this.activeTab = `Inputs`;
+        this.inputsTabList = this.Inputs.inputListElement;
+        this.inputsTabList.addEventListener(`click`, function() {
+            thisClass.activeTab = `Inputs`;
+        });
+        this.inputsTabExpend.className = `despand`;
+        this.inputsTabExpend.addEventListener(`click`, function(event) {
+            thisClass.inputsTabList.hidden = !thisClass.inputsTabList.hidden;
+            if(thisClass.inputsTabList.hidden)
+                thisClass.inputsTabExpend.className = `expand`;
+            else
+                thisClass.inputsTabExpend.className = `despand`;
+            event.preventDefault();
+            event.stopPropagation()
+            return false;
+        });
+        this.inputsTab.append(this.inputsTabExpend);
+        this.inputsTab.class = `w3-bar-item w3-button input-tab`;
+        this.inputsTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Inputs`;
+        });
+        this.engineTab.class = `w3-bar-item w3-button engine-tab`;
+        this.engineTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Engine`;
+        });
+        this.fuelTab.class = `w3-bar-item w3-button fuel-tab`;
+        this.fuelTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Fuel`;
+        });
+        this.ignitionTab.class = `w3-bar-item w3-button ignition-tab`;
+        this.ignitionTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Ignition`;
+        });
         this.Setup(prop);
+    }
+
+    get activeTab() {
+        return this.title.textContent;
+    }
+    set activeTab(activeTab) {
+        this.title.textContent = activeTab;
+        this.Inputs.hidden = true;
+        this.Engine.hidden = true;
+        this.Fuel.hidden = true;
+        this.Ignition.hidden = true;
+        this.inputsTab.classList.remove(`active`);
+        this.engineTab.classList.remove(`active`);
+        this.fuelTab.classList.remove(`active`);
+        this.ignitionTab.classList.remove(`active`);
+        switch(activeTab) {
+            case `Inputs`:
+                this.Inputs.hidden = false;
+                this.inputsTab.classList.add(`active`);
+                break;
+            case `Engine`:
+                this.Engine.hidden = false;
+                this.engineTab.classList.add(`active`);
+                break;
+            case `Fuel`:
+                this.Fuel.hidden = false;
+                this.fuelTab.classList.add(`active`);
+                break;
+            case `Ignition`:
+                this.Ignition.hidden = false;
+                this.ignitionTab.classList.add(`active`);
+                break;
+        }
     }
 
     get saveValue() {
@@ -396,120 +518,6 @@ class ConfigTop extends UI.OldTemplate {
     set saveValue(saveValue) {
         super.saveValue = saveValue;
         this.RegisterVariables();
-    }
-
-    Detach() {
-        super.Detach();
-
-        $(document).off(`click.${this.GUID}`);
-    }
-
-    Attach() {
-        super.Attach();
-
-        var thisClass = this;
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){
-            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
-            var containerSelector = $(`#${thisClass.GUID}-container`);
-            var width = sidebarSelector.width();
-            var moveamount = 0.005 * width / 0.1;
-            var left = containerSelector.position().left;
-            sidebarSelector.show();
-            sidebarSelector.css(`left`, `${left-width}px`);
-            var intervalId = setInterval(function() {
-                if (left >= width) {
-                    clearInterval(intervalId);
-                } else {
-                    left += moveamount;
-                    containerSelector.css(`left`, `${left}px`);
-                    containerSelector.css(`margin-right`, `${left}px`);
-                    sidebarSelector.css(`left`, `${left-width}px`);
-                    sidebarSelector.css(`opacity`, left / width);
-                }
-            }, 5);
-            $(`#${thisClass.GUID}-sidebar-open`).hide();
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-close`, function(){
-            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
-            var containerSelector = $(`#${thisClass.GUID}-container`);
-            var width = sidebarSelector.width();
-            var moveamount = 0.005 * width / 0.1;
-            var left = containerSelector.position().left;
-            sidebarSelector.css(`left`, `${left-width}px`);
-            var intervalId = setInterval(function() {
-                if (left <= 0) {
-                    clearInterval(intervalId);
-                    sidebarSelector.hide();
-                } else {
-                    left -= moveamount;
-                    containerSelector.css(`left`, `${left}px`);
-                    containerSelector.css(`margin-right`, `${left}px`);
-                    sidebarSelector.css(`left`, `${left-width}px`);
-                    sidebarSelector.css(`opacity`, left / width);
-                }
-            }, 5);
-            $(`#${thisClass.GUID}-sidebar-open`).show();
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-inputstab, #${this.GUID}-inputstablist`, function(e){
-            if($(e.target).hasClass(`expand`)) {
-                if( $(`#${thisClass.GUID}-inputstablist`).is(`:visible`)) {
-                    $(e.target).html(`►&nbsp;`);
-                    $(`#${thisClass.GUID}-inputstablist`).hide();
-                } else {
-                    $(e.target).html(`▼&nbsp;`);
-                    $(`#${thisClass.GUID}-inputstablist`).show();
-                }
-            } else {
-                $(`.${thisClass.GUID}-content`).hide();
-                $(`#${thisClass.GUID}-inputs`).show();
-                $(`#${thisClass.GUID}-inputstab .w3-right`).show();
-                $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-                $(`#${thisClass.GUID}-inputstab`).addClass(`active`);
-                $(`#${thisClass.GUID}-title`).html(`Inputs`);
-            }
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-enginetab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-engine`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-enginetab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Engine`);
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-fueltab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-fuel`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-fueltab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Fuel`);
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-ignitiontab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-ignition`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-ignitiontab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Ignition`);
-        });
-    }
-
-    GetHtml() {
-        var template = super.GetHtml();
-
-        template = template.replace(/[%]inputstablist[%]/g, this.Inputs.inputListElement.GetHtml());
-
-        template = template.replace(/[%]inputsstyle[%]/g, ``);
-        template = template.replace(/[%]fuelstyle[%]/g, ` style="display: none;"`);
-        template = template.replace(/[%]enginestyle[%]/g, ` style="display: none;"`);
-        template = template.replace(/[%]ignitionstyle[%]/g, ` style="display: none;"`);
-
-        return template;
     }
 
     RegisterVariables() {
@@ -559,6 +567,7 @@ class ConfigTop extends UI.OldTemplate {
         ]};
     }
 }
+customElements.define(`config-top`, ConfigTop, { extends: `div` });
 
 class ConfigFuel extends UI.Template {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
@@ -636,11 +645,6 @@ class ConfigFuel extends UI.Template {
             saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs;
 
         super.saveValue = saveValue;
-    }
-
-    Attach() {
-        super.Attach();
-        UpdateOverlay();
     }
 
     RegisterVariables() {
@@ -768,11 +772,6 @@ class ConfigIgnition extends UI.Template {
         });
         this.Outputs.value = new Array(8);
         this.Setup(prop);
-    }
-
-    Attach() {
-        super.Attach();
-        UpdateOverlay();
     }
 
     RegisterVariables() {

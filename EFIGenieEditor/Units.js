@@ -123,7 +123,7 @@ function PerSecond(units)
 {
     var newUnits = [];
 
-    $.each(units, function(index, value){
+    units.forEach(function(value, index){
         newUnits.push( { Name: value.Name + `/s`, DisplayMultiplier: value.DisplayMultiplier, DisplayOffset: value.DisplayOffset });
     });
 
@@ -134,7 +134,7 @@ function PerMinute(units)
 {
     var newUnits = [];
 
-    $.each(units, function(index, value){
+    units.forEach(function(value, index){
         newUnits.push( { Name: value.Name + `/min`, DisplayMultiplier: value.DisplayMultiplier * 60, DisplayOffset: value.DisplayOffset * 60 });
     });
 
