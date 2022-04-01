@@ -210,24 +210,20 @@ function UpdateOverlay() {
     $(`.gpiooverlay`).html(GenerateOverlay());
 }
 
-//todo, context menu, scroll into view, get rid of GetHtml and GetInputsHtml
+//todo, context menu
 class ConfigInputs extends UI.Template {
     static Template = `<div data-element="Inputs"></div><div data-element="newInputElement"></div>`
+    inputListElement = document.createElement(`div`);
+
+    Attach() {
+        super.Attach();
+        this.inputListElement.Attach();
+    }
 
     GetHtml() {
         let html = super.GetHtml();
         html += `<div class="gpiooverlay">${GenerateOverlay()}</div>`;
         return html;
-    }
-    GetInputsHtml() {
-        var inputlist = ``;
-        for(var i = 0; i < this.Inputs.children.length; i++){
-            inputlist += `<div class="w3-bar-subitem w3-button">${this.Inputs.children[i].Name}</div>`;
-        }
-        if(this.Inputs.children.length === 0){
-            // inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
-        }
-        return `<div>${inputlist}</div>`;
     }
 
     TargetDevice = `STM32F401C`;
@@ -280,6 +276,10 @@ class ConfigInputs extends UI.Template {
         this.Inputs.saveValue = [{}];
         this.newInputElement = new UI.Button({className: `controladd`});
         this.newInputElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
+        this.inputListNewElement = document.createElement(`div`);
+        this.inputListNewElement.class = `w3-bar-subitem w3-button`;
+        this.inputListNewElement.textContent = `+ New`;
+        this.inputListNewElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
         this.Setup(prop);
     }
 
@@ -323,6 +323,34 @@ class ConfigInputs extends UI.Template {
                 down.className = `controlDown`;
                 down.disabled = false;
             }
+        }
+        this.#updateInputListElement();
+    }
+
+    #updateInputListElement() {
+        const thisClass = this;
+        this.inputListElement.innerHTML = ``;
+        while(this.Inputs.children.length < this.inputListElement.children.length) this.inputListElement.removeChild(this.inputListElement.lastChild);
+        for(let i = 0; i < this.Inputs.children.length; i++){
+            let inputElement = this.inputListElement.children[i];
+            if(!inputElement) {
+                inputElement = this.inputListElement.appendChild(document.createElement(`div`));
+                inputElement.class = `w3-bar-subitem w3-button`;
+                inputElement.addEventListener(`click`, function() {
+                    let index = [...thisClass.inputListElement.children].indexOf(this);
+                    thisClass.Inputs.children[index].scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                });
+            }
+            inputElement.textContent = this.Inputs.children[i].Name;
+            inputElement.class = `w3-bar-subitem w3-button`;
+        }
+        if(this.Inputs.children.length === 0){
+            let inputElement = this.inputListElement.appendChild(document.createElement(`div`));
+            inputElement.appendChild(this.inputListNewElement);
         }
     }
 
@@ -372,6 +400,9 @@ class ConfigInputs extends UI.Template {
         Object.defineProperty(input, 'Name', {
             get: function() { return this.lastChild.Name.value; },
             set: function(value) { this.lastChild.Name.value = value; }
+        });
+        input.lastChild.Name.addEventListener(`change`, function() {
+            thisClass.#updateInputListElement();
         });
         return input;
     }

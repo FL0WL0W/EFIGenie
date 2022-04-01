@@ -502,7 +502,7 @@ class ConfigTop extends UI.OldTemplate {
     GetHtml() {
         var template = super.GetHtml();
 
-        template = template.replace(/[%]inputstablist[%]/g, this.Inputs.GetInputsHtml());
+        template = template.replace(/[%]inputstablist[%]/g, this.Inputs.inputListElement.GetHtml());
 
         template = template.replace(/[%]inputsstyle[%]/g, ``);
         template = template.replace(/[%]fuelstyle[%]/g, ` style="display: none;"`);
