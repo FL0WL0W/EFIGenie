@@ -309,10 +309,12 @@ class Calculation_LookupTable extends UI.Template {
     }
 
     get saveValue() {
-        return this.Table.saveValue;
+        return super.saveValue;
     }
     set saveValue(saveValue) {
-        this.Table.saveValue = saveValue;
+        super.saveValue = saveValue;
+        if(!saveValue.Table)
+            this.Table.saveValue = saveValue;
     }
 
     constructor(prop) {
@@ -502,12 +504,14 @@ class Calculation_2AxisTable extends UI.Template {
     }
 
     get saveValue() {
-        return this.Table.saveValue;
+        return super.saveValue;
     }
     set saveValue(saveValue) {
-        this.Table.saveValue = saveValue;
+        super.saveValue = saveValue;
+        if(!saveValue.Table)
+            this.Table.saveValue = saveValue;
     }
-
+    
     constructor(prop) {
         super();
         this.Dialog = new UI.Dialog({
