@@ -315,3 +315,15 @@ Object.defineProperty(HTMLDivElement.prototype, 'hidder', {
         }
     }
 })
+
+async function postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    return response.text(); // parses JSON response into native JavaScript objects
+}

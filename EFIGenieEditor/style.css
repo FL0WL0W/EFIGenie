@@ -60,7 +60,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
 .w3-bar .w3-button{white-space:normal}
 .w3-bar-block div.w3-bar-item{border: 2px solid transparent; width:100%;display:block;padding:8px 16px;text-align:left;white-space:normal;float:none;outline:0}
-.w3-bar-block div.w3-bar-subitem{border: 2px solid transparent; width:100%;display:block;padding:8px 16px 8px 48px;text-align:left;white-space:normal;float:none;outline:0}
+.w3-bar-block div.w3-bar-subitem{border: 2px solid transparent;display:block;padding:8px 16px 8px 48px;text-align:left;white-space:normal;float:none;outline:0}
 .w3-bar-block.w3-center div.w3-bar-item{border: 2px solid transparent; text-align:center}.w3-block{display:block;width:100%}
 .w3-bar-block.w3-center div.w3-bar-subitem{border: 2px solid transparent; text-align:center}.w3-block{display:block;width:100%}
 .w3-responsive{display:block;overflow-x:auto}

@@ -670,7 +670,7 @@ function GetSelections(measurement, output, inputs, configs, configsOnly) {
 }
 
 class CalculationOrVariableSelection extends UI.Template {
-    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="Selection"></div><span style="float: right;" data-element="LiveUpdate"></span><span data-element="CalculationContent"></span>`
+    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="Selection"></div><div data-element="LiveUpdate"></div><span data-element="CalculationContent"></span>`
     CalculationContent = document.createElement(`span`);
     ConfigValues = [];
 
@@ -769,6 +769,7 @@ class CalculationOrVariableSelection extends UI.Template {
             Measurement: prop?.Measurement,
             MeasurementUnitName: prop?.MeasurementUnitName
         });
+        this.LiveUpdate.style.float = `right`;
         this.Selection = new UI.Selection({
             options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
             selectDisabled: false,
@@ -881,6 +882,7 @@ class CalculationOrVariableSelection extends UI.Template {
             else 
                 this.LiveUpdate.VariableReference = undefined;
             this.LiveUpdate.Measurement = this.Measurement;
+            this.LiveUpdate.RegisterVariables();
         }
     }
 
@@ -980,12 +982,14 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
 
         this._variableReference = variableReference;
 
-        if(this._variableReference) {
+        if(variableReference) {
             let measurement = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
             measurement = measurement.substring(0, measurement.length - 1);
             this.Measurement = measurement;
         }
+    }
 
+    RegisterVariables() {
         const thisClass = this
         if(VariablesToPoll.indexOf(thisClass.VariableReference) === -1)
             VariablesToPoll.push(thisClass.VariableReference)

@@ -305,6 +305,9 @@ class ConfigInputs extends UI.Template {
         for(var i = 0; i < this.Inputs.children.length; i++){
             this.Inputs.children[i].RegisterVariables();
         }
+        for(var i = 0; i < this.inputListElement.children.length; i++){
+            this.inputListElement.children[i].RegisterVariables();
+        }
     }
 
     GetObjOperation() {
@@ -352,6 +355,8 @@ class ConfigInputs extends UI.Template {
             let inputElement = this.inputListElement.children[i];
             if(!inputElement) {
                 inputElement = this.inputListElement.appendChild(document.createElement(`div`));
+                inputElement.appendChild(new DisplayLiveUpdate()).style.float = `right`;
+                inputElement.append(document.createElement(`div`));
                 inputElement.class = `w3-bar-subitem w3-button`;
                 inputElement.addEventListener(`click`, function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this);
@@ -361,8 +366,14 @@ class ConfigInputs extends UI.Template {
                         inline: 'center'
                     });
                 });
+                inputElement.RegisterVariables = function() {
+                    let index = [...thisClass.inputListElement.children].indexOf(this);
+                    let input = thisClass.Inputs.children[index];
+                    this.firstChild.VariableReference = input.lastChild.TranslationConfig?.LiveUpdate?.VariableReference;
+                    this.firstChild.RegisterVariables();
+                }
             }
-            inputElement.textContent = this.Inputs.children[i].Name;
+            inputElement.lastChild.textContent = this.Inputs.children[i].Name;
             inputElement.class = `w3-bar-subitem w3-button`;
         }
         if(this.Inputs.children.length === 0){

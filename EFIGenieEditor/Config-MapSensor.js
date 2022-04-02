@@ -13,6 +13,7 @@ class Input_AnalogPolynomial extends UI.Template {
         this.VoltageLiveUpdate = new DisplayLiveUpdate({
             Measurement: Input_Analog.Measurement
         });
+        this.VoltageLiveUpdate.style.float = `right`;
         this.Setup(prop);
         this.style.display = `block`;
     }
@@ -23,6 +24,7 @@ class Input_AnalogPolynomial extends UI.Template {
             `float`
         );
         this.VoltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
+        this.VoltageLiveUpdate.RegisterVariables();
     }
 
     GetObjOperation(outputVariableId) {
