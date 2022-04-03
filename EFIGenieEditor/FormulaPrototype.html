@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
+        <link rel = "stylesheet" type = "text/css" href = "style.css" />
+        <style> 
+            body {background-color: #222629; color: #eee; font-weight:bold;}
+        </style>
+        <script src="JavascriptUI/UIUtils.js"></script>
+        <script type="module">
+            import UIText from "./JavascriptUI/UIText.js";
+            import UINumber from "./JavascriptUI/UINumber.js";
+            import UICheckBox from "./JavascriptUI/UICheckBox.js";
+            import UITemplate from "./JavascriptUI/UITemplate.js"
+            import UISelection from "./JavascriptUI/UISelection.js"
+            import UITable from "./JavascriptUI/UITable.js"
+            import UIGraph3D from "./JavascriptUI/UIGraph3D.js"
+            import UIGraph2D from "./JavascriptUI/UIGraph2D.js"
+            import UIDialog from "./JavascriptUI/UIDialog.js"
+            window.addEventListener(`load`, function() {
+                let baseSelection = document.querySelector(`#baseselection`);
+                let dialog = document.querySelector(`#dialog`);
+                baseSelection.options = [
+                    { Name: `2 Axis Table`, Value: 1 },
+                ];
+                baseSelection.value = 1;
+                let adderSelection = document.querySelector(`#adderselection`);
+                adderSelection.options = [
+                    { Name: `Lookup Table`, Value: 1 },
+                ];
+                adderSelection.value = 1;
+                let MultiplierSelection = document.querySelector(`#multiplierselection`);
+                MultiplierSelection.options = [
+                    { Name: `Lookup Table`, Value: 1 },
+                ];
+                MultiplierSelection.value = 1;
+                dialog.buttonLabel = "Edit Formula";
+                dialog.title = "AFR Formula";
+                dialog.content.append(document.querySelector(`#dialogContent`));
+            });
+        </script>
+    </head>
+    <body>
+        <div>
+            AFR <div is="ui-dialog" style="display: inline-block;" id="dialog"></div><br/>
+            <div class="configContainer">
+                <label>Base:</label><div is="ui-button" style="display: inline-block;">Edit Table</div><br/>
+                <label>Adder:</label><div is="ui-button" style="display: inline-block;">Edit Table</div><br/>
+                <label>Multiplier:</label><div is="ui-button" style="display: inline-block;">Edit Table</div><br/>
+            </div>
+        </div>
+        <div id="dialogContent">
+            Formula:<input class="ui text formula" is="ui-text" value="(Base + Adder) * Multiplier - 1"></input><br/>
+            <label>Base:</label><div is="ui-selection" id="baseselection"></div><br/>
+            <label>Adder:</label><div is="ui-selection" id="adderselection"></div><br/>
+            <label>Multiplier:</label><div is="ui-selection" id="multiplierselection"></div><br/>
+        </div>
+        <br/>
+    </body>
+</html>

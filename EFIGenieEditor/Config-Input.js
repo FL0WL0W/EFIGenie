@@ -106,329 +106,207 @@ PinOuts = {
     }
 };
 
-var PinOut = PinOuts.STM32F103C;
-
-function ParsePinSelectElements(pinSelectElements){
-    var elements = [];
-    if(pinSelectElements) {
-        for(var i=0; i<pinSelectElements.length; i++) {
-            const pinSelectElementSelector = $(pinSelectElements[i]);
-            elements.push({
-                name: GetNameFromPinSelectElement(pinSelectElements[i]),
-                pinselectmode: pinSelectElementSelector.attr(`data-pinselectmode`),
-                pin: parseInt(pinSelectElementSelector.attr(`data-value`))
-            });
-        }
-    }
-    return elements;
-}
-
-function GetNameFromPinSelectChildren(element){
-    const elementSelector = $(element);
-
-    if(elementSelector.hasClass(`pinselectname`)){
-        const name = elementSelector.val();
-        if(!name)
-            return elementSelector.text();
-        return name;
-    }
-
-    const elements = elementSelector.children();
-    for(var i = 0; i < elements?.length; i++) {
-        const name = GetNameFromPinSelectChildren(elements[i]);
-        if(name)
-            return name;
-    }
-}
-
-function GetNameFromPinSelectElement(element){    
-    const name = GetNameFromPinSelectChildren(element);
-    if(name)
-        return name;
-
-    return GetNameFromPinSelectElement($(element).parent());
-}
-
-//The overlay is a bit of a javascript hack, but it works well so I'm not changing it.
-function GenerateOverlay() {
-    var pinSelectElements = ParsePinSelectElements($(`.pinselect`));
-    let scale = 700 / (PinOut.OverlayWidth + 300);
-    var ret = `<div style="width: ${PinOut.OverlayWidth + 300}px; position: relative; transform-origin: top left; transform: scale(${scale}););"><img src="${PinOut.Overlay}" style="position: absolute; left: 150px;"></img><br>`;
-    for(var i = 0; i < PinOut.Pins.length; i++) {
-        var selectCount = 0;
-        var sel = ``;
-        var endsel = ``;
-        for(var s=0; s<pinSelectElements.length; s++) {
-            var selected = false;
-            if(pinSelectElements[s].pin == PinOut.Pins[i].Value) {
-                selectCount++;
-                selected = true;
+class PinOverlay extends HTMLDivElement {
+    get pinSelectElements() {
+        function getNameFromPinSelectChildren(element){
+            if(element.classList.contains(`pinselectname`)){
+                const name = element.value;
+                if(!name)
+                    return element.textContent;
+                return name;
             }
-            if(PinOut.Pins[i].SupportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1) {
-                endsel += `<option value="${pinSelectElements[s].name}"${selected? ` class="incompatible" selected` : ``} disabled>${pinSelectElements[s].name}</option>`;
-            } else {
-                sel += `<option value="${pinSelectElements[s].name}"${selected? ` selected` : ``}>${pinSelectElements[s].name}</option>`;            
+    
+            const elements = element.children;
+            for(var i = 0; i < elements?.length; i++) {
+                const name = getNameFromPinSelectChildren(elements[i]);
+                if(name)
+                    return name;
             }
-                
         }
-        if(selectCount > 1)
-        {
-            sel = sel.replaceAll(`selected`, `class="pinconflict"`);
-            endsel = endsel.replaceAll(`" selected`, ` pinconflict"`);
+        function getNameFromPinSelectElement(element){
+            if(!element)
+                return;
+            const name = getNameFromPinSelectChildren(element);
+            if(name)
+                return name;
+    
+            return getNameFromPinSelectElement(element.parentElement);
         }
-        sel += endsel;
-        sel = `<select class="gpiooverlayselect${selectCount > 1? ` pinconflict` : ``}" data-pin="${PinOut.Pins[i].Value}" style="` +
-            `; height: ${PinOut.OverlayElementHeight}` + 
-            `; top: ${PinOut.Pins[i].OverlayY - PinOut.OverlayElementHeight / 2}`+ 
-            `; left: ${PinOut.Pins[i].Align === `left`? PinOut.Pins[i].OverlayX + 150: PinOut.OverlayWidth - PinOut.Pins[i].OverlayX}px;">` +
-            `<option value="" disabled ${selectCount != 1? `selected` : ``}>select</option>${sel}</select>`;
 
-        ret += sel;
+        let pinSelectElements = [...document.querySelectorAll(`.pinselect`)];
+        var elements = [];
+        if(pinSelectElements) {
+            for(var i=0; i<pinSelectElements.length; i++) {
+                elements.push({
+                    name: getNameFromPinSelectElement(pinSelectElements[i]),
+                    pinselectmode: pinSelectElements[i].getAttribute(`data-pinselectmode`),
+                    pin: pinSelectElements[i].value,
+                    element: pinSelectElements[i]
+                });
+            }
+        }
+        return elements;
     }
-    return `${ret}</div>`;
+
+    #pinOut;
+    get pinOut() {
+        return this.#pinOut;
+    }
+    set pinOut(pinOut) {
+        if(!pinOut)
+            return;
+        this.#pinOut = pinOut;
+        let scale = 750 / (pinOut.OverlayWidth + 300);
+        this.style.width = pinOut.OverlayWidth;
+        this.style.transform = `scale(${scale})`;
+        this.overlayImage.src = pinOut.Overlay;
+        while(pinOut.Pins.length < this.pinElements.children.length) this.pinElements.removeChild(this.pinElements.lastChild);
+        for(let i = 0; i < pinOut.Pins.length; i++) {
+            let pinElement = this.pinElements.children[i];
+            if(!pinElement) {
+                pinElement = this.pinElements.appendChild(new UI.Selection());
+                pinElement.firstChild.style.minWidth = `100px`;
+                pinElement.style.width = `150px`;
+                pinElement.style.position = `absolute`;
+                Object.defineProperty(pinElement, 'pinSelectElements', {
+                    set: function(pinSelectElements) { 
+                        this._pinSelectElements = pinSelectElements;
+                        let options = [];
+                        let selectedOption;
+                        for(let s=0; s<pinSelectElements.length; s++) {
+                            let option = {
+                                Name: pinSelectElements[s].name,
+                                Value: s,
+                                Disabled: this.supportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1
+                            };
+                            if(pinSelectElements[s].pin == this.pin) {
+                                if(selectedOption) {
+                                    option.Class = selectedOption.Class = `pinconflict`;
+                                    selectedOption = `conflict`;
+                                } else {
+                                    selectedOption = option;
+                                }
+                            }
+                            options.push(option);
+                        }
+                        this.options = options;
+                        if(!selectedOption) {
+                            this.value = undefined;
+                        } else if(selectedOption === `conflict`) {
+                            this.classList.add(`pinconflict`)
+                            this.value = undefined;
+                        }
+                        else {
+                            this.classList.remove(`pinconflict`)
+                            this.value = selectedOption.Value;
+                        }
+                    }
+                });
+                pinElement.addEventListener(`change`, function() {
+                    if(this.value !== undefined)
+                        this._pinSelectElements[this.value].element.parentElement.value = this.pin;
+                });
+            }
+            pinElement.pin = pinOut.Pins[i].Value;
+            pinElement.supportedModes = pinOut.Pins[i].SupportedModes;
+            pinElement.style.top = pinOut.Pins[i].OverlayY - pinOut.OverlayElementHeight / 2 + `px`;
+            pinElement.style.left = (pinOut.Pins[i].Align === `left`? pinOut.Pins[i].OverlayX + 150 : pinOut.OverlayWidth - pinOut.Pins[i].OverlayX) + `px`;
+        }
+        this.update();
+    }
+    update() {
+        let pinSelectElements = this.pinSelectElements;
+        [...this.pinElements.children].forEach(element => element.pinSelectElements = pinSelectElements);
+    }
+    pinElements = document.createElement(`div`);
+    overlayImage = document.createElement(`img`);
+    constructor() {
+        super();
+        this.class = `pinoverlay`;
+        this.overlayImage.style.position = `absolute`;
+        this.overlayImage.style.left = `150px`;
+        this.append(this.overlayImage);
+        this.append(this.pinElements);
+    }
 }
+customElements.define('config-pinoverlay', PinOverlay, { extends: `div` });
+
+let pinOverlay = new PinOverlay();
 
 function UpdateOverlay() {
-    $(`.gpiooverlay`).html(GenerateOverlay());
-    $(`.gpiooverlay`).css(`transform`, `scale(${700 / (PinOut.OverlayWidth + 300)})`);
+    pinOverlay.update();
 }
 
-//if any changes are needed in ConfigInputs, refactor to use UITemplate
-class ConfigInputs {
-    static Template = getFileContents(`ConfigGui/Inputs.html`);
-
-    constructor(){
-        this.GUID = generateGUID();
-        this.Inputs = [this.NewInput()];
-    }
+//todo, context menu
+class ConfigInputs extends UI.Template {
+    static Template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="Inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
+    inputListElement = document.createElement(`div`);
+    pinOverlay = pinOverlay;
 
     TargetDevice = `STM32F401C`;
-    Selected = 0;
-    ContextSelect;
-
-    NewInput() {
-        const thisClass = this;
-        return new ConfigInput({
-            OnChange: function() {$(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());}
-        });
-    }
-
-    get SaveValue() {
-        var saveValue = { Inputs: [], TargetDevice: this.TargetDevice };
-
-        for(var i = 0; i < this.Inputs.length; i++){
-            saveValue.Inputs.push(this.Inputs[i].SaveValue);
-        }
-
+    get saveValue() {
+        let saveValue = super.saveValue;
+        saveValue.TargetDevice = this.TargetDevice;
         return saveValue;
     }
 
-    set SaveValue(saveValue) {
-        this.Detach();
-
-        if(saveValue) {
-            if(saveValue.TargetDevice) {
-                this.TargetDevice = saveValue.TargetDevice;
-                PinOut = PinOuts[this.TargetDevice];
-            }
-            else if(!saveValue.Inputs) {
-                saveValue = { Inputs: saveValue };
-            }
-
-            for(var i = 0; i < saveValue.Inputs.length; i++){
-                if(i >= this.Inputs.length)
-                    this.Inputs.push(this.NewInput());
-                this.Inputs[i].SaveValue = saveValue.Inputs[i];
-            }
-            this.Inputs = this.Inputs.slice(0, saveValue.Inputs.length)
+    set saveValue(saveValue) {
+        if(!saveValue)
+            return;
+            
+        if(saveValue.TargetDevice) {
+            this.TargetDevice = saveValue.TargetDevice;
+            pinOverlay.pinOut = PinOuts[this.TargetDevice];
+            delete saveValue.TargetDevice;
         }
 
-        $(`#${this.GUID}`).replaceWith(this.GetHtml());
-        this.Attach();
+        super.saveValue = saveValue;
     }
-
-    Detach() {
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].Detach();
-        }
-
-        $(document).off(`contextmenu.${this.GUID}`);
-        $(document).off(`change.${this.GUID}`);
-        $(document).off(`click.${this.GUID}`);
-    }
-
-    Attach() {
-        this.Detach();
-        var thisClass = this;
-        
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].Attach();
-        }
-
-        $(document).on(`change.${this.GUID}`, `.gpiooverlayselect`, function(){
-            var selected = $(this).val();
-
-            var pinSelectElements = $(`.pinselect`);
-            if(pinSelectElements) {
-                for(var i=0; i<pinSelectElements.length; i++) {
-                    var name = GetNameFromPinSelectElement(pinSelectElements[i]);
-                    if(selected == name)
-                    {
-                        $(pinSelectElements[i]).val($(this).data(`pin`));
-                        $(pinSelectElements[i]).trigger(`change`);
+    constructor(prop) {
+        super();
+        this.Inputs = document.createElement(`div`);
+        const thisClass = this;
+        Object.defineProperty(this.Inputs, 'saveValue', {
+            get: function() { return [...this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        thisClass.#appendInput();
                     }
+                    this.children[i].saveValue = saveValue[i];
                 }
             }
         });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-inputs div`, function(){
-            var selected = parseInt($(this).data(`index`));
-            if(isNaN(selected))
-                return;
-
-            $(`#${thisClass.GUID}-${selected}`)[0].scrollIntoView();
+        Object.defineProperty(this.Inputs, 'value', {
+            get: function() { return [...this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        thisClass.#appendInput();
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
         });
-                
-        $(document).on(`contextmenu.${this.GUID}`, `#${this.GUID}-inputs div`, function(e){
-            var relativeX = (e.pageX - window.scrollX),
-                relativeY = (e.pageY - window.scrollY);
-
-            $(`#${thisClass.GUID}-contextmenu`).show();
-            $(`#${thisClass.GUID}-contextmenu`).css(`left`, `${relativeX}px`);
-            $(`#${thisClass.GUID}-contextmenu`).css(`top` , `${relativeY}px`);
-            thisClass.ContextSelect = $(this).data(`index`);
-            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
-            $(this).addClass(`active`);
-            
-            e.preventDefault();
-        });
-        $(document).on(`click.${this.GUID}`, function(){
-            $(`#${thisClass.GUID}-contextmenu`).hide();
-            $(`#${thisClass.GUID}-inputs div`).removeClass(`active`);
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-add`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-
-            thisClass.Inputs.splice(thisClass.ContextSelect + 1, 0, thisClass.NewInput());
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-delete`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-            
-            thisClass.Inputs.splice(thisClass.ContextSelect, 1);
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-duplicate`, function(){
-            if(isNaN(thisClass.ContextSelect))
-                return;
-            
-            thisClass.Inputs.push(this.NewInput());
-            thisClass.Inputs[thisClass.Inputs.length-1].SaveValue = thisClass.Inputs[contextSelect].SaveValue;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controladd`, function(){
-            var selected = $(this).data('i');
-            
-            thisClass.Inputs.splice(selected + 1, 0, thisClass.NewInput());
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldelete`, function(){
-            var selected = $(this).data('i');
-            
-            thisClass.Inputs.splice(selected, 1);
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controlup`, function(){
-            var selected = $(this).data('i');
-
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected - 1];
-            thisClass.Inputs[selected - 1] = temp;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-        
-        $(document).on(`click.${this.GUID}`, `#${this.GUID} .controldown`, function(){
-            var selected = $(this).data('i');
-
-            var temp = thisClass.Inputs[selected];
-            thisClass.Inputs[selected] = thisClass.Inputs[selected + 1];
-            thisClass.Inputs[selected + 1] = temp;
-            $(`#${thisClass.GUID}-inputs`).replaceWith(thisClass.GetInputsHtml());
-            $(`#${thisClass.GUID}`).replaceWith(thisClass.GetHtml());
-            thisClass.Attach();
-        });
-    }
-
-    GetInputsHtml() {
-
-        var inputlist = ``;
-        for(var i = 0; i < this.Inputs.length; i++){
-            var liveUpdate = this.Inputs[i].TranslationConfig.LiveUpdate;
-            if(!this.Inputs[i].TranslationConfig.Selection.Value)
-                liveUpdate = this.Inputs[i].RawConfig.LiveUpdate;
-            inputlist += `<div data-index="${i}" class="w3-bar-subitem w3-button">${this.Inputs[i].Name.Value}<span style="float: right;">${liveUpdate.GetHtml()}</span></div>`;
-        }
-        if(this.Inputs.length === 0){
-            this.ContextSelect = -1;
-            inputlist = `<div id="${this.GUID}-add" class="w3-bar-subitem w3-button"><span class="monospace">+ </span>New</div>`;
-        }
-        return `<div id="${this.GUID}-inputs">${inputlist}</div>`;
-    }
-
-    GetHtml() {
-        var template = GetClassProperty(this, `Template`);
-
-        template = template.replace(/[$]id[$]/g, this.GUID);
-        
-
-        var configs = ``;
-        for(var i = 0; i < this.Inputs.length; i++)
-        {
-            configs += `<div id="${this.GUID}-${i}" class="inputconfig"><span style="float: right;">`;
-            configs += `<span class="controldelete" data-i="${i}">-</span>`;
-            if(i !== 0)
-                configs += `<span class="controlup" data-i="${i}">↑</span>`;
-            else
-                configs += `<span class="controldummy">&nbsp;</span>`;
-            if(i !== this.Inputs.length - 1)
-                configs += `<span class="controldown" data-i="${i}">↓</span>`;
-            else
-                configs += `<span class="controldummy">&nbsp;</span>`;
-
-            configs += `</span>${this.Inputs[i].GetHtml()}</div><div class="inputSpacer"></div>`;
-        }
-        configs += `<span class="controladd" data-i="${this.Inputs.length-1}">+ New</span>`;
-
-        template = template.replace(/[$]inputconfig[$]/g, configs);
-        template = template.replace(/[$]overlay[$]/g, GenerateOverlay());
-
-        return template;
+        this.Inputs.saveValue = [{}];
+        this.newInputElement = new UI.Button({className: `controladd`});
+        this.newInputElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
+        this.inputListNewElement = document.createElement(`div`);
+        this.inputListNewElement.class = `w3-bar-subitem w3-button`;
+        this.inputListNewElement.textContent = `+ New`;
+        this.inputListNewElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
+        this.Setup(prop);
     }
 
     RegisterVariables() {
         VariableRegister.CurrentTickId = VariableRegister.GenerateVariableId();
-        for(var i = 0; i < this.Inputs.length; i++){
-            this.Inputs[i].RegisterVariables();
+        for(var i = 0; i < this.Inputs.children.length; i++){
+            this.Inputs.children[i].RegisterVariables();
+        }
+        for(var i = 0; i < this.inputListElement.children.length; i++){
+            this.inputListElement.children[i].RegisterVariables();
         }
     }
 
@@ -440,75 +318,209 @@ class ConfigInputs {
                 outputVariables: [`CurrentTickId`]
             }
         ]};
-        for(var i = 0; i < this.Inputs.length; i++){
-            group.value.push(this.Inputs[i].GetObjOperation());
+        for(var i = 0; i < this.Inputs.children.length; i++){
+            group.value.push(this.Inputs.children[i].GetObjOperation());
         }
 
         return group;
     }
-}
 
-class ConfigInput extends UITemplate {
-    static Template = `<div>$Name$</div>
+    #updateInputControls() {
+        for(let i = 0; i < this.Inputs.children.length; i++) {
+            let up = this.Inputs.children[i].firstChild.children[1];
+            let down = this.Inputs.children[i].firstChild.children[2];
+            if(i === 0) {
+                up.className = `controlDummy`;
+                up.disabled = true;
+            } else {
+                up.className = `controlUp`;
+                up.disabled = false;
+            }
+            if(i === this.Inputs.children.length-1) {
+                down.className = `controlDummy`;
+                down.disabled = true;
+            } else {
+                down.className = `controlDown`;
+                down.disabled = false;
+            }
+        }
+        this.#updateInputListElement();
+    }
+
+    #updateInputListElement() {
+        const thisClass = this;
+        this.inputListElement.innerHTML = ``;
+        while(this.Inputs.children.length < this.inputListElement.children.length) this.inputListElement.removeChild(this.inputListElement.lastChild);
+        for(let i = 0; i < this.Inputs.children.length; i++){
+            let inputElement = this.inputListElement.children[i];
+            if(!inputElement) {
+                inputElement = this.inputListElement.appendChild(document.createElement(`div`));
+                inputElement.appendChild(new DisplayLiveUpdate()).style.float = `right`;
+                inputElement.append(document.createElement(`div`));
+                inputElement.class = `w3-bar-subitem w3-button`;
+                inputElement.addEventListener(`click`, function() {
+                    let index = [...thisClass.inputListElement.children].indexOf(this);
+                    thisClass.Inputs.children[index].scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                });
+                inputElement.RegisterVariables = function() {
+                    let index = [...thisClass.inputListElement.children].indexOf(this);
+                    let input = thisClass.Inputs.children[index];
+                    this.firstChild.VariableReference = input.lastChild.TranslationConfig?.LiveUpdate?.VariableReference;
+                    this.firstChild.RegisterVariables();
+                }
+            }
+            inputElement.lastChild.textContent = this.Inputs.children[i].Name;
+            inputElement.class = `w3-bar-subitem w3-button`;
+        }
+        if(this.Inputs.children.length === 0){
+            let inputElement = this.inputListElement.appendChild(document.createElement(`div`));
+            inputElement.appendChild(this.inputListNewElement);
+        }
+    }
+
+    #appendInput() {
+        this.Inputs.append(this.#newInput());
+        this.#updateInputControls();
+    }
+
+    #newInput() {
+        const thisClass = this;
+        let input = document.createElement(`div`);
+        let controlElement = input.appendChild(document.createElement(`span`));
+        controlElement.style.float = `right`;
+        let deleteElement = controlElement.appendChild(document.createElement(`span`));
+        deleteElement.className = `controldelete`;
+        deleteElement.addEventListener(`click`, function() {
+            this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        let upElement = controlElement.appendChild(document.createElement(`span`));
+        upElement.className = `controlup`;
+        upElement.addEventListener(`click`, function() {
+            if(upElement.disabled)
+                return;
+            this.parentElement.parentElement.previousSibling.before(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        let downElement = controlElement.appendChild(document.createElement(`span`));
+        downElement.className = `controldown`;
+        downElement.addEventListener(`click`, function() {
+            if(downElement.disabled)
+                return;
+            this.parentElement.parentElement.nextSibling.after(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        input.append(new ConfigInput());
+        input.RegisterVariables = function() { this.lastChild.RegisterVariables(); };
+        input.GetObjOperation = function() { return this.lastChild.GetObjOperation(); };
+        Object.defineProperty(input, 'saveValue', {
+            get: function() { return this.lastChild.saveValue; },
+            set: function(saveValue) { this.lastChild.saveValue = saveValue; }
+        });
+        Object.defineProperty(input, 'value', {
+            get: function() { return this.lastChild.value; },
+            set: function(value) { this.lastChild.saveValue = value; }
+        });
+        Object.defineProperty(input, 'Name', {
+            get: function() { return this.lastChild.Name.value; },
+            set: function(value) { this.lastChild.Name.value = value; }
+        });
+        input.lastChild.Name.addEventListener(`change`, function() {
+            thisClass.#updateInputListElement();
+        });
+        return input;
+    }
+}
+customElements.define('config-inputs', ConfigInputs, { extends: `div` });
+
+class ConfigInput extends UI.Template {
+    static Template = `<div data-element="Name"></div>
 <div class="configContainer">
-    $TranslationConfig$
-    <hr id="$GUID$-hr" style="$HRDisplay$margin: 2px;"/>
-    <div id="$GUID$-raw">$RawConfigReplacer$</div>
+    <div data-element="TranslationConfig"></div>
+    <div data-element="hr"></div>
+    <div data-element="RawConfig"></div>
 </div>`
 
+    hr = document.createElement(`hr`);
     constructor(prop) {
-        super();
-        const thisClass = this;
-        prop ??= {};
+        super();;
+        prop ??= { };
+        prop.Name ??= `Input`;
+        this.style.display = `block`;
+        const thisClass = this
         const measurementKeys = Object.keys(Measurements)
         var options = [];
         measurementKeys.forEach(function(measurement) {options.push({Name: measurement, Value: measurement})});
         this.RawConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              `Source`,
+            label:              `Source`,
             Inputs:             [],
             ReferenceName:      `Inputs.${prop.Name}`,
-            NoParameterSelection: true
+            noParameterSelection: true
+        });
+        this.RawConfig.addEventListener(`change`, function() {
+            UpdateOverlay();
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.TranslationConfig = new CalculationOrVariableSelection({
             Configs:            InputConfigs,
-            Label:              prop.Name ?? `Input`,
+            label:              prop.Name,
             ConfigsOnly:        true,
             Measurement:        `None`,
             ReferenceName:      `Inputs.${prop.Name}`,
-            NoParameterSelection: true,
-            Template: CalculationOrVariableSelection.Template.replace(`$Label$`, `Input\\$TranslationMeasurement\\$`),
-            OnChange: function() { 
-                const subConfig = thisClass.TranslationConfig.GetSubConfig();
-                if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
-                    $(`#${thisClass.GUID}-hr`).hide();
-                    thisClass.HRDisplay = `display: none; `;
-                    $(`#${thisClass.GUID}-raw`).html(``);
-                    thisClass.RawConfigReplacer = ``
-                } else {
-                    thisClass.RawConfig.Output = subConfig.constructor.Inputs[0];
-                    $(`#${thisClass.GUID}-hr`).show();
-                    thisClass.HRDisplay = ``;
-                    $(`#${thisClass.GUID}-raw`).html(thisClass.RawConfig.GetHtml());
-                    thisClass.RawConfigReplacer = `$RawConfig$`
-                }
+            noParameterSelection: true
+        });
+        this.TranslationConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                thisClass.hr.hidden = true;
+                thisClass.RawConfig.hidden = true;
+                thisClass.RawConfig.Selection.value = undefined;
+            } else {
+                thisClass.hr.hidden = false;
+                thisClass.RawConfig.hidden = false;
+            }
+            UpdateOverlay();
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
+        });
+        this.RawConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+                thisClass.hr.hidden = true;
+                thisClass.RawConfig.hidden = true;
+                thisClass.RawConfig.Selection.value = undefined;
+                UpdateOverlay();
+            } else {
+                thisClass.hr.hidden = false;
+                thisClass.RawConfig.hidden = false;
+                UpdateOverlay();
             }
         });
-        this.TranslationMeasurement = new UISelection({
+        this.TranslationMeasurement = new UI.Selection({
             Value:              `None`,
-            SelectNotVisible:   true,
-            Options:            options,
-            OnChange:           function() { thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value; }
+            selectNotVisible:   true,
+            options:            options,
         });
-        prop.Name = new UIText({
-            Value: prop.Name ?? `Input`,
-            Class: `pinselectname inputName`,
-            OnChange: function() { 
-                thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
-                thisClass.TranslationConfig.Label = thisClass.Name.Value;
-            }
+        this.TranslationMeasurement.addEventListener(`change`, function() {
+            thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.Value;
+        });
+        this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
+        this.Name = new UI.Text({
+            Value: prop.Name,
+            Class: `pinselectname inputName`
         })
-        this.HRDisplay = `display: none; `;
+        this.Name.addEventListener(`change`, function() {
+            thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.Name.Value}`;
+            thisClass.TranslationConfig.label = thisClass.Name.Value;
+        });
+        this.Name.style.display = `block`;
+        this.hr.hidden = true;
+        this.hr.style.margin = `2px`;
+        delete prop.Name;
         this.Setup(prop);
     }
 
@@ -536,40 +548,39 @@ class ConfigInput extends UITemplate {
         ]};
     }
 }
+customElements.define('config-input', ConfigInput, { extends: `div` });
 
-class UIPinSelection extends UISelection {
+class UIPinSelection extends UI.Selection {
     constructor(prop){
         super(prop);
-        this.SelectDisabled = prop.SelectDisabled ?? true;
-        this.SelectValue = prop.SelectValue ?? 0xFFFF;
-        this.Class = !prop.Class? `pinselect` : `${prop.Class} pinselect`;
-        this.Options = this.GenerateOptionList();
-        this.OnChange.push(function() {
+        this.selectDisabled = prop.selectDisabled ?? true;
+        this.selectValue = prop.selectValue ?? 0xFFFF;
+        this.options = this.#generateOptionList();
+        this.addEventListener(`change`, function() {
             UpdateOverlay();
-        })
+        });
+        this.selectedElement.dataset.pinselectmode = this.PinType;
+        this.selectedElement.classList.add(`pinselect`);
     }
-
-    GetHtml() {
-        return `<div data-pinselectmode="${this.PinType}"${super.GetHtml().substring(4)}`;
-    }
-
-    GenerateOptionList() {
+    
+    #generateOptionList() {
         var options = []
         var endOptions = [];
-        for(var i = 0; i < PinOut.Pins.length; i++) {
-            const selected = this.Value === PinOut.Pins[i].Value;
-            if(PinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
+        let pinOut = pinOverlay.pinOut;
+        for(var i = 0; i < pinOut.Pins.length; i++) {
+            const selected = this.Value === pinOut.Pins[i].Value;
+            if(pinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
                 endOptions.push({
-                    Name: PinOut.Pins[i].Name,
-                    Value: PinOut.Pins[i].Value,
+                    Name: pinOut.Pins[i].Name,
+                    Value: pinOut.Pins[i].Value,
                     Selected: selected,
                     Class: selected? `incompatible` : undefined,
                     Disabled: true
                 });
             } else {
                 options.push({
-                    Name: PinOut.Pins[i].Name,
-                    Value: PinOut.Pins[i].Value,
+                    Name: pinOut.Pins[i].Name,
+                    Value: pinOut.Pins[i].Value,
                     Selected: selected
                 });
             }
@@ -579,13 +590,14 @@ class UIPinSelection extends UISelection {
         return options;
     }
 }
+customElements.define('ui-pinselection', UIPinSelection, { extends: `div` });
 
-class Input_Analog extends UITemplate {
+class Input_Analog extends UI.Template {
     static Name = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Voltage`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>`
+    static Template = `<label>Pin:</label><div data-element="Pin"></div>`
 
     constructor(prop){
         super();
@@ -593,6 +605,7 @@ class Input_Analog extends UITemplate {
             Value: 0xFFFF,
             PinType: `analog`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -611,13 +624,14 @@ class Input_Analog extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_Analog);
+customElements.define(`input-analog`, Input_Analog, { extends: `div` });
 
-class Input_Digital extends UITemplate {
+class Input_Digital extends UI.Template {
     static Name = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
-    static Measurement = ``;
-    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>`
+    static Measurement = `Bool`;
+    static Template = `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted`
 
     constructor(prop){
         super();
@@ -625,7 +639,8 @@ class Input_Digital extends UITemplate {
             Value: 0xFFFF,
             PinType: `digital`
         });
-        this.Inverted = new UICheckbox();
+        this.Inverted = new UI.CheckBox();
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -645,14 +660,15 @@ class Input_Digital extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_Digital);
+customElements.define(`input-digital`, Input_Digital, { extends: `div` });
 
-class Input_DigitalRecord extends UITemplate {
+class Input_DigitalRecord extends UI.Template {
     static Name = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
     static Measurement = `Record`;
-    static Template =   `<div><label>Pin:</label>$Pin$$Inverted$Inverted</div>` +
-                        `<div><label for="$Length.GUID$">Length:</label>$Length$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted` +
+                        `<br/><label>Length:</label><div data-element="Length"></div>`
 
     constructor(prop){
         super();
@@ -660,13 +676,14 @@ class Input_DigitalRecord extends UITemplate {
             Value: 0xFFFF,
             PinType: `digitalinterrupt`
         });
-        this.Inverted = new UICheckbox();
-        this.Length = new UINumber ({
+        this.Inverted = new UI.CheckBox();
+        this.Length = new UI.Number ({
             Value: 2,
-            Step: 1,
-            Min: 1,
-            Max: 1000
+            step: 1,
+            min: 1,
+            max: 1000
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -687,14 +704,15 @@ class Input_DigitalRecord extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_DigitalRecord);
+customElements.define(`input-digitalrecord`, Input_DigitalRecord, { extends: `div` });
 
-class Input_DutyCycle extends UITemplate {
+class Input_DutyCycle extends UI.Template {
     static Name = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Percentage`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -702,13 +720,14 @@ class Input_DutyCycle extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -728,14 +747,15 @@ class Input_DutyCycle extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_DutyCycle);
+customElements.define(`input-dutycycle`, Input_DutyCycle, { extends: `div` });
 
-class Input_Frequency extends UITemplate {
+class Input_Frequency extends UI.Template {
     static Name = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Frequency`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -743,13 +763,14 @@ class Input_Frequency extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -769,14 +790,15 @@ class Input_Frequency extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_Frequency);
+customElements.define(`input-frequency`, Input_Frequency, { extends: `div` });
 
-class Input_PulseWidth extends UITemplate {
+class Input_PulseWidth extends UI.Template {
     static Name = `Pulse Width Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Time`;
-    static Template =   `<div><label>Pin:</label>$Pin$</div>` +
-                        `<div><label for="$MinFrequency.GUID$">Minimum Frequency:</label>$MinFrequency$</div>`;
+    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
 
     constructor(prop){
         super();
@@ -784,13 +806,14 @@ class Input_PulseWidth extends UITemplate {
             Value: 0xFFFF,
             PinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
+        this.MinFrequency = new UI.NumberWithMeasurement({
             Value: 1000,
-            Step: 1,
-            Min: 0,
-            Max: 65535,
+            step: 1,
+            min: 0,
+            max: 65535,
             Measurement: `Frequency`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -810,3 +833,4 @@ class Input_PulseWidth extends UITemplate {
     }
 }
 RawInputConfigs.push(Input_PulseWidth);
+customElements.define(`input-pulsewidth`, Input_PulseWidth, { extends: `div` });

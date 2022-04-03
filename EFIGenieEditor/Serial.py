@@ -7,6 +7,7 @@ import struct
 import http.server
 import argparse
 import base64
+import json
 from sys import version as python_version
 from cgi import parse_header, parse_multipart
 
@@ -75,9 +76,10 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         if(self.path == "/GetVariable") :
-            postvars = self.parse_POST()
-            variables = postvars[b'Variables[]']
-            offsets = postvars[b'Offsets[]']
+            body = self.rfile.read(int(self.headers['content-length']))
+            postvars = json.loads(body)
+            variables = postvars['Variables']
+            offsets = postvars['Offsets']
             # sendBytes = struct.pack("<IB", varID, offset)
             sendBytes = bytearray([])
             for i in range(len(variables)):

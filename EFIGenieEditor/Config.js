@@ -377,145 +377,152 @@ for(var index in STM32TypeAlignment) {
     }
 }
 
-class ConfigTop extends UITemplate {
+class ConfigTop extends UI.Template {
     static Template = getFileContents(`ConfigGui/Top.html`);
 
+    title = document.createElement(`div`);
+    inputsTabExpend = document.createElement(`span`);
+    inputsTab = document.createElement(`div`);
+    engineTab = document.createElement(`div`);
+    fuelTab = document.createElement(`div`);
+    ignitionTab = document.createElement(`div`);
     constructor(prop){
         super();
+        const thisClass = this;
         this.Inputs = new ConfigInputs();
         this.Engine = new ConfigEngine();
         this.Fuel = new ConfigFuel();
         this.Ignition = new ConfigIgnition();
-        this.Setup(prop);
-    }
-
-    get SaveValue() {
-        return super.SaveValue;
-    }
-
-    set SaveValue(saveValue) {
-        super.SaveValue = saveValue;
-        this.RegisterVariables();
-    }
-
-    Detach() {
-        super.Detach();
-        DetachPasteOptions();
-
-        $(document).off(`click.${this.GUID}`);
-    }
-
-    Attach() {
-        super.Attach();
-        AttachPasteOptions();
-
-        var thisClass = this;
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-open`, function(){
-            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
-            var containerSelector = $(`#${thisClass.GUID}-container`);
-            var width = sidebarSelector.width();
+        this.sidebarClose = new UI.Button({className: `sidebaropenclose w3-button w3-padding-16 w3-right`});
+        this.sidebarOpen = new UI.Button({className: `sidebaropenclose w3-button w3-padding-16`});
+        this.sidebarOpen.addEventListener(`click`, function() {
+            var sidebarElement = thisClass.firstChild;
+            var containerElement = thisClass.lastChild;
+            sidebarElement.hidden = false;
+            var width = sidebarElement.offsetWidth;
             var moveamount = 0.005 * width / 0.1;
-            var left = containerSelector.position().left;
-            sidebarSelector.show();
-            sidebarSelector.css(`left`, `${left-width}px`);
+            var left = parseFloat(containerElement.style.left);
+            if(isNaN(left))
+                left = 0;
+            sidebarElement.style.left= `${left-width}px`;
             var intervalId = setInterval(function() {
                 if (left >= width) {
                     clearInterval(intervalId);
                 } else {
                     left += moveamount;
-                    containerSelector.css(`left`, `${left}px`);
-                    containerSelector.css(`margin-right`, `${left}px`);
-                    sidebarSelector.css(`left`, `${left-width}px`);
-                    sidebarSelector.css(`opacity`, left / width);
+                    containerElement.style.marginRight = containerElement.style.left = `${left}px`;
+                    sidebarElement.style.left = `${left-width}px`;
+                    sidebarElement.style.opacity = left / width;
                 }
             }, 5);
-            $(`#${thisClass.GUID}-sidebar-open`).hide();
+            thisClass.sidebarOpen.hidden = true;
         });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-sidebar-close`, function(){
-            var sidebarSelector = $(`#${thisClass.GUID}-sidebar`);
-            var containerSelector = $(`#${thisClass.GUID}-container`);
-            var width = sidebarSelector.width();
+        this.sidebarClose.addEventListener(`click`, function() {
+            var sidebarElement = thisClass.firstChild;
+            var containerElement = thisClass.lastChild;
+            var width = sidebarElement.offsetWidth;
             var moveamount = 0.005 * width / 0.1;
-            var left = containerSelector.position().left;
-            sidebarSelector.css(`left`, `${left-width}px`);
+            var left = parseFloat(containerElement.style.left);
+            if(isNaN(left))
+                left = 0;
+            sidebarElement.style.left= `${left-width}px`;
             var intervalId = setInterval(function() {
                 if (left <= 0) {
                     clearInterval(intervalId);
-                    sidebarSelector.hide();
+                    sidebarElement.hidden = true;
                 } else {
                     left -= moveamount;
-                    containerSelector.css(`left`, `${left}px`);
-                    containerSelector.css(`margin-right`, `${left}px`);
-                    sidebarSelector.css(`left`, `${left-width}px`);
-                    sidebarSelector.css(`opacity`, left / width);
+                    containerElement.style.marginRight = containerElement.style.left = `${left}px`;
+                    sidebarElement.style.left = `${left-width}px`;
+                    sidebarElement.style.opacity = left / width;
                 }
             }, 5);
-            $(`#${thisClass.GUID}-sidebar-open`).show();
+            thisClass.sidebarOpen.hidden = false;
         });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-inputstab, #${this.GUID}-inputstablist`, function(e){
-            if($(e.target).hasClass(`expand`)) {
-                if( $(`#${thisClass.GUID}-inputstablist`).is(`:visible`)) {
-                    $(e.target).html(`►&nbsp;`);
-                    $(`#${thisClass.GUID}-inputstablist`).hide();
-                } else {
-                    $(e.target).html(`▼&nbsp;`);
-                    $(`#${thisClass.GUID}-inputstablist`).show();
-                }
-            } else {
-                $(`.${thisClass.GUID}-content`).hide();
-                $(`#${thisClass.GUID}-inputs`).show();
-                $(`#${thisClass.GUID}-inputstab .w3-right`).show();
-                $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-                $(`#${thisClass.GUID}-inputstab`).addClass(`active`);
-                $(`#${thisClass.GUID}-title`).html(`Inputs`);
-            }
+        this.title.class = `w3-padding-16`;
+        this.title.style.display = `inline-block`;
+        this.title.style.margin = `3px`;
+        this.activeTab = `Inputs`;
+        this.inputsTabList = this.Inputs.inputListElement;
+        this.inputsTabList.addEventListener(`click`, function() {
+            thisClass.activeTab = `Inputs`;
         });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-enginetab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-engine`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-enginetab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Engine`);
+        this.inputsTabExpend.className = `despand`;
+        this.inputsTabExpend.addEventListener(`click`, function(event) {
+            thisClass.inputsTabList.hidden = !thisClass.inputsTabList.hidden;
+            if(thisClass.inputsTabList.hidden)
+                thisClass.inputsTabExpend.className = `expand`;
+            else
+                thisClass.inputsTabExpend.className = `despand`;
+            event.preventDefault();
+            event.stopPropagation()
+            return false;
         });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-fueltab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-fuel`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-fueltab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Fuel`);
+        this.inputsTab.append(this.inputsTabExpend);
+        this.inputsTab.class = `w3-bar-item w3-button input-tab`;
+        this.inputsTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Inputs`;
         });
-
-        $(document).on(`click.${this.GUID}`, `#${this.GUID}-ignitiontab`, function(){
-            $(`.${thisClass.GUID}-content`).hide();
-            $(`#${thisClass.GUID}-ignition`).show();
-            $(`#${thisClass.GUID}-inputstab .w3-right`).hide();
-            $(`#${thisClass.GUID}-sidebar .w3-bar-item`).removeClass(`active`);
-            $(`#${thisClass.GUID}-ignitiontab`).addClass(`active`);
-            $(`#${thisClass.GUID}-title`).html(`Ignition`);
+        this.engineTab.class = `w3-bar-item w3-button engine-tab`;
+        this.engineTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Engine`;
         });
+        this.fuelTab.class = `w3-bar-item w3-button fuel-tab`;
+        this.fuelTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Fuel`;
+        });
+        this.ignitionTab.class = `w3-bar-item w3-button ignition-tab`;
+        this.ignitionTab.addEventListener(`click`, function() {
+            thisClass.activeTab = `Ignition`;
+        });
+        this.Setup(prop);
     }
 
-    GetHtml() {
-        var template = super.GetHtml();
+    get activeTab() {
+        return this.title.textContent;
+    }
+    set activeTab(activeTab) {
+        this.title.textContent = activeTab;
+        this.Inputs.hidden = true;
+        this.Engine.hidden = true;
+        this.Fuel.hidden = true;
+        this.Ignition.hidden = true;
+        this.inputsTab.classList.remove(`active`);
+        this.engineTab.classList.remove(`active`);
+        this.fuelTab.classList.remove(`active`);
+        this.ignitionTab.classList.remove(`active`);
+        switch(activeTab) {
+            case `Inputs`:
+                this.Inputs.hidden = false;
+                this.inputsTab.classList.add(`active`);
+                break;
+            case `Engine`:
+                this.Engine.hidden = false;
+                this.engineTab.classList.add(`active`);
+                break;
+            case `Fuel`:
+                this.Fuel.hidden = false;
+                this.fuelTab.classList.add(`active`);
+                break;
+            case `Ignition`:
+                this.Ignition.hidden = false;
+                this.ignitionTab.classList.add(`active`);
+                break;
+        }
+    }
 
-        template = template.replace(/[%]inputstablist[%]/g, this.Inputs.GetInputsHtml());
+    get saveValue() {
+        return super.saveValue;
+    }
 
-        template = template.replace(/[%]inputsstyle[%]/g, ``);
-        template = template.replace(/[%]fuelstyle[%]/g, ` style="display: none;"`);
-        template = template.replace(/[%]enginestyle[%]/g, ` style="display: none;"`);
-        template = template.replace(/[%]ignitionstyle[%]/g, ` style="display: none;"`);
-
-        return template;
+    set saveValue(saveValue) {
+        super.saveValue = saveValue;
+        this.RegisterVariables();
     }
 
     RegisterVariables() {
         VariableRegister.Clear();
+        LiveUpdateEvents = [];
         this.Inputs.RegisterVariables();
         this.Engine.RegisterVariables();
         this.Fuel.RegisterVariables();
@@ -560,76 +567,84 @@ class ConfigTop extends UITemplate {
         ]};
     }
 }
+customElements.define(`config-top`, ConfigTop, { extends: `div` });
 
-class ConfigFuel extends UITemplate {
+class ConfigFuel extends UI.Template {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
         super();
         this.AFRConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            AFRConfigs,
-            Label:              `Air Fuel Ratio`,
+            label:              `Air Fuel Ratio`,
             Measurement:        `Ratio`,
             ReferenceName:      `FuelParameters.Air Fuel Ratio`
         });
         this.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorEnableConfigs,
-            Label:              `Injector Enable`,
+            label:              `Injector Enable`,
             Measurement:        `Bool`,
             ReferenceName:      `FuelParameters.Injector Enable`
         });
         this.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            InjectorPulseWidthConfigs,
-            Label:              `Injector Pulse Width`,
+            label:              `Injector Pulse Width`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Pulse Width`,
             MeasurementUnitName:`ms`
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector End Position(BTDC)`,
+            label:              `Injector End Position(BTDC)`,
             Measurement:        `Angle`,
             ReferenceName:      `FuelParameters.Injector End Position`
         });
-        this.Outputs = [];
-        for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
-                Configs:        BooleanOutputConfigs,
-                Label:          `Injector ${i+1}`,
-                Measurement:    `No Measurement`
-            });
-        }
+        this.Outputs = document.createElement(`div`)
+        Object.defineProperty(this.Outputs, 'saveValue', {
+            get: function() { return [...this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].saveValue = saveValue[i];
+                }
+            }
+        });
+        Object.defineProperty(this.Outputs, 'value', {
+            get: function() { return [...this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
+        });
+        this.Outputs.value = new Array(8);
         this.Setup(prop);
     }
 
-    get SaveValue() {
-        var saveValue = super.SaveValue;
-        saveValue.Outputs = [];
-        for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].SaveValue;
-        };
-        return saveValue;
+    get saveValue() {
+        return super.saveValue;
     }
 
-    set SaveValue(saveValue) {
-        this.Detach();
+    set saveValue(saveValue) {
         if(saveValue?.ConfigInjectorOutputs)
             saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs;
-        if(saveValue?.Outputs)
-        {
-            this.Outputs = [];
-            for(var i = 0; i < saveValue.Outputs.length; i++){
-                if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput({
-                        Configs:        BooleanOutputConfigs,
-                        Label:          `Injector ${i+1}`,
-                        Measurement:    `No Measurement`
-                    });
-                this.Outputs[i].SaveValue = saveValue.Outputs[i];
-            }
-        }
 
-        super.SaveValue = saveValue;
+        super.saveValue = saveValue;
     }
 
     RegisterVariables() {
@@ -689,76 +704,74 @@ class ConfigFuel extends UITemplate {
         return group;
     }
 }
+customElements.define(`config-fuel`, ConfigFuel, { extends: `div` });
 
-class ConfigIgnition extends UITemplate {
+class ConfigIgnition extends UI.Template {
     static Template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
         super();
         this.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionEnableConfigs,
-            Label:              `Ignition Enable`,
+            label:              `Ignition Enable`,
             Measurement:        `Bool`,
             ReferenceName:      `IgnitionParameters.Ignition Enable`
         });
         this.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionAdvanceConfigs,
-            Label:              `Ignition Advance`,
+            label:              `Ignition Advance`,
             Measurement:        `Angle`,
             ReferenceName:      `IgnitionParameters.Ignition Advance`
         });
         this.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              `Ignition Dwell`,
+            label:              `Ignition Dwell`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell`,
             MeasurementUnitName:`ms`
         });
         this.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            IgnitionDwellConfigs,
-            Label:              `Ignition Dwell Deviation`,
+            label:              `Ignition Dwell Deviation`,
             Measurement:        `Time`,
             ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
             MeasurementUnitName:`ms`
         });
-        this.Outputs = [];
-        for(var i = 0; i < 8; i++){
-            this.Outputs[i] = new ConfigTDCOutput({
-                Configs:            BooleanOutputConfigs,
-                Label:              `Ignition ${i+1}`,
-                Measurement:        `No Measurement`
-            });
-        }
-        this.Setup(prop);
-    }
-
-    get SaveValue() {
-        var saveValue = super.SaveValue;
-        saveValue.Outputs = [];
-        for(var i = 0; i < this.Outputs.length; i++){
-            saveValue.Outputs[i] = this.Outputs[i].SaveValue;
-        };
-        return saveValue;
-    }
-
-    set SaveValue(saveValue) {
-        this.Detach();
-
-        if(saveValue?.Outputs)
-        {
-            this.Outputs = [];
-            for(var i = 0; i < saveValue.Outputs.length; i++){
-                if(!this.Outputs[i])
-                    this.Outputs[i] = new ConfigTDCOutput({
-                        Configs:            BooleanOutputConfigs,
-                        Label:              `Ignition ${i+1}`,
-                        Measurement:        `No Measurement`
-                    });
-                this.Outputs[i].SaveValue = saveValue.Outputs[i];
+        this.Outputs = document.createElement(`div`)
+        Object.defineProperty(this.Outputs, 'saveValue', {
+            get: function() { return [...this.children].map(e => e.saveValue); },
+            set: function(saveValue) { 
+                while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < saveValue.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:        BooleanOutputConfigs,
+                            label:          `Injector ${i+1}`,
+                            Measurement:    `No Measurement`
+                        }));
+                    }
+                    this.children[i].saveValue = saveValue[i];
+                }
             }
-        }
-
-        super.SaveValue = saveValue;
+        });
+        Object.defineProperty(this.Outputs, 'value', {
+            get: function() { return [...this.children].map(e => e.value); },
+            set: function(value) { 
+                while(this.children.length > value.length) this.removeChild(this.lastChild);
+                for(let i = 0; i < value.length; i++){
+                    if(!this.children[i]) {
+                        this.append(new ConfigTDCOutput({
+                            Configs:            BooleanOutputConfigs,
+                            label:              `Ignition ${i+1}`,
+                            Measurement:        `No Measurement`
+                        }));
+                    }
+                    this.children[i].value = value[i];
+                }
+            }
+        });
+        this.Outputs.value = new Array(8);
+        this.Setup(prop);
     }
 
     RegisterVariables() {
@@ -811,45 +824,46 @@ class ConfigIgnition extends UITemplate {
         return group;
     }
 }
+customElements.define(`config-ignition`, ConfigIgnition, { extends: `div` });
 
-class ConfigEngine extends UITemplate {
+class ConfigEngine extends UI.Template {
     static Template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
         super();
         this.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
-            Label:              `Crank Position`,
+            label:              `Crank Position`,
             Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Crank Position`
         });
         this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            undefined,
-            Label:              `Cam Position`,
+            label:              `Cam Position`,
             Measurement:        `Reluctor`,
             ReferenceName:      `EngineParameters.Cam Position`
         });
         this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirmassConfigs,
-            Label:              `Cylinder Air Mass`,
+            label:              `Cylinder Air Mass`,
             Measurement:        `Mass`,
             ReferenceName:      `EngineParameters.Cylinder Air Mass`
         });
         this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            CylinderAirTemperatureConfigs,
-            Label:              `Cylinder Air Temperature`,
+            label:              `Cylinder Air Temperature`,
             Measurement:        `Temperature`,
             ReferenceName:      `EngineParameters.Cylinder Air Temperature`
         });
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            ManifoldAbsolutePressureConfigs,
-            Label:              `Manifold Absolute Pressure`,
+            label:              `Manifold Absolute Pressure`,
             Measurement:        `Pressure`,
             ReferenceName:      `EngineParameters.Manifold Absolute Pressure`
         });
         this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            VolumetricEfficiencyConfigs,
-            Label:              `Volumetric Efficiency`,
+            label:              `Volumetric Efficiency`,
             Measurement:        `Percentage`,
             ReferenceName:      `EngineParameters.Volumetric Efficiency`
         });
@@ -870,16 +884,16 @@ class ConfigEngine extends UITemplate {
             requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
         }
 
-        this.ManifoldAbsolutePressureConfigOrVariableSelection.Hidden = requirements?.indexOf(`Manifold Absolute Pressure`) < 0;
-        if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.Hidden) 
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) < 0;
+        if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden) 
             this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables();
         
-        this.CylinderAirTemperatureConfigOrVariableSelection.Hidden = requirements?.indexOf(`Cylinder Air Temperature`) < 0;
-        if(!this.CylinderAirTemperatureConfigOrVariableSelection.Hidden) 
+        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) < 0;
+        if(!this.CylinderAirTemperatureConfigOrVariableSelection.hidden) 
             this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables();
         
-        this.VolumetricEfficiencyConfigOrVariableSelection.Hidden = requirements?.indexOf(`Volumetric Efficiency`) < 0;
-        if(!this.VolumetricEfficiencyConfigOrVariableSelection.Hidden) 
+        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) < 0;
+        if(!this.VolumetricEfficiencyConfigOrVariableSelection.hidden) 
             this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables();
 
         this.CylinderAirmassConfigOrVariableSelection.RegisterVariables();
@@ -891,9 +905,9 @@ class ConfigEngine extends UITemplate {
         var veRequired  = false;
         if(!this.CylinderAirmassConfigOrVariableSelection.Selection?.reference) {
             var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
-            mapRequired = requirements && requirements.indexOf(`Manifold Absolute Pressure`) > -1;
-            catRequired = requirements && requirements.indexOf(`Cylinder Air Temperature`) > -1
-            veRequired = requirements && requirements.indexOf(`Volumetric Efficiency`) > -1;
+            mapRequired = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
+            catRequired = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1
+            veRequired  = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) > -1;
         }
 
         var group = { type: `Group`, value: [
@@ -945,38 +959,45 @@ class ConfigEngine extends UITemplate {
         return group;
     }
 }
+customElements.define(`config-engine`, ConfigEngine, { extends: `div` });
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
-    static Template = CalculationOrVariableSelection.Template.replace(`>$Label$:`, ` for="$TDC.GUID$"><div style="display: inline-block;" class="pinselectname">$Label$</div>:&nbsp;&nbsp;&nbsp;TDC:$TDC$°`)
-
     constructor(prop) {
         super();
-        this.TDC = new UINumber({
+        let span = document.createElement(`span`);
+        this.TDC = new UI.Number({
             Value:  0,
-            Step:   1,
-            Min:    0,
-            Max:    720
-        })
+            step:   1,
+            min:    0,
+            max:    720
+        });
+        span.append(`\xa0\xa0\xa0\xa0\xa0\xa0TDC:`);
+        span.append(this.TDC)
+        span.append(`°`);
         this.Setup(prop);
+        this.labelElement.parentElement.append(span);
+        this.labelElement.class = `pinselectname`;
     }
 }
+customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `div` });
 
-class CylinderAirmass_SpeedDensity extends UITemplate {
+class CylinderAirmass_SpeedDensity extends UI.Template {
     static Name = `Speed Density`;
     static Measurement = `Mass`;
     static Output = `float`;
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`];
-    static Template = `<div><label for="$CylinderVolume.GUID$">Cylinder Volume:</label>$CylinderVolume$</div>`;
+    static Template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`;
 
     constructor(prop) {
         super();
-        this.CylinderVolume = new UINumberWithMeasurement({
+        this.CylinderVolume = new UI.NumberWithMeasurement({
             Value:              0.66594,
-            Step:               0.001,
-            Min:                0.001,
+            step:               0.001,
+            min:                0.001,
             Measurement:        `Volume`,
             MeasurementUnitName:`mL`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -997,36 +1018,38 @@ class CylinderAirmass_SpeedDensity extends UITemplate {
     }
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
+customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensity, { extends: `div` });
 
-class InjectorPulseWidth_DeadTime extends UITemplate {
+class InjectorPulseWidth_DeadTime extends UI.Template {
     static Name = `Dead Time`;
     static Output = `float`;
     static Measurement = `Time`;
-    static Template =   `<div>$FlowRateConfigOrVariableSelection$</div>` +
-                        `<div>$DeadTimeConfigOrVariableSelection$</div>` +
-                        `<div><label for="$MinInjectorFuelMass.GUID$">Min Injector Fuel Mass:</label>$MinInjectorFuelMass$</div>`;
+    static Template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
+                        `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
+                        `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 
     constructor(prop) {
         super();
         this.FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector Flow Rate`,
+            label:              `Injector Flow Rate`,
             Measurement:        `MassFlow`,
             ReferenceName:      `FuelParameters.Injector Flow Rate`
         });
         this.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             Configs:            GenericConfigs,
-            Label:              `Injector Dead Time`,
+            label:              `Injector Dead Time`,
             Measurement:        `Time`,
             ReferenceName:      `FuelParameters.Injector Dead Time`,
             MeasurementUnitName:`ms`
         });
-        this.MinInjectorFuelMass = new UINumberWithMeasurement({
+        this.MinInjectorFuelMass = new UI.NumberWithMeasurement({
             Value:              0.005,
-            Step:               0.001,
+            step:               0.001,
             Measurement:        `Mass`,
             MeasurementUnitName:`g`
         });
+        this.style.display = `block`;
         this.Setup(prop);
     }
 
@@ -1071,3 +1094,4 @@ class InjectorPulseWidth_DeadTime extends UITemplate {
     }
 }
 InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime);
+customElements.define(`injectorpulsewidth-deadtime`, InjectorPulseWidth_DeadTime, { extends: `div` });

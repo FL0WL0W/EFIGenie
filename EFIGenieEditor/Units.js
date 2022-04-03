@@ -41,6 +41,28 @@ var Measurements = {
     Bool: Bool
 }
 
+var MeasurementType = {
+    None: `float`,
+    Reluctor: `ReluctorResult`,
+    Voltage: `float`,
+    Temperature: `float`,
+    Pressure: `float`,
+    Mass: `float`,
+    MassFlow: `float`,
+    Volume: `float`,
+    Speed: `float`,
+    Time: `float`,
+    Frequency: `float`,
+    Percentage: `float`,
+    PercentageAcceleration: `float`,
+    Lambda: `float`,
+    Angle: `float`,
+    AngularSpeed: `float`,
+    Ratio: `float`,
+    Resistance: `float`,
+    Bool: `bool`
+}
+
 function GetMeasurementDisplay(measurement, index) {
     var measurementString;
     if(typeof measurement === `string`) {
@@ -101,7 +123,7 @@ function PerSecond(units)
 {
     var newUnits = [];
 
-    $.each(units, function(index, value){
+    units.forEach(function(value, index){
         newUnits.push( { Name: value.Name + `/s`, DisplayMultiplier: value.DisplayMultiplier, DisplayOffset: value.DisplayOffset });
     });
 
@@ -112,7 +134,7 @@ function PerMinute(units)
 {
     var newUnits = [];
 
-    $.each(units, function(index, value){
+    units.forEach(function(value, index){
         newUnits.push( { Name: value.Name + `/min`, DisplayMultiplier: value.DisplayMultiplier * 60, DisplayOffset: value.DisplayOffset * 60 });
     });
 

@@ -13,6 +13,6 @@
 [submodule "libs/ReluctorOperations"]
 	path = libs/ReluctorOperations
 	url = https://github.com/FL0WL0W/ReluctorOperations
-[submodule "EFIGenieEditor/JavascriptTable"]
-	path = EFIGenieEditor/JavascriptTable
-	url = https://github.com/FL0WL0W/JavascriptTable
+[submodule "EFIGenieEditor/JavascriptUI"]
+	path = EFIGenieEditor/JavascriptUI
+	url = https://github.com/FL0WL0W/JavascriptUI

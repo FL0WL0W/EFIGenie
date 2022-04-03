@@ -1,5 +1,4 @@
 /* W3.CSS 4.15 December 2020 by Jan Egil and Borge Refsnes */
-html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
 /* Extract from normalize.css by Nicolas Gallagher and Jonathan Neal git.io/normalize */
 html{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}
 article,aside,details,figcaption,figure,footer,header,main,menu,nav,section{display:block}summary{display:list-item}
@@ -11,11 +10,6 @@ b,strong{font-weight:bolder}dfn{font-style:italic}mark{background:#ff0;color:#00
 small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
 sub{bottom:-0.25em}sup{top:-0.5em}figure{margin:1em 40px}img{border-style:none}
 code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}hr{box-sizing:content-box;height:0;overflow:visible}
-button,input,select,textarea,optgroup{font:inherit;margin:0}optgroup{font-weight:bold}
-button,input{overflow:visible}button,select{text-transform:none}
-button,[type=button],[type=reset],[type=submit]{-webkit-appearance:button}
-button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border-style:none;padding:0}
-button:-moz-focusring,[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring{outline:1px dotted ButtonText}
 fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:.35em .625em .75em}
 legend{color:inherit;display:table;max-width:100%;padding:0;white-space:normal}textarea{overflow:auto}
 [type=checkbox],[type=radio]{padding:0}
@@ -66,7 +60,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
 .w3-bar .w3-button{white-space:normal}
 .w3-bar-block div.w3-bar-item{border: 2px solid transparent; width:100%;display:block;padding:8px 16px;text-align:left;white-space:normal;float:none;outline:0}
-.w3-bar-block div.w3-bar-subitem{border: 2px solid transparent; width:100%;display:block;padding:8px 16px 8px 48px;text-align:left;white-space:normal;float:none;outline:0}
+.w3-bar-block div.w3-bar-subitem{border: 2px solid transparent;display:block;padding:8px 16px 8px 48px;text-align:left;white-space:normal;float:none;outline:0}
 .w3-bar-block.w3-center div.w3-bar-item{border: 2px solid transparent; text-align:center}.w3-block{display:block;width:100%}
 .w3-bar-block.w3-center div.w3-bar-subitem{border: 2px solid transparent; text-align:center}.w3-block{display:block;width:100%}
 .w3-responsive{display:block;overflow-x:auto}
@@ -262,6 +256,21 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-radius: 6px;
     background-color: #666;
 }
+.controladd::after {
+    content: "+ New";
+}
+.controldelete::after {
+    content: "-";
+}
+.controlup::after {
+    content: "↑";
+}
+.controldown::after {
+    content: "↓";
+}
+.controldummy::after {
+    content: "\00a0";
+}
 .subOperationSelection {
     width: 110px;
 }
@@ -275,9 +284,10 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-width: 1px;
     border-color: #666;
     padding: 2.5px;
-    margin: 2.5px;
+    margin: -3.5px;
+    margin-bottom: 2.5px;
     display: inline-block;
-    min-width: 700px;
+    min-width: 750px;
 }
 .mathContainer {
     vertical-align:top; 
@@ -292,7 +302,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputSpacer {
     height: 25px;
 }
-.inputName {
+.ui.text.inputName {
     border: 0;
     outline: 0;
     background: transparent;
@@ -312,78 +322,16 @@ label.w3-button {
     border-radius: 6px;
     margin: 1px;
 }
-input {
+.button {
     font: bold 16px Arial;
+    text-decoration: none;
     background-color: #505962;
+    color: #dfdfdf;
     border-radius: 6px;
     border: 2px solid #1A1A20;
-    color: #dfdfdf;
-    margin: 1px;
-    padding: 1px 2px;
+    cursor: pointer;
 }
-input:hover {
-    background-color: #666;
-    border-color: #3590d0;
-}
-input[type="checkbox"] {
-    font: bold 16px Arial;
-    margin: 5px;
-    border-radius: 6px;
-    border-color: #666;
-}
-input[type="checkbox"]:hover {
-    background-color: #666;
-    border-color: #3590d0;
-}
-input[type="text"] {
-    width: 200px;
-}
-input[type="number"] {
-    font: bold 16px Arial;
-    background-color: #505962;
-    border-radius: 6px;
-    border: 2px solid #1A1A20;
-    color: #dfdfdf;
-    width: 100px;
-}
-input[type="number"]:hover {
-    background-color: #666;
-    border-color: #3590d0;
-}
-.select .selectgroup {
-    border-top: 1px solid #505962;
-    background-color: #3590d0;
-}
-.select p {
-    white-space: normal;
-    inline-size: 200px;
-    padding: 0 0 0 2em;
-    text-indent: -1.2em;
-    margin: 0;
-    border-top: 1px solid #505962;
-    border-bottom: 1px solid transparent;
-}
-.select p.disabled {
-    color: #888;
-    background-color: #666; 
-}
-.select p:hover:not(.disabled) {
-    background-color: #666; 
-    border-color: #3590d0;
-}
-.select {
-    font: bold 16px Arial;
-    min-width: 200px;
-    cursor: default;
-}
-.select .context-menu {
-    border: 1px solid #505962;
-    min-width: 200px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-select,
-.select {
+select {
     font: bold 16px Arial;
     text-decoration: none;
     background-color: #505962;
@@ -394,18 +342,8 @@ select,
     padding: 1px 2px;
     display: inline-block;
 }
-.button {
-    font: bold 16px Arial;
-    text-decoration: none;
-    background-color: #505962;
-    color: #dfdfdf;
-    border-radius: 6px;
-    border: 2px solid #1A1A20;
-    cursor: pointer;
-}
-select:hover,
-.button:hover,
-.select:hover {
+.button:hovver,
+select:hover {
     background-color: #666;
     border-color: #3590d0;
 }
@@ -445,7 +383,12 @@ select .pinconflict{
     cursor: default;
     position: absolute;
     background: #222629;
-    border: 1px solid black;
+    border: 1px solid #505962;
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: normal;
+    inline-size: 200px;
     z-index: 10;
 }
 
@@ -558,4 +501,50 @@ select .pinconflict{
     background-color: #505962;
     outline: 1px solid #1A1A20;
     border-radius: 0.4em;
+}
+
+.pinoverlay {
+    position: relative; 
+    transform-origin: top left;
+}
+.pinoverlay img {
+    position: absolute; left: 150px;
+}
+
+.sidebaropenclose::after {
+    content: "☰"
+}
+.input-tab .expand::before {
+    font-family:monospace;
+    content: "►\00a0";
+}
+.input-tab .despand::before {
+    font-family:monospace;
+    content: "▼\00a0";
+}
+.engine-tab::before,
+.fuel-tab::before,
+.ignition-tab::before {
+    font-family:monospace;
+    content: "\00a0\00a0";
+}
+.input-tab::after {
+    content: "Inputs";
+}
+.engine-tab::after {
+    content: "Engine";
+}
+.fuel-tab::after {
+    content: "Fuel";
+}
+.ignition-tab::after {
+    content: "Ignition";
+}
+.ui.text.formula {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-radius: 0px;
+    border-bottom: solid #3590d0;
+    width: 405px;
 }

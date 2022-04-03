@@ -116,10 +116,6 @@ ArrayBuffer.prototype.equals = function(buf)
     return true;
 }
 
-jQuery.expr[`:`].parents = function(a,i,m){
-    return jQuery(a).parents(m[3]).length < 1;
-};
-
 function getFileContents(url)
 {
     var contents
@@ -215,12 +211,7 @@ function IsBrowserSupported() {
 }
 
 function GetClassProperty(cl, prop) {
-    if(cl === undefined)
-        return undefined;
-    if(cl[prop] !== undefined)
-        return cl[prop];
-    else
-        return cl.constructor[prop];
+    return cl?.[prop] ?? cl?.constructor?.[prop];
 }
 
 // Helper to return a value's internal object [[Class]]
@@ -308,4 +299,31 @@ function objectTester(a, b) {
     }
   
     return true;
-  }
+}
+
+Object.defineProperty(HTMLDivElement.prototype, 'hidder', {
+    enumerable: true,
+    get: function() {
+        return this.style.display === `none`;
+    },
+    set: function(hidden) {
+        if(hidden) {
+            this.style.display = `none`;
+        } else if(this.style.display === `none`) {
+            this.style.display = this._previousDisplayValue ?? `default`;
+            delete this._previousDisplayValue;
+        }
+    }
+})
+
+async function postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    return response.text(); // parses JSON response into native JavaScript objects
+}
