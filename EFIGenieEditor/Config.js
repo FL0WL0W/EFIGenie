@@ -617,7 +617,7 @@ class ConfigFuel extends UI.Template {
             }
         });
         Object.defineProperty(this.Outputs, 'value', {
-            get: function() { return [...ythis.children].map(e => e.value); },
+            get: function() { return [...this.children].map(e => e.value); },
             set: function(value) { 
                 while(this.children.length > value.length) this.removeChild(this.lastChild);
                 for(let i = 0; i < value.length; i++){

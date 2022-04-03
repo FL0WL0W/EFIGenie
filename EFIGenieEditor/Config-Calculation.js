@@ -859,6 +859,77 @@ class CalculationOrVariableSelection extends UI.Template {
         super.saveValue = saveValue;
     }
 
+    get value() {
+        let value = super.value ?? {};
+
+        if (this.ConfigValues) {
+            if(CalculationOrVariableSelection.SaveOnlyActive) {
+                var subConfig = this.GetSubConfig();
+                if(subConfig?.value !== undefined) {
+                    var configValue = subConfig.value;
+                    if(typeof configValue !== `object`)
+                        configValue = { Value: configValue };
+                    configValue.ClassName = subConfig.constructor.name;
+                    value.Values = [ configValue ];
+                }
+            } else {
+                value.Values = [];
+                for (var i = 0; i < this.ConfigValues.length; i++) {
+                    var configValue = this.ConfigValues[i].value;
+                    if(typeof configValue !== `object`)
+                        configValue = { Value: configValue };
+                    configValue.ClassName = this.ConfigValues[i].constructor.name
+                    value.Values.push(configValue);
+                }
+            } 
+        }
+
+        return value;
+    }
+
+    set value(value) {
+        value ??= {};
+
+        if(value.Values === undefined)
+        value.Values = [];
+        
+        for (var i = 0; i < value.Values.length; i++) {
+            var found = false;
+            for (var t = 0; t < this.ConfigValues.length; t++) {
+                if (value.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
+                    this.ConfigValues[t].value = value.Values[i];
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && this.Configs) {
+                var configGroups = this.Configs;
+                if(!this.Configs[0].Group && !this.Configs[0].Configs)
+                    configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+        
+                for(var c = 0; c < configGroups.length; c++) {
+                    const configs = configGroups[c].Configs;
+                    for (var t = 0; t < configs.length; t++) {
+                        if (value.Values[i].ClassName !== configs[t].name)
+                            continue;
+                        this.ConfigValues.push(new configs[t]({
+                            noParameterSelection: this.noParameterSelection,
+                            label: this.label,
+                            xLabel: this.xLabel,
+                            yLabel: this.yLabel,
+                            ReferenceName: this.ReferenceName,
+                            value: value.Values[i],
+                            Measurement: this._measurement,
+                            MeasurementUnitName: this.MeasurementUnitName
+                        }));
+                    }
+                }
+            }
+        }
+
+        super.value = value;
+    }
+
     RegisterVariables() {
         this.Selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
         const selection = this.Selection.Value;
@@ -951,6 +1022,131 @@ class CalculationOrVariableSelection extends UI.Template {
     }
 }
 customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `div` });
+
+class Calculation_Formula extends UI.Template {
+    static Name = `Formula`;
+    static Output = `float`;
+    static Inputs = [];
+    static Template = `Formula:<div data-element="formula"></div></br><div class="configcontainer"></div>`;
+
+    #operations = [];
+    get operations() {
+        return this.#operations;
+    }
+    set operations(operations) {
+        this.#operations = operations;
+        const thisClass = this;
+        this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0).sort(function(a,b) { return thisClass.formula.value.indexOf(a) - thisClass.formula.value.indexOf(b); });
+    }
+
+    #parameters = [];
+    get parameters() {
+        return this.#parameters;
+    }
+    set parameters(parameters) {
+        this.#parameters = parameters;
+    }
+
+    constructor(prop) {
+        super();
+        const thisClass = this;
+        this.style.display = `block`;
+        this.formula = new UI.Text({
+            class: `formula`
+        });
+        this.addEventListener(`change`, function() {
+            const operations = Calculation_Formula.ParseFormula(thisClass.formula.value); 
+            if(!Array.isArray(operations))
+                return; //show something to user
+            thisClass.operations = operations;
+        });
+        this.Setup(prop)
+    }
+    GetObjOperation(outputVariableId) {
+    }
+    static ParseFormula(formula, operators = [`*`,`/`,`+`,`-`]) {
+        formula = formula.replaceAll(` `, ``); 
+        let operations = [];
+        let tempIndex = 0;
+
+        //do parenthesis
+        let parenthesisFormulas = formula.split(`)`)
+        if(parenthesisFormulas.length !== formula.split(`(`).length)
+            return `Parenthesis start and end not matching`
+
+        while((parenthesisFormulas = formula.split(`)`)).length > 1) {
+            tempIndex++;
+            let tempFormula = parenthesisFormulas[0].split(`(`).pop();
+            operations.push({
+                resultInto: `$temp${tempIndex}`,
+                parameters: [tempFormula]
+            })
+            formula = formula.replace(`(${tempFormula})`, `$temp${tempIndex}`);
+        }
+        operations.push({
+            resultInto: `return`,
+            parameters: [formula]
+        })
+
+        //do operators
+        function splitOnOperators(s) {
+            for(let operatorIndex in operators) {
+                let operator = operators[operatorIndex];
+                s = s.split(operator).join(`,`);
+            }
+            return s.split(`,`);
+        }
+
+        for(let operatorIndex in operators) {
+            let operator = operators[operatorIndex];
+            let operationIndex;
+            while((operationIndex = operations.findIndex(f => f.parameters.find(p => p.indexOf(operator) > -1))) > -1) {
+                let formula = operations[operationIndex];
+                let parameterIndex = formula.parameters.findIndex(p => p.indexOf(operator) > -1);
+                let parameter = formula.parameters[parameterIndex];
+                let firstParameter = splitOnOperators(parameter.split(operator)[0]).pop();
+                let secondParameter = splitOnOperators(parameter.split(operator)[1])[0];
+                if(formula.parameters.length > 1 || splitOnOperators(formula.parameters[0].replace(`${firstParameter}${operator}${secondParameter}`, `temp`)).length > 1) {
+                    tempIndex++;
+                    formula.parameters[parameterIndex] = parameter.replace(`${firstParameter}${operator}${secondParameter}`, `$temp${tempIndex}`);
+                    operations.splice(operationIndex, 0, {
+                        operator,
+                        resultInto: `$temp${tempIndex}`,
+                        parameters: [firstParameter, secondParameter]
+                    });
+                } else {
+                    operations[operationIndex].operator = operator;
+                    operations[operationIndex].parameters = [firstParameter, secondParameter];
+                }
+            }
+        }
+
+        //consolidate temp variables
+        tempIndex = 0;
+        for(let operationIndex in operations) {
+            operationIndex = parseInt(operationIndex);
+            let formula = operations[operationIndex];
+            if(formula.resultInto.indexOf(`$temp`) !== 0)
+                continue;
+            let nextFormulaParameterIndex;
+            if  (operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).length < 2 && 
+                (nextFormulaParameterIndex = operations[operationIndex+1]?.parameters?.findIndex(p => p === formula.resultInto)) > -1) {
+                    operations[operationIndex+1].parameters[nextFormulaParameterIndex] = formula.resultInto = `temp`;
+            } else {
+                tempIndex++;
+                operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).forEach(function(f) { for(let parameterIndex in f.parameters) {
+                    if(f.parameters[parameterIndex] === formula.resultInto) 
+                        f.parameters[parameterIndex] = `temp${tempIndex}`;
+                } })
+                formula.resultInto = `temp${tempIndex}`;
+            }
+        }
+
+        return operations;
+    }
+}
+customElements.define(`calculation-formula`, Calculation_Formula, { extends: `div` })
+// GenericConfigs.push(Calculation_Formula);
 
 class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
     GUID = generateGUID();

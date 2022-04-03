@@ -284,7 +284,8 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-width: 1px;
     border-color: #666;
     padding: 2.5px;
-    margin: 2.5px;
+    margin: -3.5px;
+    margin-bottom: 2.5px;
     display: inline-block;
     min-width: 750px;
 }
@@ -538,4 +539,12 @@ select .pinconflict{
 }
 .ignition-tab::after {
     content: "Ignition";
+}
+.ui.text.formula {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-radius: 0px;
+    border-bottom: solid #3590d0;
+    width: 405px;
 }
