@@ -1029,7 +1029,7 @@ class Calculation_Formula extends UI.Template {
 
     editFormula = new UI.Dialog({ buttonLabel: `Edit Formula` });
     formulaDialogTemplate = new UI.Template({ 
-        Template: `<div data-element="formula"></div><div data-element="parameterElements"></div>`, 
+        Template: `<div style="display: flex; width: 100%"><div style="margin-right: 2em; width: fit-content">Formula:</div><div data-element="formula"></div></div><div data-element="parameterElements"></div>`, 
         parameterElements: document.createElement(`div`),
         formula: new UI.Text({ class: `formula` })
     });
@@ -1041,7 +1041,7 @@ class Calculation_Formula extends UI.Template {
     set operations(operations) {
         this.#operations = operations;
         const thisClass = this;
-        this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0).sort(function(a,b) { return thisClass.formulaDialogTemplate.formula.value.indexOf(a) - thisClass.formulaDialogTemplate.formula.value.indexOf(b); });
+        this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0 && isNaN(parseFloat(p))).sort(function(a,b) { return thisClass.formulaDialogTemplate.formula.value.indexOf(a) - thisClass.formulaDialogTemplate.formula.value.indexOf(b); });
     }
 
     parameterValues = {};
@@ -1058,6 +1058,7 @@ class Calculation_Formula extends UI.Template {
                     label: parameters[i],
                     Configs: GenericConfigs,
                     output: `float`,
+                    ReferenceName:  `${this.ReferenceName}_${parameters[i]}`,
                     Measurement: this.Measurement
                 });
             }
@@ -1084,6 +1085,16 @@ class Calculation_Formula extends UI.Template {
             }
             configParameter.name = parameters[i];
             configParameter.lastChild.replaceChildren(parameterValue.LiveUpdate, parameterValue.CalculationContent);
+            if(parameterValue.CalculationContent.innerHTML === ``)
+                configParameter.hidden = true;
+            else
+                configParameter.hidden = false;
+            parameterValue.Selection.addEventListener(`change`, function() {
+                if(parameterValue.CalculationContent.innerHTML === ``)
+                    configParameter.hidden = true;
+                else
+                    configParameter.hidden = false;
+            });
         }
     }
 
@@ -1130,7 +1141,43 @@ class Calculation_Formula extends UI.Template {
         this.parameterElements.class = `configContainer`;
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.parameters.forEach(function(parameter) { this.parameterValues[parameter].RegisterVariables(); })
+        if (this.ReferenceName) {
+            const thisReference = this.GetVariableReference();
+            const type = GetClassProperty(this, `Output`);
+            VariableRegister.RegisterVariable(thisReference, GetClassProperty(this, `Output`));
+            const variable = VariableRegister.GetVariableByReference(thisReference)
+            if(type === `float` || type === `bool`){
+                this.LiveUpdate.VariableReference = thisReference;
+                this.LiveUpdate.Measurement = this.Measurement;
+            }
+            else 
+                this.LiveUpdate.VariableReference = undefined;
+            this.LiveUpdate.RegisterVariables();
+        }
+    }
+
+    GetVariableReference() {
+        return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
+    }
+
     GetObjOperation(outputVariableId) {
+        var group  = { 
+            type: `Group`, 
+            value: []
+        };
+        outputVariableId ??= this.ReferenceName;
+        
+        this.parameters.forEach(function(parameter) { this.parameterValues[parameter].RegisterVariables(); })
+        const operations = this.operations;
+        for(let operationIndex in operations) {
+            let operation = operations[operationIndex];
+            let parameterValues = operation.parameter.map(p => p.indexOf(`temp`) === 0? p : `${outputVariableId}_${p}`);
+            
+        }
+        
     }
     static ParseFormula(formula, operators = [`*`,`/`,`+`,`-`]) {
         formula = formula.replaceAll(` `, ``); 

@@ -546,10 +546,6 @@ select .pinconflict{
     content: "Ignition";
 }
 .ui.text.formula {
-    border: 0;
-    outline: 0;
-    background: transparent;
-    border-radius: 0px;
-    border-bottom: solid #3590d0;
     width: 100%;
+    flex-grow: 1;
 }
