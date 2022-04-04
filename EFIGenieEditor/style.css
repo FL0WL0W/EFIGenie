@@ -284,10 +284,15 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-width: 1px;
     border-color: #666;
     padding: 2.5px;
-    margin: -3.5px;
+    margin: 0px;
     margin-bottom: 2.5px;
-    display: inline-block;
     min-width: 750px;
+    width: fit-content;
+    box-sizing: border-box;
+}
+.configContainer .configContainer {
+    min-width: auto;
+    width: 100%
 }
 .mathContainer {
     vertical-align:top; 
@@ -546,5 +551,5 @@ select .pinconflict{
     background: transparent;
     border-radius: 0px;
     border-bottom: solid #3590d0;
-    width: 405px;
+    width: 100%;
 }

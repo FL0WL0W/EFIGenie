@@ -39,10 +39,10 @@ class Calculation_Static extends UI.NumberWithMeasurement {
     }
 }
 GenericConfigs.push(Calculation_Static);
-customElements.define(`calculation-static`, Calculation_Static, { extends: `div` });
+customElements.define(`calculation-static`, Calculation_Static, { extends: `span` });
 
 //this still needs some complicated unit work. this is ok for now
-class Calculation_Polynomial extends HTMLDivElement {
+class Calculation_Polynomial extends HTMLSpanElement {
     static Name = `Polynomial`;
     static Output = `float`;
     static Inputs = [`float`];
@@ -215,7 +215,7 @@ class Calculation_Polynomial extends HTMLDivElement {
     }
 }
 GenericConfigs.push(Calculation_Polynomial);
-customElements.define('ui-polynomial', Calculation_Polynomial, { extends: 'div' });
+customElements.define('ui-polynomial', Calculation_Polynomial, { extends: `span` });
 
 function TableGetType(tableValue) {
     var min = 18446744073709551615;
@@ -397,7 +397,7 @@ class Calculation_LookupTable extends UI.Template {
     }
 }
 GenericConfigs.push(Calculation_LookupTable);
-customElements.define(`calculation-lookuptable`, Calculation_LookupTable, { extends: `div` });
+customElements.define(`calculation-lookuptable`, Calculation_LookupTable, { extends: `span` });
 
 class Calculation_2AxisTable extends UI.Template {
     static Name = `2 Axis Table`;
@@ -598,7 +598,7 @@ class Calculation_2AxisTable extends UI.Template {
     }
 }
 GenericConfigs.push(Calculation_2AxisTable);
-customElements.define(`calculation-2axistable`, Calculation_2AxisTable, { extends: `div` });
+customElements.define(`calculation-2axistable`, Calculation_2AxisTable, { extends: `span` });
 
 function GetSelections(measurement, output, inputs, configs, configsOnly) {
     var selections = [];
@@ -777,10 +777,7 @@ class CalculationOrVariableSelection extends UI.Template {
         });
         this.Selection.addEventListener(`change`, function() {
             const subConfig = thisClass.GetSubConfig();
-            if(!subConfig)
-                thisClass.CalculationContent.innerHTML = ``;
-            else
-                thisClass.CalculationContent.replaceChildren(subConfig);
+            thisClass.CalculationContent.replaceChildren(subConfig ?? ``);
             thisClass.LiveUpdate.Measurement = thisClass.Measurement;
         });
         this.style.display = `block`;
@@ -948,11 +945,12 @@ class CalculationOrVariableSelection extends UI.Template {
                 VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${this.Measurement? `(${this.Measurement})` : ``}`);
             }
             const variable = VariableRegister.GetVariableByReference(thisReference)
-            if(variable?.Type === `float` || variable?.Type === `bool`)
+            if(variable?.Type === `float` || variable?.Type === `bool`){
                 this.LiveUpdate.VariableReference = thisReference;
+                this.LiveUpdate.Measurement = this.Measurement;
+            }
             else 
                 this.LiveUpdate.VariableReference = undefined;
-            this.LiveUpdate.Measurement = this.Measurement;
             this.LiveUpdate.RegisterVariables();
         }
     }
@@ -1021,14 +1019,21 @@ class CalculationOrVariableSelection extends UI.Template {
             return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
     }
 }
-customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `div` });
+customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `span` });
 
 class Calculation_Formula extends UI.Template {
     static Name = `Formula`;
     static Output = `float`;
     static Inputs = [];
-    static Template = `Formula:<div data-element="formula"></div></br><div class="configcontainer"></div>`;
+    static Template = `<div data-element="editFormula"></div><div data-element="parameterElements"></div>`;
 
+    editFormula = new UI.Dialog({ buttonLabel: `Edit Formula` });
+    formulaDialogTemplate = new UI.Template({ 
+        Template: `<div data-element="formula"></div><div data-element="parameterElements"></div>`, 
+        parameterElements: document.createElement(`div`),
+        formula: new UI.Text({ class: `formula` })
+    });
+    parameterElements = document.createElement(`div`);
     #operations = [];
     get operations() {
         return this.#operations;
@@ -1036,30 +1041,93 @@ class Calculation_Formula extends UI.Template {
     set operations(operations) {
         this.#operations = operations;
         const thisClass = this;
-        this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0).sort(function(a,b) { return thisClass.formula.value.indexOf(a) - thisClass.formula.value.indexOf(b); });
+        this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0).sort(function(a,b) { return thisClass.formulaDialogTemplate.formula.value.indexOf(a) - thisClass.formulaDialogTemplate.formula.value.indexOf(b); });
     }
 
-    #parameters = [];
+    parameterValues = {};
     get parameters() {
-        return this.#parameters;
+        return [...this.parameterElements.children].map(e => e.name);
     }
     set parameters(parameters) {
-        this.#parameters = parameters;
+        while(parameters.length < this.parameterElements.children.length) { this.parameterElements.removeChild(this.parameterElements.lastChild); }
+        while(parameters.length < this.formulaDialogTemplate.parameterElements.children.length) { this.formulaDialogTemplate.parameterElements.removeChild(this.formulaDialogTemplate.parameterElements.lastChild); }
+        for(let i = 0; i < parameters.length; i++) { 
+            let parameterValue = this.parameterValues[parameters[i]];
+            if(!parameterValue) {
+                parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
+                    label: parameters[i],
+                    Configs: GenericConfigs,
+                    output: `float`,
+                    Measurement: this.Measurement
+                });
+            }
+            let formulaParameter = this.formulaDialogTemplate.parameterElements.children[i];
+            if(!formulaParameter) {
+                formulaParameter = this.formulaDialogTemplate.parameterElements.appendChild(document.createElement(`div`)); 
+            }
+            formulaParameter.replaceChildren(parameterValue);
+            let configParameter = this.parameterElements.children[i];
+            if(!configParameter) {
+                configParameter = this.parameterElements.appendChild(document.createElement(`div`)); 
+                let label = configParameter.appendChild(document.createElement(`label`));
+                label.append(document.createElement(`span`));
+                Object.defineProperty(configParameter, `name`, {
+                    get: function() {
+                        return this.firstChild.firstChild.innerText;
+                    },
+                    set: function(name) {
+                        this.firstChild.firstChild.innerText = name;
+                    }
+                });
+                label.append(`:`);
+                configParameter.append(document.createElement(`span`));
+            }
+            configParameter.name = parameters[i];
+            configParameter.lastChild.replaceChildren(parameterValue.LiveUpdate, parameterValue.CalculationContent);
+        }
+    }
+
+    get label() {
+        return this.editFormula.title.substring(0, this.editFormula.title.length - 8)
+    }
+    set label(label){
+        this.editFormula.title = label + ` Formula`;
+    }
+
+    _measurement = undefined;
+    get Measurement() {
+        if(this._measurement)
+            return this._measurement;
+    }
+    set Measurement(measurement) {
+        if(!measurement || this._measurement === measurement)
+            return;
+
+        this._measurement = measurement;
+        for(let parameterValueIndex in this.parameterValues) {
+            let parameterValue = this.parameterValues;
+            if(!parameterValue)
+                continue;
+            
+            parameterValue.Measurement = measurement;
+        }
     }
 
     constructor(prop) {
         super();
         const thisClass = this;
-        this.style.display = `block`;
-        this.formula = new UI.Text({
-            class: `formula`
-        });
-        this.addEventListener(`change`, function() {
-            const operations = Calculation_Formula.ParseFormula(thisClass.formula.value); 
-            if(!Array.isArray(operations))
+        this.editFormula.content.append(this.formulaDialogTemplate);
+        this.editFormula.content.style.minHeight = `200px`;
+        this.formulaDialogTemplate.parameterElements.class = `configContainer`;
+        this.formulaDialogTemplate.formula.addEventListener(`change`, function() {
+            const operations = Calculation_Formula.ParseFormula(thisClass.formulaDialogTemplate.formula.value); 
+            if(!Array.isArray(operations)) {
                 return; //show something to user
+            }
             thisClass.operations = operations;
         });
+        this.formulaDialogTemplate.parameterElements.style.display = `block`;
+        this.parameterElements.class = `configContainer`;
         this.Setup(prop)
     }
     GetObjOperation(outputVariableId) {
@@ -1145,8 +1213,8 @@ class Calculation_Formula extends UI.Template {
         return operations;
     }
 }
-customElements.define(`calculation-formula`, Calculation_Formula, { extends: `div` })
-// GenericConfigs.push(Calculation_Formula);
+customElements.define(`calculation-formula`, Calculation_Formula, { extends: `span` })
+GenericConfigs.push(Calculation_Formula);
 
 class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
     GUID = generateGUID();
@@ -1221,4 +1289,4 @@ class DisplayLiveUpdate extends UI.DisplayNumberWithMeasurement {
         this.DisplayValue.class = `livevalue`;
     }
 }
-customElements.define(`ui-displayliveupdate`, DisplayLiveUpdate, { extends: `div` });
+customElements.define(`ui-displayliveupdate`, DisplayLiveUpdate, { extends: `span` });

@@ -34,7 +34,7 @@ class Input_AnalogPolynomial extends UI.Template {
         ]};
     }
 }
-customElements.define(`input-analogpolynomial`, Input_AnalogPolynomial, { extends: `div` });
+customElements.define(`input-analogpolynomial`, Input_AnalogPolynomial, { extends: `span` });
 
 class MAP_GM1Bar extends Input_AnalogPolynomial {
     static Name = `GM 1 Bar MAP`;
@@ -55,7 +55,7 @@ class MAP_GM1Bar extends Input_AnalogPolynomial {
     }
 }
 MapConfigs.push(MAP_GM1Bar);
-customElements.define(`map-gm1bar`, MAP_GM1Bar, { extends: `div` });
+customElements.define(`map-gm1bar`, MAP_GM1Bar, { extends: `span` });
 
 class MAP_GM2Bar extends Input_AnalogPolynomial {
     static Name = `GM 2 Bar MAP`;
@@ -76,7 +76,7 @@ class MAP_GM2Bar extends Input_AnalogPolynomial {
     }
 }
 MapConfigs.push(MAP_GM2Bar);
-customElements.define(`map-gm2bar`, MAP_GM2Bar, { extends: `div` });
+customElements.define(`map-gm2bar`, MAP_GM2Bar, { extends: `span` });
 
 class MAP_GM3Bar extends Input_AnalogPolynomial {
     static Name = `GM 3 Bar MAP`;
@@ -97,4 +97,4 @@ class MAP_GM3Bar extends Input_AnalogPolynomial {
     }
 }
 MapConfigs.push(MAP_GM3Bar);
-customElements.define(`map-gm3bar`, MAP_GM3Bar, { extends: `div` });
+customElements.define(`map-gm3bar`, MAP_GM3Bar, { extends: `span` });

@@ -349,7 +349,6 @@ class ConfigInputs extends UI.Template {
 
     #updateInputListElement() {
         const thisClass = this;
-        this.inputListElement.innerHTML = ``;
         while(this.Inputs.children.length < this.inputListElement.children.length) this.inputListElement.removeChild(this.inputListElement.lastChild);
         for(let i = 0; i < this.Inputs.children.length; i++){
             let inputElement = this.inputListElement.children[i];
@@ -435,7 +434,7 @@ class ConfigInputs extends UI.Template {
         return input;
     }
 }
-customElements.define('config-inputs', ConfigInputs, { extends: `div` });
+customElements.define('config-inputs', ConfigInputs, { extends: `span` });
 
 class ConfigInput extends UI.Template {
     static Template = `<div data-element="Name"></div>
@@ -548,7 +547,7 @@ class ConfigInput extends UI.Template {
         ]};
     }
 }
-customElements.define('config-input', ConfigInput, { extends: `div` });
+customElements.define('config-input', ConfigInput, { extends: `span` });
 
 class UIPinSelection extends UI.Selection {
     constructor(prop){
@@ -624,7 +623,7 @@ class Input_Analog extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_Analog);
-customElements.define(`input-analog`, Input_Analog, { extends: `div` });
+customElements.define(`input-analog`, Input_Analog, { extends: `span` });
 
 class Input_Digital extends UI.Template {
     static Name = `Digital Pin`;
@@ -660,7 +659,7 @@ class Input_Digital extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_Digital);
-customElements.define(`input-digital`, Input_Digital, { extends: `div` });
+customElements.define(`input-digital`, Input_Digital, { extends: `span` });
 
 class Input_DigitalRecord extends UI.Template {
     static Name = `Digital Pin (Record)`;
@@ -704,7 +703,7 @@ class Input_DigitalRecord extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_DigitalRecord);
-customElements.define(`input-digitalrecord`, Input_DigitalRecord, { extends: `div` });
+customElements.define(`input-digitalrecord`, Input_DigitalRecord, { extends: `span` });
 
 class Input_DutyCycle extends UI.Template {
     static Name = `Duty Cycle Pin Pin`;
@@ -747,7 +746,7 @@ class Input_DutyCycle extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_DutyCycle);
-customElements.define(`input-dutycycle`, Input_DutyCycle, { extends: `div` });
+customElements.define(`input-dutycycle`, Input_DutyCycle, { extends: `span` });
 
 class Input_Frequency extends UI.Template {
     static Name = `Frequency Pin`;
@@ -790,7 +789,7 @@ class Input_Frequency extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_Frequency);
-customElements.define(`input-frequency`, Input_Frequency, { extends: `div` });
+customElements.define(`input-frequency`, Input_Frequency, { extends: `span` });
 
 class Input_PulseWidth extends UI.Template {
     static Name = `Pulse Width Pin`;
@@ -833,4 +832,4 @@ class Input_PulseWidth extends UI.Template {
     }
 }
 RawInputConfigs.push(Input_PulseWidth);
-customElements.define(`input-pulsewidth`, Input_PulseWidth, { extends: `div` });
+customElements.define(`input-pulsewidth`, Input_PulseWidth, { extends: `span` });

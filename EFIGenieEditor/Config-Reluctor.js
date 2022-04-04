@@ -21,7 +21,7 @@ class Reluctor_Template extends Input_DigitalRecord {
         ]};
     }
 }
-customElements.define(`reluctor-template`, Reluctor_Template, { extends: `div` });
+customElements.define(`reluctor-template`, Reluctor_Template, { extends: `span` });
 
 class Reluctor_GM24x extends Reluctor_Template {
     static Name = `Reluctor GM 24X`;
@@ -46,7 +46,7 @@ class Reluctor_GM24x extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_GM24x);
-customElements.define(`reluctor-gm24x`, Reluctor_GM24x, { extends: `div` });
+customElements.define(`reluctor-gm24x`, Reluctor_GM24x, { extends: `span` });
 
 class Reluctor_Universal1x extends Reluctor_Template {
     static Name = `Reluctor Universal 1X`;
@@ -90,7 +90,7 @@ class Reluctor_Universal1x extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);
-customElements.define(`reluctor-universal1x`, Reluctor_Universal1x, { extends: `div` });
+customElements.define(`reluctor-universal1x`, Reluctor_Universal1x, { extends: `span` });
 
 class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     static Name = `Reluctor Universal Missing Teeth`;
@@ -147,4 +147,4 @@ class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);
-customElements.define(`reluctor-universalmissingteeth`, Reluctor_UniversalMissingTeeth, { extends: `div` });
+customElements.define(`reluctor-universalmissingteeth`, Reluctor_UniversalMissingTeeth, { extends: `span` });

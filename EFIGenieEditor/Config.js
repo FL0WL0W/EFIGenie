@@ -567,7 +567,7 @@ class ConfigTop extends UI.Template {
         ]};
     }
 }
-customElements.define(`config-top`, ConfigTop, { extends: `div` });
+customElements.define(`config-top`, ConfigTop, { extends: `span` });
 
 class ConfigFuel extends UI.Template {
     static Template =   getFileContents(`ConfigGui/Fuel.html`);
@@ -704,7 +704,7 @@ class ConfigFuel extends UI.Template {
         return group;
     }
 }
-customElements.define(`config-fuel`, ConfigFuel, { extends: `div` });
+customElements.define(`config-fuel`, ConfigFuel, { extends: `span` });
 
 class ConfigIgnition extends UI.Template {
     static Template = getFileContents(`ConfigGui/Ignition.html`);
@@ -824,7 +824,7 @@ class ConfigIgnition extends UI.Template {
         return group;
     }
 }
-customElements.define(`config-ignition`, ConfigIgnition, { extends: `div` });
+customElements.define(`config-ignition`, ConfigIgnition, { extends: `span` });
 
 class ConfigEngine extends UI.Template {
     static Template = getFileContents(`ConfigGui/Engine.html`);
@@ -959,7 +959,7 @@ class ConfigEngine extends UI.Template {
         return group;
     }
 }
-customElements.define(`config-engine`, ConfigEngine, { extends: `div` });
+customElements.define(`config-engine`, ConfigEngine, { extends: `span` });
 
 class ConfigTDCOutput extends CalculationOrVariableSelection {
     constructor(prop) {
@@ -979,7 +979,7 @@ class ConfigTDCOutput extends CalculationOrVariableSelection {
         this.labelElement.class = `pinselectname`;
     }
 }
-customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `div` });
+customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `span` });
 
 class CylinderAirmass_SpeedDensity extends UI.Template {
     static Name = `Speed Density`;
@@ -1018,7 +1018,7 @@ class CylinderAirmass_SpeedDensity extends UI.Template {
     }
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity);
-customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensity, { extends: `div` });
+customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensity, { extends: `span` });
 
 class InjectorPulseWidth_DeadTime extends UI.Template {
     static Name = `Dead Time`;
@@ -1094,4 +1094,4 @@ class InjectorPulseWidth_DeadTime extends UI.Template {
     }
 }
 InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime);
-customElements.define(`injectorpulsewidth-deadtime`, InjectorPulseWidth_DeadTime, { extends: `div` });
+customElements.define(`injectorpulsewidth-deadtime`, InjectorPulseWidth_DeadTime, { extends: `span` });

@@ -99,7 +99,7 @@ class NumberWithMeasurement extends UITemplate {
         return this.DisplayMeasurement.Measurement;
     }
     set Measurement(measurement) {
-        if(this.DisplayMeasurement.Measurement == measurement)
+        if(this.DisplayMeasurement.Measurement === measurement)
             return;
 
         this.DisplayMeasurement.Measurement = measurement;
@@ -221,7 +221,7 @@ class NumberWithMeasurement extends UITemplate {
             return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
     }
 }
-customElements.define(`ui-numberwithmeasurement`, NumberWithMeasurement, { extends: `div` });
+customElements.define(`ui-numberwithmeasurement`, NumberWithMeasurement, { extends: `span` });
 
 class DisplayNumberWithMeasurement extends UITemplate {
     static Template = `<div data-element="DisplayValue"></div><div data-element="DisplayMeasurement"></div>`
@@ -297,7 +297,7 @@ class DisplayNumberWithMeasurement extends UITemplate {
         this.DisplayValue.textContent = displayValue;
     }
 }
-customElements.define(`ui-displaynumberwithmeasurement`, DisplayNumberWithMeasurement, { extends: `div` });
+customElements.define(`ui-displaynumberwithmeasurement`, DisplayNumberWithMeasurement, { extends: `span` });
 
 export default { UI: {
     Template: UITemplate,

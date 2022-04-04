@@ -34,4 +34,4 @@ class Output_Digital extends UI.Template {
     }
 }
 BooleanOutputConfigs.push(Output_Digital);
-customElements.define(`output-digital`, Output_Digital, { extends: `div` });
+customElements.define(`output-digital`, Output_Digital, { extends: `span` });

@@ -21,7 +21,7 @@
         <script defer>
             var b;
             var configJsonName = `tune.json`
-            document.addEventListener(`change`, function() { b.RegisterVariables(); });//this is a hack but oh well
+            document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables(); }); });//this is a hack but oh well
             const loadConfig = (config) => {
                 b.saveValue = parseObject(config);
                 let workspace = document.querySelector(`#workspace`);
