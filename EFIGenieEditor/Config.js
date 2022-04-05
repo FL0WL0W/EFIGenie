@@ -136,6 +136,7 @@ var VolumetricEfficiencyConfigs = [];
 VolumetricEfficiencyConfigs.push(Calculation_Static);
 VolumetricEfficiencyConfigs.push(Calculation_LookupTable);
 VolumetricEfficiencyConfigs.push(Calculation_2AxisTable);
+VolumetricEfficiencyConfigs.push(Calculation_Formula);
 
 EngineFactoryIDs = {
     Offset : 40000,

@@ -1058,7 +1058,7 @@ class Calculation_Formula extends UI.Template {
                     label: parameters[i],
                     Configs: GenericConfigs,
                     output: `float`,
-                    ReferenceName:  `${this.ReferenceName}_${parameters[i]}`,
+                    ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined,
                     Measurement: this.Measurement
                 });
             }
@@ -1069,7 +1069,8 @@ class Calculation_Formula extends UI.Template {
             formulaParameter.replaceChildren(parameterValue);
             let configParameter = this.parameterElements.children[i];
             if(!configParameter) {
-                configParameter = this.parameterElements.appendChild(document.createElement(`div`)); 
+                configParameter = this.parameterElements.appendChild(document.createElement(`span`));
+                configParameter.style.display = "block"; 
                 let label = configParameter.appendChild(document.createElement(`label`));
                 label.append(document.createElement(`span`));
                 Object.defineProperty(configParameter, `name`, {
@@ -1111,16 +1112,98 @@ class Calculation_Formula extends UI.Template {
             return this._measurement;
     }
     set Measurement(measurement) {
-        if(!measurement || this._measurement === measurement)
+        if(this._measurement === measurement)
             return;
 
         this._measurement = measurement;
-        for(let parameterValueIndex in this.parameterValues) {
-            let parameterValue = this.parameterValues;
+        for(let parameter in this.parameterValues) {
+            let parameterValue = this.parameterValues[parameter];
             if(!parameterValue)
                 continue;
             
-            parameterValue.Measurement = measurement;
+            this.parameterValues.Measurement = measurement;
+        }
+    }
+    
+    _referenceName = undefined;
+    get ReferenceName() {
+        return this._referenceName;
+    }
+    set ReferenceName(referenceName) {
+        if(this._referenceName === referenceName)
+            return;
+
+        this._referenceName = referenceName;
+        for(let parameter in this.parameterValues) {
+            let parameterValue = this.parameterValues[parameter];
+            if(!parameterValue)
+                continue;
+
+            parameterValue.ReferenceName = this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined;
+        }
+    }
+
+    get saveValue() {
+        let saveValue = super.saveValue ?? {};
+        
+        saveValue.parameterValues = {};
+        for(let parameter in this.parameterValues) {
+            saveValue.parameterValues[parameter] = this.parameterValues[parameter]?.saveValue;
+        }
+
+        return saveValue;
+    }
+
+    set saveValue(saveValue) {
+        saveValue ??= {};
+        super.saveValue = saveValue;
+        
+        const thisClass = this;
+        Object.keys(this.parameterValues).filter(p => saveValue.parameterValues[p] === undefined).forEach(function(p) { delete thisClass.parameterValues[p]; })
+
+        for(let parameter in saveValue.parameterValues) {
+            let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
+                label: parameter,
+                Configs: GenericConfigs,
+                output: `float`,
+                ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
+                Measurement: this.Measurement
+            });
+
+            parameterValue.saveValue = saveValue.parameterValues[parameter];
+
+            window[parameter] = parameterValue.ConfigValues[0];
+        }
+    }
+
+    get value() {
+        let value = super.value ?? {};
+        
+        value.parameterValues = {};
+        for(parameter in this.parameterValues) {
+            value.parameterValues[parameter] = this.parameterValues[parameter]?.value;
+        }
+
+        return value;
+    }
+
+    set value(value) {
+        value ??= {};
+        super.value = value;
+        
+        const thisClass = this;
+        Object.keys(this.parameterValues).filter(p => value.parameterValues[p] === undefined).forEach(function(p) { delete thisClass.parameterValues[p]; })
+
+        for(let parameter in value.parameterValues) {
+            let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
+                label: parameter,
+                Configs: GenericConfigs,
+                output: `float`,
+                ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
+                Measurement: this.Measurement
+            });
+
+            parameterValue.value = value.parameterValues[parameter];
         }
     }
 
@@ -1143,19 +1226,12 @@ class Calculation_Formula extends UI.Template {
     }
 
     RegisterVariables() {
-        this.parameters.forEach(function(parameter) { this.parameterValues[parameter].RegisterVariables(); })
+        const thisClass = this;
+        this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(); })
         if (this.ReferenceName) {
             const thisReference = this.GetVariableReference();
             const type = GetClassProperty(this, `Output`);
             VariableRegister.RegisterVariable(thisReference, GetClassProperty(this, `Output`));
-            const variable = VariableRegister.GetVariableByReference(thisReference)
-            if(type === `float` || type === `bool`){
-                this.LiveUpdate.VariableReference = thisReference;
-                this.LiveUpdate.Measurement = this.Measurement;
-            }
-            else 
-                this.LiveUpdate.VariableReference = undefined;
-            this.LiveUpdate.RegisterVariables();
         }
     }
 
@@ -1168,16 +1244,55 @@ class Calculation_Formula extends UI.Template {
             type: `Group`, 
             value: []
         };
-        outputVariableId ??= this.ReferenceName;
+        outputVariableId ?? this.ReferenceName;
         
-        this.parameters.forEach(function(parameter) { this.parameterValues[parameter].RegisterVariables(); })
+        const thisClass = this;
+        this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation()); })
         const operations = this.operations;
         for(let operationIndex in operations) {
             let operation = operations[operationIndex];
-            let parameterValues = operation.parameter.map(p => p.indexOf(`temp`) === 0? p : `${outputVariableId}_${p}`);
-            
+            if(operation.resultInto === `return`)
+                operation.resultInto = outputVariableId ?? this.GetVariableReference();
+            let parameterValues = operation.parameters.map(p => thisClass.parameterValues[p]?.GetVariableReference() ?? p);
+            switch(operation.operator) {
+                case `*`: 
+                group.value.push({ 
+                    type: `Operation_Multiply`,
+                    result: operation.resultInto, //Return
+                    a: parameterValues[0],
+                    b: parameterValues[1]
+                });
+                break;
+                case `/`: 
+                group.value.push({ 
+                    type: `Operation_Divide`,
+                    result: operation.resultInto, //Return
+                    a: parameterValues[0],
+                    b: parameterValues[1]
+                });
+                break;
+                case `+`: 
+                group.value.push({ 
+                    type: `Operation_Add`,
+                    result: operation.resultInto, //Return
+                    a: parameterValues[0],
+                    b: parameterValues[1]
+                });
+                break;
+                case `-`: 
+                group.value.push({ 
+                    type: `Operation_Subtract`,
+                    result: operation.resultInto, //Return
+                    a: parameterValues[0],
+                    b: parameterValues[1]
+                });
+                break;
+            }
         }
+
+        console.log(group);
         
+        return group;
     }
     static ParseFormula(formula, operators = [`*`,`/`,`+`,`-`]) {
         formula = formula.replaceAll(` `, ``); 
