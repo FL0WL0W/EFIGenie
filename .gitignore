@@ -36,3 +36,15 @@ build/*
 !.vscode/extensions.json
 !.vscode/launch.json
 .vs/*
+
+# EFIGenieEditor
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+
+/EFIGenieEditor/dist

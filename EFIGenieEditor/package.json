@@ -1,0 +1,14 @@
+{
+  "name": "efigenieeditor",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^2.9.0",
+    "vite-plugin-compression": "^0.5.1"
+  }
+}

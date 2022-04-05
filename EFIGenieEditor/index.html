@@ -1,6 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <script src="utils.js"></script>
+        <meta charset="UTF-8" />
+        <!-- <link rel="icon" type="image/svg+xml" href="favicon.svg" /> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- THIS HAS TO BE MOVED -->
+        <!-- <script src="utils.js"></script>
         <script src="JavascriptUI/UIUtils.js"></script>
         <script type="module">
             import ui from "./UI.js"
@@ -15,102 +21,24 @@
         <script src="Config.js" defer></script>
         <script src="lzjs.js"></script>
         <script src="Units.js"></script>
-        <script src="Communication.js" defer></script>
-        <link rel = "stylesheet" type = "text/css" href = "style.css" />
-        <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
-        <script defer>
-            var b;
-            var configJsonName = `tune.json`
-            document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables(); }); });//this is a hack but oh well
-            const loadConfig = (config) => {
-                b.saveValue = parseObject(config);
-                let workspace = document.querySelector(`#workspace`);
-                workspace.innerHtml = ``;
-                workspace.append(b);
-                UpdateOverlay();
-                let btnLoad = document.querySelector(`#btnLoad`);
-                btnLoad.value = ``;
-            };
-            document.addEventListener(`DOMContentLoaded`, function() {
-                b = new ConfigTop();
-                const lastConfig = window.localStorage.getItem(`config`);
-                if (lastConfig) {
-                    loadConfig(lastConfig);
-                } else {
-                    b.RegisterVariables();
-                }
-                let workspace = document.querySelector(`#workspace`);
-                workspace.innerHtml = ``;
-                workspace.append(b);
-                UpdateOverlay();
-                let btnSave = document.querySelector(`#btnSave`);
-                btnSave.addEventListener(`click`, function(){
-                    var cfg = b.saveValue;
-                    window.localStorage.setItem(`config`, stringifyObject(cfg));
-                    downloadObject(cfg, configJsonName);
-                });
-                let btnSaveCompressed = document.querySelector(`#btnSaveCompressed`);
-                btnSaveCompressed.addEventListener(`click`, function(){
-                    var cfg = b.saveValue;
-                    window.localStorage.setItem(`config`, stringifyObject(cfg));
-                    downloadCompressedObject(cfg, configJsonName);
-                });
-                let btnLoad = document.querySelector(`#btnLoad`);
-                btnLoad.addEventListener(`click`, function(evt){
-                    var test = new FileReader();
-
-                    test.onload = function(evt) {
-                        if(evt.target.readyState != 2) return;
-                        if(evt.target.error) {
-                            alert(`Error while reading file`);
-                            return;
-                        }
-
-                        const result = evt.target.result;
-                        window.localStorage.setItem(`config`, result);
-                        loadConfig(result);
-                    };
-
-                    test.readAsText(evt.target.files[0]);
-                    configJsonName = evt.target.files[0].name;
-                });
-                let btnSaveBin = document.querySelector(`#btnSaveBin`);
-                btnSaveBin.addEventListener(`click`, function(){
-                    downloadBin(b.GetArrayBuffer(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
-                });
-
-                let selectTarget = document.querySelector(`#selectTarget`);
-                selectTarget.addEventListener(`change`, function(evt){
-                    b.Inputs.TargetDevice = this.value;
-                    pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
-                    UpdateOverlay();
-                });
-                var targets = ``;
-                Object.entries(PinOuts).forEach(entry => {
-                    const [key, value] = entry;
-                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.Name}</option>`;
-                });
-                selectTarget.innerHTML = targets;
-            });
-        </script>
-        <meta name="viewport" content="width=750, initial-scale=1">
+        <script src="Communication.js" defer></script> -->
     </head>
+    <body>
         <div style="position: fixed; background-color: #121619; z-index: 100; width: 100%; height: 57px;">
             <label for="btnLoad" class="w3-button w3-padding-16">Open</label>
             <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
             <input id="btnSaveCompressed" type="button" class="w3-button w3-padding-16" value="Save Compressed">
             <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
             <input id="btnLoad" type="file" style="display: none;">
-            <select id="selectTarget">
-            </select>
+            <select id="selectTarget"></select>
         </div>
         <div id="overlay"></div>
         <div style="position: relative; top: 57px;"><div id="workspace" style="position: static; margin: 0; padding: 0;"></div></div>
-        <script>
+        <!-- <script>
             var siteWidth = 750;
             var scale = screen.width /siteWidth;
-
             document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'');
-        </script>
+        </script> -->
+        <script type="module" src="/main.js"></script>
     </body>
 </html>

@@ -5,11 +5,11 @@ operation oriented architecture.
 
 The target microcontroller at the moment are the cheap but powerful STM32 line of processors
 but any microcontroller can be ported by creating just 4 services,
-AnalogService, DigitalService, PwmService, TimerService that can be found in the https://github.com/FL0WL0W/EmbeddedIOServices 
-repository. A large benefit to this architecture is that new sensors/abilities/features/etc. 
-can be added very easily and can be chosen between the old and new through the configs. 
-which means decoders can be changed, sensors added or removed, features added or removed. 
-all without having to recompile. There are also some wrapper classes where things like 
+AnalogService, DigitalService, PwmService, TimerService that can be found in the https://github.com/FL0WL0W/EmbeddedIOServices
+repository. A large benefit to this architecture is that new sensors/abilities/features/etc.
+can be added very easily and can be chosen between the old and new through the configs.
+which means decoders can be changed, sensors added or removed, features added or removed.
+all without having to recompile. There are also some wrapper classes where things like
 two step rev limiters can be implemented or tri-step or even quad-step. still have a list of
 things to complete but i am at a state where i am testing the ecu.
 
@@ -46,7 +46,30 @@ sudo apt-get install cmake gcc g++ gdb
 ```
 
 ### Building the Tests
-Make 
+Make
+
+## EFIGenieEditor
+
+### Development
+
+```bash
+cd EFIGenieEditor/
+```
+
+```bash
+npm install
+npm start
+```
+
+### Building
+
+Output directory is set to: `/dist`. Assets are also compressed using `gzip`.
+
+```bash
+npm run build
+npm run preview
+```
+
 
 ## TODO List
 * *Logging
