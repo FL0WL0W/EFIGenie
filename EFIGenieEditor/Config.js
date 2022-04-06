@@ -674,26 +674,26 @@ class ConfigFuel extends UI.Template {
             calculations:            AFRConfigs,
             label:              `Air Fuel Ratio`,
             measurementName:        `Ratio`,
-            ReferenceName:      `FuelParameters.Air Fuel Ratio`
+            referenceName:      `FuelParameters.Air Fuel Ratio`
         });
         this.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            InjectorEnableConfigs,
             label:              `Injector Enable`,
             measurementName:        `Bool`,
-            ReferenceName:      `FuelParameters.Injector Enable`
+            referenceName:      `FuelParameters.Injector Enable`
         });
         this.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            InjectorPulseWidthConfigs,
             label:              `Injector Pulse Width`,
             measurementName:        `Time`,
-            ReferenceName:      `FuelParameters.Injector Pulse Width`,
+            referenceName:      `FuelParameters.Injector Pulse Width`,
             measurementUnitName:`ms`
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            GenericConfigs,
             label:              `Injector End Position(BTDC)`,
             measurementName:        `Angle`,
-            ReferenceName:      `FuelParameters.Injector End Position`
+            referenceName:      `FuelParameters.Injector End Position`
         });
         this.Outputs = document.createElement(`div`)
         Object.defineProperty(this.Outputs, 'saveValue', {
@@ -811,26 +811,26 @@ class ConfigIgnition extends UI.Template {
             calculations:            IgnitionEnableConfigs,
             label:              `Ignition Enable`,
             measurementName:        `Bool`,
-            ReferenceName:      `IgnitionParameters.Ignition Enable`
+            referenceName:      `IgnitionParameters.Ignition Enable`
         });
         this.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            IgnitionAdvanceConfigs,
             label:              `Ignition Advance`,
             measurementName:        `Angle`,
-            ReferenceName:      `IgnitionParameters.Ignition Advance`
+            referenceName:      `IgnitionParameters.Ignition Advance`
         });
         this.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            IgnitionDwellConfigs,
             label:              `Ignition Dwell`,
             measurementName:        `Time`,
-            ReferenceName:      `IgnitionParameters.Ignition Dwell`,
+            referenceName:      `IgnitionParameters.Ignition Dwell`,
             measurementUnitName:`ms`
         });
         this.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            IgnitionDwellConfigs,
             label:              `Ignition Dwell Deviation`,
             measurementName:        `Time`,
-            ReferenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
+            referenceName:      `IgnitionParameters.Ignition Dwell Deviation`,
             measurementUnitName:`ms`
         });
         this.Outputs = document.createElement(`div`)
@@ -931,37 +931,37 @@ class ConfigEngine extends UI.Template {
             calculations:            undefined,
             label:              `Crank Position`,
             measurementName:        `Reluctor`,
-            ReferenceName:      `EngineParameters.Crank Position`
+            referenceName:      `EngineParameters.Crank Position`
         });
         this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            undefined,
             label:              `Cam Position`,
             measurementName:        `Reluctor`,
-            ReferenceName:      `EngineParameters.Cam Position`
+            referenceName:      `EngineParameters.Cam Position`
         });
         this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            CylinderAirmassConfigs,
             label:              `Cylinder Air Mass`,
             measurementName:        `Mass`,
-            ReferenceName:      `EngineParameters.Cylinder Air Mass`
+            referenceName:      `EngineParameters.Cylinder Air Mass`
         });
         this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            CylinderAirTemperatureConfigs,
             label:              `Cylinder Air Temperature`,
             measurementName:        `Temperature`,
-            ReferenceName:      `EngineParameters.Cylinder Air Temperature`
+            referenceName:      `EngineParameters.Cylinder Air Temperature`
         });
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            ManifoldAbsolutePressureConfigs,
             label:              `Manifold Absolute Pressure`,
             measurementName:        `Pressure`,
-            ReferenceName:      `EngineParameters.Manifold Absolute Pressure`
+            referenceName:      `EngineParameters.Manifold Absolute Pressure`
         });
         this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            VolumetricEfficiencyConfigs,
             label:              `Volumetric Efficiency`,
             measurementName:        `Percentage`,
-            ReferenceName:      `EngineParameters.Volumetric Efficiency`
+            referenceName:      `EngineParameters.Volumetric Efficiency`
         });
         this.Setup(prop);
     }
@@ -1130,13 +1130,13 @@ class InjectorPulseWidth_DeadTime extends UI.Template {
             calculations:            GenericConfigs,
             label:              `Injector Flow Rate`,
             measurementName:        `MassFlow`,
-            ReferenceName:      `FuelParameters.Injector Flow Rate`
+            referenceName:      `FuelParameters.Injector Flow Rate`
         });
         this.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            GenericConfigs,
             label:              `Injector Dead Time`,
             measurementName:        `Time`,
-            ReferenceName:      `FuelParameters.Injector Dead Time`,
+            referenceName:      `FuelParameters.Injector Dead Time`,
             measurementUnitName:`ms`
         });
         this.MinInjectorFuelMass = new UI.NumberWithMeasurement({

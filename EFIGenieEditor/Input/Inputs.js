@@ -134,7 +134,7 @@ export default class Inputs extends UITemplate {
                 inputElement.RegisterVariables = function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this);
                     let input = thisClass.Inputs.children[index];
-                    this.firstChild.VariableReference = input.lastChild.TranslationConfig?.LiveUpdate?.VariableReference;
+                    this.firstChild.VariableReference = input.lastChild.TranslationConfig?.liveUpdate?.VariableReference;
                     this.firstChild.RegisterVariables();
                 }
             }

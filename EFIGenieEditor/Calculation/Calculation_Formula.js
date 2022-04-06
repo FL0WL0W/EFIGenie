@@ -45,7 +45,7 @@ export default class Calculation_Formula extends UITemplate {
                     label: parameters[i],
                     calculations: GenericConfigs,
                     output: `float`,
-                    ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined,
+                    referenceName: this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined,
                     measurementName: this.measurementName
                 });
             }
@@ -72,13 +72,13 @@ export default class Calculation_Formula extends UITemplate {
                 configParameter.append(document.createElement(`span`));
             }
             configParameter.name = parameters[i];
-            configParameter.lastChild.replaceChildren(parameterValue.LiveUpdate, parameterValue.CalculationContent);
-            if(parameterValue.CalculationContent.innerHTML === ``)
+            configParameter.lastChild.replaceChildren(parameterValue.liveUpdate, parameterValue.calculationContent);
+            if(parameterValue.calculationContent.innerHTML === ``)
                 configParameter.hidden = true;
             else
                 configParameter.hidden = false;
             parameterValue.selection.addEventListener(`change`, function() {
-                if(parameterValue.CalculationContent.innerHTML === ``)
+                if(parameterValue.calculationContent.innerHTML === ``)
                     configParameter.hidden = true;
                 else
                     configParameter.hidden = false;
@@ -121,10 +121,10 @@ export default class Calculation_Formula extends UITemplate {
     }
     
     _referenceName = undefined;
-    get ReferenceName() {
+    get referenceName() {
         return this._referenceName;
     }
-    set ReferenceName(referenceName) {
+    set referenceName(referenceName) {
         if(this._referenceName === referenceName)
             return;
 
@@ -134,7 +134,7 @@ export default class Calculation_Formula extends UITemplate {
             if(!parameterValue)
                 continue;
 
-            parameterValue.ReferenceName = this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined;
+            parameterValue.referenceName = this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined;
         }
     }
 
@@ -161,7 +161,7 @@ export default class Calculation_Formula extends UITemplate {
                 label: parameter,
                 calculations: GenericConfigs,
                 output: `float`,
-                ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
+                referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
                 measurementName: this.measurementName
             });
 
@@ -194,7 +194,7 @@ export default class Calculation_Formula extends UITemplate {
                 label: parameter,
                 calculations: GenericConfigs,
                 output: `float`,
-                ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
+                referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
                 measurementName: this.measurementName
             });
 
@@ -223,7 +223,7 @@ export default class Calculation_Formula extends UITemplate {
     RegisterVariables() {
         const thisClass = this;
         this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(); })
-        if (this.ReferenceName) {
+        if (this.referenceName) {
             const thisReference = this.GetVariableReference();
             const type = GetClassProperty(this, `Output`);
             VariableRegister.RegisterVariable(thisReference, GetClassProperty(this, `Output`));
@@ -231,7 +231,7 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     GetVariableReference() {
-        return `${this.ReferenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
+        return `${this.referenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
     }
 
     GetObjOperation(outputVariableId) {
@@ -239,7 +239,7 @@ export default class Calculation_Formula extends UITemplate {
             type: `Group`, 
             value: []
         };
-        outputVariableId ?? this.ReferenceName;
+        outputVariableId ?? this.referenceName;
         
         const thisClass = this;
         this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation()); })

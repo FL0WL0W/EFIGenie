@@ -31,7 +31,7 @@ export default class Input extends UITemplate {
             calculations:            InputConfigs,
             label:              `Source`,
             Inputs:             [],
-            ReferenceName:      `Inputs.${prop.name}`,
+            referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
         this.RawConfig.addEventListener(`change`, function() {
@@ -42,7 +42,7 @@ export default class Input extends UITemplate {
             label:              prop.name,
             ConfigsOnly:        true,
             measurementName:        `None`,
-            ReferenceName:      `Inputs.${prop.name}`,
+            referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
         this.TranslationConfig.addEventListener(`change`, function() {
@@ -83,7 +83,7 @@ export default class Input extends UITemplate {
             Class: `pinselectname inputName`
         })
         this.name.addEventListener(`change`, function() {
-            thisClass.TranslationConfig.ReferenceName = thisClass.RawConfig.ReferenceName = `Inputs.${thisClass.name.value}`;
+            thisClass.TranslationConfig.referenceName = thisClass.RawConfig.referenceName = `Inputs.${thisClass.name.value}`;
             thisClass.TranslationConfig.label = thisClass.name.value;
         });
         this.name.style.display = `block`;

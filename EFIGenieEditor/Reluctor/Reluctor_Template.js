@@ -7,7 +7,7 @@ export default class Reluctor_Template extends Input_DigitalRecord {
 
     GetObjOperation(objOperation) {
         return { type: `Group`, value: [
-            super.GetObjOperation(`${this.ReferenceName}(Reluctor)`),
+            super.GetObjOperation(`${this.referenceName}(Reluctor)`),
             objOperation
         ]};
     }

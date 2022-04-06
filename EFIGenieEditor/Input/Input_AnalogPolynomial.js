@@ -21,17 +21,17 @@ export default class Input_AnalogPolynomial extends UITemplate {
 
     RegisterVariables() {
         VariableRegister.RegisterVariable(
-            `${this.ReferenceName}(Voltage)`,
+            `${this.referenceName}(Voltage)`,
             `float`
         );
-        this.voltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
+        this.voltageLiveUpdate.VariableReference = `${this.referenceName}(Voltage)`;
         this.voltageLiveUpdate.RegisterVariables();
     }
 
     GetObjOperation(outputVariableId) {
         return { type: `Group`, value: [
-            this.analogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`),
-            this.polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`)
+            this.analogInput.GetObjOperation(`${this.referenceName}(Voltage)`),
+            this.polynomial.GetObjOperation(outputVariableId, `${this.referenceName}(Voltage)`)
         ]};
     }
 }

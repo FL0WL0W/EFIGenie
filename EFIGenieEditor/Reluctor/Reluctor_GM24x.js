@@ -14,7 +14,7 @@ export default class Reluctor_GM24x extends Reluctor_Template {
         obj =  Packagize(obj, { 
             outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
-                `${this.ReferenceName}(Reluctor)`,
+                `${this.referenceName}(Reluctor)`,
                 `CurrentTickId`
             ]
         });
