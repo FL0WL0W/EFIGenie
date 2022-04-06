@@ -12,20 +12,28 @@
             window.Calculation_Static = Calculation_Static;
             import Calculation_Polynomial from "./Calculation/Calculation_Polynomial.js"
             window.Calculation_Polynomial = Calculation_Polynomial;
+            import UIPinOverlay from "./UI/UIPinOverlay.js"
+            import Calculation_LookupTable from "./Calculation/Calculation_LookupTable.js"
+            window.Calculation_LookupTable = Calculation_LookupTable;
+            import Calculation_2AxisTable from "./Calculation/Calculation_2AxisTable.js"
+            window.Calculation_2AxisTable = Calculation_2AxisTable;
+            import CalculationOrVariableSelection from "./Calculation/CalculationOrVariableSelection.js"
+            window.CalculationOrVariableSelection = CalculationOrVariableSelection;
+            import Calculation_Formula from "./Calculation/Calculation_Formula.js"
+            window.Calculation_Formula = Calculation_Formula;
         </script>
         <script src="Config-Input.js" defer></script>
         <script type="module">
+            import Inputs from "./Input/Inputs.js"
+            window.ConfigInputs = Inputs;
             import Input_Analog from "./Input/Input_Analog.js"
-            window.Input_Analog = Input_Analog;
             import Input_Digital from "./Input/Input_Digital.js"
             import Input_DigitalRecord from "./Input/Input_DigitalRecord.js"
-            window.Input_DigitalRecord = Input_DigitalRecord;
             import Input_DutyCycle from "./Input/Input_DutyCycle.js"
             import Input_Frequency from "./Input/Input_Frequency.js"
             import Input_PulseWidth from "./Input/Input_PulseWidth.js"
             import Output_Digital from "./Output/Output_Digital.js"
             import Input_AnalogPolynomial from "./Input/Input_AnalogPolynomial.js"
-            window.Input_AnalogPolynomial = Input_AnalogPolynomial;
             import MAP_GM1Bar from "./MAP/MAP_GM1Bar.js"
             import MAP_GM2Bar from "./MAP/MAP_GM2Bar.js"
             import MAP_GM3Bar from "./MAP/MAP_GM3Bar.js"
@@ -40,7 +48,10 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
         <script defer>
-            var b;
+            var b, pinOverlay;
+            function UpdateOverlay() {
+                b.Inputs.pinOverlay.update();
+            }
             var configJsonName = `tune.json`
             document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables(); }); });//this is a hack but oh well
             const loadConfig = (config) => {
@@ -54,6 +65,7 @@
             };
             document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop();
+                pinOverlay = b.Inputs.pinOverlay;
                 const lastConfig = window.localStorage.getItem(`config`);
                 if (lastConfig) {
                     loadConfig(lastConfig);
@@ -103,8 +115,7 @@
                 let selectTarget = document.querySelector(`#selectTarget`);
                 selectTarget.addEventListener(`change`, function(evt){
                     b.Inputs.TargetDevice = this.value;
-                    pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
-                    UpdateOverlay();
+                    b.Inputs.pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
                 });
                 var targets = ``;
                 Object.entries(PinOuts).forEach(entry => {

@@ -1,6 +1,7 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import Input_Analog from "./Input_Analog.js";
 import Calculation_Polynomial from "../Calculation/Calculation_Polynomial.js";
+import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 export default class Input_AnalogPolynomial extends UITemplate {
     static Template = `<div data-element="VoltageLiveUpdate"></div><div data-element="AnalogInput"></div><div data-element="Polynomial"></div>`;
     static Output = `float`;
@@ -10,7 +11,7 @@ export default class Input_AnalogPolynomial extends UITemplate {
         super();
         this.AnalogInput = new Input_Analog();
         this.Polynomial = new Calculation_Polynomial();
-        this.VoltageLiveUpdate = new DisplayLiveUpdate({
+        this.VoltageLiveUpdate = new UIDisplayLiveUpdate({
             Measurement: Input_Analog.Measurement
         });
         this.VoltageLiveUpdate.style.float = `right`;

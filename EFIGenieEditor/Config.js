@@ -101,6 +101,74 @@ class VariableRegistry {
 }
 
 VariableRegister = new VariableRegistry();
+function GetSelections(measurement, output, inputs, configs, configsOnly) {
+    var selections = [];
+    if (configs?.length > 0) {
+        var configGroups = configs;
+        if(!configs[0].Group && !configs[0].Configs)
+            configGroups = [{ Group: `Calculations`, Configs: configs }];
+
+        for(var c = 0; c < configGroups.length; c++) {
+            var configOptions = { Group: configGroups[c].Group, Options: [] }
+            configs = configGroups[c].Configs;
+            for (var i = 0; i < configs.length; i++) {
+                if (output !== undefined && configs[i].Output !== output) 
+                    continue;
+
+                if(measurement !== undefined && ((configs[i].Measurement !== undefined && measurement !== configs[i].Measurement) || (MeasurementType[measurement] !== undefined && MeasurementType[measurement] !== configs[i].Output)))
+                    continue;
+                
+                if(inputs !== undefined) {
+                    if(inputs.length !== configs[i].Inputs.length || configs[i].Inputs === undefined)
+                        continue;
+                    var inputsMatch = true;
+                    for(var im = 0; im < inputs.length; im++){
+                        if(inputs[im] !== configs[i].Inputs[im]){
+                            inputsMatch = false;
+                            break;
+                        }
+                    }
+                    if(!inputsMatch)
+                        continue;
+                }
+                configOptions.Options.push({
+                    Name: configs[i].Name,
+                    Value: { value: configs[i].name }
+                });
+            }
+            if(configOptions.Options.length > 0)
+                selections.push(configOptions);
+        }
+    }
+
+    if(!(inputs || configsOnly)) {
+        for (var property in VariableRegister) {
+            if (!Array.isArray(VariableRegister[property]))
+                continue;
+
+            var arr = VariableRegister[property];
+
+            var arrSelections = { Group: property, Options: [] };
+
+            for (var i = 0; i < arr.length; i++) {
+                if ((!measurement || arr[i].Measurement === measurement) && (output === undefined || arr[i].Type === output)) {
+                    arrSelections.Options.push({
+                        Name: arr[i].Name,
+                        Info: (!measurement ? `[${arr[i].Measurement}]` : undefined),
+                        Value: { reference: property, value: arr[i].Name, measurement: arr[i].Measurement }
+                    });
+                }
+            }
+            if(arrSelections.Options.length > 0)
+                selections.push(arrSelections);
+        }
+    }
+
+    if(selections.length === 1)
+        return selections[0].Options;
+
+    return selections;
+}
 
 var AFRConfigs = [];
 AFRConfigs.push(Calculation_Static);
@@ -150,9 +218,36 @@ EngineFactoryIDs = {
     InjectorDeadTime: 8
 }
 
+function GetArrayType(tableValue) {
+    var min = 18446744073709551615;
+    var max = -9223372036854775808;
+    for (var i = 0; i < tableValue.length; i++) {
+        if (tableValue[i] % 1 != 0) {
+            return `FLOAT`;
+        }
+        if (tableValue[i] < min) {
+            min = tableValue[i];
+        }
+        if (tableValue[i] > max) {
+            max = tableValue[i];
+        }
+    }
+    if (typeof tableValue[0] === `boolean`) {
+        return `BOOL`;
+    }
+    if (min < 0) {
+        if (max < 0 || min < -max)
+            return GetType(min);
+        return GetType(-max);
+    }
+    return GetType(max);
+}
+
 function GetType(value) {
     if(value == undefined)
         return `VOID`;
+    if(Array.isArray(value)) 
+        return GetArrayType(value);
     if(typeof value === `boolean`)
         return `BOOL`
     if(value % 1 !== 0)
