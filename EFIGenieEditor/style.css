@@ -322,7 +322,8 @@ label:not(.w3-button) {
     padding-right: 5px;
     margin: 1px;
 }
-label.w3-button {
+label.w3-button,
+input.w3-button {
     font: bold 16px Arial;
     border-radius: 6px;
     margin: 1px;

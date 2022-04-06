@@ -7,11 +7,32 @@
             window.UI = ui.UI;
         </script>
         <script src="Config-Calculation.js" defer></script>
+        <script type="module">
+            import Calculation_Static from "./Calculation/Calculation_Static.js"
+            window.Calculation_Static = Calculation_Static;
+            import Calculation_Polynomial from "./Calculation/Calculation_Polynomial.js"
+            window.Calculation_Polynomial = Calculation_Polynomial;
+        </script>
         <script src="Config-Input.js" defer></script>
-        <script src="Config-MapSensor.js" defer></script>
-        <script src="Config-TemperatureSensor.js" defer></script>
-        <script src="Config-Reluctor.js" defer></script>
-        <script src="Config-Output.js" defer></script>
+        <script type="module">
+            import Input_Analog from "./Input/Input_Analog.js"
+            window.Input_Analog = Input_Analog;
+            import Input_Digital from "./Input/Input_Digital.js"
+            import Input_DigitalRecord from "./Input/Input_DigitalRecord.js"
+            window.Input_DigitalRecord = Input_DigitalRecord;
+            import Input_DutyCycle from "./Input/Input_DutyCycle.js"
+            import Input_Frequency from "./Input/Input_Frequency.js"
+            import Input_PulseWidth from "./Input/Input_PulseWidth.js"
+            import Output_Digital from "./Output/Output_Digital.js"
+            import Input_AnalogPolynomial from "./Input/Input_AnalogPolynomial.js"
+            window.Input_AnalogPolynomial = Input_AnalogPolynomial;
+            import MAP_GM1Bar from "./MAP/MAP_GM1Bar.js"
+            import MAP_GM2Bar from "./MAP/MAP_GM2Bar.js"
+            import MAP_GM3Bar from "./MAP/MAP_GM3Bar.js"
+            import Reluctor_GM24x from "./Reluctor/Reluctor_GM24x.js"
+            import Reluctor_Universal1x from "./Reluctor/Reluctor_Universal1x.js"
+            import Reluctor_UniversalMissingTeeth from "./Reluctor/Reluctor_UniversalMissingTeeth.js"
+        </script>
         <script src="Config.js" defer></script>
         <script src="lzjs.js"></script>
         <script src="Units.js"></script>

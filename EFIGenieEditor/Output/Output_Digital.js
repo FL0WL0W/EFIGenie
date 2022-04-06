@@ -1,6 +1,6 @@
-var BooleanOutputConfigs = [];
-
-class Output_Digital extends UI.Template {
+import UITemplate from "../JavascriptUI/UITemplate.js"
+import UIPinSelection from "../UI/UIPinSelection.js";
+export default class Output_Digital extends UITemplate {
     static Name = `Digital Pin`;
     static Inputs = [`bool`];
     static Template =   `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted <div data-element="HighZ"></div>High Z`;
