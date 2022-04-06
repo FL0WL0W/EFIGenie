@@ -5,14 +5,22 @@ import UIPinOverlay from "../UI/UIPinOverlay.js"
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 //todo, context menu
 export default class Inputs extends UITemplate {
-    static template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="Inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
+    static template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
     inputListElement = document.createElement(`div`);
     pinOverlay = new UIPinOverlay();
 
-    TargetDevice = `STM32F401C`;
+    _targetDevice = `STM32F401C`;
+    get targetDevice() {
+        return this._targetDevice;
+    }
+    set targetDevice(targetDevice) {
+        this._targetDevice = targetDevice;
+        this.pinOverlay.pinOut = PinOuts[targetDevice];
+    }
+
     get saveValue() {
         let saveValue = super.saveValue;
-        saveValue.TargetDevice = this.TargetDevice;
+        saveValue.targetDevice = this.targetDevice;
         return saveValue;
     }
 
@@ -20,9 +28,11 @@ export default class Inputs extends UITemplate {
         if(!saveValue)
             return;
             
-        if(saveValue.TargetDevice) {
-            this.TargetDevice = saveValue.TargetDevice;
-            this.pinOverlay.pinOut = PinOuts[this.TargetDevice];
+        saveValue.inputs ??= saveValue.Inputs;
+        saveValue.targetDevice ??= saveValue.TargetDevice;
+        if(saveValue.targetDevice) {
+            this.targetDevice = saveValue.targetDevice;
+            delete saveValue.targetDevice;
             delete saveValue.TargetDevice;
         }
 
@@ -30,9 +40,9 @@ export default class Inputs extends UITemplate {
     }
     constructor(prop) {
         super();
-        this.Inputs = document.createElement(`div`);
+        this.inputs = document.createElement(`div`);
         const thisClass = this;
-        Object.defineProperty(this.Inputs, 'saveValue', {
+        Object.defineProperty(this.inputs, 'saveValue', {
             get: function() { return [...this.children].map(e => e.saveValue); },
             set: function(saveValue) { 
                 while(this.children.length > saveValue.length) this.removeChild(this.lastChild);
@@ -44,7 +54,7 @@ export default class Inputs extends UITemplate {
                 }
             }
         });
-        Object.defineProperty(this.Inputs, 'value', {
+        Object.defineProperty(this.inputs, 'value', {
             get: function() { return [...this.children].map(e => e.value); },
             set: function(value) { 
                 while(this.children.length > value.length) this.removeChild(this.lastChild);
@@ -56,7 +66,7 @@ export default class Inputs extends UITemplate {
                 }
             }
         });
-        this.Inputs.saveValue = [{}];
+        this.inputs.saveValue = [{}];
         this.newInputElement = new UIButton({className: `controladd`});
         this.newInputElement.addEventListener(`click`, function() { thisClass.#appendInput(); });
         this.inputListNewElement = document.createElement(`div`);
@@ -68,8 +78,8 @@ export default class Inputs extends UITemplate {
 
     RegisterVariables() {
         VariableRegister.CurrentTickId = VariableRegister.GenerateVariableId();
-        for(var i = 0; i < this.Inputs.children.length; i++){
-            this.Inputs.children[i].RegisterVariables();
+        for(var i = 0; i < this.inputs.children.length; i++){
+            this.inputs.children[i].RegisterVariables();
         }
         for(var i = 0; i < this.inputListElement.children.length; i++){
             this.inputListElement.children[i].RegisterVariables();
@@ -84,17 +94,17 @@ export default class Inputs extends UITemplate {
                 outputVariables: [`CurrentTickId`]
             }
         ]};
-        for(var i = 0; i < this.Inputs.children.length; i++){
-            group.value.push(this.Inputs.children[i].GetObjOperation());
+        for(var i = 0; i < this.inputs.children.length; i++){
+            group.value.push(this.inputs.children[i].GetObjOperation());
         }
 
         return group;
     }
 
     #updateInputControls() {
-        for(let i = 0; i < this.Inputs.children.length; i++) {
-            let up = this.Inputs.children[i].firstChild.children[1];
-            let down = this.Inputs.children[i].firstChild.children[2];
+        for(let i = 0; i < this.inputs.children.length; i++) {
+            let up = this.inputs.children[i].firstChild.children[1];
+            let down = this.inputs.children[i].firstChild.children[2];
             if(i === 0) {
                 up.className = `controlDummy`;
                 up.disabled = true;
@@ -102,7 +112,7 @@ export default class Inputs extends UITemplate {
                 up.className = `controlUp`;
                 up.disabled = false;
             }
-            if(i === this.Inputs.children.length-1) {
+            if(i === this.inputs.children.length-1) {
                 down.className = `controlDummy`;
                 down.disabled = true;
             } else {
@@ -115,8 +125,8 @@ export default class Inputs extends UITemplate {
 
     #updateInputListElement() {
         const thisClass = this;
-        while(this.Inputs.children.length < this.inputListElement.children.length) this.inputListElement.removeChild(this.inputListElement.lastChild);
-        for(let i = 0; i < this.Inputs.children.length; i++){
+        while(this.inputs.children.length < this.inputListElement.children.length) this.inputListElement.removeChild(this.inputListElement.lastChild);
+        for(let i = 0; i < this.inputs.children.length; i++){
             let inputElement = this.inputListElement.children[i];
             if(!inputElement) {
                 inputElement = this.inputListElement.appendChild(document.createElement(`div`));
@@ -125,7 +135,7 @@ export default class Inputs extends UITemplate {
                 inputElement.class = `w3-bar-subitem w3-button`;
                 inputElement.addEventListener(`click`, function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this);
-                    thisClass.Inputs.children[index].scrollIntoView({
+                    thisClass.inputs.children[index].scrollIntoView({
                         behavior: 'auto',
                         block: 'center',
                         inline: 'center'
@@ -133,22 +143,22 @@ export default class Inputs extends UITemplate {
                 });
                 inputElement.RegisterVariables = function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this);
-                    let input = thisClass.Inputs.children[index];
+                    let input = thisClass.inputs.children[index];
                     this.firstChild.VariableReference = input.lastChild.TranslationConfig?.liveUpdate?.VariableReference;
                     this.firstChild.RegisterVariables();
                 }
             }
-            inputElement.lastChild.textContent = this.Inputs.children[i].name;
+            inputElement.lastChild.textContent = this.inputs.children[i].name;
             inputElement.class = `w3-bar-subitem w3-button`;
         }
-        if(this.Inputs.children.length === 0){
+        if(this.inputs.children.length === 0){
             let inputElement = this.inputListElement.appendChild(document.createElement(`div`));
             inputElement.appendChild(this.inputListNewElement);
         }
     }
 
     #appendInput() {
-        this.Inputs.append(this.#newInput());
+        this.inputs.append(this.#newInput());
         this.#updateInputControls();
     }
 
