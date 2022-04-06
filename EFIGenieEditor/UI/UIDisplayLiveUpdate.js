@@ -30,9 +30,9 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithMeasurement 
         this._variableReference = variableReference;
 
         if(variableReference) {
-            let measurement = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
-            measurement = measurement.substring(0, measurement.length - 1);
-            this.Measurement = measurement;
+            let measurementName = variableReference.substring(variableReference.lastIndexOf(`(`) + 1);
+            measurementName = measurementName.substring(0, measurementName.length - 1);
+            this.measurementName = measurementName;
         }
     }
 
@@ -69,7 +69,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithMeasurement 
         prop ??= {};
         super(prop);
         this.superHidden = true;
-        this.DisplayValue.class = `livevalue`;
+        this.displayValue.class = `livevalue`;
     }
 }
 customElements.define(`ui-displayliveupdate`, UIDisplayLiveUpdate, { extends: `span` });

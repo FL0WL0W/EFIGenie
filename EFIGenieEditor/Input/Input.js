@@ -41,7 +41,7 @@ export default class Input extends UITemplate {
             calculations:            InputConfigs,
             label:              prop.name,
             ConfigsOnly:        true,
-            Measurement:        `None`,
+            measurementName:        `None`,
             ReferenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
@@ -75,7 +75,7 @@ export default class Input extends UITemplate {
             options:            options,
         });
         this.TranslationMeasurement.addEventListener(`change`, function() {
-            thisClass.TranslationConfig.Measurement = thisClass.TranslationMeasurement.value;
+            thisClass.TranslationConfig.measurementName = thisClass.TranslationMeasurement.value;
         });
         this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
         this.name = new UIText({

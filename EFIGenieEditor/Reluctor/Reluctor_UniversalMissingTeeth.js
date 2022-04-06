@@ -16,14 +16,14 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
             step: 0.1,
             min: 0,
             max: 360,
-            Measurement: `Angle`
+            measurementName: `Angle`
         });
         this.toothWidth = new UINumberWithMeasurement({
             value: 5,
             step: 0.1,
             min: 0,
             max: 360,
-            Measurement: `Angle`
+            measurementName: `Angle`
         });
         this.length.value = 72;
         this.numberOfTeeth = new UINumber({

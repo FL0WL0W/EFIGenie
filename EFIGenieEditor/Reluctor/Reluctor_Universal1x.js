@@ -12,14 +12,14 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
             step: 0.1,
             min: 0,
             max: 360,
-            Measurement: `Angle`
+            measurementName: `Angle`
         });
         prop.fallingPosition = new UINumberWithMeasurement({
             value: 180,
             step: 0.1,
             min: 0,
             max: 360,
-            Measurement: `Angle`
+            measurementName: `Angle`
         });
         this.Setup(prop);
         this.length.value = 4;

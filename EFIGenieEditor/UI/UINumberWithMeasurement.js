@@ -2,27 +2,27 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UINumber from "../JavascriptUI/UINumber.js"
 import UIMeasurement from "./UIMeasurement.js"
 export default class UINumberWithMeasurement extends UITemplate {
-    static Template = `<div data-element="DisplayValue"></div><div data-element="DisplayMeasurement"></div>`
+    static Template = `<div data-element="DisplayValue"></div><div data-element="displayMeasurement"></div>`
 
-    get MeasurementUnitName() {
-        return this.DisplayMeasurement.value;
+    get measurementUnitName() {
+        return this.displayMeasurement.value;
     }
-    set MeasurementUnitName(measurementUnitName) {
-        if(measurementUnitName === undefined || this.DisplayMeasurement.value === measurementUnitName)
+    set measurementUnitName(measurementUnitName) {
+        if(measurementUnitName === undefined || this.displayMeasurement.value === measurementUnitName)
             return;
 
-        this.DisplayMeasurement.value = measurementUnitName;
+        this.displayMeasurement.value = measurementUnitName;
         this.UpdateDisplayValue();
     }
 
-    get Measurement() {
-        return this.DisplayMeasurement.Measurement;
+    get measurementName() {
+        return this.displayMeasurement.measurementName;
     }
-    set Measurement(measurement) {
-        if(this.DisplayMeasurement.Measurement === measurement)
+    set measurementName(measurementName) {
+        if(this.displayMeasurement.measurementName === measurementName)
             return;
 
-        this.DisplayMeasurement.Measurement = measurement;
+        this.displayMeasurement.measurementName = measurementName;
         this.UpdateDisplayValue();
     }
 
@@ -79,17 +79,17 @@ export default class UINumberWithMeasurement extends UITemplate {
     }
 
     get Unit() {
-        return GetUnit(this.Measurement, this.MeasurementUnitName)
+        return GetUnit(this.measurementName, this.measurementUnitName)
     }
 
     constructor(prop) {
         super();
         const thisClass = this;
-        this.DisplayMeasurement = new UIMeasurement({
-            Measurement : prop?.Measurement,
-            value: prop?.MeasurementUnitName,
+        this.displayMeasurement = new UIMeasurement({
+            measurementName : prop?.measurementName,
+            value: prop?.measurementUnitName,
         });
-        this.DisplayMeasurement.addEventListener(`change`, function() {
+        this.displayMeasurement.addEventListener(`change`, function() {
             thisClass.UpdateDisplayValue();
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
@@ -104,17 +104,17 @@ export default class UINumberWithMeasurement extends UITemplate {
     }
 
     get saveValue() {
-        if(this.DisplayMeasurement.saveValue === undefined)
+        if(this.displayMeasurement.saveValue === undefined)
             return this.value;
 
         return {
-            measurementUnitName: this.DisplayMeasurement.saveValue,
+            measurementUnitName: this.displayMeasurement.saveValue,
             value: this.value
         };
     }
     set saveValue(saveValue){
         if(typeof saveValue === `object`) {
-            this.DisplayMeasurement.saveValue = saveValue.measurementUnitName ?? saveValue.MeasurementUnitName;
+            this.displayMeasurement.saveValue = saveValue.measurementUnitName ?? saveValue.measurementUnitName;
             this.value = saveValue.value ?? saveValue.value;
         } else {
             this.value = saveValue;

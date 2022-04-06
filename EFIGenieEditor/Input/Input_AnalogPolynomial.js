@@ -12,7 +12,7 @@ export default class Input_AnalogPolynomial extends UITemplate {
         this.analogInput = new Input_Analog();
         this.polynomial = new Calculation_Polynomial();
         this.voltageLiveUpdate = new UIDisplayLiveUpdate({
-            Measurement: Input_Analog.Measurement
+            measurementName: Input_Analog.measurementName
         });
         this.voltageLiveUpdate.style.float = `right`;
         this.Setup(prop);

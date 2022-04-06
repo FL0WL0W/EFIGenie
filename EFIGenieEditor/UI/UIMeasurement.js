@@ -13,17 +13,17 @@ export default class UIMeasurement extends UISelection {
         }
     }
 
-    _measurement;
-    get Measurement() {
-        return this._measurement;
+    _measurementName;
+    get measurementName() {
+        return this._measurementName;
     }
-    set Measurement(measurement){
-        if(!measurement)
+    set measurementName(measurementName){
+        if(!measurementName)
             return;
 
-        this._measurement = measurement;
-        this.Default = Measurements[measurement]?.[GetDefaultUnitIndex(measurement)]?.name;
-        this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name }; })
+        this._measurementName = measurementName;
+        this.Default = Measurements[measurementName]?.[GetDefaultUnitIndex(measurementName)]?.name;
+        this.options = Measurements[measurementName]?.map(unit => { return { name: unit.name, value: unit.name }; })
         if(this.value === undefined || this.value === `` || this.value === null) 
             this.value = this.Default;
         if(this.options.length === 0)
@@ -45,7 +45,7 @@ export default class UIMeasurement extends UISelection {
 
     constructor(prop) {
         super(prop);
-        if(prop?.Measurement && prop?.value !== undefined) {
+        if(prop?.measurementName && prop?.value !== undefined) {
             this.Default = this.value;
         }
         this.class = `ui measurement`;

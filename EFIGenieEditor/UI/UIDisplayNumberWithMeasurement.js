@@ -1,21 +1,21 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIMeasurement from "./UIMeasurement.js"
 export default class UIDisplayNumberWithMeasurement extends UITemplate {
-    static Template = `<div data-element="DisplayValue"></div><div data-element="DisplayMeasurement"></div>`
+    static Template = `<div data-element="displayValue"></div><div data-element="displayMeasurement"></div>`
 
-    get MeasurementUnitName() {
-        return this.DisplayMeasurement.value;
+    get measurementUnitName() {
+        return this.displayMeasurement.value;
     }
-    set MeasurementUnitName(measurementUnitName) {
-        this.DisplayMeasurement.value = measurementUnitName;
+    set measurementUnitName(measurementUnitName) {
+        this.displayMeasurement.value = measurementUnitName;
         this.UpdateDisplayValue();
     }
 
-    get Measurement() {
-        return this.DisplayMeasurement.Measurement;
+    get measurementName() {
+        return this.displayMeasurement.measurementName;
     }
-    set Measurement(measurement) {
-        this.DisplayMeasurement.Measurement = measurement;
+    set measurementName(measurementName) {
+        this.displayMeasurement.measurementName = measurementName;
         this.UpdateDisplayValue();
     }
 
@@ -31,31 +31,31 @@ export default class UIDisplayNumberWithMeasurement extends UITemplate {
     constructor(prop) {
         super();
         const thisClass = this;
-        this.DisplayMeasurement = new UIMeasurement({
-            Measurement : prop?.Measurement,
-            value: prop?.MeasurementUnitName
+        this.displayMeasurement = new UIMeasurement({
+            measurementName : prop?.measurementName,
+            value: prop?.measurementUnitName
         });
-        this.DisplayMeasurement.addEventListener(`change`, function() {
+        this.displayMeasurement.addEventListener(`change`, function() {
             thisClass.ZeroesToAdd = 10000000;
             thisClass.UpdateDisplayValue();
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
-        this.DisplayValue = document.createElement(`div`);
-        this.DisplayValue.style.display = this.DisplayMeasurement.style.display = `inline-block`;
+        this.displayValue = document.createElement(`div`);
+        this.displayValue.style.display = this.displayMeasurement.style.display = `inline-block`;
         
         this.Setup(prop);
         this.ZeroesToAdd = 10000000;
     }
 
     get saveValue() {
-        return this.DisplayMeasurement.saveValue;
+        return this.displayMeasurement.saveValue;
     }
     set saveValue(saveValue) {
-        this.DisplayMeasurement.saveValue = saveValue;
+        this.displayMeasurement.saveValue = saveValue;
     }
 
     UpdateDisplayValue() {
-        let unit = GetUnit(this.Measurement, this.MeasurementUnitName)
+        let unit = GetUnit(this.measurementName, this.measurementUnitName)
         if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
             
@@ -71,7 +71,7 @@ export default class UIDisplayNumberWithMeasurement extends UITemplate {
         for(var i = 0; i < zeroesToAdd; i++)
             displayValue += `0`;
 
-        this.DisplayValue.textContent = displayValue;
+        this.displayValue.textContent = displayValue;
     }
 }
 customElements.define(`ui-displaynumberwithmeasurement`, UIDisplayNumberWithMeasurement, { extends: `span` });

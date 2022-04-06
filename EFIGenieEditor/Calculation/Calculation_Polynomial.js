@@ -6,18 +6,18 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     static Output = `float`;
     static Inputs = [`float`];
 
-    get Measurement() {
-        return this.#coeffecientElement.firstChild.Measurement;
+    get measurementName() {
+        return this.#coeffecientElement.firstChild.measurementName;
     }
-    set Measurement(measurement) {
-        this.#coeffecientElement.firstChild.Measurement = measurement;
+    set measurementName(measurement) {
+        this.#coeffecientElement.firstChild.measurementName = measurement;
     }
 
-    get MeasurementUnitName() {
-        return this.#coeffecientElement.firstChild.MeasurementUnitName;
+    get measurementUnitName() {
+        return this.#coeffecientElement.firstChild.measurementUnitName;
     }
-    set MeasurementUnitName(measurementUnitName) {
-        this.#coeffecientElement.firstChild.MeasurementUnitName = measurementUnitName;
+    set measurementUnitName(measurementUnitName) {
+        this.#coeffecientElement.firstChild.measurementUnitName = measurementUnitName;
     }
 
     #coeffecientElement = document.createElement(`div`);
@@ -70,12 +70,12 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         const minValueLabel = document.createElement(`label`);
         minValueLabel.textContent = `Minimum Value:`
         this.append(minValueLabel);
-        this.#minValueElement.DisplayMeasurement.hidden = true;
+        this.#minValueElement.displayMeasurement.hidden = true;
         this.append(this.#minValueElement);
         this.append(document.createElement(`br`));
         const maxValueLabel = document.createElement(`label`);
         this.append(maxValueLabel);
-        this.#maxValueElement.DisplayMeasurement.hidden = true;
+        this.#maxValueElement.displayMeasurement.hidden = true;
         maxValueLabel.textContent = `Maximum Value:`
         this.append(this.#maxValueElement);
         this.append(document.createElement(`br`));
@@ -102,13 +102,13 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
                     get: function() { return this.firstChild.value; },
                     set: function(value) { this.firstChild.value = value }
                 });
-                Object.defineProperty(coeffecientElement, 'Measurement', {
-                    get: function() { return this.firstChild.Measurement; },
-                    set: function(value) { this.firstChild.Measurement = value }
+                Object.defineProperty(coeffecientElement, 'measurementName', {
+                    get: function() { return this.firstChild.measurementName; },
+                    set: function(value) { this.firstChild.measurementName = value }
                 });
-                Object.defineProperty(coeffecientElement, 'MeasurementUnitName', {
-                    get: function() { return this.firstChild.MeasurementUnitName; },
-                    set: function(value) { this.firstChild.MeasurementUnitName = value }
+                Object.defineProperty(coeffecientElement, 'measurementUnitName', {
+                    get: function() { return this.firstChild.measurementUnitName; },
+                    set: function(value) { this.firstChild.measurementUnitName = value }
                 });
             }
         });
@@ -120,10 +120,10 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.#coeffecientElement.style.justifyContent = `flex-end`;
         this.#coeffecientElement.firstChild.addEventListener(`change`, function() {
             //convert value
-            thisClass.#minValueElement.Measurement = thisClass.Measurement;
-            thisClass.#maxValueElement.Measurement = thisClass.Measurement;
-            thisClass.#minValueElement.MeasurementUnitName = thisClass.MeasurementUnitName;
-            thisClass.#maxValueElement.MeasurementUnitName = thisClass.MeasurementUnitName;
+            thisClass.#minValueElement.measurementName = thisClass.measurementName;
+            thisClass.#maxValueElement.measurementName = thisClass.measurementName;
+            thisClass.#minValueElement.measurementUnitName = thisClass.measurementUnitName;
+            thisClass.#maxValueElement.measurementUnitName = thisClass.measurementUnitName;
         });
         Object.assign(this, prop);
     }
@@ -179,12 +179,12 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
 
     #toDisplayValue(value, index) {
         //todo
-        const unit = Measurements[this.Measurement]?.[this.MeasurementUnitName];
+        const unit = Measurements[this.measurementName]?.[this.measurementUnitName];
         return value;
     }
     #toBaseValue(value, index) {
         //todo
-        const unit = Measurements[this.Measurement]?.[this.MeasurementUnitName];
+        const unit = Measurements[this.measurementName]?.[this.measurementUnitName];
         return value;
     }
 }

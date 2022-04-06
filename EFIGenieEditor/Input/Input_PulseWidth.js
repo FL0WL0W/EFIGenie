@@ -20,7 +20,7 @@ export default class Input_PulseWidth extends UITemplate {
             step: 1,
             min: 0,
             max: 65535,
-            Measurement: `Frequency`
+            measurementName: `Frequency`
         });
         this.style.display = `block`;
         this.Setup(prop);

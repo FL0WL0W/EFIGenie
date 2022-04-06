@@ -46,7 +46,7 @@ export default class Calculation_Formula extends UITemplate {
                     calculations: GenericConfigs,
                     output: `float`,
                     ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined,
-                    Measurement: this.Measurement
+                    measurementName: this.measurementName
                 });
             }
             let formulaParameter = this.formulaDialogTemplate.parameterElements.children[i];
@@ -101,22 +101,22 @@ export default class Calculation_Formula extends UITemplate {
         this.editFormula.title = label + ` Formula`;
     }
 
-    _measurement = undefined;
-    get Measurement() {
-        if(this._measurement)
-            return this._measurement;
+    _measurementName = undefined;
+    get measurementName() {
+        if(this._measurementName)
+            return this._measurementName;
     }
-    set Measurement(measurement) {
-        if(this._measurement === measurement)
+    set measurementName(measurementName) {
+        if(this._measurementName === measurementName)
             return;
 
-        this._measurement = measurement;
+        this._measurementName = measurementName;
         for(let parameter in this.parameterValues) {
             let parameterValue = this.parameterValues[parameter];
             if(!parameterValue)
                 continue;
             
-            this.parameterValues.Measurement = measurement;
+            this.parameterValues.measurementName = measurementName;
         }
     }
     
@@ -162,7 +162,7 @@ export default class Calculation_Formula extends UITemplate {
                 calculations: GenericConfigs,
                 output: `float`,
                 ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
-                Measurement: this.Measurement
+                measurementName: this.measurementName
             });
 
             parameterValue.saveValue = saveValue.parameterValues[parameter];
@@ -195,7 +195,7 @@ export default class Calculation_Formula extends UITemplate {
                 calculations: GenericConfigs,
                 output: `float`,
                 ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
-                Measurement: this.Measurement
+                measurementName: this.measurementName
             });
 
             parameterValue.value = value.parameterValues[parameter];
@@ -231,7 +231,7 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     GetVariableReference() {
-        return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
+        return `${this.ReferenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
     }
 
     GetObjOperation(outputVariableId) {
