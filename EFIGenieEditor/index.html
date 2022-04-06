@@ -120,7 +120,7 @@
                 var targets = ``;
                 Object.entries(PinOuts).forEach(entry => {
                     const [key, value] = entry;
-                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.Name}</option>`;
+                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.name}</option>`;
                 });
                 selectTarget.innerHTML = targets;
             });

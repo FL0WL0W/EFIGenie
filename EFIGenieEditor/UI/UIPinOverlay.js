@@ -68,9 +68,9 @@ export default class PinOverlay extends HTMLDivElement {
                         let selectedOption;
                         for(let s=0; s<pinSelectElements.length; s++) {
                             let option = {
-                                Name: pinSelectElements[s].name,
-                                Value: s,
-                                Disabled: this.supportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1
+                                name: pinSelectElements[s].name,
+                                value: s,
+                                disabled: this.supportedModes.split(` `).indexOf(pinSelectElements[s].pinselectmode) === -1
                             };
                             if(pinSelectElements[s].pin == this.pin) {
                                 if(selectedOption) {
@@ -91,7 +91,7 @@ export default class PinOverlay extends HTMLDivElement {
                         }
                         else {
                             this.classList.remove(`pinconflict`)
-                            this.value = selectedOption.Value;
+                            this.value = selectedOption.value;
                         }
                     }
                 });
@@ -100,10 +100,10 @@ export default class PinOverlay extends HTMLDivElement {
                         this._pinSelectElements[this.value].element.parentElement.value = this.pin;
                 });
             }
-            pinElement.pin = pinOut.Pins[i].Value;
-            pinElement.supportedModes = pinOut.Pins[i].SupportedModes;
-            pinElement.style.top = pinOut.Pins[i].OverlayY - pinOut.OverlayElementHeight / 2 + `px`;
-            pinElement.style.left = (pinOut.Pins[i].Align === `left`? pinOut.Pins[i].OverlayX + 150 : pinOut.OverlayWidth - pinOut.Pins[i].OverlayX) + `px`;
+            pinElement.pin = pinOut.Pins[i].value;
+            pinElement.supportedModes = pinOut.Pins[i].supportedModes;
+            pinElement.style.top = pinOut.Pins[i].overlayY - pinOut.OverlayElementHeight / 2 + `px`;
+            pinElement.style.left = (pinOut.Pins[i].align === `left`? pinOut.Pins[i].overlayX + 150 : pinOut.OverlayWidth - pinOut.Pins[i].overlayX) + `px`;
         }
         this.update();
     }

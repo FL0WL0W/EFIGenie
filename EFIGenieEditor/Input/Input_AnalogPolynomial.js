@@ -3,18 +3,18 @@ import Input_Analog from "./Input_Analog.js";
 import Calculation_Polynomial from "../Calculation/Calculation_Polynomial.js";
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 export default class Input_AnalogPolynomial extends UITemplate {
-    static Template = `<div data-element="VoltageLiveUpdate"></div><div data-element="AnalogInput"></div><div data-element="Polynomial"></div>`;
+    static Template = `<div data-element="voltageLiveUpdate"></div><div data-element="analogInput"></div><div data-element="polynomial"></div>`;
     static Output = `float`;
     static Inputs = [];
 
     constructor(prop){
         super();
-        this.AnalogInput = new Input_Analog();
-        this.Polynomial = new Calculation_Polynomial();
-        this.VoltageLiveUpdate = new UIDisplayLiveUpdate({
+        this.analogInput = new Input_Analog();
+        this.polynomial = new Calculation_Polynomial();
+        this.voltageLiveUpdate = new UIDisplayLiveUpdate({
             Measurement: Input_Analog.Measurement
         });
-        this.VoltageLiveUpdate.style.float = `right`;
+        this.voltageLiveUpdate.style.float = `right`;
         this.Setup(prop);
         this.style.display = `block`;
     }
@@ -24,14 +24,14 @@ export default class Input_AnalogPolynomial extends UITemplate {
             `${this.ReferenceName}(Voltage)`,
             `float`
         );
-        this.VoltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
-        this.VoltageLiveUpdate.RegisterVariables();
+        this.voltageLiveUpdate.VariableReference = `${this.ReferenceName}(Voltage)`;
+        this.voltageLiveUpdate.RegisterVariables();
     }
 
     GetObjOperation(outputVariableId) {
         return { type: `Group`, value: [
-            this.AnalogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`),
-            this.Polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`)
+            this.analogInput.GetObjOperation(`${this.ReferenceName}(Voltage)`),
+            this.polynomial.GetObjOperation(outputVariableId, `${this.ReferenceName}(Voltage)`)
         ]};
     }
 }

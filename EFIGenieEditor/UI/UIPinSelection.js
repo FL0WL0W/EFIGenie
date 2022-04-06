@@ -8,7 +8,7 @@ export default class UIPinSelection extends UISelection {
         this.addEventListener(`change`, function() {
             UpdateOverlay();
         });
-        this.selectedElement.dataset.pinselectmode = this.PinType;
+        this.selectedElement.dataset.pinselectmode = this.pinType;
         this.selectedElement.classList.add(`pinselect`);
     }
     
@@ -17,19 +17,19 @@ export default class UIPinSelection extends UISelection {
         var endOptions = [];
         let pinOut = pinOverlay.pinOut;
         for(var i = 0; i < pinOut.Pins.length; i++) {
-            const selected = this.Value === pinOut.Pins[i].Value;
-            if(pinOut.Pins[i].SupportedModes.split(` `). indexOf(this.PinType) === -1) {
+            const selected = this.value === pinOut.Pins[i].value;
+            if(pinOut.Pins[i].supportedModes.split(` `). indexOf(this.pinType) === -1) {
                 endOptions.push({
-                    Name: pinOut.Pins[i].Name,
-                    Value: pinOut.Pins[i].Value,
+                    name: pinOut.Pins[i].name,
+                    value: pinOut.Pins[i].value,
                     Selected: selected,
                     Class: selected? `incompatible` : undefined,
-                    Disabled: true
+                    disabled: true
                 });
             } else {
                 options.push({
-                    Name: pinOut.Pins[i].Name,
-                    Value: pinOut.Pins[i].Value,
+                    name: pinOut.Pins[i].name,
+                    value: pinOut.Pins[i].value,
                     Selected: selected
                 });
             }

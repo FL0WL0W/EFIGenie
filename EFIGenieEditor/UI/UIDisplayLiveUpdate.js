@@ -47,7 +47,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithMeasurement 
                 const variableId = VariableMetadata.GetVariableId(thisClass.VariableReference);
                 if(CurrentVariableValues[variableId] !== undefined) {
                     thisClass.superHidden = false;
-                    thisClass.Value = CurrentVariableValues[variableId];
+                    thisClass.value = CurrentVariableValues[variableId];
                     if(!thisClass.superHidden) {
                         if(thisClass.superHidden)
                             thisClass.superHidden = false;

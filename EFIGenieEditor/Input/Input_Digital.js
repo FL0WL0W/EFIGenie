@@ -2,19 +2,19 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UICheckBox from "../JavascriptUI/UICheckBox.js";
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_Digital extends UITemplate {
-    static Name = `Digital Pin`;
+    static displayName = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
     static Measurement = `Bool`;
-    static Template = `<label>Pin:</label><div data-element="Pin"></div><div data-element="Inverted"></div>Inverted`
+    static Template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
     constructor(prop){
         super();
-        this.Pin = new UIPinSelection({
-            Value: 0xFFFF,
-            PinType: `digital`
+        this.pin = new UIPinSelection({
+            value: 0xFFFF,
+            pinType: `digital`
         });
-        this.Inverted = new UICheckBox();
+        this.inverted = new UICheckBox();
         this.style.display = `block`;
         this.Setup(prop);
     }
@@ -22,8 +22,8 @@ export default class Input_Digital extends UITemplate {
     GetObjOperation(outputVariableId) {
         var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
-            { type: `UINT16`, value: this.Pin.Value}, //pin
-            { type: `BOOL`, value: this.Inverted.Value}, //inverted
+            { type: `UINT16`, value: this.value.pin}, //pin
+            { type: `BOOL`, value: this.value.inverted}, //inverted
         ]};
 
         if (outputVariableId)

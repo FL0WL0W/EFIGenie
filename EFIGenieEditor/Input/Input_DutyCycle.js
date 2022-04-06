@@ -2,21 +2,21 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_DutyCycle extends UITemplate {
-    static Name = `Duty Cycle Pin Pin`;
+    static displayName = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Percentage`;
-    static Template =   `<label>Pin:</label><div data-element="Pin"></div>` +
-                        `<br/><label>Minimum Frequency:</label><div data-element="MinFrequency"></div>`
+    static Template =   `<label>Pin:</label><div data-element="pin"></div>` +
+                        `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 
     constructor(prop){
         super();
-        this.Pin = new UIPinSelection({
-            Value: 0xFFFF,
-            PinType: `pwm`
+        this.pin = new UIPinSelection({
+            value: 0xFFFF,
+            pinType: `pwm`
         });
-        this.MinFrequency = new UINumberWithMeasurement({
-            Value: 1000,
+        this.minFrequency = new UINumberWithMeasurement({
+            value: 1000,
             step: 1,
             min: 0,
             max: 65535,
@@ -29,8 +29,8 @@ export default class Input_DutyCycle extends UITemplate {
     GetObjOperation(outputVariableId) {
         var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
-            { type: `UINT16`, value: this.Pin.Value}, //pin
-            { type: `UINT16`, value: this.MinFrequency.Value}, //minFrequency
+            { type: `UINT16`, value: this.value.pin}, //pin
+            { type: `UINT16`, value: this.value.minFrequency}, //minFrequency
         ]};
 
         if (outputVariableId) 

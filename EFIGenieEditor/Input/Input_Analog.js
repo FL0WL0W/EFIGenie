@@ -1,17 +1,25 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_Analog extends UITemplate {
-    static Name = `Analog Pin`;
+    static displayName = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
     static Measurement = `Voltage`;
-    static Template = `<label>Pin:</label><div data-element="Pin"></div>`
+    static Template = `<label>Pin:</label><div data-element="pin"></div>`
+
+    get saveValue() {
+        return super.saveValue;
+    }
+    set saveValue(saveValue) {
+        saveValue.pin ??= saveValue.Pin;
+        super.saveValue = saveValue;
+    }
 
     constructor(prop){
         super();
-        this.Pin = new UIPinSelection({
-            Value: 0xFFFF,
-            PinType: `analog`
+        this.pin = new UIPinSelection({
+            value: 0xFFFF,
+            pinType: `analog`
         });
         this.style.display = `block`;
         this.Setup(prop);
@@ -20,7 +28,7 @@ export default class Input_Analog extends UITemplate {
     GetObjOperation(outputVariableId) {
         var obj = { value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
-            { type: `UINT16`, value: this.Pin.Value}, //pin
+            { type: `UINT16`, value: this.value.pin}, //pin
         ]};
 
         if (outputVariableId)

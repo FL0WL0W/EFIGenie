@@ -22,8 +22,8 @@ export default class UIMeasurement extends UISelection {
             return;
 
         this._measurement = measurement;
-        this.Default = Measurements[measurement]?.[GetDefaultUnitIndex(measurement)]?.Name;
-        this.options = Measurements[measurement]?.map(unit => { return { Name: unit.Name, Value: unit.Name }; })
+        this.Default = Measurements[measurement]?.[GetDefaultUnitIndex(measurement)]?.name;
+        this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name }; })
         if(this.value === undefined || this.value === `` || this.value === null) 
             this.value = this.Default;
         if(this.options.length === 0)

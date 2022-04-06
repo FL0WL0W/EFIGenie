@@ -1,20 +1,20 @@
 import Input_AnalogPolynomial from "../Input/Input_AnalogPolynomial.js";
 export default class MAP_GM2Bar extends Input_AnalogPolynomial {
-    static Name = `GM 2 Bar MAP`;
+    static displayName = `GM 2 Bar MAP`;
     static Measurement = `Pressure`;
 
-    get saveValue() { return this.AnalogInput.saveValue; }
-    set saveValue(saveValue) { return this.AnalogInput.saveValue = saveValue; }
+    get saveValue() { return this.analogInput.saveValue; }
+    set saveValue(saveValue) { return this.analogInput.saveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
-        this.Polynomial.hidden = true;
-        this.Polynomial.minValue = 0.088;
-        this.Polynomial.maxValue = 2.08;
-        let value = [];
-        value[0] = 0.082718614718615;
-        value[1] = 0.398493506493506;
-        this.Polynomial.value = value;
+        this.polynomial.hidden = true;
+        this.polynomial.minValue = 0.088;
+        this.polynomial.maxValue = 2.08;
+        let coeffecients = [];
+        coeffecients[0] = 0.082718614718615;
+        coeffecients[1] = 0.398493506493506;
+        this.polynomial.coeffecients = coeffecients;
     }
 }
 MapConfigs.push(MAP_GM2Bar);

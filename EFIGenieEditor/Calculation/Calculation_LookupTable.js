@@ -4,18 +4,18 @@ import UIDialog from "../JavascriptUI/UIDialog.js";
 import UITable from "../JavascriptUI/UITable.js";
 import UIGraph2D from "../JavascriptUI/UIGraph2D.js";
 export default class Calculation_LookupTable extends UITemplate {
-    static Name = `Lookup Table`;
+    static displayName = `Lookup Table`;
     static Output = `float`;
     static Inputs = [`float`];
-    static Template = `<div data-element="Dialog"></div>`
+    static Template = `<div data-element="dialog"></div>`
     GUID = generateGUID();
 
     get label() {
-        return this.Table.zLabel;
+        return this.table.zLabel;
     }
     set label(label){
-        this.Table.zLabel = label;
-        this.Dialog.title = label;
+        this.table.zLabel = label;
+        this.dialog.title = label;
     }
 
     _xLabel = `X`
@@ -27,100 +27,108 @@ export default class Calculation_LookupTable extends UITemplate {
             return;
 
         this._xLabel = xLabel;
-        if(!this.ParameterSelection)
-            this.Table.xLabel = xLabel;
+        if(!this.parameterSelection)
+            this.table.xLabel = xLabel;
     }
 
     get xOptions() {
-        if(!this.ParameterSelection) 
+        if(!this.parameterSelection) 
             return;
 
-        return this.ParameterSelection.options;
+        return this.parameterSelection.options;
     }
     set xOptions(options) {
-        if(!this.ParameterSelection || objectTester(this.ParameterSelection.options, options)) 
+        if(!this.parameterSelection || objectTester(this.parameterSelection.options, options)) 
             return;
 
-        this.ParameterSelection.options = options;
+        this.parameterSelection.options = options;
     }
 
     get noParameterSelection() {
-        if(this.ParameterSelection)
+        if(this.parameterSelection)
             return false;
         return true;
     }
     set noParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
-            this.ParameterReference = undefined;
-            this.ParameterSelection = undefined;
-            this.Table.xLabel = this.xLabel;
+            this.parameterReference = undefined;
+            this.parameterSelection = undefined;
+            this.table.xLabel = this.xLabel;
             return;
         }
 
         const thisClass = this;
-        if(!this.ParameterSelection) {
-            this.ParameterSelection = new UISelection({
+        if(!this.parameterSelection) {
+            this.parameterSelection = new UISelection({
                 options: GetSelections(),
                 Class: `TableParameterSelect`
             });
-            this.ParameterSelection.addEventListener(`change`, function() {
-                thisClass.ParameterReference = `${thisClass.ParameterSelection.Value.reference}.${thisClass.ParameterSelection.Value.value}${thisClass.ParameterSelection.Value.measurement? `(${thisClass.ParameterSelection.Value.measurement})` : ``}`;
+            this.parameterSelection.addEventListener(`change`, function() {
+                const parameterSelectionValue = thisClass.parameterSelection.value;
+                thisClass.parameterReference = `${parameterSelectionValue.reference}.${parameterSelectionValue.value}${parameterSelectionValue.measurement? `(${parameterSelectionValue.measurement})` : ``}`;
             })
-            this.Table.xLabel = this.ParameterSelection;
+            this.table.xLabel = this.parameterSelection;
         }
     }
 
+    get value() {
+        return this.table.saveValue;
+    }
+    set value(value) {
+        this.table.saveValue = value;
+    }
+
     get saveValue() {
-        return super.saveValue;
+        let saveValue = super.saveValue;
+        delete saveValue.graph;
+        return saveValue;
     }
     set saveValue(saveValue) {
+        saveValue.table ??= saveValue.Table;
+        saveValue.parameterSelection ??= saveValue.ParameterSelection;
         super.saveValue = saveValue;
-        if(!saveValue.Table)
-            this.Table.saveValue = saveValue;
+        if(!saveValue.table)
+            this.table.saveValue = saveValue;
     }
 
     constructor(prop) {
         super();
-        const thisClass = this;
-        this.Dialog = new UIDialog({
+        this.dialog = new UIDialog({
             buttonLabel: `Edit Table`,
         });
-        this.TableGroup = `$Graph$</br>$Table$`;
-        this.Table = new UITable({
+        this.table = new UITable({
             selectNotVisible: true,
             yResolution: 1,
             yResolutionModifiable: false,
             BaseObj: true
         });
-        this.Graph = new UIGraph2D({
+        this.graph = new UIGraph2D({
             width: 800,
             height: 450
         });
-        delete this.Graph.saveValue;
-        this.Table.attachToTable(this.Graph);
-        this.Graph.attachToTable(this.Table);
-        this.Dialog.content.append(this.Graph);
-        this.Dialog.content.append(document.createElement(`br`));
-        this.Dialog.content.append(this.Table);
+        this.table.attachToTable(this.graph);
+        this.graph.attachToTable(this.table);
+        this.dialog.content.append(this.graph);
+        this.dialog.content.append(document.createElement(`br`));
+        this.dialog.content.append(this.table);
         this.noParameterSelection = false;
         this.label = `Value`;
         this.Setup(prop);
     }
 
     GetObjOperation(outputVariableId, inputVariableId) {
-        const table = this.Table;
-        const tableValue = table.Value;
-        const type = GetArrayType(tableValue);
+        const table = this.value;
+        const type = GetArrayType(table.value);
         const typeId = GetTypeId(type);
 
         var obj = {
             value: [
                 { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
                 { type: `FLOAT`, value: table.xAxis[0] }, //MinXValue
-                { type: `FLOAT`, value: table.xAxis[table.xResolution-1] }, //MaxXValue
-                { type: `UINT8`, value: table.xResolution }, //xResolution
+                { type: `FLOAT`, value: table.xAxis[table.xAxis.length-1] }, //MaxXValue
+                { type: `UINT8`, value: table.xAxis.length }, //xResolution
                 { type: `UINT8`, value: typeId }, //Type
-                { type: type, value: tableValue }, //Table
+                { type: type, value: table.value }, //Table
             ]
         };
 
@@ -129,7 +137,7 @@ export default class Calculation_LookupTable extends UITemplate {
             if(inputVariableId) {
                 inputVariables = [ inputVariableId ]; //inputVariable
             } else if (!this.noParameterSelection) {
-                const parameterSelection = this.ParameterSelection.Value;
+                const parameterSelection = this.parameterSelection.value;
                 inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //inputVariable
             }
             obj = Packagize(obj, { 
@@ -143,15 +151,15 @@ export default class Calculation_LookupTable extends UITemplate {
 
     RegisterVariables() {
         this.xOptions = GetSelections();
-        if(VariablesToPoll.indexOf(this.ParameterReference) === -1)
-            VariablesToPoll.push(this.ParameterReference);
+        if(VariablesToPoll.indexOf(this.parameterReference) === -1)
+            VariablesToPoll.push(this.parameterReference);
         
         const thisClass = this;
         LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.ParameterReference) { 
-                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.ParameterReference);
+            if(thisClass.parameterReference) { 
+                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.parameterReference);
                 if(CurrentVariableValues[parameterVariableId] !== undefined) {
-                    thisClass.Table.trail(CurrentVariableValues[parameterVariableId])
+                    thisClass.table.trail(CurrentVariableValues[parameterVariableId])
                 } 
             }
         };

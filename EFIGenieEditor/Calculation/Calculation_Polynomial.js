@@ -2,33 +2,33 @@ import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 import UINumber from "../JavascriptUI/UINumber.js";
 //this still needs some complicated unit work. this is ok for now
 export default class Calculation_Polynomial extends HTMLSpanElement {
-    static Name = `Polynomial`;
+    static displayName = `Polynomial`;
     static Output = `float`;
     static Inputs = [`float`];
 
     get Measurement() {
-        return this.#valueElement.firstChild.Measurement;
+        return this.#coeffecientElement.firstChild.Measurement;
     }
     set Measurement(measurement) {
-        this.#valueElement.firstChild.Measurement = measurement;
+        this.#coeffecientElement.firstChild.Measurement = measurement;
     }
 
     get MeasurementUnitName() {
-        return this.#valueElement.firstChild.MeasurementUnitName;
+        return this.#coeffecientElement.firstChild.MeasurementUnitName;
     }
     set MeasurementUnitName(measurementUnitName) {
-        this.#valueElement.firstChild.MeasurementUnitName = measurementUnitName;
+        this.#coeffecientElement.firstChild.MeasurementUnitName = measurementUnitName;
     }
 
-    #valueElement = document.createElement(`div`);
-    get value() {
+    #coeffecientElement = document.createElement(`div`);
+    get coeffecients() {
         const thisClass = this;
-        return [...this.#valueElement.children].map(function(element, index) { return thisClass.#toBaseValue(element.value, index); });
+        return [...this.#coeffecientElement.children].map(function(element, index) { return thisClass.#toBaseValue(element.value, index); });
     }
-    set value(value) {
+    set coeffecients(value) {
         this.degree = value.length;
-        for(let i = 0; i < this.#valueElement.children.length; i++) {
-            this.#valueElement.children[i].value = this.#toDisplayValue(value[i], i);
+        for(let i = 0; i < this.#coeffecientElement.children.length; i++) {
+            this.#coeffecientElement.children[i].value = this.#toDisplayValue(value[i], i);
         }
     }
     
@@ -86,39 +86,39 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.append(document.createElement(`br`));
         const thisClass = this;
         this.#degreeElement.addEventListener(`change`, function() {
-            while(thisClass.#valueElement.children.length > thisClass.degree) { thisClass.#valueElement.removeChild(thisClass.#valueElement.lastChild); }
-            for(let i = thisClass.#valueElement.children.length; i < thisClass.degree; i++) {
-                let valueElement = thisClass.#valueElement.appendChild(document.createElement(`div`));
-                let number = valueElement.appendChild(i === 0? new UINumberWithMeasurement({ value: 0 }) : new UINumber({ value: 0 }));
+            while(thisClass.#coeffecientElement.children.length > thisClass.degree) { thisClass.#coeffecientElement.removeChild(thisClass.#coeffecientElement.lastChild); }
+            for(let i = thisClass.#coeffecientElement.children.length; i < thisClass.degree; i++) {
+                let coeffecientElement = thisClass.#coeffecientElement.appendChild(document.createElement(`div`));
+                let number = coeffecientElement.appendChild(i === 0? new UINumberWithMeasurement({ value: 0 }) : new UINumber({ value: 0 }));
                 if(i !== 0) {
-                    let label = valueElement.appendChild(document.createElement(`span`));
+                    let label = coeffecientElement.appendChild(document.createElement(`span`));
                     label.innerHTML = `x<sup>${i}</sup> +`;
                 } else {
 
-                    number.addEventListener(`change`, function() { valueElement.dispatchEvent(new Event(`change`, {bubbles: true})); });
+                    number.addEventListener(`change`, function() { coeffecientElement.dispatchEvent(new Event(`change`, {bubbles: true})); });
                 }
-                valueElement.style.display = `inline`;
-                Object.defineProperty(valueElement, 'value', {
+                coeffecientElement.style.display = `inline`;
+                Object.defineProperty(coeffecientElement, 'value', {
                     get: function() { return this.firstChild.value; },
                     set: function(value) { this.firstChild.value = value }
                 });
-                Object.defineProperty(valueElement, 'Measurement', {
+                Object.defineProperty(coeffecientElement, 'Measurement', {
                     get: function() { return this.firstChild.Measurement; },
                     set: function(value) { this.firstChild.Measurement = value }
                 });
-                Object.defineProperty(valueElement, 'MeasurementUnitName', {
+                Object.defineProperty(coeffecientElement, 'MeasurementUnitName', {
                     get: function() { return this.firstChild.MeasurementUnitName; },
                     set: function(value) { this.firstChild.MeasurementUnitName = value }
                 });
             }
         });
         this.degree = 2;
-        this.append(this.#valueElement);
-        this.#valueElement.style.display = `flex`;
-        this.#valueElement.style.flexDirection = `row-reverse`;
-        this.#valueElement.style.alignItems = `flex-start`;
-        this.#valueElement.style.justifyContent = `flex-end`;
-        this.#valueElement.firstChild.addEventListener(`change`, function() {
+        this.append(this.#coeffecientElement);
+        this.#coeffecientElement.style.display = `flex`;
+        this.#coeffecientElement.style.flexDirection = `row-reverse`;
+        this.#coeffecientElement.style.alignItems = `flex-start`;
+        this.#coeffecientElement.style.justifyContent = `flex-end`;
+        this.#coeffecientElement.firstChild.addEventListener(`change`, function() {
             //convert value
             thisClass.#minValueElement.Measurement = thisClass.Measurement;
             thisClass.#maxValueElement.Measurement = thisClass.Measurement;
@@ -128,19 +128,34 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         Object.assign(this, prop);
     }
 
+    get value() {
+        return { 
+            minValue: this.minValue,
+            maxValue: this.maxValue,
+            coeffecients: this.coeffecients
+        };
+    }
+    set value(value) {
+        if(value) {
+            this.minValue = value.minValue;
+            this.maxValue = value.maxValue;
+            this.coeffecients = value.coeffecients;
+        }
+    }
+
     get saveValue() {
         return { 
-            MinValue: this.minValue,
-            MaxValue: this.maxValue,
-            A: this.value
+            minValue: this.#minValueElement.saveValue,
+            maxValue: this.#maxValueElement.saveValue,
+            coeffecients: this.coeffecients
         };
     }
 
     set saveValue(saveValue) {
         if(saveValue) {
-            this.minValue = saveValue.MinValue;
-            this.maxValue = saveValue.MaxValue;
-            this.value = saveValue.A;
+            this.#minValueElement.saveValue = saveValue.minValue;
+            this.#maxValueElement.saveValue = saveValue.maxValue;
+            this.coeffecients = saveValue.coeffecients;
         }
     }
 
@@ -150,7 +165,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
             { type: `FLOAT`, value: this.minValue}, //MinValue
             { type: `FLOAT`, value: this.maxValue}, //MaxValue
             { type: `UINT8`, value: this.degree}, //Degree
-            { type: `FLOAT`, value: this.value}, //coefficients
+            { type: `FLOAT`, value: this.coeffecients}, //coefficients
         ]};
 
         if (outputVariableId || inputVariableId) 

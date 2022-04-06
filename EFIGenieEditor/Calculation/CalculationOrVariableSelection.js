@@ -2,9 +2,9 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 export default class CalculationOrVariableSelection extends UITemplate {
-    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="Selection"></div><div data-element="LiveUpdate"></div><span data-element="CalculationContent"></span>`
+    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="selection"></div><div data-element="LiveUpdate"></div><span data-element="CalculationContent"></span>`
     CalculationContent = document.createElement(`span`);
-    ConfigValues = [];
+    calculationValues = [];
 
     labelElement = document.createElement(`span`);
     get label() {
@@ -16,7 +16,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
         this.labelElement.textContent = label;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.label = label; });
+        this.calculationValues.forEach(function(configValue) { configValue.label = label; });
     }
 
     _xlabel = `X`;
@@ -29,7 +29,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
         this._xlabel = xlabel;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.xLabel = xlabel; });
+        this.calculationValues.forEach(function(configValue) { configValue.xLabel = xlabel; });
     }
 
     _ylabel = `Y`;
@@ -42,7 +42,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
         this._ylabel = ylabel;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.yLabel = ylabel; });
+        this.calculationValues.forEach(function(configValue) { configValue.yLabel = ylabel; });
     }
 
     _referenceName = undefined;
@@ -55,7 +55,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
         this._referenceName = referenceName;
 
-        this.ConfigValues.forEach(function(configValue) { configValue.ReferenceName = referenceName; });
+        this.calculationValues.forEach(function(configValue) { configValue.ReferenceName = referenceName; });
     }
 
     _measurement = undefined;
@@ -63,7 +63,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(this._measurement)
             return this._measurement;
 
-        const selection = this.Selection.Value;
+        const selection = this.selection.value;
         if (!selection?.reference) {
             const subConfig = this.GetSubConfig();
             return GetClassProperty(subConfig, `Measurement`);
@@ -75,23 +75,23 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(!this._measurement)
             return;
 
-        this.Selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
+        this.selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.calculations, this.calculationsOnly);
         let match = false;
-        let stringValue = UISelection.ParseValue(`string`, this.Selection.value)
-        this.Selection.options.forEach(option => {
-            if(option.Group){
-                option.Options.forEach(option => {
-                    if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+        let stringValue = UISelection.ParseValue(`string`, this.selection.value)
+        this.selection.options.forEach(option => {
+            if(option.group){
+                option.options.forEach(option => {
+                    if(UISelection.ParseValue(`string`, option.value) === stringValue)
                         match = true;
                 });
             } else {
-                if(UISelection.ParseValue(`string`, option.Value) === stringValue)
+                if(UISelection.ParseValue(`string`, option.value) === stringValue)
                     match = true;
             }
         });
 
         if(!match) 
-            this.Selection.value = this.Selection.selectValue;
+            this.selection.value = this.selection.selectValue;
     }
 
     constructor(prop) {
@@ -102,12 +102,12 @@ export default class CalculationOrVariableSelection extends UITemplate {
             MeasurementUnitName: prop?.MeasurementUnitName
         });
         this.LiveUpdate.style.float = `right`;
-        this.Selection = new UISelection({
-            options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.Configs, prop?.ConfigsOnly),
+        this.selection = new UISelection({
+            options: GetSelections(prop?.Measurement, prop?.Output, prop?.Inputs, prop?.calculations, prop?.calculationsOnly),
             selectDisabled: false,
             selectName: `None`
         });
-        this.Selection.addEventListener(`change`, function() {
+        this.selection.addEventListener(`change`, function() {
             const subConfig = thisClass.GetSubConfig();
             thisClass.CalculationContent.replaceChildren(subConfig ?? ``);
             thisClass.LiveUpdate.Measurement = thisClass.Measurement;
@@ -120,63 +120,66 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get saveValue() {
         let saveValue = super.saveValue ?? {};
 
-        if (this.ConfigValues) {
+        if (this.calculationValues && this.calculationValues.length > 0) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
                 if(subConfig?.saveValue !== undefined) {
                     var configValue = subConfig.saveValue;
                     if(typeof configValue !== `object`)
-                        configValue = { Value: configValue };
-                    configValue.ClassName = subConfig.constructor.name;
-                    saveValue.Values = [ configValue ];
+                        configValue = { value: configValue };
+                    configValue.className = subConfig.constructor.name;
+                    saveValue.calculationValues = [ configValue ];
                 }
             } else {
-                saveValue.Values = [];
-                for (var i = 0; i < this.ConfigValues.length; i++) {
-                    var configValue = this.ConfigValues[i].saveValue;
+                saveValue.calculationValues = [];
+                for (var i = 0; i < this.calculationValues.length; i++) {
+                    var configValue = this.calculationValues[i].saveValue;
                     if(typeof configValue !== `object`)
-                        configValue = { Value: configValue };
-                    configValue.ClassName = this.ConfigValues[i].constructor.name
-                    saveValue.Values.push(configValue);
+                        configValue = { value: configValue };
+                    configValue.className = this.calculationValues[i].constructor.name
+                    saveValue.calculationValues.push(configValue);
                 }
             } 
         }
+        if(saveValue.calculationValues?.length < 1)
+            delete saveValue.calculationValues;
 
         return saveValue;
     }
 
     set saveValue(saveValue) {
         saveValue ??= {};
-
-        if(saveValue.Values === undefined)
-            saveValue.Values = [];
+        saveValue.selection ??= saveValue.Selection;
+        saveValue.calculationValues ??= saveValue.Values ?? [];
         
-        for (var i = 0; i < saveValue.Values.length; i++) {
+        for (var i = 0; i < saveValue.calculationValues.length; i++) {
             var found = false;
-            for (var t = 0; t < this.ConfigValues.length; t++) {
-                if (saveValue.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
-                    this.ConfigValues[t].saveValue = saveValue.Values[i];
+            for (var t = 0; t < this.calculationValues.length; t++) {
+                saveValue.calculationValues[i].className ??= saveValue.calculationValues[i].ClassName;
+                if (saveValue.calculationValues[i].className === this.calculationValues[i]?.constructor.name){
+                    this.calculationValues[t].saveValue = saveValue.calculationValues[i];
                     found = true;
                     break;
                 }
             }
-            if (!found && this.Configs) {
-                var configGroups = this.Configs;
-                if(!this.Configs[0].Group && !this.Configs[0].Configs)
-                    configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+            if (!found && this.calculations) {
+                var configGroups = this.calculations;
+                if(!this.calculations[0].group && !this.calculations[0].calculations)
+                    configGroups = [{ group: `Calculations`, calculations: this.calculations }];
         
                 for(var c = 0; c < configGroups.length; c++) {
-                    const configs = configGroups[c].Configs;
-                    for (var t = 0; t < configs.length; t++) {
-                        if (saveValue.Values[i].ClassName !== configs[t].name)
+                    const calculations = configGroups[c].calculations;
+                    for (var t = 0; t < calculations.length; t++) {
+                        saveValue.calculationValues[i].className ??= saveValue.calculationValues[i].ClassName;
+                        if (saveValue.calculationValues[i].className !== calculations[t].name)
                             continue;
-                        this.ConfigValues.push(new configs[t]({
+                        this.calculationValues.push(new calculations[t]({
                             noParameterSelection: this.noParameterSelection,
                             label: this.label,
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
                             ReferenceName: this.ReferenceName,
-                            saveValue: saveValue.Values[i],
+                            saveValue: saveValue.calculationValues[i],
                             Measurement: this._measurement,
                             MeasurementUnitName: this.MeasurementUnitName
                         }));
@@ -191,63 +194,65 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get value() {
         let value = super.value ?? {};
 
-        if (this.ConfigValues) {
+        if (this.calculationValues && this.calculationValues.length > 0) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.GetSubConfig();
                 if(subConfig?.value !== undefined) {
                     var configValue = subConfig.value;
                     if(typeof configValue !== `object`)
-                        configValue = { Value: configValue };
-                    configValue.ClassName = subConfig.constructor.name;
-                    value.Values = [ configValue ];
+                        configValue = { value: configValue };
+                    configValue.className = subConfig.constructor.name;
+                    value.calculationValues = [ configValue ];
                 }
             } else {
-                value.Values = [];
-                for (var i = 0; i < this.ConfigValues.length; i++) {
-                    var configValue = this.ConfigValues[i].value;
+                value.calculationValues = [];
+                for (var i = 0; i < this.calculationValues.length; i++) {
+                    var configValue = this.calculationValues[i].value;
                     if(typeof configValue !== `object`)
-                        configValue = { Value: configValue };
-                    configValue.ClassName = this.ConfigValues[i].constructor.name
-                    value.Values.push(configValue);
+                        configValue = { value: configValue };
+                    configValue.className = this.calculationValues[i].constructor.name
+                    value.calculationValues.push(configValue);
                 }
             } 
         }
+        if(value.calculationValues?.length < 1)
+            delete value.calculationValues;
 
         return value;
     }
 
     set value(value) {
         value ??= {};
-
-        if(value.Values === undefined)
-        value.Values = [];
+        value.calculationValues ??= value.Values ?? [];
         
-        for (var i = 0; i < value.Values.length; i++) {
+        for (var i = 0; i < value.calculationValues.length; i++) {
             var found = false;
-            for (var t = 0; t < this.ConfigValues.length; t++) {
-                if (value.Values[i].ClassName === this.ConfigValues[i]?.constructor.name){
-                    this.ConfigValues[t].value = value.Values[i];
+            for (var t = 0; t < this.calculationValues.length; t++) {
+                value.calculationValues[i].className ??= value.calculationValues[i].ClassName;
+                if (value.calculationValues[i].className === this.calculationValues[i]?.constructor.name){
+                    this.calculationValues[t].value = value.calculationValues[i];
                     found = true;
                     break;
                 }
             }
-            if (!found && this.Configs) {
-                var configGroups = this.Configs;
-                if(!this.Configs[0].Group && !this.Configs[0].Configs)
-                    configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+            if (!found && this.calculations) {
+                var configGroups = this.calculations;
+                if(!this.calculations[0].group && !this.calculations[0].calculations)
+                    configGroups = [{ group: `Calculations`, calculations: this.calculations }];
         
                 for(var c = 0; c < configGroups.length; c++) {
-                    const configs = configGroups[c].Configs;
-                    for (var t = 0; t < configs.length; t++) {
-                        if (value.Values[i].ClassName !== configs[t].name)
+                    const calculations = configGroups[c].calculations;
+                    for (var t = 0; t < calculations.length; t++) {
+                        value.calculationValues[i].className ??= value.calculationValues[i].ClassName;
+                        if (value.calculationValues[i].className !== calculations[t].name)
                             continue;
-                        this.ConfigValues.push(new configs[t]({
+                        this.calculationValues.push(new calculations[t]({
                             noParameterSelection: this.noParameterSelection,
                             label: this.label,
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
                             ReferenceName: this.ReferenceName,
-                            value: value.Values[i],
+                            value: value.calculationValues[i],
                             Measurement: this._measurement,
                             MeasurementUnitName: this.MeasurementUnitName
                         }));
@@ -260,8 +265,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.Selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.Configs, this.ConfigsOnly);
-        const selection = this.Selection.Value;
+        this.selection.options = GetSelections(this._measurement, this.Output, this.Inputs, this.calculations, this.calculationsOnly);
+        const selection = this.selection.value;
         if (selection && this.ReferenceName) {
             const thisReference = this.GetVariableReference();
             if (!selection.reference) {
@@ -288,7 +293,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     GetObjOperation(...args) {
-        const selection = this.Selection.Value;         
+        const selection = this.selection.value;         
         if(!selection?.reference) {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
@@ -300,27 +305,27 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     GetSubConfigIndex() {
-        if (this.Selection.Value?.reference || !this.Configs)
+        if (this.selection.value?.reference || !this.calculations)
             return -1;
 
-        const selection = this.Selection.Value;
+        const selection = this.selection.value;
         if(selection == undefined)
             return -1;
-        for (var i = 0; i < this.ConfigValues.length; i++) {
-            if (this.ConfigValues[i].constructor.name === selection.value) {
+        for (var i = 0; i < this.calculationValues.length; i++) {
+            if (this.calculationValues[i].constructor.name === selection.value) {
                 return i;
             }
         }
-        var configGroups = this.Configs;
-        if(!this.Configs[0].Group && !this.Configs[0].Configs)
-            configGroups = [{ Group: `Calculations`, Configs: this.Configs }];
+        var configGroups = this.calculations;
+        if(!this.calculations[0].group && !this.calculations[0].calculations)
+            configGroups = [{ group: `Calculations`, calculations: this.calculations }];
         for(var c = 0; c < configGroups.length; c++) {
-            const configs = configGroups[c].Configs;
+            const calculations = configGroups[c].calculations;
     
-            for (var i = 0; i < configs.length; i++) {
-                if (configs[i] === undefined || configs[i].name !== selection.value)
+            for (var i = 0; i < calculations.length; i++) {
+                if (calculations[i] === undefined || calculations[i].name !== selection.value)
                     continue;
-                this.ConfigValues.push(new configs[i]({
+                this.calculationValues.push(new calculations[i]({
                     noParameterSelection: this.noParameterSelection,
                     label: this.label,
                     xLabel: this.xLabel,
@@ -329,7 +334,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     Measurement: this._measurement,
                     MeasurementUnitName: this.MeasurementUnitName
                 }));
-                return this.ConfigValues.length-1;
+                return this.calculationValues.length-1;
             }
         }
     }
@@ -339,15 +344,15 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if (subConfigIndex < 0)
             return undefined;
 
-        return this.ConfigValues[subConfigIndex];
+        return this.calculationValues[subConfigIndex];
     }
     
     IsVariable() {
-        return this.Selection.Value?.reference;
+        return this.selection.value?.reference;
     }
 
     GetVariableReference() {
-        if (this.Selection.Value && this.ReferenceName)
+        if (this.selection.value && this.ReferenceName)
             return `${this.ReferenceName}${this.Measurement? `(${this.Measurement})` : ``}`;
     }
 }

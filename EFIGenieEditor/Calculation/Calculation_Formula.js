@@ -3,7 +3,7 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UIDialog from "../JavascriptUI/UIDialog.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Calculation_Formula extends UITemplate {
-    static Name = `Formula`;
+    static displayName = `Formula`;
     static Output = `float`;
     static Inputs = [];
     static Template = `<div data-element="editFormula"></div><div data-element="parameterElements"></div>`;
@@ -43,7 +43,7 @@ export default class Calculation_Formula extends UITemplate {
             if(!parameterValue) {
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
                     label: parameters[i],
-                    Configs: GenericConfigs,
+                    calculations: GenericConfigs,
                     output: `float`,
                     ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameters[i]}` : undefined,
                     Measurement: this.Measurement
@@ -77,7 +77,7 @@ export default class Calculation_Formula extends UITemplate {
                 configParameter.hidden = true;
             else
                 configParameter.hidden = false;
-            parameterValue.Selection.addEventListener(`change`, function() {
+            parameterValue.selection.addEventListener(`change`, function() {
                 if(parameterValue.CalculationContent.innerHTML === ``)
                     configParameter.hidden = true;
                 else
@@ -159,7 +159,7 @@ export default class Calculation_Formula extends UITemplate {
         for(let parameter in saveValue.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
-                Configs: GenericConfigs,
+                calculations: GenericConfigs,
                 output: `float`,
                 ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
                 Measurement: this.Measurement
@@ -167,7 +167,7 @@ export default class Calculation_Formula extends UITemplate {
 
             parameterValue.saveValue = saveValue.parameterValues[parameter];
 
-            window[parameter] = parameterValue.ConfigValues[0];
+            window[parameter] = parameterValue.calculationValues[0];
         }
     }
 
@@ -192,7 +192,7 @@ export default class Calculation_Formula extends UITemplate {
         for(let parameter in value.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
-                Configs: GenericConfigs,
+                calculations: GenericConfigs,
                 output: `float`,
                 ReferenceName: this.ReferenceName? `${this.ReferenceName}_${parameter}` : undefined,
                 Measurement: this.Measurement

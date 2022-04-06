@@ -1,20 +1,20 @@
 import Input_AnalogPolynomial from "../Input/Input_AnalogPolynomial.js";
 export default class MAP_GM3Bar extends Input_AnalogPolynomial {
-    static Name = `GM 3 Bar MAP`;
+    static displayName = `GM 3 Bar MAP`;
     static Measurement = `Pressure`;
 
-    get saveValue() { return this.AnalogInput.saveValue; }
-    set saveValue(saveValue) { return this.AnalogInput.saveValue = saveValue; }
+    get saveValue() { return this.analogInput.saveValue; }
+    set saveValue(saveValue) { return this.analogInput.saveValue = saveValue; }
 
     constructor(prop) {
         super(prop);
-        this.Polynomial.hidden = true;
-        this.Polynomial.minValue = 0.036;
-        this.Polynomial.maxValue = 3.15;
-        let value = [];
-        value[0] = 0.016952380952381;
-        value[1] = 0.628;
-        this.Polynomial.value = value;
+        this.polynomial.hidden = true;
+        this.polynomial.minValue = 0.036;
+        this.polynomial.maxValue = 3.15;
+        let coeffecients = [];
+        coeffecients[0] = 0.016952380952381;
+        coeffecients[1] = 0.628;
+        this.polynomial.coeffecients = coeffecients;
     }
 }
 MapConfigs.push(MAP_GM3Bar);

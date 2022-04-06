@@ -138,7 +138,7 @@ export default class Inputs extends UITemplate {
                     this.firstChild.RegisterVariables();
                 }
             }
-            inputElement.lastChild.textContent = this.Inputs.children[i].Name;
+            inputElement.lastChild.textContent = this.Inputs.children[i].name;
             inputElement.class = `w3-bar-subitem w3-button`;
         }
         if(this.Inputs.children.length === 0){
@@ -190,9 +190,9 @@ export default class Inputs extends UITemplate {
             get: function() { return this.lastChild.value; },
             set: function(value) { this.lastChild.saveValue = value; }
         });
-        Object.defineProperty(input, 'Name', {
-            get: function() { return this.lastChild.Name.value; },
-            set: function(value) { this.lastChild.Name.value = value; }
+        Object.defineProperty(input, 'name', {
+            get: function() { return this.lastChild.name.value; },
+            set: function(value) { this.lastChild.name.value = value; }
         });
         input.lastChild.addEventListener(`change`, function() {
             thisClass.#updateInputListElement();

@@ -95,8 +95,8 @@ export default class UINumberWithMeasurement extends UITemplate {
         });
         this.DisplayValue = new UINumber();
         this.DisplayValue.addEventListener(`change`, function() {
-            if(thisClass.DisplayValue.Value !== undefined && thisClass.Unit)
-                thisClass.Value = (thisClass.DisplayValue.Value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
+            if(thisClass.DisplayValue.value !== undefined && thisClass.Unit)
+                thisClass.value = (thisClass.DisplayValue.value -  thisClass.Unit.DisplayOffset) / thisClass.Unit.DisplayMultiplier;
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
         this.DisplayValue.GUID = this.GUID;
@@ -108,35 +108,35 @@ export default class UINumberWithMeasurement extends UITemplate {
             return this.value;
 
         return {
-            MeasurementUnitName: this.DisplayMeasurement.saveValue,
-            Value: this.value
+            measurementUnitName: this.DisplayMeasurement.saveValue,
+            value: this.value
         };
     }
     set saveValue(saveValue){
         if(typeof saveValue === `object`) {
-            this.DisplayMeasurement.saveValue = saveValue?.MeasurementUnitName;
-            this.value = saveValue?.Value;
+            this.DisplayMeasurement.saveValue = saveValue.measurementUnitName ?? saveValue.MeasurementUnitName;
+            this.value = saveValue.value ?? saveValue.value;
         } else {
             this.value = saveValue;
         }
     }
 
     UpdateDisplayValue() {
-        const displayValue = this.ValueToDisplayValue(this.value);
+        const displayValue = this.#valueToDisplayValue(this.value);
         if(displayValue !== undefined)
-            this.DisplayValue.Value = displayValue;
-        const displayMin = this.ValueToDisplayValue(this.min);
+            this.DisplayValue.value = displayValue;
+        const displayMin = this.#valueToDisplayValue(this.min);
         if(displayMin !== undefined)
             this.DisplayValue.min = displayMin;
-        const displayMax = this.ValueToDisplayValue(this.max);
+        const displayMax = this.#valueToDisplayValue(this.max);
         if(displayMax !== undefined)
             this.DisplayValue.max = displayMax;
-        const displayStep = this.ValueToDisplayValue(this.step);
+        const displayStep = this.#valueToDisplayValue(this.step);
         if(displayStep !== undefined)
             this.DisplayValue.step = displayStep;
     }
 
-    ValueToDisplayValue(value) {
+    #valueToDisplayValue(value) {
         if(value !== undefined && this.Unit)
             return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
     }
