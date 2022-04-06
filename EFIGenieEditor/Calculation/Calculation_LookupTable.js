@@ -61,7 +61,7 @@ export default class Calculation_LookupTable extends UITemplate {
         if(!this.parameterSelection) {
             this.parameterSelection = new UISelection({
                 options: GetSelections(),
-                Class: `TableParameterSelect`
+                class: `TableParameterSelect`
             });
             this.parameterSelection.addEventListener(`change`, function() {
                 const parameterSelectionValue = thisClass.parameterSelection.value;

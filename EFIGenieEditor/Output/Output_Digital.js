@@ -1,5 +1,6 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIPinSelection from "../UI/UIPinSelection.js";
+import UICheckBox from "../JavascriptUI/UICheckBox.js";
 export default class Output_Digital extends UITemplate {
     static displayName = `Digital Pin`;
     static inputs = [`bool`];
@@ -21,8 +22,8 @@ export default class Output_Digital extends UITemplate {
             value: 0xFFFF,
             pinType: `digital`
         });
-        this.inverted = new UI.CheckBox();
-        this.highZ = new UI.CheckBox();
+        this.inverted = new UICheckBox();
+        this.highZ = new UICheckBox();
         this.style.display = `block`;
         this.Setup(prop);
     }

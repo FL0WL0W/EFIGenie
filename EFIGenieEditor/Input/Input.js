@@ -80,7 +80,7 @@ export default class Input extends UITemplate {
         this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
         this.name = new UIText({
             value: prop.name,
-            Class: `pinselectname inputName`
+            class: `pinselectname inputName`
         })
         this.name.addEventListener(`change`, function() {
             thisClass.TranslationConfig.referenceName = thisClass.RawConfig.referenceName = `Inputs.${thisClass.name.value}`;

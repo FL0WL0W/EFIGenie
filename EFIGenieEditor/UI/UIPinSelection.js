@@ -22,15 +22,13 @@ export default class UIPinSelection extends UISelection {
                 endOptions.push({
                     name: pinOut.Pins[i].name,
                     value: pinOut.Pins[i].value,
-                    Selected: selected,
-                    Class: selected? `incompatible` : undefined,
+                    class: selected? `incompatible` : undefined,
                     disabled: true
                 });
             } else {
                 options.push({
                     name: pinOut.Pins[i].name,
-                    value: pinOut.Pins[i].value,
-                    Selected: selected
+                    value: pinOut.Pins[i].value
                 });
             }
         }

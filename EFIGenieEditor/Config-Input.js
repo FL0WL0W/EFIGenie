@@ -118,3 +118,11 @@ ReluctorFactoryIDs = {
     Universal1X: 2,
     UniversalMissintTooth: 3
 };
+
+var CylinderAirmassConfigs = [];
+CylinderAirmassConfigs.push(Calculation_Static);
+
+var InjectorPulseWidthConfigs = [];
+InjectorPulseWidthConfigs.push(Calculation_Static);
+// InjectorPulseWidthConfigs.push(Calculation_LookupTable);
+// InjectorPulseWidthConfigs.push(Calculation_2AxisTable);
