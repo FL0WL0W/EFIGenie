@@ -103,9 +103,13 @@ export default class Calculation_LookupTable extends UITemplate {
             BaseObj: true
         });
         this.graph = new UIGraph2D({
-            width: 800,
+            width: Math.min(Math.max(600, this.table.xResolution * 100), 1000),
             height: 450
         });
+        const thisClass = this;
+        this.graph.addEventListener(`change`, function() {
+            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000);
+        })
         this.table.attachToTable(this.graph);
         this.graph.attachToTable(this.table);
         this.dialog.content.append(this.graph);

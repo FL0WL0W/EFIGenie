@@ -142,6 +142,10 @@ export default class Calculation_2AxisTable extends UITemplate {
         });
         this.table.attachToTable(this.graph);
         this.graph.attachToTable(this.table);
+        const thisClass = this;
+        this.graph.addEventListener(`change`, function() {
+            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000);
+        })
         this.dialog.content.append(this.graph);
         this.dialog.content.append(document.createElement(`br`));
         this.dialog.content.append(this.table);
