@@ -5,9 +5,9 @@ import UITable from "../JavascriptUI/UITable.js";
 import UIGraph3D from "../JavascriptUI/UIGraph3D.js";
 export default class Calculation_2AxisTable extends UITemplate {
     static displayName = `2 Axis Table`;
-    static Output = `float`;
-    static Inputs = [`float`, `float`];
-    static Template = `<div data-element="dialog"></div>`
+    static output = `float`;
+    static inputs = [`float`, `float`];
+    static template = `<div data-element="dialog"></div>`
     GUID = generateGUID();
 
     get label() {

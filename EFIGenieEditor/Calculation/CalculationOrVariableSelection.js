@@ -2,7 +2,7 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 export default class CalculationOrVariableSelection extends UITemplate {
-    static Template = `<label><span data-element="labelElement"></span>:</label><div data-element="selection"></div><div data-element="liveUpdate"></div><span data-element="calculationContent"></span>`
+    static template = `<label><span data-element="labelElement"></span>:</label><div data-element="selection"></div><div data-element="liveUpdate"></div><span data-element="calculationContent"></span>`
     calculationContent = document.createElement(`span`);
     calculationValues = [];
 
@@ -75,7 +75,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(!this._measurementName)
             return;
 
-        this.selection.options = GetSelections(this._measurementName, this.Output, this.Inputs, this.calculations, this.calculationsOnly);
+        this.selection.options = GetSelections(this._measurementName, this.output, this.inputs, this.calculations, this.calculationsOnly);
         let match = false;
         let stringValue = UISelection.ParseValue(`string`, this.selection.value)
         this.selection.options.forEach(option => {
@@ -103,7 +103,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         });
         this.liveUpdate.style.float = `right`;
         this.selection = new UISelection({
-            options: GetSelections(prop?.measurementName, prop?.Output, prop?.Inputs, prop?.calculations, prop?.calculationsOnly),
+            options: GetSelections(prop?.measurementName, prop?.output, prop?.inputs, prop?.calculations, prop?.calculationsOnly),
             selectDisabled: false,
             selectName: `None`
         });
@@ -265,14 +265,14 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.selection.options = GetSelections(this._measurementName, this.Output, this.Inputs, this.calculations, this.calculationsOnly);
+        this.selection.options = GetSelections(this._measurementName, this.output, this.inputs, this.calculations, this.calculationsOnly);
         const selection = this.selection.value;
         if (selection && this.referenceName) {
             const thisReference = this.GetVariableReference();
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if(subConfig !== undefined) {
-                    const type = GetClassProperty(subConfig, `Output`)
+                    const type = GetClassProperty(subConfig, `output`)
                     if (type) {
                         VariableRegister.RegisterVariable(thisReference, type);
                     }

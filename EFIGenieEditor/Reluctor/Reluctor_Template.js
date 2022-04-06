@@ -1,9 +1,9 @@
 import Input_DigitalRecord from "../Input/Input_DigitalRecord.js";
 export default class Reluctor_Template extends Input_DigitalRecord {
-    static Output = `ReluctorResult`;
+    static output = `ReluctorResult`;
     static measurementName = `Reluctor`;
-    static Inputs = [];
-    static Template = Input_DigitalRecord.Template.substring(0, Input_DigitalRecord.Template.lastIndexOf(`Inverted`) + 8)
+    static inputs = [];
+    static template = Input_DigitalRecord.template.substring(0, Input_DigitalRecord.template.lastIndexOf(`Inverted`) + 8)
 
     GetObjOperation(objOperation) {
         return { type: `Group`, value: [

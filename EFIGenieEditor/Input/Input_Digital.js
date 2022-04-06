@@ -3,10 +3,10 @@ import UICheckBox from "../JavascriptUI/UICheckBox.js";
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_Digital extends UITemplate {
     static displayName = `Digital Pin`;
-    static Output = `bool`;
-    static Inputs = [];
+    static output = `bool`;
+    static inputs = [];
     static measurementName = `Bool`;
-    static Template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
+    static template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
     constructor(prop){
         super();

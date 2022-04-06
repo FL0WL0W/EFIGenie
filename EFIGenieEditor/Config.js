@@ -112,18 +112,18 @@ function GetSelections(measurementName, output, inputs, calculations, calculatio
             var configOptions = { group: configGroups[c].group, options: [] }
             calculations = configGroups[c].calculations;
             for (var i = 0; i < calculations.length; i++) {
-                if (output !== undefined && calculations[i].Output !== output) 
+                if (output !== undefined && calculations[i].output !== output) 
                     continue;
 
-                if(measurementName !== undefined && ((calculations[i].measurementName !== undefined && measurementName !== calculations[i].measurementName) || (MeasurementType[measurementName] !== undefined && MeasurementType[measurementName] !== calculations[i].Output)))
+                if(measurementName !== undefined && ((calculations[i].measurementName !== undefined && measurementName !== calculations[i].measurementName) || (MeasurementType[measurementName] !== undefined && MeasurementType[measurementName] !== calculations[i].output)))
                     continue;
                 
                 if(inputs !== undefined) {
-                    if(inputs.length !== calculations[i].Inputs.length || calculations[i].Inputs === undefined)
+                    if(inputs.length !== calculations[i].inputs.length || calculations[i].inputs === undefined)
                         continue;
                     var inputsMatch = true;
                     for(var im = 0; im < inputs.length; im++){
-                        if(inputs[im] !== calculations[i].Inputs[im]){
+                        if(inputs[im] !== calculations[i].inputs[im]){
                             inputsMatch = false;
                             break;
                         }
@@ -474,7 +474,7 @@ for(var index in STM32TypeAlignment) {
 }
 
 class ConfigTop extends UI.Template {
-    static Template = getFileContents(`ConfigGui/Top.html`);
+    static template = getFileContents(`ConfigGui/Top.html`);
 
     title = document.createElement(`div`);
     inputsTabExpend = document.createElement(`span`);
@@ -666,7 +666,7 @@ class ConfigTop extends UI.Template {
 customElements.define(`config-top`, ConfigTop, { extends: `span` });
 
 class ConfigFuel extends UI.Template {
-    static Template =   getFileContents(`ConfigGui/Fuel.html`);
+    static template =   getFileContents(`ConfigGui/Fuel.html`);
 
     constructor(prop) {
         super();
@@ -803,7 +803,7 @@ class ConfigFuel extends UI.Template {
 customElements.define(`config-fuel`, ConfigFuel, { extends: `span` });
 
 class ConfigIgnition extends UI.Template {
-    static Template = getFileContents(`ConfigGui/Ignition.html`);
+    static template = getFileContents(`ConfigGui/Ignition.html`);
 
     constructor(prop) {
         super();
@@ -923,7 +923,7 @@ class ConfigIgnition extends UI.Template {
 customElements.define(`config-ignition`, ConfigIgnition, { extends: `span` });
 
 class ConfigEngine extends UI.Template {
-    static Template = getFileContents(`ConfigGui/Engine.html`);
+    static template = getFileContents(`ConfigGui/Engine.html`);
 
     constructor(prop) {
         super();
@@ -1080,9 +1080,9 @@ customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `span` });
 class CylinderAirmass_SpeedDensity extends UI.Template {
     static displayName = `Speed Density`;
     static measurementNameName = `Mass`;
-    static Output = `float`;
+    static output = `float`;
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`];
-    static Template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`;
+    static template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`;
 
     constructor(prop) {
         super();
@@ -1118,9 +1118,9 @@ customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensi
 
 class InjectorPulseWidth_DeadTime extends UI.Template {
     static displayName = `Dead Time`;
-    static Output = `float`;
+    static output = `float`;
     static measurementNameName = `Time`;
-    static Template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
+    static template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
                         `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 

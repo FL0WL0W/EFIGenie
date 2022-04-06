@@ -3,8 +3,8 @@ import UINumber from "../JavascriptUI/UINumber.js";
 //this still needs some complicated unit work. this is ok for now
 export default class Calculation_Polynomial extends HTMLSpanElement {
     static displayName = `Polynomial`;
-    static Output = `float`;
-    static Inputs = [`float`];
+    static output = `float`;
+    static inputs = [`float`];
 
     get measurementName() {
         return this.#coeffecientElement.firstChild.measurementName;

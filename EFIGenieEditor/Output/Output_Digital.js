@@ -2,8 +2,8 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Output_Digital extends UITemplate {
     static displayName = `Digital Pin`;
-    static Inputs = [`bool`];
-    static Template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted <div data-element="highZ"></div>High Z`;
+    static inputs = [`bool`];
+    static template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted <div data-element="highZ"></div>High Z`;
 
     get saveValue() {
         return super.saveValue;

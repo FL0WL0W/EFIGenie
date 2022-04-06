@@ -2,10 +2,10 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_Analog extends UITemplate {
     static displayName = `Analog Pin`;
-    static Output = `float`;
-    static Inputs = [];
+    static output = `float`;
+    static inputs = [];
     static measurementName = `Voltage`;
-    static Template = `<label>Pin:</label><div data-element="pin"></div>`
+    static template = `<label>Pin:</label><div data-element="pin"></div>`
 
     get saveValue() {
         return super.saveValue;

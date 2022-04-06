@@ -3,7 +3,7 @@ import UINumber from "../JavascriptUI/UINumber.js";
 import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     static displayName = `Reluctor Universal Missing Teeth`;
-    static Template =   Reluctor_Template.Template +
+    static template =   Reluctor_Template.template +
                         `<br/><label>First Tooth Position:</label><div data-element="firstToothPosition"></div>(Falling Edge)` +
                         `<br/><label>Tooth Width:</label><div data-element="toothWidth"></div>` +
                         `<br/><label>Number of Teeth:</label><div data-element="numberOfTeeth"></div>` +

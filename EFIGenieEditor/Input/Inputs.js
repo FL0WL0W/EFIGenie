@@ -5,7 +5,7 @@ import UIPinOverlay from "../UI/UIPinOverlay.js"
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 //todo, context menu
 export default class Inputs extends UITemplate {
-    static Template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="Inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
+    static template = `<div style="block-size: fit-content; width: fit-content;"><div data-element="Inputs"></div><div data-element="newInputElement"></div></div><div data-element="pinOverlay"></div>`
     inputListElement = document.createElement(`div`);
     pinOverlay = new UIPinOverlay();
 

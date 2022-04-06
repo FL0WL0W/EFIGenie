@@ -2,7 +2,7 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Input extends UITemplate {
-    static Template = `<div data-element="name"></div>
+    static template = `<div data-element="name"></div>
 <div class="configContainer">
     <div data-element="TranslationConfig"></div>
     <div data-element="hr"></div>
@@ -30,7 +30,7 @@ export default class Input extends UITemplate {
         this.RawConfig = new CalculationOrVariableSelection({
             calculations:            InputConfigs,
             label:              `Source`,
-            Inputs:             [],
+            inputs:             [],
             referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
@@ -47,7 +47,7 @@ export default class Input extends UITemplate {
         });
         this.TranslationConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.TranslationConfig.GetSubConfig();
-            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+            if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
                 thisClass.hr.hidden = true;
                 thisClass.RawConfig.hidden = true;
                 thisClass.RawConfig.selection.value = undefined;
@@ -59,7 +59,7 @@ export default class Input extends UITemplate {
         });
         this.RawConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.TranslationConfig.GetSubConfig();
-            if(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0) {
+            if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
                 thisClass.hr.hidden = true;
                 thisClass.RawConfig.hidden = true;
                 thisClass.RawConfig.selection.value = undefined;
@@ -96,7 +96,7 @@ export default class Input extends UITemplate {
     RegisterVariables() {
         this.TranslationConfig.RegisterVariables?.();
         const subConfig = this.TranslationConfig.GetSubConfig();
-        if(!(subConfig === undefined || subConfig.constructor.Inputs === undefined || subConfig.constructor.Inputs.length === 0))
+        if(!(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0))
             this.RawConfig.RegisterVariables?.();
     }
 
@@ -105,7 +105,7 @@ export default class Input extends UITemplate {
         if(translationConfig === undefined)
             return undefined;
 
-        if(translationConfig.constructor.Inputs === undefined || translationConfig.constructor.Inputs.length === 0)
+        if(translationConfig.constructor.inputs === undefined || translationConfig.constructor.inputs.length === 0)
             return this.TranslationConfig.GetObjOperation();
         
         const rawConfigObj = this.RawConfig.GetObjOperation();

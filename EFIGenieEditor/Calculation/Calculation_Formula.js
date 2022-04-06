@@ -4,13 +4,13 @@ import UIDialog from "../JavascriptUI/UIDialog.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Calculation_Formula extends UITemplate {
     static displayName = `Formula`;
-    static Output = `float`;
-    static Inputs = [];
-    static Template = `<div data-element="editFormula"></div><div data-element="parameterElements"></div>`;
+    static output = `float`;
+    static inputs = [];
+    static template = `<div data-element="editFormula"></div><div data-element="parameterElements"></div>`;
 
     editFormula = new UIDialog({ buttonLabel: `Edit Formula` });
     formulaDialogTemplate = new UITemplate({ 
-        Template: `<div style="display: flex; width: 100%"><div style="margin-right: 2em; width: fit-content">Formula:</div><div data-element="formula"></div></div><div data-element="parameterElements"></div>`, 
+        template: `<div style="display: flex; width: 100%"><div style="margin-right: 2em; width: fit-content">Formula:</div><div data-element="formula"></div></div><div data-element="parameterElements"></div>`, 
         parameterElements: document.createElement(`div`),
         formula: new UIText({ class: `formula` })
     });
@@ -225,8 +225,8 @@ export default class Calculation_Formula extends UITemplate {
         this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(); })
         if (this.referenceName) {
             const thisReference = this.GetVariableReference();
-            const type = GetClassProperty(this, `Output`);
-            VariableRegister.RegisterVariable(thisReference, GetClassProperty(this, `Output`));
+            const type = GetClassProperty(this, `output`);
+            VariableRegister.RegisterVariable(thisReference, type);
         }
     }
 

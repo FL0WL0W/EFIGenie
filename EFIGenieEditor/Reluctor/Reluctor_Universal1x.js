@@ -2,7 +2,7 @@ import Reluctor_Template from "./Reluctor_Template.js";
 import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 export default class Reluctor_Universal1x extends Reluctor_Template {
     static displayName = `Reluctor Universal 1X`;
-    static Template =   Reluctor_Template.Template +
+    static template =   Reluctor_Template.template +
                         `<br/><label>Rising Edge Position:</label><div data-element="risingPosition"></div>` +
                         `<br/><label>Falling Edge Position:</label><div data-element="fallingPosition"></div>`;
     constructor(prop){

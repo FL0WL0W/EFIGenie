@@ -3,10 +3,10 @@ import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_DutyCycle extends UITemplate {
     static displayName = `Duty Cycle Pin Pin`;
-    static Output = `float`;
-    static Inputs = [];
+    static output = `float`;
+    static inputs = [];
     static measurementName = `Percentage`;
-    static Template =   `<label>Pin:</label><div data-element="pin"></div>` +
+    static template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 
     constructor(prop){

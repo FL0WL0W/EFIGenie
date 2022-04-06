@@ -3,9 +3,9 @@ import Input_Analog from "./Input_Analog.js";
 import Calculation_Polynomial from "../Calculation/Calculation_Polynomial.js";
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js";
 export default class Input_AnalogPolynomial extends UITemplate {
-    static Template = `<div data-element="voltageLiveUpdate"></div><div data-element="analogInput"></div><div data-element="polynomial"></div>`;
-    static Output = `float`;
-    static Inputs = [];
+    static template = `<div data-element="voltageLiveUpdate"></div><div data-element="analogInput"></div><div data-element="polynomial"></div>`;
+    static output = `float`;
+    static inputs = [];
 
     constructor(prop){
         super();

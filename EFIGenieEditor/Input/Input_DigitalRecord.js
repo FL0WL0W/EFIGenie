@@ -4,10 +4,10 @@ import UINumber from "../JavascriptUI/UINumber.js";
 import UIPinSelection from "../UI/UIPinSelection.js";
 export default class Input_DigitalRecord extends UITemplate {
     static displayName = `Digital Pin (Record)`;
-    static Output = `Record`;
-    static Inputs = [];
+    static output = `Record`;
+    static inputs = [];
     static measurementName = `Record`;
-    static Template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted` +
+    static template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted` +
                         `<br/><label>Length:</label><div data-element="length"></div>`
 
     get saveValue() {

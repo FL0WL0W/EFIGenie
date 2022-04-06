@@ -5,9 +5,9 @@ import UITable from "../JavascriptUI/UITable.js";
 import UIGraph2D from "../JavascriptUI/UIGraph2D.js";
 export default class Calculation_LookupTable extends UITemplate {
     static displayName = `Lookup Table`;
-    static Output = `float`;
-    static Inputs = [`float`];
-    static Template = `<div data-element="dialog"></div>`
+    static output = `float`;
+    static inputs = [`float`];
+    static template = `<div data-element="dialog"></div>`
     GUID = generateGUID();
 
     get label() {

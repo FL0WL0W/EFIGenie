@@ -2,7 +2,7 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import UINumber from "../JavascriptUI/UINumber.js"
 import UIMeasurement from "./UIMeasurement.js"
 export default class UINumberWithMeasurement extends UITemplate {
-    static Template = `<div data-element="DisplayValue"></div><div data-element="displayMeasurement"></div>`
+    static template = `<div data-element="DisplayValue"></div><div data-element="displayMeasurement"></div>`
 
     get measurementUnitName() {
         return this.displayMeasurement.value;

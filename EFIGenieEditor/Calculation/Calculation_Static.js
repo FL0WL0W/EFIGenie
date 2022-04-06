@@ -1,8 +1,8 @@
 import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
 export default class Calculation_Static extends UINumberWithMeasurement {
     static displayName = `Static`;
-    static Output = `float`;
-    static Inputs = [];
+    static output = `float`;
+    static inputs = [];
 
     GetObjOperation(outputVariableId) {
         var obj = { value: [{ type: `Operation_StaticVariable`, value: this.value }] };
