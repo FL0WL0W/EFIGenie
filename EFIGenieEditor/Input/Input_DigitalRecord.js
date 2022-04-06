@@ -6,7 +6,7 @@ export default class Input_DigitalRecord extends UITemplate {
     static displayName = `Digital Pin (Record)`;
     static Output = `Record`;
     static Inputs = [];
-    static Measurement = `Record`;
+    static measurementName = `Record`;
     static Template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted` +
                         `<br/><label>Length:</label><div data-element="length"></div>`
 

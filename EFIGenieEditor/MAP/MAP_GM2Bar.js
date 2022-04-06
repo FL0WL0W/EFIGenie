@@ -1,7 +1,7 @@
 import Input_AnalogPolynomial from "../Input/Input_AnalogPolynomial.js";
 export default class MAP_GM2Bar extends Input_AnalogPolynomial {
     static displayName = `GM 2 Bar MAP`;
-    static Measurement = `Pressure`;
+    static measurementName = `Pressure`;
 
     get saveValue() { return this.analogInput.saveValue; }
     set saveValue(saveValue) { return this.analogInput.saveValue = saveValue; }

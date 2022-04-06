@@ -5,7 +5,7 @@ export default class Input_DutyCycle extends UITemplate {
     static displayName = `Duty Cycle Pin Pin`;
     static Output = `float`;
     static Inputs = [];
-    static Measurement = `Percentage`;
+    static measurementName = `Percentage`;
     static Template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 

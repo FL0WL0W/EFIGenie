@@ -4,7 +4,7 @@ export default class Input_Analog extends UITemplate {
     static displayName = `Analog Pin`;
     static Output = `float`;
     static Inputs = [];
-    static Measurement = `Voltage`;
+    static measurementName = `Voltage`;
     static Template = `<label>Pin:</label><div data-element="pin"></div>`
 
     get saveValue() {

@@ -1079,7 +1079,7 @@ customElements.define(`config-tdc`, ConfigTDCOutput, { extends: `span` });
 
 class CylinderAirmass_SpeedDensity extends UI.Template {
     static displayName = `Speed Density`;
-    static measurementName = `Mass`;
+    static measurementNameName = `Mass`;
     static Output = `float`;
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`];
     static Template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`;
@@ -1119,7 +1119,7 @@ customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensi
 class InjectorPulseWidth_DeadTime extends UI.Template {
     static displayName = `Dead Time`;
     static Output = `float`;
-    static measurementName = `Time`;
+    static measurementNameName = `Time`;
     static Template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
                         `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;

@@ -5,7 +5,7 @@ export default class Input_Frequency extends UITemplate {
     static displayName = `Frequency Pin`;
     static Output = `float`;
     static Inputs = [];
-    static Measurement = `Frequency`;
+    static measurementName = `Frequency`;
     static Template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 

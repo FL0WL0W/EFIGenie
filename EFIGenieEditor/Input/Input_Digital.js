@@ -5,7 +5,7 @@ export default class Input_Digital extends UITemplate {
     static displayName = `Digital Pin`;
     static Output = `bool`;
     static Inputs = [];
-    static Measurement = `Bool`;
+    static measurementName = `Bool`;
     static Template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
     constructor(prop){
