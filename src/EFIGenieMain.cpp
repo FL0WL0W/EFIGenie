@@ -30,7 +30,8 @@ namespace EFIGenie
             const uint32_t operationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
             if(operationId == 0)
                 break;
-            operationFactory->Create(config, size);
+            IOperationBase *operation = operationFactory->Create(config, size);
+            operationFactory->Register(operationId, operation);
             Config::OffsetConfig(config, sizeOut, size);
         }
         while(size > 0);
