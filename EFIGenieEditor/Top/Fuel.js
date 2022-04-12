@@ -1,3 +1,4 @@
+import Calculation_Formula from "../Calculation/Calculation_Formula.js";
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import Output_TDC from "../Output/Output_TDC.js"
 export default class Fuel extends UITemplate {
@@ -5,29 +6,29 @@ export default class Fuel extends UITemplate {
 
     constructor(prop) {
         super();
-        this.AFRConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            AFRConfigs,
+        this.AFRConfigOrVariableSelection = new Calculation_Formula({
+            calculations:       AFRConfigs,
             label:              `Air Fuel Ratio`,
-            measurementName:        `Ratio`,
+            measurementName:    `Ratio`,
             referenceName:      `FuelParameters.Air Fuel Ratio`
         });
         this.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            InjectorEnableConfigs,
+            calculations:       InjectorEnableConfigs,
             label:              `Injector Enable`,
-            measurementName:        `Bool`,
+            measurementName:    `Bool`,
             referenceName:      `FuelParameters.Injector Enable`
         });
         this.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            InjectorPulseWidthConfigs,
+            calculations:       InjectorPulseWidthConfigs,
             label:              `Injector Pulse Width`,
-            measurementName:        `Time`,
+            measurementName:    `Time`,
             referenceName:      `FuelParameters.Injector Pulse Width`,
             measurementUnitName:`ms`
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            GenericConfigs,
+            calculations:       GenericConfigs,
             label:              `Injector End Position(BTDC)`,
-            measurementName:        `Angle`,
+            measurementName:    `Angle`,
             referenceName:      `FuelParameters.Injector End Position`
         });
         this.Outputs = document.createElement(`div`)

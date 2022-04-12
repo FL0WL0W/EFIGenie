@@ -75,7 +75,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(!this._measurementName)
             return;
 
-        this.selection.options = GetSelections(this._measurementName, this.output, this.inputs, this.calculations, this.calculationsOnly);
+        this.selection.options = GetSelections(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculations, this.calculationsOnly);
         let match = false;
         let stringValue = UISelection.ParseValue(`string`, this.selection.value)
         this.selection.options.forEach(option => {
@@ -97,13 +97,18 @@ export default class CalculationOrVariableSelection extends UITemplate {
     constructor(prop) {
         super();
         var thisClass = this;
+        prop ??= {};
+        prop.limitSelectionsOnMeasurement ??= true;
+        this.limitSelectionsOnMeasurement = prop.limitSelectionsOnMeasurement;
+        prop.registerIfVariable ??= true;
+        this.registerIfVariable = prop.registerIfVariable;
         this.liveUpdate = new UIDisplayLiveUpdate({
-            measurementName: prop?.measurementName,
-            measurementUnitName: prop?.measurementUnitName
+            measurementName: prop.measurementName,
+            measurementUnitName: prop.measurementUnitName
         });
         this.liveUpdate.style.float = `right`;
         this.selection = new UISelection({
-            options: GetSelections(prop?.measurementName, prop?.output, prop?.inputs, prop?.calculations, prop?.calculationsOnly),
+            options: GetSelections(prop.limitSelectionsOnMeasurement? prop._measurementName : undefined, prop.output, prop.inputs, prop.calculations, prop.calculationsOnly),
             selectDisabled: false,
             selectName: `None`
         });
@@ -181,7 +186,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
                             referenceName: this.referenceName,
                             saveValue: saveValue.calculationValues[i],
                             measurementName: this._measurementName,
-                            measurementUnitName: this.measurementUnitName
+                            measurementUnitName: this.measurementUnitName,
+                            calculations: this.calculations,
+                            limitSelectionsOnMeasurement: this.limitSelectionsOnMeasurement
                         }));
                     }
                 }
@@ -254,7 +261,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
                             referenceName: this.referenceName,
                             value: value.calculationValues[i],
                             measurementName: this._measurementName,
-                            measurementUnitName: this.measurementUnitName
+                            measurementUnitName: this.measurementUnitName,
+                            calculations: this.calculations,
+                            limitSelectionsOnMeasurement: this.limitSelectionsOnMeasurement
                         }));
                     }
                 }
@@ -265,10 +274,11 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.selection.options = GetSelections(this._measurementName, this.output, this.inputs, this.calculations, this.calculationsOnly);
+        this.selection.options = GetSelections(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculations, this.calculationsOnly);
         const selection = this.selection.value;
         if (selection && this.referenceName) {
             const thisReference = this.GetVariableReference();
+            let variable;
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if(subConfig !== undefined) {
@@ -276,12 +286,14 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     if (type) {
                         VariableRegister.RegisterVariable(thisReference, type);
                     }
+                    variable = VariableRegister.GetVariableByReference(thisReference)
                     subConfig.RegisterVariables?.();
                 }
-            } else {
-                VariableRegister.RegisterVariable(thisReference, undefined, `${selection.reference}.${selection.value}${this.measurementName? `(${this.measurementName})` : ``}`);
+            } else if(this.registerIfVariable) {
+                const variableReference = `${selection.reference}.${selection.value}${this.measurementName? `(${this.measurementName})` : ``}`;
+                VariableRegister.RegisterVariable(thisReference, undefined, variableReference);
+                variable = VariableRegister.GetVariableByReference(variableReference)
             }
-            const variable = VariableRegister.GetVariableByReference(thisReference)
             if(variable?.Type === `float` || variable?.Type === `bool`){
                 this.liveUpdate.VariableReference = thisReference;
                 this.liveUpdate.measurementName = this.measurementName;
@@ -332,7 +344,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     yLabel: this.yLabel,
                     referenceName: this.referenceName,
                     measurementName: this._measurementName,
-                    measurementUnitName: this.measurementUnitName
+                    measurementUnitName: this.measurementUnitName,
+                    calculations: this.calculations,
+                    limitSelectionsOnMeasurement: this.limitSelectionsOnMeasurement
                 }));
                 return this.calculationValues.length-1;
             }

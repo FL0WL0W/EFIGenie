@@ -64,14 +64,17 @@ class VariableRegistry {
                 variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
             }
             this[listName] ??= [];
+            const existing = this[listName].findIndex(r => r.name === variableName);
+            if(existing >= 0)
+                this[listName].splice(existing, 1);
             this[listName].push({
                 name: variableName,
                 measurementName: measurementName,
                 Type,
-                Id: Id == undefined? this.GenerateVariableId() : Id
+                Id: Id ?? this.GenerateVariableId()
             });
         } else {
-            this[variableReference] = Id == undefined? this.GenerateVariableId() : Id
+            this[variableReference] = Id ?? this.GenerateVariableId();
         }
     }
     GetVariableReferenceList() {
@@ -112,10 +115,10 @@ function GetSelections(measurementName, output, inputs, calculations, calculatio
             var configOptions = { group: configGroups[c].group, options: [] }
             calculations = configGroups[c].calculations;
             for (var i = 0; i < calculations.length; i++) {
-                if (output !== undefined && calculations[i].output !== output) 
+                if (output !== undefined && calculations[i].output?.split(`|`).some(o=> output.split(`|`).indexOf(o) < 0)) 
                     continue;
 
-                if(measurementName !== undefined && ((calculations[i].measurementName !== undefined && measurementName !== calculations[i].measurementName) || (MeasurementType[measurementName] !== undefined && MeasurementType[measurementName] !== calculations[i].output)))
+                if(measurementName !== undefined && ((calculations[i].measurementName !== undefined && measurementName !== calculations[i].measurementName) || (MeasurementType[measurementName] !== undefined && calculations[i].output.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
                     continue;
                 
                 if(inputs !== undefined) {
@@ -151,7 +154,7 @@ function GetSelections(measurementName, output, inputs, calculations, calculatio
             var arrSelections = { group: property, options: [] };
 
             for (var i = 0; i < arr.length; i++) {
-                if ((!measurementName || arr[i].measurementName === measurementName) && (output === undefined || arr[i].Type === output)) {
+                if ((!measurementName || arr[i].measurementName === measurementName) && (output === undefined || output.split(`|`).indexOf(arr[i].Type) >= 0)) {
                     arrSelections.options.push({
                         name: arr[i].name,
                         info: (!measurementName ? `[${arr[i].measurementName}]` : undefined),
@@ -175,17 +178,13 @@ AFRConfigs.push(Calculation_Static);
 AFRConfigs.push(Calculation_LookupTable);
 AFRConfigs.push(Calculation_2AxisTable);
 var InjectorEnableConfigs = [];
-InjectorEnableConfigs.push(Calculation_Static);
-InjectorEnableConfigs.push(Calculation_LookupTable);
-InjectorEnableConfigs.push(Calculation_2AxisTable);
+InjectorEnableConfigs.push(Calculation_Formula);
 var IgnitionAdvanceConfigs = [];
 IgnitionAdvanceConfigs.push(Calculation_Static);
 IgnitionAdvanceConfigs.push(Calculation_LookupTable);
 IgnitionAdvanceConfigs.push(Calculation_2AxisTable);
 var IgnitionEnableConfigs = [];
-IgnitionEnableConfigs.push(Calculation_Static);
-IgnitionEnableConfigs.push(Calculation_LookupTable);
-IgnitionEnableConfigs.push(Calculation_2AxisTable);
+IgnitionEnableConfigs.push(Calculation_Formula);
 var IgnitionDwellConfigs = [];
 IgnitionDwellConfigs.push(Calculation_Static);
 IgnitionDwellConfigs.push(Calculation_LookupTable);

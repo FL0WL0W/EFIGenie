@@ -4,7 +4,7 @@ import UIDialog from "../JavascriptUI/UIDialog.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Calculation_Formula extends UITemplate {
     static displayName = `Formula`;
-    static output = `float`;
+    static output = `bool|float`;
     static inputs = [];
     static template = `<div data-element="editFormula"></div><div data-element="parameterElements"></div>`;
 
@@ -23,6 +23,7 @@ export default class Calculation_Formula extends UITemplate {
         this.#operations = operations;
         const thisClass = this;
         this.parameters = operations.flatMap(o => o.parameters).filter(p => p.indexOf(`temp`) !== 0 && isNaN(parseFloat(p))).sort(function(a,b) { return thisClass.formulaDialogTemplate.formula.value.indexOf(a) - thisClass.formulaDialogTemplate.formula.value.indexOf(b); });
+        //check operation result to make sure it matches the this.output
     }
 
     parameterValues = {};
@@ -43,10 +44,12 @@ export default class Calculation_Formula extends UITemplate {
             if(!parameterValue) {
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
                     label: parameters[i],
-                    calculations: GenericConfigs,
-                    output: `float`,
+                    calculations: this.calculations,
+                    output: `bool|float`,
                     referenceName: this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined,
-                    measurementName: this.measurementName
+                    measurementName: this.measurementName,
+                    limitSelectionsOnMeasurement: false,
+                    registerIfVariable: false
                 });
             }
             let formulaParameter = this.formulaDialogTemplate.parameterElements.children[i];
@@ -159,10 +162,12 @@ export default class Calculation_Formula extends UITemplate {
         for(let parameter in saveValue.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
-                calculations: GenericConfigs,
-                output: `float`,
+                calculations: this.calculations,
+                output: `bool|float`,
                 referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
-                measurementName: this.measurementName
+                measurementName: this.measurementName,
+                limitSelectionsOnMeasurement: false,
+                registerIfVariable: false
             });
 
             parameterValue.saveValue = saveValue.parameterValues[parameter];
@@ -192,10 +197,12 @@ export default class Calculation_Formula extends UITemplate {
         for(let parameter in value.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
-                calculations: GenericConfigs,
-                output: `float`,
+                calculations: this.calculations,
+                output: `bool|float`,
                 referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
-                measurementName: this.measurementName
+                measurementName: this.measurementName,
+                limitSelectionsOnMeasurement: false,
+                registerIfVariable: false
             });
 
             parameterValue.value = value.parameterValues[parameter];
@@ -217,6 +224,8 @@ export default class Calculation_Formula extends UITemplate {
         });
         this.formulaDialogTemplate.parameterElements.style.display = `block`;
         this.parameterElements.class = `configContainer`;
+        this.parameterElements.hidden = true;
+        this.output = MeasurementType[prop.measurementName] ?? `float`;
         this.Setup(prop)
     }
 
@@ -249,47 +258,54 @@ export default class Calculation_Formula extends UITemplate {
             if(operation.resultInto === `return`)
                 operation.resultInto = outputVariableId ?? this.GetVariableReference();
             let parameterValues = operation.parameters.map(p => thisClass.parameterValues[p]?.GetVariableReference() ?? p);
+            let operationValue = {
+                result: operation.resultInto, //Return
+                a: parameterValues[0],
+                b: parameterValues[1]
+            };
             switch(operation.operator) {
                 case `*`: 
-                group.value.push({ 
-                    type: `Operation_Multiply`,
-                    result: operation.resultInto, //Return
-                    a: parameterValues[0],
-                    b: parameterValues[1]
-                });
-                break;
+                    operationValue.type = `Operation_Multiply`;
+                    break;
                 case `/`: 
-                group.value.push({ 
-                    type: `Operation_Divide`,
-                    result: operation.resultInto, //Return
-                    a: parameterValues[0],
-                    b: parameterValues[1]
-                });
-                break;
+                    operationValue.type = `Operation_Divide`;
+                    break;
                 case `+`: 
-                group.value.push({ 
-                    type: `Operation_Add`,
-                    result: operation.resultInto, //Return
-                    a: parameterValues[0],
-                    b: parameterValues[1]
-                });
-                break;
+                    operationValue.type = `Operation_Add`;
+                    break;
                 case `-`: 
-                group.value.push({ 
-                    type: `Operation_Subtract`,
-                    result: operation.resultInto, //Return
-                    a: parameterValues[0],
-                    b: parameterValues[1]
-                });
-                break;
+                    operationValue.type = `Operation_Subtract`;
+                    break;
+                case `>=`: 
+                    operationValue.type = `Operation_GreaterThanOrEqual`;
+                    break;
+                case `<=`: 
+                    operationValue.type = `Operation_LessThanOrEqual`;
+                    break;
+                case `>`: 
+                    operationValue.type = `Operation_GreaterThan`;
+                    break;
+                case `<`: 
+                    operationValue.type = `Operation_LessThan`;
+                    break;
+                case `=`: 
+                    operationValue.type = `Operation_Equal`;
+                    break;
+                case `&`: 
+                    operationValue.type = `Operation_And`;
+                    break;
+                case `|`: 
+                    operationValue.type = `Operation_Or`;
+                    break;
             }
+            group.value.push(operationValue);
         }
 
         console.log(group);
         
         return group;
     }
-    static ParseFormula(formula, operators = [`*`,`/`,`+`,`-`]) {
+    static ParseFormula(formula, operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]) {
         formula = formula.replaceAll(` `, ``); 
         let operations = [];
         let tempIndex = 0;
