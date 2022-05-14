@@ -2,12 +2,7 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Input extends UITemplate {
-    static template = `<Label><div data-element="name"></div></label><div data-element="translationSelection"></div><div data-element="liveUpdate"></div>
-<div class="configContainer">
-    <div data-element="translationContent"></div>
-    <div data-element="hr"></div>
-    <div data-element="RawConfig"></div>
-</div>`
+    static template = `<div data-element="TranslationConfig"></div><div data-element="hr"></div><div data-element="RawConfig"></div>`
 
     get saveValue() {
         return super.saveValue;
@@ -29,7 +24,8 @@ export default class Input extends UITemplate {
             label:              `Source`,
             inputs:             [],
             referenceName:      `Inputs.${prop.name}`,
-            noParameterSelection: true
+            noParameterSelection: true,
+            hidden: true
         });
         this.RawConfig.addEventListener(`change`, function() {
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
@@ -41,9 +37,6 @@ export default class Input extends UITemplate {
             referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
-        this.translationContent = this.TranslationConfig.calculationContent;
-        this.translationSelection = this.TranslationConfig.selection;
-        this.liveUpdate = this.TranslationConfig.liveUpdate;
         this.TranslationConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.TranslationConfig.GetSubConfig();
             if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
@@ -85,6 +78,7 @@ export default class Input extends UITemplate {
             thisClass.TranslationConfig.referenceName = thisClass.RawConfig.referenceName = `Inputs.${thisClass.name.value}`;
             thisClass.TranslationConfig.label = thisClass.name.value;
         });
+        this.TranslationConfig.labelElement.replaceWith(this.name);
         this.hr.hidden = true;
         this.hr.style.margin = `2px`;
         delete prop.name;

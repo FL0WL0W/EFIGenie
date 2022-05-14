@@ -103,8 +103,8 @@ export default class Inputs extends UITemplate {
 
     #updateInputControls() {
         for(let i = 0; i < this.inputs.children.length; i++) {
-            let up = this.inputs.children[i].firstChild.children[1];
-            let down = this.inputs.children[i].firstChild.children[2];
+            let up = this.inputs.children[i].controlElement.children[0];
+            let down = this.inputs.children[i].controlElement.children[2];
             if(i === 0) {
                 up.className = `controlDummy`;
                 up.disabled = true;
@@ -144,7 +144,7 @@ export default class Inputs extends UITemplate {
                 inputElement.RegisterVariables = function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this);
                     let input = thisClass.inputs.children[index];
-                    this.firstChild.VariableReference = input.lastChild.TranslationConfig?.liveUpdate?.VariableReference;
+                    this.firstChild.VariableReference = input.input.TranslationConfig?.liveUpdate?.VariableReference;
                     this.firstChild.RegisterVariables();
                 }
             }
@@ -165,15 +165,13 @@ export default class Inputs extends UITemplate {
     #newInput() {
         const thisClass = this;
         let input = document.createElement(`div`);
-        let controlElement = input.appendChild(document.createElement(`span`));
-        controlElement.style.float = `right`;
-        let deleteElement = controlElement.appendChild(document.createElement(`span`));
-        deleteElement.className = `controldelete`;
-        deleteElement.addEventListener(`click`, function() {
-            this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement);
-            thisClass.#updateInputControls();
-        });
-        let upElement = controlElement.appendChild(document.createElement(`span`));
+        input.style.display = `flex`;
+        input.input = input.appendChild(new Input());
+        input.input.classList.add(`configContainer`);
+        input.input.classList.add(`horizontalLineSpace`);
+        input.controlElement = input.appendChild(document.createElement(`span`));
+        input.controlElement.classList.add(`controlcontainer`);
+        let upElement = input.controlElement.appendChild(document.createElement(`span`));
         upElement.className = `controlup`;
         upElement.addEventListener(`click`, function() {
             if(upElement.disabled)
@@ -181,7 +179,13 @@ export default class Inputs extends UITemplate {
             this.parentElement.parentElement.previousSibling.before(this.parentElement.parentElement);
             thisClass.#updateInputControls();
         });
-        let downElement = controlElement.appendChild(document.createElement(`span`));
+        let deleteElement = input.controlElement.appendChild(document.createElement(`span`));
+        deleteElement.className = `controldelete`;
+        deleteElement.addEventListener(`click`, function() {
+            this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement);
+            thisClass.#updateInputControls();
+        });
+        let downElement = input.controlElement.appendChild(document.createElement(`span`));
         downElement.className = `controldown`;
         downElement.addEventListener(`click`, function() {
             if(downElement.disabled)
@@ -189,23 +193,22 @@ export default class Inputs extends UITemplate {
             this.parentElement.parentElement.nextSibling.after(this.parentElement.parentElement);
             thisClass.#updateInputControls();
         });
-        input.append(new Input());
-        input.append(document.createElement(`br`));
-        input.RegisterVariables = function() { this.lastChild.previousSibling.RegisterVariables(); };
-        input.GetObjOperation = function() { return this.lastChild.previousSibling.GetObjOperation(); };
+
+        input.RegisterVariables = function() { this.input.RegisterVariables(); };
+        input.GetObjOperation = function() { return this.input.GetObjOperation(); };
         Object.defineProperty(input, 'saveValue', {
-            get: function() { return this.lastChild.previousSibling.saveValue; },
-            set: function(saveValue) { this.lastChild.previousSibling.saveValue = saveValue; }
+            get: function() { return this.input.saveValue; },
+            set: function(saveValue) { this.input.saveValue = saveValue; }
         });
         Object.defineProperty(input, 'value', {
-            get: function() { return this.lastChild.previousSibling.value; },
-            set: function(value) { this.lastChild.previousSibling.saveValue = value; }
+            get: function() { return this.input.value; },
+            set: function(value) { this.input.saveValue = value; }
         });
         Object.defineProperty(input, 'name', {
-            get: function() { return this.lastChild.previousSibling.name.value; },
-            set: function(value) { this.lastChild.previousSibling.name.value = value; }
+            get: function() { return this.input.name.value; },
+            set: function(value) { this.input.name.value = value; }
         });
-        input.lastChild.addEventListener(`change`, function() {
+        input.input.addEventListener(`change`, function() {
             thisClass.#updateInputListElement();
             thisClass.pinOverlay.update();
         });

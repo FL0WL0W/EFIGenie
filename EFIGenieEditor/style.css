@@ -239,12 +239,16 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputconfig {
     display: inline-block;
 }
+.controlcontainer {
+    display: inline-flex;
+    flex-direction: column;
+}
 .controladd,
 .controldelete,
 .controlup,
 .controldown,
 .controldummy {
-    padding: 3px 4px;
+    padding: 0px 4px;
     font-family: 'Courier New', monospace;
     font-weight: bold;
     cursor: pointer;
@@ -294,6 +298,9 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     min-width: auto;
     width: 100%
 }
+.horizontalLineSpace {
+    margin-bottom: 1.2em;
+}
 .mathContainer {
     vertical-align:top; 
     border-radius: 6px;
@@ -313,7 +320,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     background: transparent;
     border-radius: 0px;
     border-bottom: solid #3590d0;
-    width: 200px;
+    width: 250px;
 }
 label:not(.w3-button) {
     font: bold 16px Arial;

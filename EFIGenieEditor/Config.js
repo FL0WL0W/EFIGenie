@@ -123,7 +123,7 @@ function defaultFilter(measurementName, output, inputs, calculationsOnly) {
             return false;
         
         if(inputs !== undefined) {
-            if(inputs.length !== calcOrVar.inputs.length || calcOrVar.inputs === undefined)
+            if(calcOrVar.inputs === undefined || inputs.length !== calcOrVar.inputs.length)
                 return false;
             var inputsMatch = true;
             for(var im = 0; im < inputs.length; im++){
