@@ -5,39 +5,45 @@ export default class Engine extends UITemplate {
     constructor(prop) {
         super();
         this.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            undefined,
+            calculations:        undefined,
             label:              `Crank Position`,
-            measurementName:        `Reluctor`,
+            measurementName:    `Reluctor`,
+            output:             `ReluctorResult`,
             referenceName:      `EngineParameters.Crank Position`
         });
         this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            undefined,
+            calculations:        undefined,
             label:              `Cam Position`,
-            measurementName:        `Reluctor`,
+            measurementName:    `Reluctor`,
+            output:             `ReluctorResult`,
             referenceName:      `EngineParameters.Cam Position`
         });
         this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            CylinderAirmassConfigs,
+            calculations:       CylinderAirmassConfigs,
             label:              `Cylinder Air Mass`,
-            measurementName:        `Mass`,
+            measurementName:    `Mass`,
+            output:             `float`,
             referenceName:      `EngineParameters.Cylinder Air Mass`
         });
         this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            CylinderAirTemperatureConfigs,
+            calculations:       CylinderAirTemperatureConfigs,
             label:              `Cylinder Air Temperature`,
-            measurementName:        `Temperature`,
+            measurementName:    `Temperature`,
+            output:             `float`,
             referenceName:      `EngineParameters.Cylinder Air Temperature`
         });
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            ManifoldAbsolutePressureConfigs,
+            calculations:       ManifoldAbsolutePressureConfigs,
             label:              `Manifold Absolute Pressure`,
-            measurementName:        `Pressure`,
+            measurementName:    `Pressure`,
+            output:             `float`,
             referenceName:      `EngineParameters.Manifold Absolute Pressure`
         });
         this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:            VolumetricEfficiencyConfigs,
+            calculations:       VolumetricEfficiencyConfigs,
             label:              `Volumetric Efficiency`,
-            measurementName:        `Percentage`,
+            measurementName:    `Percentage`,
+            output:             `float`,
             referenceName:      `EngineParameters.Volumetric Efficiency`
         });
         this.Setup(prop);

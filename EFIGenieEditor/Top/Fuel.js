@@ -40,8 +40,7 @@ export default class Fuel extends UITemplate {
                     if(!this.children[i]) {
                         this.append(new Output_TDC({
                             calculations:        BooleanOutputConfigs,
-                            label:          `Injector ${i+1}`,
-                            measurementName:    `No Measurement`
+                            label:          `Injector ${i+1}`
                         }));
                     }
                     this.children[i].saveValue = saveValue[i];
@@ -56,8 +55,7 @@ export default class Fuel extends UITemplate {
                     if(!this.children[i]) {
                         this.append(new Output_TDC({
                             calculations:        BooleanOutputConfigs,
-                            label:          `Injector ${i+1}`,
-                            measurementName:    `No Measurement`
+                            label:          `Injector ${i+1}`
                         }));
                     }
                     this.children[i].value = value[i];

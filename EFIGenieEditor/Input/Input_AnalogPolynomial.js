@@ -24,6 +24,10 @@ export default class Input_AnalogPolynomial extends UITemplate {
             `${this.referenceName}(Voltage)`,
             `float`
         );
+        VariableRegister.RegisterVariable(
+            `${this.referenceName}(${this.constructor.measurementName})`,
+            `float`
+        );
         this.voltageLiveUpdate.VariableReference = `${this.referenceName}(Voltage)`;
         this.voltageLiveUpdate.RegisterVariables();
     }

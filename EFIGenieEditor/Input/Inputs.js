@@ -190,19 +190,20 @@ export default class Inputs extends UITemplate {
             thisClass.#updateInputControls();
         });
         input.append(new Input());
-        input.RegisterVariables = function() { this.lastChild.RegisterVariables(); };
-        input.GetObjOperation = function() { return this.lastChild.GetObjOperation(); };
+        input.append(document.createElement(`br`));
+        input.RegisterVariables = function() { this.lastChild.previousSibling.RegisterVariables(); };
+        input.GetObjOperation = function() { return this.lastChild.previousSibling.GetObjOperation(); };
         Object.defineProperty(input, 'saveValue', {
-            get: function() { return this.lastChild.saveValue; },
-            set: function(saveValue) { this.lastChild.saveValue = saveValue; }
+            get: function() { return this.lastChild.previousSibling.saveValue; },
+            set: function(saveValue) { this.lastChild.previousSibling.saveValue = saveValue; }
         });
         Object.defineProperty(input, 'value', {
-            get: function() { return this.lastChild.value; },
-            set: function(value) { this.lastChild.saveValue = value; }
+            get: function() { return this.lastChild.previousSibling.value; },
+            set: function(value) { this.lastChild.previousSibling.saveValue = value; }
         });
         Object.defineProperty(input, 'name', {
-            get: function() { return this.lastChild.name.value; },
-            set: function(value) { this.lastChild.name.value = value; }
+            get: function() { return this.lastChild.previousSibling.name.value; },
+            set: function(value) { this.lastChild.previousSibling.name.value = value; }
         });
         input.lastChild.addEventListener(`change`, function() {
             thisClass.#updateInputListElement();

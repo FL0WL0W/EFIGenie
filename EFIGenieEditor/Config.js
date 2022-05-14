@@ -104,7 +104,42 @@ class VariableRegistry {
 }
 
 VariableRegister = new VariableRegistry();
-function GetSelections(measurementName, output, inputs, calculations, calculationsOnly) {
+function defaultFilter(measurementName, output, inputs, calculationsOnly) {
+    return function(calcOrVar) {
+        //variable filter
+        if(calcOrVar.Type) {
+            if(inputs || calculationsOnly)
+                return false;
+            if ((!measurementName || calcOrVar.measurementName === measurementName) && (output === undefined || output.split(`|`).indexOf(calcOrVar.Type) >= 0))
+                return true;
+            return false;
+        }
+
+        //calculation Filter
+        if (output !== undefined && !calcOrVar.output?.split(`|`).some(o=> output.split(`|`).indexOf(o) > -1)) 
+            return false;
+
+        if(measurementName !== undefined && ((calcOrVar.measurementName !== undefined && measurementName !== calcOrVar.measurementName) || (MeasurementType[measurementName] !== undefined && calcOrVar.output.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
+            return false;
+        
+        if(inputs !== undefined) {
+            if(inputs.length !== calcOrVar.inputs.length || calcOrVar.inputs === undefined)
+                return false;
+            var inputsMatch = true;
+            for(var im = 0; im < inputs.length; im++){
+                if(inputs[im] !== calcOrVar.inputs[im]){
+                    inputsMatch = false;
+                    break;
+                }
+            }
+            if(!inputsMatch)
+                return false;
+        }
+        return true;
+
+    }
+}
+function GetSelections(calculations, filter) {
     var selections = [];
     if (calculations?.length > 0) {
         var configGroups = calculations;
@@ -115,56 +150,37 @@ function GetSelections(measurementName, output, inputs, calculations, calculatio
             var configOptions = { group: configGroups[c].group, options: [] }
             calculations = configGroups[c].calculations;
             for (var i = 0; i < calculations.length; i++) {
-                if (output !== undefined && calculations[i].output?.split(`|`).some(o=> output.split(`|`).indexOf(o) < 0)) 
-                    continue;
-
-                if(measurementName !== undefined && ((calculations[i].measurementName !== undefined && measurementName !== calculations[i].measurementName) || (MeasurementType[measurementName] !== undefined && calculations[i].output.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
-                    continue;
-                
-                if(inputs !== undefined) {
-                    if(inputs.length !== calculations[i].inputs.length || calculations[i].inputs === undefined)
-                        continue;
-                    var inputsMatch = true;
-                    for(var im = 0; im < inputs.length; im++){
-                        if(inputs[im] !== calculations[i].inputs[im]){
-                            inputsMatch = false;
-                            break;
-                        }
-                    }
-                    if(!inputsMatch)
-                        continue;
+                if(!filter || filter(calculations[i])) {
+                    configOptions.options.push({
+                        name: calculations[i].displayName,
+                        value: { value: calculations[i].name }
+                    });
                 }
-                configOptions.options.push({
-                    name: calculations[i].displayName,
-                    value: { value: calculations[i].name }
-                });
             }
             if(configOptions.options.length > 0)
                 selections.push(configOptions);
         }
     }
 
-    if(!(inputs || calculationsOnly)) {
-        for (var property in VariableRegister) {
-            if (!Array.isArray(VariableRegister[property]))
-                continue;
+    for (var property in VariableRegister) {
+        if (!Array.isArray(VariableRegister[property]))
+            continue;
 
-            var arr = VariableRegister[property];
+        var arr = VariableRegister[property];
 
-            var arrSelections = { group: property, options: [] };
+        var arrSelections = { group: property, options: [] };
 
-            for (var i = 0; i < arr.length; i++) {
-                if ((!measurementName || arr[i].measurementName === measurementName) && (output === undefined || output.split(`|`).indexOf(arr[i].Type) >= 0)) {
-                    arrSelections.options.push({
-                        name: arr[i].name,
-                        info: (!measurementName ? `[${arr[i].measurementName}]` : undefined),
-                        value: { reference: property, value: arr[i].name, measurementName: arr[i].measurementName }
-                    });
-                }
+        for (var i = 0; i < arr.length; i++) {
+            if (!filter || filter(arr[i])) {
+                arrSelections.options.push({
+                    name: arr[i].name,
+                    info: `[${arr[i].measurementName}]`,
+                    value: { reference: property, value: arr[i].name, measurementName: arr[i].measurementName }
+                });
             }
-            if(arrSelections.options.length > 0)
-                selections.push(arrSelections);
         }
+        if(arrSelections.options.length > 0)
+            selections.push(arrSelections);
     }
 
     if(selections.length === 1)

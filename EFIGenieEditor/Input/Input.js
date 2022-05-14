@@ -2,9 +2,9 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Input extends UITemplate {
-    static template = `<div data-element="name"></div>
+    static template = `<Label><div data-element="name"></div></label><div data-element="translationSelection"></div><div data-element="liveUpdate"></div>
 <div class="configContainer">
-    <div data-element="TranslationConfig"></div>
+    <div data-element="translationContent"></div>
     <div data-element="hr"></div>
     <div data-element="RawConfig"></div>
 </div>`
@@ -21,12 +21,9 @@ export default class Input extends UITemplate {
     constructor(prop) {
         super();;
         prop ??= { };
-        prop.name ??= `Input`;
+        prop.name ??= `Name`;
         this.style.display = `block`;
         const thisClass = this
-        const measurementKeys = Object.keys(Measurements)
-        var options = [];
-        measurementKeys.forEach(function(measurement) {options.push({name: measurement, value: measurement})});
         this.RawConfig = new CalculationOrVariableSelection({
             calculations:            InputConfigs,
             label:              `Source`,
@@ -41,10 +38,12 @@ export default class Input extends UITemplate {
             calculations:            InputConfigs,
             label:              prop.name,
             ConfigsOnly:        true,
-            measurementName:        `None`,
             referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
+        this.translationContent = this.TranslationConfig.calculationContent;
+        this.translationSelection = this.TranslationConfig.selection;
+        this.liveUpdate = this.TranslationConfig.liveUpdate;
         this.TranslationConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.TranslationConfig.GetSubConfig();
             if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
@@ -69,15 +68,15 @@ export default class Input extends UITemplate {
             }
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
-        this.TranslationMeasurement = new UISelection({
+        var options = [];
+        this.translationType = new UISelection({
             value:              `None`,
             selectNotVisible:   true,
             options:            options,
         });
-        this.TranslationMeasurement.addEventListener(`change`, function() {
-            thisClass.TranslationConfig.measurementName = thisClass.TranslationMeasurement.value;
+        this.translationType.addEventListener(`change`, function() {
+            thisClass.translationType.value;
         });
-        this.TranslationConfig.labelElement.replaceWith(this.TranslationMeasurement);
         this.name = new UIText({
             value: prop.name,
             class: `pinselectname inputName`
@@ -86,7 +85,6 @@ export default class Input extends UITemplate {
             thisClass.TranslationConfig.referenceName = thisClass.RawConfig.referenceName = `Inputs.${thisClass.name.value}`;
             thisClass.TranslationConfig.label = thisClass.name.value;
         });
-        this.name.style.display = `block`;
         this.hr.hidden = true;
         this.hr.style.margin = `2px`;
         delete prop.name;

@@ -15,7 +15,9 @@ export default class UIPinSelection extends UISelection {
     #generateOptionList() {
         var options = []
         var endOptions = [];
-        let pinOut = pinOverlay.pinOut;
+        let pinOut = pinOverlay?.pinOut;
+        if(!pinOut)
+            return;
         for(var i = 0; i < pinOut.Pins.length; i++) {
             const selected = this.value === pinOut.Pins[i].value;
             if(pinOut.Pins[i].supportedModes.split(` `). indexOf(this.pinType) === -1) {

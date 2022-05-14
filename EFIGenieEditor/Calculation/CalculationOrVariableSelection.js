@@ -75,7 +75,14 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(!this._measurementName)
             return;
 
-        this.selection.options = GetSelections(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculations, this.calculationsOnly);
+        this.options = GetSelections(this.calculations, defaultFilter(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculationsOnly));
+    }
+
+    get options() {
+        return this.selection.options;
+    }    
+    set options(options) {
+        this.selection.options = options;
         let match = false;
         let stringValue = UISelection.ParseValue(`string`, this.selection.value)
         this.selection.options.forEach(option => {
@@ -92,6 +99,14 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
         if(!match) 
             this.selection.value = this.selection.selectValue;
+
+        if(options.length < 2) {
+            if(!match && options.length === 1)
+                this.selection.value = options[0].value;
+            this.selection.hidden = true;
+        } else {
+            this.selection.hidden = false;
+        }
     }
 
     constructor(prop) {
@@ -108,10 +123,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
         });
         this.liveUpdate.style.float = `right`;
         this.selection = new UISelection({
-            options: GetSelections(prop.limitSelectionsOnMeasurement? prop._measurementName : undefined, prop.output, prop.inputs, prop.calculations, prop.calculationsOnly),
             selectDisabled: false,
             selectName: `None`
         });
+        this.options = GetSelections(prop.calculations, defaultFilter(prop.limitSelectionsOnMeasurement? prop._measurementName : undefined, prop.output, prop.inputs, prop.calculationsOnly));
         this.selection.addEventListener(`change`, function() {
             const subConfig = thisClass.GetSubConfig();
             thisClass.calculationContent.replaceChildren(subConfig ?? ``);
@@ -274,7 +289,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables() {
-        this.selection.options = GetSelections(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculations, this.calculationsOnly);
+        this.options = GetSelections(this.calculations, defaultFilter(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculationsOnly));
         const selection = this.selection.value;
         if (selection && this.referenceName) {
             const thisReference = this.GetVariableReference();
