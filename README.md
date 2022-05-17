@@ -15,13 +15,14 @@ things to complete but i am at a state where i am testing the ecu.
 
 ## Features
 * Customizable(size and limits) 3D Fuel and Ignition Maps (Speed Density)
+* Customizable formulas for all engine parameters
+* Cusotmizable inputs and outputs
 * Unlimited cylinder sequential injection and ignition (Depends on hardware)
   * Stm32Devboard - 8 cylinder sequential fuel and ignition (10, 12, 14, 16 wasted spark/banked injection)
 * Flexible Crank Cam Decoder
   * GM 24x (Cam + Crank, Crank Only, or Cam only)
   * Configurable Missing Tooth Decoder
   * --More to come
-* Injector Flow Rate and Dead Time
 * Firmware features
   * Unit Tests to ensure everything works
   * Operation Architecture
