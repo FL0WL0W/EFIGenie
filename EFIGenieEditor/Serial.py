@@ -133,6 +133,7 @@ def parse_readbytes(ser):
     val = "VOID"
     # For all cases we'll just use a simple if/else construct to parse
     if readBytes[0] == 0:
+        readBytes += ser.read(5)
         NOP
     elif 1 <= readBytes[0] <= 10:
         fmt = fmt_switch[readBytes[0]]
@@ -187,6 +188,7 @@ def run_serial(ser):
             ser.read(1)
             ser.write(sendBytes)
         elif readType[0] == 0:
+            ser.read(5)
             ser.write(sendBytes)
         else:
             ser.read(struct.Struct(fmt_switch[readType[0]]).size)
@@ -215,7 +217,7 @@ def main():
         default='/dev/ttyACM0'
     )
     args = ap.parse_args()
-    serial_connection = serial.Serial(args.comport, 9600, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, 1)
+    serial_connection = serial.Serial(args.comport, 115200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, 1)
     # serial_connection = "serial"
     if args.server:
         run_server(serial_connection, "localhost", 8080)
