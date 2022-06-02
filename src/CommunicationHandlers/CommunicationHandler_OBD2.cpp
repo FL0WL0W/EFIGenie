@@ -6,18 +6,10 @@ using namespace OperationArchitecture;
 #ifdef COMMUNICATIONHANDLER_OBD2_H
 namespace EFIGenie
 {	
-		CommunicationHandler_OBD2::CommunicationHandler_OBD2(ICommunicationService *communicationService, GeneratorMap<Variable> *variableMap, const OBD2VariableMap *obd2VariableMap) :
-			_communicationService(communicationService),
+		CommunicationHandler_OBD2::CommunicationHandler_OBD2(GeneratorMap<Variable> *variableMap, const OBD2VariableMap *obd2VariableMap) :
 			_variableMap(variableMap),
 			_obd2VariableMap(obd2VariableMap)
 		{
-			_communicationReceiveCallBack = [this](void *data, size_t length) { return this->Receive(data, length); };
-			_communicationService->RegisterReceiveCallBack(&_communicationReceiveCallBack);
-		}
-
-		CommunicationHandler_OBD2::~CommunicationHandler_OBD2()
-		{
-			_communicationService->UnRegisterReceiveCallBack(&_communicationReceiveCallBack);
 		}
 
 		/**
@@ -33,7 +25,7 @@ namespace EFIGenie
 		 * @param length Number of bytes that the data pointer is pointing to.
 		 * @return size_t Number of bytes parsed from data.
 		 */
-		size_t CommunicationHandler_OBD2::Receive(void *data, size_t length)
+		size_t CommunicationHandler_OBD2::Receive(communication_send_callback_t sendCallBack, void *data, size_t length)
 		{
 			uint8_t service = *reinterpret_cast<uint8_t *>(data); //grab service from data
 			data = reinterpret_cast<uint8_t *>(data) + 1; //ofset data
@@ -56,7 +48,7 @@ namespace EFIGenie
 								// Engine load will be a float value between 0 and 1
 								// Need to normalize to a byte value by multiplying by 255, then perform a type conversion.
 								uint8_t cel = it->second->To<float>() * 255;
-								_communicationService->Send(&cel, 1);
+								sendCallBack(&cel, 1);
 								return 2;
 							}
 						}
@@ -68,7 +60,7 @@ namespace EFIGenie
 							{
  								//add 40 to align with -40 to 215 of obd2 pid. then convert to uint8_t
 								uint8_t ect = it->second->To<int16_t>() + 40;
-								_communicationService->Send(&ect, 1);
+								sendCallBack(&ect, 1);
 								return 2;
 							}
 						}
@@ -83,7 +75,7 @@ namespace EFIGenie
 							{
 								// Min value is -100, max is 99.2. Need to normalize so it will fit in an unsigned byte.
 								uint8_t ft = static_cast<int16_t>(it->second->To<float>() * 128) + 128;
-								_communicationService->Send(&ft, 1);
+								sendCallBack(&ft, 1);
 								return 2;
 							}
 						}
@@ -96,7 +88,7 @@ namespace EFIGenie
 								// Fuel pressure is given in Bar but needs to be returned in kPa. Additionally, the byte
 								// will be multiplied by 3 by the receiver so must divide by 3 as well.
 								uint8_t fp = it->second->To<float>() * 100 / 3;
-								_communicationService->Send(&fp, 1);
+								sendCallBack(&fp, 1);
 								return 2;
 							}
 						}
@@ -108,7 +100,7 @@ namespace EFIGenie
 							{
 								// Intake manifold pressure is given in Bar but needs to be returned in kPa.
 								uint8_t imp = it->second->To<float>() * 100;
-								_communicationService->Send(&imp, 1);
+								sendCallBack(&imp, 1);
 								return 2;
 							}
 						}

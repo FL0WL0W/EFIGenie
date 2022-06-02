@@ -14,17 +14,14 @@ namespace EFIGenie
 		uint32_t IntakeManifoldPressureID;
 	};
 
-	class CommunicationHandler_OBD2
+	class CommunicationHandler_OBD2 : public EmbeddedIOServices::ICommunicationHandler
 	{
 	protected:
-		EmbeddedIOServices::ICommunicationService *_communicationService;
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 		const OBD2VariableMap *_obd2VariableMap;
-		EmbeddedIOServices::communication_receive_callback_t _communicationReceiveCallBack;
 	public:
-		CommunicationHandler_OBD2(EmbeddedIOServices::ICommunicationService *communicationService, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap, const OBD2VariableMap *obd2VariableMap);
-		~CommunicationHandler_OBD2();
-		size_t Receive(void* buf, size_t length);
+		CommunicationHandler_OBD2(OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap, const OBD2VariableMap *obd2VariableMap);
+		size_t Receive(EmbeddedIOServices::communication_send_callback_t sendCallBack, void* buf, size_t length);
 	};
 }
 #endif
