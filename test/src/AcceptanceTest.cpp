@@ -8,6 +8,7 @@
 #include <fstream>
 using namespace testing;
 
+using namespace OperationArchitecture;
 using namespace EmbeddedIOServices;
 using namespace EmbeddedIOOperations;
 using namespace EFIGenie;
@@ -59,7 +60,7 @@ namespace UnitTests
 			_config = malloc(size);
 			if (file.read(reinterpret_cast<char *>(_config), size))
 			{
-				_eFIGenieMain = new EFIGenieMain(_config, _sizeOut, &_embeddedIOServiceCollection);
+				_eFIGenieMain = new EFIGenieMain(_config, _sizeOut, &_embeddedIOServiceCollection, new GeneratorMap<Variable>());
 			}
 		}
 	};
