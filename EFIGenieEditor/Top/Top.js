@@ -158,7 +158,16 @@ export default class Top extends UITemplate {
 
     GetArrayBuffer() {
         this.RegisterVariables();
-        return (new ArrayBuffer()).build({ types: types, value: [this.GetObjOperation()]});
+        let buf = new ArrayBuffer()
+        buf = buf.build({ types: types, value: [this.GetObjOperation()]});
+        buf = new Uint32Array([buf.byteLength]).buffer.concatArray(buf);
+        buf = buf.concatArray(new Uint32Array([buf.crc32()]).buffer);
+
+        let bufMeta = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
+        bufMeta = new Uint32Array([bufMeta.byteLength]).buffer.concatArray(bufMeta);
+        bufMeta = bufMeta.concatArray(new Uint32Array([bufMeta.crc32()]).buffer);
+
+        return buf.concatArray(bufMeta);
     }
 
     GetObjOperation() {
@@ -185,12 +194,6 @@ export default class Top extends UITemplate {
                 this.Fuel.GetObjOperation(), 
                 this.Ignition.GetObjOperation()
             ]},
-
-            //metadata
-            { toArrayBuffer() {
-                var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
-                return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray);
-            }}
         ]};
     }
 }

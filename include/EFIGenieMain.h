@@ -8,12 +8,12 @@ namespace EFIGenie
 	class EFIGenieMain
 	{
 		protected:
-		OperationArchitecture::IOperationBase *_inputsExecute;
-		OperationArchitecture::IOperationBase *_preSyncExecute;
-		OperationArchitecture::IOperationBase *_syncCondition;
-		OperationArchitecture::IOperationBase *_mainLoopExecute;
+		OperationArchitecture::IOperationBase *_inputsExecute = 0;
+		OperationArchitecture::IOperationBase *_preSyncExecute = 0;
+		OperationArchitecture::IOperationBase *_syncCondition = 0;
+		OperationArchitecture::IOperationBase *_mainLoopExecute = 0;
 		bool _syncedOnce = false;
-		OperationArchitecture::OperationFactory *_operationFactory;
+		OperationArchitecture::OperationFactory *_operationFactory = 0;
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 
 		public:

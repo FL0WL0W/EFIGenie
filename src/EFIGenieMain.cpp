@@ -3,7 +3,9 @@
 #include "Operations/EmbeddedIOOperationFactoryRegister.h"
 #include "Operations/ReluctorOperationFactoryRegister.h"
 #include "Operations/EngineOperationFactoryRegister.h"
+#include "Operations/Operation_ReluctorGM24x.h"
 #include "Config.h"
+#include "CRC.h"
 
 using namespace OperationArchitecture;
 using namespace EmbeddedIOServices;
@@ -14,6 +16,17 @@ namespace EFIGenie
 {
     EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
     {
+        const uint32_t configSize = *reinterpret_cast<const uint32_t *>(config) + sizeof(uint32_t);
+        if(configSize == 0)
+            return;
+
+        const uint32_t configCRC = CRC::CRC32(config, configSize);
+        if(*reinterpret_cast<const uint32_t *>(reinterpret_cast<const uint8_t *>(config) + configSize) != configCRC)
+        {
+            return;
+        }
+        Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));
+
         _operationFactory = new OperationFactory();
 
         OperationFactoryRegister::Register(10000, _operationFactory, variableMap);
@@ -50,11 +63,13 @@ namespace EFIGenie
         Config::OffsetConfig(config, sizeOut, size);
 
         _operationFactory->Clear();;
+        Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));//CRC
     }
 
     EFIGenieMain::~EFIGenieMain()
     {
-        delete _operationFactory;
+        if(_operationFactory != 0)
+            delete _operationFactory;
     }
 
     void EFIGenieMain::Setup()

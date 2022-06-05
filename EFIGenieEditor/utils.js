@@ -23,6 +23,28 @@ ArrayBuffer.prototype.toRawString = function() { // a, b TypedArray of same type
     return binary
 }
 
+let crc32table = [];
+for (let i = 0; i < 256; ++i) {
+    let b = i;
+    for (let i = 0; i < 8; ++i) {
+        b = b & 1 ? 0xEDB88320 ^ (b >>> 1) : b >>> 1;
+    }
+    crc32table[i] = b;
+}
+ArrayBuffer.prototype.crc32 = function() {
+
+    var crc = -1
+
+    let uint8Array = new Uint8Array(this);
+    for (let i = 0; i < uint8Array.length; ++i) {
+        crc = crc32table[(crc ^ uint8Array[i]) & 0xFF] ^ (crc >>> 8);
+    }
+
+    crc ^= -1;
+    console.log(uint8Array.length, crc);
+    return crc;
+};
+
 ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same type
     var tmp = new Uint8Array(this.byteLength + b.byteLength);
     if(this.byteLength > 0)
