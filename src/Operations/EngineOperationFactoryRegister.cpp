@@ -13,9 +13,9 @@ using namespace EmbeddedIOOperations;
 #ifdef ENGINEOPERATIONFACTORYREGISTER_H
 namespace EFIGenie
 {
-	Operation_EnginePosition *Operation_EnginePositionInstanceCrankPriority;
-	Operation_EnginePosition *Operation_EnginePositionInstanceCamPriority;
-    Operation_EngineParameters * Operation_EngineParametersInstance;
+	Operation_EnginePosition *Operation_EnginePositionInstanceCrankPriority = 0;
+	Operation_EnginePosition *Operation_EnginePositionInstanceCamPriority = 0;
+    Operation_EngineParameters * Operation_EngineParametersInstance = 0;
 
     void EngineOperationFactoryRegister::Register(uint32_t idOffset, OperationFactory *factory, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
     {

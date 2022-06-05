@@ -127,8 +127,8 @@ export default class Fuel extends UITemplate {
             ]
         };
 
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs[i] });
+        for(var i = 0; i < this.Outputs.children.length; i++) {
+            group.value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs.children[i] });
         }
 
         return group;

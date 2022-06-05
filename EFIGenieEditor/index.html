@@ -95,7 +95,7 @@
                     downloadCompressedObject(cfg, configJsonName);
                 });
                 let btnLoad = document.querySelector(`#btnLoad`);
-                btnLoad.addEventListener(`click`, function(evt){
+                btnLoad.addEventListener(`change`, function(evt){
                     var test = new FileReader();
 
                     test.onload = function(evt) {

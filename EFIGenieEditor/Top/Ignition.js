@@ -109,8 +109,8 @@ export default class Ignition extends UITemplate {
             ]
         };
 
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs[i] });
+        for(var i = 0; i < this.Outputs.children.length; i++) {
+            group.value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs.children[i] });
         }
 
         return group;

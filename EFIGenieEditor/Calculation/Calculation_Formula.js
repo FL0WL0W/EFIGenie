@@ -244,6 +244,10 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     GetObjOperation(outputVariableId) {
+        if(this.parameters.length === 0)
+            return;
+        if(this.parameters.length === 1)
+            return this.parameterValues[this.parameters[0]].GetObjOperation();
         var group  = { 
             type: `Group`, 
             value: []
