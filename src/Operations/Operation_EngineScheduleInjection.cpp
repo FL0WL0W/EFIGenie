@@ -21,7 +21,8 @@ namespace EFIGenie
 	{
 		_timerService->UnScheduleTask(_openTask);
 		_timerService->UnScheduleTask(_closeTask);
-		_closeCallBack();
+		if(_open)
+			_timerService->ScheduleCallBack(_closeCallBack, _closeTask->ScheduledTick);
 		delete _openTask;
 		delete _closeTask;
 	}

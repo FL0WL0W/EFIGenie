@@ -12,16 +12,14 @@ using namespace ReluctorOperations;
 
 namespace EFIGenie
 {
-    EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
+    EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
     {
-        VariableMap = new OperationArchitecture::GeneratorMap<Variable>();
+        _operationFactory = new OperationFactory();
 
-        OperationFactory *operationFactory = new OperationFactory();
-
-        OperationFactoryRegister::Register(10000, operationFactory, VariableMap);
-        EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
-        ReluctorOperationFactoryRegister::Register(30000, operationFactory);
-        EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection);
+        OperationFactoryRegister::Register(10000, _operationFactory, variableMap);
+        EmbeddedIOOperationFactoryRegister::Register(20000, _operationFactory, embeddedIOServiceCollection);
+        ReluctorOperationFactoryRegister::Register(30000, _operationFactory);
+        EngineOperationFactoryRegister::Register(40000, _operationFactory, embeddedIOServiceCollection);
 
         size_t size = 0;
         do
@@ -30,42 +28,47 @@ namespace EFIGenie
             const uint32_t operationId = Config::CastAndOffset<uint32_t>(config, sizeOut);
             if(operationId == 0)
                 break;
-            IOperationBase *operation = operationFactory->Create(config, size);
-            operationFactory->Register(operationId, operation);
+            IOperationBase *operation = _operationFactory->Create(config, size);
+            _operationFactory->Register(operationId, operation);
             Config::OffsetConfig(config, sizeOut, size);
         }
         while(size > 0);
 
-        _inputsExecute = operationFactory->Create(config, size);
+        _inputsExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _preSyncExecute = operationFactory->Create(config, size);
+        _preSyncExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _syncCondition = operationFactory->Create(config, size);
+        _syncCondition = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
         size = 0;
-        _mainLoopExecute = operationFactory->Create(config, size);
+        _mainLoopExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
-        delete operationFactory;
+        _operationFactory->Clear();;
+    }
+
+    EFIGenieMain::~EFIGenieMain()
+    {
+        delete _operationFactory;
     }
 
     void EFIGenieMain::Setup()
     {
-        _inputsExecute->Execute();
-        _preSyncExecute->Execute();
+        if(_inputsExecute != 0) _inputsExecute->Execute();
+        if(_preSyncExecute != 0) _preSyncExecute->Execute();
     }
 
     void EFIGenieMain::Loop()
     {
-        _inputsExecute->Execute();
-        if(!_syncedOnce)
+        if(_inputsExecute != 0) _inputsExecute->Execute();
+        if(!_syncedOnce && _syncCondition != 0)
             _syncedOnce = _syncCondition->Execute<bool>();
-        if(_syncedOnce)
+        if(_syncedOnce && _mainLoopExecute != 0)
         {
             _mainLoopExecute->Execute();
         }

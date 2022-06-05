@@ -13,10 +13,12 @@ namespace EFIGenie
 		OperationArchitecture::IOperationBase *_syncCondition;
 		OperationArchitecture::IOperationBase *_mainLoopExecute;
 		bool _syncedOnce = false;
+		OperationArchitecture::OperationFactory *_operationFactory;
+		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 
 		public:
-		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *VariableMap;
-		EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection);
+		EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
+		~EFIGenieMain();
 
 		void Setup();
 		void Loop();

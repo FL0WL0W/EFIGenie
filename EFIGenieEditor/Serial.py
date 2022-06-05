@@ -8,6 +8,7 @@ import http.server
 import argparse
 import base64
 import json
+import time
 from sys import version as python_version
 from cgi import parse_header, parse_multipart
 
@@ -57,15 +58,15 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
         if(self.path == "/GetVariableMetaData") :
             self.serial_conn.flushOutput()
             self.serial_conn.flushInput()
-            sendBytes = struct.pack("<II", 4294967295, 0)
+            sendBytes = struct.pack("<BII", 103, 4294967295, 0)
             self.serial_conn.write(sendBytes)
             metadatalength = struct.unpack('I', self.serial_conn.read(4))[0] + 4
             metadata = self.serial_conn.read(60)
             for i in range(1, int(metadatalength/64)):
-                sendBytes = struct.pack("<II", 4294967295, i)
+                sendBytes = struct.pack("<BII", 103, 4294967295, i)
                 self.serial_conn.write(sendBytes)
                 metadata += self.serial_conn.read(64)
-            sendBytes = struct.pack("<II", 4294967295, int(metadatalength/64))
+            sendBytes = struct.pack("<BII", 103, 4294967295, int(metadatalength/64))
             self.serial_conn.write(sendBytes)
             metadata += self.serial_conn.read(64)[0:(metadatalength%64)]
             resp = base64.b64encode(metadata)
@@ -80,12 +81,12 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             postvars = json.loads(body)
             variables = postvars['Variables']
             offsets = postvars['Offsets']
-            # sendBytes = struct.pack("<IB", varID, offset)
+            # sendBytes = struct.pack("<BIB", 103, varID, offset)
             sendBytes = bytearray([])
             for i in range(len(variables)):
                 varID = int(variables[i])
                 offset = int(offsets[i])
-                sendBytes += struct.pack("<IB", varID, offset)
+                sendBytes += struct.pack("<BIB", 103, varID, offset)
             self.serial_conn.flushOutput()
             self.serial_conn.flushInput()
             self.serial_conn.write(sendBytes)
@@ -162,6 +163,38 @@ def run_server(ser, interface, port):
     httpgenie = http.server.HTTPServer((interface, port), httpgeniehandler)
     httpgenie.serve_forever()
 
+def upload_config(ser, config):
+    sendBytes = struct.pack("<B", 113)
+    ser.write(sendBytes)
+    time.sleep(1)
+    ser.read(ser.in_waiting)
+    sendBytes = struct.pack("<B", 99)
+    ser.write(sendBytes)
+    readBytes = ser.read(4)
+    configAddress = struct.unpack("<I", readBytes)[0]
+    print(configAddress)
+
+    with open(config, "rb") as f:
+        f.seek(0, 2)
+        f_left = f.tell()
+        f.seek(0, 0)
+
+        i = 0
+        while f_left > 0:
+            sendSize = min(52, f_left)
+            sendBytes = struct.pack("<BII", 119, configAddress + i, sendSize)
+            sendBytes += f.read(sendSize)
+            f_left -= sendSize
+            i += sendSize
+            ser.write(sendBytes)
+            if(ser.read(1)[0] != 6) :
+                break
+
+    sendBytes = struct.pack("<B", 115)
+    ser.write(sendBytes)
+
+    ser.close()
+
 def run_serial(ser):
     """Open and run a simple REPL loop connected to the serial console.
 
@@ -175,7 +208,7 @@ def run_serial(ser):
             break
         else:
             variableID = int(variableID)
-        sendBytes = struct.pack("<IB", variableID, 0)
+        sendBytes = struct.pack("<BIB", 103, variableID, 0)
         ser.write(sendBytes)
         readType = ser.read(1)
         if len(readType) == 0:
@@ -183,7 +216,7 @@ def run_serial(ser):
         if readType[0] == 12 or readType[0] == 14:
             ser.read(8) # clear read variable bytes and ask user for offset
             offset = int(input("Enter Offset: "))
-            ser.write(struct.pack("<IB", variableID, offset))
+            ser.write(struct.pack("<BIB", 103, variableID, offset))
         elif readType[0] == 11:
             ser.read(1)
             ser.write(sendBytes)
@@ -216,11 +249,17 @@ def main():
         help="The COM or serial port to connect to.",
         default='/dev/ttyACM0'
     )
+    ap.add_argument(
+        "--config",
+        help="to upload a config to the device"
+    )
     args = ap.parse_args()
     serial_connection = serial.Serial(args.comport, 115200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, 1)
     # serial_connection = "serial"
     if args.server:
         run_server(serial_connection, "localhost", 8080)
+    elif args.config:
+        upload_config(serial_connection, args.config)
     else:
         run_serial(serial_connection)
     
