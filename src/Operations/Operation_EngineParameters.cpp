@@ -10,7 +10,5 @@ namespace EFIGenie
 		_synced = enginePosition.Synced;
 		return std::tuple<float, bool, bool>(enginePosition.GetRPM(), _sequential, _synced);
 	}
-	
-	Operation_EngineParameters Operation_EngineParameters::Instance;
 }
 #endif

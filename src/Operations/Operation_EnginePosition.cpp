@@ -72,8 +72,5 @@ namespace EFIGenie
 		_previousReluctorResult = ret;
 		return ret;
 	}
-
-	Operation_EnginePosition Operation_EnginePosition::InstanceCrankPriority = Operation_EnginePosition(true);
-	Operation_EnginePosition Operation_EnginePosition::InstanceCamPriority = Operation_EnginePosition(false);
 }
 #endif

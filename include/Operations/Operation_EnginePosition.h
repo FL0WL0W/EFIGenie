@@ -20,9 +20,6 @@ namespace EFIGenie
         Operation_EnginePosition(bool crankPriority);
 
 		EnginePosition Execute(ReluctorOperations::ReluctorResult crankPosition, ReluctorOperations::ReluctorResult camPosition) override;
-
-		static Operation_EnginePosition InstanceCrankPriority;
-		static Operation_EnginePosition InstanceCamPriority;
 	};
 }
 #endif

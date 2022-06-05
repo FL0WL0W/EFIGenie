@@ -13,8 +13,6 @@ namespace EFIGenie
 		volatile bool _synced;
 	public:		
 		std::tuple<float, bool, bool> Execute(EnginePosition enginePosition) override;
-
-		static Operation_EngineParameters Instance;
 	};
 }
 #endif
