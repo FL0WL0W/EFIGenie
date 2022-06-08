@@ -22,7 +22,7 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
             measurementName: `Angle`
         });
         this.Setup(prop);
-        this.length.value = 4;
+        this.length.value = 8;
     }
 
     GetObjOperation(outputVariableId) {

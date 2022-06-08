@@ -74,7 +74,9 @@ export default class PinOverlay extends HTMLDivElement {
                             };
                             if(pinSelectElements[s].pin == this.pin) {
                                 if(selectedOption) {
-                                    option.Class = selectedOption.Class = `pinconflict`;
+                                    option.Class = `pinconflict`;
+                                    if(typeof selectedOption !== `string`)
+                                    selectedOption.Class = `pinconflict`;
                                     selectedOption = `conflict`;
                                 } else {
                                     selectedOption = option;
