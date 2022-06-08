@@ -41,7 +41,6 @@ ArrayBuffer.prototype.crc32 = function() {
     }
 
     crc ^= -1;
-    console.log(uint8Array.length, crc);
     return crc;
 };
 

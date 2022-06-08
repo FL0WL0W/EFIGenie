@@ -58,15 +58,15 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
         if(self.path == "/GetVariableMetaData") :
             self.serial_conn.flushOutput()
             self.serial_conn.flushInput()
-            sendBytes = struct.pack("<BII", 103, 4294967295, 0)
+            sendBytes = struct.pack("<BI", 109, 0)
             self.serial_conn.write(sendBytes)
             metadatalength = struct.unpack('I', self.serial_conn.read(4))[0] + 4
             metadata = self.serial_conn.read(60)
             for i in range(1, int(metadatalength/64)):
-                sendBytes = struct.pack("<BII", 103, 4294967295, i)
+                sendBytes = struct.pack("<BI", 109, i)
                 self.serial_conn.write(sendBytes)
                 metadata += self.serial_conn.read(64)
-            sendBytes = struct.pack("<BII", 103, 4294967295, int(metadatalength/64))
+            sendBytes = struct.pack("<BI", 109, int(metadatalength/64))
             self.serial_conn.write(sendBytes)
             metadata += self.serial_conn.read(64)[0:(metadatalength%64)]
             resp = base64.b64encode(metadata)

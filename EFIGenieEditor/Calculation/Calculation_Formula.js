@@ -304,8 +304,6 @@ export default class Calculation_Formula extends UITemplate {
             }
             group.value.push(operationValue);
         }
-
-        console.log(group);
         
         return group;
     }

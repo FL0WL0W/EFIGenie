@@ -11,8 +11,6 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithMeasurement 
         return this._stickyHidden;
     }
     set hidden(hidden) {
-        if(hidden === false)
-            debugger;
         this._stickyHidden = hidden
         if(hidden)
             super.hidden = hidden;

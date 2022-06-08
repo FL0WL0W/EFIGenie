@@ -64,7 +64,7 @@ class VariableRegistry {
                 variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
             }
             this[listName] ??= [];
-            const existing = this[listName].findIndex(r => r.name === variableName);
+            const existing = this[listName].findIndex(r => r.name === variableName && (measurementName == undefined || measurementName == r.measurementName));
             if(existing >= 0)
                 this[listName].splice(existing, 1);
             this[listName].push({
