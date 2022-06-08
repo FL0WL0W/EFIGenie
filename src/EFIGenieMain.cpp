@@ -17,7 +17,7 @@ namespace EFIGenie
     EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
     {
         const uint32_t configSize = *reinterpret_cast<const uint32_t *>(config) + sizeof(uint32_t);
-        if(configSize == 0)
+        if(configSize == 0 || configSize > 100000)
             return;
 
         const uint32_t configCRC = CRC::CRC32(config, configSize);
