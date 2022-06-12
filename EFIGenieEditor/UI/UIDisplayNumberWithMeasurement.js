@@ -58,16 +58,21 @@ export default class UIDisplayNumberWithMeasurement extends UITemplate {
         let unit = GetUnit(this.measurementName, this.measurementUnitName)
         if(!unit) 
             unit = { DisplayMultiplier: 1, DisplayOffset: 0};
+
+        if(isNaN(this.value))
+            return;
             
         let displayValue = this.value * unit.DisplayMultiplier + unit.DisplayOffset;
         displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`;
         const indexOfPoint = displayValue.indexOf(`.`);
-        var zeroesToAdd = 6-(displayValue.length - indexOfPoint);
+        var zeroesToAdd = Math.max(0, 6-(displayValue.length - indexOfPoint));
         if(indexOfPoint === -1)
             zeroesToAdd = 6;
         if(zeroesToAdd < this.ZeroesToAdd)
             this.ZeroesToAdd = zeroesToAdd;
         zeroesToAdd -= this.ZeroesToAdd;
+        if(zeroesToAdd > 0 && indexOfPoint < 0)
+            displayValue += `.`;
         for(var i = 0; i < zeroesToAdd; i++)
             displayValue += `0`;
 

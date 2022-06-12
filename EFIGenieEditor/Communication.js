@@ -47,7 +47,7 @@ function UpdateFloatCurrentVariableValues() {
         previousVariableIds = variableIds;
     }
     var offsets = []
-    for(var i = 0; i < variableIds.length; i++) offsets[i] = 0;
+    for(var i = 0; i < variableIds.length; i++) offsets[i] = -1;
 
     postData(`http://127.0.0.1:8080/GetVariable`, {
         Variables: variableIds,
