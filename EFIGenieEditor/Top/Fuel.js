@@ -27,7 +27,7 @@ export default class Fuel extends UITemplate {
         });
         this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:       GenericConfigs,
-            label:              `Injector End Position(BTDC)`,
+            label:              `Injector End Position`,
             measurementName:    `Angle`,
             referenceName:      `FuelParameters.Injector End Position`
         });
@@ -106,7 +106,7 @@ export default class Fuel extends UITemplate {
                         `EnginePositionId`,
                         `FuelParameters.Injector Enable`,
                         `FuelParameters.Injector Pulse Width`,
-                        `FuelParameters.Injector End Position(BTDC)`
+                        `FuelParameters.Injector End Position`
                     ]
                 }]};
             }}],

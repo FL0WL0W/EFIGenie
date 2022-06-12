@@ -48,7 +48,24 @@ class VariableRegistry {
     GetVariableId(variableReference) {
         var variable = this.GetVariableByReference(variableReference);
         if(variable === undefined && this.CreateIfNotFound)
-            return this[variableReference] = this.GenerateVariableId();
+        {
+            if(typeof variableReference === `string` && variableReference.indexOf(`.`) !== -1) {
+                const listName = variableReference.substring(0, variableReference.indexOf(`.`));
+                this[listName] ??= [];
+                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
+                var measurementName;
+                if(variableName.indexOf(`(`) !== -1) {
+                    measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1);
+                    measurementName = measurementName.substring(0, measurementName.length - 1);
+                    variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
+                }
+                var Id = this.GenerateVariableId();
+                this[listName].push({ name: variableName, measurementName, Id})
+                return Id;
+            } else {
+                return this[variableReference] = this.GenerateVariableId();
+            }
+        }
         if(typeof variable === `object`)
             return variable.Id;
         return variable;
@@ -119,7 +136,7 @@ function defaultFilter(measurementName, output, inputs, calculationsOnly) {
         if (output !== undefined && !calcOrVar.output?.split(`|`).some(o=> output.split(`|`).indexOf(o) > -1)) 
             return false;
 
-        if(measurementName !== undefined && ((calcOrVar.measurementName !== undefined && measurementName !== calcOrVar.measurementName) || (MeasurementType[measurementName] !== undefined && calcOrVar.output.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
+        if(measurementName !== undefined && ((calcOrVar.measurementName !== undefined && measurementName !== calcOrVar.measurementName) || (MeasurementType[measurementName] !== undefined && calcOrVar.output?.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
             return false;
         
         if(inputs !== undefined) {

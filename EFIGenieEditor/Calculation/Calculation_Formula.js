@@ -47,9 +47,7 @@ export default class Calculation_Formula extends UITemplate {
                     calculations: this.calculations,
                     output: `bool|float`,
                     referenceName: this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined,
-                    measurementName: this.measurementName,
-                    limitSelectionsOnMeasurement: false,
-                    registerIfVariable: false
+                    limitSelectionsOnMeasurement: false
                 });
             }
             let formulaParameter = this.formulaDialogTemplate.parameterElements.children[i];
@@ -114,13 +112,6 @@ export default class Calculation_Formula extends UITemplate {
             return;
 
         this._measurementName = measurementName;
-        for(let parameter in this.parameterValues) {
-            let parameterValue = this.parameterValues[parameter];
-            if(!parameterValue)
-                continue;
-            
-            this.parameterValues.measurementName = measurementName;
-        }
     }
     
     _referenceName = undefined;
@@ -165,9 +156,7 @@ export default class Calculation_Formula extends UITemplate {
                 calculations: this.calculations,
                 output: `bool|float`,
                 referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
-                measurementName: this.measurementName,
-                limitSelectionsOnMeasurement: false,
-                registerIfVariable: false
+                limitSelectionsOnMeasurement: false
             });
 
             parameterValue.saveValue = saveValue.parameterValues[parameter];
@@ -200,9 +189,7 @@ export default class Calculation_Formula extends UITemplate {
                 calculations: this.calculations,
                 output: `bool|float`,
                 referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
-                measurementName: this.measurementName,
-                limitSelectionsOnMeasurement: false,
-                registerIfVariable: false
+                limitSelectionsOnMeasurement: false
             });
 
             parameterValue.value = value.parameterValues[parameter];
@@ -233,9 +220,14 @@ export default class Calculation_Formula extends UITemplate {
         const thisClass = this;
         this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(); })
         if (this.referenceName) {
-            const thisReference = this.GetVariableReference();
-            const type = GetClassProperty(this, `output`);
-            VariableRegister.RegisterVariable(thisReference, type);
+            if(this.parameters.length === 1) {
+                const thisReference = this.GetVariableReference();
+                VariableRegister.RegisterVariable(thisReference, undefined, this.parameterValues[this.parameters[0]].GetVariableReference());
+            } else {
+                const thisReference = this.GetVariableReference();
+                const type = GetClassProperty(this, `output`);
+                VariableRegister.RegisterVariable(thisReference, type);
+            }
         }
     }
 
@@ -246,13 +238,13 @@ export default class Calculation_Formula extends UITemplate {
     GetObjOperation(outputVariableId) {
         if(this.parameters.length === 0)
             return;
-        if(this.parameters.length === 1)
+        if(this.parameters.length === 1) 
             return this.parameterValues[this.parameters[0]].GetObjOperation();
         var group  = { 
             type: `Group`, 
             value: []
         };
-        outputVariableId ?? this.referenceName;
+        outputVariableId ??= this.referenceName;
         
         const thisClass = this;
         this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation()); })

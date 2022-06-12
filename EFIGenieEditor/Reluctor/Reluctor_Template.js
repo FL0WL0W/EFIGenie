@@ -5,9 +5,13 @@ export default class Reluctor_Template extends Input_DigitalRecord {
     static inputs = [];
     static template = Input_DigitalRecord.template.substring(0, Input_DigitalRecord.template.lastIndexOf(`Inverted`) + 8)
 
+    RegisterVariables() {
+        VariableRegister.RegisterVariable(`${this.referenceName}(Record)`, "Record")
+    }
+
     GetObjOperation(objOperation) {
         return { type: `Group`, value: [
-            super.GetObjOperation(`${this.referenceName}(Reluctor)`),
+            super.GetObjOperation(`${this.referenceName}(Record)`),
             objOperation
         ]};
     }

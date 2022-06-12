@@ -115,8 +115,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
         prop ??= {};
         prop.limitSelectionsOnMeasurement ??= true;
         this.limitSelectionsOnMeasurement = prop.limitSelectionsOnMeasurement;
-        prop.registerIfVariable ??= true;
-        this.registerIfVariable = prop.registerIfVariable;
         this.liveUpdate = new UIDisplayLiveUpdate({
             measurementName: prop.measurementName,
             measurementUnitName: prop.measurementUnitName
@@ -292,6 +290,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.options = GetSelections(this.calculations, defaultFilter(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculationsOnly));
         const selection = this.selection.value;
         if (selection && this.referenceName) {
+            this.liveUpdate.VariableReference = undefined;
             const thisReference = this.GetVariableReference();
             let variable;
             if (!selection.reference) {
@@ -304,7 +303,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     variable = VariableRegister.GetVariableByReference(thisReference)
                     subConfig.RegisterVariables?.();
                 }
-            } else if(this.registerIfVariable) {
+            } else {
                 const variableReference = `${selection.reference}.${selection.value}${this.measurementName? `(${this.measurementName})` : ``}`;
                 VariableRegister.RegisterVariable(thisReference, undefined, variableReference);
                 variable = VariableRegister.GetVariableByReference(variableReference)
@@ -313,8 +312,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
                 this.liveUpdate.VariableReference = thisReference;
                 this.liveUpdate.measurementName = this.measurementName;
             }
-            else 
-                this.liveUpdate.VariableReference = undefined;
             this.liveUpdate.RegisterVariables();
         }
     }

@@ -53,7 +53,7 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
         obj =  Packagize(obj, { 
             outputVariables: [ outputVariableId ?? 0 ], 
             inputVariables: [ 
-                `${this.referenceName}(Reluctor)`,
+                `${this.referenceName}(Record)`,
                 `CurrentTickId`
             ]
         });
