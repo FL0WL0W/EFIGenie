@@ -61,13 +61,15 @@
             var configJsonName = `tune.json`
             document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables(); }); });//this is a hack but oh well
             const loadConfig = (config) => {
-                b.saveValue = parseObject(config);
-                let workspace = document.querySelector(`#workspace`);
-                workspace.innerHtml = ``;
-                workspace.append(b);
-                UpdateOverlay();
-                let btnLoad = document.querySelector(`#btnLoad`);
-                btnLoad.value = ``;
+                try {
+                    b.saveValue = parseObject(config);
+                    let workspace = document.querySelector(`#workspace`);
+                    workspace.innerHtml = ``;
+                    workspace.append(b);
+                    UpdateOverlay();
+                    let btnLoad = document.querySelector(`#btnLoad`);
+                    btnLoad.value = ``;
+                } catch { }
             };
             document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop();
@@ -117,6 +119,10 @@
                 btnSaveBin.addEventListener(`click`, function(){
                     downloadBin(b.GetArrayBuffer(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
+                let btnBurnBin = document.querySelector(`#btnBurnBin`);
+                btnBurnBin.addEventListener(`click`, function(){
+                    burnBin(b.GetArrayBuffer());
+                });
 
                 let selectTarget = document.querySelector(`#selectTarget`);
                 selectTarget.addEventListener(`change`, function(evt){
@@ -138,6 +144,7 @@
             <input id="btnSave" type="button" class="w3-button w3-padding-16" value="Save">
             <input id="btnSaveCompressed" type="button" class="w3-button w3-padding-16" value="Save Compressed">
             <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
+            <input id="btnBurnBin" type="button" class="w3-button w3-padding-16" value="Burn Bin">
             <input id="btnLoad" type="file" style="display: none;">
             <select id="selectTarget">
             </select>

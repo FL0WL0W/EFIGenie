@@ -49,7 +49,7 @@ function UpdateFloatCurrentVariableValues() {
     var offsets = []
     for(var i = 0; i < variableIds.length; i++) offsets[i] = -1;
 
-    postData(`http://127.0.0.1:8080/GetVariable`, {
+    postJSONData(`http://127.0.0.1:8080/GetVariable`, {
         Variables: variableIds,
         Offsets: offsets
     }).then(data => {
@@ -80,3 +80,7 @@ fetch(`http://127.0.0.1:8080/GetVariableMetaData`).then(response => response.tex
     VariableMetadata.CreateIfNotFound = false;
     setInterval(UpdateFloatCurrentVariableValues, 100);
 });
+
+function burnBin(arrayBuffer) {
+    postArrayBufferData(`http://127.0.0.1:8080/BurnConfig`, arrayBuffer);
+}

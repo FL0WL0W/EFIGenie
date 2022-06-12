@@ -9,8 +9,11 @@ import argparse
 import base64
 import json
 import time
+import posixpath
+import shutil
 from sys import version as python_version
 from cgi import parse_header, parse_multipart
+from os.path import exists
 
 if python_version.startswith('3'):
     from urllib.parse import parse_qs
@@ -26,6 +29,21 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
     Args:
         serial_conn: An instance of a connection to a serial or COM port.
     """
+
+    extensions_map = _encodings_map_default = {
+        '.gz': 'application/gzip',
+        '.Z': 'application/octet-stream',
+        '.bz2': 'application/x-bzip2',
+        '.xz': 'application/x-xz',
+        '.manifest': 'text/cache-manifest',
+	    '.html': 'text/html',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.svg':	'image/svg+xml',
+        '.css':	'text/css',
+        '.js':	'application/x-javascript',
+        '': 'application/octet-stream', # Default
+    }
     def __init__(self, serial_conn):
         self.serial_conn = serial_conn
 
@@ -40,6 +58,27 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
 
     def send_my_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
+
+    def guess_type(self, path):
+        """Guess the type of a file.
+        Argument is a PATH (a filename).
+        Return value is a string of the form type/subtype,
+        usable for a MIME Content-type header.
+        The default implementation looks the file's extension
+        up in the table self.extensions_map, using application/octet-stream
+        as a default; however it would be permissible (if
+        slow) to look inside the data to make a better guess.
+        """
+        base, ext = posixpath.splitext(path)
+        if ext in self.extensions_map:
+            return self.extensions_map[ext]
+        ext = ext.lower()
+        if ext in self.extensions_map:
+            return self.extensions_map[ext]
+        guess, _ = mimetypes.guess_type(path)
+        if guess:
+            return guess
+        return 'application/octet-stream'
 
     def parse_POST(self):
         ctype, pdict = parse_header(self.headers['content-type'])
@@ -73,6 +112,18 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             self.wfile.write(resp)
+        else:
+            path = self.path[1:]
+            if(exists(path)) :
+                with open(path, "rb") as f:
+                    self.send_response(200)
+                    self.send_header("Content-type", self.guess_type(path) + ";charset=UTF-8")
+                    self.end_headers()
+                    shutil.copyfileobj(f, self.wfile)
+            else:
+                self.send_response(404)
+                self.end_headers()
+
 
 
     def do_POST(self):
@@ -104,6 +155,8 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             self.wfile.write(resp.encode('utf-8'))
+        if(self.path == "/BurnConfig") :
+            burn_config(self.serial_conn, self.rfile.read(int(self.headers['content-length'])))
 
 # For the simple cases lets make a dictionary of the read type
 # key mapping to a tuple containing the struct format and the slice
@@ -156,6 +209,32 @@ def parse_readbytes(ser):
 
     return (val, readBytes)
 
+def burn_config(ser, config):
+    sendBytes = struct.pack("<B", 113)
+    ser.write(sendBytes)
+    time.sleep(1)
+    ser.read(ser.in_waiting)
+    sendBytes = struct.pack("<B", 99)
+    ser.write(sendBytes)
+    readBytes = ser.read(4)
+    configAddress = struct.unpack("<I", readBytes)[0]
+    print(configAddress)
+
+    length = len(config)
+    i = 0
+    while length > 0:
+        sendSize = min(52, length)
+        sendBytes = struct.pack("<BII", 119, configAddress + i, sendSize)
+        sendBytes += config[i:(i+sendSize)]
+        length -= sendSize
+        i += sendSize
+        ser.write(sendBytes)
+        if(ser.read(1)[0] != 6) :
+            break
+
+    sendBytes = struct.pack("<B", 115)
+    ser.write(sendBytes)
+
 def run_server(ser, interface, port):
     """Run a simple HTTP server that relays request information to the serial
     interface given by com_port and responds with the parsed info.
@@ -169,35 +248,12 @@ def run_server(ser, interface, port):
     httpgenie = http.server.HTTPServer((interface, port), httpgeniehandler)
     httpgenie.serve_forever()
 
-def upload_config(ser, config):
-    sendBytes = struct.pack("<B", 113)
-    ser.write(sendBytes)
-    time.sleep(1)
-    ser.read(ser.in_waiting)
-    sendBytes = struct.pack("<B", 99)
-    ser.write(sendBytes)
-    readBytes = ser.read(4)
-    configAddress = struct.unpack("<I", readBytes)[0]
-    print(configAddress)
-
+def run_config(ser, config):
     with open(config, "rb") as f:
         f.seek(0, 2)
-        f_left = f.tell()
+        f_length = f.tell()
         f.seek(0, 0)
-
-        i = 0
-        while f_left > 0:
-            sendSize = min(52, f_left)
-            sendBytes = struct.pack("<BII", 119, configAddress + i, sendSize)
-            sendBytes += f.read(sendSize)
-            f_left -= sendSize
-            i += sendSize
-            ser.write(sendBytes)
-            if(ser.read(1)[0] != 6) :
-                break
-
-    sendBytes = struct.pack("<B", 115)
-    ser.write(sendBytes)
+        burn_config(ser, f.read(f_length))
 
     ser.close()
 
@@ -249,7 +305,7 @@ def main():
     if args.server:
         run_server(serial_connection, "localhost", 8080)
     elif args.config:
-        upload_config(serial_connection, args.config)
+        run_config(serial_connection, args.config)
     else:
         run_serial(serial_connection)
     
