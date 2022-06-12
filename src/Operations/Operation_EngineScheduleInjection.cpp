@@ -32,7 +32,7 @@ namespace EFIGenie
 		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const tick_t pulseTicks = static_cast<tick_t>(injectionPulseWidth * ticksPerSecond);
 
-		if(enginePosition.Synced == false)
+		if(enginePosition.Synced == false || !enable)
 		{
 			_timerService->UnScheduleTask(_openTask);
 			//if we are open and have no matching close event, schedule one
@@ -59,8 +59,8 @@ namespace EFIGenie
 		tick_t closeAt = static_cast<tick_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick - (ticksPerCycle << 1);			
 		tick_t openAt = closeAt - pulseTicks;
 
-		//check _lastOpenTick is within range if enabled and _openTask is not scheduled
-		if( enable && !_openTask->Scheduled && 
+		//check _lastOpenTick is within range and _openTask is not scheduled
+		if( !_openTask->Scheduled && 
 			(_lastOpenTick == 0 ||
 			ITimerService::TickLessThanTick(_lastOpenTick + pulseTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
 			ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), _lastOpenTick)))
@@ -80,10 +80,7 @@ namespace EFIGenie
 			closeAt = openAt + pulseTicks;
 
 			//schedule open event
-			if(enable)
-				_timerService->ScheduleTask(_openTask, openAt);
-			else
-				_timerService->UnScheduleTask(_openTask);
+			_timerService->ScheduleTask(_openTask, openAt);
 		}
 
 		// if we are open. schedule close based on when it was opened
@@ -99,10 +96,7 @@ namespace EFIGenie
 
 			//schedule next open event
 			openAt += ticksPerCycle;
-			if(enable)
-				_timerService->ScheduleTask(_openTask, openAt);
-			else
-				_timerService->UnScheduleTask(_openTask);
+			_timerService->ScheduleTask(_openTask, openAt);
 		}
 		//if we are not open, just use the previously calculated close tick.
 		else

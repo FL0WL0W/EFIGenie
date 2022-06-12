@@ -32,7 +32,7 @@ namespace EFIGenie
 		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const tick_t dwellTicks = static_cast<tick_t>(ignitionDwell * ticksPerSecond);
 
-		if(enginePosition.Synced == false)
+		if(enginePosition.Synced == false || !enable)
 		{
 			_timerService->UnScheduleTask(_dwellTask);
 			//if we are open and have no matching close event, schedule one
@@ -60,8 +60,8 @@ namespace EFIGenie
 		tick_t igniteAt = static_cast<tick_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick - (ticksPerCycle << 1);		
 		tick_t dwellAt = igniteAt - dwellTicks;
 
-		//check _lastDwellTick is within range if enabled and _dwellTask is not scheduled
-		if( enable && !_dwellTask->Scheduled && 
+		//check _lastDwellTick is within range and _dwellTask is not scheduled
+		if( !_dwellTask->Scheduled && 
 			(_lastDwellTick == 0 ||
 			ITimerService::TickLessThanTick(_lastDwellTick + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
 			ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), _lastDwellTick)))
@@ -81,10 +81,7 @@ namespace EFIGenie
 			igniteAt = dwellAt + dwellTicks;
 
 			//schedule dwell
-			if(enable)
-				_timerService->ScheduleTask(_dwellTask, dwellAt);
-			else
-				_timerService->UnScheduleTask(_dwellTask);
+			_timerService->ScheduleTask(_dwellTask, dwellAt);
 		}
 
 		// if we are dwelling. schedule ignition and next dwell
@@ -107,10 +104,7 @@ namespace EFIGenie
 
 			//schedule next dwell
 			dwellAt += ticksPerCycle;
-			if(enable)
-				_timerService->ScheduleTask(_dwellTask, dwellAt);
-			else
-				_timerService->UnScheduleTask(_dwellTask);
+			_timerService->ScheduleTask(_dwellTask, dwellAt);
 		}
 		//if we are not dwelling, just use the previously calculated ignition tick.
 		else
