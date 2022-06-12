@@ -86,7 +86,10 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             for i in range(len(variables)):
                 varID = int(variables[i])
                 offset = int(offsets[i])
-                sendBytes += struct.pack("<BIB", 103, varID, offset)
+                if offset > -1:
+                    sendBytes += struct.pack("<BIB", 103, varID, offset)
+                else:
+                    sendBytes += struct.pack("<BI", 103, varID)
             self.serial_conn.flushOutput()
             self.serial_conn.flushInput()
             self.serial_conn.write(sendBytes)
@@ -131,10 +134,12 @@ def parse_readbytes(ser):
         readBytes parsed into a string or possibly a bool. 
     """
     readBytes = ser.read(1)
+    if len(readBytes) == 0:
+        return ("No Response", readBytes)
     val = "VOID"
     # For all cases we'll just use a simple if/else construct to parse
     if readBytes[0] == 0:
-        readBytes += ser.read(5)
+        readBytes += ser.read(4)
         NOP
     elif 1 <= readBytes[0] <= 10:
         fmt = fmt_switch[readBytes[0]]
@@ -145,8 +150,9 @@ def parse_readbytes(ser):
         readBytes += ser.read(1)
         val = bool(readBytes[1])
     elif 12 <= readBytes[0] <= 14:
-        readBytes += ser.read(8)
-        val = ''.join('{:02x}'.format(x) for x in readBytes[1:8])
+        time.sleep(0.1)
+        readBytes = ser.read(ser.in_waiting)
+        val = ''.join('{:02x}'.format(x) for x in readBytes)
 
     return (val, readBytes)
 
@@ -208,24 +214,8 @@ def run_serial(ser):
             break
         else:
             variableID = int(variableID)
-        sendBytes = struct.pack("<BIB", 103, variableID, 0)
+        sendBytes = struct.pack("<BI", 103, variableID)
         ser.write(sendBytes)
-        readType = ser.read(1)
-        if len(readType) == 0:
-            continue 
-        if readType[0] == 12 or readType[0] == 14:
-            ser.read(8) # clear read variable bytes and ask user for offset
-            offset = int(input("Enter Offset: "))
-            ser.write(struct.pack("<BIB", 103, variableID, offset))
-        elif readType[0] == 11:
-            ser.read(1)
-            ser.write(sendBytes)
-        elif readType[0] == 0:
-            ser.read(5)
-            ser.write(sendBytes)
-        else:
-            ser.read(struct.Struct(fmt_switch[readType[0]]).size)
-            ser.write(sendBytes)
         print(parse_readbytes(ser))
 
     ser.close()
