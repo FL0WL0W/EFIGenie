@@ -1,191 +1,191 @@
 class VariableRegistry {
     constructor(prop) {
-        Object.assign(this, prop);
-        this.CreateIfNotFound = true;
+        Object.assign(this, prop)
+        this.CreateIfNotFound = true
     }
     Clear() {
         Object.entries(this).forEach(e => {
-            var [elementname, element] = e;
+            var [elementname, element] = e
             if(elementname === `CreateIfNotFound`)
-                return;
-            delete this[elementname];
-        });
+                return
+            delete this[elementname]
+        })
     }
     GenerateVariableId() {
-        this.VariableIncrement ??= 0;
-        return ++this.VariableIncrement;
+        this.VariableIncrement ??= 0
+        return ++this.VariableIncrement
     }
     GetVariableByReference(variableReference) {
         if(typeof variableReference === `string`) {
             if(variableReference.indexOf(`.`) !== -1) {
-                const listName = variableReference.substring(0, variableReference.indexOf(`.`));
-                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
+                const listName = variableReference.substring(0, variableReference.indexOf(`.`))
+                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
                 if(Array.isArray(this[listName])) {
-                    var variable = this[listName].find(a => a.name === variableName);
+                    var variable = this[listName].find(a => a.name === variableName)
                     if(variableName.indexOf(`(`) !== -1) {
-                        var measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1);
-                        measurementName = measurementName.substring(0, measurementName.length - 1);
-                        variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
+                        var measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
+                        measurementName = measurementName.substring(0, measurementName.length - 1)
+                        variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
                         variable ??= this[listName].find(a => a.name === variableName && a.measurementName === measurementName)
                         variable ??= this[listName].find(a => a.name === variableName)
                     }
                     if(variable) {
                         if(typeof variable.Id === `string`)
-                            return this.GetVariableByReference(variable.Id);
-                        return variable;
+                            return this.GetVariableByReference(variable.Id)
+                        return variable
                     }
                 }
             }
             if(typeof this[variableReference] === `string`)
-                return this.GetVariableByReference(this[variableReference]);
+                return this.GetVariableByReference(this[variableReference])
             if(this[variableReference] !== undefined)
-                return this[variableReference];
+                return this[variableReference]
         }
         if(typeof variableReference === `number`)
-            return variableReference;
-        return undefined;
+            return variableReference
+        return undefined
     }
     GetVariableId(variableReference) {
-        var variable = this.GetVariableByReference(variableReference);
+        var variable = this.GetVariableByReference(variableReference)
         if(variable === undefined && this.CreateIfNotFound)
         {
             if(typeof variableReference === `string` && variableReference.indexOf(`.`) !== -1) {
-                const listName = variableReference.substring(0, variableReference.indexOf(`.`));
-                this[listName] ??= [];
-                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
-                var measurementName;
+                const listName = variableReference.substring(0, variableReference.indexOf(`.`))
+                this[listName] ??= []
+                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
+                var measurementName
                 if(variableName.indexOf(`(`) !== -1) {
-                    measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1);
-                    measurementName = measurementName.substring(0, measurementName.length - 1);
-                    variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
+                    measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
+                    measurementName = measurementName.substring(0, measurementName.length - 1)
+                    variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
                 }
-                var Id = this.GenerateVariableId();
+                var Id = this.GenerateVariableId()
                 this[listName].push({ name: variableName, measurementName, Id})
-                return Id;
+                return Id
             } else {
-                return this[variableReference] = this.GenerateVariableId();
+                return this[variableReference] = this.GenerateVariableId()
             }
         }
         if(typeof variable === `object`)
-            return variable.Id;
-        return variable;
+            return variable.Id
+        return variable
     }
     RegisterVariable(variableReference, Type, Id) {
         if(variableReference.indexOf(`.`) !== -1) {
-            const listName = variableReference.substring(0, variableReference.indexOf(`.`));
-            var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1);
-            let measurementName;
+            const listName = variableReference.substring(0, variableReference.indexOf(`.`))
+            var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
+            let measurementName
             if(variableName.indexOf(`(`) !== -1) {
-                measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1);
-                measurementName = measurementName.substring(0, measurementName.length - 1);
-                variableName = variableName.substring(0, variableName.lastIndexOf(`(`));
+                measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
+                measurementName = measurementName.substring(0, measurementName.length - 1)
+                variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
             }
-            this[listName] ??= [];
-            const existing = this[listName].findIndex(r => r.name === variableName && (measurementName == undefined || measurementName == r.measurementName));
+            this[listName] ??= []
+            const existing = this[listName].findIndex(r => r.name === variableName && (measurementName == undefined || measurementName == r.measurementName))
             if(existing >= 0)
-                this[listName].splice(existing, 1);
+                this[listName].splice(existing, 1)
             this[listName].push({
                 name: variableName,
                 measurementName: measurementName,
                 Type,
                 Id: Id ?? this.GenerateVariableId()
-            });
+            })
         } else {
-            this[variableReference] = Id ?? this.GenerateVariableId();
+            this[variableReference] = Id ?? this.GenerateVariableId()
         }
     }
     GetVariableReferenceList() {
-        var variableReferences = {};
+        var variableReferences = {}
         for (var property in this) {
             if (this[property] === undefined)
-                continue;
+                continue
     
             if(property === `VariableIncrement` || property === `CreateIfNotFound`)
-                continue;
+                continue
             if(property.toLowerCase().indexOf(`temp`) === 0)
-                continue;
+                continue
     
             if (Array.isArray(this[property])) {
-                variableReferences[property] ??= [];
-                var arr = this[property];
+                variableReferences[property] ??= []
+                var arr = this[property]
     
                 for (var i = 0; i < arr.length; i++) {
                     variableReferences[property].push({ name: arr[i].name, measurementName: arr[i].measurementName, Id: this.GetVariableId(arr[i].Id)})
                 }
             } else {
-                variableReferences[property] = this.GetVariableId(this[property]);
+                variableReferences[property] = this.GetVariableId(this[property])
             }
         }
-        return variableReferences;
+        return variableReferences
     }
 }
 
-VariableRegister = new VariableRegistry();
+VariableRegister = new VariableRegistry()
 function defaultFilter(measurementName, output, inputs, calculationsOnly) {
     return function(calcOrVar) {
         //variable filter
         if(calcOrVar.Type) {
             if(inputs || calculationsOnly)
-                return false;
+                return false
             if ((!measurementName || calcOrVar.measurementName === measurementName) && (output === undefined || output.split(`|`).indexOf(calcOrVar.Type) >= 0))
-                return true;
-            return false;
+                return true
+            return false
         }
 
         //calculation Filter
         if (output !== undefined && !calcOrVar.output?.split(`|`).some(o=> output.split(`|`).indexOf(o) > -1)) 
-            return false;
+            return false
 
         if(measurementName !== undefined && ((calcOrVar.measurementName !== undefined && measurementName !== calcOrVar.measurementName) || (MeasurementType[measurementName] !== undefined && calcOrVar.output?.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
-            return false;
+            return false
         
         if(inputs !== undefined) {
             if(calcOrVar.inputs === undefined || inputs.length !== calcOrVar.inputs.length)
-                return false;
-            var inputsMatch = true;
+                return false
+            var inputsMatch = true
             for(var im = 0; im < inputs.length; im++){
                 if(inputs[im] !== calcOrVar.inputs[im]){
-                    inputsMatch = false;
-                    break;
+                    inputsMatch = false
+                    break
                 }
             }
             if(!inputsMatch)
-                return false;
+                return false
         }
-        return true;
+        return true
 
     }
 }
 function GetSelections(calculations, filter) {
-    var selections = [];
+    var selections = []
     if (calculations?.length > 0) {
-        var configGroups = calculations;
+        var configGroups = calculations
         if(!calculations[0].group && !calculations[0].calculations)
-            configGroups = [{ group: `Calculations`, calculations: calculations }];
+            configGroups = [{ group: `Calculations`, calculations: calculations }]
 
         for(var c = 0; c < configGroups.length; c++) {
             var configOptions = { group: configGroups[c].group, options: [] }
-            calculations = configGroups[c].calculations;
+            calculations = configGroups[c].calculations
             for (var i = 0; i < calculations.length; i++) {
                 if(!filter || filter(calculations[i])) {
                     configOptions.options.push({
                         name: calculations[i].displayName,
                         value: { value: calculations[i].name }
-                    });
+                    })
                 }
             }
             if(configOptions.options.length > 0)
-                selections.push(configOptions);
+                selections.push(configOptions)
         }
     }
 
     for (var property in VariableRegister) {
         if (!Array.isArray(VariableRegister[property]))
-            continue;
+            continue
 
-        var arr = VariableRegister[property];
+        var arr = VariableRegister[property]
 
-        var arrSelections = { group: property, options: [] };
+        var arrSelections = { group: property, options: [] }
 
         for (var i = 0; i < arr.length; i++) {
             if (!filter || filter(arr[i])) {
@@ -193,46 +193,46 @@ function GetSelections(calculations, filter) {
                     name: arr[i].name,
                     info: `[${arr[i].measurementName}]`,
                     value: { reference: `${property}.${arr[i].name}${arr[i].measurement? `(${arr[i].measurement})` : ``}` }
-                });
+                })
             }
         }
         if(arrSelections.options.length > 0)
-            selections.push(arrSelections);
+            selections.push(arrSelections)
     }
 
     if(selections.length === 1)
-        return selections[0].options;
+        return selections[0].options
 
-    return selections;
+    return selections
 }
 
-var AFRConfigs = [];
-AFRConfigs.push(Calculation_Static);
-AFRConfigs.push(Calculation_LookupTable);
-AFRConfigs.push(Calculation_2AxisTable);
-var InjectorEnableConfigs = [];
-InjectorEnableConfigs.push(Calculation_Static);
-InjectorEnableConfigs.push(Calculation_Formula);
-var IgnitionAdvanceConfigs = [];
-IgnitionAdvanceConfigs.push(Calculation_Static);
-IgnitionAdvanceConfigs.push(Calculation_LookupTable);
-IgnitionAdvanceConfigs.push(Calculation_2AxisTable);
-var IgnitionEnableConfigs = [];
-IgnitionEnableConfigs.push(Calculation_Static);
-IgnitionEnableConfigs.push(Calculation_Formula);
-var IgnitionDwellConfigs = [];
-IgnitionDwellConfigs.push(Calculation_Static);
-IgnitionDwellConfigs.push(Calculation_LookupTable);
-IgnitionDwellConfigs.push(Calculation_2AxisTable);
-var CylinderAirTemperatureConfigs = [];
-CylinderAirTemperatureConfigs.push(Calculation_Static);
-var ManifoldAbsolutePressureConfigs = [];
-ManifoldAbsolutePressureConfigs.push(Calculation_Static);
-var VolumetricEfficiencyConfigs = [];
-VolumetricEfficiencyConfigs.push(Calculation_Static);
-VolumetricEfficiencyConfigs.push(Calculation_LookupTable);
-VolumetricEfficiencyConfigs.push(Calculation_2AxisTable);
-VolumetricEfficiencyConfigs.push(Calculation_Formula);
+var AFRConfigs = []
+AFRConfigs.push(Calculation_Static)
+AFRConfigs.push(Calculation_LookupTable)
+AFRConfigs.push(Calculation_2AxisTable)
+var InjectorEnableConfigs = []
+InjectorEnableConfigs.push(Calculation_Static)
+InjectorEnableConfigs.push(Calculation_Formula)
+var IgnitionAdvanceConfigs = []
+IgnitionAdvanceConfigs.push(Calculation_Static)
+IgnitionAdvanceConfigs.push(Calculation_LookupTable)
+IgnitionAdvanceConfigs.push(Calculation_2AxisTable)
+var IgnitionEnableConfigs = []
+IgnitionEnableConfigs.push(Calculation_Static)
+IgnitionEnableConfigs.push(Calculation_Formula)
+var IgnitionDwellConfigs = []
+IgnitionDwellConfigs.push(Calculation_Static)
+IgnitionDwellConfigs.push(Calculation_LookupTable)
+IgnitionDwellConfigs.push(Calculation_2AxisTable)
+var CylinderAirTemperatureConfigs = []
+CylinderAirTemperatureConfigs.push(Calculation_Static)
+var ManifoldAbsolutePressureConfigs = []
+ManifoldAbsolutePressureConfigs.push(Calculation_Static)
+var VolumetricEfficiencyConfigs = []
+VolumetricEfficiencyConfigs.push(Calculation_Static)
+VolumetricEfficiencyConfigs.push(Calculation_LookupTable)
+VolumetricEfficiencyConfigs.push(Calculation_2AxisTable)
+VolumetricEfficiencyConfigs.push(Calculation_Formula)
 
 EngineFactoryIDs = {
     Offset : 40000,
@@ -247,86 +247,86 @@ EngineFactoryIDs = {
 }
 
 function GetArrayType(tableValue) {
-    var min = 18446744073709551615;
-    var max = -9223372036854775808;
+    var min = 18446744073709551615
+    var max = -9223372036854775808
     for (var i = 0; i < tableValue.length; i++) {
         if (tableValue[i] % 1 != 0) {
-            return `FLOAT`;
+            return `FLOAT`
         }
         if (tableValue[i] < min) {
-            min = tableValue[i];
+            min = tableValue[i]
         }
         if (tableValue[i] > max) {
-            max = tableValue[i];
+            max = tableValue[i]
         }
     }
     if (typeof tableValue[0] === `boolean`) {
-        return `BOOL`;
+        return `BOOL`
     }
     if (min < 0) {
         if (max < 0 || min < -max)
-            return GetType(min);
-        return GetType(-max);
+            return GetType(min)
+        return GetType(-max)
     }
-    return GetType(max);
+    return GetType(max)
 }
 
 function GetType(value) {
     if(value == undefined)
-        return `VOID`;
+        return `VOID`
     if(Array.isArray(value)) 
-        return GetArrayType(value);
+        return GetArrayType(value)
     if(typeof value === `boolean`)
         return `BOOL`
     if(value % 1 !== 0)
-        return `FLOAT`;
+        return `FLOAT`
 
     if(value < 0) {
         if(value < 128 && value > -129)
-            return `INT8`;
+            return `INT8`
         if(value < 32768 && value > -32759)
-            return `INT16`;
+            return `INT16`
         if(value < 2147483648 && value > -2147483649)
-            return `INT32`;
+            return `INT32`
         if(value < 9223372036854775807 && value > -9223372036854775808)
-            return `INT64`;
+            return `INT64`
 
-        throw `number too big`;
+        throw `number too big`
     }
 
     if(value < 128)
-        return `INT8`;
+        return `INT8`
     if(value < 256)
-        return `UINT8`;
+        return `UINT8`
     if(value < 32768)
-        return `INT16`;
+        return `INT16`
     if(value < 65536)
-        return `UINT16`;
+        return `UINT16`
     if(value < 2147483648)
-        return `INT32`;
+        return `INT32`
     if(value < 4294967295)
-        return `UINT32`;
+        return `UINT32`
     if(value < 9223372036854775807)
-        return `INT64`;
+        return `INT64`
     if(value < 18446744073709551615)
-        return `UINT64`;
-    throw `number too big`;
+        return `UINT64`
+    throw `number too big`
 }
 
 function GetTypeId(type) {
     switch(type) {
-        case `VOID`: return 0;
-        case `UINT8`: return 1;
-        case `UINT16`: return 2;
-        case `UINT32`: return 3;
-        case `UINT64`: return 4;
-        case `INT8`: return 5;
-        case `INT16`: return 6;
-        case `INT32`: return 7;
-        case `INT64`: return 8;
-        case `FLOAT`: return 9;
-        case `DOUBLE`: return 10;
-        case `BOOL`: return 11;
+        case `VOID`: return 0
+        case `UINT8`: return 1
+        case `UINT16`: return 2
+        case `UINT32`: return 3
+        case `UINT64`: return 4
+        case `INT8`: return 5
+        case `INT16`: return 6
+        case `INT32`: return 7
+        case `INT64`: return 8
+        case `FLOAT`: return 9
+        case `DOUBLE`: return 10
+        case `BOOL`: return 11
     }
 }
 
@@ -374,115 +374,115 @@ x86TypeAlignment = [
 
 function Packagize(obj, val) {
     if(val.result !== undefined){
-        val.outputVariables = [val.result];
-        delete val.result;
+        val.outputVariables = [val.result]
+        delete val.result
     }
     if( (val.outputVariables && val.outputVariables.some(x => x !== undefined)) || 
         (val.intputVariables && val.intputVariables.some(x => x !== undefined))) {
-        obj.type = `Package`;
-        obj.outputVariables = val.outputVariables;
-        obj.inputVariables = val.inputVariables;
-        return { value: [ obj ] };
+        obj.type = `Package`
+        obj.outputVariables = val.outputVariables
+        obj.inputVariables = val.inputVariables
+        return { value: [ obj ] }
     }
-    return obj;
+    return obj
 }
 
-function Operation_Math(mathFactoryId) {
+function Calculation_Math(mathFactoryId) {
     if(this.a !== undefined) {
-        this.inputVariables ??= [0,0];
-        this.inputVariables[0] = this.a;
-        delete this.a;
+        this.inputVariables ??= [0,0]
+        this.inputVariables[0] = this.a
+        delete this.a
     }
     if(this.b !== undefined) {
-        this.inputVariables ??= [0,0];
-        this.inputVariables[1] = this.b;
-        delete this.b;
+        this.inputVariables ??= [0,0]
+        this.inputVariables[1] = this.b
+        delete this.b
     }
     if(this.result !== undefined) {
-        this.outputVariables ??= [0];
-        this.outputVariables[0] = this.result;
-        delete this.result;
+        this.outputVariables ??= [0]
+        this.outputVariables[0] = this.result
+        delete this.result
     }
     if(this.outputVariables || this.intputVariables){
-        this.inputVariables ??= [0,0];
-        this.outputVariables ??= [0];
+        this.inputVariables ??= [0,0]
+        this.outputVariables ??= [0]
     }
 
-    return Packagize({ value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + mathFactoryId } ]}, this);
+    return Packagize({ value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + mathFactoryId } ]}, this)
 }
 
 types = [
-    { type: `INT8`, toArrayBuffer() { return new Int8Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `INT16`, toArrayBuffer() { return new Int16Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `INT32`, toArrayBuffer() { return new Int32Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `INT64`, toArrayBuffer() { return new BigInt64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `BOOL`, toArrayBuffer() { return new Uint8Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `UINT8`, toArrayBuffer() { return new Uint8Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `UINT16`, toArrayBuffer() { return new Uint16Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `UINT32`, toArrayBuffer() { return new Uint32Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `UINT64`, toArrayBuffer() { return new BigUint64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer; }},
-    { type: `CompressedObject`, toArrayBuffer() { return base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.value))); }},
-    { type: `VariableId`, toObj() { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]}; }},
+    { type: `INT8`, toArrayBuffer() { return new Int8Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `INT16`, toArrayBuffer() { return new Int16Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `INT32`, toArrayBuffer() { return new Int32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `INT64`, toArrayBuffer() { return new BigInt64Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `BOOL`, toArrayBuffer() { return new Uint8Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `UINT8`, toArrayBuffer() { return new Uint8Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `UINT16`, toArrayBuffer() { return new Uint16Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `UINT32`, toArrayBuffer() { return new Uint32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `UINT64`, toArrayBuffer() { return new BigUint64Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
+    { type: `CompressedObject`, toArrayBuffer() { return base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.value))) }},
+    { type: `VariableId`, toObj() { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]} }},
     { type: `Package`, toObj() {
-        this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }); //Package
+        this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }) //Package
         
-        const thisValue = this;
+        const thisValue = this
         this.outputVariables?.forEach(function(outputVariable) {
             thisValue.value.push({ type: `VariableId`, value: outputVariable ?? 0 })
-        });
+        })
 
-        delete this.outputVariables;
+        delete this.outputVariables
 
         this.inputVariables?.forEach(function(inputVariable) {
             thisValue.value.push({ type: `VariableId`, value: inputVariable ?? 0 })
-        });
+        })
 
-        delete this.inputVariables;
+        delete this.inputVariables
 
-        return this;
+        return this
     }},
     { type: `Group`, toObj() {
-        let newValue = [];
-        const thisGroup = this;
+        let newValue = []
+        const thisGroup = this
         
         this.value.forEach(function(value) {
             if(isEmptyObject(value))
-                return;
+                return
             else if(value?.type === `Group`) {
                 if(value.types && thisGroup.types === undefined) {
-                    thisGroup.types = [];
+                    thisGroup.types = []
                 }
                 for(var typeIndex in value.types){
-                    var typetypeInfo = thisGroup.types.find(x => x.type === value.types[typeIndex].type);
+                    var typetypeInfo = thisGroup.types.find(x => x.type === value.types[typeIndex].type)
                     if(typetypeInfo === undefined){
-                        thisGroup.types.push(value.types[typeIndex]);
+                        thisGroup.types.push(value.types[typeIndex])
                     }
                 }
-                newValue = newValue.concat(value.value.filter(x=>!isEmptyObject(x)));
+                newValue = newValue.concat(value.value.filter(x=>!isEmptyObject(x)))
             }
             else
-                newValue.push(value);
+                newValue.push(value)
         })
 
-        newValue.unshift({ type: `UINT16`, value: newValue.length });
-        newValue.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }); //Group
-        this.value = newValue;
+        newValue.unshift({ type: `UINT16`, value: newValue.length })
+        newValue.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }) //Group
+        this.value = newValue
 
-        return Packagize(this, this);
+        return Packagize(this, this)
     }},
     { type: `Calculation_StaticVariable`, toObj() {
-        var type = GetType(this.value);
-        var typeID = GetTypeId(type);
+        var type = GetType(this.value)
+        var typeID = GetTypeId(type)
         return Packagize({ value: [ 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static},
             { type: `UINT8`, value: typeID }, //typeid
             { type: type, value: this.value } //val
-        ]}, this);
+        ]}, this)
     }},
     { type: `Calculation_2AxisTable`, toObj() {
-        this.inputVariables ??= [ undefined, undefined ];
+        this.inputVariables ??= [ undefined, undefined ]
         if(this.XSelection?.reference)
             this.inputVariables[0] = this.XSelection.reference
         if(this.YSelection?.reference)
@@ -526,21 +526,117 @@ types = [
             { type: `FLOAT`, value: this.coeffecients}, //coefficients
         ]}, this)
     }},
-    { type: `Operation_Add`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
-    { type: `Operation_Subtract`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Subtract); }},
-    { type: `Operation_Multiply`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Multiply); }},
-    { type: `Operation_Divide`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Divide); }},
-    { type: `Operation_And`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.And); }},
-    { type: `Operation_Or`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Or); }},
-    { type: `Operation_GreaterThan`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThan); }},
-    { type: `Operation_LessThan`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.LessThan); }},
-    { type: `Operation_Equal`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Equal); }},
-    { type: `Operation_GreaterThanOrEqual`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual); }},
-    { type: `Operation_LessThanOrEqual`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual); }}
+    { type: `CalculationOrVariableSelection`, toObj() {
+        if(!this.selection || this.selection.reference)
+            return { value: [] }
+
+        this.calculation.type = this.selection.value
+        return Packagize(this.calculation, this)
+    }},
+    { type: `Calculation_Add`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
+    { type: `Calculation_Subtract`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},
+    { type: `Calculation_Multiply`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Multiply) }},
+    { type: `Calculation_Divide`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Divide) }},
+    { type: `Calculation_And`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.And) }},
+    { type: `Calculation_Or`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Or) }},
+    { type: `Calculation_GreaterThan`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThan) }},
+    { type: `Calculation_LessThan`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThan) }},
+    { type: `Calculation_Equal`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
+    { type: `Calculation_GreaterThanOrEqual`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
+    { type: `Calculation_LessThanOrEqual`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
+    { type: `CylinderAirmass_SpeedDensity`, toObj() {
+        this.inputVariables = [ 
+            `EngineParameters.Cylinder Air Temperature`,
+            `EngineParameters.Manifold Absolute Pressure`,
+            `EngineParameters.Volumetric Efficiency`
+        ]
+        return Packagize({ value: [ 
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
+            { type: `FLOAT`, value: this.CylinderVolume }, //Cylinder Volume
+        ]}, this)
+    }},
+    { type: `InjectorPulseWidth_DeadTime`, toObj() {
+        return { type: `Group`, value: [
+            this.FlowRateConfigOrVariableSelection,
+            this.DeadTimeConfigOrVariableSelection,
+            //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
+            { type: `Calculation_StaticVariable`, value: 2, result: `temp` },//static value of 2
+            //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
+            { 
+                type: `Calculation_Subtract`,
+                result: `temp`, //Return
+                a: `temp`,
+                b: `EngineSequentialId`
+            },
+            { 
+                type: `Package`,
+                value: [ 
+                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+                    { type: `FLOAT`, value: this.MinInjectorFuelMass }
+                ],
+                outputVariables: [ outputVariableId ?? 0 ], //Return
+                inputVariables: [ 
+                    `temp`,
+                    `FuelParameters.Cylinder Fuel Mass`,
+                    `FuelParameters.Injector Flow Rate`,
+                    `FuelParameters.Injector Dead Time`
+                ]
+            }
+        ]}
+    }},
+    { type: `Input_Analog`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+        ]}, this)
+    }},
+    { type: `Input_Digital`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+            { type: `BOOL`, value: this.inverted}, //inverted
+        ]}, this)
+    }},
+    { type: `Input_DigitalRecord`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+            { type: `BOOL`, value: this.inverted}, //inverted
+            { type: `UINT16`, value: this.length}, //length
+        ]}, this)
+    }},
+    { type: `Input_DutyCycle`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+            { type: `UINT16`, value: this.minFrequency}, //minFrequency
+        ]}, this)
+    }},
+    { type: `Input_Frequency`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+            { type: `UINT16`, value: this.minFrequency}, //minFrequency
+        ]}, this)
+    }},
+    { type: `Input_PulseWidth`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
+            { type: `UINT16`, value: this.pin}, //pin
+            { type: `UINT16`, value: this.minFrequency}, //minFrequency
+        ]}, this)
+    }},
+    { type: `Output_Digital`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
+            { type: `UINT16`, value: this.pin },
+            { type: `UINT8`, value: this.inverted | (this.highZ? 0x02 : 0x00) }
+        ]}, this)
+    }},
 ]
 
 for(var index in STM32TypeAlignment) {
-    var type = types.find(x => x.type == x86TypeAlignment[index].type);
+    var type = types.find(x => x.type == x86TypeAlignment[index].type)
     if(type){
         type.align = x86TypeAlignment[index].align
     }

@@ -19,19 +19,12 @@ export default class Input_Digital extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(outputVariableId) {
-        var obj = { value: [
-            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
-            { type: `UINT16`, value: this.value.pin}, //pin
-            { type: `BOOL`, value: this.value.inverted}, //inverted
-        ]};
+    GetObjOperation(result) {
+        let obj = this.value
+        obj.type = `Input_Digital`
+        obj.result = result
 
-        if (outputVariableId)
-            obj = Packagize(obj, { 
-                outputVariables: [ outputVariableId ] 
-            });
-
-        return obj;
+        return obj
     }
 }
 RawInputConfigs.push(Input_Digital);

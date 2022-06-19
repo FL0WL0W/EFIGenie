@@ -90,7 +90,7 @@ export default class Fuel extends UITemplate {
 
     GetObjOperation() {
         var group = { 
-            types : [{ type: `Operation_EngineScheduleInjection`, toObj() {
+            types : [{ type: `Calculation_EngineScheduleInjection`, toObj() {
                 return { value: [ {
                     type: `Package`,
                     value: [ 
@@ -115,7 +115,7 @@ export default class Fuel extends UITemplate {
                 this.AFRConfigOrVariableSelection.GetObjOperation(), 
 
                 { 
-                    type: `Operation_Divide`,
+                    type: `Calculation_Divide`,
                     result: `FuelParameters.Cylinder Fuel Mass`,
                     a: `EngineParameters.Cylinder Air Mass`,
                     b: `FuelParameters.Air Fuel Ratio`
@@ -128,7 +128,7 @@ export default class Fuel extends UITemplate {
         };
 
         for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Operation_EngineScheduleInjection`, value: this.Outputs.children[i] });
+            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs.children[i] });
         }
 
         return group;

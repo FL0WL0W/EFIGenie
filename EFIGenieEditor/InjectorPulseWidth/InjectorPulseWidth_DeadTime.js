@@ -38,6 +38,14 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
         this.FlowRateConfigOrVariableSelection.RegisterVariables();
     }
 
+    // GetObjOperation(result) {
+    //     let obj = this.value
+    //     obj.type = `InjectorPulseWidth_DeadTime`
+    //     obj.result = result
+
+    //     return obj
+    // }
+
     GetObjOperation(outputVariableId) {
         let group = { type: `Group`, value: [
             this.FlowRateConfigOrVariableSelection.GetObjOperation(),
@@ -48,7 +56,7 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
             
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 
-                type: `Operation_Subtract`,
+                type: `Calculation_Subtract`,
                 result: `temp`, //Return
                 a: `temp`,
                 b: `EngineSequentialId`

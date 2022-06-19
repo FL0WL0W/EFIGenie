@@ -79,7 +79,7 @@ export default class Ignition extends UITemplate {
 
     GetObjOperation() {
         var group  = { 
-            types : [{ type: `Operation_EngineScheduleIgnition`, toObj() {
+            types : [{ type: `Calculation_EngineScheduleIgnition`, toObj() {
                 return { value: [ {
                     type: `Package`,
                     value: [ 
@@ -110,7 +110,7 @@ export default class Ignition extends UITemplate {
         };
 
         for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Operation_EngineScheduleIgnition`, value: this.Outputs.children[i] });
+            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs.children[i] });
         }
 
         return group;

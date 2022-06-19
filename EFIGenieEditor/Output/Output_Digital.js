@@ -29,19 +29,11 @@ export default class Output_Digital extends UITemplate {
     }
 
     GetObjOperation(inputVariableId) {
-        var obj = { value: [
-            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
-            { type: `UINT16`, value: this.value.pin },
-            { type: `UINT8`, value: this.value.inverted | (this.value.highZ? 0x02 : 0x00) }
-        ]};
+        let obj = this.value
+        obj.type = `Output_Digital`
+        obj.inputVariables = [ inputVariableId ]
 
-        if (inputVariableId) {
-            obj = Packagize(obj, {
-                inputVariables: [ inputVariableId ]
-            })
-        }
-
-        return obj;
+        return obj
     }
 }
 BooleanOutputConfigs.push(Output_Digital);

@@ -25,18 +25,12 @@ export default class Input_Analog extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(outputVariableId) {
-        var obj = { value: [
-            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
-            { type: `UINT16`, value: this.value.pin}, //pin
-        ]};
+    GetObjOperation(result) {
+        let obj = this.value
+        obj.type = `Input_Analog`
+        obj.result = result
 
-        if (outputVariableId)
-            obj = Packagize(obj, { 
-                outputVariables: [ outputVariableId ] 
-            });
-
-        return obj;
+        return obj
     }
 }
 customElements.define(`input-analog`, Input_Analog, { extends: `span` });

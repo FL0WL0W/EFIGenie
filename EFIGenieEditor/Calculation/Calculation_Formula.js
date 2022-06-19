@@ -169,10 +169,11 @@ export default class Calculation_Formula extends UITemplate {
         let value = super.value ?? {};
         
         value.parameterValues = {};
-        for(parameter in this.parameterValues) {
+        for(let parameter in this.parameterValues) {
             value.parameterValues[parameter] = this.parameterValues[parameter]?.value;
         }
 
+        console.log(value)
         return value;
     }
 
@@ -261,37 +262,37 @@ export default class Calculation_Formula extends UITemplate {
             };
             switch(operation.operator) {
                 case `*`: 
-                    operationValue.type = `Operation_Multiply`;
+                    operationValue.type = `Calculation_Multiply`;
                     break;
                 case `/`: 
-                    operationValue.type = `Operation_Divide`;
+                    operationValue.type = `Calculation_Divide`;
                     break;
                 case `+`: 
-                    operationValue.type = `Operation_Add`;
+                    operationValue.type = `Calculation_Add`;
                     break;
                 case `-`: 
-                    operationValue.type = `Operation_Subtract`;
+                    operationValue.type = `Calculation_Subtract`;
                     break;
                 case `>=`: 
-                    operationValue.type = `Operation_GreaterThanOrEqual`;
+                    operationValue.type = `Calculation_GreaterThanOrEqual`;
                     break;
                 case `<=`: 
-                    operationValue.type = `Operation_LessThanOrEqual`;
+                    operationValue.type = `Calculation_LessThanOrEqual`;
                     break;
                 case `>`: 
-                    operationValue.type = `Operation_GreaterThan`;
+                    operationValue.type = `Calculation_GreaterThan`;
                     break;
                 case `<`: 
-                    operationValue.type = `Operation_LessThan`;
+                    operationValue.type = `Calculation_LessThan`;
                     break;
                 case `=`: 
-                    operationValue.type = `Operation_Equal`;
+                    operationValue.type = `Calculation_Equal`;
                     break;
                 case `&`: 
-                    operationValue.type = `Operation_And`;
+                    operationValue.type = `Calculation_And`;
                     break;
                 case `|`: 
-                    operationValue.type = `Operation_Or`;
+                    operationValue.type = `Calculation_Or`;
                     break;
             }
             group.value.push(operationValue);
