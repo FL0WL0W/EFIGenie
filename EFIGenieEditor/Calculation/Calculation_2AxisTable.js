@@ -77,8 +77,6 @@ export default class Calculation_2AxisTable extends UITemplate {
     }
     set noParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
-            this.XReference = undefined;
-            this.YReference = undefined;
             this.XSelection = undefined;
             this.YSelection = undefined;
             this.table.xLabel = this.xLabel;
@@ -92,10 +90,6 @@ export default class Calculation_2AxisTable extends UITemplate {
                 selectNotVisible: true,
                 options: GetSelections(),
             });
-            this.XSelection.addEventListener(`change`, function() {
-                const xSelectionValue = thisClass.XSelection.value;
-                thisClass.XReference = `${xSelectionValue.reference}.${xSelectionValue.value}${xSelectionValue.measurement? `(${xSelectionValue.measurement})` : ``}`;
-            })
             this.table.xLabel = this.XSelection;
         }
         if(!this.YSelection) {
@@ -103,10 +97,6 @@ export default class Calculation_2AxisTable extends UITemplate {
                 selectNotVisible: true,
                 options: GetSelections(),
             });
-            this.YSelection.addEventListener(`change`, function() {
-                const ySelectionValue = thisClass.YSelection.value;
-                thisClass.YReference = `${ySelectionValue.reference}.${ySelectionValue.value}${ySelectionValue.measurement? `(${ySelectionValue.measurement})` : ``}`;
-            })
             this.table.yLabel = this.YSelection;
         }
     }
@@ -178,14 +168,12 @@ export default class Calculation_2AxisTable extends UITemplate {
             if(xVariableId) {
                 inputVariables = [ xVariableId ]; //inputVariable
             } else if (!this.noParameterSelection) {
-                const parameterSelection = this.XSelection.value;
-                inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //xVariable
+                inputVariables = [ this.XSelection?.value?.reference ]; //xVariable
             }
             if(yVariableId) {
                 inputVariables.push({ yVariableId }); //ytVariable
             } else if (!this.noParameterSelection) {
-                const parameterSelection = this.YSelection.value;
-                inputVariables.push( `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ); //yVariable
+                inputVariables.push( this.YSelection?.value?.reference ); //yVariable
             }
             obj = Packagize(obj, { 
                 outputVariables: [ outputVariableId ?? 0 ],
@@ -199,15 +187,15 @@ export default class Calculation_2AxisTable extends UITemplate {
     RegisterVariables() {
         this.xOptions = GetSelections();
         this.yOptions = GetSelections();
-        if(VariablesToPoll.indexOf(this.XReference) === -1)
-            VariablesToPoll.push(this.XReference);
-        if(VariablesToPoll.indexOf(this.YReference) === -1)
-            VariablesToPoll.push(this.YReference);
+        if(VariablesToPoll.indexOf(this.XSelection?.value?.reference) === -1)
+            VariablesToPoll.push(this.XSelection?.value?.reference);
+        if(VariablesToPoll.indexOf(this.YSelection?.value?.reference) === -1)
+            VariablesToPoll.push(this.YSelection?.value?.reference);
         const thisClass = this;
         LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.XReference && thisClass.YReference) { 
-                const xVariableId = VariableMetadata.GetVariableId(thisClass.XReference);
-                const yVariableId = VariableMetadata.GetVariableId(thisClass.YReference);
+            if(thisClass.XSelection?.value?.reference && thisClass.YSelection?.value?.reference) { 
+                const xVariableId = VariableMetadata.GetVariableId(thisClass.XSelection?.value?.reference);
+                const yVariableId = VariableMetadata.GetVariableId(thisClass.YSelection?.value?.reference);
                 if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
                     thisClass.table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
                 } 
