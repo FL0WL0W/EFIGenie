@@ -63,12 +63,11 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(this._measurementName)
             return this._measurementName;
 
-        const selection = this.selection.value;
-        if (!selection?.reference) {6
+        if (!this.selection.value?.reference) {6
             const subConfig = this.GetSubConfig();
             return GetClassProperty(subConfig, `measurementName`);
         }
-        return selection?.measurement;
+        return this.selection.value?.measurement;
     }
     set measurementName(measurementName) {
         this._measurementName = measurementName;
@@ -316,9 +315,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
         }
     }
 
-    GetObjOperation(...args) {
-        const selection = this.selection.value;         
-        if(!selection?.reference) {
+    GetObjOperation(...args) {       
+        if(!this.selection.value?.reference) {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
                 return;

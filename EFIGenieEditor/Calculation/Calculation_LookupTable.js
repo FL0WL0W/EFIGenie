@@ -51,7 +51,6 @@ export default class Calculation_LookupTable extends UITemplate {
     }
     set noParameterSelection(noParameterSelection) {
         if(noParameterSelection) {
-            this.parameterReference = undefined;
             this.parameterSelection = undefined;
             this.table.xLabel = this.xLabel;
             return;
@@ -63,10 +62,6 @@ export default class Calculation_LookupTable extends UITemplate {
                 options: GetSelections(),
                 class: `TableParameterSelect`
             });
-            this.parameterSelection.addEventListener(`change`, function() {
-                const parameterSelectionValue = thisClass.parameterSelection.value;
-                thisClass.parameterReference = `${parameterSelectionValue.reference}.${parameterSelectionValue.value}${parameterSelectionValue.measurement? `(${parameterSelectionValue.measurement})` : ``}`;
-            })
             this.table.xLabel = this.parameterSelection;
         }
     }
@@ -155,13 +150,13 @@ export default class Calculation_LookupTable extends UITemplate {
 
     RegisterVariables() {
         this.xOptions = GetSelections();
-        if(VariablesToPoll.indexOf(this.parameterReference) === -1)
-            VariablesToPoll.push(this.parameterReference);
+        if(VariablesToPoll.indexOf(this.parameterSelection?.value?.reference) === -1)
+            VariablesToPoll.push(this.parameterSelection?.value?.reference);
         
         const thisClass = this;
         LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.parameterReference) { 
-                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.parameterReference);
+            if(thisClass.parameterSelection?.value?.reference) { 
+                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.parameterSelection?.value?.reference);
                 if(CurrentVariableValues[parameterVariableId] !== undefined) {
                     thisClass.table.trail(CurrentVariableValues[parameterVariableId])
                 } 

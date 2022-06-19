@@ -59,7 +59,7 @@ export default class Engine extends UITemplate {
 
         var requirements = [];
 
-        if(!this.CylinderAirmassConfigOrVariableSelection.selection?.reference) {
+        if(!this.CylinderAirmassConfigOrVariableSelection.IsVariable()) {
             requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
         }
 
@@ -82,7 +82,7 @@ export default class Engine extends UITemplate {
         var mapRequired = false;
         var catRequired = false;
         var veRequired  = false;
-        if(!this.CylinderAirmassConfigOrVariableSelection.selection?.reference) {
+        if(!this.CylinderAirmassConfigOrVariableSelection.IsVariable()) {
             var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
             mapRequired = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
             catRequired = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1

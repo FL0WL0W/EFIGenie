@@ -192,7 +192,7 @@ function GetSelections(calculations, filter) {
                 arrSelections.options.push({
                     name: arr[i].name,
                     info: `[${arr[i].measurementName}]`,
-                    value: { reference: property, value: arr[i].name, measurementName: arr[i].measurementName }
+                    value: { reference: `${property}.${arr[i].name}${arr[i].measurement? `(${arr[i].measurement})` : ``}` }
                 });
             }
         }
@@ -373,7 +373,12 @@ x86TypeAlignment = [
 ]
 
 function Packagize(obj, val) {
-    if(val.outputVariables || val.intputVariables) {
+    if(val.result !== undefined){
+        val.outputVariables = [val.result];
+        delete val.result;
+    }
+    if( (val.outputVariables && val.outputVariables.some(x => x !== undefined)) || 
+        (val.intputVariables && val.intputVariables.some(x => x !== undefined))) {
         obj.type = `Package`;
         obj.outputVariables = val.outputVariables;
         obj.inputVariables = val.inputVariables;
@@ -468,11 +473,6 @@ types = [
         return Packagize(this, this);
     }},
     { type: `Operation_StaticVariable`, toObj() {
-        if(this.result !== undefined){
-            this.outputVariables = [this.result];
-            delete this.result;
-        }
-
         var type = GetType(this.value);
         var typeID = GetTypeId(type);
         return Packagize({ value: [ 
@@ -480,6 +480,51 @@ types = [
             { type: `UINT8`, value: typeID }, //typeid
             { type: type, value: this.value } //val
         ]}, this);
+    }},
+    { type: `Operation_2AxisTable`, toObj() {
+        this.inputVariables ??= [ undefined, undefined ];
+        if(this.xSelection?.reference)
+            this.inputVariables[0] = this.xSelection.reference
+        if(this.ySelection?.reference)
+            this.inputVariables[1] = this.ySelection.reference
+
+        const type = GetArrayType(this.value)
+        const typeId = GetTypeId(type)
+        return Packagize({ value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
+            { type: `FLOAT`, value: this.xAxis[0] }, //MinXValue
+            { type: `FLOAT`, value: this.xAxis[this.xAxis.length-1] }, //MaxXValue
+            { type: `FLOAT`, value: this.yAxis[0] }, //MinYValue
+            { type: `FLOAT`, value: this.yAxis[this.yAxis.length-1] }, //MaxYValue
+            { type: `UINT8`, value: this.xAxis.length }, //xResolution
+            { type: `UINT8`, value: this.yAxis.length }, //yResolution
+            { type: `UINT8`, value: typeId }, //Type
+            { type: type, value: this.value }, //Table
+        ]}, this)
+    }},
+    { type: `Operation_LookupTable`, toObj() {
+        if(this.parameterSelection?.reference)
+            this.inputVariables = [this.parameterSelection.reference]
+
+        const type = GetArrayType(this.value)
+        const typeId = GetTypeId(type)
+        return Packagize({ value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
+            { type: `FLOAT`, value: this.xAxis[0] }, //MinXValue
+            { type: `FLOAT`, value: this.xAxis[this.xAxis.length-1] }, //MaxXValue
+            { type: `UINT8`, value: this.xAxis.length }, //xResolution
+            { type: `UINT8`, value: typeId }, //Type
+            { type: type, value: this.value }, //Table
+        ]}, this)
+    }},
+    { type: `Operation_Polynomial`, toObj() {
+        return Packagize({ value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
+            { type: `FLOAT`, value: this.minValue}, //MinValue
+            { type: `FLOAT`, value: this.maxValue}, //MaxValue
+            { type: `UINT8`, value: this.coeffecients.length}, //Degree
+            { type: `FLOAT`, value: this.coeffecients}, //coefficients
+        ]}, this)
     }},
     { type: `Operation_Add`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
     { type: `Operation_Subtract`, toObj() { return Operation_Math.call(this, OperationArchitectureFactoryIDs.Subtract); }},
