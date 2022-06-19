@@ -44,7 +44,7 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
             this.DeadTimeConfigOrVariableSelection.GetObjOperation(),
             
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Operation_StaticVariable`, value: 2, result: `temp` },//static value of 2
+            { type: `Calculation_StaticVariable`, value: 2, result: `temp` },//static value of 2
             
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 

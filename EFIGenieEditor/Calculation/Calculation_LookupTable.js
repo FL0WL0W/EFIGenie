@@ -67,10 +67,14 @@ export default class Calculation_LookupTable extends UITemplate {
     }
 
     get value() {
-        return this.table.saveValue;
+        let value = super.value;
+        value.table = this.table.saveValue;
+        delete value.graph;
+        return value;
     }
     set value(value) {
-        this.table.saveValue = value;
+        value.table = value.graph = value.table.value;
+        super.value = value;
     }
 
     get saveValue() {
@@ -79,11 +83,8 @@ export default class Calculation_LookupTable extends UITemplate {
         return saveValue;
     }
     set saveValue(saveValue) {
-        saveValue.table ??= saveValue.Table;
-        saveValue.parameterSelection ??= saveValue.ParameterSelection;
+        saveValue.graph = saveValue.table;
         super.saveValue = saveValue;
-        if(!saveValue.table)
-            this.table.saveValue = saveValue;
     }
 
     constructor(prop) {
@@ -115,35 +116,11 @@ export default class Calculation_LookupTable extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
-        const table = this.value;
-        const type = GetArrayType(table.value);
-        const typeId = GetTypeId(type);
-
-        var obj = {
-            value: [
-                { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-                { type: `FLOAT`, value: table.xAxis[0] }, //MinXValue
-                { type: `FLOAT`, value: table.xAxis[table.xAxis.length-1] }, //MaxXValue
-                { type: `UINT8`, value: table.xAxis.length }, //xResolution
-                { type: `UINT8`, value: typeId }, //Type
-                { type: type, value: table.value }, //Table
-            ]
-        };
-
-        if (!this.noParameterSelection || outputVariableId || inputVariableId) {
-            var inputVariables;
-            if(inputVariableId) {
-                inputVariables = [ inputVariableId ]; //inputVariable
-            } else if (!this.noParameterSelection) {
-                const parameterSelection = this.parameterSelection.value;
-                inputVariables = [ `${parameterSelection.reference}.${parameterSelection.value}${parameterSelection.measurement? `(${parameterSelection.measurement})` : ``}` ]; //inputVariable
-            }
-            obj = Packagize(obj, { 
-                outputVariables: [ outputVariableId ?? 0 ],
-                inputVariables
-            });
-        }
+    GetObjOperation(result, inputVariableId) {
+        let obj = this.value;
+        obj.type = `Calculation_LookupTable`;
+        obj.result = result;
+        obj.inputVariables = [ inputVariableId ];
 
         return obj;
     }

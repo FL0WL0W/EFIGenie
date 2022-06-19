@@ -4,14 +4,12 @@ export default class Calculation_Static extends UINumberWithMeasurement {
     static output = `float`;
     static inputs = [];
 
-    GetObjOperation(outputVariableId) {
-        var obj = { value: [{ type: `Operation_StaticVariable`, value: this.value }] };
-
-        if (outputVariableId) {
-            obj.value[0].result = outputVariableId;
+    GetObjOperation(result) {
+        return { 
+            type: `Calculation_StaticVariable`, 
+            value: this.value,
+            result: result
         }
-
-        return obj;
     }
 }
 customElements.define(`calculation-static`, Calculation_Static, { extends: `span` });

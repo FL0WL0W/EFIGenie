@@ -185,7 +185,7 @@ export default class Top extends UITemplate {
 
             //sync condition
             { type: `Group`, value: [ 
-                { type: `Operation_StaticVariable`, value: false, result: `temp` }, //store static variable result in temp variable
+                { type: `Calculation_StaticVariable`, value: false, result: `temp` }, //store static variable result in temp variable
                 { type: `Operation_Or`, result: 0, a: `EngineSyncedId`, b: `temp` },
             ]},
 

@@ -159,20 +159,11 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         }
     }
 
-    GetObjOperation(outputVariableId, inputVariableId) {
-        var obj = { value: [
-            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
-            { type: `FLOAT`, value: this.minValue}, //MinValue
-            { type: `FLOAT`, value: this.maxValue}, //MaxValue
-            { type: `UINT8`, value: this.degree}, //Degree
-            { type: `FLOAT`, value: this.coeffecients}, //coefficients
-        ]};
-
-        if (outputVariableId || inputVariableId) 
-            obj = Packagize(obj, { 
-                outputVariables: [ outputVariableId ?? 0 ],
-                inputVariables: [ inputVariableId ?? 0 ]
-            });
+    GetObjOperation(result, inputVariableId) {
+        let obj = this.value;
+        obj.type = "Calculation_Polynomial";
+        obj.result = result;
+        obj.inputVariables = [ inputVariableId ]; 
 
         return obj;
     }

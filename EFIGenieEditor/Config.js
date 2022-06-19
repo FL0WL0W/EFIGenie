@@ -472,7 +472,7 @@ types = [
 
         return Packagize(this, this);
     }},
-    { type: `Operation_StaticVariable`, toObj() {
+    { type: `Calculation_StaticVariable`, toObj() {
         var type = GetType(this.value);
         var typeID = GetTypeId(type);
         return Packagize({ value: [ 
@@ -481,43 +481,43 @@ types = [
             { type: type, value: this.value } //val
         ]}, this);
     }},
-    { type: `Operation_2AxisTable`, toObj() {
+    { type: `Calculation_2AxisTable`, toObj() {
         this.inputVariables ??= [ undefined, undefined ];
-        if(this.xSelection?.reference)
-            this.inputVariables[0] = this.xSelection.reference
-        if(this.ySelection?.reference)
-            this.inputVariables[1] = this.ySelection.reference
+        if(this.XSelection?.reference)
+            this.inputVariables[0] = this.XSelection.reference
+        if(this.YSelection?.reference)
+            this.inputVariables[1] = this.YSelection.reference
 
-        const type = GetArrayType(this.value)
+        const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
         return Packagize({ value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-            { type: `FLOAT`, value: this.xAxis[0] }, //MinXValue
-            { type: `FLOAT`, value: this.xAxis[this.xAxis.length-1] }, //MaxXValue
-            { type: `FLOAT`, value: this.yAxis[0] }, //MinYValue
-            { type: `FLOAT`, value: this.yAxis[this.yAxis.length-1] }, //MaxYValue
-            { type: `UINT8`, value: this.xAxis.length }, //xResolution
-            { type: `UINT8`, value: this.yAxis.length }, //yResolution
+            { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
+            { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
+            { type: `FLOAT`, value: this.table.yAxis[0] }, //MinYValue
+            { type: `FLOAT`, value: this.table.yAxis[this.table.yAxis.length-1] }, //MaxYValue
+            { type: `UINT8`, value: this.table.xAxis.length }, //xResolution
+            { type: `UINT8`, value: this.table.yAxis.length }, //yResolution
             { type: `UINT8`, value: typeId }, //Type
-            { type: type, value: this.value }, //Table
+            { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
-    { type: `Operation_LookupTable`, toObj() {
+    { type: `Calculation_LookupTable`, toObj() {
         if(this.parameterSelection?.reference)
             this.inputVariables = [this.parameterSelection.reference]
 
-        const type = GetArrayType(this.value)
+        const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
         return Packagize({ value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-            { type: `FLOAT`, value: this.xAxis[0] }, //MinXValue
-            { type: `FLOAT`, value: this.xAxis[this.xAxis.length-1] }, //MaxXValue
-            { type: `UINT8`, value: this.xAxis.length }, //xResolution
+            { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
+            { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
+            { type: `UINT8`, value: this.table.xAxis.length }, //xResolution
             { type: `UINT8`, value: typeId }, //Type
-            { type: type, value: this.value }, //Table
+            { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
-    { type: `Operation_Polynomial`, toObj() {
+    { type: `Calculation_Polynomial`, toObj() {
         return Packagize({ value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
             { type: `FLOAT`, value: this.minValue}, //MinValue
