@@ -19,23 +19,23 @@ export default class Input_AnalogPolynomial extends UITemplate {
         this.style.display = `block`;
     }
 
-    RegisterVariables() {
+    RegisterVariables(referenceName) {
         VariableRegister.RegisterVariable(
-            `${this.referenceName}(Voltage)`,
+            `${referenceName}(Voltage)`,
             `float`
         );
         VariableRegister.RegisterVariable(
-            `${this.referenceName}(${this.constructor.measurementName})`,
+            `${referenceName}(${this.constructor.measurementName})`,
             `float`
         );
-        this.voltageLiveUpdate.VariableReference = `${this.referenceName}(Voltage)`;
+        this.voltageLiveUpdate.VariableReference = `${referenceName}(Voltage)`;
         this.voltageLiveUpdate.RegisterVariables();
     }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         return { type: `Group`, value: [
-            this.analogInput.GetObjOperation(`${this.referenceName}(Voltage)`),
-            this.polynomial.GetObjOperation(outputVariableId, `${this.referenceName}(Voltage)`)
+            this.analogInput.GetObjOperation(result),
+            this.polynomial.GetObjOperation(`${result}(${this.constructor.measurementName})`, `${result}(Voltage)`)
         ]};
     }
 }

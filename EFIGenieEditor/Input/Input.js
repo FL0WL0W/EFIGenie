@@ -23,7 +23,6 @@ export default class Input extends UITemplate {
             calculations:            InputConfigs,
             label:              `Source`,
             inputs:             [],
-            referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true,
             hidden: true
         });
@@ -34,7 +33,6 @@ export default class Input extends UITemplate {
             calculations:            InputConfigs,
             label:              prop.name,
             ConfigsOnly:        true,
-            referenceName:      `Inputs.${prop.name}`,
             noParameterSelection: true
         });
         this.TranslationConfig.addEventListener(`change`, function() {
@@ -75,7 +73,6 @@ export default class Input extends UITemplate {
             class: `pinselectname inputName`
         })
         this.name.addEventListener(`change`, function() {
-            thisClass.TranslationConfig.referenceName = thisClass.RawConfig.referenceName = `Inputs.${thisClass.name.value}`;
             thisClass.TranslationConfig.label = thisClass.name.value;
         });
         this.TranslationConfig.labelElement.replaceWith(this.name);
@@ -86,8 +83,8 @@ export default class Input extends UITemplate {
     }
 
     RegisterVariables() {
-        this.TranslationConfig.RegisterVariables?.();
-        const subConfig = this.TranslationConfig.GetSubConfig();
+        this.TranslationConfig.RegisterVariables?.(`Inputs.${this.name.value}`);
+        const subConfig = this.TranslationConfig.GetSubConfig(`Inputs.${this.name.value}`);
         if(!(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0))
             this.RawConfig.RegisterVariables?.();
     }
@@ -98,11 +95,10 @@ export default class Input extends UITemplate {
             return undefined;
 
         if(translationConfig.constructor.inputs === undefined || translationConfig.constructor.inputs.length === 0)
-            return this.TranslationConfig.GetObjOperation();
+            return this.TranslationConfig.GetObjOperation(`Inputs.${this.name.value}`);
         
-        const rawConfigObj = this.RawConfig.GetObjOperation();
-        const rawConfigVariable = this.RawConfig.GetVariableReference();
-        const translationConfigObj = this.TranslationConfig.GetObjOperation(rawConfigVariable);
+        const rawConfigObj = this.RawConfig.GetObjOperation(`Inputs.${this.name.value}`);
+        const translationConfigObj = this.TranslationConfig.GetObjOperation(`Inputs.${this.name.value}`, `Inputs.${this.name.value}(${rawConfigObj.measuremntName})`);
         return { type: `Group`, value: [
             rawConfigObj,
             translationConfigObj

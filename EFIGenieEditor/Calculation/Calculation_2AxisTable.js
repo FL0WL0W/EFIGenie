@@ -103,6 +103,7 @@ export default class Calculation_2AxisTable extends UITemplate {
     get value() {
         let value = super.value;
         value.table = this.table.saveValue;
+        value.type = `Calculation_2AxisTable`;
         delete value.graph;
         return value;
     }
@@ -147,7 +148,6 @@ export default class Calculation_2AxisTable extends UITemplate {
 
     GetObjOperation(result, xVariableId, yVariableId) {
         let obj = this.value;
-        obj.type = `Calculation_2AxisTable`;
         obj.result = result;
         obj.inputVariables = [ xVariableId, yVariableId ];
 

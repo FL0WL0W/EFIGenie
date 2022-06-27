@@ -45,19 +45,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.calculationValues.forEach(function(configValue) { configValue.yLabel = ylabel; });
     }
 
-    _referenceName = undefined;
-    get referenceName() {
-        return this._referenceName;
-    }
-    set referenceName(referenceName) {
-        if(this._referenceName === referenceName)
-            return;
-
-        this._referenceName = referenceName;
-
-        this.calculationValues.forEach(function(configValue) { configValue.referenceName = referenceName; });
-    }
-
     _measurementName = undefined;
     get measurementName() {
         if(this._measurementName)
@@ -195,7 +182,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
                             label: this.label,
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
-                            referenceName: this.referenceName,
                             saveValue: saveValue.calculationValues[i],
                             measurementName: this._measurementName,
                             measurementUnitName: this.measurementUnitName,
@@ -213,6 +199,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get value() {
         const subConfig = this.GetSubConfig();
         return {
+            type: `CalculationOrVariableSelection`,
             selection: this.selection.value,
             calculation: subConfig?.value
         }
@@ -225,12 +212,12 @@ export default class CalculationOrVariableSelection extends UITemplate {
             subConfig.value = value?.calculation;
     }
 
-    RegisterVariables() {
+    RegisterVariables(referenceName) {
         this.options = GetSelections(this.calculations, defaultFilter(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculationsOnly));
         const selection = this.selection.value;
-        if (selection && this.referenceName) {
+        if (selection && referenceName) {
             this.liveUpdate.VariableReference = undefined;
-            const thisReference = this.GetVariableReference();
+            const thisReference = `${referenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
             let variable;
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
@@ -240,10 +227,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
                         VariableRegister.RegisterVariable(thisReference, type);
                     }
                     variable = VariableRegister.GetVariableByReference(thisReference)
-                    subConfig.RegisterVariables?.();
+                    subConfig.RegisterVariables?.(referenceName);
                 }
             } else {
-                const variableReference = `${selection.reference}.${selection.value}${this.measurementName? `(${this.measurementName})` : ``}`;
+                const variableReference = `${selection.reference}${this.measurementName? `(${this.measurementName})` : ``}`;
                 VariableRegister.RegisterVariable(thisReference, undefined, variableReference);
                 variable = VariableRegister.GetVariableByReference(variableReference)
             }
@@ -251,7 +238,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                 this.liveUpdate.VariableReference = thisReference;
                 this.liveUpdate.measurementName = this.measurementName;
             }
-            this.liveUpdate.RegisterVariables();
+            this.liveUpdate.RegisterVariables(thisReference);
         }
     }
 
@@ -260,8 +247,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
             const subConfig = this.GetSubConfig();
             if(!subConfig)
                 return;
-            if(this.referenceName)
-                return subConfig.GetObjOperation(this.GetVariableReference(), ...args);
             return subConfig.GetObjOperation(...args);
         }
     }
@@ -292,7 +277,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
-                    referenceName: this.referenceName,
                     measurementName: this._measurementName,
                     measurementUnitName: this.measurementUnitName,
                     calculations: this.calculations,
@@ -313,11 +297,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
     
     IsVariable() {
         return this.selection.value?.reference;
-    }
-
-    GetVariableReference() {
-        if (this.selection.value && this.referenceName)
-            return `${this.referenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
     }
 }
 customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `span` });

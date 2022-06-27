@@ -14,13 +14,11 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
             calculations:            GenericConfigs,
             label:              `Injector Flow Rate`,
             measurementName:        `MassFlow`,
-            referenceName:      `FuelParameters.Injector Flow Rate`
         });
         this.DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
             calculations:            GenericConfigs,
             label:              `Injector Dead Time`,
             measurementName:        `Time`,
-            referenceName:      `FuelParameters.Injector Dead Time`,
             measurementUnitName:`ms`
         });
         this.MinInjectorFuelMass = new UINumberWithMeasurement({
@@ -34,8 +32,8 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
     }
 
     RegisterVariables() {
-        this.DeadTimeConfigOrVariableSelection.RegisterVariables();
-        this.FlowRateConfigOrVariableSelection.RegisterVariables();
+        this.DeadTimeConfigOrVariableSelection.RegisterVariables(`FuelParameters.Injector Dead Time`);
+        this.FlowRateConfigOrVariableSelection.RegisterVariables(`FuelParameters.Injector Flow Rate`);
     }
 
     // GetObjOperation(result) {
@@ -46,7 +44,7 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
     //     return obj
     // }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         let group = { type: `Group`, value: [
             this.FlowRateConfigOrVariableSelection.GetObjOperation(),
             this.DeadTimeConfigOrVariableSelection.GetObjOperation(),
@@ -68,7 +66,7 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
                     { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
                     { type: `FLOAT`, value: this.MinInjectorFuelMass.value }
                 ],
-                outputVariables: [ outputVariableId ?? 0 ], //Return
+                outputVariables: [ result ], //Return
                 inputVariables: [ 
                     `temp`,
                     `FuelParameters.Cylinder Fuel Mass`,

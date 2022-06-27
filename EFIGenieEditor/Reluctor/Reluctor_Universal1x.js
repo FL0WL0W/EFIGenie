@@ -25,20 +25,20 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
         this.length.value = 8;
     }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         var obj = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
             { type: `FLOAT`, value: this.value.risingPosition}, //RisingPosition
             { type: `FLOAT`, value: this.value.fallingPosition} //FallingPosition
         ]};
         obj =  Packagize(obj, { 
-            outputVariables: [ outputVariableId ?? 0 ], 
+            outputVariables: [ `${result}(Reluctor)` ], 
             inputVariables: [ 
-                `${this.referenceName}(Record)`,
+                `${result}(Record)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation({ obj });
+        return super.GetObjOperation(result, { obj });
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);

@@ -7,18 +7,18 @@ export default class Reluctor_GM24x extends Reluctor_Template {
         this.length.value = 100;
     }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         var obj = { value: [
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
         ]};
         obj =  Packagize(obj, { 
-            outputVariables: [ outputVariableId ?? 0 ], 
+            outputVariables: [ `${result}(Reluctor)` ], 
             inputVariables: [ 
-                `${this.referenceName}(Record)`,
+                `${result}(Record)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation({ obj });
+        return super.GetObjOperation(result, { obj });
     }
 }
 ReluctorConfigs.push(Reluctor_GM24x);

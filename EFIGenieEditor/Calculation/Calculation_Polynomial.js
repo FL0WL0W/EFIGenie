@@ -130,6 +130,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
 
     get value() {
         return { 
+            type: "Calculation_Polynomial",
             minValue: this.minValue,
             maxValue: this.maxValue,
             coeffecients: this.coeffecients
@@ -161,7 +162,6 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
 
     GetObjOperation(result, inputVariableId) {
         let obj = this.value;
-        obj.type = "Calculation_Polynomial";
         obj.result = result;
         obj.inputVariables = [ inputVariableId ]; 
 

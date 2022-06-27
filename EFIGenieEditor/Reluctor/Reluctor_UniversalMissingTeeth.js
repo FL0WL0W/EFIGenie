@@ -41,7 +41,7 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
         this.Setup(prop);
     }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         var obj = { value: [ 
             { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
             { type: `FLOAT`, value: this.value.firstToothPosition}, //FirstToothPosition
@@ -51,13 +51,13 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
         ]};
             
         obj =  Packagize(obj, { 
-            outputVariables: [ outputVariableId ?? 0 ], 
+            outputVariables: [ `${result}(Reluctor)` ], 
             inputVariables: [ 
-                `${this.referenceName}(Record)`,
+                `${result}(Record)`,
                 `CurrentTickId`
             ]
         });
-        return super.GetObjOperation({ obj });
+        return super.GetObjOperation(result, { obj });
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);

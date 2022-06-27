@@ -82,8 +82,10 @@ class VariableRegistry {
             }
             this[listName] ??= []
             const existing = this[listName].findIndex(r => r.name === variableName && (measurementName == undefined || measurementName == r.measurementName))
-            if(existing >= 0)
+            if(existing >= 0) {
+                Id ??= this[listName][existing].Id
                 this[listName].splice(existing, 1)
+            }
             this[listName].push({
                 name: variableName,
                 measurementName: measurementName,
@@ -527,8 +529,12 @@ types = [
         ]}, this)
     }},
     { type: `CalculationOrVariableSelection`, toObj() {
-        if(!this.selection || this.selection.reference)
+        if(!this.selection)
             return { value: [] }
+        if(this.selection.reference){
+            VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection.reference)
+            return { value: [] }
+        }
 
         this.calculation.type = this.selection.value
         return Packagize(this.calculation, this)
@@ -574,7 +580,7 @@ types = [
                     { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
                     { type: `FLOAT`, value: this.MinInjectorFuelMass }
                 ],
-                outputVariables: [ outputVariableId ?? 0 ], //Return
+                outputVariables: [ this.result ?? this.outputVariables?.[0 ], //Return
                 inputVariables: [ 
                     `temp`,
                     `FuelParameters.Cylinder Fuel Mass`,

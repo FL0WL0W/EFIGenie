@@ -139,6 +139,7 @@ export default class UINumberWithMeasurement extends UITemplate {
     #valueToDisplayValue(value) {
         if(value !== undefined && this.Unit)
             return value * this.Unit.DisplayMultiplier + this.Unit.DisplayOffset;
+        return value;
     }
 }
 customElements.define(`ui-numberwithmeasurement`, UINumberWithMeasurement, { extends: `span` });

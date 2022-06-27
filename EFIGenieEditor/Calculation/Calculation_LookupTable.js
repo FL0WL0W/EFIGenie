@@ -69,6 +69,7 @@ export default class Calculation_LookupTable extends UITemplate {
     get value() {
         let value = super.value;
         value.table = this.table.saveValue;
+        value.type = `Calculation_LookupTable`;
         delete value.graph;
         return value;
     }
@@ -118,7 +119,6 @@ export default class Calculation_LookupTable extends UITemplate {
 
     GetObjOperation(result, inputVariableId) {
         let obj = this.value;
-        obj.type = `Calculation_LookupTable`;
         obj.result = result;
         obj.inputVariables = [ inputVariableId ];
 

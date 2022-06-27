@@ -113,24 +113,6 @@ export default class Calculation_Formula extends UITemplate {
 
         this._measurementName = measurementName;
     }
-    
-    _referenceName = undefined;
-    get referenceName() {
-        return this._referenceName;
-    }
-    set referenceName(referenceName) {
-        if(this._referenceName === referenceName)
-            return;
-
-        this._referenceName = referenceName;
-        for(let parameter in this.parameterValues) {
-            let parameterValue = this.parameterValues[parameter];
-            if(!parameterValue)
-                continue;
-
-            parameterValue.referenceName = this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined;
-        }
-    }
 
     get saveValue() {
         let saveValue = super.saveValue ?? {};
@@ -173,7 +155,6 @@ export default class Calculation_Formula extends UITemplate {
             value.parameterValues[parameter] = this.parameterValues[parameter]?.value;
         }
 
-        console.log(value)
         return value;
     }
 
@@ -217,14 +198,14 @@ export default class Calculation_Formula extends UITemplate {
         this.Setup(prop)
     }
 
-    RegisterVariables() {
+    RegisterVariables(referenceName) {
         const thisClass = this;
-        this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(); })
-        if (this.referenceName) {
-            if(this.parameters.length === 1) {
-                const thisReference = this.GetVariableReference();
-                VariableRegister.RegisterVariable(thisReference, undefined, this.parameterValues[this.parameters[0]].GetVariableReference());
+        if (referenceName) {
+            this.referenceName = referenceName;
+            if(this.operations.length == 0) {
+                this.parameterValues[this.parameters[0]].RegisterVariables(referenceName)
             } else {
+                this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables(`${referenceName}_${parameter}`); })
                 const thisReference = this.GetVariableReference();
                 const type = GetClassProperty(this, `output`);
                 VariableRegister.RegisterVariable(thisReference, type);
@@ -236,64 +217,69 @@ export default class Calculation_Formula extends UITemplate {
         return `${this.referenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
     }
 
-    GetObjOperation(outputVariableId) {
+    GetObjOperation(result) {
         if(this.parameters.length === 0)
             return;
-        if(this.parameters.length === 1) 
+        if(this.operations.length == 0) 
             return this.parameterValues[this.parameters[0]].GetObjOperation();
         var group  = { 
             type: `Group`, 
             value: []
         };
-        outputVariableId ??= this.referenceName;
+        result ??= this.referenceName;
         
         const thisClass = this;
-        this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation()); })
+        this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation(parameter.indexOf(`temp`) === 0 ? parameter : `${thisClass.referenceName}_${parameter}`)); })
         const operations = this.operations;
         for(let operationIndex in operations) {
             let operation = operations[operationIndex];
             if(operation.resultInto === `return`)
-                operation.resultInto = outputVariableId ?? this.GetVariableReference();
-            let parameterValues = operation.parameters.map(p => thisClass.parameterValues[p]?.GetVariableReference() ?? p);
+                operation.resultInto = result ?? this.GetVariableReference();
             let operationValue = {
                 result: operation.resultInto, //Return
-                a: parameterValues[0],
-                b: parameterValues[1]
             };
-            switch(operation.operator) {
-                case `*`: 
-                    operationValue.type = `Calculation_Multiply`;
-                    break;
-                case `/`: 
-                    operationValue.type = `Calculation_Divide`;
-                    break;
-                case `+`: 
-                    operationValue.type = `Calculation_Add`;
-                    break;
-                case `-`: 
-                    operationValue.type = `Calculation_Subtract`;
-                    break;
-                case `>=`: 
-                    operationValue.type = `Calculation_GreaterThanOrEqual`;
-                    break;
-                case `<=`: 
-                    operationValue.type = `Calculation_LessThanOrEqual`;
-                    break;
-                case `>`: 
-                    operationValue.type = `Calculation_GreaterThan`;
-                    break;
-                case `<`: 
-                    operationValue.type = `Calculation_LessThan`;
-                    break;
-                case `=`: 
-                    operationValue.type = `Calculation_Equal`;
-                    break;
-                case `&`: 
-                    operationValue.type = `Calculation_And`;
-                    break;
-                case `|`: 
-                    operationValue.type = `Calculation_Or`;
-                    break;
+            if(operation.operator === `s`) {
+                operationValue.type = `Calculation_Static`;
+                operationValue.value = operation.parameters[0]
+            } else {
+                let parameterResults = operation.parameters.map(parameter => parameter.indexOf(`temp`) === 0 ? parameter : `${this.referenceName}_${parameter}`)
+                operationValue.a = parameterResults[0]
+                operationValue.b = parameterResults[1]
+                switch(operation.operator) {
+                    case `*`: 
+                        operationValue.type = `Calculation_Multiply`;
+                        break;
+                    case `/`: 
+                        operationValue.type = `Calculation_Divide`;
+                        break;
+                    case `+`: 
+                        operationValue.type = `Calculation_Add`;
+                        break;
+                    case `-`: 
+                        operationValue.type = `Calculation_Subtract`;
+                        break;
+                    case `>=`: 
+                        operationValue.type = `Calculation_GreaterThanOrEqual`;
+                        break;
+                    case `<=`: 
+                        operationValue.type = `Calculation_LessThanOrEqual`;
+                        break;
+                    case `>`: 
+                        operationValue.type = `Calculation_GreaterThan`;
+                        break;
+                    case `<`: 
+                        operationValue.type = `Calculation_LessThan`;
+                        break;
+                    case `=`: 
+                        operationValue.type = `Calculation_Equal`;
+                        break;
+                    case `&`: 
+                        operationValue.type = `Calculation_And`;
+                        break;
+                    case `|`: 
+                        operationValue.type = `Calculation_Or`;
+                        break;
+                }
             }
             group.value.push(operationValue);
         }
@@ -337,11 +323,11 @@ export default class Calculation_Formula extends UITemplate {
             let operator = operators[operatorIndex];
             let operationIndex;
             while((operationIndex = operations.findIndex(f => f.parameters.find(p => p.indexOf(operator) > -1))) > -1) {
-                let formula = operations[operationIndex];
-                let parameterIndex = formula.parameters.findIndex(p => p.indexOf(operator) > -1);
-                let parameter = formula.parameters[parameterIndex];
-                let firstParameter = splitOnOperators(parameter.split(operator)[0]).pop();
-                let secondParameter = splitOnOperators(parameter.split(operator)[1])[0];
+                const formula = operations[operationIndex];
+                const parameterIndex = formula.parameters.findIndex(p => p.indexOf(operator) > -1);
+                const parameter = formula.parameters[parameterIndex];
+                const firstParameter = splitOnOperators(parameter.split(operator)[0]).pop();
+                const secondParameter = splitOnOperators(parameter.split(operator)[1])[0];
                 if(formula.parameters.length > 1 || splitOnOperators(formula.parameters[0].replace(`${firstParameter}${operator}${secondParameter}`, `temp`)).length > 1) {
                     tempIndex++;
                     formula.parameters[parameterIndex] = parameter.replace(`${firstParameter}${operator}${secondParameter}`, `$temp${tempIndex}`);
@@ -355,6 +341,22 @@ export default class Calculation_Formula extends UITemplate {
                     operations[operationIndex].parameters = [firstParameter, secondParameter];
                 }
             }
+        }
+
+        //statics
+        let operationIndex;
+        while((operationIndex = operations.findIndex(f => f.operator !== `s` && f.parameters.find(p => p.match(/^[0-9]+$/)))) > -1) {
+            const formula = operations[operationIndex]
+            const parameterIndex = formula.parameters.findIndex(p => p.match(/^[0-9]+$/))
+            const parameter = formula.parameters[parameterIndex]
+
+            tempIndex++
+            operations[operationIndex].parameters[parameterIndex] = `$temp${tempIndex}`
+            operations.splice(operationIndex, 0, {
+                operator: `s`,
+                resultInto: `$temp${tempIndex}`,
+                parameters: [parameter]
+            });
         }
 
         //consolidate temp variables
