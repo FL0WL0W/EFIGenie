@@ -66,16 +66,10 @@ export default class Calculation_LookupTable extends UITemplate {
         }
     }
 
-    get value() {
-        let value = super.value;
-        value.table = this.table.saveValue;
-        value.type = `Calculation_LookupTable`;
-        delete value.graph;
-        return value;
-    }
-    set value(value) {
-        value.table = value.graph = value.table.value;
-        super.value = value;
+    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined, type: `Calculation_LookupTable` } }
+    set value(value) { 
+        value.table = value.graph = value.table.value
+        super.value = value 
     }
 
     get saveValue() {

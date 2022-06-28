@@ -7,14 +7,8 @@ export default class CylinderAirmass_SpeedDensity extends UITemplate {
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`]
     static template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`
 
-    get value() {
-        let value = super.value;
-        value.type = `CylinderAirmass_SpeedDensity`;
-        return value;
-    }
-    set value(value) {
-        super.value = value;
-    }
+    get value() { return { ...super.value, type: `CylinderAirmass_SpeedDensity` } }
+    set value(value) { super.value = value }
 
     constructor(prop) {
         super();

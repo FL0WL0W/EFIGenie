@@ -8,14 +8,8 @@ export default class Input_Digital extends UITemplate {
     static measurementName = `Bool`;
     static template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
-    get value() {
-        let value = super.value
-        value.type = `Input_Digital`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: "Input_Digital" } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super();
@@ -26,13 +20,6 @@ export default class Input_Digital extends UITemplate {
         this.inverted = new UICheckBox();
         this.style.display = `block`;
         this.Setup(prop);
-    }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
     }
 }
 RawInputConfigs.push(Input_Digital);

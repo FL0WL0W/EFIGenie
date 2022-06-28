@@ -18,12 +18,14 @@ export default class Inputs extends UITemplate {
         this.pinOverlay.pinOut = PinOuts[targetDevice];
     }
 
+    get value() { return { ...super.value, type: `Inputs` } }
+    set value(value) { super.value = value}
+
     get saveValue() {
         let saveValue = super.saveValue;
         saveValue.targetDevice = this.targetDevice;
         return saveValue;
     }
-
     set saveValue(saveValue) {
         if(!saveValue)
             return;
@@ -38,6 +40,7 @@ export default class Inputs extends UITemplate {
 
         super.saveValue = saveValue;
     }
+
     constructor(prop) {
         super();
         this.inputs = document.createElement(`div`);
@@ -86,20 +89,7 @@ export default class Inputs extends UITemplate {
         }
     }
 
-    GetObjOperation() {
-        var group = { type: `Group`, value: [
-            { 
-                type: `Package`, //Package
-                value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
-                outputVariables: [`CurrentTickId`]
-            }
-        ]};
-        for(var i = 0; i < this.inputs.children.length; i++){
-            group.value.push(this.inputs.children[i].GetObjOperation());
-        }
-
-        return group;
-    }
+    GetObjOperation() { return this.value }
 
     #updateInputControls() {
         for(let i = 0; i < this.inputs.children.length; i++) {

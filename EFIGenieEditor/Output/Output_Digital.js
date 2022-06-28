@@ -16,14 +16,8 @@ export default class Output_Digital extends UITemplate {
         super.saveValue = saveValue;
     }
 
-    get value() {
-        let value = super.value
-        value.type = `Output_Digital`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: `Output_Digital` } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super();

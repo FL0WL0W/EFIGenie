@@ -6,14 +6,8 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
                         `<br/><label>Rising Edge Position:</label><div data-element="risingPosition"></div>` +
                         `<br/><label>Falling Edge Position:</label><div data-element="fallingPosition"></div>`;
 
-    get value() {
-        let value = super.value
-        value.type = `Reluctor_Universal1x`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: `Reluctor_Universal1x` } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super();
@@ -33,13 +27,6 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
         });
         this.Setup(prop);
         this.length.value = 8;
-    }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);

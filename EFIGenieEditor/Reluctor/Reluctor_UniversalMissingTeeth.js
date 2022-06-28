@@ -9,14 +9,8 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
                         `<br/><label>Number of Teeth:</label><div data-element="numberOfTeeth"></div>` +
                         `<br/><label>Number of Teeth Missing:</label><div data-element="numberOfTeethMissing"></div>`;
 
-    get value() {
-        let value = super.value
-        value.type = `Reluctor_UniversalMissingTeeth`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: `Reluctor_UniversalMissingTeeth` } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super()
@@ -48,13 +42,6 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
             min: 1
         });
         this.Setup(prop);
-    }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);

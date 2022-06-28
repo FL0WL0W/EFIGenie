@@ -9,14 +9,8 @@ export default class Input_Frequency extends UITemplate {
     static template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 
-    get value() {
-        let value = super.value
-        value.type = `Input_Frequency`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: "Input_Frequency" } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super();
@@ -33,13 +27,6 @@ export default class Input_Frequency extends UITemplate {
         });
         this.style.display = `block`;
         this.Setup(prop);
-    }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
     }
 }
 RawInputConfigs.push(Input_Frequency);

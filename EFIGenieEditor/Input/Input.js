@@ -2,15 +2,10 @@ import UITemplate from "../JavascriptUI/UITemplate.js";
 import UISelection from "../JavascriptUI/UISelection.js";
 import UIText from "../JavascriptUI/UIText.js";
 export default class Input extends UITemplate {
-    static template = `<div data-element="TranslationConfig"></div><div data-element="hr"></div><div data-element="RawConfig"></div>`
+    static template = `<div data-element="translationConfig"></div><div data-element="hr"></div><div data-element="rawConfig"></div>`
 
-    get saveValue() {
-        return super.saveValue;
-    }
-    set saveValue(saveValue) {
-        saveValue.name ??= saveValue.Name;
-        super.saveValue = saveValue;
-    }
+    get value() { return { ...super.value, type: "Input" } }
+    set value(value) { super.value = value }
 
     hr = document.createElement(`hr`);
     constructor(prop) {
@@ -19,63 +14,54 @@ export default class Input extends UITemplate {
         prop.name ??= `Name`;
         this.style.display = `block`;
         const thisClass = this
-        this.RawConfig = new CalculationOrVariableSelection({
+        this.rawConfig = new CalculationOrVariableSelection({
             calculations:            InputConfigs,
             label:              `Source`,
             inputs:             [],
             noParameterSelection: true,
             hidden: true
         });
-        this.RawConfig.addEventListener(`change`, function() {
+        this.rawConfig.addEventListener(`change`, function() {
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
-        this.TranslationConfig = new CalculationOrVariableSelection({
+        this.translationConfig = new CalculationOrVariableSelection({
             calculations:            InputConfigs,
             label:              prop.name,
             ConfigsOnly:        true,
             noParameterSelection: true
         });
-        this.TranslationConfig.addEventListener(`change`, function() {
-            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+        this.translationConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.translationConfig.GetSubConfig();
             if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
                 thisClass.hr.hidden = true;
-                thisClass.RawConfig.hidden = true;
-                thisClass.RawConfig.selection.value = undefined;
+                thisClass.rawConfig.hidden = true;
+                thisClass.rawConfig.selection.value = undefined;
             } else {
                 thisClass.hr.hidden = false;
-                thisClass.RawConfig.hidden = false;
+                thisClass.rawConfig.hidden = false;
             }
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
         });
-        this.RawConfig.addEventListener(`change`, function() {
-            const subConfig = thisClass.TranslationConfig.GetSubConfig();
+        this.rawConfig.addEventListener(`change`, function() {
+            const subConfig = thisClass.translationConfig.GetSubConfig();
             if(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0) {
                 thisClass.hr.hidden = true;
-                thisClass.RawConfig.hidden = true;
-                thisClass.RawConfig.selection.value = undefined;
+                thisClass.rawConfig.hidden = true;
+                thisClass.rawConfig.selection.value = undefined;
             } else {
                 thisClass.hr.hidden = false;
-                thisClass.RawConfig.hidden = false;
+                thisClass.rawConfig.hidden = false;
             }
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}));
-        });
-        var options = [];
-        this.translationType = new UISelection({
-            value:              `None`,
-            selectNotVisible:   true,
-            options:            options,
-        });
-        this.translationType.addEventListener(`change`, function() {
-            thisClass.translationType.value;
         });
         this.name = new UIText({
             value: prop.name,
             class: `pinselectname inputName`
         })
         this.name.addEventListener(`change`, function() {
-            thisClass.TranslationConfig.label = thisClass.name.value;
+            thisClass.translationConfig.label = thisClass.name.value;
         });
-        this.TranslationConfig.labelElement.replaceWith(this.name);
+        this.translationConfig.labelElement.replaceWith(this.name);
         this.hr.hidden = true;
         this.hr.style.margin = `2px`;
         delete prop.name;
@@ -83,26 +69,10 @@ export default class Input extends UITemplate {
     }
 
     RegisterVariables() {
-        this.TranslationConfig.RegisterVariables?.(`Inputs.${this.name.value}`);
-        const subConfig = this.TranslationConfig.GetSubConfig(`Inputs.${this.name.value}`);
+        this.translationConfig.RegisterVariables?.(`Inputs.${this.name.value}`);
+        const subConfig = this.translationConfig.GetSubConfig(`Inputs.${this.name.value}`);
         if(!(subConfig === undefined || subConfig.constructor.inputs === undefined || subConfig.constructor.inputs.length === 0))
-            this.RawConfig.RegisterVariables?.();
-    }
-
-    GetObjOperation() {
-        const translationConfig = this.TranslationConfig.GetSubConfig();
-        if(translationConfig === undefined)
-            return undefined;
-
-        if(translationConfig.constructor.inputs === undefined || translationConfig.constructor.inputs.length === 0)
-            return this.TranslationConfig.GetObjOperation(`Inputs.${this.name.value}`);
-        
-        const rawConfigObj = this.RawConfig.GetObjOperation(`Inputs.${this.name.value}`);
-        const translationConfigObj = this.TranslationConfig.GetObjOperation(`Inputs.${this.name.value}`, `Inputs.${this.name.value}(${rawConfigObj.measuremntName})`);
-        return { type: `Group`, value: [
-            rawConfigObj,
-            translationConfigObj
-        ]};
+            this.rawConfig.RegisterVariables?.();
     }
 }
 customElements.define('config-input', Input, { extends: `span` });

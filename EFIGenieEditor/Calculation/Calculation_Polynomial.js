@@ -161,11 +161,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     }
 
     GetObjOperation(result, inputVariableId) {
-        let obj = this.value;
-        obj.result = result;
-        obj.inputVariables = [ inputVariableId ]; 
-
-        return obj;
+        return { ...this.value, result, inputVariables: [ inputVariableId ] };
     }
 
     #toDisplayValue(value, index) {

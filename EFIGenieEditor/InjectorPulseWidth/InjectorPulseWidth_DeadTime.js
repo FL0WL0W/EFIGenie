@@ -8,14 +8,8 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
                         `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 
-    get value() {
-        let value = super.value
-        value.type = `InjectorPulseWidth_DeadTime`
-        return value
-    }
-    set value(value) {
-        super.value = value
-    }
+    get value() { return { ...super.value, type: `InjectorPulseWidth_DeadTime` } }
+    set value(value) { super.value = value }
 
     constructor(prop) {
         super();
@@ -68,21 +62,18 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
                 a: `temp`,
                 b: `EngineSequentialId`
             },
-
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-                    { type: `FLOAT`, value: this.MinInjectorFuelMass.value }
-                ],
-                outputVariables: [ result ], //Return
+            Packagize({ type: `definition`, value: [ 
+                { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+                { type: `FLOAT`, value: this.MinInjectorFuelMass.value }
+            ]},{
+                outputVariables: [ result ],
                 inputVariables: [ 
                     `temp`,
                     `FuelParameters.Cylinder Fuel Mass`,
                     `FuelParameters.Injector Flow Rate`,
                     `FuelParameters.Injector Dead Time`
                 ]
-            }
+            })
         ]};
 
         return group;

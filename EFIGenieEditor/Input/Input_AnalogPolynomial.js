@@ -7,10 +7,18 @@ export default class Input_AnalogPolynomial extends UITemplate {
     static output = `float`;
     static inputs = [];
 
+    get value() { return { 
+        ...super.value, 
+        polynomial: { 
+            ...this.polynomial.value, 
+            outputMeasurements: this.constructor.measurementName === undefined? undefined : [this.constructor.measurementName]
+        }, type: "Input_AnalogPolynomial" } }
+    set value(value) { super.value = value }
+
     constructor(prop){
         super();
         this.analogInput = new Input_Analog();
-        this.polynomial = new Calculation_Polynomial();
+        this.polynomial = new Calculation_Polynomial({measurementName: this.constructor.measurementName});
         this.voltageLiveUpdate = new UIDisplayLiveUpdate({
             measurementName: Input_Analog.measurementName
         });
@@ -30,13 +38,6 @@ export default class Input_AnalogPolynomial extends UITemplate {
         );
         this.voltageLiveUpdate.VariableReference = `${referenceName}(Voltage)`;
         this.voltageLiveUpdate.RegisterVariables();
-    }
-
-    GetObjOperation(result) {
-        return { type: `Group`, value: [
-            this.analogInput.GetObjOperation(result),
-            this.polynomial.GetObjOperation(`${result}(${this.constructor.measurementName})`, `${result}(Voltage)`)
-        ]};
     }
 }
 customElements.define(`input-analogpolynomial`, Input_AnalogPolynomial, { extends: `span` });

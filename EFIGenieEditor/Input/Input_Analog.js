@@ -7,13 +7,8 @@ export default class Input_Analog extends UITemplate {
     static measurementName = `Voltage`;
     static template = `<label>Pin:</label><div data-element="pin"></div>`
 
-    get saveValue() {
-        return super.saveValue;
-    }
-    set saveValue(saveValue) {
-        saveValue.pin ??= saveValue.Pin;
-        super.saveValue = saveValue;
-    }
+    get value() { return { ...super.value, type: "Input_Analog" } }
+    set value(value) { super.value = value }
 
     constructor(prop){
         super();
@@ -23,14 +18,6 @@ export default class Input_Analog extends UITemplate {
         });
         this.style.display = `block`;
         this.Setup(prop);
-    }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.type = `Input_Analog`
-        obj.result = result
-
-        return obj
     }
 }
 customElements.define(`input-analog`, Input_Analog, { extends: `span` });
