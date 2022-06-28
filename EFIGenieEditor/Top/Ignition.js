@@ -75,8 +75,8 @@ export default class Ignition extends UITemplate {
 
     GetObjOperation() {
         var group  = { 
-            types : [{ type: `Calculation_EngineScheduleIgnition`, toObj() {
-                return { value: [ {
+            types : [{ type: `Calculation_EngineScheduleIgnition`, toDefinition() {
+                return { type: `definition`, value: [ {
                     type: `Package`,
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
@@ -98,10 +98,10 @@ export default class Ignition extends UITemplate {
             }}],
             type: `Group`, 
             value: [
-                this.IgnitionEnableConfigOrVariableSelection.GetObjOperation(), 
-                this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation(), 
-                this.IgnitionDwellConfigOrVariableSelection.GetObjOperation(), 
-                this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation(), 
+                this.IgnitionEnableConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Enable`), 
+                this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Advance`), 
+                this.IgnitionDwellConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Dwell`), 
+                this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Dwell Deviation`), 
             ]
         };
 

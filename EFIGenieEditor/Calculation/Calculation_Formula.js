@@ -220,17 +220,17 @@ export default class Calculation_Formula extends UITemplate {
     GetObjOperation(result) {
         if(this.parameters.length === 0)
             return;
-        if(this.operations.length == 0) 
-            return this.parameterValues[this.parameters[0]].GetObjOperation();
+        result ??= this.referenceName;
+        const operations = this.operations;
+        if(operations.length == 0 || (operations.length == 1 && operations[0].operator == undefined)) 
+            return this.parameterValues[this.parameters[0]].GetObjOperation(result);
         var group  = { 
             type: `Group`, 
             value: []
         };
-        result ??= this.referenceName;
         
         const thisClass = this;
         this.parameters.forEach(function(parameter) { group.value.push(thisClass.parameterValues[parameter].GetObjOperation(parameter.indexOf(`temp`) === 0 ? parameter : `${thisClass.referenceName}_${parameter}`)); })
-        const operations = this.operations;
         for(let operationIndex in operations) {
             let operation = operations[operationIndex];
             if(operation.resultInto === `return`)

@@ -84,8 +84,8 @@ export default class Engine extends UITemplate {
         }
 
         var group = { type: `Group`, value: [
-            this.CrankPositionConfigOrVariableSelection.GetObjOperation(),
-            this.CamPositionConfigOrVariableSelection.GetObjOperation(),
+            this.CrankPositionConfigOrVariableSelection.GetObjOperation(`EngineParameters.Crank Position`),
+            this.CamPositionConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cam Position`),
 
             //CalculateEnginePosition
             { 
@@ -116,18 +116,18 @@ export default class Engine extends UITemplate {
         ]};
         
         if(mapRequired) {
-            group.value.push(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation());
+            group.value.push(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation(`EngineParameters.Manifold Absolute Pressure`));
         }
 
         if(catRequired) {
-            group.value.push(this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation());
+            group.value.push(this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cylinder Air Temperature`));
         }
         
         if(veRequired) {
-            group.value.push(this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation());
+            group.value.push(this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation(`EngineParameters.Volumetric Efficiency`));
         }
         
-        group.value.push(this.CylinderAirmassConfigOrVariableSelection.GetObjOperation());
+        group.value.push(this.CylinderAirmassConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cylinder Air Mass`));
 
         return group;
     }

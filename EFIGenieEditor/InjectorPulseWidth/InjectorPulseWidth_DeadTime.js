@@ -8,6 +8,15 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
                         `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 
+    get value() {
+        let value = super.value
+        value.type = `InjectorPulseWidth_DeadTime`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop) {
         super();
         this.FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({
@@ -38,7 +47,7 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
 
     // GetObjOperation(result) {
     //     let obj = this.value
-    //     obj.type = `InjectorPulseWidth_DeadTime`
+    //     obj.type = 
     //     obj.result = result
 
     //     return obj
@@ -46,11 +55,11 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
 
     GetObjOperation(result) {
         let group = { type: `Group`, value: [
-            this.FlowRateConfigOrVariableSelection.GetObjOperation(),
-            this.DeadTimeConfigOrVariableSelection.GetObjOperation(),
+            this.FlowRateConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Dead Time`),
+            this.DeadTimeConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Flow Rate`),
             
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_StaticVariable`, value: 2, result: `temp` },//static value of 2
+            { type: `Calculation_Static`, value: 2, result: `temp` },//static value of 2
             
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 

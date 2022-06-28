@@ -16,6 +16,15 @@ export default class Output_Digital extends UITemplate {
         super.saveValue = saveValue;
     }
 
+    get value() {
+        let value = super.value
+        value.type = `Output_Digital`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super();
         this.pin = new UIPinSelection({
@@ -28,10 +37,9 @@ export default class Output_Digital extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(inputVariableId) {
+    GetObjOperation(input) {
         let obj = this.value
-        obj.type = `Output_Digital`
-        obj.inputVariables = [ inputVariableId ]
+        obj.inputVariables = [ input ]
 
         return obj
     }

@@ -9,6 +9,15 @@ export default class Input_PulseWidth extends UITemplate {
     static template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 
+    get value() {
+        let value = super.value
+        value.type = `Input_PulseWidth`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

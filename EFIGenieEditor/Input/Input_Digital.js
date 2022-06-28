@@ -8,6 +8,15 @@ export default class Input_Digital extends UITemplate {
     static measurementName = `Bool`;
     static template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
+    get value() {
+        let value = super.value
+        value.type = `Input_Digital`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super();
         this.pin = new UIPinSelection({
@@ -21,7 +30,6 @@ export default class Input_Digital extends UITemplate {
 
     GetObjOperation(result) {
         let obj = this.value
-        obj.type = `Input_Digital`
         obj.result = result
 
         return obj

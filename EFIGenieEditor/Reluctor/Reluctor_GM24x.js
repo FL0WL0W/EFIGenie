@@ -2,23 +2,25 @@ import Reluctor_Template from "./Reluctor_Template.js";
 export default class Reluctor_GM24x extends Reluctor_Template {
     static displayName = `Reluctor GM 24X`;
 
+    get value() {
+        let value = super.value
+        value.type = `Reluctor_GM24x`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop) {
         super(prop);
         this.length.value = 100;
     }
 
     GetObjOperation(result) {
-        var obj = { value: [
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
-        ]};
-        obj =  Packagize(obj, { 
-            outputVariables: [ `${result}(Reluctor)` ], 
-            inputVariables: [ 
-                `${result}(Record)`,
-                `CurrentTickId`
-            ]
-        });
-        return super.GetObjOperation(result, { obj });
+        let obj = this.value
+        obj.result = result
+
+        return obj
     }
 }
 ReluctorConfigs.push(Reluctor_GM24x);

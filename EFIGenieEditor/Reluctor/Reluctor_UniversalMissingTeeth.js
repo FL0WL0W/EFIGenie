@@ -9,6 +9,15 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
                         `<br/><label>Number of Teeth:</label><div data-element="numberOfTeeth"></div>` +
                         `<br/><label>Number of Teeth Missing:</label><div data-element="numberOfTeethMissing"></div>`;
 
+    get value() {
+        let value = super.value
+        value.type = `Reluctor_UniversalMissingTeeth`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super()
         this.firstToothPosition = new UINumberWithMeasurement({
@@ -42,22 +51,10 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
     }
 
     GetObjOperation(result) {
-        var obj = { value: [ 
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
-            { type: `FLOAT`, value: this.value.firstToothPosition}, //FirstToothPosition
-            { type: `FLOAT`, value: this.value.toothWidth}, //ToothWidth
-            { type: `UINT8`, value: this.value.numberOfTeeth}, //NumberOfTeeth
-            { type: `UINT8`, value: this.value.numberOfTeethMissing} //NumberOfTeethMissing
-        ]};
-            
-        obj =  Packagize(obj, { 
-            outputVariables: [ `${result}(Reluctor)` ], 
-            inputVariables: [ 
-                `${result}(Record)`,
-                `CurrentTickId`
-            ]
-        });
-        return super.GetObjOperation(result, { obj });
+        let obj = this.value
+        obj.result = result
+
+        return obj
     }
 }
 ReluctorConfigs.push(Reluctor_UniversalMissingTeeth);

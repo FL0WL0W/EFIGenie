@@ -7,6 +7,15 @@ export default class CylinderAirmass_SpeedDensity extends UITemplate {
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`]
     static template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`
 
+    get value() {
+        let value = super.value;
+        value.type = `CylinderAirmass_SpeedDensity`;
+        return value;
+    }
+    set value(value) {
+        super.value = value;
+    }
+
     constructor(prop) {
         super();
         this.CylinderVolume = new UINumberWithMeasurement({
@@ -22,7 +31,6 @@ export default class CylinderAirmass_SpeedDensity extends UITemplate {
 
     GetObjOperation(result) {
         let obj = this.value
-        obj.type = `CylinderAirmass_SpeedDensity`
         obj.result = result
 
         return obj

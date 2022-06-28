@@ -71,58 +71,7 @@ ArrayBuffer.prototype.align = function(align, padByte) {
 }
 
 ArrayBuffer.prototype.build = function(obj) {
-    var buffer = this;
-    for(var index in obj.value){
-        var typeInfo = obj.types.find(x => x.type === obj.value[index].type);
-
-        //align
-        var align = obj.value[index].align;
-        if(align === undefined && typeInfo !== undefined){
-            align = typeInfo.align;
-        }
-        if(align) {
-            buffer = buffer.align(align);
-        }
-
-        var toArrayBuffer = obj.value[index].toArrayBuffer;
-        if(toArrayBuffer === undefined && typeInfo !== undefined){
-            toArrayBuffer = typeInfo.toArrayBuffer;
-        }
-        if(toArrayBuffer !== undefined){
-            buffer = buffer.concatArray(toArrayBuffer.call(obj.value[index]));
-        } else {
-            var objobj = obj.value[index].obj;
-            if(objobj === undefined && typeInfo !== undefined){
-                objobj = typeInfo.obj;
-            }
-            if(objobj === undefined){
-                var toObj
-                var toObj = obj.value[index].toObj;
-                if(toObj === undefined && typeInfo !== undefined){
-                    toObj = typeInfo.toObj;
-                }
-                if(toObj) {
-                    objobj = toObj.call(obj.value[index]);
-                }
-            }
-            if(obj.value[index].type === undefined && Array.isArray(obj.value[index].value)) {
-                objobj = obj.value[index];
-            }
-            if(objobj !== undefined){
-                if(objobj.types === undefined) {
-                    objobj.types = [];
-                }
-                for(var typeIndex in obj.types){
-                    var typetypeInfo = objobj.types.find(x => x.type === obj.types[typeIndex].type);
-                    if(typetypeInfo === undefined){
-                        objobj.types.push(obj.types[typeIndex]);
-                    }
-                }
-                buffer = buffer.build(objobj);
-            }
-        }
-    }
-    return buffer;
+    return obj.types.find(x => x.type === obj.type).toArrayBuffer.call(obj);
 }
 
 ArrayBuffer.prototype.equals = function(buf)

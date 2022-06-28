@@ -8,12 +8,5 @@ export default class Reluctor_Template extends Input_DigitalRecord {
     RegisterVariables(referenceName) {
         VariableRegister.RegisterVariable(`${referenceName}(Record)`, "Record")
     }
-
-    GetObjOperation(result, objOperation) {
-        return { type: `Group`, value: [
-            super.GetObjOperation(`${result}(Record)`),
-            objOperation
-        ]};
-    }
 }
 customElements.define(`reluctor-template`, Reluctor_Template, { extends: `span` });

@@ -20,6 +20,15 @@ export default class Input_DigitalRecord extends UITemplate {
         super.saveValue = saveValue;
     }
 
+    get value() {
+        let value = super.value
+        value.type = `Input_DigitalRecord`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super();
         this.pin = new UIPinSelection({
@@ -39,7 +48,6 @@ export default class Input_DigitalRecord extends UITemplate {
 
     GetObjOperation(result) {
         let obj = this.value
-        obj.type = `Input_DigitalRecord`
         obj.result = result
 
         return obj

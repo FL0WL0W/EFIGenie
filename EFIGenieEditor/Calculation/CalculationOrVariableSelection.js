@@ -218,7 +218,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if (selection && referenceName) {
             this.liveUpdate.VariableReference = undefined;
             const thisReference = `${referenceName}${this.measurementName? `(${this.measurementName})` : ``}`;
-            let variable;
             if (!selection.reference) {
                 const subConfig = this.GetSubConfig();
                 if(subConfig !== undefined) {
@@ -226,14 +225,13 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     if (type) {
                         VariableRegister.RegisterVariable(thisReference, type);
                     }
-                    variable = VariableRegister.GetVariableByReference(thisReference)
                     subConfig.RegisterVariables?.(referenceName);
                 }
             } else {
                 const variableReference = `${selection.reference}${this.measurementName? `(${this.measurementName})` : ``}`;
                 VariableRegister.RegisterVariable(thisReference, undefined, variableReference);
-                variable = VariableRegister.GetVariableByReference(variableReference)
             }
+            let variable = VariableRegister.GetVariableByReference(thisReference)
             if(variable?.Type === `float` || variable?.Type === `bool`){
                 this.liveUpdate.VariableReference = thisReference;
                 this.liveUpdate.measurementName = this.measurementName;
@@ -243,11 +241,16 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     GetObjOperation(...args) {       
-        if(!this.selection.value?.reference) {
-            const subConfig = this.GetSubConfig();
-            if(!subConfig)
-                return;
-            return subConfig.GetObjOperation(...args);
+        if(this.selection.value) {
+            if(!this.selection.value.reference) {
+                const subConfig = this.GetSubConfig();
+                if(!subConfig)
+                    return;
+                return subConfig.GetObjOperation(...args);
+            } else if(args.length > 0 && args[0] !== undefined) {
+                const variableReference = `${this.selection.value.reference}${this.measurementName? `(${this.measurementName})` : ``}`;
+                VariableRegister.RegisterVariable(args[0], undefined, variableReference);
+            }
         }
     }
 

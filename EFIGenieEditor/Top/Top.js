@@ -159,7 +159,7 @@ export default class Top extends UITemplate {
     GetArrayBuffer() {
         this.RegisterVariables();
         let buf = new ArrayBuffer()
-        buf = buf.build({ types: types, value: [this.GetObjOperation()]});
+        buf = buf.build({ ...this.GetObjOperation(), types: types });
         buf = new Uint32Array([buf.byteLength]).buffer.concatArray(buf);
         buf = buf.concatArray(new Uint32Array([buf.crc32()]).buffer);
 
@@ -171,7 +171,7 @@ export default class Top extends UITemplate {
     }
 
     GetObjOperation() {
-        return { value: [
+        return { type: `definition`, value: [
             { type: `UINT32`, value: 0}, //signal last operation
 
             //inputs
@@ -185,7 +185,7 @@ export default class Top extends UITemplate {
 
             //sync condition
             { type: `Group`, value: [ 
-                { type: `Calculation_StaticVariable`, value: false, result: `temp` }, //store static variable result in temp variable
+                { type: `Calculation_Static`, value: false, result: `temp` }, //store static variable result in temp variable
                 { type: `Calculation_Or`, result: 0, a: `EngineSyncedId`, b: `temp` },
             ]},
 

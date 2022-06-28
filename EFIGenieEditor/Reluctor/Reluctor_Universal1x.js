@@ -5,6 +5,16 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
     static template =   Reluctor_Template.template +
                         `<br/><label>Rising Edge Position:</label><div data-element="risingPosition"></div>` +
                         `<br/><label>Falling Edge Position:</label><div data-element="fallingPosition"></div>`;
+
+    get value() {
+        let value = super.value
+        value.type = `Reluctor_Universal1x`
+        return value
+    }
+    set value(value) {
+        super.value = value
+    }
+
     constructor(prop){
         super();
         prop.risingPosition = new UINumberWithMeasurement({
@@ -26,19 +36,10 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
     }
 
     GetObjOperation(result) {
-        var obj = { value: [ 
-            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-            { type: `FLOAT`, value: this.value.risingPosition}, //RisingPosition
-            { type: `FLOAT`, value: this.value.fallingPosition} //FallingPosition
-        ]};
-        obj =  Packagize(obj, { 
-            outputVariables: [ `${result}(Reluctor)` ], 
-            inputVariables: [ 
-                `${result}(Record)`,
-                `CurrentTickId`
-            ]
-        });
-        return super.GetObjOperation(result, { obj });
+        let obj = this.value
+        obj.result = result
+
+        return obj
     }
 }
 ReluctorConfigs.push(Reluctor_Universal1x);

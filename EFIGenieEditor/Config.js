@@ -374,19 +374,19 @@ x86TypeAlignment = [
     { type: `DOUBLE`, align: 8 },
 ]
 
-function Packagize(obj, val) {
+function Packagize(definition, val) {
     if(val.result !== undefined){
         val.outputVariables = [val.result]
         delete val.result
     }
     if( (val.outputVariables && val.outputVariables.some(x => x !== undefined)) || 
         (val.intputVariables && val.intputVariables.some(x => x !== undefined))) {
-        obj.type = `Package`
-        obj.outputVariables = val.outputVariables
-        obj.inputVariables = val.inputVariables
-        return { value: [ obj ] }
+        definition.type = `Package`
+        definition.outputVariables = val.outputVariables
+        definition.inputVariables = val.inputVariables
+        return { type: `definition`, value: [ definition ] }
     }
-    return obj
+    return definition
 }
 
 function Calculation_Math(mathFactoryId) {
@@ -410,10 +410,68 @@ function Calculation_Math(mathFactoryId) {
         this.outputVariables ??= [0]
     }
 
-    return Packagize({ value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + mathFactoryId } ]}, this)
+    return Packagize({ type: `definition`, value: [ { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + mathFactoryId } ]}, this)
+}
+
+function ReluctorTemplate(val, recordResult, definition) {
+    let o = { type: `Group`, value: [
+        { ...val, type: `Input_DigitalRecord`, result: recordResult },
+        definition
+    ]}
+    return o;
+}
+
+function mapDefinitionFromValue(value) {
+    const typeInfo = this.types?.find(t => t.type == value.type);
+    let definition = value.definition ?? typeInfo?.definition
+    if(definition) return definition
+
+    let subToDefinition = value.toDefinition ?? typeInfo?.toDefinition;
+
+    if(subToDefinition) {
+        value.types ??= [];
+        for(let typeIndex in this.types){
+            if(value.types.find(x => x.type === this.types[typeIndex].type) === undefined){
+                value.types.push(this.types[typeIndex])
+            }
+        }    
+
+        return subToDefinition.call(value).value.flatMap(v => mapDefinitionFromValue.call(value, v));
+    }
+    return value;
+}
+function toDefinition() {
+    let definitions = this.value.flatMap(v => mapDefinitionFromValue.call(this, v));
+    return { type: `definition`, value: definitions, types: this.types }
+}
+function toArrayBuffer() {
+    let definition = toDefinition.call(this)
+    var buffer = new ArrayBuffer();
+    for(var index in definition.value){
+        var typeInfo = definition.types.find(x => x.type === definition.value[index].type);
+
+        //align
+        var align = definition.value[index].align;
+        if(align === undefined && typeInfo !== undefined){
+            align = typeInfo.align;
+        }
+        if(align) {
+            buffer = buffer.align(align);
+        }
+
+        var toArrayBuffer = definition.value[index].toArrayBuffer;
+        if(toArrayBuffer === undefined && typeInfo !== undefined && definition.value[index].type !== `definition`){
+            toArrayBuffer = typeInfo.toArrayBuffer;
+        }
+        if(toArrayBuffer !== undefined){
+            buffer = buffer.concatArray(toArrayBuffer.call(definition.value[index]));
+        }
+    }
+    return buffer;
 }
 
 types = [
+    { type: `definition`, toDefinition, toArrayBuffer},
     { type: `INT8`, toArrayBuffer() { return new Int8Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `INT16`, toArrayBuffer() { return new Int16Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `INT32`, toArrayBuffer() { return new Int32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
@@ -426,8 +484,8 @@ types = [
     { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `CompressedObject`, toArrayBuffer() { return base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.value))) }},
-    { type: `VariableId`, toObj() { return { value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]} }},
-    { type: `Package`, toObj() {
+    { type: `VariableId`, toDefinition() { return { type: `definition`, value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.value) }]} }},
+    { type: `Package`, toDefinition() {
         this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }) //Package
         
         const thisValue = this
@@ -443,47 +501,67 @@ types = [
 
         delete this.inputVariables
 
+        this.type = `definition`
+
         return this
     }},
-    { type: `Group`, toObj() {
+    { type: `Group`, toDefinition() {
         let newValue = []
         const thisGroup = this
-        
-        this.value.forEach(function(value) {
+
+        const removedTypes = [...this.types.filter(t => t.type === `Group` || t.type === `Package`)]
+        this.types = this.types.filter(t => !(t.type === `Group` || t.type === `Package`))
+        function reduce(value) {
             if(isEmptyObject(value))
                 return
-            else if(value?.type === `Group`) {
-                if(value.types && thisGroup.types === undefined) {
-                    thisGroup.types = []
-                }
-                for(var typeIndex in value.types){
-                    var typetypeInfo = thisGroup.types.find(x => x.type === value.types[typeIndex].type)
-                    if(typetypeInfo === undefined){
-                        thisGroup.types.push(value.types[typeIndex])
+                
+            let definition = mapDefinitionFromValue.call(thisGroup, value)
+            if(!Array.isArray(definition))
+                definition = [definition];
+            for(index in definition)
+            {
+                //consolidate group
+                if(definition[index].type === `Group`) {
+                    for(var typeIndex in definition[index].types){
+                        var typetypeInfo = thisGroup.types.find(x => x.type === definition[index].types[typeIndex].type)
+                        if(typetypeInfo === undefined){
+                            thisGroup.types.push(definition[index].types[typeIndex])
+                        }
+                    }
+                    definition[index].value.forEach(reduce)
+                //if type is package add to newValue
+                } else if(definition[index].type === `Package`) {
+                    newValue.push(definition[index])
+                //if type is not package than create a definition for it
+                } else {
+                    if(newValue[newValue.length - 1].type !== `definition`) {
+                        newValue.push({ type: `definition`, value: [definition[index]] })
+                    } else {
+                        newValue[newValue.length - 1].value.push(definition[index])
                     }
                 }
-                newValue = newValue.concat(value.value.filter(x=>!isEmptyObject(x)))
             }
-            else
-                newValue.push(value)
-        })
+        }
+        this.value.forEach(reduce);
+        this.types = [...this.types, ...removedTypes]
 
         newValue.unshift({ type: `UINT16`, value: newValue.length })
         newValue.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Group }) //Group
         this.value = newValue
+        this.type = `definition`
 
         return Packagize(this, this)
     }},
-    { type: `Calculation_StaticVariable`, toObj() {
+    { type: `Calculation_Static`, toDefinition() {
         var type = GetType(this.value)
         var typeID = GetTypeId(type)
-        return Packagize({ value: [ 
+        return Packagize({ type: `definition`, value: [ 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static},
             { type: `UINT8`, value: typeID }, //typeid
             { type: type, value: this.value } //val
         ]}, this)
     }},
-    { type: `Calculation_2AxisTable`, toObj() {
+    { type: `Calculation_2AxisTable`, toDefinition() {
         this.inputVariables ??= [ undefined, undefined ]
         if(this.XSelection?.reference)
             this.inputVariables[0] = this.XSelection.reference
@@ -492,7 +570,7 @@ types = [
 
         const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
-        return Packagize({ value: [
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
             { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
             { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
@@ -504,13 +582,13 @@ types = [
             { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
-    { type: `Calculation_LookupTable`, toObj() {
+    { type: `Calculation_LookupTable`, toDefinition() {
         if(this.parameterSelection?.reference)
             this.inputVariables = [this.parameterSelection.reference]
 
         const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
-        return Packagize({ value: [
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
             { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
             { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
@@ -519,8 +597,8 @@ types = [
             { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
-    { type: `Calculation_Polynomial`, toObj() {
-        return Packagize({ value: [
+    { type: `Calculation_Polynomial`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Polynomial}, //factory ID
             { type: `FLOAT`, value: this.minValue}, //MinValue
             { type: `FLOAT`, value: this.maxValue}, //MaxValue
@@ -528,45 +606,45 @@ types = [
             { type: `FLOAT`, value: this.coeffecients}, //coefficients
         ]}, this)
     }},
-    { type: `CalculationOrVariableSelection`, toObj() {
+    { type: `CalculationOrVariableSelection`, toDefinition() {
         if(!this.selection)
-            return { value: [] }
+            return
         if(this.selection.reference){
             VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection.reference)
-            return { value: [] }
+            return
         }
 
         this.calculation.type = this.selection.value
         return Packagize(this.calculation, this)
     }},
-    { type: `Calculation_Add`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
-    { type: `Calculation_Subtract`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},
-    { type: `Calculation_Multiply`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Multiply) }},
-    { type: `Calculation_Divide`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Divide) }},
-    { type: `Calculation_And`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.And) }},
-    { type: `Calculation_Or`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Or) }},
-    { type: `Calculation_GreaterThan`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThan) }},
-    { type: `Calculation_LessThan`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThan) }},
-    { type: `Calculation_Equal`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
-    { type: `Calculation_GreaterThanOrEqual`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
-    { type: `Calculation_LessThanOrEqual`, toObj() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
-    { type: `CylinderAirmass_SpeedDensity`, toObj() {
+    { type: `Calculation_Add`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
+    { type: `Calculation_Subtract`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},
+    { type: `Calculation_Multiply`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Multiply) }},
+    { type: `Calculation_Divide`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Divide) }},
+    { type: `Calculation_And`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.And) }},
+    { type: `Calculation_Or`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Or) }},
+    { type: `Calculation_GreaterThan`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThan) }},
+    { type: `Calculation_LessThan`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThan) }},
+    { type: `Calculation_Equal`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
+    { type: `Calculation_GreaterThanOrEqual`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
+    { type: `Calculation_LessThanOrEqual`, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
+    { type: `CylinderAirmass_SpeedDensity`, toDefinition() {
         this.inputVariables = [ 
             `EngineParameters.Cylinder Air Temperature`,
             `EngineParameters.Manifold Absolute Pressure`,
             `EngineParameters.Volumetric Efficiency`
         ]
-        return Packagize({ value: [ 
+        return Packagize({ type: `definition`, value: [ 
             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
             { type: `FLOAT`, value: this.CylinderVolume }, //Cylinder Volume
         ]}, this)
     }},
-    { type: `InjectorPulseWidth_DeadTime`, toObj() {
+    { type: `InjectorPulseWidth_DeadTime`, toDefinition() {
         return { type: `Group`, value: [
             this.FlowRateConfigOrVariableSelection,
             this.DeadTimeConfigOrVariableSelection,
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_StaticVariable`, value: 2, result: `temp` },//static value of 2
+            { type: `Calculation_Static`, value: 2, result: `temp` },//static value of 2
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 
                 type: `Calculation_Subtract`,
@@ -580,7 +658,7 @@ types = [
                     { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
                     { type: `FLOAT`, value: this.MinInjectorFuelMass }
                 ],
-                outputVariables: [ this.result ?? this.outputVariables?.[0 ], //Return
+                outputVariables: [ this.result ?? this.outputVariables?.[0] ], //Return
                 inputVariables: [ 
                     `temp`,
                     `FuelParameters.Cylinder Fuel Mass`,
@@ -590,54 +668,111 @@ types = [
             }
         ]}
     }},
-    { type: `Input_Analog`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_Analog`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
         ]}, this)
     }},
-    { type: `Input_Digital`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_Digital`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `BOOL`, value: this.inverted}, //inverted
         ]}, this)
     }},
-    { type: `Input_DigitalRecord`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_DigitalRecord`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `BOOL`, value: this.inverted}, //inverted
             { type: `UINT16`, value: this.length}, //length
         ]}, this)
     }},
-    { type: `Input_DutyCycle`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_DutyCycle`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `UINT16`, value: this.minFrequency}, //minFrequency
         ]}, this)
     }},
-    { type: `Input_Frequency`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_Frequency`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `UINT16`, value: this.minFrequency}, //minFrequency
         ]}, this)
     }},
-    { type: `Input_PulseWidth`, toObj() {
-        return Packagize({ value: [
+    { type: `Input_PulseWidth`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `UINT16`, value: this.minFrequency}, //minFrequency
         ]}, this)
     }},
-    { type: `Output_Digital`, toObj() {
-        return Packagize({ value: [
+    { type: `Output_Digital`, toDefinition() {
+        return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalOutput }, //variable
             { type: `UINT16`, value: this.pin },
             { type: `UINT8`, value: this.inverted | (this.highZ? 0x02 : 0x00) }
         ]}, this)
+    }},
+    { type: `Reluctor_GM24x`, toDefinition() {
+        let result = this.result ?? this.outputVariables?.[0];
+        return ReluctorTemplate(
+            this,
+            `${result}(Record)`,
+            Packagize(
+                { type: `definition`, value: [
+                    { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.GM24X}, //factory ID
+                ]}, { 
+                    outputVariables: [ `${result}(Reluctor)` ], 
+                    inputVariables: [ 
+                        `${result}(Record)`,
+                        `CurrentTickId`
+                ]
+            })
+        )
+    }},
+    { type: `Reluctor_Universal1x`, toDefinition() {
+        let result = this.result ?? this.outputVariables?.[0];
+        return ReluctorTemplate(
+            this,
+            `${result}(Record)`,
+            Packagize(
+                { type: `definition`, value: [ 
+                    { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
+                    { type: `FLOAT`, value: this.risingPosition}, //RisingPosition
+                    { type: `FLOAT`, value: this.fallingPosition} //FallingPosition
+                ]}, { 
+                    outputVariables: [ `${result}(Reluctor)` ], 
+                    inputVariables: [ 
+                        `${result}(Record)`,
+                        `CurrentTickId`
+                ]
+            })
+        )
+    }},
+    { type: `Reluctor_UniversalMissingTeeth`, toDefinition() {
+        let result = this.result ?? this.outputVariables?.[0];
+        return ReluctorTemplate(
+            this,
+            `${result}(Record)`,
+            Packagize(
+                { type: `definition`, value: [ 
+                    { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.UniversalMissintTooth}, //factory ID
+                    { type: `FLOAT`, value: this.firstToothPosition}, //FirstToothPosition
+                    { type: `FLOAT`, value: this.toothWidth}, //ToothWidth
+                    { type: `UINT8`, value: this.numberOfTeeth}, //NumberOfTeeth
+                    { type: `UINT8`, value: this.numberOfTeethMissing} //NumberOfTeethMissing
+                ]}, { 
+                    outputVariables: [ `${result}(Reluctor)` ], 
+                    inputVariables: [ 
+                        `${result}(Record)`,
+                        `CurrentTickId`
+                ]
+            })
+        )
     }},
 ]
 

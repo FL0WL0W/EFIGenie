@@ -86,8 +86,8 @@ export default class Fuel extends UITemplate {
 
     GetObjOperation() {
         var group = { 
-            types : [{ type: `Calculation_EngineScheduleInjection`, toObj() {
-                return { value: [ {
+            types : [{ type: `Calculation_EngineScheduleInjection`, toDefinition() {
+                return { type: `definition`, value: [ {
                     type: `Package`,
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
@@ -108,7 +108,7 @@ export default class Fuel extends UITemplate {
             }}],
             type: `Group`, 
             value: [
-                this.AFRConfigOrVariableSelection.GetObjOperation(), 
+                this.AFRConfigOrVariableSelection.GetObjOperation(`FuelParameters.Air Fuel Ratio`), 
 
                 { 
                     type: `Calculation_Divide`,
@@ -117,9 +117,9 @@ export default class Fuel extends UITemplate {
                     b: `FuelParameters.Air Fuel Ratio`
                 },
 
-                this.InjectorEnableConfigOrVariableSelection.GetObjOperation(), 
-                this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation(), 
-                this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation()
+                this.InjectorEnableConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Enable`), 
+                this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Pulse Width`), 
+                this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector End Position`)
             ]
         };
 
