@@ -91,8 +91,8 @@ export default class Fuel extends UITemplate {
                     type: `Package`,
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                        { type: `FLOAT`, value: this.value.TDC.value }, //tdc
-                        this.value.GetObjOperation(),
+                        { type: `FLOAT`, value: this.value.TDC }, //tdc
+                        this.value,
                     ],
                     outputVariables: [ 
                         `temp`, //store in temp variable
@@ -124,7 +124,7 @@ export default class Fuel extends UITemplate {
         };
 
         for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs.children[i] });
+            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs.value[i] });
         }
 
         return group;

@@ -80,8 +80,8 @@ export default class Ignition extends UITemplate {
                     type: `Package`,
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
-                        { type: `FLOAT`, value: this.value.TDC.value }, //tdc
-                        this.value.GetObjOperation(),
+                        { type: `FLOAT`, value: this.value.TDC }, //tdc
+                        this.value,
                     ],
                     outputVariables: [ 
                         `temp`, //store in temp variable
@@ -99,14 +99,14 @@ export default class Ignition extends UITemplate {
             type: `Group`, 
             value: [
                 this.IgnitionEnableConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Enable`), 
-                this.IgnitionAdvanceConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Advance`), 
-                this.IgnitionDwellConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Dwell`), 
-                this.IgnitionDwellDeviationConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Dwell Deviation`), 
+                { ...this.IgnitionAdvanceConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Advance` },
+                { ...this.IgnitionDwellConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Dwell` },
+                { ...this.IgnitionDwellDeviationConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Dwell Deviation` }
             ]
         };
 
         for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs.children[i] });
+            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs.value[i] });
         }
 
         return group;
