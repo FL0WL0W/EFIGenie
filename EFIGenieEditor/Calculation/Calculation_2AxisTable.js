@@ -143,15 +143,15 @@ export default class Calculation_2AxisTable extends UITemplate {
     RegisterVariables() {
         this.xOptions = GetSelections();
         this.yOptions = GetSelections();
-        if(VariablesToPoll.indexOf(this.XSelection?.value?.reference) === -1)
-            VariablesToPoll.push(this.XSelection?.value?.reference);
-        if(VariablesToPoll.indexOf(this.YSelection?.value?.reference) === -1)
-            VariablesToPoll.push(this.YSelection?.value?.reference);
+        if(VariablesToPoll.indexOf(this.XSelection?.value) === -1)
+            VariablesToPoll.push(this.XSelection?.value);
+        if(VariablesToPoll.indexOf(this.YSelection?.value) === -1)
+            VariablesToPoll.push(this.YSelection?.value);
         const thisClass = this;
         LiveUpdateEvents[this.GUID] = function() {
-            if(thisClass.XSelection?.value?.reference && thisClass.YSelection?.value?.reference) { 
-                const xVariableId = VariableMetadata.GetVariableId(thisClass.XSelection?.value?.reference);
-                const yVariableId = VariableMetadata.GetVariableId(thisClass.YSelection?.value?.reference);
+            if(thisClass.XSelection?.value && thisClass.YSelection?.value) { 
+                const xVariableId = VariableMetadata.GetVariableId(thisClass.XSelection?.value);
+                const yVariableId = VariableMetadata.GetVariableId(thisClass.YSelection?.value);
                 if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
                     thisClass.table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
                 } 

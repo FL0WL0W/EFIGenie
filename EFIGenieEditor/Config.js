@@ -172,7 +172,7 @@ function GetSelections(calculations, filter) {
                 if(!filter || filter(calculations[i])) {
                     configOptions.options.push({
                         name: calculations[i].displayName,
-                        value: { value: calculations[i].name }
+                        value: calculations[i].name
                     })
                 }
             }
@@ -194,7 +194,7 @@ function GetSelections(calculations, filter) {
                 arrSelections.options.push({
                     name: arr[i].name,
                     info: `[${arr[i].measurementName}]`,
-                    value: { reference: `${property}.${arr[i].name}${arr[i].measurementName? `(${arr[i].measurementName})` : ``}` }
+                    value: `${property}.${arr[i].name}${arr[i].measurementName? `(${arr[i].measurementName})` : ``}`
                 })
             }
         }
@@ -595,10 +595,10 @@ types = [
     }},
     { type: `Calculation_2AxisTable`, inputs: 2, toDefinition() {
         this.inputVariables ??= [ undefined, undefined ]
-        if(this.XSelection?.reference)
-            this.inputVariables[0] = this.XSelection.reference
-        if(this.YSelection?.reference)
-            this.inputVariables[1] = this.YSelection.reference
+        if(this.XSelection)
+            this.inputVariables[0] = this.XSelection
+        if(this.YSelection)
+            this.inputVariables[1] = this.YSelection
 
         const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
@@ -615,8 +615,8 @@ types = [
         ]}, this)
     }},
     { type: `Calculation_LookupTable`, inputs: 1, toDefinition() {
-        if(this.parameterSelection?.reference)
-            this.inputVariables = [this.parameterSelection.reference]
+        if(this.parameterSelection)
+            this.inputVariables = [this.parameterSelection]
 
         const type = GetArrayType(this.table.value)
         const typeId = GetTypeId(type)
@@ -639,14 +639,8 @@ types = [
         ]}, this)
     }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
-        if(!this.selection)
-            return
-        if(this.selection.reference){
-            VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection.reference)
-            return
-        }
-
-        return { ...this, ...this.calculation }
+        if(this.calculation) return { ...this, ...this.calculation }
+        VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection)
     }},
     { type: `Calculation_Add`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
     { type: `Calculation_Subtract`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},

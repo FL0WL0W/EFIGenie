@@ -33,7 +33,6 @@ export default class Calculation_Formula extends UITemplate {
                     label: parameters[i],
                     calculations: this.calculations,
                     output: `bool|float`,
-                    referenceName: this.referenceName? `${this.referenceName}_${parameters[i]}` : undefined,
                     limitSelectionsOnMeasurement: false
                 });
             }
@@ -124,7 +123,6 @@ export default class Calculation_Formula extends UITemplate {
                 label: parameter,
                 calculations: this.calculations,
                 output: `bool|float`,
-                referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
                 limitSelectionsOnMeasurement: false
             });
 
@@ -154,7 +152,6 @@ export default class Calculation_Formula extends UITemplate {
                 label: parameter,
                 calculations: this.calculations,
                 output: `bool|float`,
-                referenceName: this.referenceName? `${this.referenceName}_${parameter}` : undefined,
                 limitSelectionsOnMeasurement: false
             });
 
