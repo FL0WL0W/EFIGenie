@@ -138,10 +138,12 @@ export default class Top extends UITemplate {
         }
     }
 
+    get value() { return { ...super.value, type: `Top` } }
+    set value(value) { super.value = value }
+
     get saveValue() {
         return super.saveValue;
     }
-
     set saveValue(saveValue) {
         super.saveValue = saveValue;
         this.RegisterVariables();
@@ -154,47 +156,6 @@ export default class Top extends UITemplate {
         this.Engine.RegisterVariables();
         this.Fuel.RegisterVariables();
         this.Ignition.RegisterVariables();
-    }
-
-    GetArrayBuffer() {
-        this.RegisterVariables();
-        let buf = new ArrayBuffer()
-        buf = buf.build({ ...this.GetObjOperation(), types: types });
-        buf = new Uint32Array([buf.byteLength]).buffer.concatArray(buf);
-        buf = buf.concatArray(new Uint32Array([buf.crc32()]).buffer);
-
-        let bufMeta = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
-        bufMeta = new Uint32Array([bufMeta.byteLength]).buffer.concatArray(bufMeta);
-        bufMeta = bufMeta.concatArray(new Uint32Array([bufMeta.crc32()]).buffer);
-
-        return buf.concatArray(bufMeta);
-    }
-
-    GetObjOperation() {
-        return { type: `definition`, value: [
-            { type: `UINT32`, value: 0}, //signal last operation
-
-            //inputs
-            { type: `Group`, value: [
-                this.Inputs.GetObjOperation(), 
-                this.Engine.GetObjOperation()
-            ]},
-
-            //preSync
-            { type: `Group`, value: [ ] },
-
-            //sync condition
-            { type: `Group`, value: [ 
-                { type: `Calculation_Static`, value: false, result: `temp` }, //store static variable result in temp variable
-                { type: `Calculation_Or`, result: 0, a: `EngineSyncedId`, b: `temp` },
-            ]},
-
-            //main loop execute
-            { type: `Group`, value: [ 
-                this.Fuel.GetObjOperation(), 
-                this.Ignition.GetObjOperation()
-            ]},
-        ]};
     }
 }
 customElements.define(`top-top`, Top, { extends: `span` });

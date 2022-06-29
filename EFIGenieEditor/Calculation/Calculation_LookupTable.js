@@ -111,14 +111,6 @@ export default class Calculation_LookupTable extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(result, inputVariableId) {
-        let obj = this.value;
-        obj.result = result;
-        obj.inputVariables = [ inputVariableId ];
-
-        return obj;
-    }
-
     RegisterVariables() {
         this.xOptions = GetSelections();
         if(VariablesToPoll.indexOf(this.parameterSelection?.value?.reference) === -1)

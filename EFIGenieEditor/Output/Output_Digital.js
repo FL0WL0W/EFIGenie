@@ -30,13 +30,6 @@ export default class Output_Digital extends UITemplate {
         this.style.display = `block`;
         this.Setup(prop);
     }
-
-    GetObjOperation(input) {
-        let obj = this.value
-        obj.inputVariables = [ input ]
-
-        return obj
-    }
 }
 BooleanOutputConfigs.push(Output_Digital);
 customElements.define(`output-digital`, Output_Digital, { extends: `span` });

@@ -43,8 +43,6 @@ export default class Engine extends UITemplate {
         this.Setup(prop);
     }
 
-    CrankPriority = 1;//static set this for now
-
     RegisterVariables() {
         this.CrankPositionConfigOrVariableSelection.RegisterVariables(`EngineParameters.Crank Position`);
         this.CamPositionConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cam Position`);
@@ -72,64 +70,7 @@ export default class Engine extends UITemplate {
         this.CylinderAirmassConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cylinder Air Mass`);
     }
 
-    GetObjOperation() {
-        var mapRequired = false;
-        var catRequired = false;
-        var veRequired  = false;
-        if(!this.CylinderAirmassConfigOrVariableSelection.IsVariable()) {
-            var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
-            mapRequired = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
-            catRequired = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1
-            veRequired  = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) > -1;
-        }
-
-        var group = { type: `Group`, value: [
-            this.CrankPositionConfigOrVariableSelection.GetObjOperation(`EngineParameters.Crank Position`),
-            this.CamPositionConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cam Position`),
-
-            //CalculateEnginePosition
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.Position + ( this.CrankPriority? 0 : 1) },  //factory id
-                ],
-                outputVariables: [ `EnginePositionId` ],
-                inputVariables: [
-                    `EngineParameters.Crank Position`,
-                    `EngineParameters.Cam Position`
-                ]
-            },
-
-            //EngineParameters
-            { 
-                type: `Package`,
-                value: [ 
-                    { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
-                ],
-                outputVariables: [ 
-                    `EngineParameters.Engine Speed`,
-                    `EngineSequentialId`,
-                    `EngineSyncedId`
-                ],
-                inputVariables: [ `EnginePositionId`  ]
-            }
-        ]};
-        
-        if(mapRequired) {
-            group.value.push(this.ManifoldAbsolutePressureConfigOrVariableSelection.GetObjOperation(`EngineParameters.Manifold Absolute Pressure`));
-        }
-
-        if(catRequired) {
-            group.value.push(this.CylinderAirTemperatureConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cylinder Air Temperature`));
-        }
-        
-        if(veRequired) {
-            group.value.push(this.VolumetricEfficiencyConfigOrVariableSelection.GetObjOperation(`EngineParameters.Volumetric Efficiency`));
-        }
-        
-        group.value.push(this.CylinderAirmassConfigOrVariableSelection.GetObjOperation(`EngineParameters.Cylinder Air Mass`));
-
-        return group;
-    }
+    get value() { return { ...super.value, type: `Engine`, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`) } }
+    set value(value) { super.value = value }
 }
 customElements.define(`top-engine`, Engine, { extends: `span` });

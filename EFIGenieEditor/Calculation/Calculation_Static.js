@@ -31,13 +31,6 @@ export default class Calculation_Static extends UITemplate {
     set saveValue(saveValue) {
         this.valueElement.saveValue = saveValue
     }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
-    }
 }
 customElements.define(`calculation-static`, Calculation_Static, { extends: `span` });
 GenericConfigs.push(Calculation_Static);

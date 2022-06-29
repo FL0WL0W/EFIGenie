@@ -231,8 +231,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     subConfig.RegisterVariables?.(referenceName);
                 }
             } else {
-                const variableReference = `${selection.reference}${this.measurementName? `(${this.measurementName})` : ``}`;
-                VariableRegister.RegisterVariable(thisReference, undefined, variableReference);
+                VariableRegister.RegisterVariable(thisReference, undefined, selection.reference);
             }
             let variable = VariableRegister.GetVariableByReference(thisReference)
             if(variable?.Type === `float` || variable?.Type === `bool`){
@@ -240,20 +239,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
                 this.liveUpdate.measurementName = this.measurementName;
             }
             this.liveUpdate.RegisterVariables(thisReference);
-        }
-    }
-
-    GetObjOperation(...args) {       
-        if(this.selection.value) {
-            if(!this.selection.value.reference) {
-                const subConfig = this.GetSubConfig();
-                if(!subConfig)
-                    return;
-                return subConfig.GetObjOperation(...args);
-            } else if(args.length > 0 && args[0] !== undefined) {
-                const variableReference = `${this.selection.value.reference}${this.measurementName? `(${this.measurementName})` : ``}`;
-                VariableRegister.RegisterVariable(args[0], undefined, variableReference);
-            }
         }
     }
 

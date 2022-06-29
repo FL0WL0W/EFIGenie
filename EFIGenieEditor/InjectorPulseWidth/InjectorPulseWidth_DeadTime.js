@@ -38,46 +38,6 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
         this.DeadTimeConfigOrVariableSelection.RegisterVariables(`FuelParameters.Injector Dead Time`);
         this.FlowRateConfigOrVariableSelection.RegisterVariables(`FuelParameters.Injector Flow Rate`);
     }
-
-    // GetObjOperation(result) {
-    //     let obj = this.value
-    //     obj.type = 
-    //     obj.result = result
-
-    //     return obj
-    // }
-
-    GetObjOperation(result) {
-        let group = { type: `Group`, value: [
-            this.FlowRateConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Dead Time`),
-            this.DeadTimeConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Flow Rate`),
-            
-            //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_Static`, value: 2, result: `temp` },//static value of 2
-            
-            //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { 
-                type: `Calculation_Subtract`,
-                result: `temp`, //Return
-                a: `temp`,
-                b: `EngineSequentialId`
-            },
-            Packagize({ type: `definition`, value: [ 
-                { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-                { type: `FLOAT`, value: this.MinInjectorFuelMass.value }
-            ]},{
-                outputVariables: [ result ],
-                inputVariables: [ 
-                    `temp`,
-                    `FuelParameters.Cylinder Fuel Mass`,
-                    `FuelParameters.Injector Flow Rate`,
-                    `FuelParameters.Injector Dead Time`
-                ]
-            })
-        ]};
-
-        return group;
-    }
 }
 InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime);
 customElements.define(`injectorpulsewidth-deadtime`, InjectorPulseWidth_DeadTime, { extends: `span` });

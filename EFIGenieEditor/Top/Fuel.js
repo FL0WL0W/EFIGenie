@@ -62,10 +62,12 @@ export default class Fuel extends UITemplate {
         this.Setup(prop);
     }
 
+    get value() { return { ...super.value, type: `Fuel` } }
+    set value(value) { super.value = value }
+
     get saveValue() {
         return super.saveValue;
     }
-
     set saveValue(saveValue) {
         if(saveValue?.ConfigInjectorOutputs)
             saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs;
@@ -82,52 +84,6 @@ export default class Fuel extends UITemplate {
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].RegisterVariables();
         };
-    }
-
-    GetObjOperation() {
-        var group = { 
-            types : [{ type: `Calculation_EngineScheduleInjection`, toDefinition() {
-                return { type: `definition`, value: [ {
-                    type: `Package`,
-                    value: [ 
-                        { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
-                        { type: `FLOAT`, value: this.value.TDC }, //tdc
-                        this.value,
-                    ],
-                    outputVariables: [ 
-                        `temp`, //store in temp variable
-                        `temp` //store in temp variable
-                    ],
-                    inputVariables: [
-                        `EnginePositionId`,
-                        `FuelParameters.Injector Enable`,
-                        `FuelParameters.Injector Pulse Width`,
-                        `FuelParameters.Injector End Position`
-                    ]
-                }]};
-            }}],
-            type: `Group`, 
-            value: [
-                this.AFRConfigOrVariableSelection.GetObjOperation(`FuelParameters.Air Fuel Ratio`), 
-
-                { 
-                    type: `Calculation_Divide`,
-                    result: `FuelParameters.Cylinder Fuel Mass`,
-                    a: `EngineParameters.Cylinder Air Mass`,
-                    b: `FuelParameters.Air Fuel Ratio`
-                },
-
-                this.InjectorEnableConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Enable`), 
-                this.InjectorPulseWidthConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector Pulse Width`), 
-                this.InjectorEndPositionConfigOrVariableSelection.GetObjOperation(`FuelParameters.Injector End Position`)
-            ]
-        };
-
-        for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs.value[i] });
-        }
-
-        return group;
     }
 }
 customElements.define(`top-fuel`, Fuel, { extends: `span` });

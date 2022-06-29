@@ -89,8 +89,6 @@ export default class Inputs extends UITemplate {
         }
     }
 
-    GetObjOperation() { return this.value }
-
     #updateInputControls() {
         for(let i = 0; i < this.inputs.children.length; i++) {
             let up = this.inputs.children[i].controlElement.children[0];
@@ -185,7 +183,6 @@ export default class Inputs extends UITemplate {
         });
 
         input.RegisterVariables = function() { this.input.RegisterVariables(); };
-        input.GetObjOperation = function() { return this.input.GetObjOperation(); };
         Object.defineProperty(input, 'saveValue', {
             get: function() { return this.input.saveValue; },
             set: function(saveValue) { this.input.saveValue = saveValue; }

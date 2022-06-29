@@ -140,14 +140,6 @@ export default class Calculation_2AxisTable extends UITemplate {
         this.Setup(prop);
     }
 
-    GetObjOperation(result, xVariableId, yVariableId) {
-        let obj = this.value;
-        obj.result = result;
-        obj.inputVariables = [ xVariableId, yVariableId ];
-
-        return obj;
-    }
-
     RegisterVariables() {
         this.xOptions = GetSelections();
         this.yOptions = GetSelections();

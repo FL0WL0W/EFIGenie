@@ -3,6 +3,9 @@ import Output_TDC from "../Output/Output_TDC.js"
 export default class Ignition extends UITemplate {
     static template = getFileContents(`ConfigGui/Ignition.html`);
 
+    get value() { return { ...super.value, type: `Ignition` } }
+    set value(value) { super.value = value }
+
     constructor(prop) {
         super();
         this.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
@@ -71,45 +74,6 @@ export default class Ignition extends UITemplate {
         for(var i = 0; i < this.Outputs.length; i++){
             this.Outputs[i].RegisterVariables();
         };
-    }
-
-    GetObjOperation() {
-        var group  = { 
-            types : [{ type: `Calculation_EngineScheduleIgnition`, toDefinition() {
-                return { type: `definition`, value: [ {
-                    type: `Package`,
-                    value: [ 
-                        { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
-                        { type: `FLOAT`, value: this.value.TDC }, //tdc
-                        this.value,
-                    ],
-                    outputVariables: [ 
-                        `temp`, //store in temp variable
-                        `temp` //store in temp variable
-                    ],
-                    inputVariables: [
-                        `EnginePositionId`,
-                        `IgnitionParameters.Ignition Enable`,
-                        `IgnitionParameters.Ignition Dwell`,
-                        `IgnitionParameters.Ignition Advance`,
-                        `IgnitionParameters.Ignition Dwell Deviation`
-                    ]
-                }]};
-            }}],
-            type: `Group`, 
-            value: [
-                this.IgnitionEnableConfigOrVariableSelection.GetObjOperation(`IgnitionParameters.Ignition Enable`), 
-                { ...this.IgnitionAdvanceConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Advance` },
-                { ...this.IgnitionDwellConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Dwell` },
-                { ...this.IgnitionDwellDeviationConfigOrVariableSelection.value, result: `IgnitionParameters.Ignition Dwell Deviation` }
-            ]
-        };
-
-        for(var i = 0; i < this.Outputs.children.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs.value[i] });
-        }
-
-        return group;
     }
 }
 customElements.define(`top-ignition`, Ignition, { extends: `span` });

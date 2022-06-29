@@ -160,10 +160,6 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         }
     }
 
-    GetObjOperation(result, inputVariableId) {
-        return { ...this.value, result, inputVariables: [ inputVariableId ] };
-    }
-
     #toDisplayValue(value, index) {
         //todo
         const unit = Measurements[this.measurementName]?.[this.measurementUnitName];

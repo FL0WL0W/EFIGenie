@@ -22,13 +22,6 @@ export default class CylinderAirmass_SpeedDensity extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
-
-    GetObjOperation(result) {
-        let obj = this.value
-        obj.result = result
-
-        return obj
-    }
 }
 CylinderAirmassConfigs.push(CylinderAirmass_SpeedDensity)
 customElements.define(`cylinderairmass-speeddensity`, CylinderAirmass_SpeedDensity, { extends: `span` })

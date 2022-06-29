@@ -117,11 +117,11 @@
                 });
                 let btnSaveBin = document.querySelector(`#btnSaveBin`);
                 btnSaveBin.addEventListener(`click`, function(){
-                    downloadBin(b.GetArrayBuffer(), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
+                    downloadBin(new ArrayBuffer().build({ ...b.value , types: types }), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
                 });
                 let btnBurnBin = document.querySelector(`#btnBurnBin`);
                 btnBurnBin.addEventListener(`click`, function(){
-                    burnBin(b.GetArrayBuffer());
+                    burnBin(new ArrayBuffer().build({ ...b.value , types: types }));
                 });
 
                 let selectTarget = document.querySelector(`#selectTarget`);
