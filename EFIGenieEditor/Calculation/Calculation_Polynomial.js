@@ -130,7 +130,6 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
 
     get value() {
         return { 
-            type: "Calculation_Polynomial",
             minValue: this.minValue,
             maxValue: this.maxValue,
             coeffecients: this.coeffecients

@@ -8,9 +8,6 @@ export default class Input_Digital extends UITemplate {
     static measurementName = `Bool`;
     static template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`;
 
-    get value() { return { ...super.value, type: "Input_Digital" } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

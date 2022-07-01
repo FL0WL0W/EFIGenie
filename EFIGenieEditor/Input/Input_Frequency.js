@@ -9,9 +9,6 @@ export default class Input_Frequency extends UITemplate {
     static template =   `<label>Pin:</label><div data-element="pin"></div>` +
                         `<br/><label>Minimum Frequency:</label><div data-element="minFrequency"></div>`
 
-    get value() { return { ...super.value, type: "Input_Frequency" } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

@@ -2,9 +2,6 @@ import Reluctor_Template from "./Reluctor_Template.js";
 export default class Reluctor_GM24x extends Reluctor_Template {
     static displayName = `Reluctor GM 24X`;
 
-    get value() { return { ...super.value, type: `Reluctor_GM24x` } }
-    set value(value) { super.value = value }
-
     constructor(prop) {
         super(prop);
         this.length.value = 100;

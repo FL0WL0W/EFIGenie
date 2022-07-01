@@ -100,7 +100,7 @@ export default class Calculation_2AxisTable extends UITemplate {
         }
     }
 
-    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined, type: `Calculation_2AxisTable` } }
+    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
     set value(value) { 
         value.table = value.graph = value.table.value
         super.value = value 

@@ -66,7 +66,7 @@ export default class Calculation_LookupTable extends UITemplate {
         }
     }
 
-    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined, type: `Calculation_LookupTable` } }
+    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
     set value(value) { 
         value.table = value.graph = value.table.value
         super.value = value 

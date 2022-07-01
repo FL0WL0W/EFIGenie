@@ -70,7 +70,7 @@ export default class Engine extends UITemplate {
         this.CylinderAirmassConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cylinder Air Mass`);
     }
 
-    get value() { return { ...super.value, type: `Engine`, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`) } }
+    get value() { return { ...super.value, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`) } }
     set value(value) { super.value = value }
 }
 customElements.define(`top-engine`, Engine, { extends: `span` });

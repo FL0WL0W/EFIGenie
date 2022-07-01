@@ -12,7 +12,7 @@ export default class Input_AnalogPolynomial extends UITemplate {
         polynomial: { 
             ...this.polynomial.value, 
             outputMeasurements: this.constructor.measurementName === undefined? undefined : [this.constructor.measurementName]
-        }, type: "Input_AnalogPolynomial" } }
+        } } }
     set value(value) { super.value = value }
 
     constructor(prop){

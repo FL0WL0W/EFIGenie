@@ -8,9 +8,6 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
                         `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`;
 
-    get value() { return { ...super.value, type: `InjectorPulseWidth_DeadTime` } }
-    set value(value) { super.value = value }
-
     constructor(prop) {
         super();
         this.FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({

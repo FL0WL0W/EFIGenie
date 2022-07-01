@@ -62,9 +62,6 @@ export default class Fuel extends UITemplate {
         this.Setup(prop);
     }
 
-    get value() { return { ...super.value, type: `Fuel` } }
-    set value(value) { super.value = value }
-
     get saveValue() {
         return super.saveValue;
     }

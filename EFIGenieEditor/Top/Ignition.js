@@ -3,9 +3,6 @@ import Output_TDC from "../Output/Output_TDC.js"
 export default class Ignition extends UITemplate {
     static template = getFileContents(`ConfigGui/Ignition.html`);
 
-    get value() { return { ...super.value, type: `Ignition` } }
-    set value(value) { super.value = value }
-
     constructor(prop) {
         super();
         this.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({

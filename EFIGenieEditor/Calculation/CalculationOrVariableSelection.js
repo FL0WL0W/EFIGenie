@@ -200,7 +200,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
         const subConfig = this.GetSubConfig();
         return {
             ...super.value,
-            type: `CalculationOrVariableSelection`,
             ...(subConfig !== undefined) && {calculation: { 
                 ...subConfig?.value, 
                 outputMeasurements: this.measurementName === undefined? undefined : [this.measurementName]

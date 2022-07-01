@@ -6,9 +6,6 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
                         `<br/><label>Rising Edge Position:</label><div data-element="risingPosition"></div>` +
                         `<br/><label>Falling Edge Position:</label><div data-element="fallingPosition"></div>`;
 
-    get value() { return { ...super.value, type: `Reluctor_Universal1x` } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         prop.risingPosition = new UINumberWithMeasurement({

@@ -101,7 +101,7 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     get value() {
-        let value = { ...super.value, type: `Calculation_Formula` }
+        let value = super.value
         
         value.parameterValues = {}
         let parameters = this.parameters

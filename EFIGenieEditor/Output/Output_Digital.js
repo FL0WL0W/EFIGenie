@@ -16,9 +16,6 @@ export default class Output_Digital extends UITemplate {
         super.saveValue = saveValue;
     }
 
-    get value() { return { ...super.value, type: `Output_Digital` } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

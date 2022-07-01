@@ -12,12 +12,7 @@ export default class Calculation_Static extends UITemplate {
         this.Setup(prop)
     }
 
-    get value() {
-        return {
-            type: `Calculation_Static`,
-            value: this.valueElement.value
-        }
-    }
+    get value() { return { value: this.valueElement.value } }
     set value(value) {
         if(typeof value === `object`)
             this.valueElement.value = value.value

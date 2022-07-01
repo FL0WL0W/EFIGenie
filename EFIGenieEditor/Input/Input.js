@@ -4,9 +4,6 @@ import UIText from "../JavascriptUI/UIText.js";
 export default class Input extends UITemplate {
     static template = `<div data-element="translationConfig"></div><div data-element="hr"></div><div data-element="rawConfig"></div>`
 
-    get value() { return { ...super.value, type: "Input" } }
-    set value(value) { super.value = value }
-
     hr = document.createElement(`hr`);
     constructor(prop) {
         super();;

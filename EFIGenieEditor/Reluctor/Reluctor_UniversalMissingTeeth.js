@@ -9,9 +9,6 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
                         `<br/><label>Number of Teeth:</label><div data-element="numberOfTeeth"></div>` +
                         `<br/><label>Number of Teeth Missing:</label><div data-element="numberOfTeethMissing"></div>`;
 
-    get value() { return { ...super.value, type: `Reluctor_UniversalMissingTeeth` } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super()
         this.firstToothPosition = new UINumberWithMeasurement({

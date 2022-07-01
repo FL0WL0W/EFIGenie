@@ -7,9 +7,6 @@ export default class Input_Analog extends UITemplate {
     static measurementName = `Voltage`;
     static template = `<label>Pin:</label><div data-element="pin"></div>`
 
-    get value() { return { ...super.value, type: "Input_Analog" } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

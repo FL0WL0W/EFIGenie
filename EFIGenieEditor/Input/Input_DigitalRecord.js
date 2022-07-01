@@ -10,9 +10,6 @@ export default class Input_DigitalRecord extends UITemplate {
     static template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted` +
                         `<br/><label>Length:</label><div data-element="length"></div>`
 
-    get value() { return { ...super.value, type: "Input_DigitalRecord" } }
-    set value(value) { super.value = value }
-
     constructor(prop){
         super();
         this.pin = new UIPinSelection({

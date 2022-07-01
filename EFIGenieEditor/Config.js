@@ -639,7 +639,7 @@ types = [
         ]}, this)
     }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
-        if(this.calculation) return { ...this, ...this.calculation }
+        if(this.calculation) return { ...this, ...this.calculation, type: this.selection }
         VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection)
     }},
     { type: `Calculation_Add`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
@@ -666,8 +666,8 @@ types = [
     }},
     { type: `InjectorPulseWidth_DeadTime`, outputMeasurements: [`Time`], toDefinition() {
         return { type: `Group`, value: [
-            { ...this.FlowRateConfigOrVariableSelection, result: `FuelParameters.Injector Flow Rate` },
-            { ...this.DeadTimeConfigOrVariableSelection, result: `FuelParameters.Injector Dead Time` },
+            { ...this.FlowRateConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Flow Rate` },
+            { ...this.DeadTimeConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Dead Time` },
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
             { type: `Calculation_Static`, value: 2, result: `temp` },//static value of 2
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
@@ -701,8 +701,8 @@ types = [
         let result = this.result ?? this.outputVariables?.[0]
         let resultWithoutMeasurement = result.substring(0, result.indexOf(`(`) > -1? result.indexOf(`(`) : result.length);
         return { type: `Group`, value: [
-            { ...this.analogInput, result: `${resultWithoutMeasurement}(Voltage)` },
-            { ...this.polynomial, result, inputVariables: [`${resultWithoutMeasurement}(Voltage)`] }
+            { ...this.analogInput, result: `${resultWithoutMeasurement}(Voltage)`, type: `Input_Analog` },
+            { ...this.polynomial, result, inputVariables: [`${resultWithoutMeasurement}(Voltage)`], type: `Calculation_Polynomial` }
         ]}
     }},
     { type: `Input_Digital`, outputMeasurements: [`Bool`], toDefinition() {
@@ -778,19 +778,31 @@ types = [
             ]}
         )
     }},
+    { type: `MAP_GM1Bar`, toDefinition() {
+        this.type = `Input_AnalogPolynomial`
+        return this
+    }},
+    { type: `MAP_GM2Bar`, toDefinition() {
+        this.type = `Input_AnalogPolynomial`
+        return this
+    }},
+    { type: `MAP_GM3Bar`, toDefinition() {
+        this.type = `Input_AnalogPolynomial`
+        return this
+    }},
     { type: `Input`, toDefinition() {
         if(this.translationConfig === undefined)
             return;
-        this.translationConfig = { ...this.translationConfig, ...this.types?.find(t => t.type == this.translationConfig.type), result: `Inputs.${this.name}` }
+        this.translationConfig = { ...this.translationConfig, type: `CalculationOrVariableSelection`, result: `Inputs.${this.name}` }
 
         if(this.translationConfig.inputs === undefined || this.translationConfig.inputs === 0)
             return this.translationConfig
 
-        this.rawConfig = { ...this.rawConfig, ...this.types?.find(t => t.type == this.rawConfig.type), result: `Inputs.${this.name}` }
+        this.rawConfig = { ...this.rawConfig, type: `CalculationOrVariableSelection`, result: `Inputs.${this.name}` }
         
         return { type: `Group`, value: [
-            this.rawConfig,
-            { ...this.translationConfig, inputVariables: [`Inputs.${this.name}(${this.rawConfig.outputMeasurements[0]})`] }
+            { ...this.rawConfig, type: `CalculationOrVariableSelection` },
+            { ...this.translationConfig, type: `CalculationOrVariableSelection`, inputVariables: [`Inputs.${this.name}(${this.rawConfig.outputMeasurements[0]})`] }
         ]};
     }},
     { type: `Inputs`, toDefinition() {
@@ -798,7 +810,7 @@ types = [
             { type: `Package`, //Package
                 value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
                 outputVariables: [`CurrentTickId`]
-            }, ...this.inputs
+            }, ...this.inputs.map(function(input) { return { ...input, type: `Input` }})
         ]};
     }},
     { type: `Calculation_Formula`, toDefinition() {
@@ -910,14 +922,14 @@ types = [
             return;
         const operations = ParseFormula(this.formula)
         if(operations.length == 0 || (operations.length == 1 && operations[0].operator == undefined)) 
-            return { ...this.parameterValues[parameters[0]], result }
+            return { ...this.parameterValues[parameters[0]], type: `CalculationOrVariableSelection`, result }
         var group  = { 
             type: `Group`, 
             value: []
         };
         
         const thisClass = this;
-        parameters.forEach(function(parameter) { group.value.push({ ...thisClass.parameterValues[parameter], result: parameter.indexOf(`temp`) === 0 ? parameter : `${result}_${parameter}` }); })
+        parameters.forEach(function(parameter) { group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, result: parameter.indexOf(`temp`) === 0 ? parameter : `${result}_${parameter}` }); })
         for(let operationIndex in operations) {
             let operation = operations[operationIndex];
             if(operation.resultInto === `return`)
@@ -981,7 +993,7 @@ types = [
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleInjection }, //factory id
                         { type: `FLOAT`, value: this.value.TDC }, //tdc
-                        this.value,
+                        { ...this.value, type: `CalculationOrVariableSelection` },
                     ],
                     outputVariables: [ 
                         `temp`, //store in temp variable
@@ -997,7 +1009,7 @@ types = [
             }}],
             type: `Group`, 
             value: [
-                { ...this.AFRConfigOrVariableSelection, result: `FuelParameters.Air Fuel Ratio` }, 
+                { ...this.AFRConfigOrVariableSelection, type: `Calculation_Formula`, result: `FuelParameters.Air Fuel Ratio` }, 
 
                 { 
                     type: `Calculation_Divide`,
@@ -1006,9 +1018,9 @@ types = [
                     b: `FuelParameters.Air Fuel Ratio`
                 },
 
-                { ...this.InjectorEnableConfigOrVariableSelection, result: `FuelParameters.Injector Enable` }, 
-                { ...this.InjectorPulseWidthConfigOrVariableSelection, result: `FuelParameters.Injector Pulse Width` }, 
-                { ...this.InjectorEndPositionConfigOrVariableSelection, result: `FuelParameters.Injector End Position` }
+                { ...this.InjectorEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Enable` }, 
+                { ...this.InjectorPulseWidthConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Pulse Width` }, 
+                { ...this.InjectorEndPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector End Position` }
             ]
         };
 
@@ -1026,7 +1038,7 @@ types = [
                     value: [ 
                         { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.ScheduleIgnition }, //factory id
                         { type: `FLOAT`, value: this.value.TDC }, //tdc
-                        this.value,
+                        { ...this.value, type: `CalculationOrVariableSelection` },
                     ],
                     outputVariables: [ 
                         `temp`, //store in temp variable
@@ -1043,10 +1055,10 @@ types = [
             }}],
             type: `Group`, 
             value: [
-                { ...this.IgnitionEnableConfigOrVariableSelection, result: `IgnitionParameters.Ignition Enable` }, 
-                { ...this.IgnitionAdvanceConfigOrVariableSelection, result: `IgnitionParameters.Ignition Advance` },
-                { ...this.IgnitionDwellConfigOrVariableSelection, result: `IgnitionParameters.Ignition Dwell` },
-                { ...this.IgnitionDwellDeviationConfigOrVariableSelection, result: `IgnitionParameters.Ignition Dwell Deviation` }
+                { ...this.IgnitionEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Enable` }, 
+                { ...this.IgnitionAdvanceConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Advance` },
+                { ...this.IgnitionDwellConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Dwell` },
+                { ...this.IgnitionDwellDeviationConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Dwell Deviation` }
             ]
         };
 
@@ -1056,14 +1068,17 @@ types = [
 
         return group;
     }},
+    { type: `WTF`, toDefinition() {
+        console.log(this)
+    }},
     { type: `Engine`, toDefinition() {
         let mapRequired = (this.requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
         let catRequired = (this.requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1
         let veRequired  = (this.requirements?.indexOf(`Volumetric Efficiency`) ?? -1) > -1;
 
         var group = { type: `Group`, value: [
-            { ...this.CrankPositionConfigOrVariableSelection, result: `EngineParameters.Crank Position` },
-            { ...this.CamPositionConfigOrVariableSelection, result: `EngineParameters.Cam Position` },
+            { ...this.CrankPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Crank Position` },
+            { ...this.CamPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cam Position` },
 
             //CalculateEnginePosition
             { 
@@ -1094,18 +1109,18 @@ types = [
         ]};
         
         if(mapRequired) {
-            group.value.push({ ...this.ManifoldAbsolutePressureConfigOrVariableSelection, result: `EngineParameters.Manifold Absolute Pressure` });
+            group.value.push({ ...this.ManifoldAbsolutePressureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Manifold Absolute Pressure` });
         }
 
         if(catRequired) {
-            group.value.push({ ...this.CylinderAirTemperatureConfigOrVariableSelection, result: `EngineParameters.Cylinder Air Temperature` });
+            group.value.push({ ...this.CylinderAirTemperatureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cylinder Air Temperature` });
         }
         
         if(veRequired) {
-            group.value.push({ ...this.VolumetricEfficiencyConfigOrVariableSelection, result: `EngineParameters.Volumetric Efficiency` });
+            group.value.push({ ...this.VolumetricEfficiencyConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Volumetric Efficiency` });
         }
         
-        group.value.push({ ...this.CylinderAirmassConfigOrVariableSelection, result: `EngineParameters.Cylinder Air Mass` });
+        group.value.push({ ...this.CylinderAirmassConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cylinder Air Mass` });
 
         return group;
     }},
@@ -1115,8 +1130,8 @@ types = [
 
             //inputs
             { type: `Group`, value: [
-                this.Inputs, 
-                this.Engine,
+                { ...this.Inputs, type: `Inputs` }, 
+                { ...this.Engine, type: `Engine` },
             ]},
 
             //preSync
@@ -1130,8 +1145,8 @@ types = [
 
             //main loop execute
             { type: `Group`, value: [ 
-                this.Fuel,
-                this.Ignition
+                { ...this.Fuel, type: `Fuel` },
+                { ...this.Ignition, type: `Ignition` }
             ]},
         ]};
     }, toArrayBuffer() {
