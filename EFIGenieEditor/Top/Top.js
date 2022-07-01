@@ -138,9 +138,6 @@ export default class Top extends UITemplate {
         }
     }
 
-    get value() { return { ...super.value, type: `Top` } }
-    set value(value) { super.value = value }
-
     get saveValue() {
         return super.saveValue;
     }
