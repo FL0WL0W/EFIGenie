@@ -3,6 +3,11 @@ import UINumber from "../JavascriptUI/UINumber.js";
 export default class Output_TDC extends CalculationOrVariableSelection {
     constructor(prop) {
         super();
+        this.limitSelectionsOnMeasurement = false;
+        this.output = ``
+        this.inputs = [`bool`]
+        this.calculationsOnly = true
+        this.calculations = BooleanOutputConfigs
         let span = document.createElement(`span`);
         this.TDC = new UINumber({
             value:  0,

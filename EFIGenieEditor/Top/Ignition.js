@@ -35,7 +35,6 @@ export default class Ignition extends UITemplate {
                 for(let i = 0; i < saveValue.length; i++){
                     if(!this.children[i]) {
                         this.append(new Output_TDC({
-                            calculations:        BooleanOutputConfigs,
                             label:          `Injector ${i+1}`
                         }));
                     }
@@ -50,7 +49,6 @@ export default class Ignition extends UITemplate {
                 for(let i = 0; i < value.length; i++){
                     if(!this.children[i]) {
                         this.append(new Output_TDC({
-                            calculations:            BooleanOutputConfigs,
                             label:              `Ignition ${i+1}`
                         }));
                     }

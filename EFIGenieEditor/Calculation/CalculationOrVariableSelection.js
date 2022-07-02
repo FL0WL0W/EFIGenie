@@ -113,7 +113,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
             selectDisabled: false,
             selectName: `None`
         });
-        this.options = GetSelections(prop.calculations, defaultFilter(prop.limitSelectionsOnMeasurement? prop._measurementName : undefined, prop.output, prop.inputs, prop.calculationsOnly));
         this.selection.addEventListener(`change`, function() {
             const subConfig = thisClass.GetSubConfig();
             thisClass.calculationContent.replaceChildren(subConfig ?? ``);
@@ -121,6 +120,11 @@ export default class CalculationOrVariableSelection extends UITemplate {
         });
         this.style.display = `block`;
         this.Setup(prop);
+    }
+
+    Setup(...args) {
+        super.Setup(...args)
+        this.options = GetSelections(this.calculations, defaultFilter(this.limitSelectionsOnMeasurement? this._measurementName : undefined, this.output, this.inputs, this.calculationsOnly));
     }
 
     static SaveOnlyActive = false;
