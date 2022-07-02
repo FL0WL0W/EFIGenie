@@ -103,6 +103,16 @@ export default class Top extends UITemplate {
             thisClass.activeTab = `Ignition`;
         });
         this.Setup(prop);
+        let touched = false;
+        this.querySelector(`.sidebarSelection`).addEventListener(`touchstart`, function() {
+            touched = true;
+        })
+        this.addEventListener(`click`, function() {
+            if(touched) {
+                touched = false
+                thisClass.sidebarClose.dispatchEvent(new Event(`click`));
+            }
+        })
     }
 
     get activeTab() {
