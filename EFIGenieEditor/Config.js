@@ -825,7 +825,7 @@ types = [
             if(parenthesisFormulas.length !== formula.split(`(`).length)
                 return `Parenthesis start and end not matching`
     
-            while((parenthesisFormulas = formula.split(`)`)).length > 1) {
+            while((parenthesisFormulas = formula.split(`)`).filter(p => operators.some(o => p.split(`(`).pop()?.indexOf(o) > -1))).length > 1) {
                 tempIndex++;
                 let tempFormula = parenthesisFormulas[0].split(`(`).pop();
                 operations.push({
@@ -917,7 +917,10 @@ types = [
             let operator = operators[operatorIndex]
             parameters = parameters.split(operator).join(`,`)
         }
-        parameters = parameters.split(`,`).filter(x => !x.match(/^[0-9]*$/))
+        parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
+        parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
+        parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
+        parameters = parameters.filter(s => s.length !== 0)
         if(parameters.length === 0)
             return;
         const operations = ParseFormula(this.formula)

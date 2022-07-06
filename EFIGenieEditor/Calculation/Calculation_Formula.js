@@ -30,7 +30,7 @@ export default class Calculation_Formula extends UITemplate {
             let parameterValue = this.parameterValues[parameters[i]];
             if(!parameterValue) {
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
-                    label: parameters[i],
+                    label: parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(0, parameters[i].indexOf(`(`)) : parameters[i],
                     calculations: this.calculations,
                     output: `bool|float`,
                     limitSelectionsOnMeasurement: false
@@ -49,16 +49,18 @@ export default class Calculation_Formula extends UITemplate {
                 label.append(document.createElement(`span`));
                 Object.defineProperty(configParameter, `name`, {
                     get: function() {
+                        return this._name;
                         return this.firstChild.firstChild.innerText;
                     },
                     set: function(name) {
-                        this.firstChild.firstChild.innerText = name;
+                        this._name = name;
+                        this.firstChild.firstChild.innerText = name.indexOf(`(`) !== -1 ? name.substring(0, name.indexOf(`(`)) : name;
                     }
                 });
                 label.append(`:`);
                 configParameter.append(document.createElement(`span`));
             }
-            configParameter.name = parameters[i];
+            configParameter.name = parameters[i]
             configParameter.lastChild.replaceChildren(parameterValue.liveUpdate, parameterValue.calculationContent);
             if(parameterValue.calculationContent.innerHTML === ``)
                 configParameter.hidden = true;
@@ -169,13 +171,16 @@ export default class Calculation_Formula extends UITemplate {
         this.parameterValueElements.hidden = true
         this.formula.addEventListener(`change`, function() {
             let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
-            let s = thisClass.formula.value.replaceAll(` `, ``)
+            let parameters = thisClass.formula.value.replaceAll(` `, ``)
             for(let operatorIndex in operators) {
                 let operator = operators[operatorIndex]
-                s = s.split(operator).join(`,`)
+                parameters = parameters.split(operator).join(`,`)
             }
-            s = s.split(`,`).filter(x => !x.match(/^[0-9]*$/))
-            thisClass.parameters = s
+            parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
+            parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
+            parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
+            parameters = parameters.filter(s => s.length !== 0)
+            thisClass.parameters = parameters
         })
         this.output = MeasurementType[prop.measurementName] ?? `float`
         this.Setup(prop)
