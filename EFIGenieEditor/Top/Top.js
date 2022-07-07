@@ -23,6 +23,7 @@ export default class Top extends UITemplate {
         super()
         const thisClass = this
         this.sidebarOpen.addEventListener(`click`, function() {
+            window.localStorage.setItem(`expanded`, true)
             var sidebarElement = thisClass.firstChild
             var containerElement = thisClass.lastChild
             sidebarElement.hidden = false
@@ -45,6 +46,7 @@ export default class Top extends UITemplate {
             thisClass.sidebarOpen.hidden = true
         })
         this.sidebarClose.addEventListener(`click`, function() {
+            window.localStorage.setItem(`expanded`, false)
             var sidebarElement = thisClass.firstChild
             var containerElement = thisClass.lastChild
             var width = sidebarElement.offsetWidth
@@ -77,10 +79,13 @@ export default class Top extends UITemplate {
         this.inputsTabExpend.className = `despand`
         this.inputsTabExpend.addEventListener(`click`, function(event) {
             thisClass.inputsTabList.hidden = !thisClass.inputsTabList.hidden
-            if(thisClass.inputsTabList.hidden)
+            if(thisClass.inputsTabList.hidden) {
+                window.localStorage.setItem(`inputExpanded`, false)
                 thisClass.inputsTabExpend.className = `expand`
-            else
+            } else {
+                window.localStorage.setItem(`inputExpanded`, true)
                 thisClass.inputsTabExpend.className = `despand`
+            }
             event.preventDefault()
             event.stopPropagation()
             return false
@@ -113,6 +118,14 @@ export default class Top extends UITemplate {
                 thisClass.sidebarClose.dispatchEvent(new Event(`click`))
             }
         })
+        window.setTimeout(function() {
+            if(window.localStorage.getItem(`inputExpanded`) ?? true === false) {
+                thisClass.inputsTabExpend.dispatchEvent(new Event(`click`))
+            }
+            if(window.localStorage.getItem(`expanded`) ?? false) {
+                thisClass.sidebarOpen.dispatchEvent(new Event(`click`))
+            }
+        }, 50)
     }
 
     get activeTab() { return this.title.textContent }
