@@ -138,7 +138,7 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
 
         //calculation Filter
         for(let i = 0; i < (outputUnits?.length ?? outputTypes?.length); i++){
-            if(outputUnits?.[i] !== undefined) {
+            if(outputUnits?.[i] !== undefined && outputUnits[i] !== ``) {
                 if((calcOrVar.outputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && outputUnits[i] !== calcOrVar.outputUnits?.[i]) return false
             } else if(outputTypes?.[i] !== undefined){
                 if(calcOrVar.outputUnits?.[i] === undefined && calcOrVar.outputTypes?.[i] === undefined) false

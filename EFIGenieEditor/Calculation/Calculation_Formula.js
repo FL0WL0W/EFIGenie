@@ -29,8 +29,8 @@ export default class Calculation_Formula extends UITemplate {
             let parameterValue = this.parameterValues[parameters[i]]
             if(!parameterValue) {
                 const label = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(0, parameters[i].indexOf(`(`)) : parameters[i];
-                let unit = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(parameters[i].indexOf(`(`) + 1) : undefined;
-                unit = unit?.substring(0, unit.length -1)
+                let unit = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(parameters[i].indexOf(`(`) + 1) : ``;
+                unit = unit.substring(0, unit.length -1)
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
                     label,
                     calculations: this.calculations,
