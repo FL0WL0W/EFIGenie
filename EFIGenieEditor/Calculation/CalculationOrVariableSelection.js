@@ -111,7 +111,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         prop ??= {}
         this.liveUpdate = new UIDisplayLiveUpdate({
             valueUnit: prop.outputUnits?.[0],
-            displayUnit: prop.displayUnit
+            displayUnit: prop.displayUnits?.[0]
         })
         this.liveUpdate.style.float = `right`
         var thisClass = this
@@ -188,7 +188,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                             yLabel: this.yLabel,
                             saveValue: saveValue.calculationValues[i],
                             outputUnits: this._outputUnits,
-                            displayUnit: this.displayUnit,
+                            displayUnits: this.displayUnits,
                             calculations: this.calculations
                         }))
                     }
@@ -268,7 +268,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
                     outputUnits: this._outputUnits,
-                    displayUnit: this.displayUnit,
+                    displayUnits: this.displayUnits,
                     calculations: this.calculations
                 }))
                 return this.calculationValues.length-1

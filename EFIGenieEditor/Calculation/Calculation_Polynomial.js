@@ -6,15 +6,15 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     static outputTypes = [ `float` ]
     static inputTypes = [ `float` ]
 
-    get outputUnits() { return [ this.displayUnit ] }
-    set outputUnits(outputUnits) { this.displayUnit = outputUnits?.[0] }
+    get outputUnits() { return this.displayUnits }
+    set outputUnits(outputUnits) { this.displayUnits = outputUnits }
 
-    get displayUnit() { return this.#coeffecientElement.firstChild.displayUnit }
-    set displayUnit(displayUnit) {
-        this.#coeffecientElement.firstChild.valueUnit = displayUnit
-        this.#minValueElement.firstChild.valueUnit = displayUnit
-        this.#maxValueElement.firstChild.valueUnit = displayUnit
-        this.#coeffecientElement.firstChild.displayUnit = displayUnit
+    get displayUnits() { return [ this.#coeffecientElement.firstChild.displayUnit ] }
+    set displayUnits(displayUnits) {
+        this.#coeffecientElement.firstChild.valueUnit = displayUnits?.[0]
+        this.#minValueElement.firstChild.valueUnit = displayUnits?.[0]
+        this.#maxValueElement.firstChild.valueUnit = displayUnits?.[0]
+        this.#coeffecientElement.firstChild.displayUnit = displayUnits?.[0]
     }
 
     #coeffecientElement = document.createElement(`div`)
@@ -89,7 +89,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.#coeffecientElement.style.alignItems = `flex-start`
         this.#coeffecientElement.style.justifyContent = `flex-end`
         this.#coeffecientElement.firstChild.addEventListener(`change`, function() {
-            thisClass.displayUnit = thisClass.displayUnit
+            thisClass.displayUnits = thisClass.displayUnits
         })
         Object.assign(this, prop)
     }

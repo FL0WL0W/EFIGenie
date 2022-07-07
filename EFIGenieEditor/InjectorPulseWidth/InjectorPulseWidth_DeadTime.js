@@ -16,13 +16,13 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
         calculations:   GenericConfigs,
         label:          `Injector Dead Time`,
         outputUnits:    [ `s` ],
-        displayUnit:    `ms`
+        displayUnits:   [ `ms` ]
     })
     MinInjectorFuelMass = new UINumberWithUnit({
         value:          0.005,
         step:           0.001,
         valueUnit:      `g`,
-        displayUnit:    `mg`
+        displayUnits:   [ `mg` ]
     })
     constructor(prop) {
         super()

@@ -241,6 +241,47 @@ VolumetricEfficiencyConfigs.push(Calculation_LookupTable)
 VolumetricEfficiencyConfigs.push(Calculation_2AxisTable)
 VolumetricEfficiencyConfigs.push(Calculation_Formula)
 
+OperationArchitectureFactoryIDs = {
+    Offset: 10000,
+    Package: 0,
+    Group: 1,
+    Table: 2,
+    LookupTable: 3,
+    Polynomial: 4,
+    Static: 5,
+    FaultDetection: 6,
+    Add: 10,
+    Subtract: 11,
+    Multiply: 12,
+    Divide: 13,
+    And: 14,
+    Or: 15,
+    GreaterThan: 16,
+    LessThan: 17,
+    Equal: 18,
+    GreaterThanOrEqual: 19,
+    LessThanOrEqual: 20
+}
+EmbeddedOperationsFactoryIDs = {
+    Offset: 20000,
+    AnalogInput: 1,
+    DigitalInput: 2,
+    DigitalPinRecord: 3,
+    DutyCyclePinRead: 4,
+    FrequencyPinRead: 5,
+    PulseWidthPinRead: 6,
+    DigitalOutput: 7,
+    PulseWidthPinWrite: 8,
+    GetTick: 9,
+    SecondsToTick: 10,
+    TickToSeconds: 11
+}
+ReluctorFactoryIDs = {
+    Offset: 30000,
+    GM24X: 1,
+    Universal1X: 2,
+    UniversalMissintTooth: 3
+}
 EngineFactoryIDs = {
     Offset : 40000,
     CylinderAirMass_SD: 1,

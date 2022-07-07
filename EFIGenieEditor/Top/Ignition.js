@@ -17,13 +17,13 @@ export default class Ignition extends UITemplate {
         calculations:   IgnitionDwellConfigs,
         label:          `Ignition Dwell`,
         outputUnits:    [ `s` ],
-        displayUnit:    `ms`
+        displayUnits:   [ `ms` ]
     })
     IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   IgnitionDwellConfigs,
         label:          `Ignition Dwell Deviation`,
         outputUnits:    [ `°` ],
-        displayUnit:    `ms`
+        displayUnits:   [ `ms` ]
     })
     Outputs = document.createElement(`div`)
     constructor(prop) {

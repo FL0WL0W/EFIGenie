@@ -18,7 +18,7 @@ export default class Fuel extends UITemplate {
         calculations:   InjectorPulseWidthConfigs,
         label:          `Injector Pulse Width`,
         outputUnits:    [ `s` ],
-        displayUnit:    `ms`
+        displayUnits:   [ `ms` ]
     })
     InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   GenericConfigs,

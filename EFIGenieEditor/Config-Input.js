@@ -8,20 +8,6 @@ var InputConfigs = [
     ]}
 ]
 
-EmbeddedOperationsFactoryIDs = {
-    Offset: 20000,
-    AnalogInput: 1,
-    DigitalInput: 2,
-    DigitalPinRecord: 3,
-    DutyCyclePinRead: 4,
-    FrequencyPinRead: 5,
-    PulseWidthPinRead: 6,
-    DigitalOutput: 7,
-    PulseWidthPinWrite: 8,
-    GetTick: 9,
-    SecondsToTick: 10,
-    TickToSeconds: 11
-}
 
 PinOuts = {
     STM32F103C: { 
@@ -153,13 +139,6 @@ InputConfigs.unshift({group: `MAP Sensors`, calculations: MapConfigs})
 
 ReluctorConfigs = []
 InputConfigs.unshift({group: `Reluctor Decoders`, calculations: ReluctorConfigs})
-ReluctorFactoryIDs = {
-    Offset: 30000,
-    GM24X: 1,
-    Universal1X: 2,
-    UniversalMissintTooth: 3
-}
-
 var CylinderAirmassConfigs = []
 CylinderAirmassConfigs.push(Calculation_Static)
 

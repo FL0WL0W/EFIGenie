@@ -12,8 +12,8 @@ export default class Calculation_Static extends UITemplate {
         this.Setup(prop)
     }
 
-    get displayUnit() { return this.numberElement.displayUnit }
-    set displayUnit(displayUnit) { this.numberElement.displayUnit = displayUnit}
+    get displayUnits() { return [ this.numberElement.displayUnit ] }
+    set displayUnits(displayUnits) { this.numberElement.displayUnit = displayUnits?.[0] }
     get outputUnits() { return [ this.numberElement.valueUnit ] }
     set outputUnits(outputUnits) { this.numberElement.valueUnit = outputUnits?.[0] }
     get outputTypes() { return this.outputUnits? undefined : this.constructor.outputTypes }
