@@ -4,26 +4,18 @@ export default class PinOverlay extends HTMLDivElement {
         function getNameFromPinSelectChildren(element){
             if(element.classList.contains(`pinselectname`)){
                 const name = element.value
-                if(!name)
-                    return element.textContent
+                if(!name) return element.textContent
                 return name
             }
     
             const elements = element.children
             for(var i = 0; i < elements?.length; i++) {
                 const name = getNameFromPinSelectChildren(elements[i])
-                if(name)
-                    return name
+                if(name) return name
             }
         }
         function getNameFromPinSelectElement(element){
-            if(!element)
-                return
-            const name = getNameFromPinSelectChildren(element)
-            if(name)
-                return name
-    
-            return getNameFromPinSelectElement(element.parentElement)
+            return !element? undefined : getNameFromPinSelectChildren(element) ?? getNameFromPinSelectElement(element.parentElement)
         }
 
         let pinSelectElements = [...document.querySelectorAll(`.pinselect`)]
@@ -42,12 +34,9 @@ export default class PinOverlay extends HTMLDivElement {
     }
 
     #pinOut
-    get pinOut() {
-        return this.#pinOut
-    }
+    get pinOut() { return this.#pinOut }
     set pinOut(pinOut) {
-        if(!pinOut)
-            return
+        if(!pinOut) return
         this.#pinOut = pinOut
         let scale = 750 / (pinOut.OverlayWidth + 300)
         this.style.width = pinOut.OverlayWidth
@@ -98,8 +87,7 @@ export default class PinOverlay extends HTMLDivElement {
                     }
                 })
                 pinElement.addEventListener(`change`, function() {
-                    if(this.value !== undefined)
-                        this._pinSelectElements[this.value].element.parentElement.value = this.pin
+                    if(this.value !== undefined) this._pinSelectElements[this.value].element.parentElement.value = this.pin
                 })
             }
             pinElement.pin = pinOut.Pins[i].value

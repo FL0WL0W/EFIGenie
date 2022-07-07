@@ -7,41 +7,26 @@ export default class CalculationOrVariableSelection extends UITemplate {
     calculationValues = []
 
     labelElement = document.createElement(`span`)
-    get label() {
-        return this.labelElement.textContent
-    }
+    get label() { return this.labelElement.textContent }
     set label(label) {
-        if(this.label === label)
-            return
-
+        if(this.label === label) return
         this.labelElement.textContent = label
-
         this.calculationValues.forEach(function(configValue) { configValue.label = label })
     }
 
     _xlabel = `X`
-    get xLabel() {
-        return this._xlabel
-    }
+    get xLabel() { return this._xlabel }
     set xLabel(xlabel) {
-        if(this._xlabel === xlabel)
-            return
-
+        if(this._xlabel === xlabel) return
         this._xlabel = xlabel
-
         this.calculationValues.forEach(function(configValue) { configValue.xLabel = xlabel })
     }
 
     _ylabel = `Y`
-    get yLabel() {
-        return this._xlabel
-    }
+    get yLabel() { return this._xlabel }
     set yLabel(ylabel) {
-        if(this._ylabel === ylabel)
-            return
-
+        if(this._ylabel === ylabel) return
         this._ylabel = ylabel
-
         this.calculationValues.forEach(function(configValue) { configValue.yLabel = ylabel })
     }
 
@@ -91,9 +76,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
-    get options() {
-        return this.selection.options
-    }    
+    get options() { return this.selection.options }    
     set options(options) {
         this.selection.options = options
         let match = false
@@ -122,22 +105,18 @@ export default class CalculationOrVariableSelection extends UITemplate {
         // }
     }
 
+    selection = new UISelection({ selectDisabled: false, selectName: `None` })
     constructor(prop) {
         super()
-        var thisClass = this
         prop ??= {}
         this.liveUpdate = new UIDisplayLiveUpdate({
             valueUnit: prop.outputUnits?.[0],
             displayUnit: prop.displayUnit
         })
         this.liveUpdate.style.float = `right`
-        this.selection = new UISelection({
-            selectDisabled: false,
-            selectName: `None`
-        })
+        var thisClass = this
         this.selection.addEventListener(`change`, function() {
-            const subConfig = thisClass.SubConfig
-            thisClass.calculationContent.replaceChildren(subConfig ?? ``)
+            thisClass.calculationContent.replaceChildren(thisClass.SubConfig ?? ``)
             thisClass.liveUpdate.valueUnit = thisClass.outputUnits?.[0]
         })
         this.style.display = `block`

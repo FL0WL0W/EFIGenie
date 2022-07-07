@@ -10,43 +10,28 @@ export default class Calculation_LookupTable extends UITemplate {
     static template = `<div data-element="dialog"></div>`
     GUID = generateGUID()
 
-    get label() {
-        return this.table.zLabel
-    }
+    get label() { return this.table.zLabel }
     set label(label){
         this.table.zLabel = label
         this.dialog.title = label
     }
 
     _xLabel = `X`
-    get xLabel() {
-        return this._xLabel
-    }
+    get xLabel() { return this._xLabel }
     set xLabel(xLabel) {
-        if(this._xLabel === xLabel)
-            return
-
+        if(this._xLabel === xLabel) return
         this._xLabel = xLabel
-        if(!this.parameterSelection)
-            this.table.xLabel = xLabel
+        if(!this.parameterSelection) this.table.xLabel = xLabel
     }
 
-    get xOptions() {
-        if(!this.parameterSelection) 
-            return
-
-        return this.parameterSelection.options
-    }
+    get xOptions() { return this.parameterSelection?.options }
     set xOptions(options) {
-        if(!this.parameterSelection || objectTester(this.parameterSelection.options, options)) 
-            return
-
+        if(!this.parameterSelection || objectTester(this.parameterSelection.options, options)) return
         this.parameterSelection.options = options
     }
 
     get noParameterSelection() {
-        if(this.parameterSelection)
-            return false
+        if(this.parameterSelection) return false
         return true
     }
     set noParameterSelection(noParameterSelection) {
@@ -56,7 +41,6 @@ export default class Calculation_LookupTable extends UITemplate {
             return
         }
 
-        const thisClass = this
         if(!this.parameterSelection) {
             this.parameterSelection = new UISelection({
                 options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
@@ -82,21 +66,16 @@ export default class Calculation_LookupTable extends UITemplate {
         super.saveValue = saveValue
     }
 
+    dialog = new UIDialog({ buttonLabel: `Edit Table`, })
+    table = new UITable({
+        selectNotVisible: true,
+        yResolution: 1,
+        yResolutionModifiable: false,
+        BaseObj: true
+    })
+    graph = new UIGraph2D({ width: Math.min(Math.max(600, this.table.xResolution * 100), 1000), height: 450 })
     constructor(prop) {
         super()
-        this.dialog = new UIDialog({
-            buttonLabel: `Edit Table`,
-        })
-        this.table = new UITable({
-            selectNotVisible: true,
-            yResolution: 1,
-            yResolutionModifiable: false,
-            BaseObj: true
-        })
-        this.graph = new UIGraph2D({
-            width: Math.min(Math.max(600, this.table.xResolution * 100), 1000),
-            height: 450
-        })
         const thisClass = this
         this.graph.addEventListener(`change`, function() {
             thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)

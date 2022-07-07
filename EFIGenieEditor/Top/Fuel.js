@@ -4,30 +4,30 @@ import Output_TDC from "../Output/Output_TDC.js"
 export default class Fuel extends UITemplate {
     static template =   getFileContents(`ConfigGui/Fuel.html`)
 
+    AFRConfigOrVariableSelection = new Calculation_Formula({
+        calculations:   AFRConfigs,
+        label:          `Air Fuel Ratio`,
+        outputUnits:    [ `:1` ],
+    })
+    InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   InjectorEnableConfigs,
+        label:          `Injector Enable`,
+        outputTypes:    [ `bool` ],
+    })
+    InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   InjectorPulseWidthConfigs,
+        label:          `Injector Pulse Width`,
+        outputUnits:    [ `s` ],
+        displayUnit:    `ms`
+    })
+    InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   GenericConfigs,
+        label:          `Injector End Position`,
+        outputUnits:    [ `°` ],
+    })
+    Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
-        this.AFRConfigOrVariableSelection = new Calculation_Formula({
-            calculations:   AFRConfigs,
-            label:          `Air Fuel Ratio`,
-            outputUnits:    [ `:1` ],
-        })
-        this.InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   InjectorEnableConfigs,
-            label:          `Injector Enable`,
-            outputTypes:    [ `bool` ],
-        })
-        this.InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   InjectorPulseWidthConfigs,
-            label:          `Injector Pulse Width`,
-            outputUnits:    [ `s` ],
-            displayUnit:    `ms`
-        })
-        this.InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   GenericConfigs,
-            label:          `Injector End Position`,
-            outputUnits:    [ `°` ],
-        })
-        this.Outputs = document.createElement(`div`)
         Object.defineProperty(this.Outputs, 'saveValue', {
             get: function() { return [...this.children].map(e => e.saveValue) },
             set: function(saveValue) { 
@@ -58,16 +58,6 @@ export default class Fuel extends UITemplate {
         })
         this.Outputs.value = new Array(8)
         this.Setup(prop)
-    }
-
-    get saveValue() {
-        return super.saveValue
-    }
-    set saveValue(saveValue) {
-        if(saveValue?.ConfigInjectorOutputs)
-            saveValue.Outputs = saveValue.ConfigInjectorOutputs.Outputs
-
-        super.saveValue = saveValue
     }
 
     RegisterVariables() {

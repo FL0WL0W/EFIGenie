@@ -1,19 +1,12 @@
 import UIDisplayNumberWithUnit from "./UIDisplayNumberWithUnit.js"
 export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
     GUID = generateGUID()
-    get superHidden() {
-        return super.hidden
-    }
-    set superHidden(hidden) {
-        super.hidden = hidden
-    }
-    get hidden() {
-        return this._stickyHidden
-    }
+    get superHidden() { return super.hidden }
+    set superHidden(hidden) { super.hidden = hidden }
+    get hidden() { return this._stickyHidden }
     set hidden(hidden) {
         this._stickyHidden = hidden
-        if(hidden)
-            super.hidden = hidden
+        if(hidden) super.hidden = hidden
     }
 
     RegisterVariables(reference) {

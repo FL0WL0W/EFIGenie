@@ -1,23 +1,17 @@
 import UISelection from "../JavascriptUI/UISelection.js"
 export default class UIUnit extends UISelection {
     _hidden = false
-    get hidden() {
-        return this._hidden
-    }
+    get hidden() { return this._hidden }
     set hidden(hidden) {
         this._hidden = hidden
-        if(hidden || this.options.length === 0) {
-            super.hidden = true
-        } else {
-            super.hidden = false
-        }
+        if(hidden || this.options.length === 0) super.hidden = true
+        else super.hidden = false
     }
 
     get value() { return super.value }
     set value(value) {
         let measurement = GetMeasurementNameFromUnitName(value)
-        if(measurement === undefined)
-            return
+        if(measurement === undefined) return
         this.measurement = measurement
         super.value = value
     }
@@ -25,36 +19,27 @@ export default class UIUnit extends UISelection {
     _measurement
     get measurement() { return this._measurement }
     set measurement(measurement){
-        if(!measurement || this._measurement === measurement)
-            return
-
+        if(!measurement || this._measurement === measurement) return
         this._measurement = measurement
         this.Default = Measurements[measurement]?.[0]?.name
         this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
-        if(this.value === undefined || this.value === `` || this.value === null) 
-            this.value = this.Default
-        if(this.options.length === 0)
-            super.hidden = true
-        else if(!this.hidden)
-            super.hidden = false
+        if(this.value === undefined || this.value === `` || this.value === null) this.value = this.Default
+        if(this.options.length === 0) super.hidden = true
+        else if(!this.hidden) super.hidden = false
     }
 
     get saveValue() {
-        if(this.value === this.Default)
-            return
+        if(this.value === this.Default) return
         return super.saveValue
     }
     set saveValue(saveValue) {
-        if(saveValue === undefined || saveValue === ``)
-            return
+        if(saveValue === undefined || saveValue === ``) return
         super.saveValue = saveValue
     }
 
     constructor(prop) {
         super(prop)
-        if(prop?.measurement || prop?.value) {
-            this.Default = this.value
-        }
+        if(prop?.measurement || prop?.value) this.Default = this.value
         this.class = `ui unit`
         this.selectNotVisible = true
         this.selectName = ``

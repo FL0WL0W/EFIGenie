@@ -8,19 +8,16 @@ export default class Input_DigitalRecord extends UITemplate {
     static template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted` +
                         `<br/><label>Length:</label><div data-element="length"></div>`
 
+    inverted = new UICheckBox()
+    pin = new UIPinSelection({ value: 0xFFFF, pinType: `digital` })
+    length = new UINumber ({
+        value: 2,
+        step: 1,
+        min: 1,
+        max: 1000
+    })
     constructor(prop){
         super()
-        this.pin = new UIPinSelection({
-            value: 0xFFFF,
-            pinType: `digitalinterrupt`
-        })
-        this.inverted = new UICheckBox()
-        this.length = new UINumber ({
-            value: 2,
-            step: 1,
-            min: 1,
-            max: 1000
-        })
         this.style.display = `block`
         this.Setup(prop)
     }

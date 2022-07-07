@@ -10,22 +10,15 @@ export default class Inputs extends UITemplate {
     pinOverlay = new UIPinOverlay()
 
     _targetDevice = `STM32F401C`
-    get targetDevice() {
-        return this._targetDevice
-    }
+    get targetDevice() { return this._targetDevice }
     set targetDevice(targetDevice) {
         this._targetDevice = targetDevice
         this.pinOverlay.pinOut = PinOuts[targetDevice]
     }
 
-    get saveValue() {
-        let saveValue = super.saveValue
-        saveValue.targetDevice = this.targetDevice
-        return saveValue
-    }
+    get saveValue() { return { ...super.saveValue, targetDevice: this.targetDevice } }
     set saveValue(saveValue) {
-        if(!saveValue)
-            return
+        if(!saveValue) return
             
         saveValue.inputs ??= saveValue.Inputs
         saveValue.targetDevice ??= saveValue.TargetDevice

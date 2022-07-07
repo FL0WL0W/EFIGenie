@@ -10,18 +10,14 @@ export default class Calculation_2AxisTable extends UITemplate {
     static template = `<div data-element="dialog"></div>`
     GUID = generateGUID()
 
-    get label() {
-        return this.table.zLabel
-    }
+    get label() { return this.table.zLabel }
     set label(label){
         this.table.zLabel = label
         this.dialog.title = label
     }
 
     _xLabel = `X`
-    get xLabel() {
-        return this._xLabel
-    }
+    get xLabel() { return this._xLabel }
     set xLabel(xLabel) {
         if(this._xLabel === xLabel)
             return
@@ -32,47 +28,27 @@ export default class Calculation_2AxisTable extends UITemplate {
     }
 
     _yLabel = `Y`
-    get yLabel() {
-        return this._yLabel
-    }
+    get yLabel() { return this._yLabel }
     set yLabel(yLabel) {
-        if(this._yLabel === yLabel)
-            return
-
+        if(this._yLabel === yLabel) return
         this._yLabel = yLabel
-        if(!this.YSelection)
-            this.table.yLabel = yLabel
+        if(!this.YSelection) this.table.yLabel = yLabel
     }
 
-    get xOptions() {
-        if(!this.XSelection) 
-            return
-
-        return this.XSelection.options
-    }
+    get xOptions() { return this.XSelection?.options }
     set xOptions(options) {
-        if(!this.XSelection || objectTester(this.XSelection.options, options)) 
-            return
-
+        if(!this.XSelection || objectTester(this.XSelection.options, options)) return
         this.XSelection.options = options
     }
 
-    get yOptions() {
-        if(!this.YSelection) 
-            return
-
-        return this.YSelection.options
-    }
+    get yOptions() { return this.YSelection?.options }
     set yOptions(options) {
-        if(!this.YSelection || objectTester(this.YSelection.options, options)) 
-            return
-
+        if(!this.YSelection || objectTester(this.YSelection.options, options)) return
         this.YSelection.options = options
     }
 
     get noParameterSelection() {
-        if(this.XSelection || this.YSelection)
-            return false
+        if(this.XSelection || this.YSelection) return false
         return true
     }
     set noParameterSelection(noParameterSelection) {
@@ -115,23 +91,18 @@ export default class Calculation_2AxisTable extends UITemplate {
         saveValue.graph = saveValue.table
         super.saveValue = saveValue
     }
-    
+
+    dialog = new UIDialog({ buttonLabel: `Edit Table` })
+    table = new UITable()
+    graph = new UIGraph3D({ width: 800, height: 450 })
     constructor(prop) {
         super()
-        this.dialog = new UIDialog({
-            buttonLabel: `Edit Table`,
-        })
-        this.table = new UITable()
-        this.graph = new UIGraph3D({
-            width: 800,
-            height: 450
-        })
-        this.table.attachToTable(this.graph)
-        this.graph.attachToTable(this.table)
         const thisClass = this
         this.graph.addEventListener(`change`, function() {
             thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
         })
+        this.table.attachToTable(this.graph)
+        this.graph.attachToTable(this.table)
         this.dialog.content.append(this.graph)
         this.dialog.content.append(document.createElement(`br`))
         this.dialog.content.append(this.table)

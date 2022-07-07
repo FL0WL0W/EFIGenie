@@ -26,7 +26,6 @@ export default class UINumberWithUnit extends UITemplate {
     get value() { return this.#value }
     set value(value) {
         if(this.#value === value) return
-
         this.#value = value
         this.UpdateDisplayValue()
     }
@@ -37,7 +36,6 @@ export default class UINumberWithUnit extends UITemplate {
     get min() { return this.#min }
     set min(min) {
         if(this.#min === min) return
-
         this.#min = min
         this.UpdateDisplayValue()
     }
@@ -46,7 +44,6 @@ export default class UINumberWithUnit extends UITemplate {
     get max() { return this.#max }
     set max(max) {
         if(this.#max === max) return
-
         this.#max = max
         this.UpdateDisplayValue()
     }
@@ -55,7 +52,6 @@ export default class UINumberWithUnit extends UITemplate {
     get step() { return this.#step }
     set step(step) {
         if(this.#step === step) return
-
         this.#step = step
         this.UpdateDisplayValue()
     }

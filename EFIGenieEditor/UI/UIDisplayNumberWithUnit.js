@@ -31,15 +31,11 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
         displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`
         const indexOfPoint = displayValue.indexOf(`.`)
         var zeroesToAdd = Math.max(0, 6-(displayValue.length - indexOfPoint))
-        if(indexOfPoint === -1)
-            zeroesToAdd = 6
-        if(zeroesToAdd < this.ZeroesToAdd)
-            this.ZeroesToAdd = zeroesToAdd
+        if(indexOfPoint === -1) zeroesToAdd = 6
+        if(zeroesToAdd < this.ZeroesToAdd) this.ZeroesToAdd = zeroesToAdd
         zeroesToAdd -= this.ZeroesToAdd
-        if(zeroesToAdd > 0 && indexOfPoint < 0)
-            displayValue += `.`
-        for(var i = 0; i < zeroesToAdd; i++)
-            displayValue += `0`
+        if(zeroesToAdd > 0 && indexOfPoint < 0) displayValue += `.`
+        for(var i = 0; i < zeroesToAdd; i++) displayValue += `0`
 
         if(this.displayElement)
             this.displayElement.textContent = displayValue

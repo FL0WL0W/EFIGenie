@@ -6,16 +6,6 @@ export default class Output_Digital extends UITemplate {
     static inputTypes = [ `bool` ]
     static template =   `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted <div data-element="highZ"></div>High Z`
 
-    get saveValue() {
-        return super.saveValue
-    }
-    set saveValue(saveValue) {
-        saveValue.pin ??= saveValue.Pin
-        saveValue.inverted ??= saveValue.Inverted
-        saveValue.highZ ??= saveValue.HighZ
-        super.saveValue = saveValue
-    }
-
     constructor(prop){
         super()
         this.pin = new UIPinSelection({

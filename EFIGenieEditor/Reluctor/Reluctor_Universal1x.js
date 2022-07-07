@@ -6,22 +6,22 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
                         `<br/><label>Rising Edge Position:</label><div data-element="risingPosition"></div>` +
                         `<br/><label>Falling Edge Position:</label><div data-element="fallingPosition"></div>`
 
+    risingPosition = new UINumberWithUnit({
+        value: 0,
+        step: 0.1,
+        min: 0,
+        max: 360,
+        valueUnit: `°`
+    })
+    fallingPosition = new UINumberWithUnit({
+        value: 180,
+        step: 0.1,
+        min: 0,
+        max: 360,
+        valueUnit: `°`
+    })
     constructor(prop){
         super()
-        prop.risingPosition = new UINumberWithUnit({
-            value: 0,
-            step: 0.1,
-            min: 0,
-            max: 360,
-            valueUnit: `°`
-        })
-        prop.fallingPosition = new UINumberWithUnit({
-            value: 180,
-            step: 0.1,
-            min: 0,
-            max: 360,
-            valueUnit: `°`
-        })
         this.Setup(prop)
         this.length.value = 8
     }

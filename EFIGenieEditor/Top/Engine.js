@@ -2,38 +2,38 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 export default class Engine extends UITemplate {
     static template = getFileContents(`ConfigGui/Engine.html`)
 
+    CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  undefined,
+        label:         `Crank Position`,
+        outputTypes:   [ `ReluctorResult` ],
+    })
+    CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  undefined,
+        label:         `Cam Position`,
+        outputTypes:   [ `ReluctorResult` ],
+    })
+    CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  CylinderAirmassConfigs,
+        label:         `Cylinder Air Mass`,
+        outputUnits:   [ `g` ],
+    })
+    CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  CylinderAirTemperatureConfigs,
+        label:         `Cylinder Air Temperature`,
+        outputUnits:   [ `°C` ],
+    })
+    ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  ManifoldAbsolutePressureConfigs,
+        label:         `Manifold Absolute Pressure`,
+        outputUnits:   [ `Bar` ],
+    })
+    VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:  VolumetricEfficiencyConfigs,
+        label:         `Volumetric Efficiency`,
+        outputUnits:   [ `[0.0-1.0]` ],
+    })
     constructor(prop) {
         super()
-        this.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  undefined,
-            label:         `Crank Position`,
-            outputTypes:   [ `ReluctorResult` ],
-        })
-        this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  undefined,
-            label:         `Cam Position`,
-            outputTypes:   [ `ReluctorResult` ],
-        })
-        this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  CylinderAirmassConfigs,
-            label:         `Cylinder Air Mass`,
-            outputUnits:   [ `g` ],
-        })
-        this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  CylinderAirTemperatureConfigs,
-            label:         `Cylinder Air Temperature`,
-            outputUnits:   [ `°C` ],
-        })
-        this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  ManifoldAbsolutePressureConfigs,
-            label:         `Manifold Absolute Pressure`,
-            outputUnits:   [ `Bar` ],
-        })
-        this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:  VolumetricEfficiencyConfigs,
-            label:         `Volumetric Efficiency`,
-            outputUnits:   [ `[0.0-1.0]` ],
-        })
         this.Setup(prop)
     }
 

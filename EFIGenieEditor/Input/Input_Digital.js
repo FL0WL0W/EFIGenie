@@ -6,13 +6,10 @@ export default class Input_Digital extends UITemplate {
     static outputTypes = [ `bool` ]
     static template = `<label>Pin:</label><div data-element="pin"></div><div data-element="inverted"></div>Inverted`
 
+    inverted = new UICheckBox()
+    pin = new UIPinSelection({ value: 0xFFFF, pinType: `digital` })
     constructor(prop){
         super()
-        this.pin = new UIPinSelection({
-            value: 0xFFFF,
-            pinType: `digital`
-        })
-        this.inverted = new UICheckBox()
         this.style.display = `block`
         this.Setup(prop)
     }

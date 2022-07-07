@@ -3,31 +3,31 @@ import Output_TDC from "../Output/Output_TDC.js"
 export default class Ignition extends UITemplate {
     static template = getFileContents(`ConfigGui/Ignition.html`)
 
+    IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   IgnitionEnableConfigs,
+        label:          `Ignition Enable`,
+        outputTypes:    [ `bool` ],
+    })
+    IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   IgnitionAdvanceConfigs,
+        label:          `Ignition Advance`,
+        outputUnits:    [ `°` ],
+    })
+    IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   IgnitionDwellConfigs,
+        label:          `Ignition Dwell`,
+        outputUnits:    [ `s` ],
+        displayUnit:    `ms`
+    })
+    IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   IgnitionDwellConfigs,
+        label:          `Ignition Dwell Deviation`,
+        outputUnits:    [ `°` ],
+        displayUnit:    `ms`
+    })
+    Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
-        this.IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   IgnitionEnableConfigs,
-            label:          `Ignition Enable`,
-            outputTypes:    [ `bool` ],
-        })
-        this.IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   IgnitionAdvanceConfigs,
-            label:          `Ignition Advance`,
-            outputUnits:    [ `°` ],
-        })
-        this.IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   IgnitionDwellConfigs,
-            label:          `Ignition Dwell`,
-            outputUnits:    [ `s` ],
-            displayUnit:    `ms`
-        })
-        this.IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:   IgnitionDwellConfigs,
-            label:          `Ignition Dwell Deviation`,
-            outputUnits:    [ `°` ],
-            displayUnit:    `ms`
-        })
-        this.Outputs = document.createElement(`div`)
         Object.defineProperty(this.Outputs, 'saveValue', {
             get: function() { return [...this.children].map(e => e.saveValue) },
             set: function(saveValue) { 

@@ -5,12 +5,9 @@ export default class Input_Analog extends UITemplate {
     static outputUnits = [ `V` ]
     static template = `<label>Pin:</label><div data-element="pin"></div>`
 
+    pin = new UIPinSelection({ value: 0xFFFF, pinType: `analog` })
     constructor(prop){
         super()
-        this.pin = new UIPinSelection({
-            value: 0xFFFF,
-            pinType: `analog`
-        })
         this.style.display = `block`
         this.Setup(prop)
     }

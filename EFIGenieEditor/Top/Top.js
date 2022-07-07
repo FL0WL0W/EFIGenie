@@ -13,15 +13,15 @@ export default class Top extends UITemplate {
     engineTab = document.createElement(`div`)
     fuelTab = document.createElement(`div`)
     ignitionTab = document.createElement(`div`)
+    Inputs = new Inputs()
+    Engine = new Engine()
+    Fuel = new Fuel()
+    Ignition = new Ignition()
+    sidebarClose = new UIButton({className: `sidebaropenclose w3-button w3-padding-16 w3-right`})
+    sidebarOpen = new UIButton({className: `sidebaropenclose w3-button w3-padding-16`})
     constructor(prop){
         super()
         const thisClass = this
-        this.Inputs = new Inputs()
-        this.Engine = new Engine()
-        this.Fuel = new Fuel()
-        this.Ignition = new Ignition()
-        this.sidebarClose = new UIButton({className: `sidebaropenclose w3-button w3-padding-16 w3-right`})
-        this.sidebarOpen = new UIButton({className: `sidebaropenclose w3-button w3-padding-16`})
         this.sidebarOpen.addEventListener(`click`, function() {
             var sidebarElement = thisClass.firstChild
             var containerElement = thisClass.lastChild
@@ -69,7 +69,7 @@ export default class Top extends UITemplate {
         this.title.class = `w3-padding-16`
         this.title.style.display = `inline-block`
         this.title.style.margin = `3px`
-        this.activeTab = `Inputs`
+        this.activeTab = window.localStorage.getItem(`lastTab`) ?? `Inputs`
         this.inputsTabList = this.Inputs.inputListElement
         this.inputsTabList.addEventListener(`click`, function() {
             thisClass.activeTab = `Inputs`
@@ -115,10 +115,9 @@ export default class Top extends UITemplate {
         })
     }
 
-    get activeTab() {
-        return this.title.textContent
-    }
+    get activeTab() { return this.title.textContent }
     set activeTab(activeTab) {
+        window.localStorage.setItem(`lastTab`, activeTab)
         this.title.textContent = activeTab
         this.Inputs.hidden = true
         this.Engine.hidden = true
@@ -148,9 +147,7 @@ export default class Top extends UITemplate {
         }
     }
 
-    get saveValue() {
-        return super.saveValue
-    }
+    get saveValue() { return super.saveValue }
     set saveValue(saveValue) {
         super.saveValue = saveValue
         this.RegisterVariables()

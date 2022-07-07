@@ -6,16 +6,10 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     static outputTypes = [ `float` ]
     static inputTypes = [ `float` ]
 
-    get outputUnits() {
-        return [ this.displayUnit ]
-    }
-    set outputUnits(outputUnits) {
-        this.displayUnit = outputUnits?.[0]
-    }
+    get outputUnits() { return [ this.displayUnit ] }
+    set outputUnits(outputUnits) { this.displayUnit = outputUnits?.[0] }
 
-    get displayUnit() {
-        return this.#coeffecientElement.firstChild.displayUnit
-    }
+    get displayUnit() { return this.#coeffecientElement.firstChild.displayUnit }
     set displayUnit(displayUnit) {
         this.#coeffecientElement.firstChild.valueUnit = displayUnit
         this.#minValueElement.firstChild.valueUnit = displayUnit
@@ -24,9 +18,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     }
 
     #coeffecientElement = document.createElement(`div`)
-    get coeffecients() {
-        return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })
-    }
+    get coeffecients() { return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })  }
     set coeffecients(value) {
         this.degree = value.length
         for(let i = 0; i < this.#coeffecientElement.children.length; i++) {
@@ -34,25 +26,13 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         }
     }
     
-    #minValueElement = new UINumberWithUnit({
-        value: 0
-    })
-    get minValue() {
-        return this.#minValueElement.value
-    }
-    set minValue(minValue) {
-        this.#minValueElement.value = minValue
-    }
+    #minValueElement = new UINumberWithUnit({  value: 0 })
+    get minValue() { return this.#minValueElement.value }
+    set minValue(minValue) { this.#minValueElement.value = minValue }
     
-    #maxValueElement = new UINumberWithUnit({
-        value: 1
-    })
-    get maxValue() {
-        return this.#maxValueElement.value
-    }
-    set maxValue(maxValue) {
-        this.#maxValueElement.value = maxValue
-    }
+    #maxValueElement = new UINumberWithUnit({ value: 1 })
+    get maxValue() { return this.#maxValueElement.value }
+    set maxValue(maxValue) { this.#maxValueElement.value = maxValue }
 
     #degreeElement = new UINumber({
         min: 2,
@@ -60,12 +40,8 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         step: 1,
         value: 0
     })
-    get degree() {
-        return this.#degreeElement.value
-    }
-    set degree(degree) {
-        this.#degreeElement.value = degree
-    }
+    get degree() { return this.#degreeElement.value }
+    set degree(degree) { this.#degreeElement.value = degree  }
 
     constructor(prop) {
         super()

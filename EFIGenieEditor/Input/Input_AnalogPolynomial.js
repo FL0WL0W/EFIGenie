@@ -13,13 +13,11 @@ export default class Input_AnalogPolynomial extends UITemplate {
         } } }
     set value(value) { super.value = value }
 
+    analogInput = new Input_Analog()
+    polynomial = new Calculation_Polynomial({outputUnits: this.constructor.outputUnits})
+    voltageLiveUpdate = new UIDisplayLiveUpdate({ valueUnit: Input_Analog.outputUnits[0] })
     constructor(prop){
         super()
-        this.analogInput = new Input_Analog()
-        this.polynomial = new Calculation_Polynomial({outputUnits: this.constructor.outputUnits})
-        this.voltageLiveUpdate = new UIDisplayLiveUpdate({
-            valueUnit: Input_Analog.outputUnits[0]
-        })
         this.voltageLiveUpdate.style.float = `right`
         this.Setup(prop)
         this.style.display = `block`
