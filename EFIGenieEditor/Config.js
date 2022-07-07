@@ -851,8 +851,11 @@ types = [
     }},
     { type: `Calculation_Formula`, toDefinition() {
         let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
-        function ParseFormula(formula) {
+        function ParseFormula(formula, parameters) {
             formula = formula.replaceAll(` `, ``)
+            for(let i = 0; i < parameters.length; i++) {
+                formula = formula.replaceAll(parameters[i], `param${i}`)
+            }
             let operations = []
             let tempIndex = 0
     
@@ -945,6 +948,15 @@ types = [
                 }
             }
     
+            for(let i = 0; i < operations.length; i++) {
+                operations[i].parameters
+                for(let p = 0; p < operations[i].parameters.length; p++) {
+                    if(operations[i].parameters[p].indexOf(`param`) === 0) {
+                        operations[i].parameters[p] = parameters[parseInt(operations[i].parameters[p].substring(5))]
+                    }
+                }
+            }
+
             return operations
         }
         let parameters = this.formula.replaceAll(` `, ``)
@@ -952,13 +964,33 @@ types = [
             let operator = operators[operatorIndex]
             parameters = parameters.split(operator).join(`,`)
         }
+        let parameterSplit = parameters.split(`,`)
+        let operatorSplit = this.formula.replaceAll(` `, ``)
+        for(let i = 0; i < parameterSplit.length; i++) {
+            let loc = operatorSplit.indexOf(parameterSplit[i])
+            operatorSplit = operatorSplit.substring(0, loc) + `,` + operatorSplit.substring(loc + parameterSplit[i].length)
+        }
+        operatorSplit = operatorSplit.split(`,`)
+        parameters = ``
+        for(let i = 0; i < parameterSplit.length; i++) {
+            if(parameters !== ``) parameters += `,`
+            parameters += parameterSplit[i]
+
+            if(parameterSplit[i].match(/[^,][(]/) && parameterSplit[i][parameterSplit[i].length - 1] !== `)`) {
+                while(++i < parameterSplit.length) {
+                    parameters += operatorSplit[i] + parameterSplit[i]
+                    if(parameterSplit[i][parameterSplit[i].length - 1] === `)`) break
+                }
+            }
+        }
         parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
         parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
         parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
         parameters = parameters.filter(s => s.length !== 0)
         if(parameters.length === 0)
             return
-        const operations = ParseFormula(this.formula)
+        const operations = ParseFormula(this.formula, parameters)
+        console.log(operations)
         if(operations.length == 0 || (operations.length == 1 && operations[0].operator == undefined)) 
             return { ...this.parameterValues[parameters[0]], type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
         var group  = { 
@@ -968,7 +1000,11 @@ types = [
         
         const thisClass = this
         let resultName = this.outputVariables?.[0]?.name
-        parameters.forEach(function(parameter) { group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, outputVariables: [ { name: parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}` } ] }) })
+        parameters.forEach(function(parameter) { 
+            let name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
+            name = name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length)
+            group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, outputVariables: [ { name } ] }) 
+        })
         for(let operationIndex in operations) {
             let operation = operations[operationIndex]
             let operationValue = { outputVariables: operation.resultInto === `return`? this.outputVariables : [ { name: operation.resultInto } ] }
@@ -976,7 +1012,11 @@ types = [
                 operationValue.type = `Calculation_Static`
                 operationValue.value = operation.parameters[0]
             } else {
-                operationValue.inputVariables = operation.parameters.map(function(parameter) { return { name: parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}` } })
+                operationValue.inputVariables = operation.parameters.map(function(parameter) { 
+                    let name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
+                    name = name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length)
+                    return { name } 
+                })
                 switch(operation.operator) {
                     case `*`: 
                         operationValue.type = `Calculation_Multiply`

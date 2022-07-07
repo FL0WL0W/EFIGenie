@@ -28,10 +28,14 @@ export default class Calculation_Formula extends UITemplate {
         for(let i = 0; i < parameters.length; i++) { 
             let parameterValue = this.parameterValues[parameters[i]]
             if(!parameterValue) {
+                const label = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(0, parameters[i].indexOf(`(`)) : parameters[i];
+                let unit = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(parameters[i].indexOf(`(`) + 1) : undefined;
+                unit = unit?.substring(0, unit.length -1)
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
-                    label: parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(0, parameters[i].indexOf(`(`)) : parameters[i],
+                    label,
                     calculations: this.calculations,
-                    outputTypes: [ `bool|float` ]
+                    outputTypes: [ `bool|float` ],
+                    outputUnits: [ unit ]
                 })
             }
             let formulaParameter = this.parameterElements.children[i]
@@ -159,6 +163,25 @@ export default class Calculation_Formula extends UITemplate {
                 let operator = operators[operatorIndex]
                 parameters = parameters.split(operator).join(`,`)
             }
+            let parameterSplit = parameters.split(`,`)
+            let operatorSplit = thisClass.formula.value.replaceAll(` `, ``)
+            for(let i = 0; i < parameterSplit.length; i++) {
+                let loc = operatorSplit.indexOf(parameterSplit[i])
+                operatorSplit = operatorSplit.substring(0, loc) + `,` + operatorSplit.substring(loc + parameterSplit[i].length)
+            }
+            operatorSplit = operatorSplit.split(`,`)
+            parameters = ``
+            for(let i = 0; i < parameterSplit.length; i++) {
+                if(parameters !== ``) parameters += `,`
+                parameters += parameterSplit[i]
+
+                if(parameterSplit[i].match(/[^,][(]/) && parameterSplit[i][parameterSplit[i].length - 1] !== `)`) {
+                    while(++i < parameterSplit.length) {
+                        parameters += operatorSplit[i] + parameterSplit[i]
+                        if(parameterSplit[i][parameterSplit[i].length - 1] === `)`) break
+                    }
+                }
+            }
             parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
             parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
             parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
@@ -181,10 +204,12 @@ export default class Calculation_Formula extends UITemplate {
             }
 
             let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
-            if(!operators.some(o => this.formula.value.indexOf(o) > -1)) {
+            let formulaWithoutUnits = this.formula.value;
+            Object.keys(Measurements).forEach(m => Measurements[m].forEach(u => formulaWithoutUnits = formulaWithoutUnits.replaceAll(`(${u.name})`, ``)))
+            if(!operators.some(o => formulaWithoutUnits.indexOf(o) > -1)) {
                 this.parameterValues[this.parameters[0]].RegisterVariables(reference)
             } else {
-                this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter].RegisterVariables({ ...reference, name: `${reference.name}_${parameter}`}) })
+                this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter]?.RegisterVariables({ name: `${reference.name}_${thisClass.parameterValues[parameter].label}`, unit: thisClass.parameterValues[parameter].unit}) })
                 VariableRegister.RegisterVariable(reference)
             }
         }

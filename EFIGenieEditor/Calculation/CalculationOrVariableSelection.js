@@ -173,7 +173,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             }
             if (!found && this.calculations) {
                 var configGroups = this.calculations
-                if(!this.calculations[0].group && !this.calculations[0].calculations)
+                if(!this.calculations[0]?.group && !this.calculations[0]?.calculations)
                     configGroups = [{ group: `Calculations`, calculations: this.calculations }]
         
                 for(var c = 0; c < configGroups.length; c++) {
@@ -254,7 +254,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             }
         }
         var configGroups = this.calculations
-        if(!this.calculations[0].group && !this.calculations[0].calculations)
+        if(!this.calculations[0]?.group && !this.calculations[0]?.calculations)
             configGroups = [{ group: `Calculations`, calculations: this.calculations }]
         for(var c = 0; c < configGroups.length; c++) {
             const calculations = configGroups[c].calculations
