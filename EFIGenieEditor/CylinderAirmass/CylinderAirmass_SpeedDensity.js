@@ -1,20 +1,19 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
-import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js"
+import UINumberWithUnit from "../UI/UINumberWithUnit.js"
 export default class CylinderAirmass_SpeedDensity extends UITemplate {
     static displayName = `Speed Density`
-    static measurementNameName = `Mass`
-    static output = `float`
+    static outputUnits = [`g`]
     static Requirements = [`Cylinder Air Temperature`, `Manifold Absolute Pressure`, `Volumetric Efficiency`]
     static template = `<label>Cylinder Volume:</label><div data-element="CylinderVolume"></div>`
 
     constructor(prop) {
-        super();
-        this.CylinderVolume = new UINumberWithMeasurement({
-            value:              0.66594,
-            step:               0.001,
-            min:                0.001,
-            measurementName:        `Volume`,
-            measurementUnitName:`mL`
+        super()
+        this.CylinderVolume = new UINumberWithUnit({
+            value:          0.66594,
+            step:           0.001,
+            min:            0.001,
+            valueUnit:      `L`,
+            displayUnit:    `mL`
         })
         this.style.display = `block`
         this.Setup(prop)

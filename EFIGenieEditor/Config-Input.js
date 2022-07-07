@@ -1,12 +1,12 @@
-var CurrentTickVariableID = 0;
-var RawInputConfigs = [];
+var CurrentTickVariableID = 0
+var RawInputConfigs = []
 var InputConfigs = [
     { group: `Generic Pin Input`, calculations: RawInputConfigs},
     { group: `Custom Input`, calculations: [ 
         Calculation_Static,
         Calculation_LookupTable
     ]}
-];
+]
 
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -21,7 +21,7 @@ EmbeddedOperationsFactoryIDs = {
     GetTick: 9,
     SecondsToTick: 10,
     TickToSeconds: 11
-};
+}
 
 PinOuts = {
     STM32F103C: { 
@@ -145,25 +145,25 @@ PinOuts = {
             { name: `PB_13`, value: (32*1 + 13), supportedModes: `digital digitalinterrupt pwm` , overlayX: 577, overlayY: 506, align: `left`},
         ]
     }
-};
-BooleanOutputConfigs = [];
+}
+BooleanOutputConfigs = []
 
-MapConfigs = [];
-InputConfigs.unshift({group: `MAP Sensors`, calculations: MapConfigs});
+MapConfigs = []
+InputConfigs.unshift({group: `MAP Sensors`, calculations: MapConfigs})
 
-ReluctorConfigs = [];
-InputConfigs.unshift({group: `Reluctor Decoders`, calculations: ReluctorConfigs});
+ReluctorConfigs = []
+InputConfigs.unshift({group: `Reluctor Decoders`, calculations: ReluctorConfigs})
 ReluctorFactoryIDs = {
     Offset: 30000,
     GM24X: 1,
     Universal1X: 2,
     UniversalMissintTooth: 3
-};
+}
 
-var CylinderAirmassConfigs = [];
-CylinderAirmassConfigs.push(Calculation_Static);
+var CylinderAirmassConfigs = []
+CylinderAirmassConfigs.push(Calculation_Static)
 
-var InjectorPulseWidthConfigs = [];
-InjectorPulseWidthConfigs.push(Calculation_Static);
-// InjectorPulseWidthConfigs.push(Calculation_LookupTable);
-// InjectorPulseWidthConfigs.push(Calculation_2AxisTable);
+var InjectorPulseWidthConfigs = []
+InjectorPulseWidthConfigs.push(Calculation_Static)
+// InjectorPulseWidthConfigs.push(Calculation_LookupTable)
+// InjectorPulseWidthConfigs.push(Calculation_2AxisTable)

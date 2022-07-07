@@ -5,17 +5,17 @@
         <script src="Config-Calculation.js" defer></script>
         <script type="module">
             import Calculation_Static from "./Calculation/Calculation_Static.js"
-            window.Calculation_Static = Calculation_Static;
+            window.Calculation_Static = Calculation_Static
             import Calculation_Polynomial from "./Calculation/Calculation_Polynomial.js"
-            window.Calculation_Polynomial = Calculation_Polynomial;
+            window.Calculation_Polynomial = Calculation_Polynomial
             import Calculation_LookupTable from "./Calculation/Calculation_LookupTable.js"
-            window.Calculation_LookupTable = Calculation_LookupTable;
+            window.Calculation_LookupTable = Calculation_LookupTable
             import Calculation_2AxisTable from "./Calculation/Calculation_2AxisTable.js"
-            window.Calculation_2AxisTable = Calculation_2AxisTable;
+            window.Calculation_2AxisTable = Calculation_2AxisTable
             import CalculationOrVariableSelection from "./Calculation/CalculationOrVariableSelection.js"
-            window.CalculationOrVariableSelection = CalculationOrVariableSelection;
+            window.CalculationOrVariableSelection = CalculationOrVariableSelection
             import Calculation_Formula from "./Calculation/Calculation_Formula.js"
-            window.Calculation_Formula = Calculation_Formula;
+            window.Calculation_Formula = Calculation_Formula
         </script>
         <script src="Config-Input.js" defer></script>
         <script type="module">
@@ -46,7 +46,7 @@
         <script src="Config.js" defer></script>
         <script type="module">
             import Top from "./Top/Top.js"
-            window.ConfigTop = Top;
+            window.ConfigTop = Top
         </script>
         <script src="lzjs.js"></script>
         <script src="Units.js"></script>
@@ -54,88 +54,88 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
         <script defer>
-            var b, pinOverlay;
+            var b, pinOverlay
             function UpdateOverlay() {
-                b.Inputs.pinOverlay.update();
+                b.Inputs.pinOverlay.update()
             }
             var configJsonName = `tune.json`
-            document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables(); }); });//this is a hack but oh well
+            document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables() }) })//this is a hack but oh well
             const loadConfig = (config) => {
-                try {
-                    b.saveValue = parseObject(config);
-                    let workspace = document.querySelector(`#workspace`);
-                    workspace.innerHtml = ``;
-                    workspace.append(b);
-                    UpdateOverlay();
-                    let btnLoad = document.querySelector(`#btnLoad`);
-                    btnLoad.value = ``;
-                } catch { }
-            };
+                // try {
+                    b.saveValue = parseObject(config)
+                    let workspace = document.querySelector(`#workspace`)
+                    workspace.innerHtml = ``
+                    workspace.append(b)
+                    UpdateOverlay()
+                    let btnLoad = document.querySelector(`#btnLoad`)
+                    btnLoad.value = ``
+                // } catch { }
+            }
             document.addEventListener(`DOMContentLoaded`, function() {
-                b = new ConfigTop();
-                pinOverlay = b.Inputs.pinOverlay;
-                const lastConfig = window.localStorage.getItem(`config`);
+                b = new ConfigTop()
+                pinOverlay = b.Inputs.pinOverlay
+                const lastConfig = window.localStorage.getItem(`config`)
                 if (lastConfig) {
-                    loadConfig(lastConfig);
+                    loadConfig(lastConfig)
                 } else {
-                    b.RegisterVariables();
+                    b.RegisterVariables()
                 }
-                let workspace = document.querySelector(`#workspace`);
-                workspace.innerHtml = ``;
-                workspace.append(b);
-                UpdateOverlay();
-                let btnSave = document.querySelector(`#btnSave`);
+                let workspace = document.querySelector(`#workspace`)
+                workspace.innerHtml = ``
+                workspace.append(b)
+                UpdateOverlay()
+                let btnSave = document.querySelector(`#btnSave`)
                 btnSave.addEventListener(`click`, function(){
-                    var cfg = b.saveValue;
-                    window.localStorage.setItem(`config`, stringifyObject(cfg));
-                    downloadObject(cfg, configJsonName);
-                });
-                let btnSaveCompressed = document.querySelector(`#btnSaveCompressed`);
+                    var cfg = b.saveValue
+                    window.localStorage.setItem(`config`, stringifyObject(cfg))
+                    downloadObject(cfg, configJsonName)
+                })
+                let btnSaveCompressed = document.querySelector(`#btnSaveCompressed`)
                 btnSaveCompressed.addEventListener(`click`, function(){
-                    var cfg = b.saveValue;
-                    window.localStorage.setItem(`config`, stringifyObject(cfg));
-                    downloadCompressedObject(cfg, configJsonName);
-                });
-                let btnLoad = document.querySelector(`#btnLoad`);
+                    var cfg = b.saveValue
+                    window.localStorage.setItem(`config`, stringifyObject(cfg))
+                    downloadCompressedObject(cfg, configJsonName)
+                })
+                let btnLoad = document.querySelector(`#btnLoad`)
                 btnLoad.addEventListener(`change`, function(evt){
-                    var test = new FileReader();
+                    var test = new FileReader()
 
                     test.onload = function(evt) {
-                        if(evt.target.readyState != 2) return;
+                        if(evt.target.readyState != 2) return
                         if(evt.target.error) {
-                            alert(`Error while reading file`);
-                            return;
+                            alert(`Error while reading file`)
+                            return
                         }
 
-                        const result = evt.target.result;
-                        window.localStorage.setItem(`config`, result);
-                        loadConfig(result);
-                    };
+                        const result = evt.target.result
+                        window.localStorage.setItem(`config`, result)
+                        loadConfig(result)
+                    }
 
-                    test.readAsText(evt.target.files[0]);
-                    configJsonName = evt.target.files[0].name;
-                });
-                let btnSaveBin = document.querySelector(`#btnSaveBin`);
+                    test.readAsText(evt.target.files[0])
+                    configJsonName = evt.target.files[0].name
+                })
+                let btnSaveBin = document.querySelector(`#btnSaveBin`)
                 btnSaveBin.addEventListener(`click`, function(){
-                    downloadBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin");
-                });
-                let btnBurnBin = document.querySelector(`#btnBurnBin`);
+                    downloadBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }), configJsonName.substring(0, configJsonName.lastIndexOf(".")) + ".bin")
+                })
+                let btnBurnBin = document.querySelector(`#btnBurnBin`)
                 btnBurnBin.addEventListener(`click`, function(){
-                    burnBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }));
-                });
+                    burnBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }))
+                })
 
-                let selectTarget = document.querySelector(`#selectTarget`);
+                let selectTarget = document.querySelector(`#selectTarget`)
                 selectTarget.addEventListener(`change`, function(evt){
-                    b.Inputs.TargetDevice = this.value;
-                    b.Inputs.pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice];
-                });
-                var targets = ``;
+                    b.Inputs.TargetDevice = this.value
+                    b.Inputs.pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice]
+                })
+                var targets = ``
                 Object.entries(PinOuts).forEach(entry => {
-                    const [key, value] = entry;
-                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.name}</option>`;
-                });
-                selectTarget.innerHTML = targets;
-            });
+                    const [key, value] = entry
+                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.name}</option>`
+                })
+                selectTarget.innerHTML = targets
+            })
         </script>
         <meta name="viewport" content="width=750, initial-scale=1">
     </head>
@@ -152,10 +152,10 @@
         <div id="overlay"></div>
         <div style="position: relative; top: 57px;"><div id="workspace" style="position: static; margin: 0; padding: 0;"></div></div>
         <script>
-            var siteWidth = 750;
-            var scale = screen.width /siteWidth;
+            var siteWidth = 750
+            var scale = screen.width /siteWidth
 
-            document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'');
+            document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'')
         </script>
     </body>
 </html>

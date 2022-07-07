@@ -1,76 +1,65 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 export default class Engine extends UITemplate {
-    static template = getFileContents(`ConfigGui/Engine.html`);
+    static template = getFileContents(`ConfigGui/Engine.html`)
 
     constructor(prop) {
-        super();
+        super()
         this.CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:        undefined,
-            label:              `Crank Position`,
-            measurementName:    `Reluctor`,
-            output:             `ReluctorResult`,
-        });
+            calculations:  undefined,
+            label:         `Crank Position`,
+            outputTypes:   [ `ReluctorResult` ],
+        })
         this.CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:        undefined,
-            label:              `Cam Position`,
-            measurementName:    `Reluctor`,
-            output:             `ReluctorResult`,
-        });
+            calculations:  undefined,
+            label:         `Cam Position`,
+            outputTypes:   [ `ReluctorResult` ],
+        })
         this.CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:       CylinderAirmassConfigs,
-            label:              `Cylinder Air Mass`,
-            measurementName:    `Mass`,
-            output:             `float`,
-        });
+            calculations:  CylinderAirmassConfigs,
+            label:         `Cylinder Air Mass`,
+            outputUnits:   [ `g` ],
+        })
         this.CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:       CylinderAirTemperatureConfigs,
-            label:              `Cylinder Air Temperature`,
-            measurementName:    `Temperature`,
-            output:             `float`,
-        });
+            calculations:  CylinderAirTemperatureConfigs,
+            label:         `Cylinder Air Temperature`,
+            outputUnits:   [ `°C` ],
+        })
         this.ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:       ManifoldAbsolutePressureConfigs,
-            label:              `Manifold Absolute Pressure`,
-            measurementName:    `Pressure`,
-            output:             `float`,
-        });
+            calculations:  ManifoldAbsolutePressureConfigs,
+            label:         `Manifold Absolute Pressure`,
+            outputUnits:   [ `Bar` ],
+        })
         this.VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
-            calculations:       VolumetricEfficiencyConfigs,
-            label:              `Volumetric Efficiency`,
-            measurementName:    `Percentage`,
-            output:             `float`,
-        });
-        this.Setup(prop);
+            calculations:  VolumetricEfficiencyConfigs,
+            label:         `Volumetric Efficiency`,
+            outputUnits:   [ `[0.0-1.0]` ],
+        })
+        this.Setup(prop)
     }
 
     RegisterVariables() {
-        this.CrankPositionConfigOrVariableSelection.RegisterVariables(`EngineParameters.Crank Position`);
-        this.CamPositionConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cam Position`);
+        VariableRegister.RegisterVariable({ name: `EngineParameters.Engine Speed`, unit: `RPM` })
 
-        VariableRegister.RegisterVariable(`EngineParameters.Engine Speed(AngularSpeed)`, `float`);
+        this.CrankPositionConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Crank Position` })
+        this.CamPositionConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Cam Position` })
+        this.CylinderAirmassConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Cylinder Air Mass` })
 
-        var requirements = [];
+        var requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.SubConfig, `Requirements`)
 
-        if(!this.CylinderAirmassConfigOrVariableSelection.IsVariable()) {
-            requirements = GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`);
-        }
-
-        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) < 0;
+        this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) === -1
         if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden) 
-            this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables(`EngineParameters.Manifold Absolute Pressure`);
+            this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Manifold Absolute Pressure` })
         
-        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) < 0;
+        this.CylinderAirTemperatureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) === -1
         if(!this.CylinderAirTemperatureConfigOrVariableSelection.hidden) 
-            this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cylinder Air Temperature`);
+            this.CylinderAirTemperatureConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Cylinder Air Temperature` })
         
-        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) < 0;
+        this.VolumetricEfficiencyConfigOrVariableSelection.hidden = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) === -1
         if(!this.VolumetricEfficiencyConfigOrVariableSelection.hidden) 
-            this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables(`EngineParameters.Volumetric Efficiency`);
-
-        this.CylinderAirmassConfigOrVariableSelection.RegisterVariables(`EngineParameters.Cylinder Air Mass`);
+            this.VolumetricEfficiencyConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Volumetric Efficiency` })
     }
 
-    get value() { return { ...super.value, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.GetSubConfig(), `Requirements`) } }
+    get value() { return { ...super.value, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmassConfigOrVariableSelection.SubConfig, `Requirements`) } }
     set value(value) { super.value = value }
 }
-customElements.define(`top-engine`, Engine, { extends: `span` });
+customElements.define(`top-engine`, Engine, { extends: `span` })

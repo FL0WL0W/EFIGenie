@@ -1,4 +1,4 @@
-var GenericConfigs = [];
+var GenericConfigs = []
 
 var OperationArchitectureFactoryIDs = {
     Offset: 10000,

@@ -1,0 +1,48 @@
+import UINumberWithUnit from "./UINumberWithUnit.js"
+export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
+    static template = `<div data-element="displayElement"></div><div data-element="displayUnitElement"></div>`
+
+    ZeroesToAdd = 10000000
+    displayElement = document.createElement(`div`)
+
+    constructor(prop) {
+        super(prop)
+        const thisClass = this
+        this.displayUnitElement.addEventListener(`change`, function() {
+            thisClass.ZeroesToAdd = 10000000
+            thisClass.UpdateDisplayValue()
+            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+        })
+        this.displayElement.style.display = this.displayUnitElement.style.display = `inline-block`
+        this.ZeroesToAdd = 10000000
+    }
+
+    get value() { return undefined }
+    set value(value) {}
+    get saveValue() { return this.displayUnitElement.saveValue }
+    set saveValue(saveValue) { this.displayUnitElement.saveValue = saveValue }
+
+    UpdateDisplayValue() {
+        super.UpdateDisplayValue()
+
+        let displayValue = this.displayValue
+        if(displayValue) return
+            
+        displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`
+        const indexOfPoint = displayValue.indexOf(`.`)
+        var zeroesToAdd = Math.max(0, 6-(displayValue.length - indexOfPoint))
+        if(indexOfPoint === -1)
+            zeroesToAdd = 6
+        if(zeroesToAdd < this.ZeroesToAdd)
+            this.ZeroesToAdd = zeroesToAdd
+        zeroesToAdd -= this.ZeroesToAdd
+        if(zeroesToAdd > 0 && indexOfPoint < 0)
+            displayValue += `.`
+        for(var i = 0; i < zeroesToAdd; i++)
+            displayValue += `0`
+
+        if(this.displayElement)
+            this.displayElement.textContent = displayValue
+    }
+}
+customElements.define(`ui-displaynumberwithunit`, UIDisplayNumberWithUnit, { extends: `span` })

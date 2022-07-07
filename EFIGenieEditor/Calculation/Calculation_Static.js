@@ -1,31 +1,34 @@
-import UITemplate from "../JavascriptUI/UITemplate.js";
-import UINumberWithMeasurement from "../UI/UINumberWithMeasurement.js";
+import UITemplate from "../JavascriptUI/UITemplate.js"
+import UINumberWithUnit from "../UI/UINumberWithUnit.js"
 export default class Calculation_Static extends UITemplate {
-    static template = `<span data-element="valueElement"></span>`
-    static displayName = `Static`;
-    static output = `float`;
-    static inputs = [];
+    static displayName = `Static`
+    static outputTypes = [ `float` ]
+    static template = `<div data-element="numberElement"></div>`
+
+    numberElement = new UINumberWithUnit()
 
     constructor(prop) {
         super()
-        this.valueElement = new UINumberWithMeasurement(prop);
         this.Setup(prop)
     }
 
-    get value() { return { value: this.valueElement.value } }
-    set value(value) {
-        if(typeof value === `object`)
-            this.valueElement.value = value.value
-        else
-            this.valueElement.value = value
-    }
+    get displayUnit() { return this.numberElement.displayUnit }
+    set displayUnit(displayUnit) { this.numberElement.displayUnit = displayUnit}
+    get outputUnits() { return [ this.numberElement.valueUnit ] }
+    set outputUnits(outputUnits) { this.numberElement.valueUnit = outputUnits?.[0] }
+    get outputTypes() { return this.outputUnits? undefined : this.constructor.outputTypes }
 
-    get saveValue() {
-        return this.valueElement.saveValue;
-    }
-    set saveValue(saveValue) {
-        this.valueElement.saveValue = saveValue
-    }
+    get value() { return this.numberElement.value }
+    set value(value) { this.numberElement.value = value }
+    get saveValue() { return this.numberElement.saveValue }
+    set saveValue(saveValue) { this.numberElement.saveValue = saveValue }
+
+    get step() { return this.numberElement.step }
+    set step(step) { this.numberElement.step = step }
+    get min() { return this.numberElement.min }
+    set min(min) { this.numberElement.min = min }
+    get max() { return this.numberElement.max }
+    set max(max) { this.numberElement.max = max }
 }
-customElements.define(`calculation-static`, Calculation_Static, { extends: `span` });
-GenericConfigs.push(Calculation_Static);
+customElements.define(`calculation-static`, Calculation_Static, { extends: `span` })
+GenericConfigs.push(Calculation_Static)

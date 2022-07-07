@@ -1,27 +1,25 @@
-var BlankUnits = [ { name: ``, DisplayMultiplier: 1, DisplayOffset: 0} ];
-var PercentUnits = [ { name: `%`, DisplayMultiplier: 100, DisplayOffset: 0 }, { name: `[0.0-1.0]`, DisplayMultiplier: 1, DisplayOffset: 0} ];
-var PercentageAccelerationUnits = PerSecond(PercentUnits);// [ { name: `(0.0-1.0)/s`, DisplayMultiplier: 1, DisplayOffset: 0}, { name: `%/s`, DisplayMultiplier: 100, DisplayOffset: 0 } ];
-var TimeUnits = [ { name: `s`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `ms`, DisplayMultiplier: 1000, DisplayOffset: 0 }, { name: `us`, DisplayMultiplier: 1000000, DisplayOffset: 0 }, { name: `ns`, DisplayMultiplier: 1000000000, DisplayOffset: 0 } ];
-var FrequencyUnits = [ { name: `Hz`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `KHz`, DisplayMultiplier: 0.001, DisplayOffset: 0 }, { name: `MHz`, DisplayMultiplier: 0.000001, DisplayOffset: 0 } ];
-var AngleUnits = [ { name: `°`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var VoltageUnits = [ { name: `V`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `mV`, DisplayMultiplier: 1000, DisplayOffset: 0 } ];
-var PressureUnits = [ { name: `Bar`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `kPa`, DisplayMultiplier: 100, DisplayOffset: 0 } ];
-var AngularSpeedUnits = [ { name: `RPM`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var SpeedUnits = [ { name: `KPH`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `MPH`, DisplayMultiplier: 1.61, DisplayOffset: 0 } ];
-var TemperatureUnits = [ { name: `°C`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `°F`, DisplayMultiplier: 1.8, DisplayOffset: 32 } ];
-var GasConstantUnits = [ { name: `J/kg K`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `kJ/kg K`, DisplayMultiplier: 0.1, DisplayOffset: 0 } ];
-var MassUnits = [ { name: `g`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `mg`, DisplayMultiplier: 1000, DisplayOffset: 0 }, { name: `kg`, DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
-var Ratio = [ { name: `:1`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var CycleUnits = [ { name: `Cycles`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var LambdaUnits = [ { name: `λ`, DisplayMultiplier: 1, DisplayOffset: 0 } ];
-var VolumeUnits = [ { name: `L`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `mL`, DisplayMultiplier: 1000, DisplayOffset: 0 } ];
-var MassFlowUnits = [ { name: `g/s`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `g/min`, DisplayMultiplier: 60, DisplayOffset: 0 } ];
-var ResistanceUnits = [ { name: `Ω`, DisplayMultiplier: 1, DisplayOffset: 0 }, { name: `kΩ`, DisplayMultiplier: 0.001, DisplayOffset: 0 } ];
-var Bool = [ { name: ``, DisplayMultiplier: 1, DisplayOffset: 0 } ];
+var BlankUnits = [ { name: ``, SIMultiplier: 1, SIOffset: 0} ]
+var PercentUnits = [ { name: `%`, SIMultiplier: 100, SIOffset: 0 }, { name: `[0.0-1.0]`, SIMultiplier: 1, SIOffset: 0} ]
+var PercentageAccelerationUnits = PerSecond(PercentUnits)// [ { name: `(0.0-1.0)/s`, SIMultiplier: 1, SIOffset: 0}, { name: `%/s`, SIMultiplier: 100, SIOffset: 0 } ]
+var TimeUnits = [ { name: `s`, SIMultiplier: 1, SIOffset: 0 }, { name: `ms`, SIMultiplier: 1000, SIOffset: 0 }, { name: `us`, SIMultiplier: 1000000, SIOffset: 0 }, { name: `ns`, SIMultiplier: 1000000000, SIOffset: 0 } ]
+var FrequencyUnits = [ { name: `Hz`, SIMultiplier: 1, SIOffset: 0 }, { name: `KHz`, SIMultiplier: 0.001, SIOffset: 0 }, { name: `MHz`, SIMultiplier: 0.000001, SIOffset: 0 } ]
+var AngleUnits = [ { name: `°`, SIMultiplier: 1, SIOffset: 0 } ]
+var VoltageUnits = [ { name: `V`, SIMultiplier: 1, SIOffset: 0 }, { name: `mV`, SIMultiplier: 1000, SIOffset: 0 } ]
+var PressureUnits = [ { name: `Bar`, SIMultiplier: 1, SIOffset: 0 }, { name: `kPa`, SIMultiplier: 100, SIOffset: 0 } ]
+var AngularSpeedUnits = [ { name: `RPM`, SIMultiplier: 1, SIOffset: 0 } ]
+var SpeedUnits = [ { name: `KPH`, SIMultiplier: 1, SIOffset: 0 }, { name: `MPH`, SIMultiplier: 1.61, SIOffset: 0 } ]
+var TemperatureUnits = [ { name: `°C`, SIMultiplier: 1, SIOffset: 0 }, { name: `°F`, SIMultiplier: 1.8, SIOffset: 32 } ]
+var GasConstantUnits = [ { name: `J/kg K`, SIMultiplier: 1, SIOffset: 0 }, { name: `kJ/kg K`, SIMultiplier: 0.1, SIOffset: 0 } ]
+var MassUnits = [ { name: `g`, SIMultiplier: 1, SIOffset: 0 }, { name: `mg`, SIMultiplier: 1000, SIOffset: 0 }, { name: `kg`, SIMultiplier: 0.001, SIOffset: 0 } ]
+var Ratio = [ { name: `:1`, SIMultiplier: 1, SIOffset: 0 } ]
+var CycleUnits = [ { name: `Cycles`, SIMultiplier: 1, SIOffset: 0 } ]
+var LambdaUnits = [ { name: `λ`, SIMultiplier: 1, SIOffset: 0 } ]
+var VolumeUnits = [ { name: `L`, SIMultiplier: 1, SIOffset: 0 }, { name: `mL`, SIMultiplier: 1000, SIOffset: 0 } ]
+var MassFlowUnits = [ { name: `g/s`, SIMultiplier: 1, SIOffset: 0 }, { name: `g/min`, SIMultiplier: 60, SIOffset: 0 } ]
+var ResistanceUnits = [ { name: `Ω`, SIMultiplier: 1, SIOffset: 0 }, { name: `kΩ`, SIMultiplier: 0.001, SIOffset: 0 } ]
 
 var Measurements = {
     None: BlankUnits,
-    Reluctor: [],
     Voltage: VoltageUnits,
     Temperature: TemperatureUnits,
     Pressure: PressureUnits,
@@ -38,105 +36,77 @@ var Measurements = {
     AngularSpeed: AngularSpeedUnits,
     Ratio: Ratio,
     Resistance: ResistanceUnits,
-    Bool: Bool
 }
 
-var MeasurementType = {
-    None: `float`,
-    Reluctor: `ReluctorResult`,
-    Voltage: `float`,
-    Temperature: `float`,
-    Pressure: `float`,
-    Mass: `float`,
-    MassFlow: `float`,
-    Volume: `float`,
-    Speed: `float`,
-    Time: `float`,
-    Frequency: `float`,
-    Percentage: `float`,
-    PercentageAcceleration: `float`,
-    Lambda: `float`,
-    Angle: `float`,
-    AngularSpeed: `float`,
-    Ratio: `float`,
-    Resistance: `float`,
-    Bool: `bool`
+function ConvertValueFromUnitToUnit(value, fromUnit, toUnit) {
+    fromUnit = GetUnitFromName(fromUnit)
+    toUnit = GetUnitFromName(toUnit)
+    return (value - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset
 }
 
-function GetMeasurementDisplay(measurement, index) {
-    var measurementString;
-    if(typeof measurement === `string`) {
-        measurementString = measurement;
-        measurement = Measurements[measurement];
+function GetUnitFromName(unitName) { return Measurements[GetMeasurementNameFromUnitName(unitName)]?.find(u => u.name === unitName) ?? 
+                                            Measurements[GetMeasurementNameFromUnitName(unitName)]?.find(u => u.name === `°${unitName}`) ?? 
+                                            BlankUnits[0] }
+
+function GetMeasurementNameFromUnitName(unit){
+    for(let measurementName in Measurements) {
+        for(let measurementIndex in Measurements[measurementName]) {
+            if(unit === Measurements[measurementName][measurementIndex].name)
+                return measurementName
+        }
     }
-
-    if(!measurement)
-        return ``;
-
-    if(index !== undefined && index >= measurement.length)
-        return ``;
-
-    if(measurementString){
-        if(index !== undefined && measurement[index].name !== ``)
-            return measurementString + ` [` + measurement[index].name + `]`;
-        else
-            return measurementString;
+    for(let measurementName in Measurements) {
+        for(let measurementIndex in Measurements[measurementName]) {
+            if(`°${unit}` === Measurements[measurementName][measurementIndex].name)
+                return measurementName
+        }
     }
-
-    return measurement[index].name;
-}
-
-function GetUnitDisplay(measurement, name) {
-    return GetUnit(measurement, name).name;
+    return `None`
 }
 
 function GetUnit(measurement, name) {
     if(typeof measurement === `string`) {
-        measurement = Measurements[measurement];
+        measurement = Measurements[measurement]
     }
 
     if(!measurement)
-        return ``;
+        return ``
     
     if(measurement.length < 1)
-        return ``;
+        return ``
 
     let index = 0
 
     if(name) {
         for(let i=0; i<measurement.length; i++){
             if(measurement[i].name === name) {
-                index = i;
-                break;
+                index = i
+                break
             }
         }
     }
         
-    return measurement[index];
-}
-
-function GetDefaultUnitIndex(measurement) {
-    return 0;
+    return measurement[index]
 }
 
 function PerSecond(units)
 {
-    var newUnits = [];
+    var newUnits = []
 
     units.forEach(function(value, index){
-        newUnits.push( { name: value.name + `/s`, DisplayMultiplier: value.DisplayMultiplier, DisplayOffset: value.DisplayOffset });
-    });
+        newUnits.push( { name: value.name + `/s`, SIMultiplier: value.SIMultiplier, SIOffset: value.SIOffset })
+    })
 
-    return newUnits;
+    return newUnits
 }
 
 function PerMinute(units)
 {
-    var newUnits = [];
+    var newUnits = []
 
     units.forEach(function(value, index){
-        newUnits.push( { name: value.name + `/min`, DisplayMultiplier: value.DisplayMultiplier * 60, DisplayOffset: value.DisplayOffset * 60 });
-    });
+        newUnits.push( { name: value.name + `/min`, SIMultiplier: value.SIMultiplier * 60, SIOffset: value.SIOffset * 60 })
+    })
 
-    return newUnits;
+    return newUnits
 }

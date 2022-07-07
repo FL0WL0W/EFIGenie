@@ -15,85 +15,79 @@ class VariableRegistry {
         this.VariableIncrement ??= 0
         return ++this.VariableIncrement
     }
-    GetVariableByReference(variableReference) {
-        if(typeof variableReference === `string`) {
-            if(variableReference.indexOf(`.`) !== -1) {
-                const listName = variableReference.substring(0, variableReference.indexOf(`.`))
-                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
-                if(Array.isArray(this[listName])) {
-                    var variable = this[listName].find(a => a.name === variableName)
-                    if(variableName.indexOf(`(`) !== -1) {
-                        var measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
-                        measurementName = measurementName.substring(0, measurementName.length - 1)
-                        variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
-                        variable ??= this[listName].find(a => a.name === variableName && a.measurementName === measurementName)
-                        variable ??= this[listName].find(a => a.name === variableName)
-                    }
-                    if(variable) {
-                        if(typeof variable.Id === `string`)
-                            return this.GetVariableByReference(variable.Id)
-                        return variable
-                    }
-                }
-            }
-            if(typeof this[variableReference] === `string`)
-                return this.GetVariableByReference(this[variableReference])
-            if(this[variableReference] !== undefined)
-                return this[variableReference]
+    GetVariableByReference(reference) {
+        if(!reference || typeof reference !== `object`) return
+
+        let variable
+        //variable is contained in a list
+        const dotIndex = reference.name.indexOf(`.`)
+        if(dotIndex !== -1) {
+            const listName = reference.name.substring(0, dotIndex)
+            if(!this[listName]) return
+            variable = { name: reference.name.substring(dotIndex + 1) }
+
+            variable = this[listName].find(a => 
+                a.name === variable.name && 
+                (reference.unit === undefined || a.unit === reference.unit || (a.unit === undefined && typeof a.id === `string`)) && 
+                (reference.type === undefined || (a.unit !== undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type?.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type === undefined && typeof a.id === `string`)))
+        //variable is an object in this
+        } else if (typeof this[reference.name] === `object`) {
+            variable = this[reference.name]
+        //variable points indirectly to another variable by name or is directly the id
+        } else if (typeof this[reference.name] === `string`, typeof this[reference.name] === `number`) {
+            variable = { name: reference.name, id: this[reference.name] }
         }
-        if(typeof variableReference === `number`)
-            return variableReference
-        return undefined
-    }
-    GetVariableId(variableReference) {
-        var variable = this.GetVariableByReference(variableReference)
-        if(variable === undefined && this.CreateIfNotFound)
-        {
-            if(typeof variableReference === `string` && variableReference.indexOf(`.`) !== -1) {
-                const listName = variableReference.substring(0, variableReference.indexOf(`.`))
-                this[listName] ??= []
-                var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
-                var measurementName
-                if(variableName.indexOf(`(`) !== -1) {
-                    measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
-                    measurementName = measurementName.substring(0, measurementName.length - 1)
-                    variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
-                }
-                var Id = this.GenerateVariableId()
-                this[listName].push({ name: variableName, measurementName, Id})
-                return Id
-            } else {
-                return this[variableReference] = this.GenerateVariableId()
-            }
+
+        if(variable) {
+            if(typeof variable.id === `string`)
+                return { ...this.GetVariableByReference({ name: variable.id, unit: reference.unit ?? variable.unit, type: reference.type ?? variable.type }), name: variable.name }
+            return variable
         }
-        if(typeof variable === `object`)
-            return variable.Id
-        return variable
     }
-    RegisterVariable(variableReference, Type, Id) {
-        if(variableReference.indexOf(`.`) !== -1) {
-            const listName = variableReference.substring(0, variableReference.indexOf(`.`))
-            var variableName = variableReference.substring(variableReference.indexOf(`.`) + 1)
-            let measurementName
-            if(variableName.indexOf(`(`) !== -1) {
-                measurementName = variableName.substring(variableName.lastIndexOf(`(`) + 1)
-                measurementName = measurementName.substring(0, measurementName.length - 1)
-                variableName = variableName.substring(0, variableName.lastIndexOf(`(`))
-            }
+    GetVariableId(reference) {
+        let variable = this.GetVariableByReference(reference)
+        if(variable) return variable.id
+        if(!this.CreateIfNotFound) return
+        reference = { ...reference }
+
+        //create variable since it was not found
+        reference.id ??= this.GenerateVariableId()
+
+        const dotIndex = reference.name.indexOf(`.`)
+        if(dotIndex !== -1) {
+            const listName = reference.name.substring(0, dotIndex)
             this[listName] ??= []
-            const existing = this[listName].findIndex(r => r.name === variableName && (measurementName == undefined || measurementName == r.measurementName))
-            if(existing >= 0) {
-                Id ??= this[listName][existing].Id
-                this[listName].splice(existing, 1)
-            }
-            this[listName].push({
-                name: variableName,
-                measurementName: measurementName,
-                Type,
-                Id: Id ?? this.GenerateVariableId()
-            })
+            reference.name = reference.name.substring(dotIndex + 1)
+
+            this[listName].push(reference)
         } else {
-            this[variableReference] = Id ?? this.GenerateVariableId()
+            this[reference.name] = reference
+        }
+        return reference.id
+    }
+    RegisterVariable(reference) {
+        if(!reference || typeof reference !== `object`) return
+        reference = { ...reference }
+
+        const dotIndex = reference.name.indexOf(`.`)
+        if(dotIndex !== -1) {
+            const listName = reference.name.substring(0, dotIndex)
+            this[listName] ??= []
+            reference.name = reference.name.substring(dotIndex + 1)
+
+            const existingIndex = this[listName].findIndex(a => 
+                a.name === reference.name && 
+                (reference.unit === undefined || a.unit === reference.unit || (a.unit === undefined && typeof a.id === `string`)) && 
+                (reference.type === undefined || (a.unit !== undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type === undefined && typeof a.id === `string`)))
+            if(existingIndex !== -1) {
+                reference.id ??= this[listName][existingIndex].id
+                this[listName].splice(existingIndex, 1)
+            }
+            reference.id ??= this.GenerateVariableId()
+            this[listName].push(reference)
+        } else {
+            reference.id ??= this.GenerateVariableId()
+            this[reference.name] = reference
         }
     }
     GetVariableReferenceList() {
@@ -111,51 +105,58 @@ class VariableRegistry {
                 variableReferences[property] ??= []
                 var arr = this[property]
     
-                for (var i = 0; i < arr.length; i++) {
-                    variableReferences[property].push({ name: arr[i].name, measurementName: arr[i].measurementName, Id: this.GetVariableId(arr[i].Id)})
+                for (var i = 0; i < this[property].length; i++) {
+                    let reference = { ...this[property][i] }
+                    reference.name = `${property}.${reference.name}`
+                    variableReferences[property].push(this.GetVariableByReference(reference))
                 }
             } else {
-                variableReferences[property] = this.GetVariableId(this[property])
+                variableReferences[property] = this.GetVariableByReference(this[property])
             }
         }
         return variableReferences
     }
 }
-
 VariableRegister = new VariableRegistry()
-function defaultFilter(measurementName, output, inputs, calculationsOnly) {
+
+function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
     return function(calcOrVar) {
         //variable filter
-        if(calcOrVar.Type) {
-            if(inputs || calculationsOnly)
-                return false
-            if ((!measurementName || calcOrVar.measurementName === measurementName) && (output === undefined || output.split(`|`).indexOf(calcOrVar.Type) >= 0))
-                return true
-            return false
+        if(calcOrVar.type || calcOrVar.unit) {
+            if(inputTypes || inputUnits) return false
+            if(outputUnits?.[0] !== undefined) {
+                if(outputUnits.length !== 1) return false
+                if(calcOrVar.unit !== outputUnits[0]) return false
+            } else if(outputTypes?.[0] !== undefined){
+                if(outputTypes.length !== 1) return false
+                if(calcOrVar.unit === undefined && calcOrVar.type === undefined ) return false
+                if(calcOrVar.unit !== undefined && outputTypes[0].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.type !== undefined && !outputTypes[0].split(`|`).some(t => calcOrVar.type.split(`|`).indexOf(t) !== -1)) return false
+            }
+            return true
         }
 
         //calculation Filter
-        if (output !== undefined && !calcOrVar.output?.split(`|`).some(o=> output.split(`|`).indexOf(o) > -1)) 
-            return false
-
-        if(measurementName !== undefined && ((calcOrVar.measurementName !== undefined && measurementName !== calcOrVar.measurementName) || (MeasurementType[measurementName] !== undefined && calcOrVar.output?.split(`|`).indexOf(MeasurementType[measurementName]) < 0)))
-            return false
-        
-        if(inputs !== undefined) {
-            if(calcOrVar.inputs === undefined || inputs.length !== calcOrVar.inputs.length)
-                return false
-            var inputsMatch = true
-            for(var im = 0; im < inputs.length; im++){
-                if(inputs[im] !== calcOrVar.inputs[im]){
-                    inputsMatch = false
-                    break
-                }
+        for(let i = 0; i < (outputUnits?.length ?? outputTypes?.length); i++){
+            if(outputUnits?.[i] !== undefined) {
+                if((calcOrVar.outputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && outputUnits[i] !== calcOrVar.outputUnits?.[i]) return false
+            } else if(outputTypes?.[i] !== undefined){
+                if(calcOrVar.outputUnits?.[i] === undefined && calcOrVar.outputTypes?.[i] === undefined) false
+                if(calcOrVar.outputUnits?.[i] !== undefined && outputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.outputTypes?.[i] !== undefined && !outputTypes[i].split(`|`).some(t => calcOrVar.outputTypes[i].split(`|`).indexOf(t) !== -1)) return false
             }
-            if(!inputsMatch)
-                return false
+        }
+
+        for(let i = 0; i < (inputUnits?.length ?? inputTypes?.length); i++){
+            if(inputUnits?.[i] !== undefined) {
+                if((calcOrVar.inputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && inputUnits[i] !== calcOrVar.inputUnits?.[i]) return false
+            } else if(inputTypes?.[i] !== undefined){
+                if(calcOrVar.inputUnits?.[i] === undefined && calcOrVar.inputTypes?.[i] === undefined) false
+                if(calcOrVar.inputUnits?.[i] !== undefined && inputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.inputTypes?.[i] !== undefined && !inputTypes[i].split(`|`).some(t => calcOrVar.inputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+            }
         }
         return true
-
     }
 }
 function GetSelections(calculations, filter) {
@@ -193,8 +194,12 @@ function GetSelections(calculations, filter) {
             if (!filter || filter(arr[i])) {
                 arrSelections.options.push({
                     name: arr[i].name,
-                    info: `[${arr[i].measurementName}]`,
-                    value: `${property}.${arr[i].name}${arr[i].measurementName? `(${arr[i].measurementName})` : ``}`
+                    info: arr[i].unit? `[${GetMeasurementNameFromUnitName(arr[i].unit)}]` : ``,
+                    value: { 
+                        name: `${property}.${arr[i].name}`,
+                        ...( arr[i].type === undefined? undefined :{ type: arr[i].type } ),
+                        ...( arr[i].unit === undefined? undefined :{ unit: arr[i].unit } )
+                    }
                 })
             }
         }
@@ -376,33 +381,31 @@ x86TypeAlignment = [
 
 function Packagize(definition, val) {
     val ??= {}
-    val.outputVariables = val.result === undefined? val.outputVariables : [val.result]
-    val.outputVariables ??= this.result === undefined? this.outputVariables : [this.result]
-    val.outputMeasurements = val.measurementName === undefined? val.outputMeasurements : [val.measurementName]
-    val.outputMeasurements ??= this.measurementName === undefined? this.outputMeasurements : [this.measurementName]
+    val.outputVariables ??= this.outputVariables
+    val.outputUnits = val.unit === undefined? val.outputUnits : [val.unit]
+    val.outputUnits ??= this.unit === undefined? this.outputUnits : [this.unit]
     val.outputVariables = val.outputVariables?.map(function(ov, idx) {
         if(typeof ov !== `string`)
             return ov
 
-        let measurement = ov.substring(ov.indexOf(`(`) > -1? ov.indexOf(`(`)+1 : ov.length)
-        if(measurement.indexOf(`)`) > 0)
+        let unit = ov.substring(ov.indexOf(`(`) > -1? ov.indexOf(`(`)+1 : ov.length)
+        if(unit.indexOf(`)`) > 0)
         {
-            measurement = measurement.substring(0, measurement.indexOf(`)`))
-            val.outputMeasurements ??= []
-            val.outputMeasurements[idx] ??= measurement
+            unit = unit.substring(0, unit.indexOf(`)`))
+            val.outputUnits ??= []
+            val.outputUnits[idx] ??= unit
         }
 
         let variableReference = ov.substring(0, ov.indexOf(`(`) > -1? ov.indexOf(`(`) : ov.length)
         return variableReference
     })
     val.inputVariables ??= this.inputVariables
-    delete val.measurementName
-    delete val.result
+    delete val.unit
     if( (val.outputVariables && val.outputVariables.some(x => x !== undefined)) || 
         (val.intputVariables && val.intputVariables.some(x => x !== undefined))) {
         definition.type = `Package`
         definition.outputVariables = val.outputVariables
-        definition.outputMeasurements = val.outputMeasurements
+        definition.outputUnits = val.outputUnits
         definition.inputVariables = val.inputVariables
         return { type: `definition`, value: [ definition ] }
     }
@@ -410,22 +413,7 @@ function Packagize(definition, val) {
 }
 
 function Calculation_Math(mathFactoryId) {
-    if(this.a !== undefined) {
-        this.inputVariables ??= [0,0]
-        this.inputVariables[0] = this.a
-        delete this.a
-    }
-    if(this.b !== undefined) {
-        this.inputVariables ??= [0,0]
-        this.inputVariables[1] = this.b
-        delete this.b
-    }
-    if(this.result !== undefined) {
-        this.outputVariables ??= [0]
-        this.outputVariables[0] = this.result
-        delete this.result
-    }
-    if(this.outputVariables || this.intputVariables){
+    if(this.outputVariables || this.inputVariables){
         this.inputVariables ??= [0,0]
         this.outputVariables ??= [0]
     }
@@ -434,26 +422,27 @@ function Calculation_Math(mathFactoryId) {
 }
 
 function ReluctorTemplate(definition) {
+    const recordVariable = { name: this.outputVariables?.[0]?.name, type: `Record` }
     let o = { type: `Group`, value: [
-        { ...this, type: `Input_DigitalRecord` },
+        { ...this, type: `Input_DigitalRecord`, outputVariables: [ recordVariable ] },
         Packagize( definition, { 
             ...this,
             inputVariables: [ 
-                `${this.result ?? this.outputVariables?.[0]}(Record)`,
-                `CurrentTickId`
+                recordVariable,
+                { name: `CurrentTick`, type: `tick` }
             ]
         })
     ]}
-    return o;
+    return o
 }
 
 function mapDefinitionFromValue(value) {
-    const typeInfo = this.types?.find(t => t.type == value.type);
+    const typeInfo = this.types?.find(t => t.type == value.type)
     value = { ...value, ...typeInfo }
     if(value.definition) return value.definition
 
     if(value.toDefinition) {
-        value.types ??= [];
+        value.types ??= []
         for(let typeIndex in this.types){
             if(value.types.find(x => x.type === this.types[typeIndex].type) === undefined){
                 value.types.push(this.types[typeIndex])
@@ -465,38 +454,38 @@ function mapDefinitionFromValue(value) {
             return
         if(definition.type !== `definition`)
             definition = { type: `definition`, value: [definition]}
-        return definition.value.flatMap(v => mapDefinitionFromValue.call(value, v));
+        return definition.value.flatMap(v => mapDefinitionFromValue.call(value, v))
     }
-    return value;
+    return value
 }
 function toDefinition() {
-    let definitions = this.value.flatMap(v => mapDefinitionFromValue.call(this, v));
+    let definitions = this.value.flatMap(v => mapDefinitionFromValue.call(this, v))
     return { type: `definition`, value: definitions, types: this.types }
 }
 function toArrayBuffer() {
     let definition = toDefinition.call(this)
-    var buffer = new ArrayBuffer();
+    var buffer = new ArrayBuffer()
     for(var index in definition.value){
-        var typeInfo = definition.types.find(x => x.type === definition.value[index].type);
+        var typeInfo = definition.types.find(x => x.type === definition.value[index].type)
 
         //align
-        var align = definition.value[index].align;
+        var align = definition.value[index].align
         if(align === undefined && typeInfo !== undefined){
-            align = typeInfo.align;
+            align = typeInfo.align
         }
         if(align) {
-            buffer = buffer.align(align);
+            buffer = buffer.align(align)
         }
 
-        var toArrayBuffer = definition.value[index].toArrayBuffer;
+        var toArrayBuffer = definition.value[index].toArrayBuffer
         if(toArrayBuffer === undefined && typeInfo !== undefined && definition.value[index].type !== `definition`){
-            toArrayBuffer = typeInfo.toArrayBuffer;
+            toArrayBuffer = typeInfo.toArrayBuffer
         }
         if(toArrayBuffer !== undefined){
-            buffer = buffer.concatArray(toArrayBuffer.call(definition.value[index]));
+            buffer = buffer.concatArray(toArrayBuffer.call(definition.value[index]))
         }
     }
-    return buffer;
+    return buffer
 }
 
 types = [
@@ -513,16 +502,20 @@ types = [
     { type: `FLOAT`, toArrayBuffer() { return new Float32Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `DOUBLE`, toArrayBuffer() { return new Float64Array(Array.isArray(this.value)? this.value : [this.value]).buffer }},
     { type: `CompressedObject`, toArrayBuffer() { return base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.value))) }},
-    { type: `VariableId`, toDefinition() { return { type: `definition`, value: [{ type: `UINT32`, value: VariableRegister.GetVariableId(this.measurement === undefined? this.value : (typeof this.value === `string` ? `${this.value.substring(0, this.value.indexOf(`(`) > -1? this.value.indexOf(`(`) : this.value.length)}(${this.measurement})` : this.value) ) }]} }},
+    { type: `VariableId`, toDefinition() { 
+        return { type: `definition`, value: [
+            { type: `UINT32`, value: typeof this.value === `number`? this.value : VariableRegister.GetVariableId(this.value) }
+        ]} 
+    }},
     { type: `Package`, toDefinition() {
         this.value.unshift({ type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Package }) //Package
         
         const thisValue = this
         for(let index in this.outputVariables) {
-            thisValue.value.push({ type: `VariableId`, value: this.outputVariables?.[index], measurement: this.outputMeasurements?.[index] })
+            thisValue.value.push({ type: `VariableId`, value: this.outputVariables?.[index] })
         }
 
-        delete this.outputMeasurements
+        delete this.outputUnits
         delete this.outputVariables
 
         this.inputVariables?.forEach(function(inputVariable) {
@@ -574,7 +567,7 @@ types = [
                 }
             }
         }
-        this.value.forEach(reduce);
+        this.value.forEach(reduce)
         this.types = [...this.types, ...removedTypes]
 
         newValue.unshift({ type: `UINT16`, value: newValue.length })
@@ -640,7 +633,7 @@ types = [
     }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
         if(this.calculation) return { ...this, ...this.calculation, type: this.selection }
-        VariableRegister.RegisterVariable(this.result ?? this.outputVariables?.[0], undefined, this.selection)
+        VariableRegister.RegisterVariable({ ...this.selection, ...this.outputVariables?.[0] })
     }},
     { type: `Calculation_Add`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
     { type: `Calculation_Subtract`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},
@@ -653,29 +646,31 @@ types = [
     { type: `Calculation_Equal`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
     { type: `Calculation_GreaterThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
     { type: `Calculation_LessThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
-    { type: `CylinderAirmass_SpeedDensity`, outputMeasurements: [`Mass`], toDefinition() {
+    { type: `CylinderAirmass_SpeedDensity`, outputUnits: [`g`], toDefinition() {
         this.inputVariables = [ 
-            `EngineParameters.Cylinder Air Temperature`,
-            `EngineParameters.Manifold Absolute Pressure`,
-            `EngineParameters.Volumetric Efficiency`
+            { name: `EngineParameters.Cylinder Air Temperature` },
+            { name: `EngineParameters.Manifold Absolute Pressure` },
+            { name: `EngineParameters.Volumetric Efficiency` }
         ]
         return Packagize({ type: `definition`, value: [ 
             { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
             { type: `FLOAT`, value: this.CylinderVolume }, //Cylinder Volume
         ]}, this)
     }},
-    { type: `InjectorPulseWidth_DeadTime`, outputMeasurements: [`Time`], toDefinition() {
+    { type: `InjectorPulseWidth_DeadTime`, outputUnits: [`s`], toDefinition() {
         return { type: `Group`, value: [
-            { ...this.FlowRateConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Flow Rate` },
-            { ...this.DeadTimeConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Dead Time` },
+            { ...this.FlowRateConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Flow Rate` } ] },
+            { ...this.DeadTimeConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Dead Time` } ] },
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_Static`, value: 2, result: `temp` },//static value of 2
+            { type: `Calculation_Static`, value: 2, outputVariables: [ { name: `temp` } ] },//static value of 2
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 
                 type: `Calculation_Subtract`,
-                result: `temp`, //Return
-                a: `temp`,
-                b: `EngineSequentialId`
+                outputVariables: [ { name: `temp` } ], //Return
+                inputVariables: [
+                    { name: `temp` },
+                    { name: `EngineSequentialId` }
+                ]
             },
             Packagize({ type: `definition`, value: [ 
                 { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
@@ -683,36 +678,35 @@ types = [
             ]},{
                 ...this,
                 inputVariables: [ 
-                    `temp`,
-                    `FuelParameters.Cylinder Fuel Mass`,
-                    `FuelParameters.Injector Flow Rate`,
-                    `FuelParameters.Injector Dead Time`
+                    { name: `temp` },
+                    { name: `FuelParameters.Cylinder Fuel Mass` },
+                    { name: `FuelParameters.Injector Flow Rate` },
+                    { name: `FuelParameters.Injector Dead Time` }
                 ]
             })
         ]}
     }},
-    { type: `Input_Analog`, outputMeasurements: [`Voltage`], toDefinition() {
+    { type: `Input_Analog`, outputUnits: [`V`], toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.AnalogInput}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
         ]}, this)
     }},
     { type: `Input_AnalogPolynomial`, toDefinition() {
-        let result = this.result ?? this.outputVariables?.[0]
-        let resultWithoutMeasurement = result.substring(0, result.indexOf(`(`) > -1? result.indexOf(`(`) : result.length);
+        const analogInputOutputVariable = { name: this.outputVariables[0].name, unit: `V` }
         return { type: `Group`, value: [
-            { ...this.analogInput, result: `${resultWithoutMeasurement}(Voltage)`, type: `Input_Analog` },
-            { ...this.polynomial, result, inputVariables: [`${resultWithoutMeasurement}(Voltage)`], type: `Calculation_Polynomial` }
+            { ...this.analogInput, type: `Input_Analog`, outputVariables: [ analogInputOutputVariable ]},
+            { ...this.polynomial, type: `Calculation_Polynomial`, outputVariables: this.outputVariables, inputVariables: [ analogInputOutputVariable ] }
         ]}
     }},
-    { type: `Input_Digital`, outputMeasurements: [`Bool`], toDefinition() {
+    { type: `Input_Digital`, toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalInput}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `BOOL`, value: this.inverted}, //inverted
         ]}, this)
     }},
-    { type: `Input_DigitalRecord`, outputMeasurements: [`Record`], toDefinition() {
+    { type: `Input_DigitalRecord`, toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DigitalPinRecord}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
@@ -720,21 +714,21 @@ types = [
             { type: `UINT16`, value: this.length}, //length
         ]}, this)
     }},
-    { type: `Input_DutyCycle`, outputMeasurements: [`PercentUnits`], toDefinition() {
+    { type: `Input_DutyCycle`, outputUnits: [`%`], toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.DutyCyclePinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `UINT16`, value: this.minFrequency}, //minFrequency
         ]}, this)
     }},
-    { type: `Input_Frequency`, outputMeasurements: [`Frequency`], toDefinition() {
+    { type: `Input_Frequency`, outputUnits: [`Hz`], toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.FrequencyPinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
             { type: `UINT16`, value: this.minFrequency}, //minFrequency
         ]}, this)
     }},
-    { type: `Input_PulseWidth`, outputMeasurements: [`Time`], toDefinition() {
+    { type: `Input_PulseWidth`, outputUnits: [`s`], toDefinition() {
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.PulseWidthPinRead}, //factory ID
             { type: `UINT16`, value: this.pin}, //pin
@@ -748,7 +742,7 @@ types = [
             { type: `UINT8`, value: this.inverted | (this.highZ? 0x02 : 0x00) }
         ]}, this)
     }},
-    { type: `Reluctor_GM24x`, outputMeasurements: [`Reluctor`], toDefinition() {
+    { type: `Reluctor_GM24x`, toDefinition() {
         return ReluctorTemplate.call(
             this,
             { type: `definition`, value: [
@@ -756,7 +750,7 @@ types = [
             ]}
         )
     }},
-    { type: `Reluctor_Universal1x`, outputMeasurements: [`Reluctor`], toDefinition() {
+    { type: `Reluctor_Universal1x`, toDefinition() {
         return ReluctorTemplate.call(
             this,
             { type: `definition`, value: [ 
@@ -766,7 +760,7 @@ types = [
             ]}
         )
     }},
-    { type: `Reluctor_UniversalMissingTeeth`, outputMeasurements: [`Reluctor`], toDefinition() {
+    { type: `Reluctor_UniversalMissingTeeth`, toDefinition() {
         return ReluctorTemplate.call(
             this,
             { type: `definition`, value: [ 
@@ -792,33 +786,34 @@ types = [
     }},
     { type: `Input`, toDefinition() {
         if(this.translationConfig === undefined)
-            return;
-        this.translationConfig = { ...this.translationConfig, type: `CalculationOrVariableSelection`, result: `Inputs.${this.name}` }
+            return
+        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: this.translationConfig.calculation?.outputUnits?.[0], type: this.translationConfig.calculation?.outputUnits?.[0] === undefined? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
 
         if(this.translationConfig.inputs === undefined || this.translationConfig.inputs === 0)
-            return this.translationConfig
+            return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
 
-        this.rawConfig = { ...this.rawConfig, type: `CalculationOrVariableSelection`, result: `Inputs.${this.name}` }
+        const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.calculation?.outputUnits?.[0], type: this.rawConfig.calculation?.outputUnits?.[0] === undefined? this.rawConfig.calculation?.outputTypes?.[0] : undefined }
+        this.rawConfig = { ...this.rawConfig, type: `CalculationOrVariableSelection`, outputVariables: [ rawOutputVariable ] }
         
         return { type: `Group`, value: [
             { ...this.rawConfig, type: `CalculationOrVariableSelection` },
-            { ...this.translationConfig, type: `CalculationOrVariableSelection`, inputVariables: [`Inputs.${this.name}(${this.rawConfig.outputMeasurements[0]})`] }
-        ]};
+            { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ], inputVariables: [ rawOutputVariable ] }
+        ]}
     }},
     { type: `Inputs`, toDefinition() {
         return { type: `Group`, value: [
             { type: `Package`, //Package
                 value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
-                outputVariables: [`CurrentTickId`]
+                outputVariables: [ { name: `CurrentTick`, type: `tick` } ]
             }, ...this.inputs.map(function(input) { return { ...input, type: `Input` }})
-        ]};
+        ]}
     }},
     { type: `Calculation_Formula`, toDefinition() {
         let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
         function ParseFormula(formula) {
-            formula = formula.replaceAll(` `, ``); 
-            let operations = [];
-            let tempIndex = 0;
+            formula = formula.replaceAll(` `, ``)
+            let operations = []
+            let tempIndex = 0
     
             //do parenthesis
             let parenthesisFormulas = formula.split(`)`)
@@ -826,13 +821,13 @@ types = [
                 return `Parenthesis start and end not matching`
     
             while((parenthesisFormulas = formula.split(`)`).filter(p => operators.some(o => p.split(`(`).pop()?.indexOf(o) > -1))).length > 1) {
-                tempIndex++;
-                let tempFormula = parenthesisFormulas[0].split(`(`).pop();
+                tempIndex++
+                let tempFormula = parenthesisFormulas[0].split(`(`).pop()
                 operations.push({
                     resultInto: `$temp${tempIndex}`,
                     parameters: [tempFormula]
                 })
-                formula = formula.replace(`(${tempFormula})`, `$temp${tempIndex}`);
+                formula = formula.replace(`(${tempFormula})`, `$temp${tempIndex}`)
             }
             operations.push({
                 resultInto: `return`,
@@ -842,38 +837,38 @@ types = [
             //do operators
             function splitOnOperators(s) {
                 for(let operatorIndex in operators) {
-                    let operator = operators[operatorIndex];
-                    s = s.split(operator).join(`,`);
+                    let operator = operators[operatorIndex]
+                    s = s.split(operator).join(`,`)
                 }
-                return s.split(`,`);
+                return s.split(`,`)
             }
     
             for(let operatorIndex in operators) {
-                let operator = operators[operatorIndex];
-                let operationIndex;
+                let operator = operators[operatorIndex]
+                let operationIndex
                 while((operationIndex = operations.findIndex(f => f.parameters.find(p => p.indexOf(operator) > -1))) > -1) {
-                    const formula = operations[operationIndex];
-                    const parameterIndex = formula.parameters.findIndex(p => p.indexOf(operator) > -1);
-                    const parameter = formula.parameters[parameterIndex];
-                    const firstParameter = splitOnOperators(parameter.split(operator)[0]).pop();
-                    const secondParameter = splitOnOperators(parameter.split(operator)[1])[0];
+                    const formula = operations[operationIndex]
+                    const parameterIndex = formula.parameters.findIndex(p => p.indexOf(operator) > -1)
+                    const parameter = formula.parameters[parameterIndex]
+                    const firstParameter = splitOnOperators(parameter.split(operator)[0]).pop()
+                    const secondParameter = splitOnOperators(parameter.split(operator)[1])[0]
                     if(formula.parameters.length > 1 || splitOnOperators(formula.parameters[0].replace(`${firstParameter}${operator}${secondParameter}`, `temp`)).length > 1) {
-                        tempIndex++;
-                        formula.parameters[parameterIndex] = parameter.replace(`${firstParameter}${operator}${secondParameter}`, `$temp${tempIndex}`);
+                        tempIndex++
+                        formula.parameters[parameterIndex] = parameter.replace(`${firstParameter}${operator}${secondParameter}`, `$temp${tempIndex}`)
                         operations.splice(operationIndex, 0, {
                             operator,
                             resultInto: `$temp${tempIndex}`,
                             parameters: [firstParameter, secondParameter]
-                        });
+                        })
                     } else {
-                        operations[operationIndex].operator = operator;
-                        operations[operationIndex].parameters = [firstParameter, secondParameter];
+                        operations[operationIndex].operator = operator
+                        operations[operationIndex].parameters = [firstParameter, secondParameter]
                     }
                 }
             }
     
             //statics
-            let operationIndex;
+            let operationIndex
             while((operationIndex = operations.findIndex(f => f.operator !== `s` && f.parameters.find(p => p.match(/^[0-9]+$/)))) > -1) {
                 const formula = operations[operationIndex]
                 const parameterIndex = formula.parameters.findIndex(p => p.match(/^[0-9]+$/))
@@ -885,33 +880,32 @@ types = [
                     operator: `s`,
                     resultInto: `$temp${tempIndex}`,
                     parameters: [parameter]
-                });
+                })
             }
     
             //consolidate temp variables
-            tempIndex = 0;
+            tempIndex = 0
             for(let operationIndex in operations) {
-                operationIndex = parseInt(operationIndex);
-                let formula = operations[operationIndex];
+                operationIndex = parseInt(operationIndex)
+                let formula = operations[operationIndex]
                 if(formula.resultInto.indexOf(`$temp`) !== 0)
-                    continue;
-                let nextFormulaParameterIndex;
+                    continue
+                let nextFormulaParameterIndex
                 if  (operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).length < 2 && 
                     (nextFormulaParameterIndex = operations[operationIndex+1]?.parameters?.findIndex(p => p === formula.resultInto)) > -1) {
-                        operations[operationIndex+1].parameters[nextFormulaParameterIndex] = formula.resultInto = `temp`;
+                        operations[operationIndex+1].parameters[nextFormulaParameterIndex] = formula.resultInto = `temp`
                 } else {
-                    tempIndex++;
+                    tempIndex++
                     operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).forEach(function(f) { for(let parameterIndex in f.parameters) {
                         if(f.parameters[parameterIndex] === formula.resultInto) 
-                            f.parameters[parameterIndex] = `temp${tempIndex}`;
+                            f.parameters[parameterIndex] = `temp${tempIndex}`
                     } })
-                    formula.resultInto = `temp${tempIndex}`;
+                    formula.resultInto = `temp${tempIndex}`
                 }
             }
     
-            return operations;
+            return operations
         }
-        let result = this.result ?? this.outputVariables?.[0]
         let parameters = this.formula.replaceAll(` `, ``)
         for(let operatorIndex in operators) {
             let operator = operators[operatorIndex]
@@ -922,71 +916,66 @@ types = [
         parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
         parameters = parameters.filter(s => s.length !== 0)
         if(parameters.length === 0)
-            return;
+            return
         const operations = ParseFormula(this.formula)
         if(operations.length == 0 || (operations.length == 1 && operations[0].operator == undefined)) 
-            return { ...this.parameterValues[parameters[0]], type: `CalculationOrVariableSelection`, result }
+            return { ...this.parameterValues[parameters[0]], type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
         var group  = { 
             type: `Group`, 
             value: []
-        };
-        
-        const thisClass = this;
-        parameters.forEach(function(parameter) { group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, result: parameter.indexOf(`temp`) === 0 ? parameter : `${result}_${parameter}` }); })
-        for(let operationIndex in operations) {
-            let operation = operations[operationIndex];
-            if(operation.resultInto === `return`)
-                operation.resultInto = result ?? this.GetVariableReference();
-            let operationValue = {
-                result: operation.resultInto, //Return
-            };
-            if(operation.operator === `s`) {
-                operationValue.type = `Calculation_Static`;
-                operationValue.value = operation.parameters[0]
-            } else {
-                let parameterResults = operation.parameters.map(parameter => parameter.indexOf(`temp`) === 0 ? parameter : `${result}_${parameter}`)
-                operationValue.a = parameterResults[0]
-                operationValue.b = parameterResults[1]
-                switch(operation.operator) {
-                    case `*`: 
-                        operationValue.type = `Calculation_Multiply`;
-                        break;
-                    case `/`: 
-                        operationValue.type = `Calculation_Divide`;
-                        break;
-                    case `+`: 
-                        operationValue.type = `Calculation_Add`;
-                        break;
-                    case `-`: 
-                        operationValue.type = `Calculation_Subtract`;
-                        break;
-                    case `>=`: 
-                        operationValue.type = `Calculation_GreaterThanOrEqual`;
-                        break;
-                    case `<=`: 
-                        operationValue.type = `Calculation_LessThanOrEqual`;
-                        break;
-                    case `>`: 
-                        operationValue.type = `Calculation_GreaterThan`;
-                        break;
-                    case `<`: 
-                        operationValue.type = `Calculation_LessThan`;
-                        break;
-                    case `=`: 
-                        operationValue.type = `Calculation_Equal`;
-                        break;
-                    case `&`: 
-                        operationValue.type = `Calculation_And`;
-                        break;
-                    case `|`: 
-                        operationValue.type = `Calculation_Or`;
-                        break;
-                }
-            }
-            group.value.push(operationValue);
         }
         
-        return group;
+        const thisClass = this
+        let resultName = this.outputVariables?.[0]?.name
+        parameters.forEach(function(parameter) { group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, outputVariables: [ { name: parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}` } ] }) })
+        for(let operationIndex in operations) {
+            let operation = operations[operationIndex]
+            let operationValue = { outputVariables: operation.resultInto === `return`? this.outputVariables : [ { name: operation.resultInto } ] }
+            if(operation.operator === `s`) {
+                operationValue.type = `Calculation_Static`
+                operationValue.value = operation.parameters[0]
+            } else {
+                operationValue.inputVariables = operation.parameters.map(function(parameter) { return { name: parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}` } })
+                switch(operation.operator) {
+                    case `*`: 
+                        operationValue.type = `Calculation_Multiply`
+                        break
+                    case `/`: 
+                        operationValue.type = `Calculation_Divide`
+                        break
+                    case `+`: 
+                        operationValue.type = `Calculation_Add`
+                        break
+                    case `-`: 
+                        operationValue.type = `Calculation_Subtract`
+                        break
+                    case `>=`: 
+                        operationValue.type = `Calculation_GreaterThanOrEqual`
+                        break
+                    case `<=`: 
+                        operationValue.type = `Calculation_LessThanOrEqual`
+                        break
+                    case `>`: 
+                        operationValue.type = `Calculation_GreaterThan`
+                        break
+                    case `<`: 
+                        operationValue.type = `Calculation_LessThan`
+                        break
+                    case `=`: 
+                        operationValue.type = `Calculation_Equal`
+                        break
+                    case `&`: 
+                        operationValue.type = `Calculation_And`
+                        break
+                    case `|`: 
+                        operationValue.type = `Calculation_Or`
+                        break
+                }
+            }
+            group.value.push(operationValue)
+        }
+        
+        return group
     }},
     { type: `Fuel`, toDefinition() {
         var group = { 
@@ -999,39 +988,41 @@ types = [
                         { ...this.value, type: `CalculationOrVariableSelection` },
                     ],
                     outputVariables: [ 
-                        `temp`, //store in temp variable
-                        `temp` //store in temp variable
+                        { name: `temp` }, //store in temp variable
+                        { name: `temp` } //store in temp variable
                     ],
                     inputVariables: [
-                        `EnginePositionId`,
-                        `FuelParameters.Injector Enable`,
-                        `FuelParameters.Injector Pulse Width`,
-                        `FuelParameters.Injector End Position`
+                        { name: `EnginePositionId` },
+                        { name: `FuelParameters.Injector Enable` },
+                        { name: `FuelParameters.Injector Pulse Width` },
+                        { name: `FuelParameters.Injector End Position` }
                     ]
-                }]};
+                }]}
             }}],
             type: `Group`, 
             value: [
-                { ...this.AFRConfigOrVariableSelection, type: `Calculation_Formula`, result: `FuelParameters.Air Fuel Ratio` }, 
+                { ...this.AFRConfigOrVariableSelection, type: `Calculation_Formula`, outputVariables: [ { name: `FuelParameters.Air Fuel Ratio` } ] }, 
 
                 { 
                     type: `Calculation_Divide`,
-                    result: `FuelParameters.Cylinder Fuel Mass`,
-                    a: `EngineParameters.Cylinder Air Mass`,
-                    b: `FuelParameters.Air Fuel Ratio`
+                    outputVariables: [ { name: `FuelParameters.Cylinder Fuel Mass` } ],
+                    inputVariables: [
+                        { name: `EngineParameters.Cylinder Air Mass` },
+                        { name: `FuelParameters.Air Fuel Ratio` }
+                    ]
                 },
 
-                { ...this.InjectorEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Enable` }, 
-                { ...this.InjectorPulseWidthConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector Pulse Width` }, 
-                { ...this.InjectorEndPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `FuelParameters.Injector End Position` }
+                { ...this.InjectorEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Enable` } ] }, 
+                { ...this.InjectorPulseWidthConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Pulse Width` } ] }, 
+                { ...this.InjectorEndPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector End Position` } ] }
             ]
-        };
-
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs[i] });
         }
 
-        return group;
+        for(var i = 0; i < this.Outputs.length; i++) {
+            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs[i] })
+        }
+
+        return group
     }},
     { type: `Ignition`, toDefinition() {
         var group  = { 
@@ -1044,44 +1035,41 @@ types = [
                         { ...this.value, type: `CalculationOrVariableSelection` },
                     ],
                     outputVariables: [ 
-                        `temp`, //store in temp variable
-                        `temp` //store in temp variable
+                        { name: `temp` }, //store in temp variable
+                        { name: `temp` } //store in temp variable
                     ],
                     inputVariables: [
-                        `EnginePositionId`,
-                        `IgnitionParameters.Ignition Enable`,
-                        `IgnitionParameters.Ignition Dwell`,
-                        `IgnitionParameters.Ignition Advance`,
-                        `IgnitionParameters.Ignition Dwell Deviation`
+                        { name: `EnginePositionId` },
+                        { name: `IgnitionParameters.Ignition Enable` },
+                        { name: `IgnitionParameters.Ignition Dwell` },
+                        { name: `IgnitionParameters.Ignition Advance` },
+                        { name: `IgnitionParameters.Ignition Dwell Deviation` }
                     ]
-                }]};
+                }]}
             }}],
             type: `Group`, 
             value: [
-                { ...this.IgnitionEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Enable` }, 
-                { ...this.IgnitionAdvanceConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Advance` },
-                { ...this.IgnitionDwellConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Dwell` },
-                { ...this.IgnitionDwellDeviationConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `IgnitionParameters.Ignition Dwell Deviation` }
+                { ...this.IgnitionEnableConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Enable` } ] }, 
+                { ...this.IgnitionAdvanceConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Advance` } ] },
+                { ...this.IgnitionDwellConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Dwell` } ] },
+                { ...this.IgnitionDwellDeviationConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Dwell Deviation` } ] }
             ]
-        };
-
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs[i] });
         }
 
-        return group;
-    }},
-    { type: `WTF`, toDefinition() {
-        console.log(this)
+        for(var i = 0; i < this.Outputs.length; i++) {
+            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs[i] })
+        }
+
+        return group
     }},
     { type: `Engine`, toDefinition() {
-        let mapRequired = (this.requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) > -1;
-        let catRequired = (this.requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) > -1
-        let veRequired  = (this.requirements?.indexOf(`Volumetric Efficiency`) ?? -1) > -1;
+        let mapRequired = (this.requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) !== -1
+        let catRequired = (this.requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) !== -1
+        let veRequired  = (this.requirements?.indexOf(`Volumetric Efficiency`) ?? -1) !== -1
 
         var group = { type: `Group`, value: [
-            { ...this.CrankPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Crank Position` },
-            { ...this.CamPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cam Position` },
+            { ...this.CrankPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Crank Position` } ] },
+            { ...this.CamPositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Cam Position` } ] },
 
             //CalculateEnginePosition
             { 
@@ -1089,10 +1077,10 @@ types = [
                 value: [ 
                     { type: `UINT32`, value: EngineFactoryIDs.Offset + ( this.CrankPriority? EngineFactoryIDs.PositionCrankPriority : EngineFactoryIDs.PositionCamPriority) },  //factory id
                 ],
-                outputVariables: [ `EnginePositionId` ],
+                outputVariables: [ { name: `EnginePositionId` } ],
                 inputVariables: [
-                    `EngineParameters.Crank Position`,
-                    `EngineParameters.Cam Position`
+                    { name: `EngineParameters.Crank Position` },
+                    { name: `EngineParameters.Cam Position` }
                 ]
             },
 
@@ -1103,29 +1091,29 @@ types = [
                     { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.EngineParameters },  //factory id
                 ],
                 outputVariables: [ 
-                    `EngineParameters.Engine Speed`,
-                    `EngineSequentialId`,
-                    `EngineSyncedId`
+                    { name: `EngineParameters.Engine Speed` },
+                    { name: `EngineSequentialId` },
+                    { name: `EngineSyncedId` }
                 ],
-                inputVariables: [ `EnginePositionId`  ]
+                inputVariables: [ { name: `EnginePositionId` } ]
             }
-        ]};
+        ]}
         
         if(mapRequired) {
-            group.value.push({ ...this.ManifoldAbsolutePressureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Manifold Absolute Pressure` });
+            group.value.push({ ...this.ManifoldAbsolutePressureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Manifold Absolute Pressure` } ] })
         }
 
         if(catRequired) {
-            group.value.push({ ...this.CylinderAirTemperatureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cylinder Air Temperature` });
+            group.value.push({ ...this.CylinderAirTemperatureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Cylinder Air Temperature` } ] })
         }
         
         if(veRequired) {
-            group.value.push({ ...this.VolumetricEfficiencyConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Volumetric Efficiency` });
+            group.value.push({ ...this.VolumetricEfficiencyConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Volumetric Efficiency` } ] })
         }
         
-        group.value.push({ ...this.CylinderAirmassConfigOrVariableSelection, type: `CalculationOrVariableSelection`, result: `EngineParameters.Cylinder Air Mass` });
+        group.value.push({ ...this.CylinderAirmassConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Cylinder Air Mass` } ] })
 
-        return group;
+        return group
     }},
     { type: `Top`, toDefinition() {
         return { type: `definition`, value: [
@@ -1142,8 +1130,8 @@ types = [
 
             //sync condition
             { type: `Group`, value: [ 
-                { type: `Calculation_Static`, value: false, result: `temp` }, //store static variable result in temp variable
-                { type: `Calculation_Or`, result: 0, a: `EngineSyncedId`, b: `temp` },
+                { type: `Calculation_Static`, value: false, outputVariables: [ { name: `temp` } ] }, //store static variable in temp variable
+                { type: `Calculation_Or`, inputVariables: [ { name: `EngineSyncedId` }, { name: `temp` } ] },
             ]},
 
             //main loop execute
@@ -1151,18 +1139,18 @@ types = [
                 { ...this.Fuel, type: `Fuel` },
                 { ...this.Ignition, type: `Ignition` }
             ]},
-        ]};
+        ]}
     }, toArrayBuffer() {
         let buf = new ArrayBuffer()
-        buf = buf.build({ type:`definition`, value: [ this ], types: types });
-        buf = new Uint32Array([buf.byteLength]).buffer.concatArray(buf);
-        buf = buf.concatArray(new Uint32Array([buf.crc32()]).buffer);
+        buf = buf.build({ type:`definition`, value: [ this ], types: types })
+        buf = new Uint32Array([buf.byteLength]).buffer.concatArray(buf)
+        buf = buf.concatArray(new Uint32Array([buf.crc32()]).buffer)
 
-        let bufMeta = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())));
-        bufMeta = new Uint32Array([bufMeta.byteLength]).buffer.concatArray(bufMeta);
-        bufMeta = bufMeta.concatArray(new Uint32Array([bufMeta.crc32()]).buffer);
+        let bufMeta = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(VariableRegister.GetVariableReferenceList())))
+        bufMeta = new Uint32Array([bufMeta.byteLength]).buffer.concatArray(bufMeta)
+        bufMeta = bufMeta.concatArray(new Uint32Array([bufMeta.crc32()]).buffer)
 
-        return buf.concatArray(bufMeta);
+        return buf.concatArray(bufMeta)
     }},
 ]
 
