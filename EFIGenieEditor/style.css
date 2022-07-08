@@ -389,6 +389,7 @@ select .pinconflict{
     background-color:rgb(255, 128, 128);
 }
 .livevalue {
+    font-family: 'Courier New', monospace;
     color: #55AA55;
 }
 

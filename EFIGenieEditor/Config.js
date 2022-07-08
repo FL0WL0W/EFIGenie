@@ -990,7 +990,6 @@ types = [
         if(parameters.length === 0)
             return
         const operations = ParseFormula(this.formula, parameters)
-        console.log(operations)
         if(operations.length == 0 || (operations.length == 1 && operations[0].operator == undefined)) 
             return { ...this.parameterValues[parameters[0]], type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
         var group  = { 

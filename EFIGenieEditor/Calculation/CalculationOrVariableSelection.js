@@ -30,6 +30,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.calculationValues.forEach(function(configValue) { configValue.yLabel = ylabel })
     }
 
+    selectionFilter = defaultFilter
+
     get outputTypes() {
         return  this._outputUnits? undefined : (
                     this._outputTypes ??                 
@@ -41,7 +43,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputTypes(outputTypes) {
         this._outputTypes = outputTypes
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get outputUnits() {
@@ -53,7 +55,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputUnits(outputUnits) {
         this._outputUnits = outputUnits
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get inputTypes() {
@@ -64,7 +66,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputTypes(inputTypes) {
         this._inputTypes = inputTypes
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get inputUnits() {
@@ -73,7 +75,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get options() { return this.selection.options }    
@@ -125,7 +127,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
     Setup(...args) {
         super.Setup(...args)
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     static SaveOnlyActive = false
@@ -219,7 +221,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables(reference) {
-        this.options = GetSelections(this.calculations, defaultFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
 
         if (!this.selection.value || !reference) return
 
