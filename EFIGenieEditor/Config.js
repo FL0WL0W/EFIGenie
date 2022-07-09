@@ -66,7 +66,7 @@ class VariableRegistry {
         return reference.id
     }
     RegisterVariable(reference) {
-        if(!reference || typeof reference !== `object`) return
+        if(!reference || typeof reference !== `object` || !reference.name) return
         reference = { ...reference }
 
         const dotIndex = reference.name.indexOf(`.`)
@@ -295,8 +295,8 @@ EngineFactoryIDs = {
 }
 
 function GetArrayType(tableValue) {
-    var min = 18446744073709551615
-    var max = -9223372036854775808
+    var min = 9000000000000000
+    var max = -9000000000000000
     for (var i = 0; i < tableValue.length; i++) {
         if (tableValue[i] % 1 != 0) {
             return `FLOAT`
@@ -507,6 +507,8 @@ function toArrayBuffer() {
     let definition = toDefinition.call(this)
     var buffer = new ArrayBuffer()
     for(var index in definition.value){
+        if(definition.value[index] == undefined)
+            continue
         var typeInfo = definition.types.find(x => x.type === definition.value[index].type)
 
         //align
