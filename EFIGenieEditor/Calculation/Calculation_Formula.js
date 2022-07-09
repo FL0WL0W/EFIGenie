@@ -208,7 +208,7 @@ export default class Calculation_Formula extends UITemplate {
             let formulaWithoutUnits = this.formula.value;
             Object.keys(Measurements).forEach(m => Measurements[m].forEach(u => formulaWithoutUnits = formulaWithoutUnits.replaceAll(`(${u.name})`, ``)))
             if(!operators.some(o => formulaWithoutUnits.indexOf(o) > -1)) {
-                this.parameterValues[this.parameters[0]].RegisterVariables(reference)
+                this.parameterValues[this.parameters[0]]?.RegisterVariables(reference)
             } else {
                 this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter]?.RegisterVariables({ name: `${reference.name}_${thisClass.parameterValues[parameter].label}`, unit: thisClass.parameterValues[parameter].unit}) })
                 VariableRegister.RegisterVariable(reference)
