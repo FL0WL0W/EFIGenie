@@ -58,7 +58,6 @@ function UpdateFloatCurrentVariableValues() {
         rxMissed--
         var responseVariables = data.split(`\n`).filter(v => v.replaceAll(` `, ``) !== ``)
         if(responseVariables.length !== variableIds.length + 1) return
-        if(responseVariables[11] !== `31`) debugger
         LogBytes = LogBytes.concatArray(base64ToArrayBuffer(responseVariables[0]))
         for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
             var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
