@@ -144,24 +144,13 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
                     sendBytes += struct.pack("<BIB", 103, varID, offset)
                 else:
                     sendBytes += struct.pack("<BI", 103, varID)
-                if i != 0 and i % 10 == 0 or i == len(variables) - 1:
-                    self.serial_conn.write(sendBytes)
-                    r = range(10)
-                    if i == 0 :
-                        r = range(11)
-                    if i == len(variables) - 1:
-                        r = range(len(variables) % 10)
-                    for v in r:
-                        ( val, readBytes ) = parse_readbytes(self.serial_conn)
-                        totalbytes += readBytes
-                        resp += str(val) + "\n"
-                    sendBytes = bytearray([])
 
-            # self.serial_conn.write(sendBytes)
-            # for v in range(len(variables)):
-            #     ( val, readBytes ) = parse_readbytes(self.serial_conn)
-            #     totalbytes += readBytes
-            #     resp += str(val) + "\n"
+            self.serial_conn.write(sendBytes)
+            self.serial_conn.flushOutput()
+            for v in range(len(variables)):
+                ( val, readBytes ) = parse_readbytes(self.serial_conn)
+                totalbytes += readBytes
+                resp += str(val) + "\n"
 
             resp = base64.b64encode(totalbytes).decode('ascii') + "\n" + resp
             self.send_response(200)
@@ -204,7 +193,6 @@ def parse_readbytes(ser):
     val = "VOID"
     # For all cases we'll just use a simple if/else construct to parse
     if readBytes[0] == 0:
-        readBytes += ser.read(4)
         NOP
     elif 1 <= readBytes[0] <= 10:
         fmt = fmt_switch[readBytes[0]]

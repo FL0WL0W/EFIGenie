@@ -193,6 +193,7 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     RegisterVariables(reference) {
+        reference = { ...reference }
         const thisClass = this
         if (reference) {
             reference.unit = this.outputUnits?.[0] ?? reference.unit

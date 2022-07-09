@@ -122,7 +122,7 @@ export default class Inputs extends UITemplate {
                 inputElement.RegisterVariables = function() {
                     let index = [...thisClass.inputListElement.children].indexOf(this)
                     let input = thisClass.inputs.children[index]
-                    this.firstChild.RegisterVariables({ name: `Inputs.${input.input.name.value}` })
+                    this.firstChild.RegisterVariables({ name: `Inputs.${input.input.name.value}`, unit: input.input.translationConfig.outputUnits?.[0] ?? input.input.rawConfig.outputUnits?.[0] })
                 }
             }
             inputElement.lastChild.textContent = this.inputs.children[i].name

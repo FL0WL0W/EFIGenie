@@ -24,6 +24,7 @@ export default class Input_AnalogPolynomial extends UITemplate {
     }
 
     RegisterVariables(reference) {
+        reference = { ...reference }
         delete reference.unit
         delete reference.type
         delete reference.id

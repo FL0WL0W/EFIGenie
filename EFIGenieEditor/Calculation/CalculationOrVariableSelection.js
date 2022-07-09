@@ -221,6 +221,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
 
     RegisterVariables(reference) {
+        reference = { ...reference }
         this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
 
         if (!this.selection.value || !reference) return

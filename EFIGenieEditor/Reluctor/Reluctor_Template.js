@@ -4,6 +4,7 @@ export default class Reluctor_Template extends Input_DigitalRecord {
     static template = Input_DigitalRecord.template.substring(0, Input_DigitalRecord.template.lastIndexOf(`Inverted`) + 8)
 
     RegisterVariables(reference) {
+        reference = { ...reference }
         delete reference.unit
         delete reference.id
         reference.type = `Record`

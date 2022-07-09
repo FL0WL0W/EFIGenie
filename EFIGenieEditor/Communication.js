@@ -39,7 +39,6 @@ var LogBytes = new ArrayBuffer()
 var previousVariableIds = []
 var rxMissed = 0
 function UpdateFloatCurrentVariableValues() {
-    if(rxMissed > 10 ) return console.log(`skip`)
     rxMissed++
     const variableIds = GetVariableIdList()
     if(variableIds.length < 1)

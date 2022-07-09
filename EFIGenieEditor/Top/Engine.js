@@ -3,34 +3,35 @@ export default class Engine extends UITemplate {
     static template = getFileContents(`ConfigGui/Engine.html`)
 
     CrankPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  undefined,
-        label:         `Crank Position`,
-        outputTypes:   [ `ReluctorResult` ],
+        calculations:   undefined,
+        label:          `Crank Position`,
+        outputTypes:    [ `ReluctorResult` ],
     })
     CamPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  undefined,
-        label:         `Cam Position`,
-        outputTypes:   [ `ReluctorResult` ],
+        calculations:   undefined,
+        label:          `Cam Position`,
+        outputTypes:    [ `ReluctorResult` ],
     })
     CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  CylinderAirmassConfigs,
-        label:         `Cylinder Air Mass`,
-        outputUnits:   [ `g` ],
+        calculations:   CylinderAirmassConfigs,
+        label:          `Cylinder Air Mass`,
+        outputUnits:    [ `g` ],
     })
     CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  CylinderAirTemperatureConfigs,
-        label:         `Cylinder Air Temperature`,
-        outputUnits:   [ `°C` ],
+        calculations:   CylinderAirTemperatureConfigs,
+        label:          `Cylinder Air Temperature`,
+        outputUnits:    [ `°C` ],
     })
     ManifoldAbsolutePressureConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  ManifoldAbsolutePressureConfigs,
-        label:         `Manifold Absolute Pressure`,
-        outputUnits:   [ `Bar` ],
+        calculations:   ManifoldAbsolutePressureConfigs,
+        label:          `Manifold Absolute Pressure`,
+        outputUnits:    [ `Bar` ],
     })
     VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
-        calculations:  VolumetricEfficiencyConfigs,
-        label:         `Volumetric Efficiency`,
-        outputUnits:   [ `[0.0-1.0]` ],
+        calculations:   VolumetricEfficiencyConfigs,
+        label:          `Volumetric Efficiency`,
+        outputUnits:    [ `[0.0-1.0]` ],
+        displayUnits:   [ `%` ]
     })
     constructor(prop) {
         super()
