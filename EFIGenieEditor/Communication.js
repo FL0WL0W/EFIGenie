@@ -37,7 +37,10 @@ var CurrentVariableValues = []
 var LoggedVariableValues = []
 var LogBytes = new ArrayBuffer()
 var previousVariableIds = []
+var rxMissed = 0
 function UpdateFloatCurrentVariableValues() {
+    if(rxMissed > 10 ) return console.log(`skip`)
+    rxMissed++
     const variableIds = GetVariableIdList()
     if(variableIds.length < 1)
         return
@@ -53,7 +56,10 @@ function UpdateFloatCurrentVariableValues() {
         Variables: variableIds,
         Offsets: offsets
     }).then(data => {
-        var responseVariables = data.split(`\n`)
+        rxMissed--
+        var responseVariables = data.split(`\n`).filter(v => v.replaceAll(` `, ``) !== ``)
+        if(responseVariables.length !== variableIds.length + 1) return
+        if(responseVariables[11] !== `31`) debugger
         LogBytes = LogBytes.concatArray(base64ToArrayBuffer(responseVariables[0]))
         for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
             var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`

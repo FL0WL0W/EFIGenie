@@ -132,8 +132,11 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
             postvars = json.loads(body)
             variables = postvars['Variables']
             offsets = postvars['Offsets']
-            # sendBytes = struct.pack("<BIB", 103, varID, offset)
+            resp = ""
             sendBytes = bytearray([])
+            totalbytes = bytearray([])
+            self.serial_conn.flushOutput()
+            self.serial_conn.flushInput()
             for i in range(len(variables)):
                 varID = int(variables[i])
                 offset = int(offsets[i])
@@ -141,16 +144,25 @@ class HTTPEFIGenieConsoleHandler(http.server.BaseHTTPRequestHandler):
                     sendBytes += struct.pack("<BIB", 103, varID, offset)
                 else:
                     sendBytes += struct.pack("<BI", 103, varID)
-            self.serial_conn.flushOutput()
-            self.serial_conn.flushInput()
-            self.serial_conn.write(sendBytes)
-            resp = ""
-            totalbytes = bytearray([])
-            for i in range(len(variables)):
-                ( val, readBytes ) = parse_readbytes(self.serial_conn)
-                totalbytes += readBytes
-                # print(val)
-                resp += str(val) + "\n"
+                if i != 0 and i % 10 == 0 or i == len(variables) - 1:
+                    self.serial_conn.write(sendBytes)
+                    r = range(10)
+                    if i == 0 :
+                        r = range(11)
+                    if i == len(variables) - 1:
+                        r = range(len(variables) % 10)
+                    for v in r:
+                        ( val, readBytes ) = parse_readbytes(self.serial_conn)
+                        totalbytes += readBytes
+                        resp += str(val) + "\n"
+                    sendBytes = bytearray([])
+
+            # self.serial_conn.write(sendBytes)
+            # for v in range(len(variables)):
+            #     ( val, readBytes ) = parse_readbytes(self.serial_conn)
+            #     totalbytes += readBytes
+            #     resp += str(val) + "\n"
+
             resp = base64.b64encode(totalbytes).decode('ascii') + "\n" + resp
             self.send_response(200)
             self.end_headers()
@@ -210,15 +222,18 @@ def parse_readbytes(ser):
     return (val, readBytes)
 
 def burn_config(ser, config):
-    sendBytes = struct.pack("<B", 113)
-    ser.write(sendBytes)
-    time.sleep(1)
-    ser.read(ser.in_waiting)
+    ser.flushOutput()
+    ser.flushInput()
     sendBytes = struct.pack("<B", 99)
     ser.write(sendBytes)
     readBytes = ser.read(4)
     configAddress = struct.unpack("<I", readBytes)[0]
     print(configAddress)
+
+    sendBytes = struct.pack("<B", 113)
+    ser.write(sendBytes)
+    time.sleep(1)
+    ser.read(ser.in_waiting)
 
     length = len(config)
     i = 0

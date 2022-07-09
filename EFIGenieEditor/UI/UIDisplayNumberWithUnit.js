@@ -6,7 +6,8 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     displayElement = document.createElement(`div`)
 
     constructor(prop) {
-        super(prop)
+        super()
+        this.Setup(prop)
         const thisClass = this
         this.displayUnitElement.addEventListener(`change`, function() {
             thisClass.ZeroesToAdd = 10000000
@@ -17,8 +18,6 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
         this.ZeroesToAdd = 10000000
     }
 
-    get value() { return undefined }
-    set value(value) {}
     get saveValue() { return this.displayUnitElement.saveValue }
     set saveValue(saveValue) { this.displayUnitElement.saveValue = saveValue }
 
@@ -26,7 +25,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
         super.UpdateDisplayValue()
 
         let displayValue = this.displayValue
-        if(displayValue) return
+        if(displayValue === undefined) return
             
         displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`
         const indexOfPoint = displayValue.indexOf(`.`)
@@ -37,8 +36,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
         if(zeroesToAdd > 0 && indexOfPoint < 0) displayValue += `.`
         for(var i = 0; i < zeroesToAdd; i++) displayValue += `0`
 
-        if(this.displayElement)
-            this.displayElement.textContent = displayValue
+        this.displayElement.textContent = displayValue
     }
 }
 customElements.define(`ui-displaynumberwithunit`, UIDisplayNumberWithUnit, { extends: `span` })

@@ -61,7 +61,7 @@
             var configJsonName = `tune.json`
             document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables() }) })//this is a hack but oh well
             const loadConfig = (config) => {
-                // try {
+                try {
                     b.saveValue = parseObject(config)
                     let workspace = document.querySelector(`#workspace`)
                     workspace.innerHtml = ``
@@ -69,7 +69,7 @@
                     UpdateOverlay()
                     let btnLoad = document.querySelector(`#btnLoad`)
                     btnLoad.value = ``
-                // } catch { }
+                } catch { }
             }
             document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop()

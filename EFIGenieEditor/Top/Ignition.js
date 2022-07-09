@@ -22,7 +22,7 @@ export default class Ignition extends UITemplate {
     IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   IgnitionDwellConfigs,
         label:          `Ignition Dwell Deviation`,
-        outputUnits:    [ `°` ],
+        outputUnits:    [ `s` ],
         displayUnits:   [ `ms` ]
     })
     Outputs = document.createElement(`div`)
