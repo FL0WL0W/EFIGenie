@@ -8,6 +8,8 @@ namespace EFIGenie
 	struct EnginePosition : public ReluctorOperations::ReluctorResult
 	{
 		bool Sequential : 1;
+
+		EnginePosition() : Sequential(false) {}
 	};
 
 	class Operation_EnginePosition : public OperationArchitecture::IOperation<EnginePosition, ReluctorOperations::ReluctorResult, ReluctorOperations::ReluctorResult>
