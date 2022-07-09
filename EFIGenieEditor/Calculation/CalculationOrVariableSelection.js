@@ -139,15 +139,18 @@ export default class CalculationOrVariableSelection extends UITemplate {
                 var subConfig = this.SubConfig
                 if(subConfig?.saveValue !== undefined) {
                     var configValue = subConfig.saveValue
-                    if(typeof configValue !== `object`)
-                        configValue = { value: configValue }
-                    configValue.className = subConfig.constructor.name
-                    saveValue.calculationValues = [ configValue ]
+                    if(configValue != undefined) {
+                        if(typeof configValue !== `object`)
+                            configValue = { value: configValue }
+                        configValue.className = subConfig.constructor.name
+                        saveValue.calculationValues = [ configValue ]
+                    }
                 }
             } else {
                 saveValue.calculationValues = []
                 for (var i = 0; i < this.calculationValues.length; i++) {
                     var configValue = this.calculationValues[i].saveValue
+                    if(configValue == undefined) continue
                     if(typeof configValue !== `object`)
                         configValue = { value: configValue }
                     configValue.className = this.calculationValues[i].constructor.name
