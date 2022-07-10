@@ -51,6 +51,7 @@
         <script src="lzjs.js"></script>
         <script src="Units.js"></script>
         <script src="Communication.js" defer></script>
+        <script src="Serial.js" defer></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
         <script defer>
@@ -123,6 +124,10 @@
                 btnBurnBin.addEventListener(`click`, function(){
                     burnBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }))
                 })
+                let btnConnect = document.querySelector(`#btnConnect`)
+                btnConnect.addEventListener(`click`, function(){
+                    RealtimeUpdate()
+                })
 
                 let selectTarget = document.querySelector(`#selectTarget`)
                 selectTarget.addEventListener(`change`, function(evt){
@@ -145,6 +150,7 @@
             <input id="btnSaveCompressed" type="button" class="w3-button w3-padding-16" value="Save Compressed">
             <input id="btnSaveBin" type="button" class="w3-button w3-padding-16" value="Save Bin">
             <input id="btnBurnBin" type="button" class="w3-button w3-padding-16" value="Burn Bin">
+            <input id="btnConnect" type="button" class="w3-button w3-padding-16" value="Connect">
             <input id="btnLoad" type="file" style="display: none;">
             <select id="selectTarget">
             </select>

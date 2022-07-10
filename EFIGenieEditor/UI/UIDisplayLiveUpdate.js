@@ -20,7 +20,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
         LiveUpdateEvents[this.GUID] = function() {
             if(reference) { 
                 const variableId = VariableMetadata.GetVariableId(reference)
-                if(CurrentVariableValues[variableId] !== undefined) {
+                if(CurrentVariableValues[variableId] != undefined) {
                     thisClass.superHidden = false
                     thisClass.value = CurrentVariableValues[variableId]
                     if(!thisClass.superHidden) {

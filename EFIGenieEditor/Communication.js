@@ -5,7 +5,7 @@ function GetVariableIdList() {
         variableIds.push(currentTickId)
     for (var variableReference in VariablesToPoll) {
         const variableId = VariableMetadata.GetVariableId(VariablesToPoll[variableReference])
-        if(variableId !== undefined && variableIds.indexOf(variableId) === -1)
+        if(variableId != undefined && variableIds.indexOf(variableId) === -1)
             variableIds.push(variableId)
     }
     return variableIds
@@ -60,7 +60,7 @@ function UpdateFloatCurrentVariableValues() {
         if(responseVariables.length !== variableIds.length + 1) return
         LogBytes = LogBytes.concatArray(base64ToArrayBuffer(responseVariables[0]))
         for(var i = 1; i < Math.min(responseVariables.length, variableIds.length + 1); i++) {
-            var voidValue = responseVariables[i] === undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
+            var voidValue = responseVariables[i] == undefined || !responseVariables[i].replace(/\s/g, '').length || responseVariables[i] === `VOID`
 
             if(responseVariables[i] === `True`)
                 CurrentVariableValues[variableIds[i-1]] = true
@@ -79,11 +79,11 @@ function UpdateFloatCurrentVariableValues() {
     })
 }
 
-fetch(`http://127.0.0.1:8080/GetVariableMetaData`).then(response => response.text()).then(data => {
-    VariableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(data)))
-    VariableMetadata.CreateIfNotFound = false
-    setInterval(UpdateFloatCurrentVariableValues, 100)
-})
+// fetch(`http://127.0.0.1:8080/GetVariableMetaData`).then(response => response.text()).then(data => {
+//     VariableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(data)))
+//     VariableMetadata.CreateIfNotFound = false
+//     setInterval(UpdateFloatCurrentVariableValues, 100)
+// })
 
 function burnBin(arrayBuffer) {
     postArrayBufferData(`http://127.0.0.1:8080/BurnConfig`, arrayBuffer)

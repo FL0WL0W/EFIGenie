@@ -99,7 +99,7 @@ export default class Calculation_LookupTable extends UITemplate {
         LiveUpdateEvents[this.GUID] = function() {
             if(thisClass.parameterSelection?.value) { 
                 const parameterVariableId = VariableMetadata.GetVariableId(thisClass.parameterSelection?.value)
-                if(CurrentVariableValues[parameterVariableId] !== undefined) {
+                if(CurrentVariableValues[parameterVariableId] != undefined) {
                     thisClass.table.trail(CurrentVariableValues[parameterVariableId])
                 } 
             }

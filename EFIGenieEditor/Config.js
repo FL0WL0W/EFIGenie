@@ -28,8 +28,8 @@ class VariableRegistry {
 
             variable = this[listName].find(a => 
                 a.name === variable.name && 
-                (reference.unit === undefined || a.unit === reference.unit || (a.unit === undefined && typeof a.id === `string`)) && 
-                (reference.type === undefined || (a.unit !== undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type?.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type === undefined && typeof a.id === `string`)))
+                (reference.unit == undefined || a.unit === reference.unit || (a.unit == undefined && typeof a.id === `string`)) && 
+                (reference.type == undefined || (a.unit != undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type?.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type == undefined && typeof a.id === `string`)))
         //variable is an object in this
         } else if (typeof this[reference.name] === `object`) {
             variable = this[reference.name]
@@ -77,8 +77,8 @@ class VariableRegistry {
 
             const existingIndex = this[listName].findIndex(a => 
                 a.name === reference.name && 
-                (reference.unit === undefined || a.unit === reference.unit || (a.unit === undefined && typeof a.id === `string`)) && 
-                (reference.type === undefined || (a.unit !== undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type === undefined && typeof a.id === `string`)))
+                (reference.unit == undefined || a.unit === reference.unit || (a.unit == undefined && typeof a.id === `string`)) && 
+                (reference.type == undefined || (a.unit != undefined && reference.type.split(`|`).indexOf(`float`) !== -1) || a.type.split(`|`).some(t => reference.type.split(`|`).indexOf(t) !== -1) || (a.type == undefined && typeof a.id === `string`)))
             if(existingIndex !== -1) {
                 reference.id ??= this[listName][existingIndex].id
                 this[listName].splice(existingIndex, 1)
@@ -93,7 +93,7 @@ class VariableRegistry {
     GetVariableReferenceList() {
         var variableReferences = {}
         for (var property in this) {
-            if (this[property] === undefined)
+            if (this[property] == undefined)
                 continue
     
             if(property === `VariableIncrement` || property === `CreateIfNotFound`)
@@ -124,36 +124,36 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
         //variable filter
         if(calcOrVar.type || calcOrVar.unit) {
             if(inputTypes || inputUnits) return false
-            if(outputUnits?.[0] !== undefined) {
+            if(outputUnits?.[0] != undefined) {
                 if(outputUnits.length !== 1) return false
                 if(calcOrVar.unit !== outputUnits[0]) return false
-            } else if(outputTypes?.[0] !== undefined){
+            } else if(outputTypes?.[0] != undefined){
                 if(outputTypes.length !== 1) return false
-                if(calcOrVar.unit === undefined && calcOrVar.type === undefined ) return false
-                if(calcOrVar.unit !== undefined && outputTypes[0].split(`|`).indexOf(`float`) === -1) return false
-                if(calcOrVar.type !== undefined && !outputTypes[0].split(`|`).some(t => calcOrVar.type.split(`|`).indexOf(t) !== -1)) return false
+                if(calcOrVar.unit == undefined && calcOrVar.type == undefined ) return false
+                if(calcOrVar.unit != undefined && outputTypes[0].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.type != undefined && !outputTypes[0].split(`|`).some(t => calcOrVar.type.split(`|`).indexOf(t) !== -1)) return false
             }
             return true
         }
 
         //calculation Filter
         for(let i = 0; i < (outputUnits?.length ?? outputTypes?.length); i++){
-            if(outputUnits?.[i] !== undefined && outputUnits[i] !== ``) {
+            if(outputUnits?.[i] != undefined && outputUnits[i] !== ``) {
                 if((calcOrVar.outputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && outputUnits[i] !== calcOrVar.outputUnits?.[i]) return false
-            } else if(outputTypes?.[i] !== undefined){
-                if(calcOrVar.outputUnits?.[i] === undefined && calcOrVar.outputTypes?.[i] === undefined) false
-                if(calcOrVar.outputUnits?.[i] !== undefined && outputTypes[i].split(`|`).indexOf(`float`) === -1) return false
-                if(calcOrVar.outputTypes?.[i] !== undefined && !outputTypes[i].split(`|`).some(t => calcOrVar.outputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+            } else if(outputTypes?.[i] != undefined){
+                if(calcOrVar.outputUnits?.[i] == undefined && calcOrVar.outputTypes?.[i] == undefined) false
+                if(calcOrVar.outputUnits?.[i] != undefined && outputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.outputTypes?.[i] != undefined && !outputTypes[i].split(`|`).some(t => calcOrVar.outputTypes[i].split(`|`).indexOf(t) !== -1)) return false
             }
         }
 
         for(let i = 0; i < (inputUnits?.length ?? inputTypes?.length); i++){
-            if(inputUnits?.[i] !== undefined) {
+            if(inputUnits?.[i] != undefined) {
                 if((calcOrVar.inputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && inputUnits[i] !== calcOrVar.inputUnits?.[i]) return false
-            } else if(inputTypes?.[i] !== undefined){
-                if(calcOrVar.inputUnits?.[i] === undefined && calcOrVar.inputTypes?.[i] === undefined) false
-                if(calcOrVar.inputUnits?.[i] !== undefined && inputTypes[i].split(`|`).indexOf(`float`) === -1) return false
-                if(calcOrVar.inputTypes?.[i] !== undefined && !inputTypes[i].split(`|`).some(t => calcOrVar.inputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+            } else if(inputTypes?.[i] != undefined){
+                if(calcOrVar.inputUnits?.[i] == undefined && calcOrVar.inputTypes?.[i] == undefined) false
+                if(calcOrVar.inputUnits?.[i] != undefined && inputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                if(calcOrVar.inputTypes?.[i] != undefined && !inputTypes[i].split(`|`).some(t => calcOrVar.inputTypes[i].split(`|`).indexOf(t) !== -1)) return false
             }
         }
         return true
@@ -197,8 +197,8 @@ function GetSelections(calculations, filter) {
                     info: arr[i].unit? `[${GetMeasurementNameFromUnitName(arr[i].unit)}]` : ``,
                     value: { 
                         name: `${property}.${arr[i].name}`,
-                        ...( arr[i].type === undefined? undefined :{ type: arr[i].type } ),
-                        ...( arr[i].unit === undefined? undefined :{ unit: arr[i].unit } )
+                        ...( arr[i].type == undefined? undefined :{ type: arr[i].type } ),
+                        ...( arr[i].unit == undefined? undefined :{ unit: arr[i].unit } )
                     }
                 })
             }
@@ -423,8 +423,8 @@ x86TypeAlignment = [
 function Packagize(definition, val) {
     val ??= {}
     val.outputVariables ??= this.outputVariables
-    val.outputUnits = val.unit === undefined? val.outputUnits : [val.unit]
-    val.outputUnits ??= this.unit === undefined? this.outputUnits : [this.unit]
+    val.outputUnits = val.unit == undefined? val.outputUnits : [val.unit]
+    val.outputUnits ??= this.unit == undefined? this.outputUnits : [this.unit]
     val.outputVariables = val.outputVariables?.map(function(ov, idx) {
         if(typeof ov !== `string`)
             return ov
@@ -442,8 +442,8 @@ function Packagize(definition, val) {
     })
     val.inputVariables ??= this.inputVariables
     delete val.unit
-    if( (val.outputVariables && val.outputVariables.some(x => x !== undefined)) || 
-        (val.intputVariables && val.intputVariables.some(x => x !== undefined))) {
+    if( (val.outputVariables && val.outputVariables.some(x => x != undefined)) || 
+        (val.intputVariables && val.intputVariables.some(x => x != undefined))) {
         definition.type = `Package`
         definition.outputVariables = val.outputVariables
         definition.outputUnits = val.outputUnits
@@ -485,13 +485,13 @@ function mapDefinitionFromValue(value) {
     if(value.toDefinition) {
         value.types ??= []
         for(let typeIndex in this.types){
-            if(value.types.find(x => x.type === this.types[typeIndex].type) === undefined){
+            if(value.types.find(x => x.type === this.types[typeIndex].type) == undefined){
                 value.types.push(this.types[typeIndex])
             }
         }    
 
         let definition = value.toDefinition.call(value)
-        if(definition === undefined)
+        if(definition == undefined)
             return
         if(definition.type !== `definition`)
             definition = { type: `definition`, value: [definition]}
@@ -513,7 +513,7 @@ function toArrayBuffer() {
 
         //align
         var align = definition.value[index].align
-        if(align === undefined && typeInfo !== undefined){
+        if(align == undefined && typeInfo != undefined){
             align = typeInfo.align
         }
         if(align) {
@@ -521,10 +521,10 @@ function toArrayBuffer() {
         }
 
         var toArrayBuffer = definition.value[index].toArrayBuffer
-        if(toArrayBuffer === undefined && typeInfo !== undefined && definition.value[index].type !== `definition`){
+        if(toArrayBuffer == undefined && typeInfo != undefined && definition.value[index].type !== `definition`){
             toArrayBuffer = typeInfo.toArrayBuffer
         }
-        if(toArrayBuffer !== undefined){
+        if(toArrayBuffer != undefined){
             buffer = buffer.concatArray(toArrayBuffer.call(definition.value[index]))
         }
     }
@@ -586,13 +586,13 @@ types = [
                 definition = [definition]
             for(index in definition)
             {
-                if(definition[index] === undefined)
+                if(definition[index] == undefined)
                     continue
                 //consolidate group
                 if(definition[index].type === `Group`) {
                     for(var typeIndex in definition[index].types){
                         var typetypeInfo = thisGroup.types.find(x => x.type === definition[index].types[typeIndex].type)
-                        if(typetypeInfo === undefined){
+                        if(typetypeInfo == undefined){
                             thisGroup.types.push(definition[index].types[typeIndex])
                         }
                     }
@@ -828,14 +828,14 @@ types = [
         return this
     }},
     { type: `Input`, toDefinition() {
-        if(this.translationConfig === undefined)
+        if(this.translationConfig == undefined)
             return
-        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: this.translationConfig.calculation?.outputUnits?.[0], type: this.translationConfig.calculation?.outputUnits?.[0] === undefined? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
+        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: this.translationConfig.calculation?.outputUnits?.[0], type: this.translationConfig.calculation?.outputUnits?.[0] == undefined? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
 
-        if(this.translationConfig.inputs === undefined || this.translationConfig.inputs === 0)
+        if(this.translationConfig.inputs == undefined || this.translationConfig.inputs === 0)
             return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
 
-        const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.calculation?.outputUnits?.[0], type: this.rawConfig.calculation?.outputUnits?.[0] === undefined? this.rawConfig.calculation?.outputTypes?.[0] : undefined }
+        const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.calculation?.outputUnits?.[0], type: this.rawConfig.calculation?.outputUnits?.[0] == undefined? this.rawConfig.calculation?.outputTypes?.[0] : undefined }
         this.rawConfig = { ...this.rawConfig, type: `CalculationOrVariableSelection`, outputVariables: [ rawOutputVariable ] }
         
         return { type: `Group`, value: [

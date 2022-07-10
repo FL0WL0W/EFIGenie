@@ -123,7 +123,7 @@ export default class Calculation_2AxisTable extends UITemplate {
             if(thisClass.XSelection?.value && thisClass.YSelection?.value) { 
                 const xVariableId = VariableMetadata.GetVariableId(thisClass.XSelection?.value)
                 const yVariableId = VariableMetadata.GetVariableId(thisClass.YSelection?.value)
-                if(CurrentVariableValues[xVariableId] !== undefined && CurrentVariableValues[yVariableId] !== undefined) {
+                if(CurrentVariableValues[xVariableId] != undefined && CurrentVariableValues[yVariableId] != undefined) {
                     thisClass.table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
                 } 
             }

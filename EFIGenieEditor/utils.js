@@ -43,7 +43,7 @@ ArrayBuffer.prototype.concatArray = function(b) { // a, b TypedArray of same typ
 }
 
 ArrayBuffer.prototype.pad = function(bytes, padByte) {
-    if(padByte === undefined){
+    if(padByte == undefined){
         padByte = 0xFF
     }
     var array = []
@@ -153,10 +153,19 @@ function base64ToArrayBuffer(base64) {
     }
     return bytes.buffer
 }
+function arrayBufferToBase64( buffer ) {
+	var binary = '';
+	var bytes = new Uint8Array( buffer );
+	var len = bytes.byteLength;
+	for (var i = 0; i < len; i++) {
+		binary += String.fromCharCode( bytes[ i ] );
+	}
+	return window.btoa( binary );
+}
 
 function isEmptyObject(obj) {
     for(var prop in obj) {
-        if(obj[prop] === undefined)
+        if(obj[prop] == undefined)
             continue
         if(Object.prototype.hasOwnProperty.call(obj, prop)) {
             return false

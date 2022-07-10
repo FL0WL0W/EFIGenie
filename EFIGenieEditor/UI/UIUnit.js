@@ -11,7 +11,7 @@ export default class UIUnit extends UISelection {
     get value() { return super.value }
     set value(value) {
         let measurement = GetMeasurementNameFromUnitName(value)
-        if(measurement === undefined) return
+        if(measurement == undefined) return
         this.measurement = measurement
         super.value = value
     }
@@ -23,7 +23,7 @@ export default class UIUnit extends UISelection {
         this._measurement = measurement
         this.Default = Measurements[measurement]?.[0]?.name
         this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
-        if(this.value === undefined || this.value === `` || this.value === null) this.value = this.Default
+        if(this.value == undefined || this.value === `` || this.value === null) this.value = this.Default
         if(this.options.length === 0) super.hidden = true
         else if(!this.hidden) super.hidden = false
     }
@@ -33,7 +33,7 @@ export default class UIUnit extends UISelection {
         return super.saveValue
     }
     set saveValue(saveValue) {
-        if(saveValue === undefined || saveValue === ``) return
+        if(saveValue == undefined || saveValue === ``) return
         super.saveValue = saveValue
     }
 

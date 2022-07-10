@@ -27,7 +27,7 @@ export default class Input extends UITemplate {
         })
         this.translationConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.translationConfig.SubConfig
-            if(subConfig === undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
+            if(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
                 thisClass.hr.hidden = true
                 thisClass.rawConfig.hidden = true
                 thisClass.rawConfig.selection.value = undefined
@@ -40,7 +40,7 @@ export default class Input extends UITemplate {
         this.translationConfig.labelElement.replaceWith(this.name)
         this.rawConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.translationConfig.SubConfig
-            if(subConfig === undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
+            if(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
                 thisClass.hr.hidden = true
                 thisClass.rawConfig.hidden = true
                 thisClass.rawConfig.selection.value = undefined
@@ -62,7 +62,7 @@ export default class Input extends UITemplate {
         const reference = { name: `Inputs.${this.name.value}` }
         this.translationConfig.RegisterVariables?.(reference)
         const subConfig = this.translationConfig.SubConfig
-        if(!(subConfig === undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0))
+        if(!(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0))
             this.rawConfig.RegisterVariables?.(reference)
     }
 }

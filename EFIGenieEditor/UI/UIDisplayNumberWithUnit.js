@@ -21,11 +21,12 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     get saveValue() { return this.displayUnitElement.saveValue }
     set saveValue(saveValue) { this.displayUnitElement.saveValue = saveValue }
 
-    UpdateDisplayValue() {
-        super.UpdateDisplayValue()
-
-        let displayValue = this.displayValue
-        if(displayValue === undefined) return
+    set value(value) {
+        const displayUnit = this.displayUnit
+        const valueUnit = this.valueUnit
+        function valueToDisplayValue(value) { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
+        let displayValue = valueToDisplayValue(value)
+        if(displayValue == undefined) return
             
         displayValue = `${parseFloat(parseFloat(parseFloat(displayValue).toFixed(5)).toPrecision(6))}`
         const indexOfPoint = displayValue.indexOf(`.`)

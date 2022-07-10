@@ -69,7 +69,7 @@ export default class UINumberWithUnit extends UITemplate {
         })
         this.displayValueElement = new UINumber()
         this.displayValueElement.addEventListener(`change`, function() {
-            if(thisClass.displayValue !== undefined && thisClass.displayUnit)
+            if(thisClass.displayValue != undefined && thisClass.displayUnit)
                 thisClass.#value = ConvertValueFromUnitToUnit(thisClass.displayValue, thisClass.displayUnit, thisClass.valueUnit)
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
@@ -77,7 +77,7 @@ export default class UINumberWithUnit extends UITemplate {
     }
 
     get saveValue() {
-        if(this.displayUnitElement.saveValue === undefined)
+        if(this.displayUnitElement.saveValue == undefined)
             return this.value
 
         return {
@@ -95,12 +95,13 @@ export default class UINumberWithUnit extends UITemplate {
     }
 
     UpdateDisplayValue() {
-        let thisClass = this
-        function valueToDisplayValue(value) { return value === undefined || !thisClass.displayUnit? value : ConvertValueFromUnitToUnit(value, thisClass.valueUnit, thisClass.displayUnit) }
+        const displayUnit = this.displayUnit
+        const valueUnit = this.valueUnit
+        function valueToDisplayValue(value) { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
         this.displayValue               = valueToDisplayValue(this.value)   ?? this.displayValue
         this.displayValueElement.min    = valueToDisplayValue(this.min)     ?? this.displayValueElement.min
         this.displayValueElement.max    = valueToDisplayValue(this.max)     ?? this.displayValueElement.max
-        this.displayValueElement.step   = valueToDisplayValue(this.step)    ?? this.displayValueElement.stepDown
+        this.displayValueElement.step   = valueToDisplayValue(this.step)    ?? this.displayValueElement.step
     }
 }
 customElements.define(`ui-numberwithunit`, UINumberWithUnit, { extends: `span` })

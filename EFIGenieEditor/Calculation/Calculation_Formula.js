@@ -107,7 +107,7 @@ export default class Calculation_Formula extends UITemplate {
         super.value = value
         
         const thisClass = this
-        Object.keys(this.parameterValues).filter(p => value.parameterValues[p] === undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
+        Object.keys(this.parameterValues).filter(p => value.parameterValues[p] == undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
 
         for(let parameter in value.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
@@ -135,7 +135,7 @@ export default class Calculation_Formula extends UITemplate {
         super.saveValue = saveValue
     
         const thisClass = this
-        Object.keys(this.parameterValues).filter(p => saveValue.parameterValues[p] === undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
+        Object.keys(this.parameterValues).filter(p => saveValue.parameterValues[p] == undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
 
         for(let parameter in saveValue.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({

@@ -36,7 +36,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         return  this._outputUnits? undefined : (
                     this._outputTypes ??                 
                     GetClassProperty(this.SubConfig, `outputTypes`) ?? 
-                    (this.selection.value?.unit !== undefined? undefined : (
+                    (this.selection.value?.unit != undefined? undefined : (
                         [ this.selection.value?.type ]
                     ))
                 )
@@ -49,7 +49,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get outputUnits() {
         return  this._outputUnits ?? 
                 GetClassProperty(this.SubConfig, `outputUnits`) ??      
-                (this.selection.value?.unit !== undefined? undefined : (
+                (this.selection.value?.unit != undefined? undefined : (
                     [ this.selection.value?.unit ]
                 ))
     }
@@ -137,7 +137,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if (this.calculationValues && this.calculationValues.length > 0) {
             if(CalculationOrVariableSelection.SaveOnlyActive) {
                 var subConfig = this.SubConfig
-                if(subConfig?.saveValue !== undefined) {
+                if(subConfig?.saveValue != undefined) {
                     var configValue = subConfig.saveValue
                     if(configValue != undefined) {
                         if(typeof configValue !== `object`)
@@ -208,7 +208,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         const subConfig = this.SubConfig
         return {
             ...super.value,
-            ...(subConfig !== undefined) && {calculation: { 
+            ...(subConfig != undefined) && {calculation: { 
                  ...subConfig.value, 
                 ...(typeof subConfig.value !== `object`) && { value: subConfig.value },
                 outputUnits: this.outputUnits
@@ -238,8 +238,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
         }
         
         const subConfig = this.SubConfig
-        if(subConfig !== undefined) {
-            const hasOutput = (GetClassProperty(subConfig, `outputUnits`) ?? GetClassProperty(subConfig, `outputTypes`)) !== undefined
+        if(subConfig != undefined) {
+            const hasOutput = (GetClassProperty(subConfig, `outputUnits`) ?? GetClassProperty(subConfig, `outputTypes`)) != undefined
             if (hasOutput) VariableRegister.RegisterVariable(reference)
             subConfig.RegisterVariables?.(reference)
         } else {
@@ -266,7 +266,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             const calculations = configGroups[c].calculations
     
             for (var i = 0; i < calculations.length; i++) {
-                if (calculations[i] === undefined || calculations[i].name !== this.selection.value)
+                if (calculations[i] == undefined || calculations[i].name !== this.selection.value)
                     continue
                 this.calculationValues.push(new calculations[i]({
                     noParameterSelection: this.noParameterSelection,
