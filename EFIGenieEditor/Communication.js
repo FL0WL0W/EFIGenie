@@ -90,9 +90,26 @@ class EFIGenieWebSerial extends EFIGenieLog {
                 }
                 index++
             }
-            metadataData = metadataData.slice(0, length * 64)
 
-            this.variableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(arrayBufferToBase64(metadataData))))
+            let trys = 0
+            while(metadataData.byteLength < length) {
+                await new Promise(r => setTimeout(r, 200));;
+                const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
+                if (done) {
+                    throw "Serial closed"
+                }
+                if (trys++ > 10) {
+                    throw "Metadata not returned"
+                }
+                if(value)
+                    metadataData = metadataData.concatArray(value.buffer)
+            }
+            
+            metadataData = metadataData.slice(0, length * 64)
+            const metadataString = lzjs.decompressFromBase64(arrayBufferToBase64(metadataData))
+            console.log(length * 64, metadataString)
+
+            this.variableMetadata = new VariableRegistry(JSON.parse(metadataString))
         } catch(e) {
             writer?.releaseLock?.()
             reader?.releaseLock?.()
@@ -353,9 +370,13 @@ class EFIGenieWebSerial extends EFIGenieLog {
     }
 
     connect() {
+        if(this.polling)
+            return
+        this.polling = true
         this.connected = true
         const thisClass = this
         this.pollVariables().then(function() {
+            thisClass.polling = false
             if(thisClass.connected)
                 thisClass.connect()
         }).catch(function(e) {
