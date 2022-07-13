@@ -189,7 +189,7 @@ class EFIGenieWebSerial extends EFIGenieLog {
             }
             await writer.write(data)
             let bytes = new ArrayBuffer()
-            let variableValues = []
+            let variableValues = {}
             let bytesRead = 0
             for(let i = 0; i < variableIds.length; i++) {
                 let tLen = 0
