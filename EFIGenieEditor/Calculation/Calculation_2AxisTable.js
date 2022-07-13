@@ -114,17 +114,17 @@ export default class Calculation_2AxisTable extends UITemplate {
     RegisterVariables() {
         this.xOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
         this.yOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
-        if(VariablesToPoll.indexOf(this.XSelection?.value) === -1)
-            VariablesToPoll.push(this.XSelection?.value)
-        if(VariablesToPoll.indexOf(this.YSelection?.value) === -1)
-            VariablesToPoll.push(this.YSelection?.value)
+        if(communication.variablesToPoll.indexOf(this.XSelection?.value) === -1)
+            communication.variablesToPoll.push(this.XSelection?.value)
+        if(communication.variablesToPoll.indexOf(this.YSelection?.value) === -1)
+            communication.variablesToPoll.push(this.YSelection?.value)
         const thisClass = this
-        LiveUpdateEvents[this.GUID] = function() {
+        communication.liveUpdateEvents[this.GUID] = function(variableMetadata, currentVariableValues) {
             if(thisClass.XSelection?.value && thisClass.YSelection?.value) { 
-                const xVariableId = VariableMetadata.GetVariableId(thisClass.XSelection?.value)
-                const yVariableId = VariableMetadata.GetVariableId(thisClass.YSelection?.value)
-                if(CurrentVariableValues[xVariableId] != undefined && CurrentVariableValues[yVariableId] != undefined) {
-                    thisClass.table.trail(CurrentVariableValues[xVariableId], CurrentVariableValues[yVariableId])
+                const xVariableId = variableMetadata.GetVariableId(thisClass.XSelection?.value)
+                const yVariableId = variableMetadata.GetVariableId(thisClass.YSelection?.value)
+                if(currentVariableValues[xVariableId] != undefined && currentVariableValues[yVariableId] != undefined) {
+                    thisClass.table.trail(currentVariableValues[xVariableId], currentVariableValues[yVariableId])
                 } 
             }
         }

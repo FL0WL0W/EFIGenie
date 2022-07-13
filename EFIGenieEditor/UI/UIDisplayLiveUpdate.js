@@ -15,14 +15,14 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
         variable ??= reference
         if(!variable?.unit && variable?.type?.split(`|`)?.indexOf(`float`) === -1) return
         this.valueUnit = variable.unit
-        if(VariablesToPoll.indexOf(reference) === -1)
-            VariablesToPoll.push(reference)
-        LiveUpdateEvents[this.GUID] = function() {
+        if(communication.variablesToPoll.indexOf(reference) === -1)
+            communication.variablesToPoll.push(reference)
+        communication.liveUpdateEvents[this.GUID] = function(variableMetadata, currentVariableValues) {
             if(reference) { 
-                const variableId = VariableMetadata.GetVariableId(reference)
-                if(CurrentVariableValues[variableId] != undefined) {
+                const variableId = variableMetadata.GetVariableId(reference)
+                if(currentVariableValues[variableId] != undefined) {
                     thisClass.superHidden = false
-                    thisClass.value = CurrentVariableValues[variableId]
+                    thisClass.value = currentVariableValues[variableId]
                     if(!thisClass.superHidden) {
                         if(thisClass.superHidden)
                             thisClass.superHidden = false

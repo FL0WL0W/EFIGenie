@@ -168,7 +168,7 @@ export default class Top extends UITemplate {
 
     RegisterVariables() {
         VariableRegister.Clear()
-        LiveUpdateEvents = []
+        communication.liveUpdateEvents = []
         this.Inputs.RegisterVariables()
         this.Engine.RegisterVariables()
         this.Fuel.RegisterVariables()

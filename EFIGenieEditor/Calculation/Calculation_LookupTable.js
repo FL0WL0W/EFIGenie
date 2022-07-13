@@ -92,15 +92,15 @@ export default class Calculation_LookupTable extends UITemplate {
 
     RegisterVariables() {
         this.xOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
-        if(VariablesToPoll.indexOf(this.parameterSelection?.value) === -1)
-            VariablesToPoll.push(this.parameterSelection?.value)
+        if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
+            communication.variablesToPoll.push(this.parameterSelection?.value)
         
         const thisClass = this
-        LiveUpdateEvents[this.GUID] = function() {
+        communication.liveUpdateEvents[this.GUID] = function(variableMetadata, currentVariableValues) {
             if(thisClass.parameterSelection?.value) { 
-                const parameterVariableId = VariableMetadata.GetVariableId(thisClass.parameterSelection?.value)
-                if(CurrentVariableValues[parameterVariableId] != undefined) {
-                    thisClass.table.trail(CurrentVariableValues[parameterVariableId])
+                const parameterVariableId = variableMetadata.GetVariableId(thisClass.parameterSelection?.value)
+                if(currentVariableValues[parameterVariableId] != undefined) {
+                    thisClass.table.trail(currentVariableValues[parameterVariableId])
                 } 
             }
         }

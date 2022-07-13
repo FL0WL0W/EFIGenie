@@ -51,7 +51,6 @@
         <script src="lzjs.js"></script>
         <script src="Units.js"></script>
         <script src="Communication.js" defer></script>
-        <script src="Serial.js" defer></script>
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
         <script defer>
@@ -122,7 +121,7 @@
                 })
                 let btnBurnBin = document.querySelector(`#btnBurnBin`)
                 btnBurnBin.addEventListener(`click`, function(){
-                    burnBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` }))
+                    communication.burnBin(new ArrayBuffer().build({ ...b.value , types: types, type: `Top` })).then(function() { alert(`Bin Burned!`)}).catch(function(e) { alert(e)})
                 })
                 let btnConnect = document.querySelector(`#btnConnect`)
                 btnConnect.addEventListener(`click`, function(){
