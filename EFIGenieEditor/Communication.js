@@ -16,116 +16,133 @@ class EFIGenieLog {
     }
 }
 
-async function readWithTimeout(stream, timeout) {
-    const reader = stream.getReader();
-    const timer = setTimeout(() => {
-      reader.releaseLock();
-    }, timeout);
-    const result = await reader.read();
-    clearTimeout(timer);
-    reader.releaseLock();
-    return result;
-  }
 
-class EFIGenieWebSerial extends EFIGenieLog {
-    variablesToPoll = []
-    liveUpdateEvents = []
-    previousVariableIds = []
-    baudRate = 115200
-    filters = [ 
-        { usbVendorId: 1155, usbProductId: 22336 } 
-    ]
+class Serial {
+    #options
+    #filters
+    #serialPort
+    
+    get options() { return this.#options }
+    set options(options) { 
+        this.#options = options
+        this.#serialPort = undefined
+    }
+    get filters() { return this.#filters }
+    set filters(filters) { 
+        this.#filters = filters
+        this.#serialPort = undefined
+    }
+    constructor(options, filters) {
+        this.options = options ?? { baudRate: 115200 }
+        this.filters = filters
+    }
 
-    async serialConnect() {
-        if(this.serialPort != undefined && this.serialPort.readable && this.serialPort.writable)
+    async #connect() {
+        if(this.#serialPort != undefined && this.#serialPort.readable && this.#serialPort.writable)
             return
-
-        this.variableMetadata = undefined
 
         if(!("serial" in navigator))
             throw `WebSerial not supported. please open in a supported browser`
 
         let ports = await navigator.serial.getPorts({ filter: this.filters })
         if(ports.length !== 1)
-            this.serialPort = await navigator.serial.requestPort({ filter: this.filters })
+            this.#serialPort = await navigator.serial.requestPort({ filter: this.filters })
         else
-            this.serialPort = ports[0]
+            this.#serialPort = ports[0]
 
-        await this.serialPort.open({ baudRate: this.baudRate })
+        await this.#serialPort.open(this.options)
     }
 
-    async getVariableMetadata() {
+    async read(numberOfBytes = 1, timeout = 1000) {
+        await this.#connect()
+
+        async function readWithTimeout(stream, timeout) {
+            let trys = 0
+            while(stream.locked && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
+                await new Promise(r => setTimeout(r, Math.max(timeout / 10, 10)))
+            if(stream.locked)
+                return { value: undefined, done: false }
+
+            const reader = stream.getReader();
+            const timer = setTimeout(() => {
+                reader.releaseLock()
+            }, timeout)
+            const result = await reader.read()
+            clearTimeout(timer)
+            reader.releaseLock()
+            return result
+        }
+
+        let trys = 0
+        let cummulativeValue = new ArrayBuffer()
+        while(true) {
+            const { value, done } = await readWithTimeout(this.#serialPort.readable, timeout)
+            if (done)
+                throw "Serial closed"
+            if (!value && trys++ > 10)
+                break
+            else {
+                trys = 0
+                cummulativeValue = cummulativeValue.concatArray(value)
+            }
+            if (cummulativeValue.byteLength >= numberOfBytes)
+                break
+                
+        }
+        return cummulativeValue
+    }
+    async write(sendBytes, timeout = 1000) {
+        await this.#connect()
+
+        let trys = 0
+        while(this.#serialPort.writable.locked && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
+            await new Promise(r => setTimeout(r, Math.max(timeout / 10, 10)))
+        if(this.#serialPort.writable.locked)
+            return
+
+        const writer = this.#serialPort.writable.getWriter()
+        await writer.write(sendBytes)
+        writer.releaseLock()
+    }
+}
+
+class EFIGenieSerial extends EFIGenieLog {
+    #serial = new Serial(undefined, [ 
+        { usbVendorId: 1155, usbProductId: 22336 } 
+    ])
+    
+    variableMetadata = undefined
+    variablesToPoll = []
+    liveUpdateEvents = []
+    previousVariableIds = []
+
+    async pollVariableMetadata() {
         if(this.variableMetadata != undefined)
             return
 
-        await this.serialConnect()
-
-        try {
-            if(this.serialPort == undefined || !this.serialPort.readable || !this.serialPort.writable)
-                throw "Unable to connect to serial"
-
-            var writer = this.serialPort?.writable?.locked? undefined : this.serialPort?.writable?.getWriter()
-            var reader = this.serialPort?.readable?.locked? undefined : this.serialPort?.readable?.getReader()
-    
-            if(writer == undefined || reader == undefined)
-                throw "Unable to connect to serial"
-
-            reader.releaseLock()
-
-            let metadataData = new ArrayBuffer()
-            let index = 0
-            let length = 1
-            while(index < Math.ceil(length)) {
-                const data = new Uint8Array([109]).buffer.concatArray(new Uint32Array([index]).buffer) // get metadata
-                await writer.write(data)
-                let { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                if (done) 
-                    throw "Serial closed"
-                if (value) {
-                    if(index === 0) {
-                        length = new Uint32Array(value.slice(0, 4).buffer)[0] / 64
-                        value = value.slice(4)
-                    }
-                    metadataData = metadataData.concatArray(value.buffer)
-                }
-                index++
-            }
-
-            let trys = 0
-            while(metadataData.byteLength < length) {
-                await new Promise(r => setTimeout(r, 200));;
-                const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                if (done) {
-                    throw "Serial closed"
-                }
-                if (trys++ > 10) {
-                    throw "Metadata not returned"
-                }
-                if(value)
-                    metadataData = metadataData.concatArray(value.buffer)
-            }
+        let metadataData = new ArrayBuffer()
+        let length = 1
+        for(let i = 0; i < Math.ceil(length); i++) {
+            const data = new Uint8Array([109]).buffer.concatArray(new Uint32Array([i]).buffer) // get metadata
+            await this.#serial.write(data)
+            let retData = await this.#serial.read(64)
+            if(retData.byteLength !== 64) throw "Incorrect number of bytes returned when requesting metadata"
             
-            metadataData = metadataData.slice(0, length * 64)
-            const metadataString = lzjs.decompressFromBase64(arrayBufferToBase64(metadataData))
-            console.log(length * 64, metadataString)
-
-            this.variableMetadata = new VariableRegistry(JSON.parse(metadataString))
-        } catch(e) {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
-            throw e
-        } finally {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
+            if(i === 0) {
+                length = new Uint32Array(retData.slice(0, 4))[0] / 64
+                retData = retData.slice(4)
+            }
+            metadataData = metadataData.concatArray(retData)
         }
+            
+        metadataData = metadataData.slice(0, length * 64)
+        const metadataString = lzjs.decompressFromBase64(arrayBufferToBase64(metadataData))
+
+        this.variableMetadata = new VariableRegistry(JSON.parse(metadataString))
     }
 
     async pollVariables() {
-        await this.serialConnect()
-        await this.getVariableMetadata()
-
-        if(this.variableMetadata == undefined)
-            return
+        await this.pollVariableMetadata()
 
         var variableIds = []
         const currentTickId = this.variableMetadata.GetVariableId({name: `CurrentTick`, type: `tick`})
@@ -188,185 +205,79 @@ class EFIGenieWebSerial extends EFIGenieLog {
             }
         }
 
-        try {
-            if(this.serialPort == undefined || !this.serialPort.readable || !this.serialPort.writable)
-                throw "Unable to connect to serial"
-
-            var writer = this.serialPort?.writable?.locked? undefined : this.serialPort?.writable?.getWriter()
-            var reader = this.serialPort?.readable?.locked? undefined : this.serialPort?.readable?.getReader()
-    
-            if(writer == undefined || reader == undefined)
-                throw "Unable to connect to serial"
-
-            reader.releaseLock()
-
-            let data = new ArrayBuffer()
-            for(let i = 0; i < variableIds.length; i++) {
-                data = data.concatArray(new Uint8Array([103]).buffer.concatArray(new Uint32Array([variableIds[i]]).buffer))
-            }
-            await writer.write(data)
-            let bytes = new ArrayBuffer()
-            let variableValues = {}
-            let bytesRead = 0
-            for(let i = 0; i < variableIds.length; i++) {
-                let tLen = 0
-                while(bytes.byteLength - bytesRead < 1 || bytes.byteLength - bytesRead < (tLen = typeLength(new Uint8Array(bytes.slice(bytesRead, bytesRead + 1))[0])) + 1) {
-                    const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                    if (done) {
-                        writer.releaseLock()
-                        reader.releaseLock()
-                        throw "Serial closed"
-                    }
-                    if (value) {
-                        bytes = bytes.concatArray(value)
-                    }
-                }
-                variableValues[variableIds[i]] = parseVariable(bytes.slice(bytesRead, bytesRead + tLen + 1))
-                bytesRead += tLen + 1
-            }
-            this.logBytes = this.logBytes.concatArray(bytes)
-            this.loggedVariableValues.push(variableValues)
-
-            const thisClass = this
-            Object.entries(this.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(e => {
-                var [elementname, element] = e
-                element?.(thisClass.variableMetadata, thisClass.loggedVariableValues[thisClass.loggedVariableValues.length - 1])
-            })
-        } catch(e) {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
-            throw e
-        } finally {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
+        let data = new ArrayBuffer()
+        for(let i = 0; i < variableIds.length; i++) {
+            data = data.concatArray(new Uint8Array([103]).buffer.concatArray(new Uint32Array([variableIds[i]]).buffer))
         }
+        await this.#serial.write(data)
+        let bytes = new ArrayBuffer()
+        let variableValues = {}
+        let bytesRead = 0
+        for(let i = 0; i < variableIds.length; i++) {
+            let tLen = 0
+            while(bytes.byteLength - bytesRead < 1 || bytes.byteLength - bytesRead < (tLen = typeLength(new Uint8Array(bytes.slice(bytesRead, bytesRead + 1))[0])) + 1) {
+                let value = await this.#serial.read()
+                bytes = bytes.concatArray(value)
+            }
+            variableValues[variableIds[i]] = parseVariable(bytes.slice(bytesRead, bytesRead + tLen + 1))
+            bytesRead += tLen + 1
+        }
+        this.logBytes = this.logBytes.concatArray(bytes)
+        this.loggedVariableValues.push(variableValues)
+
+        const thisClass = this
+        Object.entries(this.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(e => {
+            var [elementname, element] = e
+            element?.(thisClass.variableMetadata, thisClass.loggedVariableValues[thisClass.loggedVariableValues.length - 1])
+        })
+    }
+
+    async stopExecution() {
+        await this.#serial.write(new Uint8Array([113]).buffer)
+        const retData = await this.#serial.read()
+        if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when stopping executrion"
+        if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when stopping executrion"
+    }
+
+    async startExecution() {
+        await this.#serial.write(new Uint8Array([115]).buffer)
+        const retData = await this.#serial.read()
+        if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when stopping executrion"
+        if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when stopping executrion"
+    }
+
+    async writeToAddress(address, data, chunks = 52) {
+        let left = data.byteLength
+        let i = 0
+        while(left > 0) {
+            let sendSize = Math.min(chunks, left)
+            await this.#serial.write(new Uint8Array([119]).buffer.concatArray(new Uint32Array([ address + i, sendSize]).buffer).concatArray(data.slice(i, i + sendSize)))
+            const retData = await this.#serial.read()
+            if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when writing data"
+            if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when writing data"
+            left -= sendSize
+            i += sendSize
+        }
+    }
+
+    async getConfigAddress() {
+        await this.#serial.write(new Uint8Array([99]).buffer)
+        const retData = await this.#serial.read(4)
+        if(retData.byteLength !== 4) throw "Incorrect number of bytes returned when requesting config address"
+        return new Uint32Array(retData)[0]
     }
 
     async burnBin(bin) {
         let reconnect = this.connected
         this.disconnect()
-        let trys = 0
-        while((this.serialPort?.writable?.locked || this.serialPort?.readable?.locked) && trys++ < 10) await new Promise(r => setTimeout(r, 200));;
-        await this.serialConnect()
 
-        try {
-            if(this.serialPort == undefined || !this.serialPort.readable || !this.serialPort.writable)
-                throw "Unable to connect to serial"
+        await this.stopExecution()
+        const configAddress = await this.getConfigAddress()
+        await this.writeToAddress(configAddress, bin)
+        await this.startExecution()
 
-            var writer = this.serialPort?.writable?.locked? undefined : this.serialPort?.writable?.getWriter()
-            var reader = this.serialPort?.readable?.locked? undefined : this.serialPort?.readable?.getReader()
-    
-            if(writer == undefined || reader == undefined)
-                throw "Unable to connect to serial"
-
-            reader.releaseLock()
-
-            await writer.write(new Uint8Array([113]).buffer)
-            trys = 0
-            let cummulativeValue = new ArrayBuffer()
-            while(true) {
-                const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                if (done) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "Serial closed"
-                }
-                if (trys++ > 10) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "No Ack"
-                }
-                if(value)
-                    cummulativeValue = cummulativeValue.concatArray(value)
-                if (cummulativeValue.byteLength > 0 && new Uint8Array(cummulativeValue.slice(cummulativeValue.byteLength - 1))[0] == 6)
-                    break
-            }
-
-            let configLoc = 0
-            await writer.write(new Uint8Array([99]).buffer)
-            trys = 0
-            cummulativeValue = new ArrayBuffer()
-            while(true) {
-                const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                if (done) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "Serial closed"
-                }
-                if (trys++ > 10) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "Config Location Not Returned"
-                }
-                if(value)
-                    cummulativeValue = cummulativeValue.concatArray(value)
-                if (cummulativeValue.byteLength > 3) {
-                    configLoc = new Uint32Array(cummulativeValue.slice(cummulativeValue.byteLength - 4, value.byteLength))[0]
-                    break
-                }
-            }
-
-            let left = bin.byteLength
-            let i = 0
-            while(left > 0) {
-                let sendSize = Math.min(52, left)
-                const sendData = new Uint8Array([119]).buffer.concatArray(new Uint32Array([ configLoc + i, sendSize]).buffer).concatArray(bin.slice(i, i + sendSize))
-                await writer.write(sendData)
-                left -= sendSize
-                i += sendSize
-                trys = 0
-                cummulativeValue = new ArrayBuffer()
-                while(true) {
-                    const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                    if (done) {
-                        writer.releaseLock()
-                        reader.releaseLock()
-                        throw "Serial closed"
-                    }
-                    if (trys++ > 10) {
-                        writer.releaseLock()
-                        reader.releaseLock()
-                        throw "No Ack"
-                    }
-                    if(value)
-                        cummulativeValue = cummulativeValue.concatArray(value)
-                    if (cummulativeValue.byteLength > 0 && new Uint8Array(cummulativeValue.slice(cummulativeValue.byteLength - 1))[0] == 6)
-                        break
-                }
-            }
-
-            await writer.write(new Uint8Array([115]).buffer)
-            trys = 0
-            cummulativeValue = new ArrayBuffer()
-            while(true) {
-                const { value, done } = await readWithTimeout(this.serialPort.readable, 1000)
-                if (done) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "Serial closed"
-                }
-                if (trys++ > 10) {
-                    writer.releaseLock()
-                    reader.releaseLock()
-                    throw "No Ack"
-                }
-                if(value)
-                    cummulativeValue = cummulativeValue.concatArray(value)
-                if (cummulativeValue.byteLength > 0 && new Uint8Array(cummulativeValue.slice(cummulativeValue.byteLength - 1))[0] == 6)
-                    break
-            }
-        } catch(e) {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
-            if(reconnect)
-                this.connect()
-            throw e
-        } finally {
-            writer?.releaseLock?.()
-            reader?.releaseLock?.()
-            if(reconnect)
-                this.connect()
-        }
+        if(reconnect)
+            this.connect()
     }
 
     connect() {
@@ -389,7 +300,7 @@ class EFIGenieWebSerial extends EFIGenieLog {
     }
 }
 
-communication = new EFIGenieWebSerial()
+communication = new EFIGenieSerial()
 
 function RealtimeUpdate() {
     communication.connect()
