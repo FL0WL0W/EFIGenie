@@ -16,11 +16,21 @@ class EFIGenieLog {
     }
 }
 
+async function waitForFunctionToReturnFalse(f, timeout = 1000) {
+    let trys = 0
+    while(f() && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
+        await new Promise(r => setTimeout(r, Math.max(timeout / 10, 10)))
+    if(f())
+        return false
+    return true
+}
 
 class Serial {
     #options
     #filters
     #serialPort
+    #cummulativeValue = new ArrayBuffer()
+    #commandLock
     
     get options() { return this.#options }
     set options(options) { 
@@ -53,56 +63,72 @@ class Serial {
         await this.#serialPort.open(this.options)
     }
 
-    async read(numberOfBytes = 1, timeout = 1000) {
+    async read(numberOfBytes, timeout = 1000) {
         await this.#connect()
 
         async function readWithTimeout(stream, timeout) {
-            let trys = 0
-            while(stream.locked && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
-                await new Promise(r => setTimeout(r, Math.max(timeout / 10, 10)))
-            if(stream.locked)
+            if(!await waitForFunctionToReturnFalse(function() { return stream.locked }))
                 return { value: undefined, done: false }
+            
+            const readStream = new TransformStream()
+            stream.pipeThrough(readStream, { preventClose: true, preventCancel: true })
 
-            const reader = stream.getReader();
+            const reader = readStream.readable.getReader();
+            let cancelResult
             const timer = setTimeout(() => {
-                reader.releaseLock()
+                cancelResult = { value: undefined, done: false }
+                reader.cancel()
             }, timeout)
             const result = await reader.read()
             clearTimeout(timer)
-            reader.releaseLock()
-            return result
+            reader.cancel()
+            return cancelResult ?? result
         }
 
         let trys = 0
-        let cummulativeValue = new ArrayBuffer()
-        while(true) {
+        while(numberOfBytes == undefined || this.#cummulativeValue.byteLength < numberOfBytes) {
             const { value, done } = await readWithTimeout(this.#serialPort.readable, timeout)
             if (done)
                 throw "Serial closed"
             if (!value && trys++ > 10)
                 break
-            else {
+            if(value) {
                 trys = 0
-                cummulativeValue = cummulativeValue.concatArray(value)
+                this.#cummulativeValue = this.#cummulativeValue.concatArray(value)
             }
-            if (cummulativeValue.byteLength >= numberOfBytes)
+            if(numberOfBytes == undefined)
                 break
-                
         }
-        return cummulativeValue
+        let retBytes = numberOfBytes == undefined? this.#cummulativeValue : this.#cummulativeValue.slice(0, numberOfBytes)
+        this.#cummulativeValue = numberOfBytes == undefined? new ArrayBuffer() : this.#cummulativeValue.slice(numberOfBytes)
+        return retBytes
     }
     async write(sendBytes, timeout = 1000) {
         await this.#connect()
 
-        let trys = 0
-        while(this.#serialPort.writable.locked && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
-            await new Promise(r => setTimeout(r, Math.max(timeout / 10, 10)))
-        if(this.#serialPort.writable.locked)
+        const writable = this.#serialPort.writable
+        if(!await waitForFunctionToReturnFalse(function() { return writable.locked }))
             return
 
-        const writer = this.#serialPort.writable.getWriter()
+        const writer = writable.getWriter()
         await writer.write(sendBytes)
         writer.releaseLock()
+    }
+    async command(sendBytes, numberOfReceiveBytes, timeout = 1000) {
+        const thisClass = this
+        if(!await waitForFunctionToReturnFalse(function() { return thisClass.#commandLock }))
+            throw `Serial locked`
+        this.#commandLock = true
+        let retBytes
+        try {
+            await this.write(sendBytes, timeout)
+            retBytes = this.read(numberOfReceiveBytes, timeout)
+        } catch(e) {
+            throw e
+        } finally {
+            this.#commandLock = false
+        }
+        return retBytes ?? new ArrayBuffer()
     }
 }
 
@@ -124,12 +150,12 @@ class EFIGenieSerial extends EFIGenieLog {
         let length = 1
         for(let i = 0; i < Math.ceil(length); i++) {
             const data = new Uint8Array([109]).buffer.concatArray(new Uint32Array([i]).buffer) // get metadata
-            await this.#serial.write(data)
-            let retData = await this.#serial.read(64)
-            if(retData.byteLength !== 64) throw "Incorrect number of bytes returned when requesting metadata"
+            let retData = await this.#serial.command(data, 64)
+            if(retData.byteLength !== 64) throw `Incorrect number of bytes returned when requesting metadata`
             
             if(i === 0) {
                 length = new Uint32Array(retData.slice(0, 4))[0] / 64
+                if(length > 1000)throw `Incorrect length returned when requesting metadata`
                 retData = retData.slice(4)
             }
             metadataData = metadataData.concatArray(retData)
@@ -209,19 +235,19 @@ class EFIGenieSerial extends EFIGenieLog {
         for(let i = 0; i < variableIds.length; i++) {
             data = data.concatArray(new Uint8Array([103]).buffer.concatArray(new Uint32Array([variableIds[i]]).buffer))
         }
+
         await this.#serial.write(data)
         let bytes = new ArrayBuffer()
         let variableValues = {}
-        let bytesRead = 0
         for(let i = 0; i < variableIds.length; i++) {
-            let tLen = 0
-            while(bytes.byteLength - bytesRead < 1 || bytes.byteLength - bytesRead < (tLen = typeLength(new Uint8Array(bytes.slice(bytesRead, bytesRead + 1))[0])) + 1) {
-                let value = await this.#serial.read()
-                bytes = bytes.concatArray(value)
-            }
-            variableValues[variableIds[i]] = parseVariable(bytes.slice(bytesRead, bytesRead + tLen + 1))
-            bytesRead += tLen + 1
+            let value = await this.#serial.read(1)
+            if(value.byteLength !== 1) return //throw "Incorrect number of bytes returned when polling variables"
+            const tLen = typeLength(new Uint8Array(value)[0])
+            value = value.concatArray(await this.#serial.read(tLen))
+            if(value.byteLength !== tLen + 1) return //throw "Incorrect number of bytes returned when polling variables"
+            variableValues[variableIds[i]] = parseVariable(value)
         }
+
         this.logBytes = this.logBytes.concatArray(bytes)
         this.loggedVariableValues.push(variableValues)
 
@@ -232,44 +258,40 @@ class EFIGenieSerial extends EFIGenieLog {
         })
     }
 
+    async #sendCommandAndWaitForAck(data, commandName) {
+        const retData = await this.#serial.command(data, 1)
+        if(retData.byteLength !== 1)  throw `Incorrect number of bytes returned when ${commandName}`
+        if(new Uint8Array(retData)[0] !== 6) throw `Ack not returned when ${commandName}`
+    }
+
     async stopExecution() {
-        await this.#serial.write(new Uint8Array([113]).buffer)
-        const retData = await this.#serial.read()
-        if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when stopping executrion"
-        if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when stopping executrion"
+        await this.#sendCommandAndWaitForAck(new Uint8Array([113]).buffer, `stopping execution`)
     }
 
     async startExecution() {
-        await this.#serial.write(new Uint8Array([115]).buffer)
-        const retData = await this.#serial.read()
-        if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when stopping executrion"
-        if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when stopping executrion"
+        await this.#sendCommandAndWaitForAck(new Uint8Array([115]).buffer, `starting execution`)
     }
 
-    async writeToAddress(address, data, chunks = 52) {
+    async writeToAddress(address, data, chunks = 52, timeout = 1000) {
         let left = data.byteLength
         let i = 0
         while(left > 0) {
             let sendSize = Math.min(chunks, left)
-            await this.#serial.write(new Uint8Array([119]).buffer.concatArray(new Uint32Array([ address + i, sendSize]).buffer).concatArray(data.slice(i, i + sendSize)))
-            const retData = await this.#serial.read()
-            if(retData.byteLength !== 1) throw "Incorrect number of bytes returned when writing data"
-            if(new Uint8Array(retData)[0] !== 6) throw "Ack not returned when writing data"
+            await this.#sendCommandAndWaitForAck(new Uint8Array([119]).buffer.concatArray(new Uint32Array([ address + i, sendSize]).buffer).concatArray(data.slice(i, i + sendSize)), `writing data`)
             left -= sendSize
             i += sendSize
         }
     }
 
     async getConfigAddress() {
-        await this.#serial.write(new Uint8Array([99]).buffer)
-        const retData = await this.#serial.read(4)
+        const retData = await this.#serial.command(new Uint8Array([99]).buffer, 4)
         if(retData.byteLength !== 4) throw "Incorrect number of bytes returned when requesting config address"
         return new Uint32Array(retData)[0]
     }
 
     async burnBin(bin) {
         let reconnect = this.connected
-        this.disconnect()
+        await this.disconnect()
 
         await this.stopExecution()
         const configAddress = await this.getConfigAddress()
@@ -292,11 +314,15 @@ class EFIGenieSerial extends EFIGenieLog {
                 thisClass.connect()
         }).catch(function(e) {
             alert(e)
+            thisClass.variableMetadata = undefined
+            thisClass.polling = false
             thisClass.connected = false
         })
     }
-    disconnect() {
+    async disconnect() {
         this.connected = false
+        const thisClass = this
+        await waitForFunctionToReturnFalse(function() { return thisClass.polling || thisClass.connected })
     }
 }
 
