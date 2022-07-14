@@ -1,21 +1,3 @@
-class EFIGenieLog { 
-    variableMetadata = undefined
-    logBytes = new ArrayBuffer()
-    loggedVariableValues = []
-
-    get saveValue() {
-        var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.variableMetadata.GetVariableReferenceList())))
-        return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray).concatArray(LogBytes)
-    }
-    set saveValue(saveValue) {
-        const referenceLength = new Uint32Array(saveValue.slice(0, 4))[0]
-        this.variableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(arrayBufferToBase64(saveValue.slice(4, referenceLength + 4)))))
-        this.logBytes = saveValue.slice(referenceLength + 4)
-
-        //TODO: parseBytes
-    }
-}
-
 async function waitForFunctionToReturnFalse(f, timeout = 1000) {
     let trys = 0
     while(f() && trys++ < Math.max(1, timeout / Math.max(timeout / 10, 10)))
@@ -132,6 +114,23 @@ class Serial {
     }
 }
 
+class EFIGenieLog { 
+    variableMetadata = undefined
+    logBytes = new ArrayBuffer()
+    loggedVariableValues = []
+
+    get saveValue() {
+        var objectArray = base64ToArrayBuffer(lzjs.compressToBase64(stringifyObject(this.variableMetadata.GetVariableReferenceList())))
+        return (new Uint32Array([objectArray.byteLength]).buffer).concatArray(objectArray).concatArray(LogBytes)
+    }
+    set saveValue(saveValue) {
+        const referenceLength = new Uint32Array(saveValue.slice(0, 4))[0]
+        this.variableMetadata = new VariableRegistry(JSON.parse(lzjs.decompressFromBase64(arrayBufferToBase64(saveValue.slice(4, referenceLength + 4)))))
+        this.logBytes = saveValue.slice(referenceLength + 4)
+
+        //TODO: parseBytes
+    }
+}
 class EFIGenieSerial extends EFIGenieLog {
     #serial = new Serial(undefined, [ 
         { usbVendorId: 1155, usbProductId: 22336 } 
