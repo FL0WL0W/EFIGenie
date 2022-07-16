@@ -20,9 +20,8 @@ namespace EFIGenie
 	Operation_EngineScheduleIgnition::~Operation_EngineScheduleIgnition()
 	{
 		_timerService->UnScheduleTask(_dwellTask);
+		while(_dwelling) ;
 		_timerService->UnScheduleTask(_igniteTask);
-		if(_dwelling)
-			_timerService->ScheduleCallBack(_igniteCallBack, _igniteTask->ScheduledTick);
 		delete _dwellTask;
 		delete _igniteTask;
 	}

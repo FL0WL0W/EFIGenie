@@ -20,9 +20,8 @@ namespace EFIGenie
 	Operation_EngineScheduleInjection::~Operation_EngineScheduleInjection()
 	{
 		_timerService->UnScheduleTask(_openTask);
+		while(_open) ;
 		_timerService->UnScheduleTask(_closeTask);
-		if(_open)
-			_timerService->ScheduleCallBack(_closeCallBack, _closeTask->ScheduledTick);
 		delete _openTask;
 		delete _closeTask;
 	}
