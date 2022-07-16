@@ -59,7 +59,8 @@
                 b.Inputs.pinOverlay.update()
             }
             var configJsonName = `tune.json`
-            document.addEventListener(`change`, function() { throttle(function() { b.RegisterVariables() }) })//this is a hack but oh well
+            let registerVariables = throttle(function() { b.RegisterVariables() })
+            document.addEventListener(`change`, function() { registerVariables() })//this is a hack but oh well
             const loadConfig = (config) => {
                 try {
                     b.saveValue = parseObject(config)
