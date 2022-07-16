@@ -41,7 +41,7 @@ export default class UIUnit extends UISelection {
         super(prop)
         if(prop?.measurement || prop?.value) this.Default = this.value
         this.class = `ui unit`
-        this.selectNotVisible = true
+        this.selectHidden = true
         this.selectName = ``
     }
 }

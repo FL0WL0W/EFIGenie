@@ -799,6 +799,7 @@ types = [
             this,
             { type: `definition`, value: [ 
                 { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
+                { type: `UINT8`, value: this.mode}, //BothEdges
                 { type: `FLOAT`, value: this.risingPosition}, //RisingPosition
                 { type: `FLOAT`, value: this.fallingPosition} //FallingPosition
             ]}

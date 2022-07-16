@@ -68,7 +68,7 @@ export default class Calculation_LookupTable extends UITemplate {
 
     dialog = new UIDialog({ buttonLabel: `Edit Table`, })
     table = new UITable({
-        selectNotVisible: true,
+        selectHidden: true,
         yResolution: 1,
         yResolutionModifiable: false,
         BaseObj: true

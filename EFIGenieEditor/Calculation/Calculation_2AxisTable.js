@@ -62,14 +62,14 @@ export default class Calculation_2AxisTable extends UITemplate {
 
         if(!this.XSelection) {
             this.XSelection = new UISelection({
-                selectNotVisible: true,
+                selectHidden: true,
                 options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
             })
             this.table.xLabel = this.XSelection
         }
         if(!this.YSelection) {
             this.YSelection = new UISelection({
-                selectNotVisible: true,
+                selectHidden: true,
                 options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
             })
             this.table.yLabel = this.YSelection
