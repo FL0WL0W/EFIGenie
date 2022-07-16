@@ -252,11 +252,16 @@ class EFIGenieSerial extends EFIGenieLog {
         this.loggedVariableValues.push(variableValues)
 
         const thisClass = this
-        Object.entries(this.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(e => {
+        let u = async function() { thisClass.#updateLiveUpdateEvents(thisClass) }
+        u()
+    }
+
+    #updateLiveUpdateEvents = throttle(function(thisClass) {
+        Object.entries(thisClass.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(e => {
             var [elementname, element] = e
             element?.(thisClass.variableMetadata, thisClass.loggedVariableValues[thisClass.loggedVariableValues.length - 1])
         })
-    }
+    })
 
     async #sendCommandAndWaitForAck(data, commandName) {
         const retData = await this.#serial.command(data, 1)
