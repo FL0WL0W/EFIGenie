@@ -48,22 +48,23 @@ class VariableRegistry {
         let variable = this.GetVariableByReference(reference)
         if(variable) return variable.id
         if(!this.CreateIfNotFound) return
-        reference = { ...reference }
+        variable = { ...reference }
 
         //create variable since it was not found
-        reference.id ??= this.GenerateVariableId()
+        variable.id ??= this.GenerateVariableId()
 
-        const dotIndex = reference.name.indexOf(`.`)
+        const dotIndex = variable.name.indexOf(`.`)
         if(dotIndex !== -1) {
-            const listName = reference.name.substring(0, dotIndex)
+            const listName = variable.name.substring(0, dotIndex)
             this[listName] ??= []
-            reference.name = reference.name.substring(dotIndex + 1)
+            variable.name = variable.name.substring(dotIndex + 1)
 
-            this[listName].push(reference)
+            this[listName].push(variable)
         } else {
-            this[reference.name] = reference
+            this[variable.name] = variable
         }
-        return reference.id
+
+        return this.GetVariableByReference(reference)
     }
     RegisterVariable(reference) {
         if(!reference || typeof reference !== `object` || !reference.name) return

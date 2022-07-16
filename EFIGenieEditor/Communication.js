@@ -245,6 +245,7 @@ class EFIGenieSerial extends EFIGenieLog {
             value = value.concatArray(await this.#serial.read(tLen))
             if(value.byteLength !== tLen + 1) return //throw "Incorrect number of bytes returned when polling variables"
             variableValues[variableIds[i]] = parseVariable(value)
+            bytes = bytes.concatArray(value)
         }
 
         this.logBytes = this.logBytes.concatArray(bytes)
