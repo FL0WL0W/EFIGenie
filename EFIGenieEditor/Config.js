@@ -64,7 +64,7 @@ class VariableRegistry {
             this[variable.name] = variable
         }
 
-        return this.GetVariableByReference(reference)
+        return this.GetVariableId(reference)
     }
     RegisterVariable(reference) {
         if(!reference || typeof reference !== `object` || !reference.name) return
