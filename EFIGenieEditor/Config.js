@@ -795,14 +795,17 @@ types = [
         )
     }},
     { type: `Reluctor_Universal1x`, toDefinition() {
+        let universal1X = { type: `definition`, value: [ 
+            { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
+            { type: `UINT8`, value: this.mode}, //mode
+        ]}
+        if(this.mode === 0 || this.mode === 1) 
+            universal1X.value.push({ type: `FLOAT`, value: this.risingPosition})
+        if(this.mode === 0 || this.mode === 1) 
+            universal1X.value.push({ type: `FLOAT`, value: this.fallingPosition})
         return ReluctorTemplate.call(
             this,
-            { type: `definition`, value: [ 
-                { type: `UINT32`, value: ReluctorFactoryIDs.Offset + ReluctorFactoryIDs.Universal1X}, //factory ID
-                { type: `UINT8`, value: this.mode}, //BothEdges
-                { type: `FLOAT`, value: this.risingPosition}, //RisingPosition
-                { type: `FLOAT`, value: this.fallingPosition} //FallingPosition
-            ]}
+            universal1X
         )
     }},
     { type: `Reluctor_UniversalMissingTeeth`, toDefinition() {
