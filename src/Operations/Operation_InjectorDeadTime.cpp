@@ -15,7 +15,7 @@ namespace EFIGenie
 		if(injectorFuelMass < _minInjectorFuelMass)
 			injectorFuelMass = _minInjectorFuelMass;
 		
-		return fuelMass / injectorFlowRate + injectorDeadTime;
+		return injectorFuelMass / injectorFlowRate + injectorDeadTime;
 	}
 	
 	IOperationBase *Operation_InjectorDeadTime::Create(const void *config, size_t &sizeOut)

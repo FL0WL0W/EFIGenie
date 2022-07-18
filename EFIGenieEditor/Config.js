@@ -706,13 +706,13 @@ types = [
             { ...this.FlowRateConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Flow Rate` } ] },
             { ...this.DeadTimeConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Dead Time` } ] },
             //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_Static`, value: 2, outputVariables: [ { name: `temp` } ] },//static value of 2
+            { type: `Calculation_Static`, value: 2, outputVariables: [ { name: `SquirtsPerCycle` } ] },//static value of 2
             //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
             { 
                 type: `Calculation_Subtract`,
-                outputVariables: [ { name: `temp` } ], //Return
+                outputVariables: [ { name: `SquirtsPerCycle` } ], //Return
                 inputVariables: [
-                    { name: `temp` },
+                    { name: `SquirtsPerCycle` },
                     { name: `EngineSequentialId` }
                 ]
             },
@@ -722,7 +722,7 @@ types = [
             ]},{
                 ...this,
                 inputVariables: [ 
-                    { name: `temp` },
+                    { name: `SquirtsPerCycle` },
                     { name: `FuelParameters.Cylinder Fuel Mass` },
                     { name: `FuelParameters.Injector Flow Rate` },
                     { name: `FuelParameters.Injector Dead Time` }

@@ -16,10 +16,21 @@ namespace EFIGenie
 	{
 		EnginePosition ret;
 		ret.Synced = false;
-
 		if(crankPosition.Synced)
 		{
-			if(camPosition.Synced)
+			bool camSynced = true;
+			if(!camPosition.Synced)
+				camSynced = false;
+			//check for eroneous cam speed when crank has priority
+			if(_crankPriority)
+			{
+				const float crankPositionDotOneThird = crankPosition.PositionDot / 3;
+				const float crankPositionDotTwoThirds = crankPositionDotOneThird * 2;
+				if(camPosition.PositionDot < crankPositionDotOneThird || camPosition.PositionDot > crankPositionDotTwoThirds)
+					camSynced = false;
+			}
+
+			if(camSynced)
 			{
 				//we have both crank and cam
 				//decide which one to use for scheduling.

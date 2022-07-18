@@ -47,9 +47,18 @@ namespace EFIGenie
 			return std::tuple<tick_t, tick_t>(0, 0);
 		}
 
+		//if sequntial is changing then treat as a brand new dwell with no prior history
+		if(_previousSequential != enginePosition.Sequential)
+		{
+			_timerService->UnScheduleTask(_dwellTask);
+			_lastDwellTick = 0;
+			_previousSequential = enginePosition.Sequential;
+		}
+
 		const uint16_t cycleDegrees = enginePosition.Sequential? 720 : 360;
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
+		const tick_t ticksPerCycleHalf = ticksPerCycle / 2;
 		const tick_t maxDwellDeviationTicks = static_cast<tick_t>(ignitionDwellMaxDeviation * ticksPerSecond);
 
 		float delta = _tdc - ignitionAdvance - enginePosition.Position;
@@ -62,12 +71,12 @@ namespace EFIGenie
 		//check _lastDwellTick is within range and _dwellTask is not scheduled
 		if( !_dwellTask->Scheduled && 
 			(_lastDwellTick == 0 ||
-			ITimerService::TickLessThanTick(_lastDwellTick + dwellTicks, enginePosition.CalculatedTick - ((ticksPerCycle * 3) / 2)) ||
-			ITimerService::TickLessThanTick(enginePosition.CalculatedTick + ((ticksPerCycle * 3) / 2), _lastDwellTick)))
+			ITimerService::TickLessThanTick(_lastDwellTick + dwellTicks, enginePosition.CalculatedTick - (ticksPerCycleHalf * 3)) ||
+			ITimerService::TickLessThanTick(enginePosition.CalculatedTick + (ticksPerCycleHalf * 3), _lastDwellTick)))
 		{
-			//if it is not within range, set it to what would be the previous open
+			//if it is not within range, set it to what would be the previous dwell
 			_lastDwellTick = dwellAt;
-			while(ITimerService::TickLessThanTick(_lastDwellTick, _timerService->GetTick() - ticksPerCycle))
+			while(ITimerService::TickLessThanEqualToTick(_lastDwellTick, _timerService->GetTick() - ticksPerCycle))
 				_lastDwellTick += ticksPerCycle;
 		}
 		
@@ -75,7 +84,7 @@ namespace EFIGenie
 		const uint32_t lastDwellTickBeforeDwellingCheck = _lastDwellTick;
 		if(!_dwelling)
 		{
-			while(ITimerService::TickLessThanTick(dwellAt - (ticksPerCycle / 2), lastDwellTickBeforeDwellingCheck))
+			while(ITimerService::TickLessThanTick(dwellAt - ticksPerCycleHalf, lastDwellTickBeforeDwellingCheck))
 				dwellAt += ticksPerCycle;
 			igniteAt = dwellAt + dwellTicks;
 
@@ -87,12 +96,12 @@ namespace EFIGenie
 		if(_dwelling)
 		{
 			//schedule ignition based off the last dwell tick
-			while(ITimerService::TickLessThanTick(dwellAt + (ticksPerCycle / 2), _lastDwellTick))
+			while(ITimerService::TickLessThanTick(dwellAt + ticksPerCycleHalf, _lastDwellTick))
 				dwellAt += ticksPerCycle;
 			igniteAt = dwellAt + dwellTicks;
 
-			const tick_t minIgniteAt = _lastDwellTick + dwellTicks - maxDwellDeviationTicks;
-			const tick_t maxIgniteAt = _lastDwellTick + dwellTicks + maxDwellDeviationTicks;
+			const tick_t minIgniteAt = _dwellTask->ExecutedTick + dwellTicks - maxDwellDeviationTicks;
+			const tick_t maxIgniteAt = _dwellTask->ExecutedTick + dwellTicks + maxDwellDeviationTicks;
 			if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
 				igniteAt = minIgniteAt;
 			else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))

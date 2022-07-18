@@ -192,7 +192,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                             xLabel: this.xLabel,
                             yLabel: this.yLabel,
                             saveValue: saveValue.calculationValues[i],
-                            outputUnits: this._outputUnits? undefined : this._outputUnits,
+                            outputUnits: this._outputUnits,
                             displayUnits: this.displayUnits,
                             calculations: this.calculations
                         }))
@@ -273,7 +273,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
-                    outputUnits: this._outputUnits? undefined : this._outputUnits,
+                    outputUnits: this._outputUnits,
                     displayUnits: this.displayUnits,
                     calculations: this.calculations
                 }))
