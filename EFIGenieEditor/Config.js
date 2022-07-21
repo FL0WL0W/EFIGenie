@@ -48,6 +48,7 @@ class VariableRegistry {
         let variable = this.GetVariableByReference(reference)
         if(variable) return variable.id
         if(!this.CreateIfNotFound) return
+        if(reference == undefined || reference.name == undefined) return
         variable = { ...reference }
 
         //create variable since it was not found
