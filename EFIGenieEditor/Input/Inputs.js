@@ -16,16 +16,24 @@ export default class Inputs extends UITemplate {
         this.pinOverlay.pinOut = PinOuts[targetDevice]
     }
 
+    get value() { return { ...super.saveValue, targetDevice: this.targetDevice } }
+    set value(value) {
+        if(!value) return
+
+        if(value.targetDevice) {
+            this.targetDevice = value.targetDevice
+            delete value.targetDevice
+        }
+
+        super.value = value
+    }
+
     get saveValue() { return { ...super.saveValue, targetDevice: this.targetDevice } }
     set saveValue(saveValue) {
         if(!saveValue) return
-            
-        saveValue.inputs ??= saveValue.Inputs
-        saveValue.targetDevice ??= saveValue.TargetDevice
         if(saveValue.targetDevice) {
             this.targetDevice = saveValue.targetDevice
             delete saveValue.targetDevice
-            delete saveValue.TargetDevice
         }
 
         super.saveValue = saveValue

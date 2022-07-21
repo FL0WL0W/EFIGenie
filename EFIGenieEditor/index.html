@@ -94,7 +94,7 @@
                 let btnSaveCompressed = document.querySelector(`#btnSaveCompressed`)
                 btnSaveCompressed.addEventListener(`click`, function(){
                     var cfg = b.value
-                    window.localStorage.setItem(`config`, stringifyObject(cfg))
+                    window.localStorage.setItem(`config`, stringifyObject(b.saveValue))
                     downloadCompressedObject(cfg, configJsonName)
                 })
                 let btnLoad = document.querySelector(`#btnLoad`)
