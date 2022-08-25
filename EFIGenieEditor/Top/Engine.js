@@ -27,6 +27,11 @@ export default class Engine extends UITemplate {
         label:          `Manifold Absolute Pressure`,
         outputUnits:    [ `Bar` ],
     })
+    ThrottlePositionConfigOrVariableSelection = new CalculationOrVariableSelection({
+        calculations:   ThrottlePositionConfigs,
+        label:          `Throttle Position`,
+        outputUnits:    [ `%` ],
+    })
     VolumetricEfficiencyConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   VolumetricEfficiencyConfigs,
         label:          `Volumetric Efficiency`,
@@ -50,6 +55,10 @@ export default class Engine extends UITemplate {
         this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) === -1
         if(!this.ManifoldAbsolutePressureConfigOrVariableSelection.hidden) 
             this.ManifoldAbsolutePressureConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Manifold Absolute Pressure` })
+
+        this.ThrottlePositionConfigOrVariableSelection.hidden = (requirements?.indexOf(`Throttle Position`) ?? -1) === -1
+        if(!this.ThrottlePositionConfigOrVariableSelection.hidden) 
+            this.ThrottlePositionConfigOrVariableSelection.RegisterVariables({ name: `EngineParameters.Throttle Position` })
         
         this.CylinderAirTemperatureConfigOrVariableSelection.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) === -1
         if(!this.CylinderAirTemperatureConfigOrVariableSelection.hidden) 

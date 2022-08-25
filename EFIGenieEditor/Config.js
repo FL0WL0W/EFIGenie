@@ -237,11 +237,18 @@ var CylinderAirTemperatureConfigs = []
 CylinderAirTemperatureConfigs.push(Calculation_Static)
 var ManifoldAbsolutePressureConfigs = []
 ManifoldAbsolutePressureConfigs.push(Calculation_Static)
+var ThrottlePositionConfigs = []
+ThrottlePositionConfigs.push(Calculation_Static)
 var VolumetricEfficiencyConfigs = []
 VolumetricEfficiencyConfigs.push(Calculation_Static)
 VolumetricEfficiencyConfigs.push(Calculation_LookupTable)
 VolumetricEfficiencyConfigs.push(Calculation_2AxisTable)
 VolumetricEfficiencyConfigs.push(Calculation_Formula)
+var AirmassConfigs = []
+AirmassConfigs.push(Calculation_Static)
+AirmassConfigs.push(Calculation_LookupTable)
+AirmassConfigs.push(Calculation_2AxisTable)
+AirmassConfigs.push(Calculation_Formula)
 
 OperationArchitectureFactoryIDs = {
     Offset: 10000,
@@ -691,6 +698,9 @@ types = [
     { type: `Calculation_Equal`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
     { type: `Calculation_GreaterThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
     { type: `Calculation_LessThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
+    { type: `CylinderAirmass_AlphaN`, outputUnits: [`g`], toDefinition() {
+        return { ...this.Airmass, type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
+    }},
     { type: `CylinderAirmass_SpeedDensity`, outputUnits: [`g`], toDefinition() {
         this.inputVariables = [ 
             { name: `EngineParameters.Cylinder Air Temperature` },
@@ -1152,6 +1162,7 @@ types = [
     }},
     { type: `Engine`, toDefinition() {
         let mapRequired = (this.requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) !== -1
+        let tpsRequired = (this.requirements?.indexOf(`Throttle Position`) ?? -1) !== -1
         let catRequired = (this.requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) !== -1
         let veRequired  = (this.requirements?.indexOf(`Volumetric Efficiency`) ?? -1) !== -1
 
@@ -1189,6 +1200,10 @@ types = [
         
         if(mapRequired) {
             group.value.push({ ...this.ManifoldAbsolutePressureConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Manifold Absolute Pressure` } ] })
+        }
+        
+        if(tpsRequired) {
+            group.value.push({ ...this.ThrottlePositionConfigOrVariableSelection, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Throttle Position` } ] })
         }
 
         if(catRequired) {
