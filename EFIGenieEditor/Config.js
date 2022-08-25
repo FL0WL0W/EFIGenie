@@ -846,7 +846,8 @@ types = [
     { type: `Input`, toDefinition() {
         if(this.translationConfig == undefined)
             return
-        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: this.translationConfig.calculation?.outputUnits?.[0], type: this.translationConfig.calculation?.outputUnits?.[0] == undefined? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
+        const translationOutputVariableUnit = this.translationConfig.calculation != undefined && (this.translationConfig.calculation.outputUnits?.length ?? 0) === 0? this.translationOutputVariableUnit : this.translationConfig.calculation?.outputUnits?.[0]
+        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: translationOutputVariableUnit, type: translationOutputVariableUnit? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
 
         if(this.translationConfig.inputs == undefined || this.translationConfig.inputs === 0)
             return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
