@@ -290,7 +290,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     padding: 2.5px;
     margin: 0px;
     margin-bottom: 2.5px;
-    min-width: 750px;
+    min-width: 850px;
     width: fit-content;
     box-sizing: border-box;
 }
@@ -474,4 +474,8 @@ select .pinconflict{
 .ui.text.formula {
     width: 100%;
     flex-grow: 1;
+}
+
+.ui.select.inputmeasurement .ui.selected {
+    min-width: 120px;
 }

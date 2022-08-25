@@ -21,15 +21,15 @@ export default class UIUnit extends UISelection {
     set measurement(measurement){
         if(!measurement || this._measurement === measurement) return
         this._measurement = measurement
-        this.Default = Measurements[measurement]?.[0]?.name
+        this.default = Measurements[measurement]?.[0]?.name
         this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
-        if(this.value == undefined || this.value === `` || this.value === null) this.value = this.Default
+        if(this.value == undefined || this.value === `` || this.value === null) this.value = this.default
         if(this.options.length === 0) super.hidden = true
         else if(!this.hidden) super.hidden = false
     }
 
     get saveValue() {
-        if(this.value === this.Default) return
+        if(this.value === this.default) return
         return super.saveValue
     }
     set saveValue(saveValue) {
@@ -39,7 +39,7 @@ export default class UIUnit extends UISelection {
 
     constructor(prop) {
         super(prop)
-        if(prop?.measurement || prop?.value) this.Default = this.value
+        if(prop?.measurement || prop?.value) this.default = this.value
         this.class = `ui unit`
         this.selectHidden = true
         this.selectName = ``

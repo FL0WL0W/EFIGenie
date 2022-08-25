@@ -1,6 +1,7 @@
 import Input_DigitalRecord from "../Input/Input_DigitalRecord.js"
 export default class Reluctor_Template extends Input_DigitalRecord {
     static outputTypes = [ `ReluctorResult` ]
+    static outputUnits = [ `None` ]
     static template = Input_DigitalRecord.template.substring(0, Input_DigitalRecord.template.lastIndexOf(`Inverted`) + 8)
 
     RegisterVariables(reference) {
