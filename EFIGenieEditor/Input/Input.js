@@ -43,7 +43,7 @@ export default class Input extends UITemplate {
         })
         this.translationConfig.addEventListener(`change`, function() {
             const subConfig = thisClass.translationConfig.SubConfig
-            if(subConfig != undefined && (subConfig.constructor.outputUnits?.length ?? 0) === 0) {
+            if(subConfig != undefined && (subConfig.constructor.outputUnits?.length ?? 0) === 0 && subConfig.constructor.outputTypes?.[0] === `float`) {
                 thisClass.translationConfigMeasurement.hidden = false
                 thisClass.translationConfigUnit.hidden = false
             } else {

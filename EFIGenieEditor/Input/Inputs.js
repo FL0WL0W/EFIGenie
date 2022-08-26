@@ -16,7 +16,7 @@ export default class Inputs extends UITemplate {
         this.pinOverlay.pinOut = PinOuts[targetDevice]
     }
 
-    get value() { return { ...super.saveValue, targetDevice: this.targetDevice } }
+    get value() { return { ...super.value, targetDevice: this.targetDevice } }
     set value(value) {
         if(!value) return
 

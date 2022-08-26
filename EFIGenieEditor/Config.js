@@ -846,10 +846,11 @@ types = [
     { type: `Input`, toDefinition() {
         if(this.translationConfig == undefined)
             return
-        const translationOutputVariableUnit = this.translationConfig.calculation != undefined && (this.translationConfig.calculation.outputUnits?.length ?? 0) === 0? this.translationOutputVariableUnit : this.translationConfig.calculation?.outputUnits?.[0]
+        const translationOutputVariableUnit = this.translationConfig.calculation != undefined && (this.translationConfig.calculation.outputUnits?.length ?? 0) === 0 && subConfig.constructor.outputTypes?.[0] === `float`? this.translationOutputVariableUnit : this.translationConfig.calculation?.outputUnits?.[0]
         const translationOutputVariable = { name: `Inputs.${this.name}`, unit: translationOutputVariableUnit, type: translationOutputVariableUnit? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
 
-        if(this.translationConfig.inputs == undefined || this.translationConfig.inputs === 0)
+        console.log(this.translationConfig)
+        if(this.translationConfig.calculation.inputTypes == undefined || this.translationConfig.calculation.inputTypes.length === 0)
             return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
 
         const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.calculation?.outputUnits?.[0], type: this.rawConfig.calculation?.outputUnits?.[0] == undefined? this.rawConfig.calculation?.outputTypes?.[0] : undefined }
