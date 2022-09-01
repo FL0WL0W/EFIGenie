@@ -1,8 +1,12 @@
+import UINumber from "../JavascriptUI/UINumber.js"
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import Output_TDC from "../Output/Output_TDC.js"
 export default class Ignition extends UITemplate {
     static template = getFileContents(`ConfigGui/Ignition.html`)
 
+    OutputCount = new UINumber({
+        value: 8
+    })
     IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   IgnitionEnableConfigs,
         label:          `Ignition Enable`,
@@ -28,6 +32,7 @@ export default class Ignition extends UITemplate {
     Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
+        const thisClass = this
         Object.defineProperty(this.Outputs, 'saveValue', {
             get: function() { return [...this.children].map(e => e.saveValue) },
             set: function(saveValue) { 
@@ -57,7 +62,27 @@ export default class Ignition extends UITemplate {
             }
         })
         this.Outputs.value = new Array(8)
+        this.OutputCount.addEventListener(`change`, function() {
+            const count = thisClass.OutputCount.value
+            let newOutputs = thisClass.Outputs.saveValue
+            newOutputs.splice(count)
+            for(let i = newOutputs.length; i < count; i++)
+                newOutputs[i] = {}
+            thisClass.Outputs.saveValue = newOutputs
+        })
         this.Setup(prop)
+    }
+
+    get saveValue() { return { ...super.saveValue, OutputCount: undefined } }
+    set saveValue(saveValue) { 
+        this.OutputCount.value = saveValue.Outputs.length
+        super.saveValue = saveValue
+    }
+    
+    get value() { return { ...super.saveValue, OutputCount: undefined } }
+    set value(value) { 
+        this.OutputCount.value = value.Outputs.length
+        super.value = value
     }
 
     RegisterVariables() {
