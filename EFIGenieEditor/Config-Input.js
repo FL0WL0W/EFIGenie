@@ -136,6 +136,8 @@ BooleanOutputConfigs = []
 
 MapConfigs = []
 InputConfigs.unshift({group: `MAP Sensors`, calculations: MapConfigs})
+TpsConfigs = []
+InputConfigs.unshift({group: `TPS Sensors`, calculations: TpsConfigs})
 
 ReluctorConfigs = []
 InputConfigs.unshift({group: `Reluctor Decoders`, calculations: ReluctorConfigs})

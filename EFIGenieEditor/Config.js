@@ -831,6 +831,10 @@ types = [
             ]}
         )
     }},
+    { type: `TPS_Linear`, toDefinition() {
+        this.type = `Input_AnalogPolynomial`
+        return this
+    }},
     { type: `MAP_GM1Bar`, toDefinition() {
         this.type = `Input_AnalogPolynomial`
         return this
