@@ -20,7 +20,8 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
         displayUnit:    `V`
     })
     calibrate = new UIButton({
-        label:          `Calibrate`
+        label:          `Calibrate`,
+        hidden:         true
     })
     get saveValue() { 
         let saveValue = super.saveValue
@@ -41,7 +42,25 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
             thisClass.updatePolynomial()
         })
         this.calibrate.addEventListener(`click`, function() {
-            alert(`TODO`)
+            if(thisClass.calibrate.label == `Stop`) {
+
+            } else {
+                thisClass.calibrate.label = `Stop`
+            }
+        })
+        this.voltageLiveUpdate.addEventListener(`change`, function() {
+            const liveValue = thisClass.voltageLiveUpdate.value
+            const calibrating = thisClass.calibrate.label == `Stop`
+            thisClass.calibrate.hidden = liveValue == undefined
+            if(liveValue != undefined) {
+                thisClass.calibrate.hidden = false
+                if(calibrating && liveValue < thisClass.minVoltage.value)
+                    thisClass.minVoltage.value = liveValue
+                if(calibrating && liveValue > thisClass.maxVoltage.value)
+                    thisClass.maxVoltage.value = liveValue
+            } else {
+                thisClass.calibrate.hidden = true
+            }
         })
         this.Setup(prop)
     }

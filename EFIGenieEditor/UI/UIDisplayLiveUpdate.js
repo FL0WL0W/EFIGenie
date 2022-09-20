@@ -30,6 +30,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
                             window.clearTimeout(thisClass.TimeoutHandle)
         
                         thisClass.TimeoutHandle = window.setTimeout(function() {
+                            thisClass.value = undefined
                             thisClass.superHidden = true
                         },5000)
                     }
