@@ -43,7 +43,8 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
         })
         this.calibrate.addEventListener(`click`, function() {
             if(thisClass.calibrate.label == `Stop`) {
-
+                thisClass.calibrate.label = `Calibrate`
+                thisClass.minVoltage.value = thisClass.maxVoltage.value = thisClass.voltageLiveUpdate.value
             } else {
                 thisClass.calibrate.label = `Stop`
             }
