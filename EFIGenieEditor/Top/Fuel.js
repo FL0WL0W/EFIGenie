@@ -79,7 +79,7 @@ export default class Fuel extends UITemplate {
         super.saveValue = saveValue
     }
     
-    get value() { return { ...super.saveValue, OutputCount: undefined } }
+    get value() { return { ...super.value, OutputCount: undefined } }
     set value(value) { 
         this.OutputCount.value = value.Outputs.length
         super.value = value

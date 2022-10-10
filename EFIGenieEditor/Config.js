@@ -685,6 +685,7 @@ types = [
     }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
         if(this.calculation) return { ...this, ...this.calculation, type: this.selection }
+        if(!this.selection) return
         VariableRegister.RegisterVariable({ ...this.selection, ...this.outputVariables?.[0] })
     }},
     { type: `Calculation_Add`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
@@ -853,7 +854,6 @@ types = [
         const translationOutputVariableUnit = this.translationConfig.calculation != undefined && (this.translationConfig.calculation.outputUnits?.length ?? 0) === 0 && subConfig.constructor.outputTypes?.[0] === `float`? this.translationOutputVariableUnit : this.translationConfig.calculation?.outputUnits?.[0]
         const translationOutputVariable = { name: `Inputs.${this.name}`, unit: translationOutputVariableUnit, type: translationOutputVariableUnit? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
 
-        console.log(this.translationConfig)
         if(this.translationConfig.calculation.inputTypes == undefined || this.translationConfig.calculation.inputTypes.length === 0)
             return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
 
