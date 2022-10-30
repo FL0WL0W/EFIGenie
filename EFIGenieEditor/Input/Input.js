@@ -10,7 +10,7 @@ export default class Input extends UITemplate {
     name = new UIText({ class: `pinselectname inputName` })
     translationConfig = new CalculationOrVariableSelection({
         calculations:           InputConfigs,
-        ConfigsOnly:            true,
+        selectionFilter:        defaultNoVariables,
         noParameterSelection:   true
     })
     translationConfigMeasurement = new UISelection({
@@ -22,6 +22,7 @@ export default class Input extends UITemplate {
     })
     rawConfig = new CalculationOrVariableSelection({
         calculations:           InputConfigs,
+        selectionFilter:        defaultNoVariables,
         label:                  `Source`,
         inputTypes:             [],
         noParameterSelection:   true,

@@ -121,11 +121,19 @@ class VariableRegistry {
 }
 VariableRegister = new VariableRegistry()
 
+function defaultNoVariables(outputUnits, outputTypes, inputTypes, inputUnits) {
+    const def = defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits)
+    return function(calcOrVar) {
+        if(calcOrVar.type || calcOrVar.unit) 
+            return false
+        return def(calcOrVar)
+    }
+}
 function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
     return function(calcOrVar) {
         //variable filter
         if(calcOrVar.type || calcOrVar.unit) {
-            if(inputTypes || inputUnits) return false
+            if(inputTypes?.length || inputUnits?.length) return false
             if(outputUnits?.[0] != undefined) {
                 if(outputUnits.length !== 1) return false
                 if(calcOrVar.unit !== outputUnits[0]) return false
@@ -473,7 +481,7 @@ function Calculation_Math(mathFactoryId) {
 
 function ReluctorTemplate(definition) {
     const recordVariable = { name: this.outputVariables?.[0]?.name, type: `Record` }
-    let o = { type: `Group`, value: [
+    return { type: `Group`, value: [
         { ...this, type: `Input_DigitalRecord`, outputVariables: [ recordVariable ] },
         Packagize( definition, { 
             ...this,
@@ -483,7 +491,6 @@ function ReluctorTemplate(definition) {
             ]
         })
     ]}
-    return o
 }
 
 function mapDefinitionFromValue(value) {
