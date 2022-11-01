@@ -18,18 +18,20 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
         selectHidden: true
     })
     risingPosition = new UINumberWithUnit({
-        value: 0,
-        step: 0.1,
-        min: 0,
-        max: 360,
-        valueUnit: `°`
+        value:          0,
+        step:           0.1,
+        min:            0,
+        max:            360,
+        measurement:    `Angle`,
+        valueUnit:      `°`
     })
     fallingPosition = new UINumberWithUnit({
-        value: 180,
-        step: 0.1,
-        min: 0,
-        max: 360,
-        valueUnit: `°`
+        value:          180,
+        step:           0.1,
+        min:            0,
+        max:            360,
+        measurement:    `Angle`,
+        valueUnit:      `°`
     })
     constructor(prop){
         super()

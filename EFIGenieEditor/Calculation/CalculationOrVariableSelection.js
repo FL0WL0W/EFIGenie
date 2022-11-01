@@ -210,8 +210,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             ...super.value,
             ...(subConfig != undefined) && {calculation: { 
                  ...subConfig.value, 
-                ...(typeof subConfig.value !== `object`) && { value: subConfig.value },
-                outputUnits: this.outputUnits
+                ...(typeof subConfig.value !== `object`) && { value: subConfig.value }
             }}
         }
     }

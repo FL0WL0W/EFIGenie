@@ -1,5 +1,14 @@
 import UISelection from "../JavascriptUI/UISelection.js"
 export default class UIUnit extends UISelection {
+    static allMeasurementOptions = Object.keys(Measurements).map(measurement => { 
+        if(Measurements[measurement].length === 0 || (Measurements[measurement].length === 1 && Measurements[measurement][0].name === ``))
+            return { name: measurement, value: `` }
+        if(Measurements[measurement].length === 1)
+            return { name: `${measurement} [${Measurements[measurement][0].name}]`, value: Measurements[measurement][0].name }
+
+        return { group: measurement, options: Measurements[measurement]?.map(unit => { return { selectedName: `${measurement} [${unit.name}]`, name: `${unit.name}`, value: unit.name } }) } 
+    })
+
     _hidden = false
     get hidden() { return this._hidden }
     set hidden(hidden) {
@@ -10,19 +19,21 @@ export default class UIUnit extends UISelection {
 
     get value() { return super.value }
     set value(value) {
-        let measurement = GetMeasurementNameFromUnitName(value)
-        if(measurement == undefined) return
-        this.measurement = measurement
         super.value = value
     }
 
     _measurement
     get measurement() { return this._measurement }
     set measurement(measurement){
-        if(!measurement || this._measurement === measurement) return
-        this._measurement = measurement
-        this.default = Measurements[measurement]?.[0]?.name
-        this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
+        if(this._measurement === measurement) return
+        if(!measurement) {
+            this.options = UIUnit.allMeasurementOptions
+            this.default = ``
+        } else {
+            this._measurement = measurement
+            this.default = GetDefaultUnitFromMeasurement(measurement)
+            this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
+        }
         if(this.value == undefined || this.value === `` || this.value === null) this.value = this.default
         if(this.options.length === 0) super.hidden = true
         else if(!this.hidden) super.hidden = false
@@ -38,11 +49,12 @@ export default class UIUnit extends UISelection {
     }
 
     constructor(prop) {
+        prop ??= {}
+        prop.options ??= UIUnit.allMeasurementOptions
         super(prop)
         if(prop?.measurement || prop?.value) this.default = this.value
         this.class = `ui unit`
         this.selectHidden = true
-        this.selectName = ``
     }
 }
 customElements.define(`ui-unit`, UIUnit, { extends: `div` })

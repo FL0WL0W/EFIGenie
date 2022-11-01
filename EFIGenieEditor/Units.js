@@ -39,12 +39,15 @@ var Measurements = {
 }
 
 function ConvertValueFromUnitToUnit(value, fromUnit, toUnit) {
+    let fromMeasurement = GetMeasurementNameFromUnitName(fromUnit)
     fromUnit = GetUnitFromName(fromUnit)
+    let toMeasurement = GetMeasurementNameFromUnitName(toUnit)
     toUnit = GetUnitFromName(toUnit)
-    return (value - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset
+    return fromUnit == undefined || toUnit == undefined || fromMeasurement !== toMeasurement ? value : (value - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset
 }
 
-function GetUnitFromName(unitName) { return Measurements[GetMeasurementNameFromUnitName(unitName)]?.find(u => u.name === unitName) ?? 
+function GetUnitFromName(unitName) { return unitName == undefined? undefined :
+                                            Measurements[GetMeasurementNameFromUnitName(unitName)]?.find(u => u.name === unitName) ?? 
                                             Measurements[GetMeasurementNameFromUnitName(unitName)]?.find(u => u.name === `°${unitName}`) ?? 
                                             BlankUnits[0] }
 
@@ -62,6 +65,10 @@ function GetMeasurementNameFromUnitName(unit){
         }
     }
     return `None`
+}
+
+function GetDefaultUnitFromMeasurement(measurement) {
+    return Measurements[measurement]?.[0]?.name
 }
 
 function GetUnit(measurement, name) {

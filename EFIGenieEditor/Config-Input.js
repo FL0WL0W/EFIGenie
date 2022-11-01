@@ -4,7 +4,8 @@ var InputConfigs = [
     { group: `Generic Pin Input`, calculations: RawInputConfigs},
     { group: `Custom Input`, calculations: [ 
         Calculation_Static,
-        Calculation_LookupTable
+        Calculation_LookupTable,
+        Calculation_Polynomial
     ]}
 ]
 

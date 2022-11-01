@@ -1,14 +1,32 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UISelection from "../JavascriptUI/UISelection.js"
 import UIDialog from "../JavascriptUI/UIDialog.js"
-import UITable from "../JavascriptUI/UITable.js"
 import UIGraph3D from "../JavascriptUI/UIGraph3D.js"
+import UITableWithUnit from "../UI/UITableWithUnit.js"
 export default class Calculation_2AxisTable extends UITemplate {
     static displayName = `2 Axis Table`
     static outputTypes = [ `float` ]
     static inputTypes = [ `float`, `float` ]
     static template = `<div data-element="dialog"></div>`
     GUID = generateGUID()
+
+    dialog = new UIDialog({ buttonLabel: `Edit Table` })
+    table = new UITableWithUnit()
+    graph = new UIGraph3D({ width: 800, height: 450 })
+    constructor(prop) {
+        super()
+        const thisClass = this
+        this.graph.addEventListener(`change`, function() {
+            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
+        })
+        this.table.attachToTable(this.graph)
+        this.dialog.content.append(this.graph)
+        this.dialog.content.append(document.createElement(`br`))
+        this.dialog.content.append(this.table)
+        this.noParameterSelection = false
+        this.label = `Value`
+        this.Setup(prop)
+    }
 
     get label() { return this.table.zLabel }
     set label(label){
@@ -76,12 +94,26 @@ export default class Calculation_2AxisTable extends UITemplate {
         }
     }
 
+    get min() { return this.table.min }
+    set min(min) { this.table.min = min }
+    get max() { return this.table.max }
+    set max(max) { this.table.max = max }
+    get step() { return this.table.step }
+    set step(step) { this.table.step = step }
+    
+    get displayUnit() { return this.table.displayUnit }
+    set displayUnit(displayUnit) { this.table.displayValue = displayUnit }
+    get displayValue() { return this.table.displayValue }
+    set displayValue(displayValue) { this.table.displayValue = displayValue }
+    get measurement() { return this.table.measurement }
+    set measurement(measurement) { this.table.measurement = measurement }
+    get valueUnit() { return this.table.valueUnit }
+    set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
     get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
     set value(value) { 
         value.table = value.graph = value.table.value
         super.value = value 
     }
-
     get saveValue() {
         let saveValue = super.saveValue
         delete saveValue.graph
@@ -92,24 +124,17 @@ export default class Calculation_2AxisTable extends UITemplate {
         super.saveValue = saveValue
     }
 
-    dialog = new UIDialog({ buttonLabel: `Edit Table` })
-    table = new UITable()
-    graph = new UIGraph3D({ width: 800, height: 450 })
-    constructor(prop) {
-        super()
-        const thisClass = this
-        this.graph.addEventListener(`change`, function() {
-            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
-        })
-        this.table.attachToTable(this.graph)
-        this.graph.attachToTable(this.table)
-        this.dialog.content.append(this.graph)
-        this.dialog.content.append(document.createElement(`br`))
-        this.dialog.content.append(this.table)
-        this.noParameterSelection = false
-        this.label = `Value`
-        this.Setup(prop)
+    get outputTypes() { return this.outputUnits? undefined : this.constructor.outputTypes }
+    _outputUnits
+    get outputUnits() { return this._outputUnits ?? [ this.valueUnit ] }
+    set outputUnits(outputUnits) { 
+        this._outputUnits = outputUnits
+        this.valueUnit = outputUnits?.[0]
+        if(outputUnits?.[0] != undefined)
+            this.measurement = GetMeasurementNameFromUnitName(outputUnits?.[0])
     }
+    get displayUnits() { return [ this.displayUnit ] }
+    set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
         this.xOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))

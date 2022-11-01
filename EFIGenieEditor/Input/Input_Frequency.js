@@ -9,11 +9,12 @@ export default class Input_Frequency extends UITemplate {
 
     pin = new UIPinSelection({ value: 0xFFFF, pinType: `pwm` })
     minFrequency = new UINumberWithUnit({
-        value: 1000,
-        step: 1,
-        min: 0,
-        max: 65535,
-        valueUnit: `Hz`
+        value:          1000,
+        step:           1,
+        min:            0,
+        max:            65535,
+        measurement:    `Frequency`,
+        valueUnit:      `Hz`
     })
     constructor(prop){
         super()

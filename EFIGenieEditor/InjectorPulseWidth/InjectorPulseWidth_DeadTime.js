@@ -21,8 +21,9 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
     MinInjectorFuelMass = new UINumberWithUnit({
         value:          0.005,
         step:           0.001,
+        measurement:    `Mass`,
         valueUnit:      `g`,
-        displayUnits:   [ `mg` ]
+        displayUnit:    `mg`
     })
     constructor(prop) {
         super()

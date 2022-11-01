@@ -10,18 +10,20 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
                         `<br/><label>Number of Teeth Missing:</label><div data-element="numberOfTeethMissing"></div>`
 
     firstToothPosition = new UINumberWithUnit({
-        value: 0,
-        step: 0.1,
-        min: 0,
-        max: 360,
-        valueUnit: `°`
+        value:          0,
+        step:           0.1,
+        min:            0,
+        max:            360,
+        measurement:    `Angle`,
+        valueUnit:      `°`
     })
     toothWidth = new UINumberWithUnit({
-        value: 5,
-        step: 0.1,
-        min: 0,
-        max: 360,
-        valueUnit: `°`
+        value:          5,
+        step:           0.1,
+        min:            0,
+        max:            360,
+        measurement:    `Angle`,
+        valueUnit:      `°`
     })
     numberOfTeeth = new UINumber({
         value: 36,

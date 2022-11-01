@@ -42,8 +42,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
     }
 
     constructor(prop) {
-        prop ??= {}
-        super(prop)
+        super(prop ?? {})
         this.superHidden = true
         this.displayElement.class = `livevalue`
     }

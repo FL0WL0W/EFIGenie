@@ -9,15 +9,15 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
         value:          0.1,
         step:           0.001,
         min:            0.001,
-        valueUnit:      `V`,
-        displayUnit:    `V`
+        measurement:    `Voltage`,
+        valueUnit:      `V`
     })
     voltage100 = new UINumberWithUnit({
         value:          4.9,
         step:           0.001,
         min:            0.001,
-        valueUnit:      `V`,
-        displayUnit:    `V`
+        measurement:    `Voltage`,
+        valueUnit:      `V`
     })
     calibrate = new UIButton({
         label:          `Calibrate`,
@@ -81,6 +81,7 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
             }
         })
         this.Setup(prop)
+        this.outputUnits = this.constructor.outputUnits
     }
 
     updatePolynomial() {

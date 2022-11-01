@@ -1,50 +1,23 @@
 import UINumberWithUnit from "../UI/UINumberWithUnit.js"
 import UINumber from "../JavascriptUI/UINumber.js"
-//this still needs some complicated unit work. this is ok for now
+import UISelection from "../JavascriptUI/UISelection.js"
 export default class Calculation_Polynomial extends HTMLSpanElement {
     static displayName = `Polynomial`
     static outputTypes = [ `float` ]
     static inputTypes = [ `float` ]
 
-    get outputUnits() { return this.displayUnits }
-    set outputUnits(outputUnits) { this.displayUnits = outputUnits }
-
-    get displayUnits() { return [ this.#coeffecientElement.firstChild.displayUnit ] }
-    set displayUnits(displayUnits) {
-        this.#coeffecientElement.firstChild.valueUnit = displayUnits?.[0]
-        this.#minValueElement.firstChild.valueUnit = displayUnits?.[0]
-        this.#maxValueElement.firstChild.valueUnit = displayUnits?.[0]
-        this.#coeffecientElement.firstChild.displayUnit = displayUnits?.[0]
-    }
-
     #coeffecientElement = document.createElement(`div`)
-    get coeffecients() { return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })  }
-    set coeffecients(value) {
-        this.degree = value.length
-        for(let i = 0; i < this.#coeffecientElement.children.length; i++) {
-            this.#coeffecientElement.children[i].value = value[i]
-        }
-    }
-    
     #minValueElement = new UINumberWithUnit({  value: 0 })
-    get minValue() { return this.#minValueElement.value }
-    set minValue(minValue) { this.#minValueElement.value = minValue }
-    
     #maxValueElement = new UINumberWithUnit({ value: 1 })
-    get maxValue() { return this.#maxValueElement.value }
-    set maxValue(maxValue) { this.#maxValueElement.value = maxValue }
-
     #degreeElement = new UINumber({
         min: 2,
         max: 100,
         step: 1,
         value: 0
     })
-    get degree() { return this.#degreeElement.value }
-    set degree(degree) { this.#degreeElement.value = degree  }
-
     constructor(prop) {
         super()
+        this.append(document.createElement(`br`))
         const minValueLabel = document.createElement(`label`)
         minValueLabel.textContent = `Minimum Value:`
         this.append(minValueLabel)
@@ -93,13 +66,42 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         })
         Object.assign(this, prop)
     }
-
+    get coeffecients() { return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })  }
+    set coeffecients(value) {
+        this.degree = value.length
+        for(let i = 0; i < this.#coeffecientElement.children.length; i++) {
+            this.#coeffecientElement.children[i].value = value[i]
+        }
+    }
+    get minValue() { return this.#minValueElement.value }
+    set minValue(minValue) { this.#minValueElement.value = minValue }
+    get maxValue() { return this.#maxValueElement.value }
+    set maxValue(maxValue) { this.#maxValueElement.value = maxValue }
+    get degree() { return this.#degreeElement.value }
+    set degree(degree) { this.#degreeElement.value = degree  }
+    
+    get displayUnit() { return this.#coeffecientElement.firstChild.firstChild.displayUnit }
+    set displayUnit(displayUnit) { 
+        this.#coeffecientElement.firstChild.firstChild.displayUnit = this.#coeffecientElement.firstChild.firstChild.valueUnit = displayUnit
+        this.#minValueElement.displayUnit = this.#maxValueElement.valueUnit = displayUnit
+        this.#maxValueElement.displayUnit = this.#maxValueElement.valueUnit = displayUnit
+        this.#coeffecientElement.firstChild.firstChild.displayUnit = displayUnit
+    }
+    get measurement() { return this.#coeffecientElement.firstChild.firstChild.measurement }
+    set measurement(measurement) { this.#coeffecientElement.firstChild.firstChild.measurement = measurement }
+    get valueUnit() { return this.#coeffecientElement.firstChild.firstChild.valueUnit }
+    set valueUnit(valueUnit) { 
+        this.#coeffecientElement.firstChild.firstChild.displayUnit = this.#coeffecientElement.firstChild.firstChild.valueUnit = valueUnit
+        this.#minValueElement.displayUnit = this.#maxValueElement.valueUnit = valueUnit
+        this.#maxValueElement.displayUnit = this.#maxValueElement.valueUnit = valueUnit
+        this.#coeffecientElement.firstChild.firstChild.displayUnit = valueUnit
+    }
     get value() {
         return { 
             minValue: this.minValue,
             maxValue: this.maxValue,
             coeffecients: this.coeffecients,
-            outputUnits: this.outputUnits
+            unit: this.valueUnit
         }
     }
     set value(value) {
@@ -107,24 +109,37 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
             this.minValue = value.minValue
             this.maxValue = value.maxValue
             this.coeffecients = value.coeffecients
+            if(!this._outputUnits)
+                this.numberElement.displayUnit = value.unit
         }
     }
-
     get saveValue() {
         return { 
             minValue: this.#minValueElement.saveValue,
             maxValue: this.#maxValueElement.saveValue,
-            coeffecients: this.coeffecients
+            coeffecients: this.coeffecients,
+            unit: this.displayUnit
         }
     }
-
     set saveValue(saveValue) {
         if(saveValue) {
             this.#minValueElement.saveValue = saveValue.minValue
             this.#maxValueElement.saveValue = saveValue.maxValue
             this.coeffecients = saveValue.coeffecients
+            this.displayUnit = saveValue.unit
         }
     }
+
+    _outputUnits
+    get outputUnits() { return this._outputUnits ?? [ this.valueUnit ] }
+    set outputUnits(outputUnits) { 
+        this._outputUnits = outputUnits
+        this.valueUnit = outputUnits?.[0]
+        if(this.valueUnit != undefined)
+            this.measurement = GetMeasurementNameFromUnitName(this.valueUnit)
+    }
+    get displayUnits() { return [ this.displayUnit ] }
+    set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 }
 customElements.define('ui-polynomial', Calculation_Polynomial, { extends: `span` })
 GenericConfigs.push(Calculation_Polynomial)

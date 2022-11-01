@@ -8,6 +8,7 @@ export default class MAP_GM1Bar extends Input_AnalogPolynomial {
 
     constructor(prop) {
         super(prop)
+        this.outputUnits = this.constructor.outputUnits
         this.polynomial.hidden = true
         this.polynomial.minValue = 0.1
         this.polynomial.maxValue = 1.05

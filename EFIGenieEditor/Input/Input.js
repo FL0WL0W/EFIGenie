@@ -1,10 +1,14 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIText from "../JavascriptUI/UIText.js"
 import CalculationOrVariableSelection from "../Calculation/CalculationOrVariableSelection.js"
-import UISelection from "../JavascriptUI/UISelection.js"
-import UIUnit from "../UI/UIUnit.js"
+
 export default class Input extends UITemplate {
-    static template = `<div style="float: right;"><div data-element="translationConfigMeasurement"></div><div data-element="translationConfigUnit"></div></div><div data-element="translationConfig"></div><div data-element="hr"></div><div data-element="rawConfig"></div>`
+    static template = `<div style="float: right;"></div><div data-element="translationConfig"></div><div data-element="hr"></div><div data-element="rawConfig"></div>`
+
+    get outputTypes() { return this.translationConfig.outputTypes }
+    set outputTypes(outputTypes) { this.translationConfig.outputTypes = outputTypes }
+    get outputUnits() { return this.translationConfig.outputUnits }
+    set outputUnits(outputUnits) { this.translationConfig.outputUnits = outputUnits }
 
     hr = document.createElement(`hr`)
     name = new UIText({ class: `pinselectname inputName` })
@@ -12,13 +16,6 @@ export default class Input extends UITemplate {
         calculations:           InputConfigs,
         selectionFilter:        defaultNoVariables,
         noParameterSelection:   true
-    })
-    translationConfigMeasurement = new UISelection({
-        options: Object.keys(Measurements).map(x => { return { name: x, value: x } })
-    })
-    translationConfigUnit = new UIUnit({
-        measurement: `None`,
-        hidden: true
     })
     rawConfig = new CalculationOrVariableSelection({
         calculations:           InputConfigs,
@@ -32,26 +29,11 @@ export default class Input extends UITemplate {
         super()
         this.style.display = `block`
         const thisClass = this
-        this.translationConfigMeasurement.class = `inputmeasurement`
-        this.translationConfigMeasurement.addEventListener(`change`, function() {
-            if(thisClass.translationConfigUnit.measurement !== thisClass.translationConfigMeasurement.value) {
-                thisClass.translationConfigUnit.measurement = thisClass.translationConfigMeasurement.value
-                thisClass.translationConfigUnit.value = thisClass.translationConfigUnit.default
-            }
-        })
         this.name.addEventListener(`change`, function() {
             thisClass.translationConfig.label = thisClass.name.value
         })
         this.translationConfig.addEventListener(`change`, function() {
-            const subConfig = thisClass.translationConfig.SubConfig
-            if(subConfig != undefined && (subConfig.constructor.outputUnits?.length ?? 0) === 0 && subConfig.constructor.outputTypes?.[0] === `float`) {
-                thisClass.translationConfigMeasurement.hidden = false
-                thisClass.translationConfigUnit.hidden = false
-            } else {
-                thisClass.translationConfigMeasurement.hidden = true
-                thisClass.translationConfigUnit.hidden = true
-            }
-            if(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
+            if((thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
                 thisClass.hr.hidden = true
                 thisClass.rawConfig.hidden = true
                 thisClass.rawConfig.selection.value = undefined
@@ -63,8 +45,7 @@ export default class Input extends UITemplate {
         })
         this.translationConfig.labelElement.replaceWith(this.name)
         this.rawConfig.addEventListener(`change`, function() {
-            const subConfig = thisClass.translationConfig.SubConfig
-            if(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0) {
+            if((thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
                 thisClass.hr.hidden = true
                 thisClass.rawConfig.hidden = true
                 thisClass.rawConfig.selection.value = undefined
@@ -85,12 +66,8 @@ export default class Input extends UITemplate {
     RegisterVariables() {
         const reference = { name: `Inputs.${this.name.value}` }
         
-        const subConfig = this.translationConfig.SubConfig
-        if(subConfig != undefined && (subConfig.constructor.outputUnits?.length ?? 0) === 0)
-            reference.unit = this.translationConfigUnit.value
         this.translationConfig.RegisterVariables?.(reference)
-        delete reference.unit
-        if(!(subConfig == undefined || (subConfig.constructor.inputTypes?.length ?? 0) === 0))
+        if(!((this.translationConfig.inputTypes?.length ?? 0) === 0))
             this.rawConfig.RegisterVariables?.(reference)
     }
 }

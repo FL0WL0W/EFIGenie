@@ -8,6 +8,7 @@ export default class MAP_GM3Bar extends Input_AnalogPolynomial {
 
     constructor(prop) {
         super(prop)
+        this.outputUnits = this.constructor.outputUnits
         this.polynomial.hidden = true
         this.polynomial.minValue = 0.036
         this.polynomial.maxValue = 3.15

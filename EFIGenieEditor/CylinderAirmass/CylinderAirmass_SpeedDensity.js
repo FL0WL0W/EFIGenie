@@ -12,6 +12,7 @@ export default class CylinderAirmass_SpeedDensity extends UITemplate {
             value:          0.66594,
             step:           0.001,
             min:            0.001,
+            measurement:    `Volume`,
             valueUnit:      `L`,
             displayUnit:    `mL`
         })

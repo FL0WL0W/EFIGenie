@@ -4,20 +4,18 @@ import UIUnit from "./UIUnit.js"
 export default class UINumberWithUnit extends UITemplate {
     static template = `<div data-element="displayValueElement"></div><div data-element="displayUnitElement"></div>`
     
-    get displayMeasurement() { return this.displayUnitElement.measurement }
-    set displayMeasurement(displayMeasurement) { this.displayUnitElement.measurement = displayMeasurement }
+    get measurement() { return this.displayUnitElement.measurement }
+    set measurement(measurement) { this.displayUnitElement.measurement = measurement }
     get displayUnit() { return this.displayUnitElement.value }
-    set displayUnit(displayUnit) { this.displayUnitElement.value = displayUnit ?? this.valueUnit }
+    set displayUnit(displayUnit) { this.displayUnitElement.value = displayUnit ?? this._valueUnit }
     get displayValue() { return this.displayValueElement.value }
     set displayValue(displayValue) { this.displayValueElement.value = displayValue }
 
-    get valueMeasurement() { return this.displayMeasurement }
-    set valueMeasurement(valueMeasurement) { this.displayMeasurement = valueMeasurement }
     _valueUnit
-    get valueUnit() { return this._valueUnit }
+    get valueUnit() { return this._valueUnit ?? this.displayUnit }
     set valueUnit(valueUnit) { 
+        if(this._valueUnit === valueUnit) return
         let newValue = ConvertValueFromUnitToUnit(this.value, this._valueUnit, valueUnit)
-        this.valueMeasurement = GetMeasurementNameFromUnitName(valueUnit) 
         this._valueUnit = valueUnit
         this.displayUnit ??= valueUnit
         this.value = newValue
@@ -60,12 +58,14 @@ export default class UINumberWithUnit extends UITemplate {
         super()
         const thisClass = this
         this.displayUnitElement = new UIUnit({
-            measurement : prop?.displayMeasurement ?? prop?.valueMeasurement,
+            measurement : prop?.measurement,
             value: prop?.displayUnit ?? prop?.valueUnit
         })
+        let oldUnit = this.displayUnit
         this.displayUnitElement.addEventListener(`change`, function() {
-            thisClass.UpdateDisplayValue()
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+            if(thisClass.displayValue != undefined)
+                thisClass.displayValue = ConvertValueFromUnitToUnit(thisClass.displayValue, oldUnit, thisClass.displayUnit)
+            oldUnit = thisClass.displayUnit
         })
         this.displayValueElement = new UINumber()
         this.displayValueElement.addEventListener(`change`, function() {
@@ -77,9 +77,6 @@ export default class UINumberWithUnit extends UITemplate {
     }
 
     get saveValue() {
-        if(this.displayUnitElement.saveValue == undefined)
-            return this.value
-
         return {
             unit: this.displayUnitElement.saveValue,
             value: this.value
@@ -87,7 +84,7 @@ export default class UINumberWithUnit extends UITemplate {
     }
     set saveValue(saveValue){
         if(typeof saveValue === `object`) {
-            this.displayUnitElement.saveValue = saveValue.unit ?? saveValue.measurementUnitName
+            this.displayUnitElement.saveValue = saveValue.unit
             this.value = saveValue.value ?? saveValue.value
         } else {
             this.value = saveValue
