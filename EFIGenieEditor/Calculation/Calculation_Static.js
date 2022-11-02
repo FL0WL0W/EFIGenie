@@ -26,8 +26,8 @@ export default class Calculation_Static extends UITemplate {
     set measurement(measurement) { this.numberElement.measurement = measurement }
     get valueUnit() { return this.numberElement.valueUnit }
     set valueUnit(valueUnit) { this.numberElement.valueUnit = valueUnit }
-    get value() { return { value: this.numberElement.value, unit: this.numberElement.valueUnit } }
-    set value(value) { this.numberElement.saveValue = value }
+    get value() { return this.numberElement.value }
+    set value(value) { this.numberElement.value = value }
     get saveValue() { return this.numberElement.saveValue }
     set saveValue(saveValue) { this.numberElement.saveValue = saveValue }
 

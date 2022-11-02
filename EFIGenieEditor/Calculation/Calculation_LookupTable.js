@@ -86,7 +86,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set measurement(measurement) { this.table.measurement = measurement }
     get valueUnit() { return this.table.valueUnit }
     set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
-    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined, unit: this.table.valueUnit } }
+    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
     set value(value) { 
         value.table = value.graph = value.table.value
         super.value = value 

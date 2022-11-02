@@ -147,23 +147,31 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
         }
 
         //calculation Filter
-        for(let i = 0; i < (outputUnits?.length ?? outputTypes?.length); i++){
-            if(outputUnits?.[i] != undefined && outputUnits[i] !== ``) {
-                if((calcOrVar.outputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && outputUnits[i] !== calcOrVar.outputUnits?.[i]) return false
-            } else if(outputTypes?.[i] != undefined){
-                if(calcOrVar.outputUnits?.[i] == undefined && calcOrVar.outputTypes?.[i] == undefined) false
-                if(calcOrVar.outputUnits?.[i] != undefined && outputTypes[i].split(`|`).indexOf(`float`) === -1) return false
-                if(calcOrVar.outputTypes?.[i] != undefined && !outputTypes[i].split(`|`).some(t => calcOrVar.outputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+        if(outputUnits != undefined || outputTypes != undefined) {
+            if((outputUnits?.length ?? outputTypes?.length ?? 0) === 0 && (calcOrVar.outputUnits?.length ?? calcOrVar.outputTypes?.length) !== 0)
+                return false
+            for(let i = 0; i < (outputUnits?.length ?? outputTypes?.length ?? 0); i++){
+                if(outputUnits?.[i] != undefined && outputUnits[i] !== ``) {
+                    if((calcOrVar.outputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && outputUnits[i] !== calcOrVar.outputUnits?.[i]) return false
+                } else if(outputTypes?.[i] != undefined){
+                    if(calcOrVar.outputUnits?.[i] == undefined && calcOrVar.outputTypes?.[i] == undefined) false
+                    if(calcOrVar.outputUnits?.[i] != undefined && outputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                    if(calcOrVar.outputTypes?.[i] != undefined && !outputTypes[i].split(`|`).some(t => calcOrVar.outputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+                }
             }
         }
-
-        for(let i = 0; i < (inputUnits?.length ?? inputTypes?.length); i++){
-            if(inputUnits?.[i] != undefined) {
-                if((calcOrVar.inputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && inputUnits[i] !== calcOrVar.inputUnits?.[i]) return false
-            } else if(inputTypes?.[i] != undefined){
-                if(calcOrVar.inputUnits?.[i] == undefined && calcOrVar.inputTypes?.[i] == undefined) false
-                if(calcOrVar.inputUnits?.[i] != undefined && inputTypes[i].split(`|`).indexOf(`float`) === -1) return false
-                if(calcOrVar.inputTypes?.[i] != undefined && !inputTypes[i].split(`|`).some(t => calcOrVar.inputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+        
+        if(inputUnits != undefined || inputTypes != undefined) {
+            if((inputUnits?.length ?? inputTypes?.length ?? 0) === 0 && (calcOrVar.inputUnits?.length ?? calcOrVar.inputTypes?.length ?? 0) !== 0)
+                return false
+            for(let i = 0; i < (inputUnits?.length ?? inputTypes?.length ?? 0); i++){
+                if(inputUnits?.[i] != undefined) {
+                    if((calcOrVar.inputTypes?.[i]?.split(`|`).indexOf(`float`) ?? -1) === -1 && inputUnits[i] !== calcOrVar.inputUnits?.[i]) return false
+                } else if(inputTypes?.[i] != undefined){
+                    if(calcOrVar.inputUnits?.[i] == undefined && calcOrVar.inputTypes?.[i] == undefined) false
+                    if(calcOrVar.inputUnits?.[i] != undefined && inputTypes[i].split(`|`).indexOf(`float`) === -1) return false
+                    if(calcOrVar.inputTypes?.[i] != undefined && !inputTypes[i].split(`|`).some(t => calcOrVar.inputTypes[i].split(`|`).indexOf(t) !== -1)) return false
+                }
             }
         }
         return true
@@ -637,12 +645,12 @@ types = [
         return Packagize(this, this)
     }},
     { type: `Calculation_Static`, toDefinition() {
-        var type = GetType(this.value)
+        var type = GetType(this.value.value)
         var typeID = GetTypeId(type)
         return Packagize({ type: `definition`, value: [ 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static},
             { type: `UINT8`, value: typeID }, //typeid
-            { type: type, value: this.value } //val
+            { type: type, value: this.value.value } //val
         ]}, this)
     }},
     { type: `Calculation_2AxisTable`, inputs: 2, toDefinition() {
@@ -858,13 +866,13 @@ types = [
     { type: `Input`, toDefinition() {
         if(this.translationConfig == undefined)
             return
-        const translationOutputVariableUnit = this.translationConfig.calculation != undefined && (this.translationConfig.calculation.outputUnits?.length ?? 0) === 0 && subConfig.constructor.outputTypes?.[0] === `float`? this.translationOutputVariableUnit : this.translationConfig.calculation?.outputUnits?.[0]
-        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: translationOutputVariableUnit, type: translationOutputVariableUnit? this.translationConfig.calculation?.outputTypes?.[0] : undefined }
+        const translationOutputVariable = { name: `Inputs.${this.name}`, unit: this.translationConfig.outputUnits?.[0], type: this.translationConfig.outputTypes?.[0] }
 
-        if(this.translationConfig.calculation.inputTypes == undefined || this.translationConfig.calculation.inputTypes.length === 0)
+        if((this.translationConfig.inputTypes?.length ?? 0) === 0 && (this.translationConfig.inputUnits?.length ?? 0) === 0)
             return { ...this.translationConfig, type: `CalculationOrVariableSelection`, outputVariables: [ translationOutputVariable ] }
 
-        const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.calculation?.outputUnits?.[0], type: this.rawConfig.calculation?.outputUnits?.[0] == undefined? this.rawConfig.calculation?.outputTypes?.[0] : undefined }
+        const rawOutputVariable = { name: `Inputs.${this.name}`, unit: this.rawConfig.outputUnits?.[0], type: this.rawConfig.outputTypes?.[0] }
+
         this.rawConfig = { ...this.rawConfig, type: `CalculationOrVariableSelection`, outputVariables: [ rawOutputVariable ] }
         
         return { type: `Group`, value: [

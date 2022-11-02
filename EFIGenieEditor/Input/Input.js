@@ -14,7 +14,13 @@ export default class Input extends UITemplate {
     name = new UIText({ class: `pinselectname inputName` })
     translationConfig = new CalculationOrVariableSelection({
         calculations:           InputConfigs,
-        selectionFilter:        defaultNoVariables,
+        selectionFilter:        function() {
+            return function(calcOrVar) {
+                if(calcOrVar.type || calcOrVar.unit) 
+                    return false
+                return true
+            }
+        },
         noParameterSelection:   true
     })
     rawConfig = new CalculationOrVariableSelection({
@@ -33,7 +39,8 @@ export default class Input extends UITemplate {
             thisClass.translationConfig.label = thisClass.name.value
         })
         this.translationConfig.addEventListener(`change`, function() {
-            if((thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
+            thisClass.translationConfig.inputUnits = thisClass.translationConfig.inputTypes = undefined
+            if((thisClass.translationConfig.inputUnits?.length ?? thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
                 thisClass.hr.hidden = true
                 thisClass.rawConfig.hidden = true
                 thisClass.rawConfig.selection.value = undefined
@@ -45,13 +52,9 @@ export default class Input extends UITemplate {
         })
         this.translationConfig.labelElement.replaceWith(this.name)
         this.rawConfig.addEventListener(`change`, function() {
-            if((thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
-                thisClass.hr.hidden = true
-                thisClass.rawConfig.hidden = true
-                thisClass.rawConfig.selection.value = undefined
-            } else {
-                thisClass.hr.hidden = false
-                thisClass.rawConfig.hidden = false
+            if(thisClass.rawConfig.outputUnits?.[0]) {
+                thisClass.translationConfig.inputUnits = thisClass.rawConfig.outputUnits
+                thisClass.translationConfig.xLabel = GetMeasurementNameFromUnitName(thisClass.rawConfig.outputUnits?.[0])
             }
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
@@ -67,7 +70,7 @@ export default class Input extends UITemplate {
         const reference = { name: `Inputs.${this.name.value}` }
         
         this.translationConfig.RegisterVariables?.(reference)
-        if(!((this.translationConfig.inputTypes?.length ?? 0) === 0))
+        if(!((this.translationConfig.inputUnits?.length ?? this.translationConfig.inputTypes?.length ?? 0) === 0))
             this.rawConfig.RegisterVariables?.(reference)
     }
 }
