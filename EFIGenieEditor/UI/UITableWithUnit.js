@@ -56,7 +56,12 @@ export default class UITableWithUnit extends UITemplate {
     _xUnit
     get xUnit() { return this._xUnit ?? this.xDisplayUnit }
     set xUnit(xUnit) { 
-        if(this._xUnit === xUnit) return
+        if(objectTester(this._xUnit, xUnit)) return
+        if(Array.isArray(xUnit) && xUnit.indexOf(this._xUnit) < 0)
+            xUnit = xUnit[0]
+        else
+            xUnit = this._xUnit
+
         let newXAxis = this.xAxis == undefined? undefined : this.xAxis.map(x => ConvertValueFromUnitToUnit(x, this._xUnit, xUnit))
         this._xUnit = xUnit
         this.xDisplayUnit ??= xUnit

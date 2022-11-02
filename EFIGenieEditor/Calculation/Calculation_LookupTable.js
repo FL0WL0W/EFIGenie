@@ -56,7 +56,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set xDisplayAxis(xDisplayAxis) { this.table.xDisplayAxis = xDisplayAxis }
     get xUnit() { return this.table.xUnit }
     set xUnit(xUnit) { 
-        this.table.xUnit = xUnit 
+        this.table.xUnit = xUnit
     }
     get xAxis() { return this.table.xAxis }
     set xAxis(xAxis) { this.table.xAxis = xAxis }
@@ -80,14 +80,15 @@ export default class Calculation_LookupTable extends UITemplate {
 
         if(!this.parameterSelection) {
             this.parameterSelection = new UISelection({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ])),
+                options: this.GetSelections(),
                 class: `TableParameterSelect`
             })
             const thisClass = this
             this.parameterSelection.addEventListener(`change`, function() {
-                thisClass.xUnit = thisClass.parameterSelection.selectedOption?.value.unit
+                const xUnit = thisClass.parameterSelection.selectedOption?.value.unit
                 if(thisClass._inputUnits?.[0] == undefined)
-                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(thisClass.xUnit)
+                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+                thisClass.xUnit = xUnit
             })
             this.table.xLabel = this.parameterSelection
         } else {
@@ -145,7 +146,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ]))
+        this.xOptions = this.GetSelections()
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         
@@ -158,6 +159,43 @@ export default class Calculation_LookupTable extends UITemplate {
                 } 
             }
         }
+    }
+
+    GetSelections() {
+        let gotoptions = GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ]))
+        let options = []
+        for(let topOptionIndex in gotoptions) {
+            const topOption = gotoptions[topOptionIndex]
+            if(topOption.group) {
+                let group = { group: topOption.group, options: []}
+                for(let optionIndex in topOption.options) {
+                    const option = topOption.options[optionIndex]
+                    let found = group.options.find(x=> x.name === option.name && x.value.name === option.value.name)
+                    if(found) {
+                        if(Array.isArray(found.value.unit)) {
+                            if(found.value.unit.indexOf(option.value.unit) < 0)
+                                found.value.unit.push(option.value.unit)
+                        } else if (found.value.unit !== option.value.unit)
+                            found.value.unit = [ found.value.unit, option.value.unit ]
+                    } else {
+                        group.options.push({...option, info: undefined})
+                    }
+                }
+                options.push(group)
+            } else {
+                let found = options.find(x=> x.name === topOption.name && x.value.name === topOption.value.name)
+                if(found) {
+                    if(Array.isArray(found.value.unit)) {
+                        if(found.value.unit.indexOf(topOption.value.unit) < 0)
+                            found.value.unit.push(topOption.value.unit)
+                    } else if (found.value.unit !== topOption.value.unit)
+                        found.value.unit = [ found.value.unit, topOption.value.unit ]
+                } else {
+                    options.push({...topOption, info: undefined})
+                }
+            }
+        }
+        return options
     }
 }
 GenericConfigs.push(Calculation_LookupTable)

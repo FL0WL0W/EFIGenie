@@ -52,6 +52,8 @@ function GetUnitFromName(unitName) { return unitName == undefined? undefined :
                                             BlankUnits[0] }
 
 function GetMeasurementNameFromUnitName(unit){
+    if(Array.isArray(unit))
+        return unit.map(x => GetMeasurementNameFromUnitName(x))
     for(let measurementName in Measurements) {
         for(let measurementIndex in Measurements[measurementName]) {
             if(unit === Measurements[measurementName][measurementIndex].name)

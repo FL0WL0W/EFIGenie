@@ -33,7 +33,11 @@ export default class UIUnit extends UISelection {
             this.value = undefined
             this._measurement = measurement
             this.default = GetDefaultUnitFromMeasurement(measurement)
-            this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
+            if(Array.isArray(measurement))
+                this.options = UIUnit.allMeasurementOptions.filter(x => measurement.indexOf(x.group) !== -1 || measurement.some(y=>x.name?.indexOf(y) === 0))
+                    .map(x=> x.group? { group: x.group, options: x.options.map(y=> { return { ...y, selectedName: undefined} } ) } : { ...x, selectedName: x.value} )
+            else
+                this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
         }
         if(this.value == undefined || this.value === `` || this.value === null) this.value = this.default
         if(this.options.length === 0) super.hidden = true
