@@ -37,6 +37,10 @@ export default class Calculation_LookupTable extends UITemplate {
         this.dialog.title = label
     }
 
+    get xResolutionModifiable() { return this.table.xResolutionModifiable }
+    set xResolutionModifiable(xResolutionModifiable) { this.table.xResolutionModifiable = xResolutionModifiable }
+    get xResolution() { return this.table.xResolution }
+    set xResolution(xResolution) { this.table.xResolution = xResolution }
     _xLabel = `X`
     get xLabel() { return this._xLabel }
     set xLabel(xLabel) {
@@ -44,6 +48,18 @@ export default class Calculation_LookupTable extends UITemplate {
         this._xLabel = xLabel
         if(!this.parameterSelection) this.table.xLabel = xLabel
     }
+    get xMeasurement() { return this.table.xMeasurement }
+    set xMeasurement(xMeasurement) { this.table.xMeasurement = xMeasurement }
+    get xDisplayUnit() { return this.table.xDisplayUnit }
+    set xDisplayUnit(xDisplayUnit) { this.table.xDisplayUnit = xDisplayUnit }
+    get xDisplayAxis() { return this.table.xDisplayAxis }
+    set xDisplayAxis(xDisplayAxis) { this.table.xDisplayAxis = xDisplayAxis }
+    get xUnit() { return this.table.xUnit }
+    set xUnit(xUnit) { 
+        this.table.xUnit = xUnit 
+    }
+    get xAxis() { return this.table.xAxis }
+    set xAxis(xAxis) { this.table.xAxis = xAxis }
 
     get xOptions() { return this.parameterSelection?.options }
     set xOptions(options) {
@@ -64,10 +80,19 @@ export default class Calculation_LookupTable extends UITemplate {
 
         if(!this.parameterSelection) {
             this.parameterSelection = new UISelection({
-                options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
+                options: GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ])),
                 class: `TableParameterSelect`
             })
+            const thisClass = this
+            this.parameterSelection.addEventListener(`change`, function() {
+                thisClass.xUnit = thisClass.parameterSelection.selectedOption?.value.unit
+                if(thisClass._inputUnits?.[0] == undefined)
+                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(thisClass.xUnit)
+            })
             this.table.xLabel = this.parameterSelection
+        } else {
+            if(this._inputUnits?.[0] == undefined)
+                this.xMeasurement = undefined
         }
     }
 
@@ -101,7 +126,15 @@ export default class Calculation_LookupTable extends UITemplate {
         super.saveValue = saveValue
     }
 
-    get outputTypes() { return this.outputUnits? undefined : this.constructor.outputTypes }
+    _inputUnits
+    get inputUnits() { return [ this.xUnit ] }
+    set inputUnits(inputUnits) {
+        this._inputUnits = inputUnits?.[0]
+        this.xOptions = defaultFilter(this._inputUnits, [ `float` ])
+        this.xUnit = inputUnits?.[0]
+        if(inputUnits?.[0] != undefined)
+            this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
+    }
     get outputUnits() { return [ this.valueUnit ] }
     set outputUnits(outputUnits) { 
         this.valueUnit = outputUnits?.[0]
@@ -112,7 +145,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
+        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ]))
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         

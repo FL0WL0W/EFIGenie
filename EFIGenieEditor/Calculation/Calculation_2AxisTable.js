@@ -34,17 +34,34 @@ export default class Calculation_2AxisTable extends UITemplate {
         this.dialog.title = label
     }
 
+    get xResolutionModifiable() { return this.table.xResolutionModifiable }
+    set xResolutionModifiable(xResolutionModifiable) { this.table.xResolutionModifiable = xResolutionModifiable }
+    get xResolution() { return this.table.xResolution }
+    set xResolution(xResolution) { this.table.xResolution = xResolution }
     _xLabel = `X`
     get xLabel() { return this._xLabel }
     set xLabel(xLabel) {
-        if(this._xLabel === xLabel)
-            return
-
+        if(this._xLabel === xLabel) return
         this._xLabel = xLabel
-        if(!this.XSelection)
-            this.table.xLabel = xLabel
+        if(!this.XSelection) this.table.xLabel = xLabel
     }
+    get xMeasurement() { return this.table.xMeasurement }
+    set xMeasurement(xMeasurement) { this.table.xMeasurement = xMeasurement }
+    get xDisplayUnit() { return this.table.xDisplayUnit }
+    set xDisplayUnit(xDisplayUnit) { this.table.xDisplayUnit = xDisplayUnit }
+    get xDisplayAxis() { return this.table.xDisplayAxis }
+    set xDisplayAxis(xDisplayAxis) { this.table.xDisplayAxis = xDisplayAxis }
+    get xUnit() { return this.table.xUnit }
+    set xUnit(xUnit) { 
+        this.table.xUnit = xUnit 
+    }
+    get xAxis() { return this.table.xAxis }
+    set xAxis(xAxis) { this.table.xAxis = xAxis }
 
+    get yResolutionModifiable() { return this.table.yResolutionModifiable }
+    set yResolutionModifiable(yResolutionModifiable) { this.table.yResolutionModifiable = yResolutionModifiable }
+    get yResolution() { return this.table.yResolution }
+    set yResolution(yResolution) { this.table.yResolution = yResolution }
     _yLabel = `Y`
     get yLabel() { return this._yLabel }
     set yLabel(yLabel) {
@@ -52,6 +69,18 @@ export default class Calculation_2AxisTable extends UITemplate {
         this._yLabel = yLabel
         if(!this.YSelection) this.table.yLabel = yLabel
     }
+    get yMeasurement() { return this.table.yMeasurement }
+    set yMeasurement(yMeasurement) { this.table.yMeasurement = yMeasurement }
+    get yDisplayUnit() { return this.table.yDisplayUnit }
+    set yDisplayUnit(yDisplayUnit) { this.table.yDisplayUnit = yDisplayUnit }
+    get yDisplayAxis() { return this.table.yDisplayAxis }
+    set yDisplayAxis(yDisplayAxis) { this.table.yDisplayAxis = yDisplayAxis }
+    get yUnit() { return this.table.yUnit }
+    set yUnit(yUnit) { 
+        this.table.yUnit = yUnit 
+    }
+    get yAxis() { return this.table.yAxis }
+    set yAxis(yAxis) { this.table.yAxis = yAxis }
 
     get xOptions() { return this.XSelection?.options }
     set xOptions(options) {
@@ -78,19 +107,36 @@ export default class Calculation_2AxisTable extends UITemplate {
             return
         }
 
+        const thisClass = this
         if(!this.XSelection) {
             this.XSelection = new UISelection({
                 selectHidden: true,
-                options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
+                options: GetSelections(undefined, defaultFilter([this._inputUnits?.[0]], [ `float` ])),
+            })
+            this.XSelection.addEventListener(`change`, function() {
+                thisClass.xUnit = thisClass.XSelection.selectedOption?.value.unit
+                if(thisClass._inputUnits?.[0] == undefined)
+                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(thisClass.xUnit)
             })
             this.table.xLabel = this.XSelection
+        } else {
+            if(this._inputUnits?.[0] == undefined)
+                this.xMeasurement = undefined
         }
         if(!this.YSelection) {
             this.YSelection = new UISelection({
                 selectHidden: true,
-                options: GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
+                options: GetSelections(undefined, defaultFilter([this._inputUnits?.[1]], [ `float` ])),
+            })
+            this.YSelection.addEventListener(`change`, function() {
+                thisClass.yUnit = thisClass.YSelection.selectedOption?.value.unit
+                if(thisClass._inputUnits?.[1] == undefined)
+                    thisClass.yMeasurement = GetMeasurementNameFromUnitName(thisClass.yUnit)
             })
             this.table.yLabel = this.YSelection
+        } else {
+            if(this._inputUnits?.[1] == undefined)
+                this.yMeasurement = undefined
         }
     }
 
@@ -124,7 +170,17 @@ export default class Calculation_2AxisTable extends UITemplate {
         super.saveValue = saveValue
     }
 
-    get outputTypes() { return this.outputUnits? undefined : this.constructor.outputTypes }
+    _inputUnits
+    get inputUnits() { return [ this.xUnit ] }
+    set inputUnits(inputUnits) {
+        this._inputUnits = inputUnits?.[0]
+        this.xOptions = defaultFilter(this._inputUnits, [ `float` ])
+        this.xUnit = inputUnits?.[0]
+        if(inputUnits?.[0] != undefined)
+            this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
+        if(inputUnits?.[1] != undefined)
+            this.yMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[1])
+    }
     _outputUnits
     get outputUnits() { return this._outputUnits ?? [ this.valueUnit ] }
     set outputUnits(outputUnits) { 
@@ -137,8 +193,8 @@ export default class Calculation_2AxisTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
-        this.yOptions = GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
+        this.xOptions = GetSelections(undefined, defaultFilter([this._inputUnits?.[0]], [ `float` ]))
+        this.yOptions = GetSelections(undefined, defaultFilter([this._inputUnits?.[1]], [ `float` ]))
         if(communication.variablesToPoll.indexOf(this.XSelection?.value) === -1)
             communication.variablesToPoll.push(this.XSelection?.value)
         if(communication.variablesToPoll.indexOf(this.YSelection?.value) === -1)

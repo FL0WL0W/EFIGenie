@@ -4,6 +4,13 @@ import UIUnit from "./UIUnit.js"
 export default class UITableWithUnit extends UITemplate {
     static template = `<div data-element="displayValueElement">`
     
+    get zLabel() { return this.#zLabel; }
+    set zLabel(zLabel) {
+        if(this.#zLabel === zLabel)
+            return;
+        this.#zLabel = zLabel;
+        this.#zLabelElement.replaceChildren(zLabel ?? ``);
+    }
     get measurement() { return this.displayUnitElement.measurement }
     set measurement(measurement) { this.displayUnitElement.measurement = measurement }
     get displayUnit() { return this.displayUnitElement.value }
@@ -32,25 +39,72 @@ export default class UITableWithUnit extends UITemplate {
     set xResolutionModifiable(xResolutionModifiable) { this.displayValueElement.xResolutionModifiable = xResolutionModifiable }
     get xResolution() { return this.displayValueElement.xResolution }
     set xResolution(xResolution) { this.displayValueElement.xResolution = xResolution }
-    get xAxis() { return this.displayValueElement.xAxis }
-    set xAxis(xAxis) { this.displayValueElement.xAxis = xAxis }
-    get xLabel() { return this.displayValueElement.xLabel }
-    set xLabel(xLabel) { this.displayValueElement.xLabel = xLabel }
+    get xLabel() { return this.#xLabel; }
+    set xLabel(xLabel) {
+        if(this.#xLabel === xLabel)
+            return;
+        this.#xLabel = xLabel;
+        this.#xLabelElement.replaceChildren(xLabel ?? ``);
+    }
+    get xMeasurement() { return this.xDisplayUnitElement.measurement }
+    set xMeasurement(xMeasurement) { this.xDisplayUnitElement.measurement = xMeasurement }
+    get xDisplayUnit() { return this.xDisplayUnitElement.value }
+    set xDisplayUnit(xDisplayUnit) { this.xDisplayUnitElement.value = xDisplayUnit ?? this._xUnit }
+    get xDisplayAxis() { return this.displayValueElement.xAxis }
+    set xDisplayAxis(xDisplayAxis) { this.displayValueElement.xAxis = xDisplayAxis }
+
+    _xUnit
+    get xUnit() { return this._xUnit ?? this.xDisplayUnit }
+    set xUnit(xUnit) { 
+        if(this._xUnit === xUnit) return
+        let newXAxis = this.xAxis == undefined? undefined : this.xAxis.map(x => ConvertValueFromUnitToUnit(x, this._xUnit, xUnit))
+        this._xUnit = xUnit
+        this.xDisplayUnit ??= xUnit
+        this.xAxis = newXAxis
+    }
+    #xAxis
+    get xAxis() { return this.#xAxis }
+    set xAxis(xAxis) {
+        if(objectTester(this.#xAxis, xAxis)) return
+        this.#xAxis = xAxis
+        this.UpdateDisplayValue()
+    }
+
     get yResolutionModifiable() { return this.displayValueElement.yResolutionModifiable }
     set yResolutionModifiable(yResolutionModifiable) { this.displayValueElement.yResolutionModifiable = yResolutionModifiable }
     get yResolution() { return this.displayValueElement.yResolution }
     set yResolution(yResolution) { this.displayValueElement.yResolution = yResolution }
-    get yAxis() { return this.displayValueElement.yAxis }
-    set yAxis(yAxis) { this.displayValueElement.yAxis = yAxis }
-    get yLabel() { return this.displayValueElement.yLabel }
-    set yLabel(yLabel) { this.displayValueElement.yLabel = yLabel }
-    get zLabel() { return this.#zLabel; }
-    set zLabel(zLabel) {
-        if(this.#zLabel === zLabel)
+    get yLabel() { return this.#yLabel; }
+    set yLabel(yLabel) {
+        if(this.#yLabel === yLabel)
             return;
-        this.#zLabel = zLabel;
-        this.#zLabelElement.replaceChildren(zLabel ?? ``);
+        this.#yLabel = yLabel;
+        this.#yLabelElement.replaceChildren(yLabel ?? ``);
     }
+    get yMeasurement() { return this.yDisplayUnitElement.measurement }
+    set yMeasurement(yMeasurement) { this.yDisplayUnitElement.measurement = yMeasurement }
+    get yDisplayUnit() { return this.yDisplayUnitElement.value }
+    set yDisplayUnit(yDisplayUnit) { this.yDisplayUnitElement.value = yDisplayUnit ?? this._yUnit }
+    get yDisplayAxis() { return this.displayValueElement.yAxis }
+    set yDisplayAxis(yDisplayAxis) { this.displayValueElement.yAxis = yDisplayAxis }
+
+    _yUnit
+    get yUnit() { return this._yUnit ?? this.yDisplayUnit }
+    set yUnit(yUnit) { 
+        if(this._yUnit === yUnit) return
+        let newYAxis = this.yAxis == undefined? undefined : this.yAxis.map(x => ConvertValueFromUnitToUnit(x, this._yUnit, yUnit))
+        this._yUnit = yUnit
+        this.yDisplayUnit ??= yUnit
+        this.yAxis = newYAxis
+    }
+    #yAxis
+    get yAxis() { return this.#yAxis }
+    set yAxis(yAxis) {
+        if(objectTester(this.#yAxis, yAxis)) return
+        this.#yAxis = yAxis
+        this.UpdateDisplayValue()
+    }
+
     get selecting() { return this.displayValueElement.selecting }
     set selecting(selecting) { this.displayValueElement.selecting = selecting }
 
@@ -78,6 +132,12 @@ export default class UITableWithUnit extends UITemplate {
         this.UpdateDisplayValue()
     }
     
+    #xLabelElementWithUnit = document.createElement(`div`);
+    #xLabelElement = document.createElement(`span`);
+    #xLabel = `X`
+    #yLabelElementWithUnit = document.createElement(`div`);
+    #yLabelElement = document.createElement(`span`);
+    #yLabel = `Y`
     #zLabelElementWithUnit = document.createElement(`div`);
     #zLabelElement = document.createElement(`span`);
     #zLabel = undefined
@@ -95,11 +155,39 @@ export default class UITableWithUnit extends UITemplate {
                 thisClass.displayValue = thisClass.displayValue.map(x => ConvertValueFromUnitToUnit(x, oldUnit, thisClass.displayUnit))
             oldUnit = thisClass.displayUnit
         })
+        this.xDisplayUnitElement = new UIUnit({
+            measurement : prop?.xMeasurement,
+            value: prop?.xDisplayUnit ?? prop?.xUnit
+        })
+        let xOldUnit = this.xDisplayUnit
+        this.xDisplayUnitElement.addEventListener(`change`, function() {
+            if(thisClass.xDisplayAxis != undefined)
+                thisClass.xDisplayAxis = thisClass.xDisplayAxis.map(x => ConvertValueFromUnitToUnit(x, xOldUnit, thisClass.xDisplayUnit))
+            xOldUnit = thisClass.xDisplayUnit
+        })
+        this.yDisplayUnitElement = new UIUnit({
+            measurement : prop?.yMeasurement,
+            value: prop?.yDisplayUnit ?? prop?.yUnit
+        })
+        let yOldUnit = this.yDisplayUnit
+        this.yDisplayUnitElement.addEventListener(`change`, function() {
+            if(thisClass.yDisplayAxis != undefined)
+                thisClass.yDisplayAxis = thisClass.yDisplayAxis.map(x => ConvertValueFromUnitToUnit(x, yOldUnit, thisClass.yDisplayUnit))
+            yOldUnit = thisClass.yDisplayUnit
+        })
         this.displayValueElement.addEventListener(`change`, function() {
             if(thisClass.displayValue != undefined && thisClass.displayUnit)
                 thisClass.#value = thisClass.displayValue.map(x => ConvertValueFromUnitToUnit(x, thisClass.displayUnit, thisClass.valueUnit))
+            if(thisClass.xDisplayAxis != undefined && thisClass.xDisplayUnit)
+                thisClass.#xAxis = thisClass.xDisplayAxis.map(x => ConvertValueFromUnitToUnit(x, thisClass.xDisplayUnit, thisClass.xUnit))
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
+        this.#xLabelElementWithUnit.append(this.#xLabelElement)
+        this.#xLabelElementWithUnit.append(this.xDisplayUnitElement)
+        this.displayValueElement.xLabel = this. #xLabelElementWithUnit
+        this.#yLabelElementWithUnit.append(this.#yLabelElement)
+        this.#yLabelElementWithUnit.append(this.yDisplayUnitElement)
+        this.displayValueElement.yLabel = this. #yLabelElementWithUnit
         this.#zLabelElementWithUnit.append(this.#zLabelElement)
         this.#zLabelElementWithUnit.append(this.displayUnitElement)
         this.displayValueElement.zLabel = this. #zLabelElementWithUnit
@@ -116,12 +204,16 @@ export default class UITableWithUnit extends UITemplate {
         return {
             ...this.displayValueElement.saveValue,
             value: this.value,
+            xAxis: this.xAxis,
+            yAxis: this.yAxis,
             ...(this.displayUnitElement.saveValue != undefined) && { unit: this.displayUnitElement.saveValue }
         }
     }
     set saveValue(saveValue){
         this.displayValueElement.saveValue = saveValue
         this.value = saveValue.value
+        this.xAxis = saveValue.xAxis
+        this.yAxis = saveValue.yAxis
         if(saveValue.unit != undefined)
             this.displayUnitElement.saveValue = saveValue.unit
     }
@@ -130,10 +222,21 @@ export default class UITableWithUnit extends UITemplate {
         const displayUnit = this.displayUnit
         const valueUnit = this.valueUnit
         function valueToDisplayValue(value) { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
-        this.displayValue               = this.value.map(x => valueToDisplayValue(x))
+        if(this.value != undefined)
+            this.displayValue           = this.value.map(x => valueToDisplayValue(x))
         this.displayValueElement.min    = valueToDisplayValue(this.min)     ?? this.displayValueElement.min
         this.displayValueElement.max    = valueToDisplayValue(this.max)     ?? this.displayValueElement.max
         this.displayValueElement.step   = valueToDisplayValue(this.step)    ?? this.displayValueElement.step
+        const xDisplayUnit = this.xDisplayUnit
+        const xUnit = this.xUnit
+        function xValueToDisplayValue(value) { return value == undefined || !xDisplayUnit? value : ConvertValueFromUnitToUnit(value, xUnit, xDisplayUnit) }
+        if(this.xAxis != undefined)
+            this.xDisplayAxis           = this.xAxis.map(x => xValueToDisplayValue(x))
+        const yDisplayUnit = this.yDisplayUnit
+        const yUnit = this.yUnit
+        function yValueToDisplayValue(value) { return value == undefined || !yDisplayUnit? value : ConvertValueFromUnitToUnit(value, yUnit, yDisplayUnit) }
+        if(this.yAxis != undefined)
+            this.yDisplayAxis           = this.yAxis.map(y => yValueToDisplayValue(y))
     }
     attachToTable(table) {
         this.displayValueElement.attachToTable(table)

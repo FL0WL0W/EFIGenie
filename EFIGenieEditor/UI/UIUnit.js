@@ -30,6 +30,7 @@ export default class UIUnit extends UISelection {
             this.options = UIUnit.allMeasurementOptions
             this.default = ``
         } else {
+            this.value = undefined
             this._measurement = measurement
             this.default = GetDefaultUnitFromMeasurement(measurement)
             this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })

@@ -43,6 +43,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputTypes(outputTypes) {
         this._outputTypes = outputTypes
+        this.calculationValues.forEach(function(calculationValue) {
+            if(`outputTypes` in calculationValue)
+                calculationValue.outputTypes = outputTypes
+        })
         this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
@@ -55,6 +59,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputUnits(outputUnits) {
         this._outputUnits = outputUnits
+        this.calculationValues.forEach(function(calculationValue) {
+            if(`outputUnits` in calculationValue)
+                calculationValue.outputUnits = outputUnits
+        })
         this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
@@ -66,6 +74,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputTypes(inputTypes) {
         this._inputTypes = inputTypes
+        this.calculationValues.forEach(function(calculationValue) {
+            if(`inputTypes` in calculationValue)
+                calculationValue.inputTypes = inputTypes
+        })
         this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
@@ -75,6 +87,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits
+        this.calculationValues.forEach(function(calculationValue) {
+            if(`inputUnits` in calculationValue)
+                calculationValue.inputUnits = inputUnits
+        })
         this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
@@ -271,7 +287,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
             for (var i = 0; i < calculations.length; i++) {
                 if (calculations[i] == undefined || calculations[i].name !== this.selection.value)
                     continue
-                this.calculationValues.push(new calculations[i]({
+                this.calculationValues.push(new calculations[i]())
+                this.calculationValues[this.calculationValues.length-1].Setup({
                     noParameterSelection: this.noParameterSelection,
                     label: this.label,
                     xLabel: this.xLabel,
@@ -279,7 +296,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     outputUnits: this._outputUnits,
                     displayUnits: this.displayUnits,
                     calculations: this.calculations
-                }))
+                })
                 return this.calculationValues.length-1
             }
         }
