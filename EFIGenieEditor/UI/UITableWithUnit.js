@@ -218,7 +218,7 @@ export default class UITableWithUnit extends UITemplate {
         }
     }
     set saveValue(saveValue){
-        this.displayValueElement.saveValue = saveValue
+        this.displayValueElement.saveValue = { ...saveValue, value: undefined }
         this.value = saveValue.value
         this.xAxis = saveValue.xAxis
         this.yAxis = saveValue.yAxis

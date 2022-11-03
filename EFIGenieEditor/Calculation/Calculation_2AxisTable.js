@@ -164,18 +164,17 @@ export default class Calculation_2AxisTable extends UITemplate {
         graph: undefined
     } }
     set value(value) { 
-        value.table = value.graph = value.table.value
+        const table = value.table
+        delete value.table
         super.value = value 
+        this.table.saveValue = table
     }
     get saveValue() {
         let saveValue = super.saveValue
         delete saveValue.graph
         return saveValue
     }
-    set saveValue(saveValue) {
-        saveValue.graph = saveValue.table
-        super.saveValue = saveValue
-    }
+    set saveValue(saveValue) { super.saveValue = saveValue }
 
     _inputUnits
     get inputUnits() { return [ this.xUnit, this.yUnit ] }
