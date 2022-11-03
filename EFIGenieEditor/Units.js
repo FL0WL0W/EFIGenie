@@ -74,6 +74,7 @@ function GetMeasurementNameFromUnitName(unit){
 }
 
 function GetDefaultUnitFromMeasurement(measurement) {
+    if(Array.isArray(measurement)) measurement = measurement[0]
     return Measurements[measurement]?.[0]?.name
 }
 

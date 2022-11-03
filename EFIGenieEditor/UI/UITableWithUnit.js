@@ -54,7 +54,7 @@ export default class UITableWithUnit extends UITemplate {
     set xDisplayAxis(xDisplayAxis) { this.displayValueElement.xAxis = xDisplayAxis }
 
     _xUnit
-    get xUnit() { return Array.isArray(this._xUnit)? this._xUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.xDisplayUnit)) : this._xUnit ?? this.xDisplayUnit }
+    get xUnit() { return Array.isArray(this._xUnit)? this._xUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.xDisplayUnit)) : (this._xUnit ?? this.xDisplayUnit) }
     set xUnit(xUnit) { 
         if(objectTester(this._xUnit, xUnit)) return
 
@@ -91,14 +91,14 @@ export default class UITableWithUnit extends UITemplate {
     set yDisplayAxis(yDisplayAxis) { this.displayValueElement.yAxis = yDisplayAxis }
 
     _yUnit
-    get yUnit() { return Array.isArray(this._yUnit)? this._yUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.yDisplayUnit)) : this._yUnit ?? this.yDisplayUnit }
+    get yUnit() { return Array.isArray(this._yUnit)? this._yUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.yDisplayUnit)) : (this._yUnit ?? this.yDisplayUnit) }
     set yUnit(yUnit) { 
         if(objectTester(this._yUnit, yUnit)) return
 
         const newUnit = Array.isArray(yUnit)? yUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.yDisplayUnit)) : yUnit
         const newAxis = ConvertValueFromUnitToUnit(this.yAxis, this.yUnit, newUnit)
         this._yUnit = yUnit
-        this.xDisplayUnit ??= Array.isArray(yUnit)? yUnit[0] : yUnit
+        this.yDisplayUnit ??= Array.isArray(yUnit)? yUnit[0] : yUnit
         this.yAxis = newAxis
     }
     #yAxis
@@ -181,11 +181,11 @@ export default class UITableWithUnit extends UITemplate {
         })
         this.displayValueElement.addEventListener(`change`, function() {
             if(thisClass.displayValue != undefined && thisClass.displayUnit)
-                thisClass.#value = ConvertValueFromUnitToUnit(thisClass.displayValue, thisClass.displayUnit, thisClass.valueUnit)
+                thisClass.value = ConvertValueFromUnitToUnit(thisClass.displayValue, thisClass.displayUnit, thisClass.valueUnit)
             if(thisClass.xDisplayAxis != undefined && thisClass.xDisplayUnit)
-                thisClass.#xAxis = ConvertValueFromUnitToUnit(thisClass.xDisplayAxis, thisClass.xDisplayUnit, thisClass.xUnit)
+                thisClass.xAxis = ConvertValueFromUnitToUnit(thisClass.xDisplayAxis, thisClass.xDisplayUnit, thisClass.xUnit)
             if(thisClass.yDisplayAxis != undefined && thisClass.yDisplayUnit)
-                thisClass.#yAxis = ConvertValueFromUnitToUnit(thisClass.yDisplayAxis, thisClass.yDisplayUnit, thisClass.yUnit)
+                thisClass.yAxis = ConvertValueFromUnitToUnit(thisClass.yDisplayAxis, thisClass.yDisplayUnit, thisClass.yUnit)
             thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.#xLabelElementWithUnit.append(this.#xLabelElement)
@@ -212,7 +212,9 @@ export default class UITableWithUnit extends UITemplate {
             value: this.value,
             xAxis: this.xAxis,
             yAxis: this.yAxis,
-            ...(this.displayUnitElement.saveValue != undefined) && { unit: this.displayUnitElement.saveValue }
+            ...(this.displayUnitElement.saveValue != undefined) && { unit: this.displayUnitElement.saveValue },
+            ...(this.xDisplayUnitElement.saveValue != undefined) && { xUnit: this.xDisplayUnitElement.saveValue },
+            ...(this.yDisplayUnitElement.saveValue != undefined) && { yUnit: this.yDisplayUnitElement.saveValue }
         }
     }
     set saveValue(saveValue){
@@ -222,6 +224,10 @@ export default class UITableWithUnit extends UITemplate {
         this.yAxis = saveValue.yAxis
         if(saveValue.unit != undefined)
             this.displayUnitElement.saveValue = saveValue.unit
+        if(saveValue.xUnit != undefined)
+            this.xDisplayUnitElement.saveValue = saveValue.xUnit
+        if(saveValue.yUnit != undefined)
+            this.yDisplayUnitElement.saveValue = saveValue.yUnit
     }
 
     UpdateDisplayValue() {

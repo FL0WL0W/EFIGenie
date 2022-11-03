@@ -25,12 +25,11 @@ export default class UIUnit extends UISelection {
     _measurement
     get measurement() { return Array.isArray(this._measurement)? this._measurement.find(x => x === GetMeasurementNameFromUnitName(this.value)) : this._measurement }
     set measurement(measurement){
-        if(this._measurement === measurement) return
+        if(objectTester(this._measurement, measurement)) return
         if(!measurement) {
             this.options = UIUnit.allMeasurementOptions
             this.default = ``
         } else {
-            this.value = undefined
             this._measurement = measurement
             this.default = GetDefaultUnitFromMeasurement(measurement)
             if(Array.isArray(measurement))
@@ -38,6 +37,7 @@ export default class UIUnit extends UISelection {
                     .map(x=> x.group? { group: x.group, options: x.options.map(y=> { return { ...y, selectedName: undefined} } ) } : { ...x, selectedName: x.value === ``? x.selectedName : x.value } )
             else
                 this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
+            this.value = this.default
         }
         if(this.value == undefined || this.value === `` || this.value === null) this.value = this.default
         if(this.options.length === 0) super.hidden = true

@@ -1,8 +1,8 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
-import UISelection from "../JavascriptUI/UISelection.js"
 import UIDialog from "../JavascriptUI/UIDialog.js"
 import UIGraph2D from "../JavascriptUI/UIGraph2D.js"
 import UITableWithUnit from "../UI/UITableWithUnit.js"
+import UIParameterWithUnit from "../UI/UIParameterWithUnit.js"
 export default class Calculation_LookupTable extends UITemplate {
     static displayName = `Lookup Table`
     static outputTypes = [ `float` ]
@@ -21,6 +21,11 @@ export default class Calculation_LookupTable extends UITemplate {
         const thisClass = this
         this.graph.addEventListener(`change`, function() {
             thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
+        })
+        this.table.addEventListener(`change`, e => {
+            if(!this.parameterSelection)
+                return
+            this.parameterSelection.displayUnit = this.table.xDisplayUnit
         })
         this.table.attachToTable(this.graph)
         this.dialog.content.append(this.graph)
@@ -62,10 +67,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set xAxis(xAxis) { this.table.xAxis = xAxis }
 
     get xOptions() { return this.parameterSelection?.options }
-    set xOptions(options) {
-        if(!this.parameterSelection || objectTester(this.parameterSelection.options, options)) return
-        this.parameterSelection.options = options
-    }
+    set xOptions(options) { if(this.parameterSelection) this.parameterSelection.options = options }
 
     get noParameterSelection() {
         if(this.parameterSelection) return false
@@ -79,14 +81,14 @@ export default class Calculation_LookupTable extends UITemplate {
         }
 
         if(!this.parameterSelection) {
-            this.parameterSelection = new UISelection({
-                options: GetSelectionsCombinedUnits(this._inputUnits?.[0]),
-                class: `TableParameterSelect`
+            this.parameterSelection = new UIParameterWithUnit({
+                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
             })
+            this.parameterSelection.unitSelection.hidden = true
             const thisClass = this
             this.parameterSelection.addEventListener(`change`, function() {
-                const xUnit = thisClass.parameterSelection.selectedOption?.value.unit
                 if(thisClass._inputUnits?.[0] == undefined) {
+                    const xUnit = thisClass.parameterSelection.units
                     thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
                     thisClass.xUnit = xUnit
                 }
@@ -115,12 +117,9 @@ export default class Calculation_LookupTable extends UITemplate {
     set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
     get value() { return { ...super.value, 
         table: this.table.saveValue, 
-        graph: undefined, 
-        ...(this.parameterSelection) && { parameterSelection: { ...this.parameterSelection.value, unit: this.xUnit } } 
+        graph: undefined
     } }
     set value(value) { 
-        if(value.parameterSelection?.unit != undefined)
-            this.xDisplayUnit = value.parameterSelection.unit
         value.table = value.graph = value.table.value
         super.value = value 
     }
@@ -138,7 +137,7 @@ export default class Calculation_LookupTable extends UITemplate {
     get inputUnits() { return [ this.xUnit ] }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits?.[0]
-        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
+        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
         this.xUnit = inputUnits?.[0]
         if(inputUnits?.[0] != undefined)
             this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
@@ -153,7 +152,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
+        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         
