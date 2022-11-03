@@ -80,15 +80,16 @@ export default class Calculation_LookupTable extends UITemplate {
 
         if(!this.parameterSelection) {
             this.parameterSelection = new UISelection({
-                options: this.GetSelections(),
+                options: GetSelectionsCombinedUnits(this._inputUnits?.[0]),
                 class: `TableParameterSelect`
             })
             const thisClass = this
             this.parameterSelection.addEventListener(`change`, function() {
                 const xUnit = thisClass.parameterSelection.selectedOption?.value.unit
-                if(thisClass._inputUnits?.[0] == undefined)
+                if(thisClass._inputUnits?.[0] == undefined) {
                     thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
-                thisClass.xUnit = xUnit
+                    thisClass.xUnit = xUnit
+                }
             })
             this.table.xLabel = this.parameterSelection
         } else {
@@ -112,8 +113,14 @@ export default class Calculation_LookupTable extends UITemplate {
     set measurement(measurement) { this.table.measurement = measurement }
     get valueUnit() { return this.table.valueUnit }
     set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
-    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
+    get value() { return { ...super.value, 
+        table: this.table.saveValue, 
+        graph: undefined, 
+        ...(this.parameterSelection) && { parameterSelection: { ...this.parameterSelection.value, unit: this.xUnit } } 
+    } }
     set value(value) { 
+        if(value.parameterSelection?.unit != undefined)
+            this.xDisplayUnit = value.parameterSelection.unit
         value.table = value.graph = value.table.value
         super.value = value 
     }
@@ -131,7 +138,7 @@ export default class Calculation_LookupTable extends UITemplate {
     get inputUnits() { return [ this.xUnit ] }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits?.[0]
-        this.xOptions = defaultFilter(this._inputUnits, [ `float` ])
+        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
         this.xUnit = inputUnits?.[0]
         if(inputUnits?.[0] != undefined)
             this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
@@ -146,7 +153,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = this.GetSelections()
+        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         
@@ -159,43 +166,6 @@ export default class Calculation_LookupTable extends UITemplate {
                 } 
             }
         }
-    }
-
-    GetSelections() {
-        let gotoptions = GetSelections(undefined, defaultFilter(this._inputUnits, [ `float` ]))
-        let options = []
-        for(let topOptionIndex in gotoptions) {
-            const topOption = gotoptions[topOptionIndex]
-            if(topOption.group) {
-                let group = { group: topOption.group, options: []}
-                for(let optionIndex in topOption.options) {
-                    const option = topOption.options[optionIndex]
-                    let found = group.options.find(x=> x.name === option.name && x.value.name === option.value.name)
-                    if(found) {
-                        if(Array.isArray(found.value.unit)) {
-                            if(found.value.unit.indexOf(option.value.unit) < 0)
-                                found.value.unit.push(option.value.unit)
-                        } else if (found.value.unit !== option.value.unit)
-                            found.value.unit = [ found.value.unit, option.value.unit ]
-                    } else {
-                        group.options.push({...option, info: undefined})
-                    }
-                }
-                options.push(group)
-            } else {
-                let found = options.find(x=> x.name === topOption.name && x.value.name === topOption.value.name)
-                if(found) {
-                    if(Array.isArray(found.value.unit)) {
-                        if(found.value.unit.indexOf(topOption.value.unit) < 0)
-                            found.value.unit.push(topOption.value.unit)
-                    } else if (found.value.unit !== topOption.value.unit)
-                        found.value.unit = [ found.value.unit, topOption.value.unit ]
-                } else {
-                    options.push({...topOption, info: undefined})
-                }
-            }
-        }
-        return options
     }
 }
 GenericConfigs.push(Calculation_LookupTable)

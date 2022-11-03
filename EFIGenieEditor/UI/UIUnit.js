@@ -23,7 +23,7 @@ export default class UIUnit extends UISelection {
     }
 
     _measurement
-    get measurement() { return this._measurement }
+    get measurement() { return Array.isArray(this._measurement)? this._measurement.find(x => x === GetMeasurementNameFromUnitName(this.value)) : this._measurement }
     set measurement(measurement){
         if(this._measurement === measurement) return
         if(!measurement) {
@@ -35,7 +35,7 @@ export default class UIUnit extends UISelection {
             this.default = GetDefaultUnitFromMeasurement(measurement)
             if(Array.isArray(measurement))
                 this.options = UIUnit.allMeasurementOptions.filter(x => measurement.indexOf(x.group) !== -1 || measurement.some(y=>x.name?.indexOf(y) === 0))
-                    .map(x=> x.group? { group: x.group, options: x.options.map(y=> { return { ...y, selectedName: undefined} } ) } : { ...x, selectedName: x.value} )
+                    .map(x=> x.group? { group: x.group, options: x.options.map(y=> { return { ...y, selectedName: undefined} } ) } : { ...x, selectedName: x.value === ``? x.selectedName : x.value } )
             else
                 this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
         }

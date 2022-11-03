@@ -111,12 +111,14 @@ export default class Calculation_2AxisTable extends UITemplate {
         if(!this.XSelection) {
             this.XSelection = new UISelection({
                 selectHidden: true,
-                options: GetSelections(undefined, defaultFilter([this._inputUnits?.[0]], [ `float` ])),
+                options: GetSelectionsCombinedUnits(this._inputUnits?.[0])
             })
             this.XSelection.addEventListener(`change`, function() {
-                thisClass.xUnit = thisClass.XSelection.selectedOption?.value.unit
-                if(thisClass._inputUnits?.[0] == undefined)
-                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(thisClass.xUnit)
+                const xUnit = thisClass.XSelection.selectedOption?.value.unit
+                if(thisClass._inputUnits?.[0] == undefined){
+                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+                    thisClass.xUnit = xUnit
+                }
             })
             this.table.xLabel = this.XSelection
         } else {
@@ -126,12 +128,14 @@ export default class Calculation_2AxisTable extends UITemplate {
         if(!this.YSelection) {
             this.YSelection = new UISelection({
                 selectHidden: true,
-                options: GetSelections(undefined, defaultFilter([this._inputUnits?.[1]], [ `float` ])),
+                options: GetSelectionsCombinedUnits(this._inputUnits?.[1])
             })
             this.YSelection.addEventListener(`change`, function() {
-                thisClass.yUnit = thisClass.YSelection.selectedOption?.value.unit
-                if(thisClass._inputUnits?.[1] == undefined)
-                    thisClass.yMeasurement = GetMeasurementNameFromUnitName(thisClass.yUnit)
+                const yUnit = thisClass.YSelection.selectedOption?.value.unit
+                if(thisClass._inputUnits?.[1] == undefined){
+                    thisClass.yMeasurement = GetMeasurementNameFromUnitName(yUnit)
+                    thisClass.yUnit = yUnit
+                }
             })
             this.table.yLabel = this.YSelection
         } else {
@@ -155,7 +159,12 @@ export default class Calculation_2AxisTable extends UITemplate {
     set measurement(measurement) { this.table.measurement = measurement }
     get valueUnit() { return this.table.valueUnit }
     set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
-    get value() { return { ...super.value, table: this.table.saveValue, graph: undefined } }
+    get value() { return { ...super.value, table: 
+        this.table.saveValue, 
+        graph: undefined,
+        ...(this.XSelection) && { XSelection: { ...this.XSelection.value, unit: this.xUnit } },
+        ...(this.YSelection) && { YSelection: { ...this.YSelection.value, unit: this.yUnit } } 
+    } }
     set value(value) { 
         value.table = value.graph = value.table.value
         super.value = value 
@@ -171,11 +180,13 @@ export default class Calculation_2AxisTable extends UITemplate {
     }
 
     _inputUnits
-    get inputUnits() { return [ this.xUnit ] }
+    get inputUnits() { return [ this.xUnit, this.yUnit ] }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits?.[0]
-        this.xOptions = defaultFilter(this._inputUnits, [ `float` ])
+        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
+        this.yOptions = GetSelectionsCombinedUnits(this._inputUnits?.[1])
         this.xUnit = inputUnits?.[0]
+        this.yUnit = inputUnits?.[1]
         if(inputUnits?.[0] != undefined)
             this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
         if(inputUnits?.[1] != undefined)
@@ -193,8 +204,8 @@ export default class Calculation_2AxisTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter([this._inputUnits?.[0]], [ `float` ]))
-        this.yOptions = GetSelections(undefined, defaultFilter([this._inputUnits?.[1]], [ `float` ]))
+        this.xOptions = GetSelectionsCombinedUnits(this._inputUnits?.[0])
+        this.yOptions = GetSelectionsCombinedUnits(this._inputUnits?.[1])
         if(communication.variablesToPoll.indexOf(this.XSelection?.value) === -1)
             communication.variablesToPoll.push(this.XSelection?.value)
         if(communication.variablesToPoll.indexOf(this.YSelection?.value) === -1)

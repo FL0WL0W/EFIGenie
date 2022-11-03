@@ -49,23 +49,20 @@ export default class UITableWithUnit extends UITemplate {
     get xMeasurement() { return this.xDisplayUnitElement.measurement }
     set xMeasurement(xMeasurement) { this.xDisplayUnitElement.measurement = xMeasurement }
     get xDisplayUnit() { return this.xDisplayUnitElement.value }
-    set xDisplayUnit(xDisplayUnit) { this.xDisplayUnitElement.value = xDisplayUnit ?? this._xUnit }
+    set xDisplayUnit(xDisplayUnit) { this.xDisplayUnitElement.value = xDisplayUnit }
     get xDisplayAxis() { return this.displayValueElement.xAxis }
     set xDisplayAxis(xDisplayAxis) { this.displayValueElement.xAxis = xDisplayAxis }
 
     _xUnit
-    get xUnit() { return this._xUnit ?? this.xDisplayUnit }
+    get xUnit() { return Array.isArray(this._xUnit)? this._xUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.xDisplayUnit)) : this._xUnit ?? this.xDisplayUnit }
     set xUnit(xUnit) { 
         if(objectTester(this._xUnit, xUnit)) return
-        if(Array.isArray(xUnit) && xUnit.indexOf(this._xUnit) < 0)
-            xUnit = xUnit[0]
-        else
-            xUnit = this._xUnit
 
-        let newXAxis = this.xAxis == undefined? undefined : this.xAxis.map(x => ConvertValueFromUnitToUnit(x, this._xUnit, xUnit))
+        const newUnit = Array.isArray(xUnit)? xUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.xDisplayUnit)) : xUnit
+        const newAxis = this.xAxis == undefined? undefined : this.xAxis.map(x => ConvertValueFromUnitToUnit(x, this.xUnit, newUnit))
         this._xUnit = xUnit
-        this.xDisplayUnit ??= xUnit
-        this.xAxis = newXAxis
+        this.xDisplayUnit ??= Array.isArray(xUnit)? xUnit[0] : xUnit
+        this.xAxis = newAxis
     }
     #xAxis
     get xAxis() { return this.#xAxis }
@@ -89,18 +86,20 @@ export default class UITableWithUnit extends UITemplate {
     get yMeasurement() { return this.yDisplayUnitElement.measurement }
     set yMeasurement(yMeasurement) { this.yDisplayUnitElement.measurement = yMeasurement }
     get yDisplayUnit() { return this.yDisplayUnitElement.value }
-    set yDisplayUnit(yDisplayUnit) { this.yDisplayUnitElement.value = yDisplayUnit ?? this._yUnit }
+    set yDisplayUnit(yDisplayUnit) { this.yDisplayUnitElement.value = yDisplayUnit }
     get yDisplayAxis() { return this.displayValueElement.yAxis }
     set yDisplayAxis(yDisplayAxis) { this.displayValueElement.yAxis = yDisplayAxis }
 
     _yUnit
-    get yUnit() { return this._yUnit ?? this.yDisplayUnit }
+    get yUnit() { return Array.isArray(this._yUnit)? this._yUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.yDisplayUnit)) : this._yUnit ?? this.yDisplayUnit }
     set yUnit(yUnit) { 
-        if(this._yUnit === yUnit) return
-        let newYAxis = this.yAxis == undefined? undefined : this.yAxis.map(x => ConvertValueFromUnitToUnit(x, this._yUnit, yUnit))
+        if(objectTester(this._yUnit, yUnit)) return
+
+        const newUnit = Array.isArray(yUnit)? yUnit.find(x => GetMeasurementNameFromUnitName(x) === GetMeasurementNameFromUnitName(this.yDisplayUnit)) : yUnit
+        const newAxis = this.yAxis == undefined? undefined : this.yAxis.map(x => ConvertValueFromUnitToUnit(x, this.yUnit, newUnit))
         this._yUnit = yUnit
-        this.yDisplayUnit ??= yUnit
-        this.yAxis = newYAxis
+        this.xDisplayUnit ??= Array.isArray(yUnit)? yUnit[0] : yUnit
+        this.yAxis = newAxis
     }
     #yAxis
     get yAxis() { return this.#yAxis }
