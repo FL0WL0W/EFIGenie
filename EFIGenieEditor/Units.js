@@ -43,7 +43,11 @@ function ConvertValueFromUnitToUnit(value, fromUnit, toUnit) {
     fromUnit = GetUnitFromName(fromUnit)
     let toMeasurement = GetMeasurementNameFromUnitName(toUnit)
     toUnit = GetUnitFromName(toUnit)
-    return fromUnit == undefined || toUnit == undefined || fromMeasurement !== toMeasurement ? value : (value - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset
+    if(value == undefined || fromUnit == undefined || toUnit == undefined || fromMeasurement !== toMeasurement)
+        return value
+    if(Array.isArray(value))
+        return value.map(x => x == undefined? x : (x - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset)
+    return (value - fromUnit.SIOffset) / fromUnit.SIMultiplier * toUnit.SIMultiplier + toUnit.SIOffset
 }
 
 function GetUnitFromName(unitName) { return unitName == undefined? undefined :

@@ -189,6 +189,10 @@ export default class Calculation_Formula extends UITemplate {
             thisClass.parameters = parameters
         })
         this.Setup(prop)
+    }
+    
+    Setup(prop) {
+        super.Setup(prop)
         this.editFormula.content.append(this.querySelector(`[data-element="editFormulaContent"]`))
     }
 

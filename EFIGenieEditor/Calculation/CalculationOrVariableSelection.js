@@ -5,6 +5,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     static template = `<label><span data-element="labelElement"></span>:</label><div data-element="selection"></div><div data-element="liveUpdate"></div><span data-element="calculationContent"></span>`
     calculationContent = document.createElement(`span`)
     calculationValues = []
+    calculationSaveValueCache = []
 
     labelElement = document.createElement(`span`)
     get label() { return this.labelElement.textContent }
@@ -182,40 +183,18 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
     set saveValue(saveValue) {
         saveValue ??= {}
-        
+
         for (var i = 0; i < saveValue.calculationValues?.length ?? 0; i++) {
-            var found = false
             for (var t = 0; t < this.calculationValues.length; t++) {
-                if (saveValue.calculationValues[i].className === this.calculationValues[i]?.constructor.name){
+                if ((saveValue.calculationValues[i]?.className ?? 0) === this.calculationValues[i]?.constructor.name){
                     this.calculationValues[t].saveValue = saveValue.calculationValues[i]
-                    found = true
                     break
                 }
             }
-            if (!found && this.calculations) {
-                var configGroups = this.calculations
-                if(!this.calculations[0]?.group && !this.calculations[0]?.calculations)
-                    configGroups = [{ group: `Calculations`, calculations: this.calculations }]
-        
-                for(var c = 0; c < configGroups.length; c++) {
-                    const calculations = configGroups[c].calculations
-                    for (var t = 0; t < calculations.length; t++) {
-                        if (saveValue.calculationValues[i].className !== calculations[t].name)
-                            continue
-                        this.calculationValues.push(new calculations[t]({
-                            noParameterSelection: this.noParameterSelection,
-                            label: this.label,
-                            xLabel: this.xLabel,
-                            yLabel: this.yLabel,
-                            saveValue: saveValue.calculationValues[i],
-                            outputUnits: this._outputUnits,
-                            displayUnits: this.displayUnits,
-                            calculations: this.calculations
-                        }))
-                    }
-                }
-            }
         }
+        if(saveValue.calculationValues)
+            this.calculationSaveValueCache = saveValue.calculationValues.filter(x => !saveValue.calculationValues.find(y => y?.constructor.name === (x?.className ?? 0)))
+        
 
         super.saveValue = saveValue
     }
@@ -287,16 +266,27 @@ export default class CalculationOrVariableSelection extends UITemplate {
             for (var i = 0; i < calculations.length; i++) {
                 if (calculations[i] == undefined || calculations[i].name !== this.selection.value)
                     continue
+                var found = false
+                for (var t = 0; t < this.calculationSaveValueCache.length; t++) {
+                    if (this.calculationSaveValueCache[t]?.className === this.selection.value){
+                        found = this.calculationSaveValueCache[t]
+                        this.calculationSaveValueCache.splice(t, 1)
+                        break
+                    }
+                }
                 this.calculationValues.push(new calculations[i]())
                 this.calculationValues[this.calculationValues.length-1].Setup({
                     noParameterSelection: this.noParameterSelection,
                     label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
+                    ...found && {saveValue: found},
                     outputUnits: this._outputUnits,
                     displayUnits: this.displayUnits,
                     calculations: this.calculations
                 })
+                if(found)
+                    this.calculationValues[this.calculationValues.length-1].saveValue = found
                 return this.calculationValues.length-1
             }
         }
