@@ -128,6 +128,7 @@ export default class Calculation_LookupTable extends UITemplate {
         graph: undefined
     } }
     set value(value) { 
+        value = {...value}
         const table = value.table
         delete value.table
         super.value = value 
@@ -140,6 +141,7 @@ export default class Calculation_LookupTable extends UITemplate {
     }
     set saveValue(saveValue) { 
         const table = saveValue.table
+        saveValue = {...saveValue}
         delete saveValue.table
         super.saveValue = saveValue
         if(table !== undefined)

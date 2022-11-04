@@ -181,6 +181,7 @@ export default class Calculation_2AxisTable extends UITemplate {
         graph: undefined
     } }
     set value(value) { 
+        value = {...value}
         const table = value.table
         delete value.table
         super.value = value 
@@ -192,6 +193,7 @@ export default class Calculation_2AxisTable extends UITemplate {
         return saveValue
     }
     set saveValue(saveValue) { 
+        saveValue = {...saveValue}
         const table = saveValue.table
         delete saveValue.table
         super.saveValue = saveValue

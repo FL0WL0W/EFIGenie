@@ -14,7 +14,7 @@ export default class UITableWithUnit extends UITemplate {
     get measurement() { return this.displayUnitElement.measurement }
     set measurement(measurement) { this.displayUnitElement.measurement = measurement }
     get displayUnit() { return this.displayUnitElement.value }
-    set displayUnit(displayUnit) { console.log(this.displayUnitElement.value = displayUnit ?? this._valueUnit) }
+    set displayUnit(displayUnit) { this.displayUnitElement.value = displayUnit ?? this._valueUnit }
     get displayValue() { return this.displayValueElement.value }
     set displayValue(displayValue) { this.displayValueElement.value = displayValue }
 

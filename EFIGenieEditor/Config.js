@@ -482,7 +482,7 @@ x86TypeAlignment = [
 ]
 
 function Packagize(definition, val) {
-    val ??= {}
+    val = {...val}
     val.outputVariables ??= this.outputVariables
     val.outputUnits = val.unit == undefined? val.outputUnits : [val.unit]
     val.outputUnits ??= this.unit == undefined? this.outputUnits : [this.unit]

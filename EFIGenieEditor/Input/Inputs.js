@@ -19,7 +19,8 @@ export default class Inputs extends UITemplate {
     get value() { return { ...super.value, targetDevice: this.targetDevice } }
     set value(value) {
         if(!value) return
-
+        value = {...value}
+        
         if(value.targetDevice) {
             this.targetDevice = value.targetDevice
             delete value.targetDevice
@@ -30,6 +31,7 @@ export default class Inputs extends UITemplate {
 
     get saveValue() { return { ...super.saveValue, targetDevice: this.targetDevice } }
     set saveValue(saveValue) {
+        saveValue = {...saveValue}
         if(!saveValue) return
         if(saveValue.targetDevice) {
             this.targetDevice = saveValue.targetDevice

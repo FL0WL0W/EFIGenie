@@ -46,12 +46,19 @@ export default class Calculation_Formula extends UITemplate {
                 parameterUnit.addEventListener(`change`, e => {
                     const subConfig = parameterValue.SubConfig
                     if(subConfig)
-                        subConfig.displayUnits = [ parameterUnit.value ]
+                        subConfig.displayUnits = subConfig.outputUnits = [ parameterUnit.value ]
+                })
+                parameterValue.selection.addEventListener(`change`, e => {
+                    const subConfig = parameterValue.SubConfig
+                    if(subConfig && subConfig.outputUnits?.[0] == undefined) {
+                        subConfig.outputUnits = [ parameterUnit.value ?? this.outputUnits?.[0] ]
+                    }
                 })
                 parameterValue.addEventListener(`change`, e => {
                     const subConfig = parameterValue.SubConfig
                     if(subConfig) {
-                        parameterUnit.value = subConfig.displayUnits?.[0]
+                        if(subConfig.outputUnits?.[0] != undefined)
+                            parameterUnit.value = subConfig.outputUnits?.[0]
                         parameterUnit.hidden = false
                     } else {
                         parameterUnit.hidden = true
@@ -142,6 +149,11 @@ export default class Calculation_Formula extends UITemplate {
             parameterValue.style.display = `inline`
 
             parameterValue.value = value.parameterValues[parameter]
+            if(this.parameterUnits[parameter])
+                this.parameterUnits[parameter].value = value.parameterValues[parameter].outputUnits?.[0]
+            else if(saveValue.parameterUnits?.[parameter] && parameterValue.SubConfig)
+                parameterValue.SubConfig.outputUnits = value.parameterValues[parameter].outputUnits
+            parameterValue.value = value.parameterValues[parameter]
         }
     }
 
@@ -149,8 +161,10 @@ export default class Calculation_Formula extends UITemplate {
         let saveValue = super.saveValue ?? {}
         
         saveValue.parameterValues = {}
+        saveValue.parameterUnits = {}
         for(let parameter in this.parameterValues) {
             saveValue.parameterValues[parameter] = this.parameterValues[parameter]?.saveValue
+            saveValue.parameterUnits[parameter] = this.parameterUnits[parameter]?.value
         }
 
         return saveValue
@@ -167,10 +181,15 @@ export default class Calculation_Formula extends UITemplate {
                 label: parameter,
                 calculations: this.calculations,
                 outputTypes: [ `bool|float` ],
-                displayUnits: this.outputUnits
+                displayUnits: this.outputUnits,
             })
             parameterValue.style.display = `inline`
 
+            parameterValue.saveValue = saveValue.parameterValues[parameter]
+            if(this.parameterUnits[parameter])
+                this.parameterUnits[parameter].value = saveValue.parameterUnits[parameter]
+            else if(saveValue.parameterUnits?.[parameter] && parameterValue.SubConfig)
+                parameterValue.SubConfig.outputUnits = [ saveValue.parameterUnits[parameter] ]
             parameterValue.saveValue = saveValue.parameterValues[parameter]
         }
     }
@@ -220,6 +239,7 @@ export default class Calculation_Formula extends UITemplate {
     
     Setup(prop) {
         super.Setup(prop)
+        this.editFormula.content.innerHTML = ``
         this.editFormula.content.append(this.querySelector(`[data-element="editFormulaContent"]`))
     }
 

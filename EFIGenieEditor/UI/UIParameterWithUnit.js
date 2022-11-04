@@ -57,6 +57,7 @@ export default class UIParameterWithUnit extends UITemplate {
     }
     set value(value) {
         if(typeof value === `object`) {
+            value = {...value}
             if(this.optionUnits[value.name] !== undefined)
                 this.unitSelection.value = value.unit
             delete value.unit
@@ -72,6 +73,7 @@ export default class UIParameterWithUnit extends UITemplate {
     }
     set saveValue(saveValue) {
         if(typeof saveValue === `object`) {
+            saveValue = {...saveValue}
             if(this.optionUnits[saveValue.name] !== undefined)
                 this.unitSelection.saveValue = saveValue.unit
             delete saveValue.unit

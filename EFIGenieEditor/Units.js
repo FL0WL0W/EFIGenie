@@ -19,7 +19,7 @@ var MassFlowUnits = [ { name: `g/s`, SIMultiplier: 1, SIOffset: 0 }, { name: `g/
 var ResistanceUnits = [ { name: `Ω`, SIMultiplier: 1, SIOffset: 0 }, { name: `kΩ`, SIMultiplier: 0.001, SIOffset: 0 } ]
 
 var Measurements = {
-    None: BlankUnits,
+    'No Unit': BlankUnits,
     Voltage: VoltageUnits,
     Temperature: TemperatureUnits,
     Pressure: PressureUnits,
