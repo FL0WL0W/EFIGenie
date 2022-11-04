@@ -63,6 +63,9 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.#coeffecientElement.firstChild.addEventListener(`change`, function() {
             thisClass.displayUnits = thisClass.displayUnits
         })
+        this.Setup(prop)
+    }
+    Setup(prop) {
         Object.assign(this, prop)
     }
     get coeffecients() { return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })  }

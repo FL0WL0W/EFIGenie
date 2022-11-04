@@ -123,6 +123,10 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.selection.addEventListener(`change`, function() {
             thisClass.calculationContent.replaceChildren(thisClass.SubConfig ?? ``)
             thisClass.liveUpdate.measurement = GetMeasurementNameFromUnitName(thisClass.outputUnits?.[0])
+            if(thisClass._outputUnits?.[0] == undefined)
+                thisClass.selection.unitHidden = false
+            else
+                thisClass.selection.unitHidden = true
         })
         this.style.display = `block`
         this.Setup(prop)

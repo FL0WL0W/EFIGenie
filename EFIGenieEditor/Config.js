@@ -136,7 +136,7 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
             if(inputTypes?.length || inputUnits?.length) return false
             if(outputUnits?.[0] != undefined) {
                 if(outputUnits.length !== 1) return false
-                if(calcOrVar.unit !== outputUnits[0]) return false
+                if(GetMeasurementNameFromUnitName(calcOrVar.unit) !== GetMeasurementNameFromUnitName(outputUnits[0])) return false
             } else if(outputTypes?.[0] != undefined){
                 if(outputTypes.length !== 1) return false
                 if(calcOrVar.unit == undefined && calcOrVar.type == undefined ) return false
@@ -176,42 +176,6 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
         }
         return true
     }
-}
-function GetSelectionsCombinedUnits(inputUnits) {
-    let gotoptions = GetSelections(undefined, defaultFilter(inputUnits, [ `float` ]))
-    let options = []
-    for(let topOptionIndex in gotoptions) {
-        const topOption = gotoptions[topOptionIndex]
-        if(topOption.group) {
-            let group = { group: topOption.group, options: []}
-            for(let optionIndex in topOption.options) {
-                const option = topOption.options[optionIndex]
-                let found = group.options.find(x=> x.name === option.name && x.value.name === option.value.name)
-                if(found) {
-                    if(Array.isArray(found.value.unit)) {
-                        if(found.value.unit.indexOf(option.value.unit) < 0)
-                            found.value.unit.push(option.value.unit)
-                    } else if (found.value.unit !== option.value.unit)
-                        found.value.unit = [ found.value.unit, option.value.unit ]
-                } else {
-                    group.options.push({...option, info: undefined})
-                }
-            }
-            options.push(group)
-        } else {
-            let found = options.find(x=> x.name === topOption.name && x.value.name === topOption.value.name)
-            if(found) {
-                if(Array.isArray(found.value.unit)) {
-                    if(found.value.unit.indexOf(topOption.value.unit) < 0)
-                        found.value.unit.push(topOption.value.unit)
-                } else if (found.value.unit !== topOption.value.unit)
-                    found.value.unit = [ found.value.unit, topOption.value.unit ]
-            } else {
-                options.push({...topOption, info: undefined})
-            }
-        }
-    }
-    return options
 }
 function GetSelections(calculations, filter) {
     var selections = []
