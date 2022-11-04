@@ -2,6 +2,7 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIDialog from "../JavascriptUI/UIDialog.js"
 import UIText from "../JavascriptUI/UIText.js"
+import UIUnit from "../UI/UIUnit.js"
 export default class Calculation_Formula extends UITemplate {
     static displayName = `Formula`
     static outputTypes = [ `bool|float` ]
@@ -13,6 +14,7 @@ export default class Calculation_Formula extends UITemplate {
     parameterValueElements = document.createElement(`div`)
 
     parameterValues = {}
+    parameterUnits = {}
     get parameters() {
         return [...this.parameterValueElements.children].map(e => e.name)
     }
@@ -28,21 +30,42 @@ export default class Calculation_Formula extends UITemplate {
         for(let i = 0; i < parameters.length; i++) { 
             let parameterValue = this.parameterValues[parameters[i]]
             if(!parameterValue) {
-                const label = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(0, parameters[i].indexOf(`(`)) : parameters[i];
-                let unit = parameters[i].indexOf(`(`) !== -1 ? parameters[i].substring(parameters[i].indexOf(`(`) + 1) : ``;
-                unit = unit.substring(0, unit.length -1)
                 parameterValue = this.parameterValues[parameters[i]] = new CalculationOrVariableSelection({
-                    label,
+                    label: parameters[i],
                     calculations: this.calculations,
                     outputTypes: [ `bool|float` ],
-                    outputUnits: [ unit ]
+                    displayUnits: this.outputUnits
                 })
+                parameterValue.style.display = `inline`
+            }
+            let parameterUnit = this.parameterUnits[parameters[i]]
+            if(!parameterUnit) {
+                parameterUnit = this.parameterUnits[parameters[i]] = new UIUnit({
+                    value: this.outputUnits?.[0]
+                })
+                parameterUnit.addEventListener(`change`, e => {
+                    const subConfig = parameterValue.SubConfig
+                    if(subConfig)
+                        subConfig.displayUnits = [ parameterUnit.value ]
+                })
+                parameterValue.addEventListener(`change`, e => {
+                    const subConfig = parameterValue.SubConfig
+                    if(subConfig) {
+                        parameterUnit.value = subConfig.displayUnits?.[0]
+                        parameterUnit.hidden = false
+                    } else {
+                        parameterUnit.hidden = true
+                    }
+                })
+                if(!parameterValue.SubConfig)
+                    parameterUnit.hidden = true
             }
             let formulaParameter = this.parameterElements.children[i]
             if(!formulaParameter) {
                 formulaParameter = this.parameterElements.appendChild(document.createElement(`div`))
             }
             formulaParameter.replaceChildren(parameterValue)
+            formulaParameter.appendChild(parameterUnit)
             let configParameter = this.parameterValueElements.children[i]
             if(!configParameter) {
                 configParameter = this.parameterValueElements.appendChild(document.createElement(`span`))
@@ -55,7 +78,7 @@ export default class Calculation_Formula extends UITemplate {
                     },
                     set: function(name) {
                         this._name = name
-                        this.firstChild.firstChild.innerText = name.indexOf(`(`) !== -1 ? name.substring(0, name.indexOf(`(`)) : name
+                        this.firstChild.firstChild.innerText = name
                     }
                 })
                 label.append(`:`)
@@ -113,8 +136,10 @@ export default class Calculation_Formula extends UITemplate {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
                 calculations: this.calculations,
-                outputTypes: [ `bool|float` ]
+                outputTypes: [ `bool|float` ],
+                displayUnits: this.outputUnits
             })
+            parameterValue.style.display = `inline`
 
             parameterValue.value = value.parameterValues[parameter]
         }
@@ -141,8 +166,10 @@ export default class Calculation_Formula extends UITemplate {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
                 label: parameter,
                 calculations: this.calculations,
-                outputTypes: [ `bool|float` ]
+                outputTypes: [ `bool|float` ],
+                displayUnits: this.outputUnits
             })
+            parameterValue.style.display = `inline`
 
             parameterValue.saveValue = saveValue.parameterValues[parameter]
         }
@@ -209,9 +236,7 @@ export default class Calculation_Formula extends UITemplate {
             }
 
             let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
-            let formulaWithoutUnits = this.formula.value;
-            Object.keys(Measurements).forEach(m => Measurements[m].forEach(u => formulaWithoutUnits = formulaWithoutUnits.replaceAll(`(${u.name})`, ``)))
-            if(!operators.some(o => formulaWithoutUnits.indexOf(o) > -1)) {
+            if(!operators.some(o => this.formula.value.indexOf(o) > -1)) {
                 this.parameterValues[this.parameters[0]]?.RegisterVariables(reference)
             } else {
                 this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter]?.RegisterVariables({ name: `${reference.name}_${thisClass.parameterValues[parameter].label}`, unit: thisClass.parameterValues[parameter].unit}) })

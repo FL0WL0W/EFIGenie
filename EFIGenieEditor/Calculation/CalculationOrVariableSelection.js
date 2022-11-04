@@ -1,6 +1,6 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
-import UISelection from "../JavascriptUI/UISelection.js"
 import UIDisplayLiveUpdate from "../UI/UIDisplayLiveUpdate.js"
+import UIParameterWithUnit from "../UI/UIParameterWithUnit.js"
 export default class CalculationOrVariableSelection extends UITemplate {
     static template = `<label><span data-element="labelElement"></span>:</label><div data-element="selection"></div><div data-element="liveUpdate"></div><span data-element="calculationContent"></span>`
     calculationContent = document.createElement(`span`)
@@ -54,8 +54,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get outputUnits() {
         return  this._outputUnits ?? 
                 GetClassProperty(this.SubConfig, `outputUnits`) ??      
-                (this.selection.value?.unit != undefined? undefined : (
-                    [ this.selection.value?.unit ]
+                (this.selection.displayUnit != undefined? undefined : (
+                    [ this.selection.displayUnit ]
                 ))
     }
     set outputUnits(outputUnits) {
@@ -98,21 +98,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get options() { return this.selection.options }    
     set options(options) {
         this.selection.options = options
-        let match = false
-        let stringValue = UISelection.ParseValue(`string`, this.selection.value)
-        this.selection.options.forEach(option => {
-            if(option.group){
-                option.options.forEach(option => {
-                    if(UISelection.ParseValue(`string`, option.value) === stringValue)
-                        match = true
-                })
-            } else {
-                if(UISelection.ParseValue(`string`, option.value) === stringValue)
-                    match = true
-            }
-        })
-
-        if(!match) 
+        if(this.selection.selectedOption === undefined) 
             this.selection.value = this.selection.selectValue
 
         // if(options.length < 2) {
@@ -124,7 +110,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         // }
     }
 
-    selection = new UISelection({ selectDisabled: false, selectName: `None` })
+    selection = new UIParameterWithUnit({ selectDisabled: false, selectName: `None` })
     constructor(prop) {
         super()
         prop ??= {}
@@ -136,7 +122,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         var thisClass = this
         this.selection.addEventListener(`change`, function() {
             thisClass.calculationContent.replaceChildren(thisClass.SubConfig ?? ``)
-            thisClass.liveUpdate.valueUnit = thisClass.outputUnits?.[0]
+            thisClass.liveUpdate.measurement = GetMeasurementNameFromUnitName(thisClass.outputUnits?.[0])
         })
         this.style.display = `block`
         this.Setup(prop)
@@ -178,6 +164,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(saveValue.calculationValues?.length < 1)
             delete saveValue.calculationValues
 
+        if(typeof this.selection.value !== `string`)
+            saveValue.displayUnit = this.selection.displayUnit
+
         return saveValue
     }
 
@@ -195,8 +184,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
         if(saveValue.calculationValues)
             this.calculationSaveValueCache = saveValue.calculationValues.filter(x => !saveValue.calculationValues.find(y => y?.constructor.name === (x?.className ?? 0)))
         
-
         super.saveValue = saveValue
+
+        this.selection.displayUnit = saveValue.displayUnit
     }
 
     get value() {
@@ -219,6 +209,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
         const subConfig = this.SubConfig
         if(subConfig)
             subConfig.value = value?.calculation
+        this.selection.displayUnit = value?.outputUnits?.[0]
     }
 
     RegisterVariables(reference) {
@@ -280,7 +271,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
                     label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
-                    ...found && {saveValue: found},
                     outputUnits: this._outputUnits,
                     displayUnits: this.displayUnits,
                     calculations: this.calculations

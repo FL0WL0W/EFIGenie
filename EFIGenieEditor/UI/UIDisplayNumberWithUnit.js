@@ -6,8 +6,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     displayElement = document.createElement(`div`)
 
     constructor(prop) {
-        super()
-        this.Setup(prop)
+        super(prop)
         const thisClass = this
         this.displayUnitElement.addEventListener(`change`, function() {
             thisClass.ZeroesToAdd = 10000000

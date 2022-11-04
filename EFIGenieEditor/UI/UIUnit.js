@@ -4,9 +4,9 @@ export default class UIUnit extends UISelection {
         if(Measurements[measurement].length === 0 || (Measurements[measurement].length === 1 && Measurements[measurement][0].name === ``))
             return { name: measurement, value: `` }
         if(Measurements[measurement].length === 1)
-            return { name: `${measurement} [${Measurements[measurement][0].name}]`, value: Measurements[measurement][0].name }
+            return { selectedName: Measurements[measurement][0].name, name: `${measurement} [${Measurements[measurement][0].name}]`, value: Measurements[measurement][0].name }
 
-        return { group: measurement, options: Measurements[measurement]?.map(unit => { return { selectedName: `${measurement} [${unit.name}]`, name: `${unit.name}`, value: unit.name } }) } 
+        return { group: measurement, options: Measurements[measurement]?.map(unit => { return { selectedName: unit.name, name: `${unit.name}`, value: unit.name } }) } 
     })
 
     _hidden = false
@@ -31,13 +31,17 @@ export default class UIUnit extends UISelection {
             this.default = ``
         } else {
             this._measurement = measurement
-            this.default = GetDefaultUnitFromMeasurement(measurement)
-            if(Array.isArray(measurement))
+            if(GetMeasurementNameFromUnitName(this.default) !== measurement)
+                this.default = GetDefaultUnitFromMeasurement(measurement)
+            if(!Array.isArray(measurement))
+                measurement = [measurement]
+            if(measurement.length > 1)
                 this.options = UIUnit.allMeasurementOptions.filter(x => measurement.indexOf(x.group) !== -1 || measurement.some(y=>x.name?.indexOf(y) === 0))
                     .map(x=> x.group? { group: x.group, options: x.options.map(y=> { return { ...y, selectedName: undefined} } ) } : { ...x, selectedName: x.value === ``? x.selectedName : x.value } )
             else
-                this.options = Measurements[measurement]?.map(unit => { return { name: unit.name, value: unit.name } })
-            this.value = this.default
+                this.options = Measurements[measurement[0]]?.map(unit => { return { name: unit.name, value: unit.name } })
+            if(this.selectedOption == undefined)
+                this.value = this.default
         }
         if(this.value == undefined || this.value === `` || this.value === null) this.value = this.default
         if(this.options.length === 0) super.hidden = true

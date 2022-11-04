@@ -11,7 +11,10 @@ export default class Calculation_2AxisTable extends UITemplate {
     GUID = generateGUID()
 
     dialog = new UIDialog({ buttonLabel: `Edit Table` })
-    table = new UITableWithUnit()
+    table = new UITableWithUnit({
+        xResolution: 8,
+        yResolution: 8
+    })
     graph = new UIGraph3D({ width: 800, height: 450 })
     constructor(prop) {
         super()
@@ -89,10 +92,22 @@ export default class Calculation_2AxisTable extends UITemplate {
     set yAxis(yAxis) { this.table.yAxis = yAxis }
 
     get xOptions() { return this.XSelection?.options }
-    set xOptions(options) { if(this.XSelection) this.XSelection.options = options }
+    set xOptions(options) { 
+        if(!this.XSelection) return
+        this.XSelection.options = options 
+        const xUnit = this.XSelection.units
+        this.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+        this.xUnit = xUnit
+    }
 
     get yOptions() { return this.YSelection?.options }
-    set yOptions(options) { if(this.YSelection) this.YSelection.options = options }
+    set yOptions(options) { 
+        if(!this.YSelection) return 
+        this.YSelection.options = options
+        const yUnit = this.YSelection.units
+        this.yMeasurement = GetMeasurementNameFromUnitName(yUnit)
+        this.yUnit = yUnit
+     }
 
     get noParameterSelection() {
         if(this.XSelection || this.YSelection) return false
@@ -110,9 +125,10 @@ export default class Calculation_2AxisTable extends UITemplate {
         const thisClass = this
         if(!this.XSelection) {
             this.XSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
+                selectHidden: true
             })
-            this.XSelection.unitSelection.hidden = true
+            this.XSelection.unitHidden = true
             this.XSelection.addEventListener(`change`, function() {
                 if(thisClass._inputUnits?.[0] == undefined){
                     const xUnit = thisClass.XSelection.units
@@ -127,9 +143,10 @@ export default class Calculation_2AxisTable extends UITemplate {
         }
         if(!this.YSelection) {
             this.YSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ]))
+                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ])),
+                selectHidden: true
             })
-            this.YSelection.unitSelection.hidden = true
+            this.YSelection.unitHidden = true
             this.YSelection.addEventListener(`change`, function() {
                 if(thisClass._inputUnits?.[1] == undefined){
                     const yUnit = thisClass.YSelection.units
@@ -152,15 +169,15 @@ export default class Calculation_2AxisTable extends UITemplate {
     set step(step) { this.table.step = step }
     
     get displayUnit() { return this.table.displayUnit }
-    set displayUnit(displayUnit) { this.table.displayValue = displayUnit }
+    set displayUnit(displayUnit) { this.table.displayUnit = displayUnit }
     get displayValue() { return this.table.displayValue }
     set displayValue(displayValue) { this.table.displayValue = displayValue }
     get measurement() { return this.table.measurement }
     set measurement(measurement) { this.table.measurement = measurement }
     get valueUnit() { return this.table.valueUnit }
     set valueUnit(valueUnit) { this.table.valueUnit = valueUnit }
-    get value() { return { ...super.value, table: 
-        this.table.saveValue, 
+    get value() { return { ...super.value, 
+        table: this.table.saveValue, 
         graph: undefined
     } }
     set value(value) { 
@@ -174,7 +191,13 @@ export default class Calculation_2AxisTable extends UITemplate {
         delete saveValue.graph
         return saveValue
     }
-    set saveValue(saveValue) { super.saveValue = saveValue }
+    set saveValue(saveValue) { 
+        const table = saveValue.table
+        delete saveValue.table
+        super.saveValue = saveValue
+        if(table !== undefined)
+            this.table.saveValue = table
+    }
 
     _inputUnits
     get inputUnits() { return [ this.xUnit, this.yUnit ] }

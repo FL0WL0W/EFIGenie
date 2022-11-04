@@ -14,6 +14,7 @@ export default class UIDisplayLiveUpdate extends UIDisplayNumberWithUnit {
         let variable = VariableRegister.GetVariableByReference(reference)
         variable ??= reference
         if(!variable?.unit && variable?.type?.split(`|`)?.indexOf(`float`) === -1) return
+        this.measurement = GetMeasurementNameFromUnitName(variable.unit)
         this.valueUnit = variable.unit
         if(communication.variablesToPoll.indexOf(reference) === -1)
             communication.variablesToPoll.push(reference)

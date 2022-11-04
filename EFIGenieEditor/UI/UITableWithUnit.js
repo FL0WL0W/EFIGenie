@@ -14,7 +14,7 @@ export default class UITableWithUnit extends UITemplate {
     get measurement() { return this.displayUnitElement.measurement }
     set measurement(measurement) { this.displayUnitElement.measurement = measurement }
     get displayUnit() { return this.displayUnitElement.value }
-    set displayUnit(displayUnit) { this.displayUnitElement.value = displayUnit ?? this._valueUnit }
+    set displayUnit(displayUnit) { console.log(this.displayUnitElement.value = displayUnit ?? this._valueUnit) }
     get displayValue() { return this.displayValueElement.value }
     set displayValue(displayValue) { this.displayValueElement.value = displayValue }
 
@@ -212,22 +212,22 @@ export default class UITableWithUnit extends UITemplate {
             value: this.value,
             xAxis: this.xAxis,
             yAxis: this.yAxis,
-            ...(this.displayUnitElement.saveValue != undefined) && { unit: this.displayUnitElement.saveValue },
-            ...(this.xDisplayUnitElement.saveValue != undefined) && { xUnit: this.xDisplayUnitElement.saveValue },
-            ...(this.yDisplayUnitElement.saveValue != undefined) && { yUnit: this.yDisplayUnitElement.saveValue }
+            ...(this.displayUnitElement.saveValue != undefined) && { displayUnit: this.displayUnitElement.saveValue },
+            ...(this.xDisplayUnitElement.saveValue != undefined) && { xDisplayUnit: this.xDisplayUnitElement.saveValue },
+            ...(this.yDisplayUnitElement.saveValue != undefined) && { yDisplayUnit: this.yDisplayUnitElement.saveValue }
         }
     }
     set saveValue(saveValue){
-        this.displayValueElement.saveValue = { ...saveValue, value: undefined }
-        this.value = saveValue.value
+        this.displayValueElement.saveValue = { ...saveValue, value: undefined, xAxis: undefined, yAxis: undefined }
+        if(saveValue.displayUnit != undefined)
+            this.displayUnitElement.saveValue = saveValue.displayUnit
+        if(saveValue.xDisplayUnit != undefined)
+            this.xDisplayUnitElement.saveValue = saveValue.xDisplayUnit
+        if(saveValue.yDisplayUnit != undefined)
+            this.yDisplayUnitElement.saveValue = saveValue.yDisplayUnit
         this.xAxis = saveValue.xAxis
         this.yAxis = saveValue.yAxis
-        if(saveValue.unit != undefined)
-            this.displayUnitElement.saveValue = saveValue.unit
-        if(saveValue.xUnit != undefined)
-            this.xDisplayUnitElement.saveValue = saveValue.xUnit
-        if(saveValue.yUnit != undefined)
-            this.yDisplayUnitElement.saveValue = saveValue.yUnit
+        this.value = saveValue.value
     }
 
     UpdateDisplayValue() {

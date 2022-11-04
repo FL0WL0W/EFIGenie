@@ -17,6 +17,7 @@ export default class UINumberWithUnit extends UITemplate {
         if(this._valueUnit === valueUnit) return
         let newValue = ConvertValueFromUnitToUnit(this.value, this._valueUnit, valueUnit)
         this._valueUnit = valueUnit
+        this.measurement = GetMeasurementNameFromUnitName(valueUnit)
         this.displayUnit ??= valueUnit
         this.value = newValue
     }
@@ -78,13 +79,14 @@ export default class UINumberWithUnit extends UITemplate {
 
     get saveValue() {
         return {
-            unit: this.displayUnitElement.saveValue,
+            displayUnit: this.displayUnitElement.saveValue,
             value: this.value
         }
     }
     set saveValue(saveValue){
         if(typeof saveValue === `object`) {
-            this.displayUnitElement.saveValue = saveValue.unit
+            if(saveValue.displayUnit != undefined)
+                this.displayUnitElement.saveValue = saveValue.displayUnit
             this.value = saveValue.value ?? saveValue.value
         } else {
             this.value = saveValue

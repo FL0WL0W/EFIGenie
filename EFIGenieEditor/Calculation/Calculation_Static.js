@@ -5,9 +5,12 @@ export default class Calculation_Static extends UITemplate {
     static outputTypes = [ `float` ]
     static template = `<div data-element="numberElement"></div>`
 
-    numberElement = new UINumberWithUnit()
     constructor(prop) {
         super()
+        this.numberElement = new UINumberWithUnit({
+            valueUnit: prop?.outputUnits?.[0],
+            displayUnit: prop?.displayUnits?.[0]
+        })
         this.Setup(prop)
     }
     set class(pclass) { this.numberElement.class = pclass }
@@ -19,7 +22,7 @@ export default class Calculation_Static extends UITemplate {
     set step(step) { this.numberElement.step = step }
     
     get displayUnit() { return this.numberElement.displayUnit }
-    set displayUnit(displayUnit) { this.numberElement.displayValue = displayUnit }
+    set displayUnit(displayUnit) { this.numberElement.displayUnit = displayUnit }
     get displayValue() { return this.numberElement.displayValue }
     set displayValue(displayValue) { this.numberElement.displayValue = displayValue }
     get measurement() { return this.numberElement.measurement }

@@ -12,6 +12,7 @@ export default class Calculation_LookupTable extends UITemplate {
 
     dialog = new UIDialog({ buttonLabel: `Edit Table`, })
     table = new UITableWithUnit({
+        xResolution: 8,
         yResolution: 1,
         yResolutionModifiable: false
     })
@@ -67,7 +68,13 @@ export default class Calculation_LookupTable extends UITemplate {
     set xAxis(xAxis) { this.table.xAxis = xAxis }
 
     get xOptions() { return this.parameterSelection?.options }
-    set xOptions(options) { if(this.parameterSelection) this.parameterSelection.options = options }
+    set xOptions(options) { 
+        if(!this.parameterSelection) return
+        this.parameterSelection.options = options 
+        const xUnit = this.parameterSelection.units
+        this.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+        this.xUnit = xUnit
+    }
 
     get noParameterSelection() {
         if(this.parameterSelection) return false
@@ -82,9 +89,10 @@ export default class Calculation_LookupTable extends UITemplate {
 
         if(!this.parameterSelection) {
             this.parameterSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
+                selectHidden: true
             })
-            this.parameterSelection.unitSelection.hidden = true
+            this.parameterSelection.unitHidden = true
             const thisClass = this
             this.parameterSelection.addEventListener(`change`, function() {
                 if(thisClass._inputUnits?.[0] == undefined) {
@@ -108,7 +116,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set step(step) { this.table.step = step }
     
     get displayUnit() { return this.table.displayUnit }
-    set displayUnit(displayUnit) { this.table.displayValue = displayUnit }
+    set displayUnit(displayUnit) { this.table.displayUnit = displayUnit }
     get displayValue() { return this.table.displayValue }
     set displayValue(displayValue) { this.table.displayValue = displayValue }
     get measurement() { return this.table.measurement }
@@ -130,9 +138,12 @@ export default class Calculation_LookupTable extends UITemplate {
         delete saveValue.graph
         return saveValue
     }
-    set saveValue(saveValue) {
-        saveValue.graph = saveValue.table
+    set saveValue(saveValue) { 
+        const table = saveValue.table
+        delete saveValue.table
         super.saveValue = saveValue
+        if(table !== undefined)
+            this.table.saveValue = table
     }
 
     _inputUnits
