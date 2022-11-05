@@ -86,7 +86,7 @@ export default class PinOverlay extends HTMLDivElement {
                         }
                     }
                 })
-                pinElement.addEventListener(`change`, function() {
+                pinElement.addEventListener(`change`, () => {
                     if(this.value != undefined) this._pinSelectElements[this.value].element.parentElement.value = this.pin
                 })
             }

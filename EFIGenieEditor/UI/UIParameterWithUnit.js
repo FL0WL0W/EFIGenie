@@ -8,7 +8,7 @@ export default class UIParameterWithUnit extends UITemplate {
     unitSelection = new UIUnit()
     constructor(prop){
         super()
-        this.parameterSelection.addEventListener(`change`, e => {
+        this.parameterSelection.addEventListener(`change`, () => {
             const units = this.units
             this.unitSelection.measurement = GetMeasurementNameFromUnitName(units)
             if(units !== undefined)
@@ -90,19 +90,18 @@ export default class UIParameterWithUnit extends UITemplate {
 
     optionUnits = {}
     get options() { 
-        const thisClass = this
-        function expand(options) {
+        const expand = options => {
             let expandedOptions = []
             for(const optionIndex in options) {
                 let option = {...options[optionIndex]}
                 if(option.group) {
                     option.options = expand(option.options)
                     expandedOptions.push(option)
-                } else if(typeof option.value === `object` && thisClass.optionUnits[option.value.name] !== undefined) {
-                    for(const unitIndex in thisClass.optionUnits[option.value.name]) {
+                } else if(typeof option.value === `object` && this.optionUnits[option.value.name] !== undefined) {
+                    for(const unitIndex in this.optionUnits[option.value.name]) {
                         option = {...options[optionIndex]}
                         option.value = {...option.value}
-                        const unit = thisClass.optionUnits[option.value.name][unitIndex]
+                        const unit = this.optionUnits[option.value.name][unitIndex]
                         option.value.unit = unit
                         option.info = `[${GetMeasurementNameFromUnitName(unit)}]`
                         expandedOptions.push(option)
@@ -116,15 +115,14 @@ export default class UIParameterWithUnit extends UITemplate {
         return expand(this.parameterSelection.options)
     }
     set options(options) {
-        const thisClass = this
-        function flatten(options) {
+        const flatten = options => {
             for(const optionIndex in options) {
                 let option = options[optionIndex]
                 if(option.group) {
                     option.options = flatten(option.options)
                 } else if(typeof option.value === `object` && option.value.unit !== undefined) {
-                    thisClass.optionUnits[option.value.name] ??= []
-                    thisClass.optionUnits[option.value.name].push(option.value.unit)
+                    this.optionUnits[option.value.name] ??= []
+                    this.optionUnits[option.value.name].push(option.value.unit)
                     if(options.filter(x=>x?.value?.name === option.value.name).length > 1) {
                         delete options[optionIndex]
                     } else {

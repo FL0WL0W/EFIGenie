@@ -7,11 +7,10 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
 
     constructor(prop) {
         super(prop)
-        const thisClass = this
-        this.displayUnitElement.addEventListener(`change`, function() {
-            thisClass.ZeroesToAdd = 10000000
-            thisClass.UpdateDisplayValue()
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+        this.displayUnitElement.addEventListener(`change`, () => {
+            this.ZeroesToAdd = 10000000
+            this.UpdateDisplayValue()
+            this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.displayElement.style.display = this.displayUnitElement.style.display = `inline-block`
         this.ZeroesToAdd = 10000000
@@ -23,7 +22,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     set value(value) {
         const displayUnit = this.displayUnit
         const valueUnit = this.valueUnit
-        function valueToDisplayValue(value) { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
+        const valueToDisplayValue = value => { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
         let displayValue = valueToDisplayValue(value)
         if(displayValue == undefined) return
             

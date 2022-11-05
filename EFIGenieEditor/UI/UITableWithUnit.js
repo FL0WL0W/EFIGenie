@@ -32,6 +32,7 @@ export default class UITableWithUnit extends UITemplate {
     set value(value) {
         if(objectTester(this.#value, value)) return
         this.#value = value
+        this.displayValue           = ConvertValueFromUnitToUnit(value, this.valueUnit, this.displayUnit)
         this.UpdateDisplayValue()
     }
 
@@ -69,6 +70,7 @@ export default class UITableWithUnit extends UITemplate {
     set xAxis(xAxis) {
         if(objectTester(this.#xAxis, xAxis)) return
         this.#xAxis = xAxis
+        this.xDisplayAxis           = ConvertValueFromUnitToUnit(xAxis, this.xUnit, this.xDisplayUnit)
         this.UpdateDisplayValue()
     }
 
@@ -106,6 +108,7 @@ export default class UITableWithUnit extends UITemplate {
     set yAxis(yAxis) {
         if(objectTester(this.#yAxis, yAxis)) return
         this.#yAxis = yAxis
+        this.yDisplayAxis           = ConvertValueFromUnitToUnit(yAxis, this.yUnit, this.yDisplayUnit)
         this.UpdateDisplayValue()
     }
 
@@ -147,46 +150,45 @@ export default class UITableWithUnit extends UITemplate {
     #zLabel = undefined
     constructor(prop) {
         super()
-        const thisClass = this
         this.displayValueElement = new UITable()
         this.displayUnitElement = new UIUnit({
             measurement : prop?.measurement,
             value: prop?.displayUnit ?? prop?.valueUnit
         })
         let oldUnit = this.displayUnit
-        this.displayUnitElement.addEventListener(`change`, function() {
-            if(thisClass.displayValue != undefined)
-                thisClass.displayValue = ConvertValueFromUnitToUnit(thisClass.displayValue, oldUnit, thisClass.displayUnit)
-            oldUnit = thisClass.displayUnit
+        this.displayUnitElement.addEventListener(`change`, () => {
+            if(this.displayValue != undefined)
+                this.displayValue = ConvertValueFromUnitToUnit(this.displayValue, oldUnit, this.displayUnit)
+            oldUnit = this.displayUnit
         })
         this.xDisplayUnitElement = new UIUnit({
             measurement : prop?.xMeasurement,
             value: prop?.xDisplayUnit ?? prop?.xUnit
         })
         let xOldUnit = this.xDisplayUnit
-        this.xDisplayUnitElement.addEventListener(`change`, function() {
-            if(thisClass.xDisplayAxis != undefined)
-                thisClass.xDisplayAxis = ConvertValueFromUnitToUnit(thisClass.xDisplayAxis, xOldUnit, thisClass.xDisplayUnit)
-            xOldUnit = thisClass.xDisplayUnit
+        this.xDisplayUnitElement.addEventListener(`change`, () => {
+            if(this.xDisplayAxis != undefined)
+                this.xDisplayAxis = ConvertValueFromUnitToUnit(this.xDisplayAxis, xOldUnit, this.xDisplayUnit)
+            xOldUnit = this.xDisplayUnit
         })
         this.yDisplayUnitElement = new UIUnit({
             measurement : prop?.yMeasurement,
             value: prop?.yDisplayUnit ?? prop?.yUnit
         })
         let yOldUnit = this.yDisplayUnit
-        this.yDisplayUnitElement.addEventListener(`change`, function() {
-            if(thisClass.yDisplayAxis != undefined)
-                thisClass.yDisplayAxis = ConvertValueFromUnitToUnit(thisClass.yDisplayAxis, yOldUnit, thisClass.yDisplayUnit)
-            yOldUnit = thisClass.yDisplayUnit
+        this.yDisplayUnitElement.addEventListener(`change`, () => {
+            if(this.yDisplayAxis != undefined)
+                this.yDisplayAxis = ConvertValueFromUnitToUnit(this.yDisplayAxis, yOldUnit, this.yDisplayUnit)
+            yOldUnit = this.yDisplayUnit
         })
-        this.displayValueElement.addEventListener(`change`, function() {
-            if(thisClass.displayValue != undefined && thisClass.displayUnit)
-                thisClass.value = ConvertValueFromUnitToUnit(thisClass.displayValue, thisClass.displayUnit, thisClass.valueUnit)
-            if(thisClass.xDisplayAxis != undefined && thisClass.xDisplayUnit)
-                thisClass.xAxis = ConvertValueFromUnitToUnit(thisClass.xDisplayAxis, thisClass.xDisplayUnit, thisClass.xUnit)
-            if(thisClass.yDisplayAxis != undefined && thisClass.yDisplayUnit)
-                thisClass.yAxis = ConvertValueFromUnitToUnit(thisClass.yDisplayAxis, thisClass.yDisplayUnit, thisClass.yUnit)
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+        this.displayValueElement.addEventListener(`change`, () => {
+            if(this.displayValue != undefined && this.displayUnit)
+                this.value = ConvertValueFromUnitToUnit(this.displayValue, this.displayUnit, this.valueUnit)
+            if(this.xDisplayAxis != undefined && this.xDisplayUnit)
+                this.xAxis = ConvertValueFromUnitToUnit(this.xDisplayAxis, this.xDisplayUnit, this.xUnit)
+            if(this.yDisplayAxis != undefined && this.yDisplayUnit)
+                this.yAxis = ConvertValueFromUnitToUnit(this.yDisplayAxis, this.yDisplayUnit, this.yUnit)
+                this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.#xLabelElementWithUnit.append(this.#xLabelElement)
         this.#xLabelElementWithUnit.append(this.xDisplayUnitElement)
@@ -233,19 +235,15 @@ export default class UITableWithUnit extends UITemplate {
     UpdateDisplayValue() {
         const displayUnit = this.displayUnit
         const valueUnit = this.valueUnit
-        if(this.value != undefined)
+        if(this.value != undefined && this.value.length === this.displayValue.length)
             this.displayValue           = ConvertValueFromUnitToUnit(this.value, valueUnit, displayUnit)
         this.displayValueElement.min    = ConvertValueFromUnitToUnit(this.min, valueUnit, displayUnit)     ?? this.displayValueElement.min
         this.displayValueElement.max    = ConvertValueFromUnitToUnit(this.max, valueUnit, displayUnit)     ?? this.displayValueElement.max
         this.displayValueElement.step   = ConvertValueFromUnitToUnit(this.step, valueUnit, displayUnit)    ?? this.displayValueElement.step
-        const xDisplayUnit = this.xDisplayUnit
-        const xUnit = this.xUnit
-        if(this.xAxis != undefined)
-            this.xDisplayAxis           = ConvertValueFromUnitToUnit(this.xAxis, xUnit, xDisplayUnit)
-        const yDisplayUnit = this.yDisplayUnit
-        const yUnit = this.yUnit
-        if(this.yAxis != undefined)
-            this.yDisplayAxis           = ConvertValueFromUnitToUnit(this.yAxis, yUnit, yDisplayUnit)
+        if(this.xAxis != undefined && this.xAxis.length === this.xDisplayAxis.length)
+            this.xDisplayAxis           = ConvertValueFromUnitToUnit(this.xAxis, this.xUnit, this.xDisplayUnit)
+        if(this.yAxis != undefined && this.yAxis.length === this.yDisplayAxis.lengt)
+            this.yDisplayAxis           = ConvertValueFromUnitToUnit(this.yAxis, this.yUnit, this.yDisplayUnit)
     }
     attachToTable(table) {
         this.displayValueElement.attachToTable(table)

@@ -12,18 +12,17 @@ export default class Calculation_LookupTable extends UITemplate {
 
     dialog = new UIDialog({ buttonLabel: `Edit Table`, })
     table = new UITableWithUnit({
-        xResolution: 8,
+        xAxis: [1,2,3,4,5,6,7,8],
         yResolution: 1,
         yResolutionModifiable: false
     })
     graph = new UIGraph2D({ width: Math.min(Math.max(600, this.table.xResolution * 100), 1000), height: 450 })
     constructor(prop) {
         super()
-        const thisClass = this
-        this.graph.addEventListener(`change`, function() {
-            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
+        this.graph.addEventListener(`change`, () => {
+            this.graph.width = Math.min(Math.max(600, this.graph.xResolution * 75), 1000)
         })
-        this.table.addEventListener(`change`, e => {
+        this.table.addEventListener(`change`, () => {
             if(!this.parameterSelection)
                 return
             this.parameterSelection.displayUnit = this.table.xDisplayUnit
@@ -93,12 +92,11 @@ export default class Calculation_LookupTable extends UITemplate {
                 selectHidden: true
             })
             this.parameterSelection.unitHidden = true
-            const thisClass = this
-            this.parameterSelection.addEventListener(`change`, function() {
-                if(thisClass._inputUnits?.[0] == undefined) {
-                    const xUnit = thisClass.parameterSelection.units
-                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
-                    thisClass.xUnit = xUnit
+            this.parameterSelection.addEventListener(`change`, () => {
+                if(this._inputUnits?.[0] == undefined) {
+                    const xUnit = this.parameterSelection.units
+                    this.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+                    this.xUnit = xUnit
                 }
             })
             this.table.xLabel = this.parameterSelection
@@ -171,12 +169,11 @@ export default class Calculation_LookupTable extends UITemplate {
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         
-        const thisClass = this
-        communication.liveUpdateEvents[this.GUID] = function(variableMetadata, currentVariableValues) {
-            if(thisClass.parameterSelection?.value) { 
-                const parameterVariableId = variableMetadata.GetVariableId(thisClass.parameterSelection?.value)
+        communication.liveUpdateEvents[this.GUID] = (variableMetadata, currentVariableValues) => {
+            if(this.parameterSelection?.value) { 
+                const parameterVariableId = variableMetadata.GetVariableId(this.parameterSelection?.value)
                 if(currentVariableValues[parameterVariableId] != undefined) {
-                    thisClass.table.trail(currentVariableValues[parameterVariableId])
+                    this.table.trail(currentVariableValues[parameterVariableId])
                 } 
             }
         }

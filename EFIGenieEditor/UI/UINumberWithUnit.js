@@ -57,22 +57,21 @@ export default class UINumberWithUnit extends UITemplate {
 
     constructor(prop) {
         super()
-        const thisClass = this
         this.displayUnitElement = new UIUnit({
             measurement : prop?.measurement,
             value: prop?.displayUnit ?? prop?.valueUnit
         })
         let oldUnit = this.displayUnit
-        this.displayUnitElement.addEventListener(`change`, function() {
-            if(thisClass.displayValue != undefined)
-                thisClass.displayValue = ConvertValueFromUnitToUnit(thisClass.displayValue, oldUnit, thisClass.displayUnit)
-            oldUnit = thisClass.displayUnit
+        this.displayUnitElement.addEventListener(`change`, () => {
+            if(this.displayValue != undefined)
+                this.displayValue = ConvertValueFromUnitToUnit(this.displayValue, oldUnit, this.displayUnit)
+            oldUnit = this.displayUnit
         })
         this.displayValueElement = new UINumber()
-        this.displayValueElement.addEventListener(`change`, function() {
-            if(thisClass.displayValue != undefined && thisClass.displayUnit)
-                thisClass.#value = ConvertValueFromUnitToUnit(thisClass.displayValue, thisClass.displayUnit, thisClass.valueUnit)
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+        this.displayValueElement.addEventListener(`change`, () => {
+            if(this.displayValue != undefined && this.displayUnit)
+                this.#value = ConvertValueFromUnitToUnit(this.displayValue, this.displayUnit, this.valueUnit)
+            this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.Setup(prop)
     }
@@ -96,7 +95,7 @@ export default class UINumberWithUnit extends UITemplate {
     UpdateDisplayValue() {
         const displayUnit = this.displayUnit
         const valueUnit = this.valueUnit
-        function valueToDisplayValue(value) { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
+        const valueToDisplayValue = value => { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }
         this.displayValue               = valueToDisplayValue(this.value)   ?? this.displayValue
         this.displayValueElement.min    = valueToDisplayValue(this.min)     ?? this.displayValueElement.min
         this.displayValueElement.max    = valueToDisplayValue(this.max)     ?? this.displayValueElement.max

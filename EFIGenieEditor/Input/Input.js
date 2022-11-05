@@ -34,29 +34,28 @@ export default class Input extends UITemplate {
     constructor(prop) {
         super()
         this.style.display = `block`
-        const thisClass = this
-        this.name.addEventListener(`change`, function() {
-            thisClass.translationConfig.label = thisClass.name.value
+        this.name.addEventListener(`change`, () =>{
+            this.translationConfig.label = this.name.value
         })
-        this.translationConfig.addEventListener(`change`, function() {
-            thisClass.translationConfig.inputUnits = thisClass.translationConfig.inputTypes = undefined
-            if((thisClass.translationConfig.inputUnits?.length ?? thisClass.translationConfig.inputTypes?.length ?? 0) === 0) {
-                thisClass.hr.hidden = true
-                thisClass.rawConfig.hidden = true
-                thisClass.rawConfig.selection.value = undefined
+        this.translationConfig.addEventListener(`change`, () => {
+            this.translationConfig.inputUnits = this.translationConfig.inputTypes = undefined
+            if((this.translationConfig.inputUnits?.length ?? this.translationConfig.inputTypes?.length ?? 0) === 0) {
+                this.hr.hidden = true
+                this.rawConfig.hidden = true
+                this.rawConfig.selection.value = undefined
             } else {
-                thisClass.hr.hidden = false
-                thisClass.rawConfig.hidden = false
+                this.hr.hidden = false
+                this.rawConfig.hidden = false
             }
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+            this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.translationConfig.labelElement.replaceWith(this.name)
-        this.rawConfig.addEventListener(`change`, function() {
-            if(thisClass.rawConfig.outputUnits?.[0]) {
-                thisClass.translationConfig.inputUnits = thisClass.rawConfig.outputUnits
-                thisClass.translationConfig.xLabel = GetMeasurementNameFromUnitName(thisClass.rawConfig.outputUnits?.[0])
+        this.rawConfig.addEventListener(`change`, () => {
+            if(this.rawConfig.outputUnits?.[0]) {
+                this.translationConfig.inputUnits = this.rawConfig.outputUnits
+                this.translationConfig.xLabel = GetMeasurementNameFromUnitName(this.rawConfig.outputUnits?.[0])
             }
-            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+            this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
         this.hr.hidden = true
         this.hr.style.margin = `2px`

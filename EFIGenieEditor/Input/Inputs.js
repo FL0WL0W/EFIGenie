@@ -71,11 +71,11 @@ export default class Inputs extends UITemplate {
         })
         this.inputs.saveValue = [{}]
         this.newInputElement = new UIButton({className: `controladd`})
-        this.newInputElement.addEventListener(`click`, function() { thisClass.#appendInput() })
+        this.newInputElement.addEventListener(`click`, () => { thisClass.#appendInput() })
         this.inputListNewElement = document.createElement(`div`)
         this.inputListNewElement.class = `w3-bar-subitem w3-button`
         this.inputListNewElement.textContent = `+ New`
-        this.inputListNewElement.addEventListener(`click`, function() { thisClass.#appendInput() })
+        this.inputListNewElement.addEventListener(`click`, () => { thisClass.#appendInput() })
         this.Setup(prop)
     }
 
@@ -194,9 +194,9 @@ export default class Inputs extends UITemplate {
             get: function() { return this.input.name.value },
             set: function(value) { this.input.name.value = value }
         })
-        input.input.addEventListener(`change`, function() {
-            thisClass.#updateInputListElement()
-            thisClass.pinOverlay.update()
+        input.input.addEventListener(`change`, () => {
+            this.#updateInputListElement()
+            this.pinOverlay.update()
         })
         return input
     }

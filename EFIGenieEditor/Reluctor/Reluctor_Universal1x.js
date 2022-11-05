@@ -35,10 +35,9 @@ export default class Reluctor_Universal1x extends Reluctor_Template {
     })
     constructor(prop){
         super()
-        const thisClass = this
-        this.mode.addEventListener(`change`, function() {
-            thisClass.querySelectorAll(`[data-element="rising"]`)[0].hidden = !(thisClass.mode.value === 0 || thisClass.mode.value === 1)
-            thisClass.querySelectorAll(`[data-element="falling"]`)[0].hidden = !(thisClass.mode.value === 0 || thisClass.mode.value === 2)
+        this.mode.addEventListener(`change`, e=> {
+            this.querySelectorAll(`[data-element="rising"]`)[0].hidden = !(this.mode.value === 0 || this.mode.value === 1)
+            this.querySelectorAll(`[data-element="falling"]`)[0].hidden = !(this.mode.value === 0 || this.mode.value === 2)
         })
         this.Setup(prop)
         this.length.value = 8

@@ -12,7 +12,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     set label(label) {
         if(this.label === label) return
         this.labelElement.textContent = label
-        this.calculationValues.forEach(function(configValue) { configValue.label = label })
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => { calculationValue.label = label })
     }
 
     _xlabel = `X`
@@ -20,7 +20,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     set xLabel(xlabel) {
         if(this._xlabel === xlabel) return
         this._xlabel = xlabel
-        this.calculationValues.forEach(function(configValue) { configValue.xLabel = xlabel })
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => { calculationValue.xLabel = xlabel })
     }
 
     _ylabel = `Y`
@@ -28,7 +28,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     set yLabel(ylabel) {
         if(this._ylabel === ylabel) return
         this._ylabel = ylabel
-        this.calculationValues.forEach(function(configValue) { configValue.yLabel = ylabel })
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => { calculationValue.yLabel = ylabel })
     }
 
     selectionFilter = defaultFilter
@@ -44,7 +44,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputTypes(outputTypes) {
         this._outputTypes = outputTypes
-        this.calculationValues.forEach(function(calculationValue) {
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => {
             if(`outputTypes` in calculationValue)
                 calculationValue.outputTypes = outputTypes
         })
@@ -60,7 +60,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set outputUnits(outputUnits) {
         this._outputUnits = outputUnits
-        this.calculationValues.forEach(function(calculationValue) {
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => {
             if(`outputUnits` in calculationValue)
                 calculationValue.outputUnits = outputUnits
         })
@@ -75,7 +75,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputTypes(inputTypes) {
         this._inputTypes = inputTypes
-        this.calculationValues.forEach(function(calculationValue) {
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => {
             if(`inputTypes` in calculationValue)
                 calculationValue.inputTypes = inputTypes
         })
@@ -88,7 +88,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
     }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits
-        this.calculationValues.forEach(function(calculationValue) {
+        Object.keys(this.calculationValues).map(x=>this.calculationValues[x]).forEach(calculationValue => {
             if(`inputUnits` in calculationValue)
                 calculationValue.inputUnits = inputUnits
         })
@@ -100,14 +100,6 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.selection.options = options
         if(this.selection.selectedOption === undefined) 
             this.selection.value = this.selection.selectValue
-
-        // if(options.length < 2) {
-        //     if(!match && options.length === 1)
-        //         this.selection.value = options[0].value
-        //     this.selection.hidden = true
-        // } else {
-        //     this.selection.hidden = false
-        // }
     }
 
     selection = new UIParameterWithUnit({ selectDisabled: false, selectName: `None` })
@@ -119,14 +111,13 @@ export default class CalculationOrVariableSelection extends UITemplate {
             displayUnit: prop.displayUnits?.[0]
         })
         this.liveUpdate.style.float = `right`
-        var thisClass = this
-        this.selection.addEventListener(`change`, function() {
-            thisClass.calculationContent.replaceChildren(thisClass.SubConfig ?? ``)
-            thisClass.liveUpdate.measurement = GetMeasurementNameFromUnitName(thisClass.outputUnits?.[0])
-            if(thisClass._outputUnits?.[0] == undefined)
-                thisClass.selection.unitHidden = false
+        this.selection.addEventListener(`change`, () => {
+            this.calculationContent.replaceChildren(this.SubConfig ?? ``)
+            this.liveUpdate.measurement = GetMeasurementNameFromUnitName(this.outputUnits?.[0])
+            if(this._outputUnits?.[0] == undefined)
+                this.selection.unitHidden = false
             else
-                thisClass.selection.unitHidden = true
+                this.selection.unitHidden = true
         })
         this.style.display = `block`
         this.Setup(prop)
@@ -140,32 +131,21 @@ export default class CalculationOrVariableSelection extends UITemplate {
     static SaveOnlyActive = false
     get saveValue() {
         let saveValue = super.saveValue ?? {}
+        saveValue.calculationValues = {}
 
-        if (this.calculationValues && this.calculationValues.length > 0) {
-            if(CalculationOrVariableSelection.SaveOnlyActive) {
-                var subConfig = this.SubConfig
-                if(subConfig?.saveValue != undefined) {
-                    var configValue = subConfig.saveValue
-                    if(configValue != undefined) {
-                        if(typeof configValue !== `object`)
-                            configValue = { value: configValue }
-                        configValue.className = subConfig.constructor.name
-                        saveValue.calculationValues = [ configValue ]
-                    }
-                }
-            } else {
-                saveValue.calculationValues = []
-                for (var i = 0; i < this.calculationValues.length; i++) {
-                    var configValue = this.calculationValues[i].saveValue
-                    if(configValue == undefined) continue
-                    if(typeof configValue !== `object`)
-                        configValue = { value: configValue }
-                    configValue.className = this.calculationValues[i].constructor.name
-                    saveValue.calculationValues.push(configValue)
-                }
-            } 
+        if(CalculationOrVariableSelection.SaveOnlyActive) {
+            let subConfigSaveValue = subConfig?.saveValue
+            if(subConfigSaveValue != undefined) 
+                saveValue.calculationValues[this.selection.value] = subConfigSaveValue
+        } else {
+            for(const className in this.calculationValues) {
+                saveValue.calculationValues[className] = this.calculationValues[className].saveValue
+            }
+            for(const className in this.calculationSaveValueCache) {
+                saveValue.calculationValues[className] = this.calculationSaveValueCache[className]
+            }
         }
-        if(saveValue.calculationValues?.length < 1)
+        if(Object.keys(saveValue.calculationValues).length < 1)
             delete saveValue.calculationValues
 
         if(typeof this.selection.value !== `string`)
@@ -177,17 +157,27 @@ export default class CalculationOrVariableSelection extends UITemplate {
     set saveValue(saveValue) {
         saveValue ??= {}
 
-        for (var i = 0; i < saveValue.calculationValues?.length ?? 0; i++) {
-            for (var t = 0; t < this.calculationValues.length; t++) {
-                if ((saveValue.calculationValues[i]?.className ?? 0) === this.calculationValues[i]?.constructor.name){
-                    this.calculationValues[t].saveValue = saveValue.calculationValues[i]
-                    break
-                }
+        //legacy save files used an array of calculation values instead of an object with keys
+        if(Array.isArray(saveValue.calculationValues)) {
+            for (const i in saveValue.calculationValues) {
+                const className = saveValue.calculationValues[i]?.className
+                if(className == undefined)
+                    continue
+
+                if(this.calculationValues[className])
+                    this.calculationValues[className].saveValue = saveValue.calculationValues[i]
+                else
+                    this.calculationSaveValueCache[className] = saveValue.calculationValues[i]
+            }
+        } else if (saveValue.calculationValues) {
+            for(const className in saveValue.calculationValues) {
+                if(this.calculationValues[className])
+                    this.calculationValues[className].saveValue = saveValue.calculationValues[className]
+                else
+                    this.calculationSaveValueCache[className] = saveValue.calculationValues[className]
             }
         }
-        if(saveValue.calculationValues)
-            this.calculationSaveValueCache = saveValue.calculationValues.filter(x => !saveValue.calculationValues.find(y => y?.constructor.name === (x?.className ?? 0)))
-        
+
         super.saveValue = saveValue
 
         this.selection.displayUnit = saveValue.displayUnit
@@ -240,51 +230,38 @@ export default class CalculationOrVariableSelection extends UITemplate {
         this.liveUpdate.RegisterVariables(reference)
     }
 
-    get SubConfigIndex() {
-        if (typeof this.selection.value !== `string` || !this.calculations)
-            return -1
+    get SubConfig() {
+        if (typeof this.selection.value !== `string` || !this.calculations) return undefined
+        if (this.calculationValues[this.selection.value])
+            return this.calculationValues[this.selection.value]
 
-        for (var i = 0; i < this.calculationValues.length; i++) {
-            if (this.calculationValues[i].constructor.name === this.selection.value) {
-                return i
-            }
-        }
-        var configGroups = this.calculations
+        //create if it does not exist
+        let calculationGroups = this.calculations
         if(!this.calculations[0]?.group && !this.calculations[0]?.calculations)
-            configGroups = [{ group: `Calculations`, calculations: this.calculations }]
-        for(var c = 0; c < configGroups.length; c++) {
-            const calculations = configGroups[c].calculations
+            calculationGroups = [{ group: `Calculations`, calculations: this.calculations }]
+        for(const c in calculationGroups) {
+            const calculations = calculationGroups[c].calculations
     
-            for (var i = 0; i < calculations.length; i++) {
+            for (const i in calculations) {
                 if (calculations[i] == undefined || calculations[i].name !== this.selection.value)
                     continue
-                var found = false
-                for (var t = 0; t < this.calculationSaveValueCache.length; t++) {
-                    if (this.calculationSaveValueCache[t]?.className === this.selection.value){
-                        found = this.calculationSaveValueCache[t]
-                        this.calculationSaveValueCache.splice(t, 1)
-                        break
-                    }
-                }
-                this.calculationValues.push(new calculations[i]())
-                this.calculationValues[this.calculationValues.length-1].Setup({
+
+                this.calculationValues[this.selection.value] = new calculations[i]()
+                this.calculationValues[this.selection.value].Setup({
                     noParameterSelection: this.noParameterSelection,
                     label: this.label,
                     xLabel: this.xLabel,
                     yLabel: this.yLabel,
-                    ...(this._outputUnits & { outputUnits: this._outputUnits }),
+                    ...(this._outputUnits && { outputUnits: this._outputUnits }),
                     displayUnits: this.displayUnits,
                     calculations: this.calculations
                 })
-                if(found)
-                    this.calculationValues[this.calculationValues.length-1].saveValue = found
-                return this.calculationValues.length-1
+                if(this.calculationSaveValueCache[this.selection.value] != undefined)
+                    this.calculationValues[this.selection.value].saveValue = this.calculationSaveValueCache[this.selection.value]
+                delete this.calculationSaveValueCache[this.selection.value]
+                return this.calculationValues[this.selection.value]
             }
         }
-    }
-
-    get SubConfig() {
-        return this.calculationValues[this.SubConfigIndex]
     }
 }
 customElements.define(`calculation-orvariableselection`, CalculationOrVariableSelection, { extends: `span` })

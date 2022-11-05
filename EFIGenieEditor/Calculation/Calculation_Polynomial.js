@@ -35,17 +35,16 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.append(degreeLabel)
         this.append(this.#degreeElement)
         this.append(document.createElement(`br`))
-        const thisClass = this
-        this.#degreeElement.addEventListener(`change`, function() {
-            while(thisClass.#coeffecientElement.children.length > thisClass.degree) { thisClass.#coeffecientElement.removeChild(thisClass.#coeffecientElement.lastChild) }
-            for(let i = thisClass.#coeffecientElement.children.length; i < thisClass.degree; i++) {
-                let coeffecientElement = thisClass.#coeffecientElement.appendChild(document.createElement(`div`))
+        this.#degreeElement.addEventListener(`change`, () => {
+            while(this.#coeffecientElement.children.length > this.degree) { this.#coeffecientElement.removeChild(this.#coeffecientElement.lastChild) }
+            for(let i = this.#coeffecientElement.children.length; i < this.degree; i++) {
+                let coeffecientElement = this.#coeffecientElement.appendChild(document.createElement(`div`))
                 let number = coeffecientElement.appendChild(i === 0? new UINumberWithUnit({ value: 0 }) : new UINumber({ value: 0 }))
                 if(i !== 0) {
                     let label = coeffecientElement.appendChild(document.createElement(`span`))
                     label.innerHTML = `x<sup>${i}</sup> +`
                 } else {
-                    number.addEventListener(`change`, function() { coeffecientElement.dispatchEvent(new Event(`change`, {bubbles: true})) })
+                    number.addEventListener(`change`, () => { coeffecientElement.dispatchEvent(new Event(`change`, {bubbles: true})) })
                 }
                 coeffecientElement.style.display = `inline`
                 Object.defineProperty(coeffecientElement, 'value', {
@@ -60,15 +59,15 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
         this.#coeffecientElement.style.flexDirection = `row-reverse`
         this.#coeffecientElement.style.alignItems = `flex-start`
         this.#coeffecientElement.style.justifyContent = `flex-end`
-        this.#coeffecientElement.firstChild.addEventListener(`change`, function() {
-            thisClass.displayUnits = thisClass.displayUnits
+        this.#coeffecientElement.firstChild.addEventListener(`change`, () => {
+            this.displayUnits = this.displayUnits
         })
         this.Setup(prop)
     }
     Setup(prop) {
         Object.assign(this, prop)
     }
-    get coeffecients() { return [...this.#coeffecientElement.children].map(function(element, index) { return element.value })  }
+    get coeffecients() { return [...this.#coeffecientElement.children].map((element, index) => { return element.value })  }
     set coeffecients(value) {
         this.degree = value.length
         for(let i = 0; i < this.#coeffecientElement.children.length; i++) {

@@ -14,12 +14,12 @@ export default class Calculation_Formula extends UITemplate {
     parameterValueElements = document.createElement(`div`)
 
     parameterValues = {}
+    parameterSaveValueCache = {}
     parameterUnits = {}
     get parameters() {
-        return [...this.parameterValueElements.children].map(e => e.name)
+        return [...this.parameterValueElements.children].map(x => x.name)
     }
     set parameters(parameters) {
-        const thisClass = this
         for(let i in parameters){ 
             if(parameters[i] === ``) {
                 parameters.splice(i, 1)
@@ -43,18 +43,18 @@ export default class Calculation_Formula extends UITemplate {
                 parameterUnit = this.parameterUnits[parameters[i]] = new UIUnit({
                     value: this.outputUnits?.[0]
                 })
-                parameterUnit.addEventListener(`change`, e => {
+                parameterUnit.addEventListener(`change`, () => {
                     const subConfig = parameterValue.SubConfig
                     if(subConfig)
                         subConfig.displayUnits = subConfig.outputUnits = [ parameterUnit.value ]
                 })
-                parameterValue.selection.addEventListener(`change`, e => {
+                parameterValue.selection.addEventListener(`change`, () => {
                     const subConfig = parameterValue.SubConfig
-                    if(subConfig && subConfig.outputUnits?.[0] == undefined) {
+                    if(subConfig) {
                         subConfig.outputUnits = [ parameterUnit.value ?? this.outputUnits?.[0] ]
                     }
                 })
-                parameterValue.addEventListener(`change`, e => {
+                parameterValue.addEventListener(`change`, () => {
                     const subConfig = parameterValue.SubConfig
                     if(subConfig) {
                         if(subConfig.outputUnits?.[0] != undefined)
@@ -97,18 +97,18 @@ export default class Calculation_Formula extends UITemplate {
                 configParameter.hidden = true
             else
                 configParameter.hidden = false
-            parameterValue.selection.addEventListener(`change`, function() {
+            parameterValue.selection.addEventListener(`change`, () => {
                 if(parameterValue.calculationContent.innerHTML === ``)
                     configParameter.hidden = true
                 else
                     configParameter.hidden = false
-                if([...thisClass.parameterValueElements.children].filter(e => !e.hidden).length === 0)
-                    thisClass.parameterValueElements.hidden = true
+                if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0)
+                    this.parameterValueElements.hidden = true
                 else 
-                    thisClass.parameterValueElements.hidden = false
+                    this.parameterValueElements.hidden = false
             })
         }
-        if([...this.parameterValueElements.children].filter(e => !e.hidden).length === 0)
+        if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0)
             this.parameterValueElements.hidden = true
         else 
             this.parameterValueElements.hidden = false
@@ -136,8 +136,7 @@ export default class Calculation_Formula extends UITemplate {
         value ??= {}
         super.value = value
         
-        const thisClass = this
-        Object.keys(this.parameterValues).filter(p => value.parameterValues[p] == undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
+        Object.keys(this.parameterValues).filter(p => value.parameterValues[p] == undefined).forEach(p => { delete this.parameterValues[p] })
 
         for(let parameter in value.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
@@ -173,8 +172,7 @@ export default class Calculation_Formula extends UITemplate {
         saveValue ??= {}
         super.saveValue = saveValue
     
-        const thisClass = this
-        Object.keys(this.parameterValues).filter(p => saveValue.parameterValues[p] == undefined).forEach(function(p) { delete thisClass.parameterValues[p] })
+        Object.keys(this.parameterValues).filter(p => saveValue.parameterValues[p] == undefined).forEach(p => { delete this.parameterValues[p] })
 
         for(let parameter in saveValue.parameterValues) {
             let parameterValue = this.parameterValues[parameter] ??= new CalculationOrVariableSelection({
@@ -186,31 +184,32 @@ export default class Calculation_Formula extends UITemplate {
             parameterValue.style.display = `inline`
 
             parameterValue.saveValue = saveValue.parameterValues[parameter]
-            if(this.parameterUnits[parameter])
-                this.parameterUnits[parameter].value = saveValue.parameterUnits[parameter]
-            else if(saveValue.parameterUnits?.[parameter] && parameterValue.SubConfig)
-                parameterValue.SubConfig.outputUnits = [ saveValue.parameterUnits[parameter] ]
+            if(saveValue.parameterUnits?.[parameter] != undefined) {
+                if(this.parameterUnits[parameter])
+                    this.parameterUnits[parameter].value = saveValue.parameterUnits[parameter]
+                else if(parameterValue.SubConfig)
+                    parameterValue.SubConfig.outputUnits = [ saveValue.parameterUnits[parameter] ]
+            }
             parameterValue.saveValue = saveValue.parameterValues[parameter]
         }
     }
 
     constructor(prop) {
         super()
-        let thisClass = this
         this.parameterElements.class = `configContainer`
         this.parameterElements.style.display = `block`
         this.parameterElements.style.minHeight = `200px`
         this.parameterValueElements.class = `configContainer`
         this.parameterValueElements.hidden = true
-        this.formula.addEventListener(`change`, function() {
+        this.formula.addEventListener(`change`, () => {
             let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
-            let parameters = thisClass.formula.value.replaceAll(` `, ``)
+            let parameters = this.formula.value.replaceAll(` `, ``)
             for(let operatorIndex in operators) {
                 let operator = operators[operatorIndex]
                 parameters = parameters.split(operator).join(`,`)
             }
             let parameterSplit = parameters.split(`,`)
-            let operatorSplit = thisClass.formula.value.replaceAll(` `, ``)
+            let operatorSplit = this.formula.value.replaceAll(` `, ``)
             for(let i = 0; i < parameterSplit.length; i++) {
                 let loc = operatorSplit.indexOf(parameterSplit[i])
                 operatorSplit = operatorSplit.substring(0, loc) + `,` + operatorSplit.substring(loc + parameterSplit[i].length)
@@ -232,7 +231,7 @@ export default class Calculation_Formula extends UITemplate {
             parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
             parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
             parameters = parameters.filter(s => s.length !== 0)
-            thisClass.parameters = parameters
+            this.parameters = parameters
         })
         this.Setup(prop)
     }
@@ -245,7 +244,6 @@ export default class Calculation_Formula extends UITemplate {
 
     RegisterVariables(reference) {
         reference = { ...reference }
-        const thisClass = this
         if (reference) {
             reference.unit = this.outputUnits?.[0] ?? reference.unit
             if(reference.unit) {
@@ -259,7 +257,7 @@ export default class Calculation_Formula extends UITemplate {
             if(!operators.some(o => this.formula.value.indexOf(o) > -1)) {
                 this.parameterValues[this.parameters[0]]?.RegisterVariables(reference)
             } else {
-                this.parameters.forEach(function(parameter) { thisClass.parameterValues[parameter]?.RegisterVariables({ name: `${reference.name}_${thisClass.parameterValues[parameter].label}`, unit: thisClass.parameterValues[parameter].unit}) })
+                this.parameters.forEach(parameter => { this.parameterValues[parameter]?.RegisterVariables({ name: `${reference.name}_${this.parameterValues[parameter].label}`, unit: this.parameterValues[parameter].unit}) })
                 VariableRegister.RegisterVariable(reference)
             }
         }

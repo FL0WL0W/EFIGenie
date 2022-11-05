@@ -12,17 +12,16 @@ export default class Calculation_2AxisTable extends UITemplate {
 
     dialog = new UIDialog({ buttonLabel: `Edit Table` })
     table = new UITableWithUnit({
-        xResolution: 8,
-        yResolution: 8
+        xAxis: [1,2,3,4,5,6,7,8],
+        yAxis: [1,2,3,4,5,6,7,8]
     })
     graph = new UIGraph3D({ width: 800, height: 450 })
     constructor(prop) {
         super()
-        const thisClass = this
-        this.graph.addEventListener(`change`, function() {
-            thisClass.graph.width = Math.min(Math.max(600, thisClass.graph.xResolution * 75), 1000)
+        this.graph.addEventListener(`change`, () => {
+            this.graph.width = Math.min(Math.max(600, this.graph.xResolution * 75), 1000)
         })
-        this.table.addEventListener(`change`, e => {
+        this.table.addEventListener(`change`, () => {
             if(this.XSelection)
                  this.XSelection.displayUnit = this.table.xDisplayUnit
             if(this.YSelection)
@@ -122,18 +121,17 @@ export default class Calculation_2AxisTable extends UITemplate {
             return
         }
 
-        const thisClass = this
         if(!this.XSelection) {
             this.XSelection = new UIParameterWithUnit({
                 options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
                 selectHidden: true
             })
             this.XSelection.unitHidden = true
-            this.XSelection.addEventListener(`change`, function() {
-                if(thisClass._inputUnits?.[0] == undefined){
-                    const xUnit = thisClass.XSelection.units
-                    thisClass.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
-                    thisClass.xUnit = xUnit
+            this.XSelection.addEventListener(`change`, () => {
+                if(this._inputUnits?.[0] == undefined){
+                    const xUnit = this.XSelection.units
+                    this.xMeasurement = GetMeasurementNameFromUnitName(xUnit)
+                    this.xUnit = xUnit
                 }
             })
             this.table.xLabel = this.XSelection
@@ -147,11 +145,11 @@ export default class Calculation_2AxisTable extends UITemplate {
                 selectHidden: true
             })
             this.YSelection.unitHidden = true
-            this.YSelection.addEventListener(`change`, function() {
-                if(thisClass._inputUnits?.[1] == undefined){
-                    const yUnit = thisClass.YSelection.units
-                    thisClass.yMeasurement = GetMeasurementNameFromUnitName(yUnit)
-                    thisClass.yUnit = yUnit
+            this.YSelection.addEventListener(`change`, () => {
+                if(this._inputUnits?.[1] == undefined){
+                    const yUnit = this.YSelection.units
+                    this.yMeasurement = GetMeasurementNameFromUnitName(yUnit)
+                    this.yUnit = yUnit
                 }
             })
             this.table.yLabel = this.YSelection
@@ -232,13 +230,12 @@ export default class Calculation_2AxisTable extends UITemplate {
             communication.variablesToPoll.push(this.XSelection?.value)
         if(communication.variablesToPoll.indexOf(this.YSelection?.value) === -1)
             communication.variablesToPoll.push(this.YSelection?.value)
-        const thisClass = this
-        communication.liveUpdateEvents[this.GUID] = function(variableMetadata, currentVariableValues) {
-            if(thisClass.XSelection?.value && thisClass.YSelection?.value) { 
-                const xVariableId = variableMetadata.GetVariableId(thisClass.XSelection?.value)
-                const yVariableId = variableMetadata.GetVariableId(thisClass.YSelection?.value)
+        communication.liveUpdateEvents[this.GUID] = (variableMetadata, currentVariableValues) => {
+            if(this.XSelection?.value && this.YSelection?.value) { 
+                const xVariableId = variableMetadata.GetVariableId(this.XSelection?.value)
+                const yVariableId = variableMetadata.GetVariableId(this.YSelection?.value)
                 if(currentVariableValues[xVariableId] != undefined && currentVariableValues[yVariableId] != undefined) {
-                    thisClass.table.trail(currentVariableValues[xVariableId], currentVariableValues[yVariableId])
+                    this.table.trail(currentVariableValues[xVariableId], currentVariableValues[yVariableId])
                 } 
             }
         }

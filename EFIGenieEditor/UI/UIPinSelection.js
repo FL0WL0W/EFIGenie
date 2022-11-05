@@ -5,7 +5,7 @@ export default class UIPinSelection extends UISelection {
         this.selectDisabled = prop.selectDisabled ?? true
         this.selectValue = prop.selectValue ?? 0xFFFF
         this.options = this.#generateOptionList()
-        this.addEventListener(`change`, function() {
+        this.addEventListener(`change`, () => {
             UpdateOverlay()
         })
         this.selectedElement.dataset.pinselectmode = this.pinType

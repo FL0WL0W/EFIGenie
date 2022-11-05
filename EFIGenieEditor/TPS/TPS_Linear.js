@@ -35,49 +35,48 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
 
     constructor(prop) {
         super()
-        const thisClass = this
         this.polynomial.hidden = true
         this.updatePolynomial()
-        this.voltage0.addEventListener(`change`, function() {
-            thisClass.updatePolynomial()
+        this.voltage0.addEventListener(`change`, () => {
+            this.updatePolynomial()
         })
-        this.voltage100.addEventListener(`change`, function() {
-            thisClass.updatePolynomial()
+        this.voltage100.addEventListener(`change`, () => {
+            this.updatePolynomial()
         })
-        this.calibrate.addEventListener(`click`, function() {
-            if(thisClass.calibrate.label == `Stop`) {
-                thisClass.calibrate.label = `Calibrate`
+        this.calibrate.addEventListener(`click`, () => {
+            if(this.calibrate.label == `Stop`) {
+                this.calibrate.label = `Calibrate`
             } else {
-                thisClass.polarity = thisClass.voltage100.value < thisClass.voltage0.value ? -1 : 1
-                thisClass.voltage0.value = thisClass.voltage100.value = thisClass.voltageLiveUpdate.value
-                thisClass.calibrate.label = `Stop`
+                this.polarity = this.voltage100.value < this.voltage0.value ? -1 : 1
+                this.voltage0.value = this.voltage100.value = this.voltageLiveUpdate.value
+                this.calibrate.label = `Stop`
             }
         })
-        this.swap.addEventListener(`click`, function() {
-            thisClass.polarity = -thisClass.polarity
-            const temp = thisClass.voltage0.value
-            thisClass.voltage0.value = thisClass.voltage100.value
-            thisClass.voltage100.value = temp
+        this.swap.addEventListener(`click`, () => {
+            this.polarity = -this.polarity
+            const temp = this.voltage0.value
+            this.voltage0.value = this.voltage100.value
+            this.voltage100.value = temp
         })
-        this.voltageLiveUpdate.addEventListener(`change`, function() {
-            const liveValue = thisClass.voltageLiveUpdate.value
-            const calibrating = thisClass.calibrate.label == `Stop`
-            thisClass.calibrate.hidden = liveValue == undefined
+        this.voltageLiveUpdate.addEventListener(`change`, () => {
+            const liveValue = this.voltageLiveUpdate.value
+            const calibrating = this.calibrate.label == `Stop`
+            this.calibrate.hidden = liveValue == undefined
             if(liveValue != undefined) {
-                thisClass.calibrate.hidden = false
-                if(thisClass.polarity > 0) {
-                    if(calibrating && liveValue < thisClass.voltage0.value)
-                        thisClass.voltage0.value = liveValue
-                    if(calibrating && liveValue > thisClass.voltage100.value)
-                        thisClass.voltage100.value = liveValue
+                this.calibrate.hidden = false
+                if(this.polarity > 0) {
+                    if(calibrating && liveValue < this.voltage0.value)
+                        this.voltage0.value = liveValue
+                    if(calibrating && liveValue > this.voltage100.value)
+                        this.voltage100.value = liveValue
                 } else {
-                    if(calibrating && liveValue < thisClass.voltage100.value)
-                        thisClass.voltage100.value = liveValue
-                    if(calibrating && liveValue > thisClass.voltage0.value)
-                        thisClass.voltage0.value = liveValue
+                    if(calibrating && liveValue < this.voltage100.value)
+                        this.voltage100.value = liveValue
+                    if(calibrating && liveValue > this.voltage0.value)
+                        this.voltage0.value = liveValue
                 }
             } else {
-                thisClass.calibrate.hidden = true
+                this.calibrate.hidden = true
             }
         })
         this.Setup(prop)

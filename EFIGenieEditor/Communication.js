@@ -257,8 +257,7 @@ class EFIGenieSerial extends EFIGenieLog {
     }
 
     #updateLiveUpdateEvents = throttle(function(thisClass) {
-        Object.entries(thisClass.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(e => {
-            var [elementname, element] = e
+        Object.entries(thisClass.liveUpdateEvents).filter(function(value, index, self) { return self.indexOf(value) === index }).forEach(([elementname, element]) => {
             element?.(thisClass.variableMetadata, thisClass.loggedVariableValues[thisClass.loggedVariableValues.length - 1])
         })
     })

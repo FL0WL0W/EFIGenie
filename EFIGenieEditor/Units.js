@@ -105,22 +105,10 @@ function GetUnit(measurement, name) {
 
 function PerSecond(units)
 {
-    var newUnits = []
-
-    units.forEach(function(value, index){
-        newUnits.push( { name: value.name + `/s`, SIMultiplier: value.SIMultiplier, SIOffset: value.SIOffset })
-    })
-
-    return newUnits
+    return units.map(value => { return { name: value.name + `/s`, SIMultiplier: value.SIMultiplier, SIOffset: value.SIOffset } } )
 }
 
 function PerMinute(units)
 {
-    var newUnits = []
-
-    units.forEach(function(value, index){
-        newUnits.push( { name: value.name + `/min`, SIMultiplier: value.SIMultiplier * 60, SIOffset: value.SIOffset * 60 })
-    })
-
-    return newUnits
+    return units.map(value => { return { name: value.name + `/min`, SIMultiplier: value.SIMultiplier * 60, SIOffset: value.SIOffset * 60 } } )
 }

@@ -4,8 +4,7 @@ class VariableRegistry {
         this.CreateIfNotFound = true
     }
     Clear() {
-        Object.entries(this).forEach(e => {
-            var [elementname, element] = e
+        Object.entries(this).forEach(([elementname, element]) => {
             if(elementname === `CreateIfNotFound`)
                 return
             delete this[elementname]
@@ -450,7 +449,7 @@ function Packagize(definition, val) {
     val.outputVariables ??= this.outputVariables
     val.outputUnits = val.unit == undefined? val.outputUnits : [val.unit]
     val.outputUnits ??= this.unit == undefined? this.outputUnits : [this.unit]
-    val.outputVariables = val.outputVariables?.map(function(ov, idx) {
+    val.outputVariables = val.outputVariables?.map((ov, idx) => {
         if(typeof ov !== `string`)
             return ov
 
@@ -585,7 +584,7 @@ types = [
         delete this.outputUnits
         delete this.outputVariables
 
-        this.inputVariables?.forEach(function(inputVariable) {
+        this.inputVariables?.forEach(inputVariable => {
             thisValue.value.push({ type: `VariableId`, value: inputVariable ?? 0 })
         })
 
@@ -885,7 +884,7 @@ types = [
             { type: `Package`, //Package
                 value: [{ type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.GetTick }], //GetTick factory ID
                 outputVariables: [ { name: `CurrentTick`, type: `tick` } ]
-            }, ...this.inputs.map(function(input) { return { ...input, type: `Input` }})
+            }, ...this.inputs.map(input => { return { ...input, type: `Input` }})
         ]}
     }},
     { type: `Calculation_Formula`, toDefinition() {
@@ -979,7 +978,7 @@ types = [
                         operations[operationIndex+1].parameters[nextFormulaParameterIndex] = formula.resultInto = `temp`
                 } else {
                     tempIndex++
-                    operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).forEach(function(f) { for(let parameterIndex in f.parameters) {
+                    operations.filter(f => f.parameters.findIndex(p => p === formula.resultInto) > -1).forEach(f => { for(let parameterIndex in f.parameters) {
                         if(f.parameters[parameterIndex] === formula.resultInto) 
                             f.parameters[parameterIndex] = `temp${tempIndex}`
                     } })
@@ -1036,12 +1035,11 @@ types = [
             value: []
         }
         
-        const thisClass = this
         let resultName = this.outputVariables?.[0]?.name
-        parameters.forEach(function(parameter) { 
+        parameters.forEach(parameter => { 
             let name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
             name = name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length)
-            group.value.push({ ...thisClass.parameterValues[parameter], type: `CalculationOrVariableSelection`, outputVariables: [ { name } ] }) 
+            group.value.push({ ...this.parameterValues[parameter], type: `CalculationOrVariableSelection`, outputVariables: [ { name } ] }) 
         })
         for(let operationIndex in operations) {
             let operation = operations[operationIndex]
@@ -1050,7 +1048,7 @@ types = [
                 operationValue.type = `Calculation_Static`
                 operationValue.value = operation.parameters[0]
             } else {
-                operationValue.inputVariables = operation.parameters.map(function(parameter) { 
+                operationValue.inputVariables = operation.parameters.map(parameter => { 
                     let name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
                     name = name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length)
                     return { name } 

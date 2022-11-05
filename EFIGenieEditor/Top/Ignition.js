@@ -32,9 +32,8 @@ export default class Ignition extends UITemplate {
     Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
-        const thisClass = this
         Object.defineProperty(this.Outputs, 'saveValue', {
-            get: function() { return [...this.children].map(e => e.saveValue) },
+            get: function() { return [...this.children].map(x => x.saveValue) },
             set: function(saveValue) { 
                 while(this.children.length > saveValue.length) this.removeChild(this.lastChild)
                 for(let i = 0; i < saveValue.length; i++){
@@ -48,7 +47,7 @@ export default class Ignition extends UITemplate {
             }
         })
         Object.defineProperty(this.Outputs, 'value', {
-            get: function() { return [...this.children].map(e => e.value) },
+            get: function() { return [...this.children].map(x => x.value) },
             set: function(value) { 
                 while(this.children.length > value.length) this.removeChild(this.lastChild)
                 for(let i = 0; i < value.length; i++){
@@ -62,13 +61,13 @@ export default class Ignition extends UITemplate {
             }
         })
         this.Outputs.value = new Array(8)
-        this.OutputCount.addEventListener(`change`, function() {
-            const count = thisClass.OutputCount.value
-            let newOutputs = thisClass.Outputs.saveValue
+        this.OutputCount.addEventListener(`change`, () => {
+            const count = this.OutputCount.value
+            let newOutputs = this.Outputs.saveValue
             newOutputs.splice(count)
             for(let i = newOutputs.length; i < count; i++)
                 newOutputs[i] = {}
-            thisClass.Outputs.saveValue = newOutputs
+                this.Outputs.saveValue = newOutputs
         })
         this.Setup(prop)
     }
