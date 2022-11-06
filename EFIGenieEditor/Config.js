@@ -644,12 +644,12 @@ types = [
         return Packagize(this, this)
     }},
     { type: `Calculation_Static`, toDefinition() {
-        var type = GetType(this.value.value)
+        var type = GetType(this.value)
         var typeID = GetTypeId(type)
         return Packagize({ type: `definition`, value: [ 
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Static},
             { type: `UINT8`, value: typeID }, //typeid
-            { type: type, value: this.value.value } //val
+            { type: type, value: this.value } //val
         ]}, this)
     }},
     { type: `Calculation_2AxisTable`, inputs: 2, toDefinition() {
