@@ -54,9 +54,9 @@ export default class CalculationOrVariableSelection extends UITemplate {
     get outputUnits() {
         return  this._outputUnits ?? 
                 GetClassProperty(this.SubConfig, `outputUnits`) ??      
-                (this.selection.displayUnit != undefined? undefined : (
+                (this.selection.displayUnit != undefined? (
                     [ this.selection.displayUnit ]
-                ))
+                ) : undefined)
     }
     set outputUnits(outputUnits) {
         this._outputUnits = outputUnits

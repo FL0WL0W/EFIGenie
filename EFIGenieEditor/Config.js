@@ -38,8 +38,11 @@ class VariableRegistry {
         }
 
         if(variable) {
-            if(typeof variable.id === `string`)
-                return { ...this.GetVariableByReference({ name: variable.id, unit: reference.unit ?? variable.unit, type: reference.type ?? variable.type }), name: variable.name }
+            if(typeof variable.id === `string`) {
+                const referencedVariable = this.GetVariableByReference({ name: variable.id, unit: reference.unit ?? variable.unit, type: reference.type ?? variable.type })
+                if(referencedVariable)
+                    return { ...referencedVariable, name: variable.name }
+            }
             return variable
         }
     }
@@ -285,7 +288,8 @@ OperationArchitectureFactoryIDs = {
     Equal: 18,
     GreaterThanOrEqual: 19,
     LessThanOrEqual: 20,
-    Not: 21
+    Not: 21,
+    UnitConversion: 22
 }
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -698,10 +702,31 @@ types = [
             { type: `FLOAT`, value: this.coeffecients}, //coefficients
         ]}, this)
     }},
+    { type: `Calculation_UnitConversion`, inputs: 1, toDefinition() {
+        const fromUnit = GetUnitFromName(this.inputVariables?.[0]?.unit)
+        const toUnit = GetUnitFromName(this.outputVariables?.[0]?.unit)
+        const multiplier = toUnit.SIMultiplier / fromUnit.SIMultiplier
+        const adder = -fromUnit.SIOffset * multiplier + toUnit.SIOffset
+        return Packagize({ type: `definition`, value: [
+            { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.UnitConversion}, //factory ID
+            { type: `FLOAT`, value: multiplier}, //Multiplier
+            { type: `FLOAT`, value: adder}, //Adder
+        ]}, this)
+    }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
         if(this.calculation) return { ...this, ...( typeof this.calculation === `object`? this.calculation : { value: this.calculation }), type: this.selection }
         if(!this.selection) return
-        VariableRegister.RegisterVariable({ ...this.selection, ...this.outputVariables?.[0] })
+        const outputUnit = this.outputVariables?.[0]?.unit ?? this.outputUnits?.[0]
+        if(outputUnit != undefined && this.selection.unit != outputUnit && !VariableRegister.GetVariableByReference({ ...this.selection, unit: outputUnit })) {
+            const baseVariableReference = VariableRegister.GetVariableByReference(this.selection)
+            return { outputVariables: [ { ...baseVariableReference, unit: outputUnit } ], inputVariables: [ baseVariableReference ], type: `Calculation_UnitConversion` }
+        }
+        VariableRegister.RegisterVariable({ 
+            ...this.selection, 
+            ...this.outputVariables?.[0], 
+            ...(this.selection?.name != undefined && { id: this.selection.name }),
+            ...(outputUnit != undefined && { unit: outputUnit })
+        })
     }},
     { type: `Calculation_Add`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Add) }},
     { type: `Calculation_Subtract`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Subtract) }},
