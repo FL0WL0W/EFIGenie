@@ -37,6 +37,9 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
         super()
         this.polynomial.hidden = true
         this.updatePolynomial()
+        this.polynomial.addEventListener(`change`, () => {
+            this.updatePolynomial()
+        })
         this.voltage0.addEventListener(`change`, () => {
             this.updatePolynomial()
         })
@@ -58,7 +61,15 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
             this.voltage0.value = this.voltage100.value
             this.voltage100.value = temp
         })
-        this.voltageLiveUpdate.addEventListener(`change`, () => {
+        this.Setup(prop)
+        this.outputUnits = this.constructor.outputUnits
+    }
+
+    RegisterVariables(reference) {
+        super.RegisterVariables(reference)
+        const origUpdateEvent = communication.liveUpdateEvents[this.voltageLiveUpdate.GUID]
+        communication.liveUpdateEvents[this.voltageLiveUpdate.GUID] = (variableMetadata, currentVariableValues) => {
+            origUpdateEvent(variableMetadata, currentVariableValues)
             const liveValue = this.voltageLiveUpdate.value
             const calibrating = this.calibrate.label == `Stop`
             this.calibrate.hidden = liveValue == undefined
@@ -78,9 +89,7 @@ export default class TPS_Linear extends Input_AnalogPolynomial {
             } else {
                 this.calibrate.hidden = true
             }
-        })
-        this.Setup(prop)
-        this.outputUnits = this.constructor.outputUnits
+        }
     }
 
     updatePolynomial() {

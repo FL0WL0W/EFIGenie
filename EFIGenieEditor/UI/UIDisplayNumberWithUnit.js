@@ -20,7 +20,12 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     get saveValue() { return this.displayUnitElement.saveValue }
     set saveValue(saveValue) { this.displayUnitElement.saveValue = saveValue }
 
+    #value
+    get value() { return this.#value }
     set value(value) {
+        if(this.#value === value)
+            return
+        this.#value = value
         const displayUnit = this.displayUnit
         const valueUnit = this.valueUnit
         const valueToDisplayValue = value => { return value == undefined || !displayUnit? value : ConvertValueFromUnitToUnit(value, valueUnit, displayUnit) }

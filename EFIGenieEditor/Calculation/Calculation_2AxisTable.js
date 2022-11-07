@@ -232,9 +232,9 @@ export default class Calculation_2AxisTable extends UITemplate {
             communication.variablesToPoll.push(this.YSelection?.value)
         communication.liveUpdateEvents[this.GUID] = (variableMetadata, currentVariableValues) => {
             if(this.XSelection?.value && this.YSelection?.value) { 
-                const xVariableId = variableMetadata.GetVariableId(this.XSelection?.value)
-                const yVariableId = variableMetadata.GetVariableId(this.YSelection?.value)
-                if(currentVariableValues[xVariableId] != undefined && currentVariableValues[yVariableId] != undefined) {
+                const xVariableId = variableMetadata?.GetVariableId(this.XSelection?.value)
+                const yVariableId = variableMetadata?.GetVariableId(this.YSelection?.value)
+                if(currentVariableValues?.[xVariableId] != undefined && currentVariableValues[yVariableId] != undefined) {
                     this.table.trail(currentVariableValues[xVariableId], currentVariableValues[yVariableId])
                 } 
             }

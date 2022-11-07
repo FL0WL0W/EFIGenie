@@ -171,8 +171,8 @@ export default class Calculation_LookupTable extends UITemplate {
         
         communication.liveUpdateEvents[this.GUID] = (variableMetadata, currentVariableValues) => {
             if(this.parameterSelection?.value) { 
-                const parameterVariableId = variableMetadata.GetVariableId(this.parameterSelection?.value)
-                if(currentVariableValues[parameterVariableId] != undefined) {
+                const parameterVariableId = variableMetadata?.GetVariableId(this.parameterSelection?.value)
+                if(currentVariableValues?.[parameterVariableId] != undefined) {
                     this.table.trail(currentVariableValues[parameterVariableId])
                 } 
             }
