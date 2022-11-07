@@ -6,8 +6,13 @@ import UIUnit from "../UI/UIUnit.js"
 export default class Calculation_Formula extends UITemplate {
     static displayName = `Formula`
     static outputTypes = [ `bool|float` ]
-    static template = `<div data-element="editFormula"></div><div data-element="editFormulaContent"><div style="display: flex; width: 100%"><div style="margin-right: 2em; width: fit-content">Formula:</div><div data-element="formula"></div></div><div data-element="parameterElements"></div></div><div data-element="parameterValueElements"></div>`
+    static template = `<div data-element="editFormula"></div><div data-element="editFormulaContent"><div style="display: flex; width: 100%"><div style="margin: auto; margin-right: 1em; width: fit-content; white-space: nowrap;"><div data-element="labelElement"></div> <div data-element="formulaUnit"></div> = </div><div data-element="formula"></div></div><div data-element="parameterElements"></div></div><div data-element="parameterValueElements"></div>`
 
+    get outputUnits() { return [ this.formulaUnit.textContent ] }
+    set outputUnits(outputUnits) { this.formulaUnit.textContent = outputUnits?.[0] }
+
+    labelElement = document.createElement(`span`)
+    formulaUnit = document.createElement(`span`)
     editFormula = new UIDialog({ buttonLabel: `Edit Formula` })
     formula = new UIText({ class: `formula` })
     parameterElements = document.createElement(`div`)
@@ -115,9 +120,10 @@ export default class Calculation_Formula extends UITemplate {
     }
 
     get label() {
-        return this.editFormula.title.substring(0, this.editFormula.title.length - 8)
+        return this.labelElement.textContent
     }
     set label(label){
+        this.labelElement.textContent = label
         this.editFormula.title = label + ` Formula`
     }
 
