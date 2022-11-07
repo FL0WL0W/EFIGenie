@@ -215,6 +215,7 @@ export default class Calculation_Formula extends UITemplate {
                 operatorSplit = operatorSplit.substring(0, loc) + `,` + operatorSplit.substring(loc + parameterSplit[i].length)
             }
             operatorSplit = operatorSplit.split(`,`)
+            //allow parenthesis in parameter names
             parameters = ``
             for(let i = 0; i < parameterSplit.length; i++) {
                 if(parameters !== ``) parameters += `,`
@@ -227,9 +228,12 @@ export default class Calculation_Formula extends UITemplate {
                     }
                 }
             }
+            //filter out static values
             parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
+            //remove parenthesis operator from parameters
             parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
             parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
+            //filter out null parameters
             parameters = parameters.filter(s => s.length !== 0)
             this.parameters = parameters
         })
