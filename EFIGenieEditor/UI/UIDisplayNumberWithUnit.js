@@ -6,7 +6,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
     displayElement = document.createElement(`div`)
 
     constructor(prop) {
-        super(prop)
+        super()
         this.displayUnitElement.addEventListener(`change`, () => {
             this.ZeroesToAdd = 10000000
             this.UpdateDisplayValue()
@@ -14,6 +14,7 @@ export default class UIDisplayNumberWithUnit extends UINumberWithUnit {
         })
         this.displayElement.style.display = this.displayUnitElement.style.display = `inline-block`
         this.ZeroesToAdd = 10000000
+        this.Setup(prop)
     }
 
     get saveValue() { return this.displayUnitElement.saveValue }

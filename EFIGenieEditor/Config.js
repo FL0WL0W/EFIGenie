@@ -698,7 +698,7 @@ types = [
         ]}, this)
     }},
     { type: `CalculationOrVariableSelection`, toDefinition() {
-        if(this.calculation) return { ...this, ...this.calculation, type: this.selection }
+        if(this.calculation) return { ...this, ...( typeof this.calculation === `object`? this.calculation : { value: this.calculation }), type: this.selection }
         if(!this.selection) return
         VariableRegister.RegisterVariable({ ...this.selection, ...this.outputVariables?.[0] })
     }},
