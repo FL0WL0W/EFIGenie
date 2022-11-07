@@ -284,7 +284,8 @@ OperationArchitectureFactoryIDs = {
     LessThan: 17,
     Equal: 18,
     GreaterThanOrEqual: 19,
-    LessThanOrEqual: 20
+    LessThanOrEqual: 20,
+    Not: 21
 }
 EmbeddedOperationsFactoryIDs = {
     Offset: 20000,
@@ -477,9 +478,9 @@ function Packagize(definition, val) {
     return definition
 }
 
-function Calculation_Math(mathFactoryId) {
+function Calculation_Math(mathFactoryId, inputs = 2) {
     if(this.outputVariables || this.inputVariables){
-        this.inputVariables ??= [0,0]
+        this.inputVariables ??= inputs === 2? [0,0] : [0]
         this.outputVariables ??= [0]
     }
 
@@ -713,6 +714,7 @@ types = [
     { type: `Calculation_Equal`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Equal) }},
     { type: `Calculation_GreaterThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.GreaterThanOrEqual) }},
     { type: `Calculation_LessThanOrEqual`, inputs: 2, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.LessThanOrEqual) }},
+    { type: `Calculation_Not`, inputs: 1, toDefinition() { return Calculation_Math.call(this, OperationArchitectureFactoryIDs.Not, 1) }},
     { type: `CylinderAirmass_AlphaN`, outputUnits: [`g`], toDefinition() {
         return { ...this.Airmass, type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
     }},
@@ -888,7 +890,7 @@ types = [
         ]}
     }},
     { type: `Calculation_Formula`, toDefinition() {
-        let operators = [`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
+        let operators = [`!`,`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]
         function ParseFormula(formula, parameters) {
             formula = formula.replaceAll(` `, ``)
             for(let i = 0; i < parameters.length; i++) {
@@ -1027,6 +1029,8 @@ types = [
         //remove parenthesis operator from parameters
         parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
         parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
+        //remove not operator from parameters
+        parameters = parameters.map(s => s[0] === `!` ? s.substring(1) : s)
         //filter out null parameters
         parameters = parameters.filter(s => s.length !== 0)
         if(parameters.length === 0)
@@ -1051,11 +1055,14 @@ types = [
             if(operation.operator === `s`) {
                 operationValue.type = `Calculation_Static`
                 operationValue.value = operation.parameters[0]
+            } else if(operation.operator === `!`) {
+                operationValue.type = `Calculation_Not`
+                const name = operation.parameters[1].indexOf(`temp`) === 0 ? operation.parameters[1] : `${resultName}_${operation.parameters[1]}`
+                operationValue.inputVariables = [ name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length) ]
             } else {
                 operationValue.inputVariables = operation.parameters.map(parameter => { 
-                    let name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
-                    name = name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length)
-                    return { name } 
+                    const name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
+                    return { name: name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length) }
                 })
                 switch(operation.operator) {
                     case `*`: 
