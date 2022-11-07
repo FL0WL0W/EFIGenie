@@ -904,15 +904,17 @@ types = [
             if(parenthesisFormulas.length !== formula.split(`(`).length)
                 return `Parenthesis start and end not matching`
     
-            while((parenthesisFormulas = formula.split(`)`).filter(p => operators.some(o => p.split(`(`).pop()?.indexOf(o) > -1))).length > 1) {
+            while(formula.split(`)`).flatMap(p => p.split(`(`)).filter(p => operators.some(o => p.indexOf(o) > -1)).length > 1) {
                 tempIndex++
-                let tempFormula = parenthesisFormulas[0].split(`(`).pop()
+                let tempFormula = formula.split(`)`).filter(p => operators.some(o => p.split(`(`).pop()?.indexOf(o) > -1))[0].split(`(`).pop()
                 operations.push({
                     resultInto: `$temp${tempIndex}`,
                     parameters: [tempFormula]
                 })
                 formula = formula.replace(`(${tempFormula})`, `$temp${tempIndex}`)
             }
+            if(formula[0] === `(` && formula[formula.length-1] === `)`)
+                formula = formula.substring(1,formula.length-1)
             operations.push({
                 resultInto: `return`,
                 parameters: [formula]
@@ -1024,13 +1026,12 @@ types = [
                 }
             }
         }
-        //filter out static values
-        parameters = parameters.split(`,`).filter(s => !s.match(/^[0-9]*$/))
+        parameters = parameters.split(`,`)
         //remove parenthesis operator from parameters
         parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
         parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
-        //remove not operator from parameters
-        parameters = parameters.map(s => s[0] === `!` ? s.substring(1) : s)
+        //filter out static values
+        parameters = parameters.filter(s => !s.match(/^[0-9]*$/))
         //filter out null parameters
         parameters = parameters.filter(s => s.length !== 0)
         if(parameters.length === 0)
