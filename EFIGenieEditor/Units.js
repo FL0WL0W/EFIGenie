@@ -78,6 +78,18 @@ function GetDefaultUnitFromMeasurement(measurement) {
     return Measurements[measurement]?.[0]?.name
 }
 
+function GetDefaultMinMaxStepRedlineFromUnit(unit) {
+    switch(unit){
+        case `%`:           return { min: 0,      max: 100,       step: 10,       redline:        undefined }
+        case `[0.0-1.0]`:   return { min: 0,      max: 1,         step: 0.1,      redline:        undefined }
+        case `RPM`:         return { min: 0,      max: 8000,      step: 1000,     redline:        6500      }
+        case `Bar`:         return { min: 0.2,    max: 3,         step: 0.2,      redline:        undefined }
+        case `kPa`:         return { min: 20,     max: 300,       step: 20,       redline:        undefined }
+        case `V`:           return { min: 0,      max: 5,         step: 1,        redline:        undefined }
+        case `mV`:          return { min: 0,      max: 5000,      step: 1000,     redline:        undefined }
+    }
+}
+
 function GetUnit(measurement, name) {
     if(typeof measurement === `string`) {
         measurement = Measurements[measurement]

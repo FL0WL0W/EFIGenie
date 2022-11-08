@@ -88,7 +88,7 @@ export default class Calculation_LookupTable extends UITemplate {
 
         if(!this.parameterSelection) {
             this.parameterSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
+                options: VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
                 selectHidden: true
             })
             this.parameterSelection.unitHidden = true
@@ -150,7 +150,7 @@ export default class Calculation_LookupTable extends UITemplate {
     get inputUnits() { return [ this.xUnit ] }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits?.[0]
-        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+        this.xOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
         this.xUnit = inputUnits?.[0]
         if(inputUnits?.[0] != undefined)
             this.xMeasurement = GetMeasurementNameFromUnitName(inputUnits?.[0])
@@ -165,7 +165,7 @@ export default class Calculation_LookupTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+        this.xOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
         if(communication.variablesToPoll.indexOf(this.parameterSelection?.value) === -1)
             communication.variablesToPoll.push(this.parameterSelection?.value)
         

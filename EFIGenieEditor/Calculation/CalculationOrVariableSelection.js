@@ -48,7 +48,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             if(`outputTypes` in calculationValue)
                 calculationValue.outputTypes = outputTypes
         })
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get outputUnits() {
@@ -64,7 +64,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             if(`outputUnits` in calculationValue)
                 calculationValue.outputUnits = outputUnits
         })
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get inputTypes() {
@@ -79,7 +79,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             if(`inputTypes` in calculationValue)
                 calculationValue.inputTypes = inputTypes
         })
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get inputUnits() {
@@ -92,7 +92,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
             if(`inputUnits` in calculationValue)
                 calculationValue.inputUnits = inputUnits
         })
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     get options() { return this.selection.options }    
@@ -125,7 +125,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
     Setup(...args) {
         super.Setup(...args)
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
     }
 
     static SaveOnlyActive = false
@@ -205,7 +205,7 @@ export default class CalculationOrVariableSelection extends UITemplate {
 
     RegisterVariables(reference) {
         reference = { ...reference }
-        this.options = GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
+        this.options = VariableRegister.GetSelections(this.calculations, this.selectionFilter(this._outputUnits, this._outputTypes, this._inputTypes, this._inputUnits))
 
         if (!this.selection.value || !reference) return
 

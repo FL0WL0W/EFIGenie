@@ -453,11 +453,15 @@ select .pinconflict{
     font-family:monospace;
     content: "▼\00a0";
 }
+.dashboard-tab::before,
 .engine-tab::before,
 .fuel-tab::before,
 .ignition-tab::before {
     font-family:monospace;
     content: "\00a0\00a0";
+}
+.dashboard-tab::after {
+    content: "Dashboard";
 }
 .input-tab::after {
     content: "Inputs";
@@ -478,4 +482,9 @@ select .pinconflict{
 
 .ui.select.inputmeasurement .ui.selected {
     min-width: 120px;
+}
+
+.gauges {
+    display: flex;
+    flex-wrap: wrap;
 }

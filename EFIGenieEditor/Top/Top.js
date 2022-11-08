@@ -1,5 +1,6 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIButton from "../JavascriptUI/UIButton.js"
+import Dashboard from "./Dashboard.js"
 import Engine from "./Engine.js"
 import Ignition from "./Ignition.js"
 import Fuel from "./Fuel.js"
@@ -8,11 +9,13 @@ export default class Top extends UITemplate {
     static template = getFileContents(`ConfigGui/Top.html`)
 
     title = document.createElement(`div`)
+    dashboardTab = document.createElement(`div`)
     inputsTabExpend = document.createElement(`span`)
     inputsTab = document.createElement(`div`)
     engineTab = document.createElement(`div`)
     fuelTab = document.createElement(`div`)
     ignitionTab = document.createElement(`div`)
+    Dashboard = new Dashboard()
     Inputs = new Inputs()
     Engine = new Engine()
     Fuel = new Fuel()
@@ -71,6 +74,10 @@ export default class Top extends UITemplate {
         this.title.style.display = `inline-block`
         this.title.style.margin = `3px`
         this.activeTab = window.localStorage.getItem(`lastTab`) ?? `Inputs`
+        this.dashboardTab.class = `w3-bar-item w3-button dashboard-tab`
+        this.dashboardTab.addEventListener(`click`, () => {
+            this.activeTab = `Dashboard`
+        })
         this.inputsTabList = this.Inputs.inputListElement
         this.inputsTabList.addEventListener(`click`, () => {
             this.activeTab = `Inputs`
@@ -131,15 +138,21 @@ export default class Top extends UITemplate {
     set activeTab(activeTab) {
         window.localStorage.setItem(`lastTab`, activeTab)
         this.title.textContent = activeTab
+        this.Dashboard.hidden = true
         this.Inputs.hidden = true
         this.Engine.hidden = true
         this.Fuel.hidden = true
         this.Ignition.hidden = true
+        this.dashboardTab.classList.remove(`active`)
         this.inputsTab.classList.remove(`active`)
         this.engineTab.classList.remove(`active`)
         this.fuelTab.classList.remove(`active`)
         this.ignitionTab.classList.remove(`active`)
         switch(activeTab) {
+            case `Dashboard`:
+                this.Dashboard.hidden = false
+                this.dashboardTab.classList.add(`active`)
+                break
             case `Inputs`:
                 this.Inputs.hidden = false
                 this.inputsTab.classList.add(`active`)
@@ -173,6 +186,7 @@ export default class Top extends UITemplate {
         this.Engine.RegisterVariables()
         this.Fuel.RegisterVariables()
         this.Ignition.RegisterVariables()
+        this.Dashboard.RegisterVariables()
     }
 }
 customElements.define(`top-top`, Top, { extends: `span` })

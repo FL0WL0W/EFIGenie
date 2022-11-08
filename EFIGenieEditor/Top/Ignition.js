@@ -90,8 +90,8 @@ export default class Ignition extends UITemplate {
         this.IgnitionDwellConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell` })
         this.IgnitionDwellDeviationConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell Deviation` })
 
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].RegisterVariables()
+        for(var i = 0; i < this.Outputs.children.length; i++){
+            this.Outputs.children[i].RegisterVariables()
         }
     }
 }

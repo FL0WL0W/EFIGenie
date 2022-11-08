@@ -8,6 +8,8 @@ export default class UIParameterWithUnit extends UITemplate {
     unitSelection = new UIUnit()
     constructor(prop){
         super()
+        this.style.display = `inline-flex`
+        this.style.alignItems = `center`
         this.parameterSelection.addEventListener(`change`, () => {
             const units = this.units
             this.unitSelection.measurement = GetMeasurementNameFromUnitName(units)

@@ -123,7 +123,7 @@ export default class Calculation_2AxisTable extends UITemplate {
 
         if(!this.XSelection) {
             this.XSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
+                options: VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ])),
                 selectHidden: true
             })
             this.XSelection.unitHidden = true
@@ -141,7 +141,7 @@ export default class Calculation_2AxisTable extends UITemplate {
         }
         if(!this.YSelection) {
             this.YSelection = new UIParameterWithUnit({
-                options: GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ])),
+                options: VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ])),
                 selectHidden: true
             })
             this.YSelection.unitHidden = true
@@ -203,8 +203,8 @@ export default class Calculation_2AxisTable extends UITemplate {
     get inputUnits() { return [ this.xUnit, this.yUnit ] }
     set inputUnits(inputUnits) {
         this._inputUnits = inputUnits?.[0]
-        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
-        this.yOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ]))
+        this.xOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+        this.yOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[1], [ `float` ]))
         this.xUnit = inputUnits?.[0]
         this.yUnit = inputUnits?.[1]
         if(inputUnits?.[0] != undefined)
@@ -224,8 +224,8 @@ export default class Calculation_2AxisTable extends UITemplate {
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 
     RegisterVariables() {
-        this.xOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
-        this.yOptions = GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+        this.xOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
+        this.yOptions = VariableRegister.GetSelections(undefined, defaultFilter(this._inputUnits?.[0], [ `float` ]))
         if(communication.variablesToPoll.indexOf(this.XSelection?.value) === -1)
             communication.variablesToPoll.push(this.XSelection?.value)
         if(communication.variablesToPoll.indexOf(this.YSelection?.value) === -1)

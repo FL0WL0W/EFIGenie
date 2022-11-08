@@ -93,8 +93,8 @@ export default class Fuel extends UITemplate {
         this.InjectorPulseWidthConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector Pulse Width` })
         this.InjectorEndPositionConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector End Position` })
 
-        for(var i = 0; i < this.Outputs.length; i++){
-            this.Outputs[i].RegisterVariables()
+        for(var i = 0; i < this.Outputs.children.length; i++){
+            this.Outputs.children[i].RegisterVariables()
         }
     }
 }

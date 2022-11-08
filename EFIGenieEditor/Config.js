@@ -19,8 +19,8 @@ class VariableRegistry {
 
         let variable
         //variable is contained in a list
-        const dotIndex = reference.name.indexOf(`.`)
-        if(dotIndex !== -1) {
+        const dotIndex = reference.name?.indexOf(`.`)
+        if((dotIndex ?? -1) !== -1) {
             const listName = reference.name.substring(0, dotIndex)
             if(!this[listName]) return
             variable = { name: reference.name.substring(dotIndex + 1) }
@@ -120,6 +120,59 @@ class VariableRegistry {
         }
         return variableReferences
     }
+    GetSelections(calculations, filter) {
+        var selections = []
+        if (calculations?.length > 0) {
+            var configGroups = calculations
+            if(!calculations[0].group && !calculations[0].calculations)
+                configGroups = [{ group: `Calculations`, calculations: calculations }]
+    
+            for(var c = 0; c < configGroups.length; c++) {
+                var configOptions = { group: configGroups[c].group, options: [] }
+                calculations = configGroups[c].calculations
+                for (var i = 0; i < calculations.length; i++) {
+                    if(!filter || filter(calculations[i])) {
+                        configOptions.options.push({
+                            name: calculations[i].displayName,
+                            value: calculations[i].name
+                        })
+                    }
+                }
+                if(configOptions.options.length > 0)
+                    selections.push(configOptions)
+            }
+        }
+    
+        for (var property in this) {
+            if (!Array.isArray(this[property]))
+                continue
+    
+            var arr = this[property]
+    
+            var arrSelections = { group: property, options: [] }
+    
+            for (var i = 0; i < arr.length; i++) {
+                if (!filter || filter(arr[i])) {
+                    arrSelections.options.push({
+                        name: arr[i].name,
+                        info: arr[i].unit? `[${GetMeasurementNameFromUnitName(arr[i].unit)}]` : ``,
+                        value: { 
+                            name: `${property}.${arr[i].name}`,
+                            ...( arr[i].type == undefined? undefined :{ type: arr[i].type } ),
+                            ...( arr[i].unit == undefined? undefined :{ unit: arr[i].unit } )
+                        }
+                    })
+                }
+            }
+            if(arrSelections.options.length > 0)
+                selections.push(arrSelections)
+        }
+    
+        if(selections.length === 1)
+            return selections[0].options
+    
+        return selections
+    }
 }
 VariableRegister = new VariableRegistry()
 
@@ -178,59 +231,6 @@ function defaultFilter(outputUnits, outputTypes, inputTypes, inputUnits) {
         }
         return true
     }
-}
-function GetSelections(calculations, filter) {
-    var selections = []
-    if (calculations?.length > 0) {
-        var configGroups = calculations
-        if(!calculations[0].group && !calculations[0].calculations)
-            configGroups = [{ group: `Calculations`, calculations: calculations }]
-
-        for(var c = 0; c < configGroups.length; c++) {
-            var configOptions = { group: configGroups[c].group, options: [] }
-            calculations = configGroups[c].calculations
-            for (var i = 0; i < calculations.length; i++) {
-                if(!filter || filter(calculations[i])) {
-                    configOptions.options.push({
-                        name: calculations[i].displayName,
-                        value: calculations[i].name
-                    })
-                }
-            }
-            if(configOptions.options.length > 0)
-                selections.push(configOptions)
-        }
-    }
-
-    for (var property in VariableRegister) {
-        if (!Array.isArray(VariableRegister[property]))
-            continue
-
-        var arr = VariableRegister[property]
-
-        var arrSelections = { group: property, options: [] }
-
-        for (var i = 0; i < arr.length; i++) {
-            if (!filter || filter(arr[i])) {
-                arrSelections.options.push({
-                    name: arr[i].name,
-                    info: arr[i].unit? `[${GetMeasurementNameFromUnitName(arr[i].unit)}]` : ``,
-                    value: { 
-                        name: `${property}.${arr[i].name}`,
-                        ...( arr[i].type == undefined? undefined :{ type: arr[i].type } ),
-                        ...( arr[i].unit == undefined? undefined :{ unit: arr[i].unit } )
-                    }
-                })
-            }
-        }
-        if(arrSelections.options.length > 0)
-            selections.push(arrSelections)
-    }
-
-    if(selections.length === 1)
-        return selections[0].options
-
-    return selections
 }
 
 var AFRConfigs = []

@@ -164,6 +164,7 @@ class EFIGenieSerial extends EFIGenieLog {
         const metadataString = lzjs.decompressFromBase64(arrayBufferToBase64(metadataData))
 
         this.variableMetadata = new VariableRegistry(JSON.parse(metadataString))
+        registerVariables()
     }
 
     async pollVariables() {
