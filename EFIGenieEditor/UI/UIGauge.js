@@ -132,6 +132,8 @@ export default class UIGauge extends HTMLDivElement {
         }
         options.title = this.parameter
         this.gauge.update(options)
+        this.gauge.value = ConvertValueFromUnitToUnit(this.value, this.valueUnit, this.displayUnit)
+        this.gauge.draw()
     }
 
     constructor(prop) {
@@ -144,8 +146,8 @@ export default class UIGauge extends HTMLDivElement {
         this.variable.parameterSelection.selectedElement.style.minWidth = `auto`
         this.variable.parameterSelection.selectedElement.style.maxWidth = `150px`
         this.variable.addEventListener(`change`, () => {
-            this.#updateGauge()
             this.RegisterVariables()
+            this.#updateGauge()
         })
         this.template = this.constructor.template
         Object.assign(this, prop)
