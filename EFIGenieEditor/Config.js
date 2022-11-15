@@ -668,13 +668,11 @@ types = [
         const typeId = GetTypeId(type)
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.Table }, //factory ID
-            { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
-            { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
-            { type: `FLOAT`, value: this.table.yAxis[0] }, //MinYValue
-            { type: `FLOAT`, value: this.table.yAxis[this.table.yAxis.length-1] }, //MaxYValue
             { type: `UINT8`, value: this.table.xAxis.length }, //xResolution
             { type: `UINT8`, value: this.table.yAxis.length }, //yResolution
             { type: `UINT8`, value: typeId }, //Type
+            { type: `FLOAT`, value: this.table.xAxis }, //xAxis
+            { type: `FLOAT`, value: this.table.yAxis }, //yAxis
             { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
@@ -686,10 +684,9 @@ types = [
         const typeId = GetTypeId(type)
         return Packagize({ type: `definition`, value: [
             { type: `UINT32`, value: OperationArchitectureFactoryIDs.Offset + OperationArchitectureFactoryIDs.LookupTable }, //factory ID
-            { type: `FLOAT`, value: this.table.xAxis[0] }, //MinXValue
-            { type: `FLOAT`, value: this.table.xAxis[this.table.xAxis.length-1] }, //MaxXValue
             { type: `UINT8`, value: this.table.xAxis.length }, //xResolution
             { type: `UINT8`, value: typeId }, //Type
+            { type: `FLOAT`, value: this.table.xAxis }, //xAxis
             { type: type, value: this.table.value }, //Table
         ]}, this)
     }},
