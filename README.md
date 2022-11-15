@@ -14,13 +14,14 @@ two step rev limiters can be implemented or tri-step or even quad-step. still ha
 things to complete but i am at a state where i am testing the ecu.
 
 ## Features
-* Customizable(size and limits) 3D Fuel and Ignition Maps (Speed Density)
+* Customizable(size, limits, and axis) 3D Fuel and Ignition Maps (Speed Density, Alpha N)
 * Customizable formulas for all engine parameters
 * Cusotmizable inputs and outputs
 * Unlimited cylinder sequential injection and ignition (Depends on hardware)
   * Stm32Devboard - 8 cylinder sequential fuel and ignition (10, 12, 14, 16 wasted spark/banked injection)
 * Flexible Crank Cam Decoder
   * GM 24x (Cam + Crank, Crank Only, or Cam only)
+  * Universal 1X decoder
   * Configurable Missing Tooth Decoder
   * --More to come
 * Firmware features
@@ -51,14 +52,12 @@ Make
 
 ## TODO List
 * *Logging
-* *EFIGenie Viewer
 * *Idle Control
-* *Alpha-N
 * *Create unit tests
 * Prime
 * After Start Enrichment
 * Warm Up Enrichment
-* Flex fuel
+* Flex fuel Sensors
 * Rev Limiting (Hard and Soft Spark)
 * Launch control (Hard and Soft Spark)
 * Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table
@@ -76,6 +75,5 @@ Make
 * VVT control (PWM - Open loop or PID control loop)
 * Boost control (PWM - Open loop or PID control loop)
 * CAN Bus/OBD2
-* Variable table axis(I.E. RPM 400, 600, 800, 1200, 2400, 3600, 3800, 4000, 4200, 5400, 6600)
 
 > *High Priority
