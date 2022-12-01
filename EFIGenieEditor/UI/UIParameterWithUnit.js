@@ -137,7 +137,12 @@ export default class UIParameterWithUnit extends UITemplate {
         }
         this.optionUnits = {}
         this.parameterSelection.options = flatten(options)
-        this.unitSelection.measurement = GetMeasurementNameFromUnitName(this.units)
+        const units = this.units
+        this.unitSelection.measurement = GetMeasurementNameFromUnitName(units)
+        if(units !== undefined)
+            this.unitSelection.hidden = this.unitHidden
+        else 
+            this.unitSelection.hidden = true
     }
     
 }

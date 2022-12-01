@@ -1,5 +1,6 @@
+import UITemplate from "../JavascriptUI/UITemplate.js"
 import UIParameterWithUnit from "./UIParameterWithUnit.js"
-export default class UIGauge extends HTMLDivElement {
+export default class UIGauge extends UITemplate {
     static template = 
 `<canvas data-type="radial-gauge"
     data-width="350"
@@ -20,19 +21,17 @@ export default class UIGauge extends HTMLDivElement {
     data-animation-duration="50"
     data-animation-rule="linear"
 ></canvas>
-<div data-element="variable" style="
+<div style="
     position: absolute;
     inset: auto auto 100px 0px;
     z-index: 1;
     display: flex;
     justify-content: center;
     width: 350;
-"></div>`
+"><div data-element="variable"></div></div>`
 
-    get template() { return this.innerHTML }
-    set template(template) {
-        this.innerHTML = template
-        this.querySelector(`[data-element="variable"]`).replaceChildren(this.variable)
+    Setup(prop) {
+        super.Setup(prop)
         const canvas = this.querySelector(`canvas`)
         BaseGauge.fromElement(canvas)
         this.gauge = document.gauges.find(x=> x.canvas.element === canvas)
@@ -140,17 +139,16 @@ export default class UIGauge extends HTMLDivElement {
         super()
         this.style.position = `relative`
         this.canvas = this.appendChild(document.createElement(`div`))
-        this.variable = this.appendChild(new UIParameterWithUnit({
+        this.variable = new UIParameterWithUnit({
             options: VariableRegister.GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
-        }))
+        })
         this.variable.parameterSelection.selectedElement.style.minWidth = `auto`
         this.variable.parameterSelection.selectedElement.style.maxWidth = `150px`
         this.variable.addEventListener(`change`, () => {
             this.RegisterVariables()
             this.#updateGauge()
         })
-        this.template = this.constructor.template
-        Object.assign(this, prop)
+        this.Setup(prop)
     }
 
     GUID = generateGUID()
@@ -195,4 +193,4 @@ export default class UIGauge extends HTMLDivElement {
         }
     }
 }
-customElements.define(`ui-gauge`, UIGauge, { extends: `div` })
+customElements.define(`ui-gauge`, UIGauge, { extends: `span` })
