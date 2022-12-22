@@ -70,7 +70,7 @@ export default class Inputs extends UITemplate {
             }
         })
         this.inputs.saveValue = [{}]
-        this.newInputElement = new UIButton({className: `controladd`})
+        this.newInputElement = new UIButton({className: `controlnew`})
         this.newInputElement.addEventListener(`click`, () => { thisClass.#appendInput() })
         this.inputListNewElement = document.createElement(`div`)
         this.inputListNewElement.class = `w3-bar-subitem w3-button`

@@ -1,4 +1,6 @@
+import UIDialog from "../JavascriptUI/UIDialog.js"
 import UITemplate from "../JavascriptUI/UITemplate.js"
+import Dashboard from "../Top/Dashboard.js"
 import UIParameterWithUnit from "./UIParameterWithUnit.js"
 export default class UIGauge extends UITemplate {
     static template = 
@@ -20,19 +22,14 @@ export default class UIGauge extends UITemplate {
     data-needle-circle-inner="false"
     data-animation-duration="50"
     data-animation-rule="linear"
-></canvas>
-<div style="
-    position: absolute;
-    inset: auto auto 100px 0px;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    width: 350;
-"><div data-element="variable"></div></div>`
+></canvas>`
 
     Setup(prop) {
         super.Setup(prop)
         const canvas = this.querySelector(`canvas`)
+        canvas.addEventListener(`click`, () => {
+            this.configDialog.show()
+        })
         BaseGauge.fromElement(canvas)
         this.gauge = document.gauges.find(x=> x.canvas.element === canvas)
         this.#updateGauge()
@@ -138,43 +135,21 @@ export default class UIGauge extends UITemplate {
     constructor(prop) {
         super()
         this.style.position = `relative`
-        this.canvas = this.appendChild(document.createElement(`div`))
         this.variable = new UIParameterWithUnit({
-            options: VariableRegister.GetSelections(undefined, defaultFilter(undefined, [ `float` ])),
+            options: VariableRegister.GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
         })
-        this.variable.parameterSelection.selectedElement.style.minWidth = `auto`
-        this.variable.parameterSelection.selectedElement.style.maxWidth = `150px`
         this.variable.addEventListener(`change`, () => {
             this.RegisterVariables()
             this.#updateGauge()
         })
+        this.configDialog = new UIDialog({ title: `Edit Gauge` })
+        this.configDialog.content.append(this.variable)
         this.Setup(prop)
     }
 
     GUID = generateGUID()
     RegisterVariables() {
-        let options = VariableRegister.GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
-        let metadataOptions = communication.variableMetadata?.GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
-        for(const i in metadataOptions) {
-            const option = metadataOptions[i]
-            if(option.group) {
-                const optionGroup = options.find(x => x.group === option.group)
-                if(optionGroup == undefined) {
-                    options.push(option)
-                } else {
-                    for(const i in option.options) {
-                        const optionG = option.options[i]
-                        if(optionGroup.options.find(x => objectTester(x.value, optionG.value)) == undefined) {
-                            optionGroup.options.push(optionG)
-                        }
-                    }
-                }
-            } else {
-                if(options.find(x => objectTester(x.value, option.value)) == undefined) {
-                    options.push(option)
-                }
-            }
-        }
+        let options = Dashboard.thisDashboard.options.map(x => x.group && x.options? {...x, options: x.options.map(x => { return {...x, disabled: !x.disabled}})} : {...x, disabled: !x.disabled})
         this.variable.options = options
 
         const reference = this.variable.value

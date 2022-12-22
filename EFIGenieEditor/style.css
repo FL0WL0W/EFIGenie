@@ -244,6 +244,7 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     flex-direction: column;
 }
 .controladd,
+.controlnew,
 .controldelete,
 .controlup,
 .controldown,
@@ -252,16 +253,21 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     font-family: 'Courier New', monospace;
     font-weight: bold;
     cursor: pointer;
+    width: fit-content;
 }
 .controladd:hover,
+.controlnew:hover,
 .controldelete:hover,
 .controlup:hover,
 .controldown:hover {
     border-radius: 6px;
     background-color: #666;
 }
-.controladd::after {
+.controlnew::after {
     content: "+ New";
+}
+.controladd::after {
+    content: "+";
 }
 .controldelete::after {
     content: "-";
@@ -487,4 +493,66 @@ select .pinconflict{
 .gauges {
     display: flex;
     flex-wrap: wrap;
+}
+
+.loggedVariables {
+    border-right: 0.1em solid #eee
+}
+.loggedVariables table {
+    outline: none;
+    border-spacing: 0;
+}
+.loggedVariables table tr.selected td {
+    background-color: #3590d0;
+}
+.loggedVariables table tr.selected td.actions {
+    background-color: inherit;
+}
+.loggedVariables table td {
+    border: 0.1em solid rgba(0, 0, 0, 0.3);
+    border-spacing: 0;
+    min-width: 50px;
+    white-space: nowrap;
+}
+.loggedVariables table td.actions {
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    border-spacing: 0;
+    min-width: 50px;
+}
+.loggedVariables table td.loggedVariableName {
+    min-width: 200px;
+}
+.ui.select.refreshRateSelection .ui.selected {
+    min-width: 50px;
+}
+
+.ui.button.loggedVariablesExpand {
+    writing-mode: vertical-lr;
+    height: fit-content;
+}
+
+.ui.context-menu.openned {
+    position: inherit;
+    width: 500px;
+}
+
+.ui.select.logged-variable-selection .ui.selected {
+    width: 100%;
+}
+.ui.select.logged-variable-selection .ui.selected,
+.ui.select.unit .ui.selected {
+    min-width: 0px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    min-width: 2em;
+}
+.ui.select.logged-variable-selection .ui.selected::after {
+    float: right;
+}
+.ui.select.unit .ui.selected::after {
+    float: right;
+    content: "";
 }
