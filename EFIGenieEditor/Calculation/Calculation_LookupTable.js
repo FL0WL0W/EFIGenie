@@ -60,9 +60,7 @@ export default class Calculation_LookupTable extends UITemplate {
     get xDisplayAxis() { return this.table.xDisplayAxis }
     set xDisplayAxis(xDisplayAxis) { this.table.xDisplayAxis = xDisplayAxis }
     get xUnit() { return this.table.xUnit }
-    set xUnit(xUnit) { 
-        this.table.xUnit = xUnit
-    }
+    set xUnit(xUnit) { this.table.xUnit = xUnit }
     get xAxis() { return this.table.xAxis }
     set xAxis(xAxis) { this.table.xAxis = xAxis }
 
@@ -129,6 +127,8 @@ export default class Calculation_LookupTable extends UITemplate {
         value = {...value}
         const table = value.table
         delete value.table
+        if(value.parameterSelection?.unit != undefined)
+            this.xUnit = value.parameterSelection?.unit
         super.value = value 
         this.table.saveValue = table
     }
@@ -141,6 +141,8 @@ export default class Calculation_LookupTable extends UITemplate {
         const table = saveValue.table
         saveValue = {...saveValue}
         delete saveValue.table
+        if(saveValue.parameterSelection?.unit != undefined)
+            this.xUnit = saveValue.parameterSelection?.unit
         super.saveValue = saveValue
         if(table !== undefined)
             this.table.saveValue = table

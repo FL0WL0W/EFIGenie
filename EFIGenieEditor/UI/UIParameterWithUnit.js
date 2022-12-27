@@ -118,22 +118,21 @@ export default class UIParameterWithUnit extends UITemplate {
     }
     set options(options) {
         const flatten = options => {
+            let newOptions = []
             for(const optionIndex in options) {
                 let option = options[optionIndex]
                 if(option.group) {
-                    option.options = flatten(option.options)
+                    newOptions.push({ ...option, options: flatten(option.options) })
                 } else if(typeof option.value === `object` && option.value.unit !== undefined) {
                     this.optionUnits[option.value.name] ??= []
                     this.optionUnits[option.value.name].push(option.value.unit)
-                    if(options.filter(x=>x?.value?.name === option.value.name).length > 1) {
-                        delete options[optionIndex]
-                    } else {
-                        delete option.value.unit
-                        delete option.info
-                    }
+                    if(newOptions.filter(x=>x?.value?.name === option.value.name).length < 1)
+                        newOptions.push({ ...option, value: { ...option.value, unit: undefined }, info: undefined})
+                } else {
+                    newOptions.push(option)
                 }
             }
-            return options.filter(x => true)
+            return newOptions
         }
         this.optionUnits = {}
         this.parameterSelection.options = flatten(options)

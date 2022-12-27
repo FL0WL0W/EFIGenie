@@ -60,9 +60,7 @@ export default class Calculation_2AxisTable extends UITemplate {
     get xDisplayAxis() { return this.table.xDisplayAxis }
     set xDisplayAxis(xDisplayAxis) { this.table.xDisplayAxis = xDisplayAxis }
     get xUnit() { return this.table.xUnit }
-    set xUnit(xUnit) { 
-        this.table.xUnit = xUnit 
-    }
+    set xUnit(xUnit) { this.table.xUnit = xUnit }
     get xAxis() { return this.table.xAxis }
     set xAxis(xAxis) { this.table.xAxis = xAxis }
 
@@ -84,9 +82,7 @@ export default class Calculation_2AxisTable extends UITemplate {
     get yDisplayAxis() { return this.table.yDisplayAxis }
     set yDisplayAxis(yDisplayAxis) { this.table.yDisplayAxis = yDisplayAxis }
     get yUnit() { return this.table.yUnit }
-    set yUnit(yUnit) { 
-        this.table.yUnit = yUnit 
-    }
+    set yUnit(yUnit) { this.table.yUnit = yUnit }
     get yAxis() { return this.table.yAxis }
     set yAxis(yAxis) { this.table.yAxis = yAxis }
 
@@ -182,6 +178,10 @@ export default class Calculation_2AxisTable extends UITemplate {
         value = {...value}
         const table = value.table
         delete value.table
+        if(value.XSelection?.unit != undefined)
+            this.xUnit = value.XSelection?.unit
+        if(value.YSelection?.unit != undefined)
+            this.yUnit = value.YSelection?.unit
         super.value = value 
         this.table.saveValue = table
     }
@@ -194,6 +194,10 @@ export default class Calculation_2AxisTable extends UITemplate {
         saveValue = {...saveValue}
         const table = saveValue.table
         delete saveValue.table
+        if(saveValue.XSelection?.unit != undefined)
+            this.xUnit = saveValue.XSelection?.unit
+        if(saveValue.YSelection?.unit != undefined)
+            this.yUnit = saveValue.YSelection?.unit
         super.saveValue = saveValue
         if(table !== undefined)
             this.table.saveValue = table

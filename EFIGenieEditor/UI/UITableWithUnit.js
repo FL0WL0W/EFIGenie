@@ -182,11 +182,11 @@ export default class UITableWithUnit extends UITemplate {
             yOldUnit = this.yDisplayUnit
         })
         this.displayValueElement.addEventListener(`change`, () => {
-            if(this.displayValue != undefined && this.displayUnit)
+            if(this.displayValue != undefined)
                 this.value = ConvertValueFromUnitToUnit(this.displayValue, this.displayUnit, this.valueUnit)
-            if(this.xDisplayAxis != undefined && this.xDisplayUnit)
+            if(this.xDisplayAxis != undefined)
                 this.xAxis = ConvertValueFromUnitToUnit(this.xDisplayAxis, this.xDisplayUnit, this.xUnit)
-            if(this.yDisplayAxis != undefined && this.yDisplayUnit)
+            if(this.yDisplayAxis != undefined)
                 this.yAxis = ConvertValueFromUnitToUnit(this.yDisplayAxis, this.yDisplayUnit, this.yUnit)
                 this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })
@@ -227,8 +227,10 @@ export default class UITableWithUnit extends UITemplate {
             this.xDisplayUnitElement.saveValue = saveValue.xDisplayUnit
         if(saveValue.yDisplayUnit != undefined)
             this.yDisplayUnitElement.saveValue = saveValue.yDisplayUnit
-        this.xAxis = saveValue.xAxis
-        this.yAxis = saveValue.yAxis
+        if(saveValue.xAxis != undefined)
+            this.xAxis = saveValue.xAxis
+        if(saveValue.yAxis != undefined)
+            this.yAxis = saveValue.yAxis
         this.value = saveValue.value
     }
 

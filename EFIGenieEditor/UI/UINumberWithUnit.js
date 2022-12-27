@@ -69,7 +69,7 @@ export default class UINumberWithUnit extends UITemplate {
         })
         this.displayValueElement = new UINumber()
         this.displayValueElement.addEventListener(`change`, () => {
-            if(this.displayValue != undefined && this.displayUnit)
+            if(this.displayValue != undefined)
                 this.#value = ConvertValueFromUnitToUnit(this.displayValue, this.displayUnit, this.valueUnit)
             this.dispatchEvent(new Event(`change`, {bubbles: true}))
         })

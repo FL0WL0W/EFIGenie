@@ -39,7 +39,7 @@ export default class Ignition extends UITemplate {
                 for(let i = 0; i < saveValue.length; i++){
                     if(!this.children[i]) {
                         this.append(new Output_TDC({
-                            label:          `Injector ${i+1}`
+                            label:          `Ignition ${i+1}`
                         }))
                     }
                     this.children[i].saveValue = saveValue[i]

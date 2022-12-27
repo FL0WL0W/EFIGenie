@@ -33,7 +33,7 @@ export default class Reluctor_UniversalMissingTeeth extends Reluctor_Template {
         super()
         this.length.value = 72
         this.numberOfTeeth.addEventListener(`change`, () => {
-            this.length.value = this.NumberOfTeeth.value * 2
+            this.length.value = this.numberOfTeeth.value * 2
         })
         this.numberOfTeethMissing = new UINumber({
             value: 1,
