@@ -68,7 +68,11 @@ export default class UIGauge extends UITemplate {
         options.maxValue = parseFloat(ConvertValueFromUnitToUnit(this.max, this.valueUnit, this.displayUnit)?.toFixed(2) ?? 100)
         let i = options.minValue
         options.majorTicks = [i]
-        const step = ConvertValueFromUnitToUnit(this.step, this.valueUnit, this.displayUnit) ?? 10
+        let step = ConvertValueFromUnitToUnit(this.step, this.valueUnit, this.displayUnit) ?? 10
+        const range = options.maxValue - options.minValue
+        if(range < 0 || range / Math.max(range/30,step) > 25)
+            step = range / 25
+
         while((i+=step) < (options.maxValue - step /2))
             options.majorTicks.push(parseFloat(i.toFixed(2)))
         options.majorTicks.push(parseFloat(i.toFixed(2)))
@@ -168,6 +172,7 @@ export default class UIGauge extends UITemplate {
                 if(this.highRedline === pMax)
                     this.highRedline = this.max
             }
+            this.configTemplate.step.min = (this.max - this.min) / 25
             this.#updateGauge()
         })
         this.configDialog = new UIDialog({ title: `Edit Gauge` })
