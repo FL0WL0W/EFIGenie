@@ -91,7 +91,7 @@ export default class UIGauge extends UITemplate {
         }
         options.title = this.configTemplate.variable.value?.name
         options.title = options.title?.substring(options.title.indexOf(`.`) + 1)
-        options.unit = this.configTemplate.variable.value?.unit
+        options.units = this.configTemplate.variable.displayUnit
 
 
         this.gauge.update(options)
