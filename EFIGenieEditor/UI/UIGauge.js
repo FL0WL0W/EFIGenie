@@ -3,6 +3,8 @@ import UITemplate from "../JavascriptUI/UITemplate.js"
 import Dashboard from "../Top/Dashboard.js"
 import UIParameterWithUnit from "./UIParameterWithUnit.js"
 import UINumberWithUnit from "./UINumberWithUnit.js"
+import UITextArea from "../JavascriptUI/UITextArea.js"
+import UIButton from "../JavascriptUI/UIButton.js"
 export default class UIGauge extends UITemplate {
     static template = 
 `<canvas data-type="radial-gauge"
@@ -32,7 +34,6 @@ export default class UIGauge extends UITemplate {
             this.configDialog.show()
         })
         BaseGauge.fromElement(canvas)
-        //this.gauge = { update: () => {}, draw: () => {} }
         this.gauge = document.gauges.find(x=> x.canvas.element === canvas)
         this.#updateGauge()
     }
@@ -49,7 +50,12 @@ export default class UIGauge extends UITemplate {
         this.gauge.value = ConvertValueFromUnitToUnit(value, this.valueUnit, this.displayUnit)
     }
 
-    get saveValue() { return this.configTemplate.saveValue }
+    get saveValue() { 
+        let saveValue = this.configTemplate.saveValue 
+        if(saveValue.gaugeTemplate === this.constructor.template)
+            delete saveValue.gaugeTemplate
+        return saveValue
+    }
     set saveValue(saveValue) { this.configTemplate.saveValue = saveValue }
     get min() { return this.configTemplate.min.value }
     set min(min) { this.configTemplate.min.value = min }
@@ -97,7 +103,6 @@ export default class UIGauge extends UITemplate {
         options.title = options.title?.substring(options.title.indexOf(`.`) + 1)
         options.units = this.configTemplate.variable.displayUnit
 
-
         this.gauge.update(options)
         this.gauge.value = ConvertValueFromUnitToUnit(this.value, this.valueUnit, this.displayUnit)
         this.gauge.draw()
@@ -112,7 +117,8 @@ export default class UIGauge extends UITemplate {
                         <span style="display: block;"><label>Low:</label><div data-element="lowRedline"></div><span>
                         <span style="display: block;"><label>Step:</label><div data-element="step"></div><span>
                         <span style="display: block;"><label>High:</label><div data-element="highRedline"></div><span>
-                        <span style="display: block;"><label>Max:</label><div data-element="max"></div><span>`,
+                        <span style="display: block;"><label>Max:</label><div data-element="max"></div><span>
+                        <span style="display: block;"><label>Gauge Template</label><div data-element="editGauge"></div><div data-element="gaugeTemplate"></div><span>`,
             variable: new UIParameterWithUnit({
                 options: VariableRegister.GetSelections(undefined, defaultFilter(undefined, [ `float` ]))
             }),
@@ -120,7 +126,23 @@ export default class UIGauge extends UITemplate {
             max: new UINumberWithUnit(),
             step: new UINumberWithUnit({ min: 0.0000001 }),
             highRedline: new UINumberWithUnit(),
-            lowRedline: new UINumberWithUnit()
+            lowRedline: new UINumberWithUnit(),
+            editGauge: new UIButton({ label: `Edit` }),
+            gaugeTemplate: new UITextArea({ value: this.constructor.template, class: `gaugeTemplate`, hidden: true })
+        })
+        this.configTemplate.editGauge.addEventListener(`click`, event => {
+            if(this.configTemplate.editGauge.label === `Edit`) {
+                this.configTemplate.editGauge.label = `Hide`
+                this.configTemplate.gaugeTemplate.hidden = false
+            } else {
+                this.configTemplate.editGauge.label = `Edit`
+                this.configTemplate.gaugeTemplate.hidden = true
+            }
+        })
+        this.configTemplate.gaugeTemplate.addEventListener(`change`, event => {
+            this.template = this.configTemplate.gaugeTemplate.value
+            this.Setup()
+            event.preventDefault()
         })
         let previousDisplayUnit
         let previousValueUnit
