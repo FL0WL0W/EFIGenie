@@ -22,7 +22,6 @@
         </script>
         <script src="Config-Input.js" defer></script>
         <script type="module">
-            import Inputs from "./Input/Inputs.js"
             import Input_Analog from "./Input/Input_Analog.js"
             import Input_Digital from "./Input/Input_Digital.js"
             import Input_DigitalRecord from "./Input/Input_DigitalRecord.js"
@@ -135,17 +134,7 @@
                     RealtimeUpdate()
                 })
 
-                let selectTarget = document.querySelector(`#selectTarget`)
-                selectTarget.addEventListener(`change`, function(evt){
-                    b.Inputs.TargetDevice = this.value
-                    b.Inputs.pinOverlay.pinOut = PinOuts[b.Inputs.TargetDevice]
-                })
-                var targets = ``
-                Object.entries(PinOuts).forEach(entry => {
-                    const [key, value] = entry
-                    targets += `<option value="${key}"${key === b.Inputs.TargetDevice? ` selected` : ``}>${value.name}</option>`
-                })
-                selectTarget.innerHTML = targets
+                document.querySelector(`#selectTarget`).replaceWith(b.Inputs.targetDevice)
             })
         </script>
         <meta name="viewport" content="width=750, initial-scale=1">

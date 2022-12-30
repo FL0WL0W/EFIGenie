@@ -4,7 +4,7 @@ import Dashboard from "./Dashboard.js"
 import Engine from "./Engine.js"
 import Ignition from "./Ignition.js"
 import Fuel from "./Fuel.js"
-import Inputs from "../Input/Inputs.js"
+import Inputs from "./Inputs.js"
 export default class Top extends UITemplate {
     static template = getFileContents(`ConfigGui/Top.html`)
 
