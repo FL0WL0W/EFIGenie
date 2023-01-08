@@ -11,6 +11,8 @@ export default class Output_TDC extends CalculationOrVariableSelection {
     })
     constructor(prop) {
         super()
+        this.inputTypes = [ `bool` ]
+        this.required = true
         this.calculations = BooleanOutputConfigs
         let span = document.createElement(`span`)
         span.append(`\xa0\xa0\xa0\xa0\xa0\xa0TDC:`)

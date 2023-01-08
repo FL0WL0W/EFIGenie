@@ -7,6 +7,12 @@ export default class CalculationOrVariableSelection extends UITemplate {
     calculationValues = []
     calculationSaveValueCache = []
 
+    get required() { return this.selection.selectDisabled }
+    set required(required) { this.selection.selectHidden = this.selection.selectDisabled = required }
+
+    get selectName() { return this.selection.selectName }
+    set selectName(selectName) { this.selection.selectName = selectName}
+
     labelElement = document.createElement(`span`)
     get label() { return this.labelElement.textContent }
     set label(label) {

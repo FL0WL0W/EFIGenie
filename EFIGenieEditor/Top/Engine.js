@@ -15,7 +15,9 @@ export default class Engine extends UITemplate {
     CylinderAirmassConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   CylinderAirmassConfigs,
         label:          `Cylinder Air Mass`,
+        selectName:     `No Calculation`,
         outputUnits:    [ `g` ],
+        value:          { selection: `CylinderAirmass_SpeedDensity` }
     })
     CylinderAirTemperatureConfigOrVariableSelection = new CalculationOrVariableSelection({
         calculations:   CylinderAirTemperatureConfigs,

@@ -24,6 +24,13 @@ export default class Top extends UITemplate {
     sidebarOpen = new UIButton({className: `sidebaropenclose w3-button w3-padding-16`})
     constructor(prop){
         super()
+        this.Engine.addEventListener(`change`, () => {
+            if(this.Engine.value.CylinderAirmassConfigOrVariableSelection.selection == undefined) {
+                this.fuelTab.classList.add(`disabled`)
+            } else {
+                this.fuelTab.classList.remove(`disabled`)
+            }
+        })
         this.sidebarOpen.addEventListener(`click`, () => {
             window.localStorage.setItem(`expanded`, true)
             var sidebarElement = this.firstChild
@@ -107,7 +114,8 @@ export default class Top extends UITemplate {
         })
         this.fuelTab.class = `w3-bar-item w3-button fuel-tab`
         this.fuelTab.addEventListener(`click`, () => {
-            this.activeTab = `Fuel`
+            if(!this.fuelTab.classList.contains(`disabled`))
+                this.activeTab = `Fuel`
         })
         this.ignitionTab.class = `w3-bar-item w3-button ignition-tab`
         this.ignitionTab.addEventListener(`click`, () => {

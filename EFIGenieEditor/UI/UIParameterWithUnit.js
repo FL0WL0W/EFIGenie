@@ -4,6 +4,9 @@ import UIUnit from "./UIUnit.js"
 export default class UIParameterWithUnit extends UITemplate {
     static template = `<div data-element="parameterSelection"></div><div data-element="unitSelection"></div>`
 
+    get selectName() { return this.parameterSelection.selectName }
+    set selectName(selectName) { this.parameterSelection.selectName = selectName}
+
     parameterSelection = new UISelection()
     unitSelection = new UIUnit()
     constructor(prop){

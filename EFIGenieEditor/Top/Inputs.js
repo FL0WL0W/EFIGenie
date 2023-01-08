@@ -17,7 +17,6 @@ export default class Inputs extends UITemplate {
     constructor(prop) {
         super()
         this.targetDevice.addEventListener(`change`, () => { 
-            console.log(this.targetDevice.value)
             this.pinOverlay.pinOut = PinOuts[this.targetDevice.value]
         })
         this.pinOverlay.pinOut = PinOuts[this.targetDevice.value]
