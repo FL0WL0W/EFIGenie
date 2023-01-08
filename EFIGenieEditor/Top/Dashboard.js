@@ -85,6 +85,7 @@ export default class Dashboard extends UITemplate {
 
     get value() {
         let value = super.value
+        if(value == undefined) return value
         delete value.loggedVariablesUnitSelection
         delete value.loggedVariablesRefreshSelection
         delete value.loggedVariableVariableSelection

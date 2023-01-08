@@ -1051,7 +1051,11 @@ types = [
         parameters = parameters.split(`,`)
         //remove parenthesis operator from parameters
         parameters = parameters.map(s => s[0] === `(` ? s.substring(1) : s)
-        parameters = parameters.map(s => s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length? s.substring(0, s.length-1) : s)
+        parameters = parameters.map(s => {
+            while(s[s.length-1] === `)` && s.split(`)`).length > s.split(`(`).length)
+                s = s.substring(0, s.length-1)
+            return s
+        })
         //filter out static values
         parameters = parameters.filter(s => !s.match(/^[0-9]*$/))
         //filter out null parameters
@@ -1075,18 +1079,20 @@ types = [
         for(let operationIndex in operations) {
             let operation = operations[operationIndex]
             let operationValue = { outputVariables: operation.resultInto === `return`? this.outputVariables : [ { name: operation.resultInto } ] }
+            const parameterToInputVariable = parameter => {
+                if(parameter === `self`)
+                    return this.outputVariables[0]
+                const name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
+                return { name: name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length) }
+            }
             if(operation.operator === `s`) {
                 operationValue.type = `Calculation_Static`
                 operationValue.value = operation.parameters[0]
             } else if(operation.operator === `!`) {
                 operationValue.type = `Calculation_Not`
-                const name = operation.parameters[1].indexOf(`temp`) === 0 ? operation.parameters[1] : `${resultName}_${operation.parameters[1]}`
-                operationValue.inputVariables = [ name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length) ]
+                operationValue.inputVariables = [ parameterToInputVariable(operation.parameters[1]) ]
             } else {
-                operationValue.inputVariables = operation.parameters.map(parameter => { 
-                    const name = parameter.indexOf(`temp`) === 0 ? parameter : `${resultName}_${parameter}`
-                    return { name: name.substring(0, name.indexOf(`(`) !== -1? name.indexOf(`(`) : name.length) }
-                })
+                operationValue.inputVariables = operation.parameters.map(parameterToInputVariable)
                 switch(operation.operator) {
                     case `*`: 
                         operationValue.type = `Calculation_Multiply`
