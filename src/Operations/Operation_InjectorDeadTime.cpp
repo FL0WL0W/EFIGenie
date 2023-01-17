@@ -18,7 +18,7 @@ namespace EFIGenie
 		return injectorFuelMass / injectorFlowRate + injectorDeadTime;
 	}
 	
-	IOperationBase *Operation_InjectorDeadTime::Create(const void *config, size_t &sizeOut)
+	AbstractOperation *Operation_InjectorDeadTime::Create(const void *config, size_t &sizeOut)
 	{
 		return new Operation_InjectorDeadTime(Config::CastAndOffset<float>(config, sizeOut));
 	}

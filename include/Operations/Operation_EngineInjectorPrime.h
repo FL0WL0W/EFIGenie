@@ -1,4 +1,4 @@
-#include "Operations/IOperation.h"
+#include "Operations/Operation.h"
 #include "EmbeddedIOServiceCollection.h"
 #include "Operations/OperationFactory.h"
 
@@ -6,7 +6,7 @@
 #define OPERATION_ENGINEINJECTORPRIME_H
 namespace EFIGenie
 {
-	class Operation_EngineInjectorPrime : public OperationArchitecture::IOperation<void, float>
+	class Operation_EngineInjectorPrime : public OperationArchitecture::Operation<void, float>
 	{
 	protected:
 		EmbeddedIOServices::ITimerService *_timerService;
@@ -18,7 +18,7 @@ namespace EFIGenie
 
 		void Execute(float time) override;
 
-		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
+		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
 	};
 }
 #endif

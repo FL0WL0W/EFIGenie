@@ -1,4 +1,4 @@
-#include "Operations/IOperation.h"
+#include "Operations/Operation.h"
 #include "ReluctorResult.h"
 
 #ifndef OPERATION_ENGINEPOSITION_H
@@ -12,7 +12,7 @@ namespace EFIGenie
 		EnginePosition() : Sequential(false) {}
 	};
 
-	class Operation_EnginePosition : public OperationArchitecture::IOperation<EnginePosition, ReluctorOperations::ReluctorResult, ReluctorOperations::ReluctorResult>
+	class Operation_EnginePosition : public OperationArchitecture::Operation<EnginePosition, ReluctorOperations::ReluctorResult, ReluctorOperations::ReluctorResult>
 	{
 	protected:
 		EnginePosition _previousPreviousReluctorResult;

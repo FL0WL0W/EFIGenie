@@ -26,13 +26,13 @@ namespace EFIGenie
 		_timerService->ScheduleTask(_closeTask, _timerService->GetTick() + static_cast<tick_t>(time * _timerService->GetTicksPerSecond()));
 	}
 
-	IOperationBase *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
+	AbstractOperation *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
 	{
 		callback_t openCallBack = 0;
 		callback_t closeCallBack = 0;
 
 		size_t size = 0;
-		IOperationBase *operation = factory->Create(config, size);
+		AbstractOperation *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
@@ -44,7 +44,7 @@ namespace EFIGenie
 			openCallBack = [operation]() { operation->Execute(); };
 
 			size = 0;
-			IOperationBase *operationClose = factory->Create(config, size);
+			AbstractOperation *operationClose = factory->Create(config, size);
 			Config::OffsetConfig(config, sizeOut, size);
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}

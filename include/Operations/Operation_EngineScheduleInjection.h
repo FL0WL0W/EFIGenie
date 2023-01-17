@@ -1,4 +1,4 @@
-#include "Operations/IOperation.h"
+#include "Operations/Operation.h"
 #include "Operation_EnginePosition.h"
 #include "EmbeddedIOServiceCollection.h"
 #include "Operations/OperationFactory.h"
@@ -8,7 +8,7 @@
 #define OPERATION_ENGINESCHEDULEINJECTION_H
 namespace EFIGenie
 {
-	class Operation_EngineScheduleInjection : public OperationArchitecture::IOperation<std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t>, EnginePosition, bool, float, float>
+	class Operation_EngineScheduleInjection : public OperationArchitecture::Operation<std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t>, EnginePosition, bool, float, float>
 	{
 	protected:
 		EmbeddedIOServices::ITimerService * const _timerService;
@@ -28,7 +28,7 @@ namespace EFIGenie
 		void Open();
 		void Close();
 
-		static OperationArchitecture::IOperationBase *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
+		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
 	};
 }
 #endif
