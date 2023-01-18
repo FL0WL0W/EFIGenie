@@ -56,12 +56,10 @@ Make
 * *Create unit tests
 * Prime
 * After Start Enrichment
-* Warm Up Enrichment
 * Flex fuel Sensors
 * Rev Limiting (Hard and Soft Spark)
 * Launch control (Hard and Soft Spark)
 * Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table
-* Deceleration fuel cut off (DFCO)
 * Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)
 * Tach Output
 * Temperature Bias between ECT and IAT
