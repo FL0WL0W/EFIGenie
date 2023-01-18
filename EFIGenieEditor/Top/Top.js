@@ -25,7 +25,7 @@ export default class Top extends UITemplate {
     constructor(prop){
         super()
         this.Engine.addEventListener(`change`, () => {
-            if(this.Engine.value.CylinderAirmassConfigOrVariableSelection.selection == undefined) {
+            if(this.Engine.value.CylinderAirmass.selection == undefined) {
                 this.fuelTab.classList.add(`disabled`)
             } else {
                 this.fuelTab.classList.remove(`disabled`)

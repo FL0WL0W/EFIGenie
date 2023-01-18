@@ -3,16 +3,16 @@ import UINumberWithUnit from "../UI/UINumberWithUnit.js"
 export default class InjectorPulseWidth_DeadTime extends UITemplate {
     static displayName = `Dead Time`
     static outputUnits = [ `s` ]
-    static template =   `<div data-element="FlowRateConfigOrVariableSelection"></div>` +
-                        `<div data-element="DeadTimeConfigOrVariableSelection"></div>` +
+    static template =   `<div data-element="FlowRate"></div>` +
+                        `<div data-element="DeadTime"></div>` +
                         `<label>Min Injector Fuel Mass:</label><div data-element="MinInjectorFuelMass"></div>`
 
-    FlowRateConfigOrVariableSelection = new CalculationOrVariableSelection({
+    FlowRate = new CalculationOrVariableSelection({
         calculations:   GenericConfigs,
         label:          `Injector Flow Rate`,
         outputUnits:    [ `g/s` ],
     })
-    DeadTimeConfigOrVariableSelection = new CalculationOrVariableSelection({
+    DeadTime = new CalculationOrVariableSelection({
         calculations:   GenericConfigs,
         label:          `Injector Dead Time`,
         outputUnits:    [ `s` ],
@@ -32,8 +32,8 @@ export default class InjectorPulseWidth_DeadTime extends UITemplate {
     }
 
     RegisterVariables() {
-        this.DeadTimeConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector Dead Time` })
-        this.FlowRateConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector Flow Rate` })
+        this.DeadTime.RegisterVariables({ name: `FuelParameters.Injector Dead Time` })
+        this.FlowRate.RegisterVariables({ name: `FuelParameters.Injector Flow Rate` })
     }
 }
 InjectorPulseWidthConfigs.push(InjectorPulseWidth_DeadTime)

@@ -8,23 +8,23 @@ export default class Fuel extends UITemplate {
     OutputCount = new UINumber({
         value: 8
     })
-    AFRConfigOrVariableSelection = new Calculation_Formula({
+    AFR = new Calculation_Formula({
         calculations:   AFRConfigs,
         label:          `Air Fuel Ratio`,
         outputUnits:    [ `:1` ],
     })
-    InjectorEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
+    InjectorEnable = new CalculationOrVariableSelection({
         calculations:   InjectorEnableConfigs,
         label:          `Injector Enable`,
         outputTypes:    [ `bool` ],
     })
-    InjectorPulseWidthConfigOrVariableSelection = new CalculationOrVariableSelection({
+    InjectorPulseWidth = new CalculationOrVariableSelection({
         calculations:   InjectorPulseWidthConfigs,
         label:          `Injector Pulse Width`,
         outputUnits:    [ `s` ],
         displayUnits:   [ `ms` ]
     })
-    InjectorEndPositionConfigOrVariableSelection = new CalculationOrVariableSelection({
+    InjectorEndPosition = new CalculationOrVariableSelection({
         calculations:   GenericConfigs,
         label:          `Injector End Position`,
         outputUnits:    [ `°` ],
@@ -88,10 +88,10 @@ export default class Fuel extends UITemplate {
     RegisterVariables() {
         VariableRegister.RegisterVariable({ name: `FuelParameters.Cylinder Fuel Mass`, unit: `g` })
 
-        this.AFRConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Air Fuel Ratio` })
-        this.InjectorEnableConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector Enable` })
-        this.InjectorPulseWidthConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector Pulse Width` })
-        this.InjectorEndPositionConfigOrVariableSelection.RegisterVariables({ name: `FuelParameters.Injector End Position` })
+        this.AFR.RegisterVariables({ name: `FuelParameters.Air Fuel Ratio` })
+        this.InjectorEnable.RegisterVariables({ name: `FuelParameters.Injector Enable` })
+        this.InjectorPulseWidth.RegisterVariables({ name: `FuelParameters.Injector Pulse Width` })
+        this.InjectorEndPosition.RegisterVariables({ name: `FuelParameters.Injector End Position` })
 
         for(var i = 0; i < this.Outputs.children.length; i++){
             this.Outputs.children[i].RegisterVariables()

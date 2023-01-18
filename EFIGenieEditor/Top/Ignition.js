@@ -7,23 +7,23 @@ export default class Ignition extends UITemplate {
     OutputCount = new UINumber({
         value: 8
     })
-    IgnitionEnableConfigOrVariableSelection = new CalculationOrVariableSelection({
+    IgnitionEnable = new CalculationOrVariableSelection({
         calculations:   IgnitionEnableConfigs,
         label:          `Ignition Enable`,
         outputTypes:    [ `bool` ],
     })
-    IgnitionAdvanceConfigOrVariableSelection = new CalculationOrVariableSelection({
+    IgnitionAdvance = new CalculationOrVariableSelection({
         calculations:   IgnitionAdvanceConfigs,
         label:          `Ignition Advance`,
         outputUnits:    [ `°` ],
     })
-    IgnitionDwellConfigOrVariableSelection = new CalculationOrVariableSelection({
+    IgnitionDwell = new CalculationOrVariableSelection({
         calculations:   IgnitionDwellConfigs,
         label:          `Ignition Dwell`,
         outputUnits:    [ `s` ],
         displayUnits:   [ `ms` ]
     })
-    IgnitionDwellDeviationConfigOrVariableSelection = new CalculationOrVariableSelection({
+    IgnitionDwellDeviation = new CalculationOrVariableSelection({
         calculations:   IgnitionDwellConfigs,
         label:          `Ignition Dwell Deviation`,
         outputUnits:    [ `s` ],
@@ -85,10 +85,10 @@ export default class Ignition extends UITemplate {
     }
 
     RegisterVariables() {
-        this.IgnitionEnableConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Enable` })
-        this.IgnitionAdvanceConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Advance` })
-        this.IgnitionDwellConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell` })
-        this.IgnitionDwellDeviationConfigOrVariableSelection.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell Deviation` })
+        this.IgnitionEnable.RegisterVariables({ name: `IgnitionParameters.Ignition Enable` })
+        this.IgnitionAdvance.RegisterVariables({ name: `IgnitionParameters.Ignition Advance` })
+        this.IgnitionDwell.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell` })
+        this.IgnitionDwellDeviation.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell Deviation` })
 
         for(var i = 0; i < this.Outputs.children.length; i++){
             this.Outputs.children[i].RegisterVariables()
