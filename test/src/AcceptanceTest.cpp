@@ -31,17 +31,17 @@ namespace UnitTests
 
 		AcceptanceTest()
 		{
-			size_t uint8_align = alignof(uint8_t);
-			size_t uint16_align = alignof(uint16_t);
-			size_t uint32_align = alignof(uint32_t);
-			size_t uint64_align = alignof(uint64_t);
-			size_t int8_align = alignof(int8_t);
-			size_t int16_align = alignof(int16_t);
-			size_t int32_align = alignof(int32_t);
-			size_t int64_align = alignof(int64_t);
-			size_t bool_align = alignof(bool);
-			size_t float_align = alignof(float);
-			size_t double_align = alignof(double);
+			// size_t uint8_align = alignof(uint8_t);
+			// size_t uint16_align = alignof(uint16_t);
+			// size_t uint32_align = alignof(uint32_t);
+			// size_t uint64_align = alignof(uint64_t);
+			// size_t int8_align = alignof(int8_t);
+			// size_t int16_align = alignof(int16_t);
+			// size_t int32_align = alignof(int32_t);
+			// size_t int64_align = alignof(int64_t);
+			// size_t bool_align = alignof(bool);
+			// size_t float_align = alignof(float);
+			// size_t double_align = alignof(double);
 
 
 			_embeddedIOServiceCollection.AnalogService = &_analogService;
