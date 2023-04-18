@@ -11,7 +11,7 @@ can be added very easily and can be chosen between the old and new through the c
 which means decoders can be changed, sensors added or removed, features added or removed. 
 all without having to recompile. There are also some wrapper classes where things like 
 two step rev limiters can be implemented or tri-step or even quad-step. still have a list of
-things to complete but i am at a state where i am testing the ecu, but at this point it has run an engine https://www.youtube.com/watch?v=jJOaTFBkKEE
+things to complete but i am at a state where i am testing the ecu. At this point it has run an engine https://www.youtube.com/watch?v=jJOaTFBkKEE
 
 ## Features
 * Customizable(size, limits, and axis) 3D Fuel and Ignition Maps (Speed Density, Alpha N)
