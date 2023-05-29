@@ -2,15 +2,16 @@
     "version": 2,
     "configurePresets": [
         {
-            "name": "GCC 9.3.0",
-            "displayName": "GCC 9.3.0",
-            "description": "Using compilers: C = /bin/gcc-9, CXX = /bin/g++-9",
+            "name": "GCC 11.3.0",
+            "displayName": "GCC 11.3.0 x86_64-linux-gnu",
+            "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "generator": "Ninja",
             "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "/bin/gcc-9",
-                "CMAKE_CXX_COMPILER": "/bin/g++-9",
                 "CMAKE_C_FLAGS": "-Wall",
                 "CMAKE_CXX_FLAGS": "-Wall",
                 "CMAKE_ASM_FLAGS": "-Wall",
