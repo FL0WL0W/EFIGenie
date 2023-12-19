@@ -59,13 +59,13 @@
         <link rel = "stylesheet" type = "text/css" href = "style.css" />
         <link rel = "stylesheet" type = "text/css" href = "JavascriptUI/UI.css" />
         <script defer>
-            var b, pinOverlay
+            var b
             function UpdateOverlay() {
                 b.Inputs.pinOverlay.update()
             }
             var configJsonName = `tune.json`
-            let registerVariables = throttle(function() { b.RegisterVariables() })
-            document.addEventListener(`change`, function() { registerVariables() })//this is a hack but oh well
+            var registerVariables = function() {  b.RegisterVariables() }
+            document.addEventListener(`change`, registerVariables)//this is a hack but oh well
             const loadConfig = (config) => {
                 try {
                     b.saveValue = parseObject(config)
@@ -79,7 +79,6 @@
             }
             document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop()
-                pinOverlay = b.Inputs.pinOverlay
                 const lastConfig = window.localStorage.getItem(`config`)
                 if (lastConfig) {
                     loadConfig(lastConfig)

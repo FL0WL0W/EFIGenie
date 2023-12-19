@@ -4,6 +4,7 @@ export default class UIPinSelection extends UISelection {
         super(prop)
         this.selectDisabled = prop.selectDisabled ?? true
         this.selectValue = prop.selectValue ?? 0xFFFF
+
         this.options = this.#generateOptionList()
         this.addEventListener(`change`, () => {
             UpdateOverlay()
@@ -15,7 +16,7 @@ export default class UIPinSelection extends UISelection {
     #generateOptionList() {
         var options = []
         var endOptions = []
-        let pinOut = pinOverlay?.pinOut
+        let pinOut = b.Inputs.pinOverlay?.pinOut
         if(!pinOut) return
         for(var i = 0; i < pinOut.Pins.length; i++) {
             const selected = this.value === pinOut.Pins[i].value

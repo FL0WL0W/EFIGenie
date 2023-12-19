@@ -10,7 +10,7 @@ export default class Inputs extends UITemplate {
     inputListElement = document.createElement(`div`)
     targetDevice = new UISelection({
         options: Object.entries(PinOuts).map(([key, value]) => { return { name: value.name, value: key } }),
-        value: `STM32F401C`
+        value: `ESP_WROOM_32`
     })
     pinOverlay = new UIPinOverlay()
 

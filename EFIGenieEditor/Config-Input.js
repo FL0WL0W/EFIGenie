@@ -131,6 +131,40 @@ PinOuts = {
             { name: `PB_14`, value: (32*1 + 14), supportedModes: `digital digitalinterrupt pwm` , overlayX: 577, overlayY: 484, align: `left`},
             { name: `PB_13`, value: (32*1 + 13), supportedModes: `digital digitalinterrupt pwm` , overlayX: 577, overlayY: 506, align: `left`},
         ]
+    },
+    ESP_WROOM_32 : { 
+        name: `ESP-WROOM-32`,
+        Overlay: `images/ESP_WROOM_32_Overlay.webp`,
+        OverlayWidth: 600,
+        OverlayElementHeight: 25,
+        Pins: [
+            { name: `GPIO36`, value: 36, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 257, align: `right`},
+            { name: `GPIO39`, value: 39, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 281, align: `right`},
+            { name: `GPIO34`, value: 34, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 305, align: `right`},
+            { name: `GPIO35`, value: 35, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 329, align: `right`},
+            { name: `GPIO32`, value: 32, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 353, align: `right`},
+            { name: `GPIO33`, value: 33, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 377, align: `right`},
+            { name: `GPIO25`, value: 25, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 401, align: `right`},
+            { name: `GPIO26`, value: 26, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 425, align: `right`},
+            { name: `GPIO27`, value: 27, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 449, align: `right`},
+            { name: `GPIO14`, value: 14, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 473, align: `right`},
+            { name: `GPIO12`, value: 12, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 497, align: `right`},
+            { name: `GPIO13`, value: 12, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 550, align: `right`},
+            { name: `GPIO23`, value: 23, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 352, align: `left`},
+            { name: `GPIO22`, value: 22, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 352, align: `left`},
+            { name: `GPIO1`,  value: 1,  supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 257, align: `left`},
+            { name: `GPIO3`,  value: 3,  supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 281, align: `left`},
+            { name: `GPIO21`, value: 21, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 305, align: `left`},
+            { name: `GPIO19`, value: 19, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 353, align: `left`},
+            { name: `GPIO18`, value: 18, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 377, align: `left`},
+            { name: `GPIO5`,  value: 5,  supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 401, align: `left`},
+            { name: `GPIO17`, value: 17, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 425, align: `left`},
+            { name: `GPIO16`, value: 16, supportedModes: `digital digitalinterrupt pwm`, overlayX: 480, overlayY: 449, align: `left`},
+            { name: `GPIO4`,  value: 4,  supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 473, align: `left`},
+            { name: `GPIO0`,  value: 0,  supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 497, align: `left`},
+            { name: `GPIO2`,  value: 2,  supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 550, align: `left`},
+            { name: `GPIO15`, value: 15, supportedModes: `digital digitalinterrupt analog pwm`, overlayX: 480, overlayY: 574, align: `left`}
+        ]
     }
 }
 BooleanOutputConfigs = []
