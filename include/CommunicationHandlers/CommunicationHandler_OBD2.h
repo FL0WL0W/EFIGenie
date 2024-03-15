@@ -14,7 +14,7 @@ namespace EFIGenie
 		uint32_t IntakeManifoldPressureID;
 	};
 
-	class CommunicationHandler_OBD2 : public EmbeddedIOServices::ICommunicationHandler
+	class CommunicationHandler_OBD2
 	{
 	protected:
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
