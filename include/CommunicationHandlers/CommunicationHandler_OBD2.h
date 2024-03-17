@@ -21,7 +21,7 @@ namespace EFIGenie
 		const OBD2VariableMap *_obd2VariableMap;
 	public:
 		CommunicationHandler_OBD2(OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap, const OBD2VariableMap *obd2VariableMap);
-		size_t Receive(EmbeddedIOServices::communication_send_callback_t sendCallBack, void* buf, size_t length);
+		size_t Receive(EmbeddedIOServices::communication_send_callback_t sendCallBack, const void* buf, size_t length);
 	};
 }
 #endif

@@ -25,18 +25,18 @@ namespace EFIGenie
 		 * @param length Number of bytes that the data pointer is pointing to.
 		 * @return size_t Number of bytes parsed from data.
 		 */
-		size_t CommunicationHandler_OBD2::Receive(communication_send_callback_t sendCallBack, void *data, size_t length)
+		size_t CommunicationHandler_OBD2::Receive(communication_send_callback_t sendCallBack, const void *data, size_t length)
 		{
-			uint8_t service = *reinterpret_cast<uint8_t *>(data); //grab service from data
-			data = reinterpret_cast<uint8_t *>(data) + 1; //ofset data
+			uint8_t service = *reinterpret_cast<const uint8_t *>(data); //grab service from data
+			data = reinterpret_cast<const uint8_t *>(data) + 1; //ofset data
 
 			switch(service)
 			{
 				// Service/Mode 01: Show Current Data
 				case 1:
 				{
-					uint8_t pid = *reinterpret_cast<uint8_t *>(data); //grab pid from data
-					data = reinterpret_cast<uint8_t *>(data) + 1; //offset data
+					uint8_t pid = *reinterpret_cast<const uint8_t *>(data); //grab pid from data
+					data = reinterpret_cast<const uint8_t *>(data) + 1; //offset data
 					switch(pid)
 					{
 						// Calculated Engine Load
