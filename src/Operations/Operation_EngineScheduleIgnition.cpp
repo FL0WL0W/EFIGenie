@@ -144,9 +144,7 @@ namespace EFIGenie
 		callback_t dwellCallBack = 0;
 		callback_t igniteCallBack = 0;
 
-		size_t size = 0;
-		AbstractOperation *operation = factory->Create(config, size);
-		Config::OffsetConfig(config, sizeOut, size);
+		AbstractOperation *operation = factory->Create(config, sizeOut);
 		if(operation->NumberOfParameters == 1)
 		{
 			dwellCallBack = [operation]() { operation->Execute(true); };
@@ -156,9 +154,7 @@ namespace EFIGenie
 		{
 			dwellCallBack = [operation]() { operation->Execute(); };
 
-			size = 0;
-			AbstractOperation *operationIgnite = factory->Create(config, size);
-			Config::OffsetConfig(config, sizeOut, size);
+			AbstractOperation *operationIgnite = factory->Create(config, sizeOut);
 			igniteCallBack = [operationIgnite]() { operationIgnite->Execute(); };
 		}
 		
