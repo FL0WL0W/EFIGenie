@@ -50,6 +50,7 @@ export default class Ignition extends UITemplate {
     Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
+        const thisClass = this
         Object.defineProperty(this.Outputs, 'saveValue', {
             get: function() { return [...this.children].map(x => x.saveValue) },
             set: function(saveValue) { 

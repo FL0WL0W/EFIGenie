@@ -21,6 +21,19 @@ export default class Output_TDC extends CalculationOrVariableSelection {
         this.Setup(prop)
         this.labelElement.parentElement.append(span)
         this.labelElement.class = `pinselectname`
+        this.selection.addEventListener(`change`, () => {
+            if(this.options.map(option => option.options?.length ?? 1).reduce((partionSum, a) => partionSum + a, 0) < 2 && this.SubConfig.querySelectorAll("label").length < 2) {
+                this.selection.hidden = true
+                if(this.subConfigLabel === undefined) {
+                    this.subConfigLabel = this.SubConfig.firstChild
+                    this.SubConfig.firstChild.remove()
+                    this.SubConfig.style.display = ``
+                }
+            } else if(this.subConfigLabel !== undefined) {
+                this.SubConfig.insertBefore(this.subConfigLabel, this.SubConfig.firstChild)
+                this.SubConfig.style.display = `block`
+            }
+        })
     }
 }
 customElements.define(`output-tdc`, Output_TDC, { extends: `span` })
