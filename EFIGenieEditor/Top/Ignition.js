@@ -70,9 +70,13 @@ export default class Ignition extends UITemplate {
                 while(this.children.length > value.length) this.removeChild(this.lastChild)
                 for(let i = 0; i < value.length; i++){
                     if(!this.children[i]) {
-                        this.append(new Output_TDC({
-                            label:              `Ignition ${i+1}`
-                        }))
+                        let output = new Output_TDC({
+                            label:          `Ignition ${i+1}`
+                        })
+                        output.addEventListener(`change`, () => {
+                            thisClass.dispatchEvent(new Event(`change`, {bubbles: true}))
+                        })
+                        this.append(output)
                     }
                     this.children[i].value = value[i]
                 }
