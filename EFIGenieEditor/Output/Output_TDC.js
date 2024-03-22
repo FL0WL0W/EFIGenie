@@ -22,7 +22,7 @@ export default class Output_TDC extends CalculationOrVariableSelection {
         this.labelElement.parentElement.append(span)
         this.labelElement.class = `pinselectname`
         this.selection.addEventListener(`change`, () => {
-            if(this.options.map(option => option.options?.length ?? 1).reduce((partionSum, a) => partionSum + a, 0) < 2 && this.SubConfig.querySelectorAll("label").length < 2) {
+            if(this.options.map(option => option.options?.length ?? 1).reduce((partionSum, a) => partionSum + a, 0) < 2 && this.SubConfig?.querySelectorAll("label").length < 2) {
                 this.selection.hidden = true
                 if(this.subConfigLabel === undefined) {
                     this.subConfigLabel = this.SubConfig.firstChild

@@ -1,4 +1,5 @@
 import UISelection from "../JavascriptUI/UISelection.js"
+import PinOverlay from "./UIPinOverlay.js"
 export default class UIPinSelection extends UISelection {
     constructor(prop){
         super(prop)
@@ -16,7 +17,7 @@ export default class UIPinSelection extends UISelection {
     #generateOptionList() {
         var options = []
         var endOptions = []
-        let pinOut = b.Inputs.pinOverlay?.pinOut
+        let pinOut = PinOverlay.PinOut //this sucks
         if(!pinOut) return
         for(var i = 0; i < pinOut.Pins.length; i++) {
             const selected = this.value === pinOut.Pins[i].value

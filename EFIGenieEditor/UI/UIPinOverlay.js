@@ -33,11 +33,11 @@ export default class PinOverlay extends HTMLDivElement {
         return elements
     }
 
-    #pinOut
-    get pinOut() { return this.#pinOut }
+    static PinOut
+    get pinOut() { return PinOverlay.PinOut }
     set pinOut(pinOut) {
         if(!pinOut) return
-        this.#pinOut = pinOut
+        PinOverlay.PinOut = pinOut
         let scale = 750 / (pinOut.OverlayWidth + 300)
         this.style.width = pinOut.OverlayWidth
         this.style.transform = `scale(${scale})`

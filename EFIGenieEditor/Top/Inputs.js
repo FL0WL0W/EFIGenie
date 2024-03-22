@@ -24,9 +24,11 @@ export default class Inputs extends UITemplate {
         this.inputListNewElement.textContent = `+ New`
         this.inputListNewElement.addEventListener(`click`, () => { this.inputs.appendNewInput() })
         this.addEventListener(`change`, () => {
-            while(this.inputs.children.length < this.inputListElement.children.length || this.inputListElement?.firstChild?.firstChild === this.inputListNewElement) this.inputListElement.removeChild(this.inputListElement.lastChild)
-            for(let i = 0; i < this.inputs.children.length; i++){
-                let inputElement = this.inputListElement.children[i]
+            while([...this.inputs.children].filter(x => x.item.constructor === Input).length < this.inputListElement.children.length || this.inputListElement?.firstChild?.firstChild === this.inputListNewElement) this.inputListElement.removeChild(this.inputListElement.lastChild)
+            for(let i = 0, iL = 0; i < this.inputs.children.length; i++){
+                if(this.inputs.children[i].item.constructor !== Input)
+                    continue
+                let inputElement = this.inputListElement.children[iL++]
                 if(!inputElement) {
                     inputElement = this.inputListElement.appendChild(document.createElement(`div`))
                     inputElement.appendChild(new UIDisplayLiveUpdate()).style.float = `right`
@@ -34,23 +36,22 @@ export default class Inputs extends UITemplate {
                     inputElement.class = `w3-bar-subitem w3-button`
                     const thisClass = this
                     inputElement.addEventListener(`click`, function() {
-                        let index = [...thisClass.inputListElement.children].indexOf(this)
-                        thisClass.inputs.children[index].scrollIntoView({
+                        thisClass.inputs.children[this.inputIndex].scrollIntoView({
                             behavior: 'auto',
                             block: 'center',
                             inline: 'center'
                         })
                     })
                     inputElement.RegisterVariables = function() {
-                        let index = [...thisClass.inputListElement.children].indexOf(this)
-                        let input = thisClass.inputs.children[index]
+                        const input = thisClass.inputs.children[this.inputIndex]
                         this.firstChild.RegisterVariables({ name: `Inputs.${input.name.value}`, unit: input.translationConfig.outputUnits?.[0] ?? input.rawConfig.outputUnits?.[0] })
                     }
                 }
+                inputElement.inputIndex = i
                 inputElement.lastChild.textContent = this.inputs.children[i].name.value
                 inputElement.class = `w3-bar-subitem w3-button`
             }
-            if(this.inputs.children.length === 0){
+            if(this.inputListElement.children.length === 0){
                 let inputElement = this.inputListElement.appendChild(document.createElement(`div`))
                 inputElement.appendChild(this.inputListNewElement)
             }
@@ -68,7 +69,7 @@ export default class Inputs extends UITemplate {
         VariableRegister.CurrentTick = { name: `CurrentTick`, type: `tick`, id: VariableRegister.GenerateVariableId() }
         this.inputs.RegisterVariables()
         for(var i = 0; i < this.inputListElement.children.length; i++){
-            this.inputListElement.children[i].RegisterVariables()
+            this.inputListElement.children[i].RegisterVariables?.()
         }
     }
 }
