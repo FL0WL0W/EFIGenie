@@ -1,18 +1,10 @@
 import UINumber from "../JavascriptUI/UINumber.js"
 import Calculation_Formula from "../Calculation/Calculation_Formula.js"
-import UITemplate from "../JavascriptUI/UITemplate.js"
+import ConfigContainer from "../Top/ConfigContainer.js"
 import Output_TDC from "../Output/Output_TDC.js"
-export default class Fuel extends UITemplate {
-    static template =   getFileContents(`ConfigGui/Fuel.html`)
-
-    OutputCount = new UINumber({
-        value: 8
-    })
-    AFR = new Calculation_Formula({
-        calculations:   AFRConfigs,
-        label:          `Air Fuel Ratio`,
-        outputUnits:    [ `:1` ],
-    })
+import UITemplate from "../JavascriptUI/UITemplate.js"
+class InjectorProperties extends ConfigContainer{
+    static template = `<div data-element="InjectorEnable"></div><div data-element="InjectorPulseWidth"></div><div data-element="InjectorEndPosition"></div>`
     InjectorEnable = new CalculationOrVariableSelection({
         calculations:   InjectorEnableConfigs,
         label:          `Injector Enable`,
@@ -29,6 +21,31 @@ export default class Fuel extends UITemplate {
         label:          `Injector End Position`,
         outputUnits:    [ `°` ],
     })
+
+    constructor(prop) {
+        super()
+        this.label = `Injector Properties`
+        this.Setup(prop)
+    }
+    RegisterVariables() {
+        this.InjectorEnable.RegisterVariables({ name: `FuelParameters.Injector Enable` })
+        this.InjectorPulseWidth.RegisterVariables({ name: `FuelParameters.Injector Pulse Width` })
+        this.InjectorEndPosition.RegisterVariables({ name: `FuelParameters.Injector End Position` })
+    }
+}
+customElements.define(`top-injector-properties`, InjectorProperties, { extends: `span` })
+export default class Fuel extends UITemplate {
+    static template =   getFileContents(`ConfigGui/Fuel.html`)
+
+    OutputCount = new UINumber({
+        value: 8
+    })
+    AFR = new Calculation_Formula({
+        calculations:   AFRConfigs,
+        label:          `Air Fuel Ratio`,
+        outputUnits:    [ `:1` ],
+    })
+    InjectorProperties = new InjectorProperties()
     Outputs = document.createElement(`div`)
     constructor(prop) {
         super()
@@ -89,9 +106,7 @@ export default class Fuel extends UITemplate {
         VariableRegister.RegisterVariable({ name: `FuelParameters.Cylinder Fuel Mass`, unit: `g` })
 
         this.AFR.RegisterVariables({ name: `FuelParameters.Air Fuel Ratio` })
-        this.InjectorEnable.RegisterVariables({ name: `FuelParameters.Injector Enable` })
-        this.InjectorPulseWidth.RegisterVariables({ name: `FuelParameters.Injector Pulse Width` })
-        this.InjectorEndPosition.RegisterVariables({ name: `FuelParameters.Injector End Position` })
+        this.InjectorProperties.RegisterVariables()
 
         for(var i = 0; i < this.Outputs.children.length; i++){
             this.Outputs.children[i].RegisterVariables()

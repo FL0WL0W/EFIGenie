@@ -296,7 +296,6 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     border-color: #666;
     padding: 2.5px;
     margin: 0px;
-    margin-bottom: 2.5px;
     min-width: 850px;
     width: fit-content;
     box-sizing: border-box;
@@ -305,8 +304,11 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     min-width: auto;
     width: 100%
 }
-.horizontalLineSpace {
-    margin-bottom: 1.2em;
+.itemContainer .configContainer {
+    margin-top: 1.5em;
+}
+.itemContainer:last-child .configContainer {
+    margin-bottom: 1.5em;
 }
 .mathContainer {
     vertical-align:top; 

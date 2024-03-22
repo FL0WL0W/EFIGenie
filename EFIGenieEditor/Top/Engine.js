@@ -1,6 +1,8 @@
 import UITemplate from "../JavascriptUI/UITemplate.js"
-export default class Engine extends UITemplate {
-    static template = getFileContents(`ConfigGui/Engine.html`)
+import ConfigContainer from "./ConfigContainer.js"
+class EngineSensors extends ConfigContainer
+{
+    static template = `<div data-element="CrankPosition"></div><div data-element="CamPosition"></div><div data-element="CylinderAirTemperature"></div><div data-element="ManifoldAbsolutePressure"></div><div data-element="ThrottlePosition"></div>`
 
     CrankPosition = new CalculationOrVariableSelection({
         calculations:   undefined,
@@ -11,13 +13,6 @@ export default class Engine extends UITemplate {
         calculations:   undefined,
         label:          `Cam Position`,
         outputTypes:    [ `ReluctorResult` ],
-    })
-    CylinderAirmass = new CalculationOrVariableSelection({
-        calculations:   CylinderAirmassConfigs,
-        label:          `Cylinder Air Mass`,
-        selectName:     `No Calculation`,
-        outputUnits:    [ `g` ],
-        value:          { selection: `CylinderAirmass_SpeedDensity` }
     })
     CylinderAirTemperature = new CalculationOrVariableSelection({
         calculations:   CylinderAirTemperatureConfigs,
@@ -42,36 +37,58 @@ export default class Engine extends UITemplate {
     })
     constructor(prop) {
         super()
+        this.label = `Engine Sensor Selection`
+        this.Setup(prop)
+    }
+
+    RegisterVariables() {
+        this.CrankPosition.RegisterVariables({ name: `EngineParameters.Crank Position` })
+        this.CamPosition.RegisterVariables({ name: `EngineParameters.Cam Position` })
+
+        this.ManifoldAbsolutePressure.hidden = (VariableRegister.EngineRequirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) === -1
+        if(!this.ManifoldAbsolutePressure.hidden) 
+            this.ManifoldAbsolutePressure.RegisterVariables({ name: `EngineParameters.Manifold Absolute Pressure` })
+
+        this.ThrottlePosition.hidden = (VariableRegister.EngineRequirements?.indexOf(`Throttle Position`) ?? -1) === -1
+        if(!this.ThrottlePosition.hidden) 
+            this.ThrottlePosition.RegisterVariables({ name: `EngineParameters.Throttle Position` })
+        
+        this.CylinderAirTemperature.hidden = (VariableRegister.EngineRequirements?.indexOf(`Cylinder Air Temperature`) ?? -1) === -1
+        if(!this.CylinderAirTemperature.hidden) 
+            this.CylinderAirTemperature.RegisterVariables({ name: `EngineParameters.Cylinder Air Temperature` })
+        
+        this.VolumetricEfficiency.hidden = (VariableRegister.EngineRequirements?.indexOf(`Volumetric Efficiency`) ?? -1) === -1
+        if(!this.VolumetricEfficiency.hidden) 
+            this.VolumetricEfficiency.RegisterVariables({ name: `EngineParameters.Volumetric Efficiency` })
+    }
+}
+customElements.define(`top-engine-sensors`, EngineSensors, { extends: `span` })
+export default class Engine extends UITemplate {
+    static template = getFileContents(`ConfigGui/Engine.html`)
+
+    CylinderAirmass = new CalculationOrVariableSelection({
+        calculations:   CylinderAirmassConfigs,
+        label:          `Cylinder Air Mass`,
+        selectName:     `No Calculation`,
+        outputUnits:    [ `g` ],
+        value:          { selection: `CylinderAirmass_SpeedDensity` }
+    })
+    EngineSensors = new EngineSensors();
+    constructor(prop) {
+        super()
         this.Setup(prop)
     }
 
     RegisterVariables() {
         VariableRegister.RegisterVariable({ name: `EngineParameters.Engine Speed`, unit: `RPM` })
 
-        this.CrankPosition.RegisterVariables({ name: `EngineParameters.Crank Position` })
-        this.CamPosition.RegisterVariables({ name: `EngineParameters.Cam Position` })
         this.CylinderAirmass.RegisterVariables({ name: `EngineParameters.Cylinder Air Mass` })
+        VariableRegister.EngineRequirements = GetClassProperty(this.CylinderAirmass.SubConfig, `Requirements`)
 
-        var requirements = GetClassProperty(this.CylinderAirmass.SubConfig, `Requirements`)
-
-        this.ManifoldAbsolutePressure.hidden = (requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) === -1
-        if(!this.ManifoldAbsolutePressure.hidden) 
-            this.ManifoldAbsolutePressure.RegisterVariables({ name: `EngineParameters.Manifold Absolute Pressure` })
-
-        this.ThrottlePosition.hidden = (requirements?.indexOf(`Throttle Position`) ?? -1) === -1
-        if(!this.ThrottlePosition.hidden) 
-            this.ThrottlePosition.RegisterVariables({ name: `EngineParameters.Throttle Position` })
-        
-        this.CylinderAirTemperature.hidden = (requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) === -1
-        if(!this.CylinderAirTemperature.hidden) 
-            this.CylinderAirTemperature.RegisterVariables({ name: `EngineParameters.Cylinder Air Temperature` })
-        
-        this.VolumetricEfficiency.hidden = (requirements?.indexOf(`Volumetric Efficiency`) ?? -1) === -1
-        if(!this.VolumetricEfficiency.hidden) 
-            this.VolumetricEfficiency.RegisterVariables({ name: `EngineParameters.Volumetric Efficiency` })
+        this.EngineSensors.RegisterVariables();
     }
 
-    get value() { return { ...super.value, CrankPriority: 1, requirements: GetClassProperty(this.CylinderAirmass.SubConfig, `Requirements`) } }
+    get value() { return { ...super.value, CrankPriority: 1, requirements: VariableRegister.EngineRequirements } }
     set value(value) { super.value = value }
 }
 customElements.define(`top-engine`, Engine, { extends: `span` })

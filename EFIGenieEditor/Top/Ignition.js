@@ -1,12 +1,9 @@
 import UINumber from "../JavascriptUI/UINumber.js"
 import UITemplate from "../JavascriptUI/UITemplate.js"
 import Output_TDC from "../Output/Output_TDC.js"
-export default class Ignition extends UITemplate {
-    static template = getFileContents(`ConfigGui/Ignition.html`)
-
-    OutputCount = new UINumber({
-        value: 8
-    })
+import ConfigContainer from "./ConfigContainer.js"
+class IgnitionProperties extends ConfigContainer{
+    static template = `<div data-element="IgnitionEnable"></div><div data-element="IgnitionAdvance"></div><div data-element="IgnitionDwell"></div><div data-element="IgnitionDwellDeviation"></div>`
     IgnitionEnable = new CalculationOrVariableSelection({
         calculations:   IgnitionEnableConfigs,
         label:          `Ignition Enable`,
@@ -28,6 +25,27 @@ export default class Ignition extends UITemplate {
         label:          `Ignition Dwell Deviation`,
         outputUnits:    [ `s` ],
         displayUnits:   [ `ms` ]
+    })
+
+    constructor(prop) {
+        super()
+        this.label = `Ignition Properties`
+        this.Setup(prop)
+    }
+    RegisterVariables() {
+        this.IgnitionEnable.RegisterVariables({ name: `IgnitionParameters.Ignition Enable` })
+        this.IgnitionAdvance.RegisterVariables({ name: `IgnitionParameters.Ignition Advance` })
+        this.IgnitionDwell.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell` })
+        this.IgnitionDwellDeviation.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell Deviation` })
+    }
+}
+customElements.define(`top-ignition-properties`, IgnitionProperties, { extends: `span` })
+export default class Ignition extends UITemplate {
+    static template = getFileContents(`ConfigGui/Ignition.html`)
+
+    IgnitionProperties = new IgnitionProperties()
+    OutputCount = new UINumber({
+        value: 8
     })
     Outputs = document.createElement(`div`)
     constructor(prop) {
@@ -85,11 +103,7 @@ export default class Ignition extends UITemplate {
     }
 
     RegisterVariables() {
-        this.IgnitionEnable.RegisterVariables({ name: `IgnitionParameters.Ignition Enable` })
-        this.IgnitionAdvance.RegisterVariables({ name: `IgnitionParameters.Ignition Advance` })
-        this.IgnitionDwell.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell` })
-        this.IgnitionDwellDeviation.RegisterVariables({ name: `IgnitionParameters.Ignition Dwell Deviation` })
-
+        this.IgnitionProperties.RegisterVariables()
         for(var i = 0; i < this.Outputs.children.length; i++){
             this.Outputs.children[i].RegisterVariables()
         }
