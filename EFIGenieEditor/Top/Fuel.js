@@ -63,8 +63,5 @@ export default class Fuel extends ConfigList {
         VariableRegister.RegisterVariable({ name: `FuelParameters.Cylinder Fuel Mass`, unit: `g` })
         super.RegisterVariables({ name: `FuelParameters` })
     }
-
-    get value() { return [ ...super.value, { name: `CrankPriority`, value: 1 } ] }
-    set value(value) { super.value = value.filter(x => x.name !== CrankPriority) }
 }
 customElements.define(`top-fuel`, Fuel, { extends: `div` })

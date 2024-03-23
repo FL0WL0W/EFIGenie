@@ -1136,7 +1136,7 @@ types = [
         return group
     }},
     { type: `Fuel`, toDefinition() {
-        var group = { 
+        return { 
             types : [{ type: `Calculation_EngineScheduleInjection`, toDefinition() {
                 return { type: `definition`, value: [ {
                     type: `Package`,
@@ -1156,10 +1156,13 @@ types = [
                         { name: `FuelParameters.Injector End Position` }
                     ]
                 }]}
+            }},
+            { type: `Calculation_EngineScheduleInjectionList`, toDefinition() {
+                return { type: `Group`, value: this.map(x => { return { type: `Calculation_EngineScheduleInjection`, value: x }}) }
             }}],
             type: `Group`, 
             value: [
-                { ...this.AFR, type: `Calculation_Formula`, outputVariables: [ { name: `FuelParameters.Air Fuel Ratio` } ] }, 
+                { ...this.AFR, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Air Fuel Ratio` } ] }, 
 
                 { 
                     type: `Calculation_Divide`,
@@ -1172,18 +1175,13 @@ types = [
 
                 { ...this.InjectorEnable, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Enable` } ] }, 
                 { ...this.InjectorPulseWidth, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Pulse Width` } ] }, 
-                { ...this.InjectorEndPosition, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector End Position` } ] }
+                { ...this.InjectorEndPosition, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector End Position` } ] }, 
+                { ...this.Outputs, type: `Calculation_EngineScheduleInjectionList` }
             ]
         }
-
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleInjection`, value: this.Outputs[i] })
-        }
-
-        return group
     }},
     { type: `Ignition`, toDefinition() {
-        var group  = { 
+        return { 
             types : [{ type: `Calculation_EngineScheduleIgnition`, toDefinition() {
                 return { type: `definition`, value: [ {
                     type: `Package`,
@@ -1204,21 +1202,19 @@ types = [
                         { name: `IgnitionParameters.Ignition Dwell Deviation` }
                     ]
                 }]}
+            }},
+            { type: `Calculation_EngineScheduleIgnitionList`, toDefinition() {
+                return { type: `Group`, value: this.map(x => { return { type: `Calculation_EngineScheduleIgnition`, value: x }}) }
             }}],
             type: `Group`, 
             value: [
                 { ...this.IgnitionEnable, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Enable` } ] }, 
                 { ...this.IgnitionAdvance, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Advance` } ] },
                 { ...this.IgnitionDwell, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Dwell` } ] },
-                { ...this.IgnitionDwellDeviation, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Dwell Deviation` } ] }
+                { ...this.IgnitionDwellDeviation, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `IgnitionParameters.Ignition Dwell Deviation` } ] },
+                { ...this.Outputs, type: `Calculation_EngineScheduleIgnitionList` }
             ]
         }
-
-        for(var i = 0; i < this.Outputs.length; i++) {
-            group.value.push({ type: `Calculation_EngineScheduleIgnition`, value: this.Outputs[i] })
-        }
-
-        return group
     }},
     { type: `Engine`, toDefinition() {
         let mapRequired = (this.requirements?.indexOf(`Manifold Absolute Pressure`) ?? -1) !== -1
@@ -1226,7 +1222,7 @@ types = [
         let catRequired = (this.requirements?.indexOf(`Cylinder Air Temperature`) ?? -1) !== -1
         let veRequired  = (this.requirements?.indexOf(`Volumetric Efficiency`) ?? -1) !== -1
 
-        var group = { type: `Group`, value: [
+        let group = { type: `Group`, value: [
             { ...this.CrankPosition, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Crank Position` } ] },
             { ...this.CamPosition, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `EngineParameters.Cam Position` } ] },
 

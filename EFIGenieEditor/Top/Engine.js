@@ -108,8 +108,8 @@ export default class Engine extends ConfigList {
         super.RegisterVariables({ name: `EngineParameters` })
         super.RegisterVariables({ name: `EngineParameters` })
     }
-
-    get value() { return [ ...super.value, { name: `CrankPriority`, value: 1 } ] }
-    set value(value) { super.value = value.filter(x => x.name !== CrankPriority) }
+    
+    get value() { return [ ...super.value, { CrankPriority: 1 } ] }
+    set value(value) { super.value = value.filter(x => Object.keys(x.name)[0] !== `CrankPriority`) }
 }
 customElements.define(`top-engine`, Engine, { extends: `div` })

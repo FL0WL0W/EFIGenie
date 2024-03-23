@@ -63,8 +63,5 @@ export default class Ignition extends ConfigList {
     RegisterVariables() {
         super.RegisterVariables({ name: `IgnitionParameters` })
     }
-
-    get value() { return [ ...super.value, { name: `CrankPriority`, value: 1 } ] }
-    set value(value) { super.value = value.filter(x => x.name !== CrankPriority) }
 }
 customElements.define(`top-ignition`, Ignition, { extends: `div` })
