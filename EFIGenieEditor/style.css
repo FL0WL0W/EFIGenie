@@ -288,6 +288,13 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .subOperationName {
     width: 125px;
 }
+.itemContainer {
+    margin-bottom: 1.5em;
+}
+.itemContainer .item .configContainer {
+    min-height: 4em;
+}
+.itemContainer .item:not(:has(.configContainer)),
 .configContainer {
     vertical-align:top; 
     border-radius: 6px;
@@ -304,10 +311,10 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     min-width: auto;
     width: 100%
 }
-.itemContainer .configContainer {
+.itemContainer .item:not(:has(.configContainer)) {
     margin-top: 1.5em;
 }
-.itemContainer:last-child .configContainer {
+.itemContainer:last-child .item {
     margin-bottom: 1.5em;
 }
 .mathContainer {
@@ -323,6 +330,13 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputSpacer {
     height: 25px;
 }
+.ui.text.genericCalculationName:disabled {
+    display: none;
+}
+label:has(.ui.text.genericCalculationName:disabled)::before {
+    content: attr(label);
+}
+.ui.text.genericCalculationName,
 .ui.text.inputName {
     border: 0;
     outline: 0;

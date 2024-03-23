@@ -14,7 +14,8 @@ export default class Inputs extends UITemplate {
     })
     pinOverlay = new UIPinOverlay()
     inputs = new ConfigList({
-        itemConstructor: Input
+        itemConstructor: Input,
+        saveValue: [{}]
     })
 
     constructor(prop) {

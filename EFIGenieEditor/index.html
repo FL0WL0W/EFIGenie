@@ -79,6 +79,7 @@
             }
             document.addEventListener(`DOMContentLoaded`, function() {
                 b = new ConfigTop()
+                b.RegisterVariables()
                 const lastConfig = window.localStorage.getItem(`config`)
                 if (lastConfig) {
                     loadConfig(lastConfig)

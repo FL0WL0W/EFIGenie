@@ -24,13 +24,13 @@ export default class Top extends UITemplate {
     sidebarOpen = new UIButton({className: `sidebaropenclose w3-button w3-padding-16`})
     constructor(prop){
         super()
-        this.Engine.addEventListener(`change`, () => {
-            if(this.Engine.value.CylinderAirmass.selection == undefined) {
-                this.fuelTab.classList.add(`disabled`)
-            } else {
-                this.fuelTab.classList.remove(`disabled`)
-            }
-        })
+        // this.Engine.addEventListener(`change`, () => {
+        //     if(this.Engine.value.find(x => Object.keys(x)[0] === `EngineCalculations`).EngineCalculations.CylinderAirmass.selection == undefined) {
+        //         this.fuelTab.classList.add(`disabled`)
+        //     } else {
+        //         this.fuelTab.classList.remove(`disabled`)
+        //     }
+        // })
         this.sidebarOpen.addEventListener(`click`, () => {
             window.localStorage.setItem(`expanded`, true)
             var sidebarElement = this.firstChild

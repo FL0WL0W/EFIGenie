@@ -237,6 +237,7 @@ var AFRConfigs = []
 AFRConfigs.push(Calculation_Static)
 AFRConfigs.push(Calculation_LookupTable)
 AFRConfigs.push(Calculation_2AxisTable)
+AFRConfigs.push(Calculation_Formula)
 var InjectorEnableConfigs = []
 InjectorEnableConfigs.push(Calculation_Static)
 InjectorEnableConfigs.push(Calculation_Formula)

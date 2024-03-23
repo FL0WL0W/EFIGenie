@@ -29,11 +29,12 @@ export default class Output_TDC extends CalculationOrVariableSelection {
                     this.SubConfig.firstChild.remove()
                     this.SubConfig.style.display = ``
                 }
-            } else if(this.subConfigLabel !== undefined) {
+            } else if(this.subConfigLabel !== undefined && this.SubConfig !== undefined) {
                 this.SubConfig.insertBefore(this.subConfigLabel, this.SubConfig.firstChild)
                 this.SubConfig.style.display = `block`
             }
         })
+        this.selection.dispatchEvent(new Event(`change`, {bubbles: true}))
     }
 }
 customElements.define(`output-tdc`, Output_TDC, { extends: `span` })

@@ -107,16 +107,22 @@ export default class Calculation_Formula extends UITemplate {
                     configParameter.hidden = true
                 else
                     configParameter.hidden = false
-                if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0)
-                    this.parameterValueElements.hidden = true
-                else 
+                if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0) {
+                    this.parameterValueElements.classList.remove(`configContainer`)
+                    this.parameterValueElementshidden = true
+                } else {
+                    this.parameterValueElements.classList.add(`configContainer`)
                     this.parameterValueElements.hidden = false
+                }
             })
         }
-        if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0)
-            this.parameterValueElements.hidden = true
-        else 
+        if([...this.parameterValueElements.children].filter(x => !x.hidden).length === 0) {
+            this.parameterValueElements.classList.remove(`configContainer`)
+            this.parameterValueElementshidden = true
+        } else {
+            this.parameterValueElements.classList.add(`configContainer`)
             this.parameterValueElements.hidden = false
+        }
     }
 
     get label() {
@@ -205,7 +211,6 @@ export default class Calculation_Formula extends UITemplate {
         this.parameterElements.class = `configContainer`
         this.parameterElements.style.display = `block`
         this.parameterElements.style.minHeight = `200px`
-        this.parameterValueElements.class = `configContainer`
         this.parameterValueElements.hidden = true
         this.formula.addEventListener(`change`, () => {
             let operators = [`!`,`*`,`/`,`+`,`-`,`>=`,`<=`,`>`,`<`,`=`,`&`,`|`]

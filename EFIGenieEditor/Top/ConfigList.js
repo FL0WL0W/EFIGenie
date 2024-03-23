@@ -13,13 +13,13 @@ export default class ConfigList extends HTMLDivElement {
         this.staticItems.forEach((item, index) => {
             if([...this.children].find(x => x.item === item.item) !== undefined)
                 return
-            const prevItem = this.staticItems[index - 1]
+            const prevItem = this.staticItems[index - 1]?.item
             //if previousItem not contained in list
-            if(prevItem === undefined || [...this.children].find(x => x.item === prevItem.item) === undefined ) {
+            if(prevItem === undefined || [...this.children].find(x => x.item === prevItem) === undefined ) {
                 //look for nextItem
                 let nextIndex = 1
-                let nextItem = this.staticItems[index + nextIndex]
-                while(nextItem !== undefined && [...this.children].find(x => x.item === nextItem.item) === undefined) nextItem = this.staticItems[++nextIndex]
+                let nextItem = this.staticItems[index + nextIndex]?.item
+                while(nextItem !== undefined && [...this.children].find(x => x.item === nextItem) === undefined) nextItem = this.staticItems[++nextIndex]?.item
                 if(nextItem === undefined)
                     return this.appendNewItem(item.item)
                 return this.appendNewItem(item.item, [...this.children].find(x => x.item === nextItem))
@@ -31,9 +31,9 @@ export default class ConfigList extends HTMLDivElement {
     constructor(prop) {
         super()
         this.newItemElement = new UIButton({className: `controlnew`})
-        this.newItemElement.addEventListener(`click`, () => { this.appendNewItem(this.#createNewItem()) })
+        this.newItemElement.addEventListener(`click`, () => { this.appendNewItem(this.newItem()) })
         prop ??= {}
-        const propSaveValue = prop.saveValue ?? [{}]
+        const propSaveValue = prop.saveValue ?? []
         const propValue = prop.value
         delete prop.saveValue
         delete prop.value
@@ -81,14 +81,14 @@ export default class ConfigList extends HTMLDivElement {
         itemContainer.classList.add(`itemContainer`)
         itemContainer.style.display = `flex`
         itemContainer.item = itemContainer.appendChild(newItem)
-        itemContainer.item.classList.add(`configContainer`)
+        itemContainer.item.classList.add(`item`)
         itemContainer.controlElement = itemContainer.appendChild(document.createElement(`span`))
         itemContainer.controlElement.classList.add(`controlcontainer`)
         let addElement = itemContainer.controlElement.appendChild(document.createElement(`span`))
         addElement.className = `controladd`
         const thisClass = this
         addElement.addEventListener(`click`, function() {
-            thisClass.appendNewItem(thisClass.#createNewItem(), this.parentElement.parentElement)
+            thisClass.appendNewItem(thisClass.newItem(), this.parentElement.parentElement)
         })
         let upElement = itemContainer.controlElement.appendChild(document.createElement(`span`))
         upElement.className = `controlup`
@@ -115,8 +115,8 @@ export default class ConfigList extends HTMLDivElement {
             thisClass.updateControls()
         })
 
-        itemContainer.RegisterVariables = function() { this.item.RegisterVariables?.() }
-        Object.entries(itemContainer.item).forEach(([elementName, element]) => {
+        itemContainer.RegisterVariables = function(reference) { this.item.RegisterVariables?.(reference) }
+        Object.entries(itemContainer.item).forEach(function([elementName, element]) {
             if(itemContainer[elementName] !== undefined)
                 return
             Object.defineProperty(itemContainer, elementName, {
@@ -135,30 +135,34 @@ export default class ConfigList extends HTMLDivElement {
         this.updateControls()
     }
 
-    #createNewItem() {
+    newItem() {
         return new (this.itemConstructor ?? this.constructor.itemConstructor)()
     }
 
-    get saveValue () { return [...this.children].map(e => { return { ...e.saveValue, name: this.staticItems.find(x => x.item === e.item)?.name } }) }
+    get saveValue () { return [...this.children].map(e => { return this.staticItems.find(x => x.item === e.item) !== undefined? { [this.staticItems.find(x => x.item === e.item)?.name] : e.item.saveValue } : e.item.saveValue }) }
     set saveValue(saveValue) { 
         //remove all static items from list, we will add them back as we populate
         [...this.children].forEach(item => {
-            if(this.staticItems.find(x => x.item === item.item) !== undefined)
+            if(this.staticItems.find(x => x.item === item.item) !== undefined) {
                 this.removeChild(item)
+            }
         })
         while(this.children.length > saveValue.length) this.removeChild(this.lastChild)
         for(let i = 0; i < saveValue.length; i++){
-            const staticItem = this.staticItems.find(x => x.name === saveValue[i]?.name)?.item 
+            const staticItem = this.staticItems.find(x => x.name === Object.keys(saveValue[i])[0])?.item 
             if(!this.children[i] || staticItem !== undefined) {
-                const item = staticItem ?? this.#createNewItem()
+                const item = staticItem ?? this.newItem()
                 this.appendNewItem(item, this.children[i])
             }
-            this.children[i].saveValue = saveValue[i]
+            if(staticItem)
+                this.children[i].item.saveValue = saveValue[i][Object.keys(saveValue[i])[0]]
+            else
+                this.children[i].item.saveValue = saveValue[i]
         }
         this.#addStaticItems();
     }
 
-    get saveValue () { return [...this.children].map(e => { return { ...e.value, name: this.staticItems.find(x => x.item === e.item)?.name } }) }
+    get value () { return [...this.children].map(e => { return this.staticItems.find(x => x.item === e.item) !== undefined? { [this.staticItems.find(x => x.item === e.item)?.name] : e.item.value } : e.item.value }) }
     set value(value) { 
         //remove all static items from list, we will add them back as we populate
         [...this.children].forEach(item => {
@@ -167,19 +171,22 @@ export default class ConfigList extends HTMLDivElement {
         })
         while(this.children.length > value.length) this.removeChild(this.lastChild)
         for(let i = 0; i < value.length; i++){
-            const staticItem = this.staticItems.find(x => x.name === value[i]?.name)?.item 
+            const staticItem = this.staticItems.find(x => x.name === Object.keys(value[i])[0])?.item 
             if(!this.children[i] || staticItem !== undefined) {
-                const item = staticItem ?? this.#createNewItem()
+                const item = staticItem ?? this.newItem()
                 this.appendNewItem(item, this.children[i])
             }
-            this.children[i].value = value[i]
+            if(staticItem)
+                this.children[i].item.value = value[i][Object.keys(value[i])[0]]
+            else
+                this.children[i].item.value = value[i]
         }
         this.#addStaticItems();
     }
 
-    RegisterVariables() {
+    RegisterVariables(reference) {
         for(var i = 0; i < this.children.length; i++){
-            this.children[i].RegisterVariables()
+            this.children[i].RegisterVariables(reference)
         }
     }
 }

@@ -1,5 +1,7 @@
-import UITemplate from "../JavascriptUI/UITemplate.js"
+import CalculationOrVariableSelection from "../Calculation/CalculationOrVariableSelection.js"
+import GenericCalculation from "../Calculation/GenericCalculation.js"
 import ConfigContainer from "./ConfigContainer.js"
+import ConfigList from "./ConfigList.js"
 var EngineRequirements = []
 class EngineSensors extends ConfigContainer
 {
@@ -89,24 +91,25 @@ class EngineCalculations extends ConfigContainer
     }
 }
 customElements.define(`top-engine-calculations`, EngineCalculations, { extends: `span` })
-export default class Engine extends UITemplate {
-    static template = `<div data-element="EngineSensors"></div><br/><div data-element="EngineCalculations"></div>`
-
-    EngineSensors = new EngineSensors();
-    EngineCalculations = new EngineCalculations();
+export default class Engine extends ConfigList {
     constructor(prop) {
-        super()
-        this.Setup(prop)
+        prop = { ...prop,
+            staticItems: [
+                { name: `EngineSensors`, item: new EngineSensors()},
+                { name: `EngineCalculations`, item: new EngineCalculations()},
+            ],
+            itemConstructor: GenericCalculation
+        }
+        super(prop)
     }
 
     RegisterVariables() {
         VariableRegister.RegisterVariable({ name: `EngineParameters.Engine Speed`, unit: `RPM` })
-
-        this.EngineCalculations.RegisterVariables();
-        this.EngineSensors.RegisterVariables();
+        super.RegisterVariables({ name: `EngineParameters` })
+        super.RegisterVariables({ name: `EngineParameters` })
     }
 
-    get value() { return { ...super.value, CrankPriority: 1, requirements: EngineRequirements } }
-    set value(value) { super.value = value }
+    get value() { return [ ...super.value, { name: `CrankPriority`, value: 1 } ] }
+    set value(value) { super.value = value.filter(x => x.name !== CrankPriority) }
 }
-customElements.define(`top-engine`, Engine, { extends: `span` })
+customElements.define(`top-engine`, Engine, { extends: `div` })
