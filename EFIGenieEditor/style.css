@@ -244,6 +244,9 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     display: inline-flex;
     flex-direction: column;
 }
+.controldummyfill {
+    flex-grow: 1;
+}
 .controladd,
 .controlnew,
 .controldelete,
@@ -288,8 +291,11 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .subOperationName {
     width: 125px;
 }
-.itemContainer {
-    margin-bottom: 1.5em;
+.itemContainer:has(.configContainer) {
+    margin-top: 0.5em;
+}
+.itemContainer .item:has(.configContainer) {
+    margin-top: 0.5em;
 }
 .itemContainer .item .configContainer {
     min-height: 4em;

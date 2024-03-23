@@ -47,8 +47,8 @@ export default class ConfigList extends HTMLDivElement {
     updateControls() {
         for(let i = 0; i < this.children.length; i++) {
             const up = this.children[i].controlElement.children[1]
-            const del = this.children[i].controlElement.children[2]
-            const down = this.children[i].controlElement.children[3]
+            const del = this.children[i].controlElement.children[3]
+            const down = this.children[i].controlElement.children[5]
             const isStatic = this.staticItems.find(x => x.item === this.children[i].item) !== undefined
             if(i === 0 || (isStatic && this.staticItems.find(x => x.item === this.children[i-1].item) !== undefined)) {
                 up.className = `controldummy`
@@ -98,6 +98,7 @@ export default class ConfigList extends HTMLDivElement {
             this.parentElement.parentElement.previousSibling.before(this.parentElement.parentElement)
             thisClass.updateControls()
         })
+        itemContainer.controlElement.appendChild(document.createElement(`span`)).className = `controldummyfill`
         let deleteElement = itemContainer.controlElement.appendChild(document.createElement(`span`))
         deleteElement.className = `controldelete`
         deleteElement.addEventListener(`click`, function() {
@@ -106,6 +107,7 @@ export default class ConfigList extends HTMLDivElement {
             this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement)
             thisClass.updateControls()
         })
+        itemContainer.controlElement.appendChild(document.createElement(`span`)).className = `controldummyfill`
         let downElement = itemContainer.controlElement.appendChild(document.createElement(`span`))
         downElement.className = `controldown`
         downElement.addEventListener(`click`, function() {
