@@ -47,7 +47,7 @@ export default class Ignition extends ConfigList {
             staticItems: [
                 { name: `IgnitionProperties`, item: new IgnitionProperties()},
                 { name: `IgnitionOutputs`, item: new OutputList({
-                    label: `Injector Outputs`,
+                    label: `Ignition Outputs`,
                     newOutput(i) {
                         return new Output_TDC({
                             label:          `Ignition ${i+1}`

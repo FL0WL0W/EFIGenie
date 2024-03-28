@@ -40,7 +40,7 @@ export default class OutputList extends ConfigContainer {
         }
     }
     
-    get value() { return [...this.children].map(x => x.value) }
+    get value() { return [...this.Outputs.children].map(x => x.value) }
     set value(value) { 
         this.OutputCount.value = value.length
         while(this.Outputs.children.length > value.length) this.Outputs.removeChild(this.Outputs.lastChild)

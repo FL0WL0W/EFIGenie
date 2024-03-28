@@ -37,6 +37,18 @@ class EngineSensors extends ConfigContainer
         this.label = `Engine Sensor Selection`
         this.Setup(prop)
     }
+    get value() {
+        let value = super.value
+        value.CrankPriority = 1
+        if(this.ManifoldAbsolutePressure.hidden) 
+            delete value.ManifoldAbsolutePressure
+        if(this.ThrottlePosition.hidden) 
+            delete value.ThrottlePosition
+        if(this.CylinderAirTemperature.hidden) 
+            delete value.CylinderAirTemperature
+        return value;
+    }
+    set value(value) { super.value = value }
 
     RegisterVariables() {
         this.CrankPosition.RegisterVariables({ name: `EngineParameters.Crank Position` })
@@ -79,6 +91,13 @@ class EngineCalculations extends ConfigContainer
         this.label = `Engine Calculations`
         this.Setup(prop)
     }
+    get value() {
+        let value = super.value
+        if(this.VolumetricEfficiency.hidden) 
+            delete value.VolumetricEfficiency
+        return value;
+    }
+    set value(value) { super.value = value }
 
     RegisterVariables() {
         this.CylinderAirmass.RegisterVariables({ name: `EngineParameters.Cylinder Air Mass` })
@@ -108,8 +127,5 @@ export default class Engine extends ConfigList {
         super.RegisterVariables({ name: `EngineParameters` })
         super.RegisterVariables({ name: `EngineParameters` })
     }
-    
-    get value() { return [ ...super.value, { CrankPriority: 1 } ] }
-    set value(value) { super.value = value.filter(x => Object.keys(x.name)[0] !== `CrankPriority`) }
 }
 customElements.define(`top-engine`, Engine, { extends: `div` })

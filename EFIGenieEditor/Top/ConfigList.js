@@ -151,7 +151,7 @@ export default class ConfigList extends HTMLDivElement {
         })
         while(this.children.length > saveValue.length) this.removeChild(this.lastChild)
         for(let i = 0; i < saveValue.length; i++){
-            const staticItem = this.staticItems.find(x => x.name === Object.keys(saveValue[i])[0])?.item 
+            const staticItem = this.staticItems.find(x => Object.keys(saveValue[i]).length === 1 && x.name === Object.keys(saveValue[i])[0])?.item 
             if(!this.children[i] || staticItem !== undefined) {
                 const item = staticItem ?? this.newItem()
                 this.appendNewItem(item, this.children[i])
@@ -173,7 +173,7 @@ export default class ConfigList extends HTMLDivElement {
         })
         while(this.children.length > value.length) this.removeChild(this.lastChild)
         for(let i = 0; i < value.length; i++){
-            const staticItem = this.staticItems.find(x => x.name === Object.keys(value[i])[0])?.item 
+            const staticItem = this.staticItems.find(x => Object.keys(value[i]).length === 1 && x.name === Object.keys(value[i])[0])?.item 
             if(!this.children[i] || staticItem !== undefined) {
                 const item = staticItem ?? this.newItem()
                 this.appendNewItem(item, this.children[i])
