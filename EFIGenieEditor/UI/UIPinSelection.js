@@ -6,7 +6,7 @@ export default class UIPinSelection extends UISelection {
         this.selectDisabled = prop.selectDisabled ?? true
         this.selectValue = prop.selectValue ?? 0xFFFF
 
-        this.options = this.#generateOptionList()
+        this.updateOptions()
         this.addEventListener(`change`, () => {
             UpdateOverlay()
         })
@@ -14,7 +14,7 @@ export default class UIPinSelection extends UISelection {
         this.selectedElement.classList.add(`pinselect`)
     }
     
-    #generateOptionList() {
+    updateOptions() {
         var options = []
         var endOptions = []
         let pinOut = PinOverlay.PinOut //this sucks
@@ -37,7 +37,7 @@ export default class UIPinSelection extends UISelection {
         }
         options = options.concat(endOptions)
 
-        return options
+        this.options = options
     }
 }
 customElements.define('ui-pinselection', UIPinSelection, { extends: `div` })

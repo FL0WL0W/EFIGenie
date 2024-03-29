@@ -11,6 +11,10 @@ export default class Input_Analog extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.pin.updateOptions()
+    }
 }
 customElements.define(`input-analog`, Input_Analog, { extends: `span` })
 RawInputConfigs.push(Input_Analog)

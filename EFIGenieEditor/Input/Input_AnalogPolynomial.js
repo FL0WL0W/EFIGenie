@@ -32,6 +32,7 @@ export default class Input_AnalogPolynomial extends UITemplate {
         delete reference.unit
         delete reference.type
         delete reference.id
+        this.analogInput.RegisterVariables()
         VariableRegister.RegisterVariable({ ...reference, unit: `V`})
         this.voltageLiveUpdate.RegisterVariables({ ...reference, unit: `V`})
     }

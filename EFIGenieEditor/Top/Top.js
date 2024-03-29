@@ -5,6 +5,8 @@ import Engine from "./Engine.js"
 import Ignition from "./Ignition.js"
 import Fuel from "./Fuel.js"
 import Inputs from "./Inputs.js"
+import GenericCalculation from "../Calculation/GenericCalculation.js"
+import ConfigList from "./ConfigList.js"
 export default class Top extends UITemplate {
     static template = getFileContents(`ConfigGui/Top.html`)
 
@@ -12,11 +14,16 @@ export default class Top extends UITemplate {
     dashboardTab = document.createElement(`div`)
     inputsTabExpend = document.createElement(`span`)
     inputsTab = document.createElement(`div`)
+    canTab = document.createElement(`div`)
     engineTab = document.createElement(`div`)
     fuelTab = document.createElement(`div`)
     ignitionTab = document.createElement(`div`)
     Dashboard = new Dashboard()
     Inputs = new Inputs()
+    CAN = new ConfigList({
+        newItem() { return new GenericCalculation({ calculations: [ {group: `CAN`, calculations: CANConfigs}, {group: `Generic`, calculations: GenericConfigs} ]  }) },
+        saveValue: [{}]
+    })
     Engine = new Engine()
     Fuel = new Fuel()
     Ignition = new Ignition()
@@ -108,6 +115,10 @@ export default class Top extends UITemplate {
         this.inputsTab.addEventListener(`click`, () => {
             this.activeTab = `Inputs`
         })
+        this.canTab.class = `w3-bar-item w3-button can-tab`
+        this.canTab.addEventListener(`click`, () => {
+            this.activeTab = `CAN`
+        })
         this.engineTab.class = `w3-bar-item w3-button engine-tab`
         this.engineTab.addEventListener(`click`, () => {
             this.activeTab = `Engine`
@@ -148,11 +159,13 @@ export default class Top extends UITemplate {
         this.title.textContent = activeTab
         this.Dashboard.hidden = true
         this.Inputs.hidden = true
+        this.CAN.hidden = true
         this.Engine.hidden = true
         this.Fuel.hidden = true
         this.Ignition.hidden = true
         this.dashboardTab.classList.remove(`active`)
         this.inputsTab.classList.remove(`active`)
+        this.canTab.classList.remove(`active`)
         this.engineTab.classList.remove(`active`)
         this.fuelTab.classList.remove(`active`)
         this.ignitionTab.classList.remove(`active`)
@@ -164,6 +177,10 @@ export default class Top extends UITemplate {
             case `Inputs`:
                 this.Inputs.hidden = false
                 this.inputsTab.classList.add(`active`)
+                break
+            case `CAN`:
+                this.CAN.hidden = false
+                this.canTab.classList.add(`active`)
                 break
             case `Engine`:
                 this.Engine.hidden = false
@@ -191,6 +208,7 @@ export default class Top extends UITemplate {
         communication.liveUpdateEvents = []
         communication.variablesToPoll = []
         this.Inputs.RegisterVariables()
+        this.CAN.RegisterVariables()
         this.Engine.RegisterVariables()
         this.Fuel.RegisterVariables()
         this.Ignition.RegisterVariables()

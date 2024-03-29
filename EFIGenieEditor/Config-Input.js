@@ -137,6 +137,7 @@ PinOuts = {
         Overlay: `images/ESP_WROOM_32_Overlay.webp`,
         OverlayWidth: 600,
         OverlayElementHeight: 25,
+        CANBusCount: 1,
         Pins: [
             { name: `GPIO36`, value: 36, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 257, align: `right`},
             { name: `GPIO39`, value: 39, supportedModes: `digital digitalinterrupt analog`, overlayX: 480, overlayY: 281, align: `right`},
@@ -176,10 +177,12 @@ InputConfigs.unshift({group: `TPS Sensors`, calculations: TpsConfigs})
 
 ReluctorConfigs = []
 InputConfigs.unshift({group: `Reluctor Decoders`, calculations: ReluctorConfigs})
-var CylinderAirmassConfigs = []
+CylinderAirmassConfigs = []
 CylinderAirmassConfigs.push(Calculation_Static)
 
-var InjectorPulseWidthConfigs = []
+InjectorPulseWidthConfigs = []
 InjectorPulseWidthConfigs.push(Calculation_Static)
 // InjectorPulseWidthConfigs.push(Calculation_LookupTable)
 // InjectorPulseWidthConfigs.push(Calculation_2AxisTable)
+
+CANConfigs = []

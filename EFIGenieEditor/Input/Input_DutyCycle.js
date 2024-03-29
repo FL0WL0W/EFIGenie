@@ -21,6 +21,10 @@ export default class Input_DutyCycle extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.pin.updateOptions()
+    }
 }
 RawInputConfigs.push(Input_DutyCycle)
 customElements.define(`input-dutycycle`, Input_DutyCycle, { extends: `span` })

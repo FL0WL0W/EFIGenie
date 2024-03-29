@@ -21,6 +21,10 @@ export default class Input_DigitalRecord extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.pin.updateOptions()
+    }
 }
 RawInputConfigs.push(Input_DigitalRecord)
 customElements.define(`input-digitalrecord`, Input_DigitalRecord, { extends: `span` })

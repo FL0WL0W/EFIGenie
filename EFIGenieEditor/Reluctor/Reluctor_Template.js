@@ -9,6 +9,7 @@ export default class Reluctor_Template extends Input_DigitalRecord {
         delete reference.id
         reference.type = `Record`
         VariableRegister.RegisterVariable(reference)
+        super.RegisterVariables()
     }
 }
 customElements.define(`reluctor-template`, Reluctor_Template, { extends: `span` })

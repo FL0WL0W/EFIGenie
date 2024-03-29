@@ -240,12 +240,19 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputconfig {
     display: inline-block;
 }
-.controlcontainer {
-    display: inline-flex;
-    flex-direction: column;
-}
 .controldummyfill {
     flex-grow: 1;
+}
+.itemContainer .controlcontainer {
+    margin-top: -0.75em;
+    display: inline-flex;
+    flex-direction: column;
+    margin-bottom: 0.75em;
+    position: relative;
+}
+.itemContainer:not(:has(.configContainer)) .controlcontainer {
+    flex-direction: row;
+    height: 3em;
 }
 .controladd,
 .controlnew,
@@ -253,22 +260,48 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .controlup,
 .controldown,
 .controldummy {
-    padding: 0px 4px;
+    padding: 0px 0.4em;
     font-family: 'Courier New', monospace;
     font-weight: bold;
     cursor: pointer;
+    height: 1.5em;
+    border-radius: 6px;
     width: fit-content;
+}
+.itemContainer:not(:has(.configContainer)) .controldelete {
+    margin-top: 1.5em;
+    transform: translateX(-1.4em);
+}
+.itemContainer:not(:has(.configContainer)) .controlup{
+    margin-top: 0.75em;
+    transform: translateX(1.4em);
+    position: absolute;
+}
+.itemContainer:not(:has(.configContainer)) .controldummy{
+    position: absolute;
+}
+.itemContainer:not(:has(.configContainer)) .controldown{
+    margin-top: 2.25em;
+    transform: translateX(1.4em);
+    position: absolute;
+}
+.itemContainer:not(:has(.configContainer)) .controlnew{
+    margin-top: 3em;
+    position: absolute;
+    white-space: nowrap
 }
 .controladd:hover,
 .controlnew:hover,
 .controldelete:hover,
 .controlup:hover,
 .controldown:hover {
-    border-radius: 6px;
     background-color: #666;
 }
 .controlnew::after {
     content: "+ New";
+}
+.configContainer .controlnew::after{
+    content: "+";
 }
 .controladd::after {
     content: "+";
@@ -291,16 +324,17 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .subOperationName {
     width: 125px;
 }
-.itemContainer:has(.configContainer) {
-    margin-top: 0.5em;
-}
 .itemContainer .item:has(.configContainer) {
-    margin-top: 0.5em;
+    margin-top: 0em;
 }
 .itemContainer .item .configContainer {
     min-height: 4em;
 }
-.itemContainer .item:not(:has(.configContainer)),
+.itemContainer .item{
+    min-width: 850px;
+    width: fit-content;
+    box-sizing: border-box;
+}
 .configContainer {
     vertical-align:top; 
     border-radius: 6px;
@@ -313,12 +347,25 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
     width: fit-content;
     box-sizing: border-box;
 }
+.itemList {
+    padding-top: 0.75em;
+}
+.configContainer .itemContainer .item,
 .configContainer .configContainer {
     min-width: auto;
     width: 100%
 }
+.configContainer .itemContainer {
+    min-width: auto;
+    width: 100%
+}
 .itemContainer .item:not(:has(.configContainer)) {
-    margin-top: 1.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border-radius: 6px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
 }
 .itemContainer:last-child .item {
     margin-bottom: 1.5em;
@@ -336,12 +383,21 @@ body {background-color: #222629; color: #eee; font-weight:bold;}
 .inputSpacer {
     height: 25px;
 }
+.ui.number.canMultiplier,
+.ui.number.canAdder {
+    width: 5em;
+}
+.ui.number.canBitOffset,
+.ui.number.canBitLength {
+    width: 3em;
+}
 .ui.text.genericCalculationName:disabled {
     display: none;
 }
 label:has(.ui.text.genericCalculationName:disabled)::before {
     content: attr(label);
 }
+.ui.text.canParseDataName,
 .ui.text.genericCalculationName,
 .ui.text.inputName {
     border: 0;
@@ -350,6 +406,9 @@ label:has(.ui.text.genericCalculationName:disabled)::before {
     border-radius: 0px;
     border-bottom: solid #3590d0;
     width: 250px;
+}
+.ui.text.canParseDataName {
+    width: 150px;
 }
 label:not(.w3-button) {
     font: bold 16px Arial;
@@ -483,6 +542,7 @@ select .pinconflict{
     content: "▼\00a0";
 }
 .dashboard-tab::before,
+.can-tab::before,
 .engine-tab::before,
 .fuel-tab::before,
 .ignition-tab::before {
@@ -494,6 +554,9 @@ select .pinconflict{
 }
 .input-tab::after {
     content: "Inputs";
+}
+.can-tab::after {
+    content: "CAN";
 }
 .engine-tab::after {
     content: "Engine";
@@ -583,4 +646,20 @@ select .pinconflict{
 .ui.text.gaugeTemplate {
     width: 100%;
     height: 25em;
+}
+
+.ui.select.can-bus-selection .ui.selected {
+    min-width: 2.5em;
+}
+.ui.select.can-bus-selection .ui.context-menu {
+    min-width: 2.5em;
+    width: fit-content;
+}
+
+.ui.select.can-write-interval .ui.selected {
+    min-width: 80px;
+}
+.ui.select.can-write-interval .ui.context-menu {
+    min-width: 80px;
+    width: fit-content;
 }

@@ -13,6 +13,10 @@ export default class Input_Digital extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.pin.updateOptions()
+    }
 }
 RawInputConfigs.push(Input_Digital)
 customElements.define(`input-digital`, Input_Digital, { extends: `span` })

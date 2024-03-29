@@ -25,7 +25,7 @@ export default class GenericCalculation extends CalculationOrVariableSelection {
     }
 
     RegisterVariables(reference) {
-        reference = { ...reference, name: `${reference.name}.${this.name.value}` }
+        reference = { ...reference, name: reference?.name === undefined? this.name.value : `${reference.name}.${this.name.value}` }
         super.RegisterVariables(reference)
     }
 

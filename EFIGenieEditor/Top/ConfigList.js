@@ -30,6 +30,7 @@ export default class ConfigList extends HTMLDivElement {
 
     constructor(prop) {
         super()
+        this.class = `itemList`
         this.newItemElement = new UIButton({className: `controlnew`})
         this.newItemElement.addEventListener(`click`, () => { this.appendNewItem(this.newItem()) })
         prop ??= {}

@@ -15,6 +15,10 @@ export default class Output_Digital extends UITemplate {
         this.style.display = `block`
         this.Setup(prop)
     }
+
+    RegisterVariables() {
+        this.pin.updateOptions()
+    }
 }
 BooleanOutputConfigs.push(Output_Digital)
 customElements.define(`output-digital`, Output_Digital, { extends: `span` })

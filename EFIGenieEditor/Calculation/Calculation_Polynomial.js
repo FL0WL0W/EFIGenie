@@ -1,7 +1,7 @@
 import UINumberWithUnit from "../UI/UINumberWithUnit.js"
 import UINumber from "../JavascriptUI/UINumber.js"
 import UISelection from "../JavascriptUI/UISelection.js"
-export default class Calculation_Polynomial extends HTMLSpanElement {
+export default class Calculation_Polynomial extends HTMLDivElement {
     static displayName = `Polynomial`
     static outputTypes = [ `float` ]
     static inputTypes = [ `float` ]
@@ -17,7 +17,7 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     })
     constructor(prop) {
         super()
-        this.append(document.createElement(`br`))
+        this.class = `configContainer`
         const minValueLabel = document.createElement(`label`)
         minValueLabel.textContent = `Minimum Value:`
         this.append(minValueLabel)
@@ -142,5 +142,5 @@ export default class Calculation_Polynomial extends HTMLSpanElement {
     get displayUnits() { return [ this.displayUnit ] }
     set displayUnits(displayUnits) { this.displayUnit = displayUnits?.[0] }
 }
-customElements.define('ui-polynomial', Calculation_Polynomial, { extends: `span` })
+customElements.define('ui-polynomial', Calculation_Polynomial, { extends: `div` })
 GenericConfigs.push(Calculation_Polynomial)
