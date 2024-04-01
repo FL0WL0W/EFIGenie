@@ -304,7 +304,14 @@ EmbeddedOperationsFactoryIDs = {
     PulseWidthPinWrite: 8,
     GetTick: 9,
     SecondsToTick: 10,
-    TickToSeconds: 11
+    TickToSeconds: 11,
+    Record: 12,
+    FIRFilter: 13,
+    Interval: 14,
+    CANReadData: 15,
+    CANWriteData: 16,
+    CANParseData: 17,
+    CANPackData: 18
 }
 ReluctorFactoryIDs = {
     Offset: 30000,
@@ -963,46 +970,23 @@ types = [
         
         return group
     }},
-    { type: `CylinderAirmass_AlphaN`, outputUnits: [`g`], toDefinition() {
-        return { ...this.Airmass, type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
-    }},
-    { type: `CylinderAirmass_SpeedDensity`, outputUnits: [`g`], toDefinition() {
-        this.inputVariables = [ 
-            { name: `EngineParameters.Cylinder Air Temperature` },
-            { name: `EngineParameters.Manifold Absolute Pressure` },
-            { name: `EngineParameters.Volumetric Efficiency` }
-        ]
-        return Packagize({ type: `definition`, value: [ 
-            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
-            { type: `FLOAT`, value: this.CylinderVolume }, //Cylinder Volume
-        ]}, this)
-    }},
-    { type: `InjectorPulseWidth_DeadTime`, outputUnits: [`s`], toDefinition() {
-        return { type: `Group`, value: [
-            { ...this.FlowRate, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Flow Rate` } ] },
-            { ...this.DeadTime, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Dead Time` } ] },
-            //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
-            { type: `Calculation_Static`, value: 2, outputVariables: [ { name: `SquirtsPerCycle` } ] },//static value of 2
-            //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
-            { 
-                type: `Calculation_Subtract`,
-                outputVariables: [ { name: `SquirtsPerCycle` } ], //Return
-                inputVariables: [
-                    { name: `SquirtsPerCycle` },
-                    { name: `EngineSequentialId` }
-                ]
-            },
-            Packagize({ type: `definition`, value: [ 
-                { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
-                { type: `FLOAT`, value: this.MinInjectorFuelMass }
-            ]},{
-                ...this,
-                inputVariables: [ 
-                    { name: `SquirtsPerCycle` },
-                    { name: `FuelParameters.Cylinder Fuel Mass` },
-                    { name: `FuelParameters.Injector Flow Rate` },
-                    { name: `FuelParameters.Injector Dead Time` }
-                ]
+    { type: `CAN_ReadData`, toDefinition() {
+        return { type: `definition`, value: [
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.CANReadData}, //factory ID
+            { type: `UINT32`, value: (this.canBus << 29) | this.canID}, //bus and identifier
+            { type: `UINT32`, value: EmbeddedOperationsFactoryIDs.Offset + EmbeddedOperationsFactoryIDs.CANParseData}, //factory ID
+            { type: `UINT8`, value: this.parseData.length }, //number of parse data values
+            ...this.parseData.map(x => {
+                return { type: `definition`, value: [
+                    { type: `FLOAT`, value: x.multiplier}, //muiltiplier
+                    { type: `FLOAT`, value: x.adder}, //adder
+                    { type: `UINT8`, value: (x.bitLocation << 2) | //bitLocation
+                                            (x.bitLength >> 4) }, //bitLength
+                    { type: `UINT8`, value: (x.bitLength << 4) | //bitLength
+                                            ((x.bitLength < 2) << 3) | //CastToBool
+                                            (0 << 2) | //CastToInt
+                                            (0) } //Reserved
+                ]}
             })
         ]}
     }},
@@ -1112,18 +1096,6 @@ types = [
         this.type = `Input_AnalogPolynomial`
         return this
     }},
-    { type: `ConfigList`, toDefinition() {
-        return { type: `Group`, value: this.value.map(x => {
-            const keys = Object.keys(x)
-            const staticItem = this.staticItems?.find(x => x.name === keys[0])
-            if(keys.length === 1 && staticItem !== undefined) {
-                if(Array.isArray(x[staticItem.name]) || typeof x[staticItem.name] !== `object`)
-                    return { value: x[staticItem.name], type: staticItem.type }
-                return { ...x[staticItem.name], type: staticItem.type }
-            }
-            return { ...x, type: this.itemType }
-        }), staticItems: undefined, itemType: undefined}
-    }},
     { type: `Input`, toDefinition() {
         if(this.translationConfig == undefined)
             return
@@ -1149,6 +1121,61 @@ types = [
             }, 
             { type: `ConfigList`, value: this.inputs, itemType: `Input` }
         ]}
+    }},
+    { type: `CylinderAirmass_AlphaN`, outputUnits: [`g`], toDefinition() {
+        return { ...this.Airmass, type: `CalculationOrVariableSelection`, outputVariables: this.outputVariables }
+    }},
+    { type: `CylinderAirmass_SpeedDensity`, outputUnits: [`g`], toDefinition() {
+        this.inputVariables = [ 
+            { name: `EngineParameters.Cylinder Air Temperature` },
+            { name: `EngineParameters.Manifold Absolute Pressure` },
+            { name: `EngineParameters.Volumetric Efficiency` }
+        ]
+        return Packagize({ type: `definition`, value: [ 
+            { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.CylinderAirMass_SD },  //factory id
+            { type: `FLOAT`, value: this.CylinderVolume }, //Cylinder Volume
+        ]}, this)
+    }},
+    { type: `InjectorPulseWidth_DeadTime`, outputUnits: [`s`], toDefinition() {
+        return { type: `Group`, value: [
+            { ...this.FlowRate, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Flow Rate` } ] },
+            { ...this.DeadTime, type: `CalculationOrVariableSelection`, outputVariables: [ { name: `FuelParameters.Injector Dead Time` } ] },
+            //Store a value of 2 into the temporary variable which will be used for SquirtsPerCycle (2 squirts per cycle default)
+            { type: `Calculation_Static`, value: 2, outputVariables: [ { name: `SquirtsPerCycle` } ] },//static value of 2
+            //Subtract 1 to temporary variable if Engine is running sequentially. This will be used for SquirtsPerCycle (1 squirts per cycle when sequential)
+            { 
+                type: `Calculation_Subtract`,
+                outputVariables: [ { name: `SquirtsPerCycle` } ], //Return
+                inputVariables: [
+                    { name: `SquirtsPerCycle` },
+                    { name: `EngineSequentialId` }
+                ]
+            },
+            Packagize({ type: `definition`, value: [ 
+                { type: `UINT32`, value: EngineFactoryIDs.Offset + EngineFactoryIDs.InjectorDeadTime },
+                { type: `FLOAT`, value: this.MinInjectorFuelMass }
+            ]},{
+                ...this,
+                inputVariables: [ 
+                    { name: `SquirtsPerCycle` },
+                    { name: `FuelParameters.Cylinder Fuel Mass` },
+                    { name: `FuelParameters.Injector Flow Rate` },
+                    { name: `FuelParameters.Injector Dead Time` }
+                ]
+            })
+        ]}
+    }},
+    { type: `ConfigList`, toDefinition() {
+        return { type: `Group`, value: this.value.map(x => {
+            const keys = Object.keys(x)
+            const staticItem = this.staticItems?.find(x => x.name === keys[0])
+            if(keys.length === 1 && staticItem !== undefined) {
+                if(Array.isArray(x[staticItem.name]) || typeof x[staticItem.name] !== `object`)
+                    return { value: x[staticItem.name], type: staticItem.type }
+                return { ...x[staticItem.name], type: staticItem.type }
+            }
+            return { ...x, type: this.itemType }
+        }), staticItems: undefined, itemType: undefined}
     }},
     { type: `Fuel`, toDefinition() {
         return { 
@@ -1325,6 +1352,16 @@ types = [
             ]
         }
     }},
+    { type: `CAN`, toDefinition() {
+        return { 
+            types : [{ type: `CAN_GenericCalculation`, toDefinition() {
+                return { ...this, type: `GenericCalculation`, outputVariables: [ { name: `CANParameters.` } ] }
+            }}],
+            type: `ConfigList`, 
+            value: this.value,
+            itemType: `CAN_GenericCalculation`
+        }
+    }},
     { type: `Top`, toDefinition() {
         return { type: `definition`, value: [
             { type: `UINT32`, value: 0}, //signal last operation
@@ -1332,6 +1369,7 @@ types = [
             //inputs
             { type: `Group`, value: [
                 { ...this.Inputs, type: `Inputs` }, 
+                { type: `CAN`, value: this.CAN },
                 { type: `Engine`, value: this.Engine },
             ]},
 
