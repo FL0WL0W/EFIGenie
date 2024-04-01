@@ -47,6 +47,7 @@ namespace EFIGenie
         }
         while(size > 0);
 
+        size = 0;
         _inputsExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
