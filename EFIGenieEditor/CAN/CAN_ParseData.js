@@ -67,7 +67,6 @@ export default class CAN_ParseData extends UITemplate {
         }
 
         VariableRegister.RegisterVariable(reference)
-        console.log(reference)
         this.liveUpdate.RegisterVariables(reference)
     }
 }

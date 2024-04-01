@@ -6,8 +6,6 @@ import PinOverlay from "../UI/UIPinOverlay.js"
 import CAN_PackData from "./CAN_PackData.js"
 export default class CAN_WriteData extends UITemplate {
     static displayName = `CAN Write`
-    static outputTypes = [ ]
-    static inputTypes = [ ]
     static template = `<div data-element="canBusLabel"></div><div data-element="canBus"></div><div data-element="canIDLabel"></div><div data-element="canID"></div>Interval:<div data-element="interval"></div><div data-element="packData"></div>`
 
     canIDLabel = document.createElement(`span`)
@@ -58,7 +56,6 @@ export default class CAN_WriteData extends UITemplate {
         var options = []
         let pinOut = PinOverlay.PinOut //this sucks
         if(!pinOut) return
-        console.log(pinOut.CANBusCount)
         for(var i = 0; i < pinOut.CANBusCount; i++) {
             options.push({
                 name: i,

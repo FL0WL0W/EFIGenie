@@ -208,7 +208,7 @@ export default class Top extends UITemplate {
         communication.liveUpdateEvents = []
         communication.variablesToPoll = []
         this.Inputs.RegisterVariables()
-        this.CAN.RegisterVariables()
+        this.CAN.RegisterVariables({ name: `CANParameters` })
         this.Engine.RegisterVariables()
         this.Fuel.RegisterVariables()
         this.Ignition.RegisterVariables()

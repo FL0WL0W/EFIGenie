@@ -225,7 +225,8 @@ export default class CalculationOrVariableSelection extends UITemplate {
         
         const subConfig = this.SubConfig
         if(subConfig != undefined) {
-            const hasOutput = (GetClassProperty(subConfig, `outputUnits`) ?? GetClassProperty(subConfig, `outputTypes`)) != undefined
+            const o = (GetClassProperty(subConfig, `outputUnits`) ?? GetClassProperty(subConfig, `outputTypes`))
+            const hasOutput = o !== undefined && o.length > 0
             if (hasOutput) VariableRegister.RegisterVariable(reference)
             subConfig.RegisterVariables?.(reference)
         } else {

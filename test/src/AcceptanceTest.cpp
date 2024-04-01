@@ -5,6 +5,7 @@
 #include "MockDigitalService.h"
 #include "MockPwmService.h"
 #include "MockTimerService.h"
+#include "MockCANService.h"
 #include <fstream>
 using namespace testing;
 
@@ -22,6 +23,7 @@ namespace UnitTests
 		MockDigitalService _digitalService;
 		MockPwmService _pwmService;
 		MockTimerService _timerService;
+		MockCANService _canService;
 		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
 		void *_config;
 		size_t _sizeOut = 0;
@@ -48,6 +50,7 @@ namespace UnitTests
 			_embeddedIOServiceCollection.DigitalService = &_digitalService;
 			_embeddedIOServiceCollection.PwmService = &_pwmService;
 			_embeddedIOServiceCollection.TimerService = &_timerService;
+			_embeddedIOServiceCollection.CANService = &_canService;
 
 			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 			EXPECT_CALL(_digitalService, AttachInterrupt(_, _)).WillOnce(SaveArg<1>(&_crankTriggerCallback)).WillOnce(SaveArg<1>(&_camTriggerCallback));
