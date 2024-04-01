@@ -127,7 +127,9 @@ namespace EFIGenie
 		callback_t openCallBack = 0;
 		callback_t closeCallBack = 0;
 
-		AbstractOperation *operation = factory->Create(config, sizeOut);
+		size_t size = 0;
+		AbstractOperation *operation = factory->Create(config, size);
+		Config::OffsetConfig(config, sizeOut, size);
 		if(operation->NumberOfParameters == 1)
 		{
 			openCallBack = [operation]() { operation->Execute(true); };
@@ -137,7 +139,9 @@ namespace EFIGenie
 		{
 			openCallBack = [operation]() { operation->Execute(); };
 
-			AbstractOperation *operationClose = factory->Create(config, sizeOut);
+			size = 0;
+			AbstractOperation *operationClose = factory->Create(config, size);
+			Config::OffsetConfig(config, sizeOut, size);
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}
 

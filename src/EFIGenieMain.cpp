@@ -47,14 +47,20 @@ namespace EFIGenie
         }
         while(size > 0);
 
-        _inputsExecute = _operationFactory->Create(config, sizeOut);
+        _inputsExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
 
-        _preSyncExecute = _operationFactory->Create(config, sizeOut);
+        size = 0;
+        _preSyncExecute = _operationFactory->Create(config, size);
+        Config::OffsetConfig(config, sizeOut, size);
 
-        _syncCondition = _operationFactory->Create(config, sizeOut);
+        size = 0;
+        _syncCondition = _operationFactory->Create(config, size);
+        Config::OffsetConfig(config, sizeOut, size);
 
-        _mainLoopExecute = _operationFactory->Create(config, sizeOut);
+        size = 0;
+        _mainLoopExecute = _operationFactory->Create(config, size);
+        Config::OffsetConfig(config, sizeOut, size);
 
         _operationFactory->Clear();;
         Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));//CRC
