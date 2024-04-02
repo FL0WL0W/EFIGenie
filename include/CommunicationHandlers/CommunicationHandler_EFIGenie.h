@@ -22,8 +22,7 @@ namespace EFIGenie
 			communicationhandler_efigenie_write_t writeCallback, 
 			communicationhandler_quit_t quitCallback, 
 			communicationhandler_start_t startCallback,
-			const void *config,
-			const void *metadata);
+			const void *config);
 		~CommunicationHandler_EFIGenie();
 	};
 }
