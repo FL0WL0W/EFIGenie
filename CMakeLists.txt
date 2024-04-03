@@ -11,18 +11,37 @@ set(LIBRARIES	libs)
 
 project(${TARGET} CXX)
 
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARIES}/OperationArchitecture/CMakeLists.txt)
-    add_subdirectory (${LIBRARIES}/OperationArchitecture)
-endif()
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARIES}/EmbeddedIOServices/CMakeLists.txt)
-    add_subdirectory (${LIBRARIES}/EmbeddedIOServices)
-endif()
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARIES}/EmbeddedIOOperations/CMakeLists.txt)
-    add_subdirectory (${LIBRARIES}/EmbeddedIOOperations)
-endif()
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARIES}/ReluctorOperations/CMakeLists.txt)
-    add_subdirectory (${LIBRARIES}/ReluctorOperations)
-endif()
+Set(FETCHCONTENT_QUIET FALSE)
+include(FetchContent)
+
+FetchContent_Declare(
+    OperationArchitecture
+    GIT_REPOSITORY    https://github.com/FL0WL0W/OperationArchitecture
+    GIT_TAG           main
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(OperationArchitecture)
+FetchContent_Declare(
+    EmbeddedIOServices
+    GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOServices
+    GIT_TAG           main
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(EmbeddedIOServices)
+FetchContent_Declare(
+    EmbeddedIOOperations
+    GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOOperations
+    GIT_TAG           main
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(EmbeddedIOOperations)
+FetchContent_Declare(
+    ReluctorOperations
+    GIT_REPOSITORY    https://github.com/FL0WL0W/ReluctorOperations
+    GIT_TAG           main
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(ReluctorOperations)
 
 # headers are always in include/
 file(GLOB_RECURSE HDRS CONFIGURE_DEPENDS ${HDR_DIR}/*.h)
@@ -38,13 +57,11 @@ target_link_libraries(${TARGET} EmbeddedIOServices)
 target_link_libraries(${TARGET} EmbeddedIOOperations)
 target_link_libraries(${TARGET} ReluctorOperations)
 
-
-
 if(EFIGenie_build_tests)
-    #include google test
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARIES}/googletest/CMakeLists.txt)
-        add_subdirectory (${LIBRARIES}/googletest)
-    endif()
     #include test
     add_subdirectory(test)
 endif()
+
+# install library
+install(TARGETS ${TARGET} LIBRARY DESTINATION lib)
+install(DIRECTORY "${HDR_DIR}/" DESTINATION include)

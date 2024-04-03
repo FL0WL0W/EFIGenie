@@ -25,6 +25,15 @@ target_link_libraries(${TARGET} EmbeddedIOServicesMockedObjects)
 target_link_libraries(${TARGET} EmbeddedIOOperations)
 target_link_libraries(${TARGET} ReluctorOperations)
 target_link_libraries(${TARGET} EFIGenie)
+Set(FETCHCONTENT_QUIET FALSE)
+include(FetchContent)
+FetchContent_Declare(
+    gtest
+    GIT_REPOSITORY    https://github.com/google/googletest
+    GIT_TAG           main
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(gtest)
 target_link_libraries(${TARGET} gtest gtest_main gmock)
 
 add_test(ALLTESTS ${TARGET})
