@@ -1,18 +1,3 @@
-[submodule "libs/EmbeddedIOOperations"]
-	path = libs/EmbeddedIOOperations
-	url = https://github.com/FL0WL0W/EmbeddedIOOperations
-[submodule "libs/EmbeddedIOServices"]
-	path = libs/EmbeddedIOServices
-	url = https://github.com/FL0WL0W/EmbeddedIOServices
-[submodule "libs/OperationArchitecture"]
-	path = libs/OperationArchitecture
-	url = https://github.com/FL0WL0W/OperationArchitecture
-[submodule "libs/googletest"]
-	path = libs/googletest
-	url = https://github.com/google/googletest
-[submodule "libs/ReluctorOperations"]
-	path = libs/ReluctorOperations
-	url = https://github.com/FL0WL0W/ReluctorOperations
 [submodule "EFIGenieEditor/JavascriptUI"]
 	path = EFIGenieEditor/JavascriptUI
 	url = https://github.com/FL0WL0W/JavascriptUI
