@@ -18,7 +18,7 @@ namespace EFIGenie
 
 		//Get Variable
     	_getVariableHandler = new CommunicationHandler_GetVariable(variableMap);
-    	RegisterReceiveCallBack([this](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler->Receive(send, data, length);}, "g", 1);
+    	RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler->Receive(send, data, length);}, "g", 1);
 
 		//Read
 		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
