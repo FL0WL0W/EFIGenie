@@ -52,10 +52,10 @@ file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS ${SRCS_DIR}/*.cpp)
 # create library
 add_library(${TARGET} STATIC ${HDRS} ${SRCS})
 target_include_directories(${TARGET} PUBLIC ${HDR_DIR})
-target_link_libraries(${TARGET} OperationArchitecture)
-target_link_libraries(${TARGET} EmbeddedIOServices)
-target_link_libraries(${TARGET} EmbeddedIOOperations)
-target_link_libraries(${TARGET} ReluctorOperations)
+target_link_libraries(${TARGET} PUBLIC OperationArchitecture)
+target_link_libraries(${TARGET} PUBLIC EmbeddedIOServices)
+target_link_libraries(${TARGET} PUBLIC EmbeddedIOOperations)
+target_link_libraries(${TARGET} PUBLIC ReluctorOperations)
 
 if(EFIGenie_build_tests)
     #include test
