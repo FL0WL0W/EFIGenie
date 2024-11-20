@@ -72,6 +72,6 @@ Make
 * Fuel Pump (On/Off, PWM Open loop or PID Control Loop)
 * VVT control (PWM - Open loop or PID control loop)
 * Boost control (PWM - Open loop or PID control loop)
-* CAN Bus/OBD2
+* OBD2
 
 > *High Priority
