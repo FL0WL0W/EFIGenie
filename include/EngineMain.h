@@ -5,7 +5,7 @@
 #define ENGINEMAIN_H
 namespace EFIGenie
 {
-	class EFIGenieMain
+	class EngineMain
 	{
 		protected:
 		OperationArchitecture::AbstractOperation *_inputsExecute = 0;
@@ -17,8 +17,8 @@ namespace EFIGenie
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 
 		public:
-		EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
-		~EFIGenieMain();
+		EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
+		~EngineMain();
 
 		void Setup();
 		void Loop();

@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "EFIGenieMain.h"
+#include "EngineMain.h"
 #include "MockAnalogService.h"
 #include "MockDigitalService.h"
 #include "MockPwmService.h"
@@ -27,7 +27,7 @@ namespace UnitTests
 		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
 		void *_config;
 		size_t _sizeOut = 0;
-		EFIGenieMain *_eFIGenieMain;
+		EngineMain *_engineMain;
 		callback_t _crankTriggerCallback;
 		callback_t _camTriggerCallback;
 
@@ -62,7 +62,7 @@ namespace UnitTests
 			_config = malloc(size);
 			if (file.read(reinterpret_cast<char *>(_config), size))
 			{
-				_eFIGenieMain = new EFIGenieMain(_config, _sizeOut, &_embeddedIOServiceCollection, new GeneratorMap<Variable>());
+				_engineMain = new EngineMain(_config, _sizeOut, &_embeddedIOServiceCollection, new GeneratorMap<Variable>());
 			}
 		}
 	};

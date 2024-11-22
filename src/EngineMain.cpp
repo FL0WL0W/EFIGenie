@@ -1,4 +1,4 @@
-#include "EFIGenieMain.h"
+#include "EngineMain.h"
 #include "Operations/OperationFactoryRegister.h"
 #include "Operations/EmbeddedIOOperationFactoryRegister.h"
 #include "Operations/ReluctorOperationFactoryRegister.h"
@@ -14,7 +14,7 @@ using namespace ReluctorOperations;
 
 namespace EFIGenie
 {
-    EFIGenieMain::EFIGenieMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
+    EngineMain::EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
     {
         const uint32_t configSize = *reinterpret_cast<const uint32_t *>(config) + sizeof(uint32_t);
         if(configSize == 0 || configSize > 100000)
@@ -67,19 +67,19 @@ namespace EFIGenie
         Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));//CRC
     }
 
-    EFIGenieMain::~EFIGenieMain()
+    EngineMain::~EngineMain()
     {
         if(_operationFactory != 0)
             delete _operationFactory;
     }
 
-    void EFIGenieMain::Setup()
+    void EngineMain::Setup()
     {
         if(_inputsExecute != 0) _inputsExecute->Execute();
         if(_preSyncExecute != 0) _preSyncExecute->Execute();
     }
 
-    void EFIGenieMain::Loop()
+    void EngineMain::Loop()
     {
         if(_inputsExecute != 0) _inputsExecute->Execute();
         if(!_syncedOnce && _syncCondition != 0)
