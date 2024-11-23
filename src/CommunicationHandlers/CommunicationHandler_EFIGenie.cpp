@@ -13,15 +13,12 @@ namespace EFIGenie
 		communicationhandler_start_t startCallback,
 		const void *config)
 	{
-		const char ack[1] = {6};
-		const char nack[1] = {21};
-
 		//Get Variable
     	_getVariableHandler = new CommunicationHandler_GetVariable(variableMap);
-    	RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler->Receive(send, data, length);}, "g", 1);
+    	RegisterReceiveCallBack([this](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler->Receive(send, data, length);}, "g", 1);
 
 		//Read
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([](communication_send_callback_t send, const void *data, size_t length)
 		{ 
 			const size_t minDataSize = sizeof(void *) + sizeof(size_t);
 			if(length < minDataSize)
@@ -35,8 +32,11 @@ namespace EFIGenie
 		}, "r", 1);
 
 		//Write
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([writeCallback](communication_send_callback_t send, const void *data, size_t length)
 		{ 
+			const char ack[1] = {6};
+			const char nack[1] = {21};
+
 			const size_t minDataSize = sizeof(void *) + sizeof(size_t);
 			if(length < minDataSize)
 				return static_cast<size_t>(0);
@@ -57,8 +57,11 @@ namespace EFIGenie
 		}, "w", 1);
 
 		//quit
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([quitCallback](communication_send_callback_t send, const void *data, size_t length)
 		{ 
+			const char ack[1] = {6};
+			const char nack[1] = {21};
+			
 			if(quitCallback())
 				send(ack, sizeof(ack));
 			else
@@ -68,8 +71,11 @@ namespace EFIGenie
 		}, "q", 1, false);
 
 		//start
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([startCallback](communication_send_callback_t send, const void *data, size_t length)
 		{ 
+			const char ack[1] = {6};
+			const char nack[1] = {21};
+			
 			if(startCallback())
 				send(ack, sizeof(ack));
 			else
@@ -79,7 +85,7 @@ namespace EFIGenie
 		}, "s", 1, false);
 
 		//metadata read 64 bytes
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([config](communication_send_callback_t send, const void *data, size_t length)
 		{ 
 			if(length < sizeof(uint32_t))//make sure there are enough bytes to process a request
 				return static_cast<size_t>(0);
@@ -92,7 +98,7 @@ namespace EFIGenie
 		}, "m", 1);
 
 		//config location
-		RegisterReceiveCallBack([&](communication_send_callback_t send, const void *data, size_t length)
+		RegisterReceiveCallBack([config](communication_send_callback_t send, const void *data, size_t length)
 		{ 
 			size_t configLocation[1] = { reinterpret_cast<size_t>(config) };
 			send(configLocation, sizeof(configLocation));
