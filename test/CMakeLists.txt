@@ -1,18 +1,18 @@
 ﻿# CMakeList.txt : CMake project for EmbeddedIOServicesUnitTests, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.30[3.30])
 
 set(TARGET		EFIGenieUnitTests)
+set(HDR_DIR		include)
+set(SRCS_DIR	src)
 
 project(${TARGET} CXX)
 
 # headers are always in include/
-set(HDR_DIR		include)
 file(GLOB_RECURSE HDRS CONFIGURE_DEPENDS ${HDR_DIR}/*.h)
 include_directories(${HDR_DIR})
 # sources are always in src/
-set(SRCS_DIR	src)
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS ${SRCS_DIR}/*.cpp)
 
 # create executable

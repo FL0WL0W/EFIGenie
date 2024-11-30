@@ -1,0 +1,10 @@
+{
+    "testMate.cpp.test.advancedExecutables": [
+        "${command:cmake.buildDirectory}/test/EFIGenieUnitTests",
+        "${command:cmake.buildDirectory}/_deps/reluctoroperations-build/test/ReluctorOperationsUnitTests",
+        "${command:cmake.buildDirectory}/_deps/embeddediooperations-build/test/EmbeddedIOOperationsUnitTests",
+        "${command:cmake.buildDirectory}/_deps/embeddedioservices-build/test/EmbeddedIOServicesUnitTests",
+        "${command:cmake.buildDirectory}/_deps/operationarchitecture-build/test/OperationArchitectureUnitTests"
+    ],
+    "cmake.ctest.testExplorerIntegrationEnabled": false
+}

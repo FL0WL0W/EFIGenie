@@ -35,5 +35,5 @@ build/*
 libs/*
 .vscode/*
 !.vscode/extensions.json
-!.vscode/launch.json
+!.vscode/settings.json
 .vs/*
