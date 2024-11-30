@@ -4,10 +4,10 @@
 cmake_minimum_required (VERSION 3.8)
 option(EFIGenie_build_tests "Build all of EFIGenie tests" OFF)
 
-set(TARGET		EFIGenie)
-set(HDR_DIR		include)
-set(SRCS_DIR	src)
-set(LIBRARIES	libs)
+set(TARGET		        EFIGenie)
+set(HDR_DIR		        include)
+set(SRCS_DIR	        src)
+set(LIBRARIES_DIR	    ${CMAKE_SOURCE_DIR}/libs)
 
 project(${TARGET} CXX)
 
@@ -19,6 +19,8 @@ FetchContent_Declare(
     GIT_REPOSITORY    https://github.com/FL0WL0W/OperationArchitecture
     GIT_TAG           main
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    SOURCE_DIR  ${LIBRARIES_DIR}/OperationArchitecture
 )
 FetchContent_MakeAvailable(OperationArchitecture)
 FetchContent_Declare(
@@ -26,6 +28,8 @@ FetchContent_Declare(
     GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOServices
     GIT_TAG           main
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    SOURCE_DIR  ${LIBRARIES_DIR}/EmbeddedIOServices
 )
 FetchContent_MakeAvailable(EmbeddedIOServices)
 FetchContent_Declare(
@@ -33,6 +37,8 @@ FetchContent_Declare(
     GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOOperations
     GIT_TAG           main
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    SOURCE_DIR  ${LIBRARIES_DIR}/EmbeddedIOOperations
 )
 FetchContent_MakeAvailable(EmbeddedIOOperations)
 FetchContent_Declare(
@@ -40,6 +46,8 @@ FetchContent_Declare(
     GIT_REPOSITORY    https://github.com/FL0WL0W/ReluctorOperations
     GIT_TAG           main
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    SOURCE_DIR  ${LIBRARIES_DIR}/ReluctorOperations
 )
 FetchContent_MakeAvailable(ReluctorOperations)
 

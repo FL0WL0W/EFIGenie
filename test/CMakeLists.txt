@@ -31,6 +31,7 @@ FetchContent_Declare(
     gtest
     GIT_REPOSITORY    https://github.com/google/googletest
     GIT_TAG           main
+    GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(gtest)
