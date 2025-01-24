@@ -91,8 +91,16 @@ namespace EFIGenie
 				return static_cast<size_t>(0);
 			const uint8_t offset = *reinterpret_cast<const uint32_t *>(data); //grab offset from data
 
-			const void *metadata = reinterpret_cast<const uint8_t *>(config) + (*reinterpret_cast<const uint32_t *>(config) + 2 * sizeof(uint32_t));
-			send(reinterpret_cast<const uint8_t *>(metadata) + offset * 64, 64);
+			if(config == 0)
+			{
+				const uint32_t length = 0;
+				send(reinterpret_cast<const uint8_t *>(&length), 4);
+			}
+			else
+			{
+				const void *metadata = reinterpret_cast<const uint8_t *>(config) + (*reinterpret_cast<const uint32_t *>(config) + 2 * sizeof(uint32_t));
+				send(reinterpret_cast<const uint8_t *>(metadata) + offset * 64, 64);
+			}
 
 			return static_cast<size_t>(sizeof(uint32_t));//return number of bytes handled
 		}, "m", 1);
