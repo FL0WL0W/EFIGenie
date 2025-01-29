@@ -52,8 +52,7 @@ Make
 
 ## TODO List
 * *Idle Control
-* Prime
-* After Start Enrichment
+* After Start Enrichment (Add Engine Time Since Started, AE can be configured in GUI with that variable available)
 * Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table
 * Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)
 * Transmission Control (Paddle shift transmission solenoid)
