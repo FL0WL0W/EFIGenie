@@ -8,9 +8,10 @@ using namespace EmbeddedIOOperations;
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
 namespace EFIGenie
 {
-	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService *timerService, float tdc, callback_t openCallBack, callback_t closeCallBack) : 
+	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService * const timerService, const float tdc, const Operation_EngineScheduleInjection_InjectAt injectAt, const callback_t openCallBack, const callback_t closeCallBack) : 
 		_timerService(timerService),
 		_tdc(tdc),
+		_injectAt(injectAt),
 		_openCallBack(openCallBack),
 		_closeCallBack(closeCallBack),
 		_openTask(new Task([this]() { this->Open(); })),
@@ -26,7 +27,7 @@ namespace EFIGenie
 		delete _closeTask;
 	}
 
-	std::tuple<tick_t, tick_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionEndPosition)
+	std::tuple<tick_t, tick_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionPosition)
 	{
 		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
 		const tick_t pulseTicks = static_cast<tick_t>(injectionPulseWidth * ticksPerSecond);
@@ -51,12 +52,11 @@ namespace EFIGenie
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
 
-		float delta = _tdc - injectionEndPosition - enginePosition.Position;
+		float delta = _tdc - injectionPosition - enginePosition.Position;
 		delta -= (static_cast<int16_t>(delta) / cycleDegrees) * cycleDegrees;
 		if(delta < 0)
 			delta += cycleDegrees;
-		tick_t closeAt = static_cast<tick_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick - (ticksPerCycle << 1);			
-		tick_t openAt = closeAt - pulseTicks;
+		tick_t openAt = static_cast<tick_t>(ticksPerDegree * delta) + enginePosition.CalculatedTick - (ticksPerCycle << 1) - ((pulseTicks * _injectAt) / 2);
 
 		//check _lastOpenTick is within range and _openTask is not scheduled
 		if( !_openTask->Scheduled && 
@@ -72,6 +72,7 @@ namespace EFIGenie
 		
 		// if we aren't open, schedule the open event
 		const uint32_t lastOpenTickBeforeOpenCheck = _lastOpenTick;
+		tick_t closeAt;
 		if(!_open)
 		{
 			while(ITimerService::TickLessThanTick(openAt - (ticksPerCycle / 2), lastOpenTickBeforeOpenCheck))
@@ -124,6 +125,7 @@ namespace EFIGenie
 	AbstractOperation *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
+		const Operation_EngineScheduleInjection_InjectAt injectAt = Config::CastAndOffset<Operation_EngineScheduleInjection_InjectAt>(config, sizeOut);
 		callback_t openCallBack = 0;
 		callback_t closeCallBack = 0;
 
@@ -145,7 +147,7 @@ namespace EFIGenie
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}
 
-		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, tdc, openCallBack, closeCallBack);
+		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, tdc, injectAt, openCallBack, closeCallBack);
 	}
 }
 #endif

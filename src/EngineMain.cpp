@@ -25,6 +25,7 @@ namespace EFIGenie
         {
             return;
         }
+        sizeOut = 0;
         Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));
 
         _operationFactory = new OperationFactory();
@@ -44,24 +45,34 @@ namespace EFIGenie
             AbstractOperation *operation = _operationFactory->Create(config, size);
             _operationFactory->Register(operationId, operation);
             Config::OffsetConfig(config, sizeOut, size);
+            if(sizeOut > configSize)
+                return;
         }
         while(size > 0);
 
         size = 0;
         _inputsExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
+        if(sizeOut > configSize)
+            return;
 
         size = 0;
         _preSyncExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
+        if(sizeOut > configSize)
+            return;
 
         size = 0;
         _syncCondition = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
+        if(sizeOut > configSize)
+            return;
 
         size = 0;
         _mainLoopExecute = _operationFactory->Create(config, size);
         Config::OffsetConfig(config, sizeOut, size);
+        if(sizeOut > configSize)
+            return;
 
         _operationFactory->Clear();;
         Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));//CRC
