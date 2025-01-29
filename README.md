@@ -51,27 +51,14 @@ sudo apt-get install cmake gcc g++ gdb
 Make 
 
 ## TODO List
-* *Logging
 * *Idle Control
-* *Create unit tests
 * Prime
 * After Start Enrichment
-* Flex fuel Sensors
-* Rev Limiting (Hard and Soft Spark)
-* Launch control (Hard and Soft Spark)
 * Customizable(size and seperations) FuelTrim Predictive Multi Channel Historic Table
 * Fuel Trim (Wideband/Pid and Narrowband | predictive based on TPS or MAP)
-* Tach Output
-* Temperature Bias between ECT and IAT
-* TPS and MAP acceleration enrichment
-* Individual injector trims
 * Transmission Control (Paddle shift transmission solenoid)
 * Transmission Control (line pressure control)
 * Transmission Control (automatic gear shifts)
-* Electric Fan Control
-* Fuel Pump (On/Off, PWM Open loop or PID Control Loop)
-* VVT control (PWM - Open loop or PID control loop)
-* Boost control (PWM - Open loop or PID control loop)
 * OBD2
 
 > *High Priority
