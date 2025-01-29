@@ -78,7 +78,14 @@ namespace EFIGenie
 			ret.CalculatedTick = camPosition.CalculatedTick;
 		}
 
-		//todo error checking
+		const rpm_t rpm = ret.GetRPM();
+		if(rpm > 20000 || rpm < 2)
+		{
+			ret.Synced = false;
+			ret.Position = 0;
+			ret.PositionDot = 0;
+			ret.Sequential = false;
+		}
 		_previousPreviousReluctorResult = _previousReluctorResult;
 		_previousReluctorResult = ret;
 		return ret;
