@@ -72,7 +72,7 @@ namespace EFIGenie
 		
 		// if we aren't open, schedule the open event
 		const uint32_t lastOpenTickBeforeOpenCheck = _lastOpenTick;
-		tick_t closeAt;
+		tick_t closeAt = 0;
 		if(!_open)
 		{
 			while(ITimerService::TickLessThanTick(openAt - (ticksPerCycle / 2), lastOpenTickBeforeOpenCheck))
