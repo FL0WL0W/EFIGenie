@@ -29,19 +29,25 @@ namespace EFIGenie
 	std::tuple<tick_t, tick_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation)
 	{
 		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
-		const tick_t dwellTicks = static_cast<tick_t>(ignitionDwell * ticksPerSecond);
+		tick_t dwellTicks = static_cast<tick_t>(ignitionDwell * ticksPerSecond + 0.5f);
+		if(dwellTicks == 0 && ignitionDwell > 0)
+			dwellTicks = 1;
 
 		if(enginePosition.Synced == false || !enable)
 		{
 			_timerService->UnScheduleTask(_dwellTask);
-			//if we are open and have no matching close event, schedule one
-			if(!_igniteTask->Scheduled && _dwelling)
+			//if we are dwelling
+			if(_dwelling)
 			{
-				const tick_t igniteAt = _lastDwellTick + dwellTicks;
-				_timerService->ScheduleTask(_igniteTask, igniteAt);
-				_lastDwellTick = 0;
+				//and have no matching ignition event, schedule one
+				if(!_igniteTask->Scheduled)
+				{
+					const tick_t igniteAt = _lastDwellTick + dwellTicks;
+					_timerService->ScheduleTask(_igniteTask, igniteAt);
+					_lastDwellTick = 0;
+				}
 
-				return std::tuple<tick_t, tick_t>(0, igniteAt);
+				return std::tuple<tick_t, tick_t>(0, _igniteTask->ScheduledTick);
 			}
 
 			return std::tuple<tick_t, tick_t>(0, 0);

@@ -30,19 +30,25 @@ namespace EFIGenie
 	std::tuple<tick_t, tick_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionPosition)
 	{
 		const tick_t ticksPerSecond = _timerService->GetTicksPerSecond();
-		const tick_t pulseTicks = static_cast<tick_t>(injectionPulseWidth * ticksPerSecond);
+		tick_t pulseTicks = static_cast<tick_t>(injectionPulseWidth * ticksPerSecond + 0.5f);
+		if(pulseTicks == 0 && injectionPulseWidth > 0)
+			pulseTicks = 1;
 
 		if(enginePosition.Synced == false || !enable)
 		{
 			_timerService->UnScheduleTask(_openTask);
-			//if we are open and have no matching close event, schedule one
-			if(!_closeTask->Scheduled && _open)
+			//if we are open
+			if(_open)
 			{
-				const tick_t closeAt = _lastOpenTick + pulseTicks;
-				_timerService->ScheduleTask(_closeTask, closeAt);
-				_lastOpenTick = 0;
+				//and have no matching close event, schedule one
+				if(!_closeTask->Scheduled)
+				{
+					const tick_t closeAt = _lastOpenTick + pulseTicks;
+					_timerService->ScheduleTask(_closeTask, closeAt);
+					_lastOpenTick = 0;
+				}
 
-				return std::tuple<tick_t, tick_t>(0, closeAt);
+				return std::tuple<tick_t, tick_t>(0, _closeTask->ScheduledTick);
 			}
 
 			return std::tuple<tick_t, tick_t>(0, 0);
@@ -52,6 +58,20 @@ namespace EFIGenie
 		const float ticksPerDegree = ticksPerSecond / enginePosition.PositionDot;
 		const tick_t ticksPerCycle = static_cast<tick_t>(cycleDegrees * ticksPerDegree);
 
+		// Handle 100% duty cycle - keep injector continuously open
+		if(pulseTicks >= ticksPerCycle)
+		{
+			// Unschedule any pending close events since we want to stay open
+			_timerService->UnScheduleTask(_closeTask);
+			// If not already open, open the injector
+			if(!_open)
+			{
+				_timerService->ScheduleTask(_openTask, enginePosition.CalculatedTick);
+			}
+			return std::tuple<tick_t, tick_t>(enginePosition.CalculatedTick, 0);
+		}
+
+		// Normal duty cycle operation
 		float delta = _tdc - injectionPosition - enginePosition.Position;
 		delta -= (static_cast<int16_t>(delta) / cycleDegrees) * cycleDegrees;
 		if(delta < 0)
@@ -87,15 +107,29 @@ namespace EFIGenie
 		if(_open)
 		{
 			//schedule close based off the last open tick
-			while(ITimerService::TickLessThanTick(openAt + (ticksPerCycle / 2), _lastOpenTick))
+			while(ITimerService::TickLessThanTick(openAt - (ticksPerCycle / 2), _lastOpenTick))
 				openAt += ticksPerCycle;
 			closeAt = _lastOpenTick + pulseTicks;
+			
+			// Safety check: ensure close doesn't occur after next open (can happen with RPM increase)
+			// If close would occur after next open, don't close and just stay open for the next cycle
+			if(ITimerService::TickLessThanTick(openAt, closeAt))
+			{
+				// Unschedule any pending close events since we want to stay open
+				_timerService->UnScheduleTask(_closeTask);
+				// If injector closed (close task fired before unscheduling), re-open immediately
+				if(!_open)
+				{
+					_timerService->ScheduleTask(_openTask, enginePosition.CalculatedTick);
+					return std::tuple<tick_t, tick_t>(enginePosition.CalculatedTick, 0);
+				}
+				// Schedule the next open task to maintain the cycle tracking (Open() will update _lastOpenTick)
+				_timerService->ScheduleTask(_openTask, openAt);
+				return std::tuple<tick_t, tick_t>(openAt, 0);
+			}
 
 			//schedule close
 			_timerService->ScheduleTask(_closeTask, closeAt);
-
-			//schedule next open event
-			openAt += ticksPerCycle;
 			_timerService->ScheduleTask(_openTask, openAt);
 		}
 		//if we are not open, just use the previously calculated close tick.
