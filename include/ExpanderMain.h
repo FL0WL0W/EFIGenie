@@ -1,4 +1,4 @@
-#include "EmbeddedIOServiceCollection.h"
+#include "ServiceRegistry.h"
 #include "Operations/Operation_Package.h"
 
 #ifndef EXPANDERMAIN_H
@@ -13,7 +13,7 @@ namespace EFIGenie
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 
 		public:
-		ExpanderMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
+		ExpanderMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::ServiceRegistry *serviceRegistry, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
 		~ExpanderMain();
 
 		void Setup();

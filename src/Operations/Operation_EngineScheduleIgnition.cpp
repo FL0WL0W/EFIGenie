@@ -144,7 +144,7 @@ namespace EFIGenie
 		_dwelling = false;
 	}
 
-	AbstractOperation *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
+	AbstractOperation *Operation_EngineScheduleIgnition::Create(const void *config, size_t &sizeOut, const ServiceRegistry *serviceRegistry, OperationFactory *factory)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		callback_t dwellCallBack = 0;
@@ -168,7 +168,7 @@ namespace EFIGenie
 			igniteCallBack = [operationIgnite]() { operationIgnite->Execute(); };
 		}
 		
-		return new Operation_EngineScheduleIgnition(embeddedIOServiceCollection->TimerService, tdc, dwellCallBack, igniteCallBack);
+		return new Operation_EngineScheduleIgnition(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), tdc, dwellCallBack, igniteCallBack);
 	}
 }
 #endif

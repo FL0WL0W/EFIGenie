@@ -1,4 +1,4 @@
-#include "EmbeddedIOServiceCollection.h"
+#include "ServiceRegistry.h"
 #include "Operations/Operation_Package.h"
 
 #ifndef ENGINEMAIN_H
@@ -17,7 +17,7 @@ namespace EFIGenie
 		OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *_variableMap;
 
 		public:
-		EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
+		EngineMain(const void *config, size_t &sizeOut, const EmbeddedIOOperations::ServiceRegistry *serviceRegistry, OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap);
 		~EngineMain();
 
 		void Setup();

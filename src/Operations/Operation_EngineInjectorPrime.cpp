@@ -26,7 +26,7 @@ namespace EFIGenie
 		_timerService->ScheduleTask(_closeTask, _timerService->GetTick() + static_cast<tick_t>(time * _timerService->GetTicksPerSecond()));
 	}
 
-	AbstractOperation *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
+	AbstractOperation *Operation_EngineInjectorPrime::Create(const void *config, size_t &sizeOut, const ServiceRegistry *serviceRegistry, OperationFactory *factory)
 	{
 		callback_t openCallBack = 0;
 		callback_t closeCallBack = 0;
@@ -49,7 +49,7 @@ namespace EFIGenie
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}
 		
-		return new Operation_EngineInjectorPrime(embeddedIOServiceCollection->TimerService, openCallBack, closeCallBack);
+		return new Operation_EngineInjectorPrime(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), openCallBack, closeCallBack);
 	}
 }
 #endif

@@ -1,6 +1,6 @@
 #include "Operations/Operation.h"
 #include "Operation_EnginePosition.h"
-#include "EmbeddedIOServiceCollection.h"
+#include "ServiceRegistry.h"
 #include "Operations/OperationFactory.h"
 #include <tuple>
 
@@ -37,7 +37,7 @@ namespace EFIGenie
 		void Open();
 		void Close();
 
-		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *factory);
+		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::ServiceRegistry *serviceRegistry, OperationArchitecture::OperationFactory *factory);
 	};
 }
 #endif

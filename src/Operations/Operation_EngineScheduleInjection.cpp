@@ -156,7 +156,7 @@ namespace EFIGenie
 		_open = false;
 	}
 
-	AbstractOperation *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationFactory *factory)
+	AbstractOperation *Operation_EngineScheduleInjection::Create(const void *config, size_t &sizeOut, const ServiceRegistry *serviceRegistry, OperationFactory *factory)
 	{
 		const float tdc = Config::CastAndOffset<float>(config, sizeOut);
 		const Operation_EngineScheduleInjection_InjectAt injectAt = Config::CastAndOffset<Operation_EngineScheduleInjection_InjectAt>(config, sizeOut);
@@ -181,7 +181,7 @@ namespace EFIGenie
 			closeCallBack = [operationClose]() { operationClose->Execute(); };
 		}
 
-		return new Operation_EngineScheduleInjection(embeddedIOServiceCollection->TimerService, tdc, injectAt, openCallBack, closeCallBack);
+		return new Operation_EngineScheduleInjection(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), tdc, injectAt, openCallBack, closeCallBack);
 	}
 }
 #endif

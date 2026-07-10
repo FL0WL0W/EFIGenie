@@ -1,7 +1,7 @@
 #include "Operations/Operation.h"
 #include "Operations/OperationFactory.h"
 #include "Operation_EnginePosition.h"
-#include "EmbeddedIOServiceCollection.h"
+#include "ServiceRegistry.h"
 #include <tuple>
 
 #ifndef OPERATION_ENGINESCHEDULEIGNITION_H
@@ -29,7 +29,7 @@ namespace EFIGenie
 		void Dwell();
 		void Ignite();
 
-		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::EmbeddedIOServiceCollection *embeddedIOServiceCollection, OperationArchitecture::OperationFactory *packager);
+		static OperationArchitecture::AbstractOperation *Create(const void *config, size_t &sizeOut, const EmbeddedIOOperations::ServiceRegistry *serviceRegistry, OperationArchitecture::OperationFactory *packager);
 	};
 }
 #endif

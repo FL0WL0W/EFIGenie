@@ -17,15 +17,15 @@ namespace EFIGenie
 	Operation_EnginePosition *Operation_EnginePositionInstanceCamPriority = 0;
     Operation_EngineParameters * Operation_EngineParametersInstance = 0;
 
-    void EngineOperationFactoryRegister::Register(uint32_t idOffset, OperationFactory *factory, const EmbeddedIOServiceCollection *embeddedIOServiceCollection)
+    void EngineOperationFactoryRegister::Register(uint32_t idOffset, OperationFactory *factory, const ServiceRegistry *serviceRegistry)
     {
         factory->Register(idOffset + 1, Operation_CylinderAirMass_SD::Create);
-        factory->Register(idOffset + 2, [embeddedIOServiceCollection, factory](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, embeddedIOServiceCollection, factory); });
+        if(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>() != 0) factory->Register(idOffset + 2, [serviceRegistry, factory](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, serviceRegistry, factory); });
         factory->Register(idOffset + 3, Operation_EnginePositionInstanceCrankPriority == 0 ? Operation_EnginePositionInstanceCrankPriority = new Operation_EnginePosition(true) : Operation_EnginePositionInstanceCrankPriority);
         factory->Register(idOffset + 4, Operation_EnginePositionInstanceCamPriority == 0 ? Operation_EnginePositionInstanceCamPriority = new Operation_EnginePosition(false) : Operation_EnginePositionInstanceCamPriority);
         factory->Register(idOffset + 5, Operation_EngineParametersInstance == 0 ? Operation_EngineParametersInstance = new Operation_EngineParameters() : Operation_EngineParametersInstance);
-        factory->Register(idOffset + 6, [embeddedIOServiceCollection, factory](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, embeddedIOServiceCollection, factory); });
-        factory->Register(idOffset + 7, [embeddedIOServiceCollection, factory](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, embeddedIOServiceCollection, factory); });
+        if(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>() != 0) factory->Register(idOffset + 6, [serviceRegistry, factory](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, serviceRegistry, factory); });
+        if(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>() != 0) factory->Register(idOffset + 7, [serviceRegistry, factory](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, serviceRegistry, factory); });
         factory->Register(idOffset + 8, Operation_InjectorDeadTime::Create);
     }
 }

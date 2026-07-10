@@ -14,7 +14,7 @@ using namespace ReluctorOperations;
 
 namespace EFIGenie
 {
-    ExpanderMain::ExpanderMain(const void *config, size_t &sizeOut, const EmbeddedIOServiceCollection *embeddedIOServiceCollection, GeneratorMap<Variable> *variableMap)
+    ExpanderMain::ExpanderMain(const void *config, size_t &sizeOut, const ServiceRegistry *serviceRegistry, GeneratorMap<Variable> *variableMap)
     {
         const uint32_t configSize = *reinterpret_cast<const uint32_t *>(config) + sizeof(uint32_t);
         if(configSize == 0 || configSize > 100000)
@@ -30,9 +30,9 @@ namespace EFIGenie
         OperationFactory * operationFactory = new OperationFactory();
 
         OperationFactoryRegister::Register(10000, operationFactory, variableMap);
-        EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, embeddedIOServiceCollection);
+        EmbeddedIOOperationFactoryRegister::Register(20000, operationFactory, serviceRegistry);
         ReluctorOperationFactoryRegister::Register(30000, operationFactory);
-        EngineOperationFactoryRegister::Register(40000, operationFactory, embeddedIOServiceCollection);
+        EngineOperationFactoryRegister::Register(40000, operationFactory, serviceRegistry);
 
         size_t size = 0;
         do

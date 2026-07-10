@@ -24,7 +24,7 @@ namespace UnitTests
 		MockPwmService _pwmService;
 		MockTimerService _timerService;
 		MockCANService _canService;
-		EmbeddedIOServiceCollection _embeddedIOServiceCollection;
+		ServiceRegistry _serviceRegistry;
 		void *_config;
 		size_t _sizeOut = 0;
 		EngineMain *_engineMain;
@@ -46,11 +46,11 @@ namespace UnitTests
 			// size_t double_align = alignof(double);
 
 
-			_embeddedIOServiceCollection.AnalogService = &_analogService;
-			_embeddedIOServiceCollection.DigitalService = &_digitalService;
-			_embeddedIOServiceCollection.PwmService = &_pwmService;
-			_embeddedIOServiceCollection.TimerService = &_timerService;
-			_embeddedIOServiceCollection.CANService = &_canService;
+			_serviceRegistry.Register<IAnalogService>(&_analogService);
+			_serviceRegistry.Register<IDigitalService>(&_digitalService);
+			_serviceRegistry.Register<IPwmService>(&_pwmService);
+			_serviceRegistry.Register<ITimerService>(&_timerService);
+			_serviceRegistry.Register<ICANService>(&_canService);
 
 			EXPECT_CALL(_timerService, GetTicksPerSecond()).WillRepeatedly(Return(5000));
 			EXPECT_CALL(_digitalService, AttachInterrupt(_, _)).WillOnce(SaveArg<1>(&_crankTriggerCallback)).WillOnce(SaveArg<1>(&_camTriggerCallback));
@@ -62,7 +62,7 @@ namespace UnitTests
 			_config = malloc(size);
 			if (file.read(reinterpret_cast<char *>(_config), size))
 			{
-				_engineMain = new EngineMain(_config, _sizeOut, &_embeddedIOServiceCollection, new GeneratorMap<Variable>());
+				_engineMain = new EngineMain(_config, _sizeOut, &_serviceRegistry, new GeneratorMap<Variable>());
 			}
 		}
 	};
