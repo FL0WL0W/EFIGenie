@@ -93,10 +93,9 @@ namespace EFIGenie
 
 		if(request[0] == 0x22)
 		{
-			if(length < 3 || (length - 1) % 2 != 0)
+			if(length < 3)
 			{
-				SendNegativeResponse(sendCallback, 0x22, 0x13);
-				return length;
+				return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request
 			}
 
 			for(size_t offset = 1; offset < length; offset += 2)
@@ -126,7 +125,7 @@ namespace EFIGenie
 		}
 
 		if(length < 2)
-			return 1;
+			return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request
 
 		const uint8_t pid = request[1];
 		if(pid % 0x20 == 0)
