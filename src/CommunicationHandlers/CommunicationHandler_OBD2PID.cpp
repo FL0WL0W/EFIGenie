@@ -95,7 +95,7 @@ namespace EFIGenie
 		{
 			if(length < 3)
 			{
-				return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request
+				return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request, we shouldn't get here because all messages should be framed already
 			}
 
 			for(size_t offset = 1; offset < length; offset += 2)
@@ -125,7 +125,7 @@ namespace EFIGenie
 		}
 
 		if(length < 2)
-			return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request
+			return 0; //we might have more info in a subsequent call, but we don't have it yet, so we can't process this request, we shouldn't get here because all messages should be framed already
 
 		const uint8_t pid = request[1];
 		if(pid % 0x20 == 0)
