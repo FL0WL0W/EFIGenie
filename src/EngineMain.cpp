@@ -6,6 +6,7 @@
 #include "Operations/Operation_ReluctorGM24x.h"
 #include "Config.h"
 #include "CRC.h"
+#include "stdio.h"
 
 using namespace OperationArchitecture;
 using namespace EmbeddedIOServices;
@@ -21,7 +22,8 @@ namespace EFIGenie
             return;
 
         const uint32_t configCRC = CRC::CRC32(config, configSize);
-        if(*reinterpret_cast<const uint32_t *>(reinterpret_cast<const uint8_t *>(config) + configSize) != configCRC)
+        const uint32_t expectedCRC = *reinterpret_cast<const uint32_t *>(reinterpret_cast<const uint8_t *>(config) + configSize);
+        if(expectedCRC != configCRC)
         {
             return;
         }
