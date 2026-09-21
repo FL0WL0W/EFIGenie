@@ -82,12 +82,12 @@ namespace EFIGenie
 		{
 			//if it is not within range, set it to what would be the previous dwell
 			_lastDwellTick = dwellAt;
-			while(ITimerService::TickLessThanEqualToTick(_lastDwellTick, _timerService->GetTick() - ticksPerCycle))
+			while(ITimerService::TickLessThanEqualToTick(_lastDwellTick, enginePosition.CalculatedTick - ticksPerCycle))
 				_lastDwellTick += ticksPerCycle;
 		}
 		
 		// if we aren't dwelling, schedule dwell
-		const uint32_t lastDwellTickBeforeDwellingCheck = _lastDwellTick;
+		const tick_t lastDwellTickBeforeDwellingCheck = _lastDwellTick;
 		if(!_dwelling)
 		{
 			while(ITimerService::TickLessThanTick(dwellAt - ticksPerCycleHalf, lastDwellTickBeforeDwellingCheck))
@@ -106,8 +106,8 @@ namespace EFIGenie
 				dwellAt += ticksPerCycle;
 			igniteAt = dwellAt + dwellTicks;
 
-			const tick_t minIgniteAt = _dwellTask->ExecutedTick + dwellTicks - maxDwellDeviationTicks;
-			const tick_t maxIgniteAt = _dwellTask->ExecutedTick + dwellTicks + maxDwellDeviationTicks;
+			const tick_t minIgniteAt = _lastDwellTick + dwellTicks - maxDwellDeviationTicks;
+			const tick_t maxIgniteAt = _lastDwellTick + dwellTicks + maxDwellDeviationTicks;
 			if(ITimerService::TickLessThanTick(igniteAt, minIgniteAt))
 				igniteAt = minIgniteAt;
 			else if(ITimerService::TickLessThanTick(maxIgniteAt, igniteAt))

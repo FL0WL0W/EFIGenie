@@ -19,7 +19,7 @@ namespace EFIGenie
 		EmbeddedIOServices::Task *_dwellTask;
 		EmbeddedIOServices::Task *_igniteTask;
 		volatile EmbeddedIOServices::tick_t _lastDwellTick = 0;
-		bool _dwelling = false;
+		volatile bool _dwelling = false;
 		bool _previousSequential = false;
 	public:		
         Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, const float tdc, const EmbeddedIOServices::callback_t dwellCallBack, const EmbeddedIOServices::callback_t igniteCallBack);

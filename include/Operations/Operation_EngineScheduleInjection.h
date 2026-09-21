@@ -28,7 +28,7 @@ namespace EFIGenie
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
 		volatile EmbeddedIOServices::tick_t _lastOpenTick = 0;
-		bool _open = false;
+		volatile bool _open = false;
 	public:		
         Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const Operation_EngineScheduleInjection_InjectAt injectAt, const EmbeddedIOServices::callback_t openCallBack, const EmbeddedIOServices::callback_t closeCallBack);
 		~Operation_EngineScheduleInjection();

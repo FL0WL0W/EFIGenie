@@ -86,7 +86,7 @@ namespace EFIGenie
 		{
 			//if it is not within range, set it to what would be the previous open
 			_lastOpenTick = openAt;
-			while(ITimerService::TickLessThanTick(_lastOpenTick, _timerService->GetTick() - ticksPerCycle))
+			while(ITimerService::TickLessThanTick(_lastOpenTick, enginePosition.CalculatedTick - ticksPerCycle))
 				_lastOpenTick += ticksPerCycle;
 		}
 		
