@@ -29,6 +29,37 @@ things to complete but i am at a state where i am testing the ecu. At this point
   * Operation Architecture
   * Easily add new sensors
 
+## Diagnostic data handlers
+
+`CommunicationHandler_OBD2PIDRequester` and `CommunicationHandler_OBD2PIDResponder`
+use Service `0x01`/`0x41` and 8-bit PIDs. UDS Service `0x22`/`0x62` uses the separate
+`CommunicationHandler_UDSDIDRequester` and `CommunicationHandler_UDSDIDResponder`
+with 16-bit DIDs. Move existing 16-bit `RegisterPID`/`RequestPID` calls to
+`RegisterDID`/`RequestDID`; the service is no longer selected by identifier size.
+
+To expose a PID responder through a DID range:
+
+```cpp
+EFIGenie::CommunicationHandler_OBD2PIDResponder pids(communicationService);
+EFIGenie::CommunicationHandler_UDSDIDResponder dids(communicationService);
+pids.RegisterPID(0x0c, rpmOperation);
+dids.RegisterOBD2PIDMirror(0xf4, &pids);
+```
+
+A request `22 F4 0C` calls the PID responder locally with `01 0C`, captures its
+`41 0C <payload>` response, and returns `62 F4 0C <payload>`. No OBD request is
+sent on the bus. The high byte is configurable; supported-PID bitmap requests
+are mirrored too, and later PID registrations/unregistrations are reflected
+immediately. Explicit `RegisterDID` entries override mirrored entries. Use
+`UnregisterOBD2PIDMirror(highByte)` to remove a mirror. Operations and mirrored
+responders are borrowed and must outlive their registrations.
+
+The DID responder accepts framed requests containing one or more DIDs, returning
+one combined positive response or a negative response if any requested value is
+unavailable. Malformed frames return `7F 22 13`; unavailable values return
+`7F 22 31`. The DID requester requests and parses one DID per transaction because
+multi-DID response payload lengths require application-specific definitions.
+
 ## Building
 After trying with a few different toolchains the tool chain that seemed to work the best is GCC/G++9.
 
