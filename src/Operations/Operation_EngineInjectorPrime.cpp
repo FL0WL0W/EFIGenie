@@ -34,20 +34,8 @@ namespace EFIGenie
 		size_t size = 0;
 		AbstractOperation *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
-		if(operation->NumberOfParameters == 1)
-		{
-			openCallBack = [operation]() { operation->Execute(true); };
-			closeCallBack = [operation]() { operation->Execute(false); };
-		}
-		else
-		{
-			openCallBack = [operation]() { operation->Execute(); };
-
-			size = 0;
-			AbstractOperation *operationClose = factory->Create(config, size);
-			Config::OffsetConfig(config, sizeOut, size);
-			closeCallBack = [operationClose]() { operationClose->Execute(); };
-		}
+		openCallBack = [operation]() { operation->Execute(true); };
+		closeCallBack = [operation]() { operation->Execute(false); };
 		
 		return new Operation_EngineInjectorPrime(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), openCallBack, closeCallBack);
 	}

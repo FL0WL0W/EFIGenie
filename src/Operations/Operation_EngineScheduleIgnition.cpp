@@ -153,20 +153,8 @@ namespace EFIGenie
 		size_t size = 0;
 		AbstractOperation *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
-		if(operation->NumberOfParameters == 1)
-		{
-			dwellCallBack = [operation]() { operation->Execute(true); };
-			igniteCallBack = [operation]() { operation->Execute(false); };
-		}
-		else
-		{
-			dwellCallBack = [operation]() { operation->Execute(); };
-
-			size = 0;
-			AbstractOperation *operationIgnite = factory->Create(config, size);
-			Config::OffsetConfig(config, sizeOut, size);
-			igniteCallBack = [operationIgnite]() { operationIgnite->Execute(); };
-		}
+		dwellCallBack = [operation]() { operation->Execute(true); };
+		igniteCallBack = [operation]() { operation->Execute(false); };
 		
 		return new Operation_EngineScheduleIgnition(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), tdc, dwellCallBack, igniteCallBack);
 	}

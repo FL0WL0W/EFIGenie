@@ -25,7 +25,7 @@ namespace EFIGenie
 
 	bool CommunicationHandler_OBD2PIDResponder::RegisterPID(uint8_t pid, OperationArchitecture::AbstractOperation *operation)
 	{
-		if(operation == nullptr || operation->NumberOfReturnVariables != 1 || operation->NumberOfParameters != 0)
+		if(operation == nullptr)
 			return false;
 
 		_operations[pid] = operation;

@@ -27,7 +27,7 @@ namespace EFIGenie
 
 	bool CommunicationHandler_UDSDIDResponder::RegisterDID(uint16_t did, OperationArchitecture::AbstractOperation *operation)
 	{
-		if(operation == nullptr || operation->NumberOfReturnVariables != 1 || operation->NumberOfParameters != 0)
+		if(operation == nullptr)
 			return false;
 		_operations[did] = operation;
 		return true;
