@@ -22,7 +22,7 @@ namespace EFIGenie
 			ReluctorOperations::RegisterReluctorOperationFactory<30000>()
 		);
 
-		OperationArchitecture::AbstractOperation *_mainLoopExecute = 0;
+		OperationArchitecture::AbstractOperation *_mainLoopExecute = nullptr;
 
 		public:
 		void Start(const void *config, size_t &sizeOut)
@@ -61,12 +61,13 @@ namespace EFIGenie
 		}
 		void Stop()
 		{
-			_mainLoopExecute = 0;
-			operationFactory->Delete();
+			delete _mainLoopExecute;
+			_mainLoopExecute = nullptr;
+			operationFactory->Clear();
 		}
 		void Loop()
 		{
-			if(_mainLoopExecute != 0)
+			if(_mainLoopExecute != nullptr)
 				_mainLoopExecute->Execute();
 		}
 	};

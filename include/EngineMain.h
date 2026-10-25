@@ -24,10 +24,10 @@ namespace EFIGenie
 			RegisterEngineOperationFactory<40000, operationFactory, serviceRegistry>()
 		);
 
-		OperationArchitecture::AbstractOperation *_inputsExecute = 0;
-		OperationArchitecture::AbstractOperation *_preSyncExecute = 0;
-		OperationArchitecture::AbstractOperation *_syncCondition = 0;
-		OperationArchitecture::AbstractOperation *_mainLoopExecute = 0;
+		OperationArchitecture::AbstractOperation *_inputsExecute = nullptr;
+		OperationArchitecture::AbstractOperation *_preSyncExecute = nullptr;
+		OperationArchitecture::AbstractOperation *_syncCondition = nullptr;
+		OperationArchitecture::AbstractOperation *_mainLoopExecute = nullptr;
 		bool _syncedOnce = false;
 		
 		public:
@@ -89,24 +89,28 @@ namespace EFIGenie
 
 			OperationArchitecture::Config::OffsetConfig(config, sizeOut, sizeof(uint32_t));//CRC
 
-			if(_inputsExecute != 0) _inputsExecute->Execute();
-			if(_preSyncExecute != 0) _preSyncExecute->Execute();
+			if(_inputsExecute != nullptr) _inputsExecute->Execute();
+			if(_preSyncExecute != nullptr) _preSyncExecute->Execute();
 		}
 		void Stop()
 		{
-			_inputsExecute = 0;
-			_preSyncExecute = 0;
-			_syncCondition = 0;
-			_mainLoopExecute = 0;
+			delete _inputsExecute;
+			_inputsExecute = nullptr;
+			delete _preSyncExecute;
+			_preSyncExecute = nullptr;
+			delete _syncCondition;
+			_syncCondition = nullptr;
+			delete _mainLoopExecute;
+			_mainLoopExecute = nullptr;
 			_syncedOnce = false;
-			operationFactory->Delete();
+			operationFactory->Clear();
 		}
 		void Loop()
 		{
-			if(_inputsExecute != 0) _inputsExecute->Execute();
-			if(!_syncedOnce && _syncCondition != 0)
+			if(_inputsExecute != nullptr) _inputsExecute->Execute();
+			if(!_syncedOnce && _syncCondition != nullptr)
 				_syncedOnce = _syncCondition->Execute<bool>();
-			if(_syncedOnce && _mainLoopExecute != 0)
+			if(_syncedOnce && _mainLoopExecute != nullptr)
 			{
 				_mainLoopExecute->Execute();
 			}
