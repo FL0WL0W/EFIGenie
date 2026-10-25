@@ -10,11 +10,11 @@ namespace EFIGenie
 	class Operation_EngineInjectorPrime : public OperationArchitecture::Operation<void, float>
 	{
 	protected:
-		EmbeddedIOServices::ITimerService *_timerService;
-		const EmbeddedIOServices::callback_t _openCallBack;
-		EmbeddedIOServices::Task *_closeTask;
+		EmbeddedIOServices::ITimerService * const _timerService;
+		OperationArchitecture::AbstractOperation * const _operation;
+		EmbeddedIOServices::Task * const _closeTask;
 	public:		
-        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService *timerService, const EmbeddedIOServices::callback_t openCallBack, const EmbeddedIOServices::callback_t closeCallBack);
+        Operation_EngineInjectorPrime(EmbeddedIOServices::ITimerService * const timerService, OperationArchitecture::AbstractOperation * const _operation);
 		~Operation_EngineInjectorPrime();
 
 		void Execute(float time) override;

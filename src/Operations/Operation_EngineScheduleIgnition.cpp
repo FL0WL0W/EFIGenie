@@ -8,11 +8,10 @@ using namespace EmbeddedIOOperations;
 #ifdef OPERATION_ENGINESCHEDULEIGNITION_H
 namespace EFIGenie
 {
-	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService *timerService, const float tdc, callback_t dwellCallBack, callback_t igniteCallBack) :
+	Operation_EngineScheduleIgnition::Operation_EngineScheduleIgnition(ITimerService * const timerService, OperationArchitecture::AbstractOperation * const operation, const float tdc) :
 		_timerService(timerService),
+		_operation(operation),
 		_tdc(tdc), 
-		_dwellCallBack(dwellCallBack),
-		_igniteCallBack(igniteCallBack),
 		_dwellTask(new Task([this]() { this->Dwell(); })),
 		_igniteTask(new Task([this]() { this->Ignite(); }))
 	{ }
@@ -24,6 +23,7 @@ namespace EFIGenie
 		_timerService->UnScheduleTask(_igniteTask);
 		delete _dwellTask;
 		delete _igniteTask;
+		delete _operation;
 	}
 
 	std::tuple<tick_t, tick_t> Operation_EngineScheduleIgnition::Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation)
@@ -132,7 +132,7 @@ namespace EFIGenie
 
 	void Operation_EngineScheduleIgnition::Dwell()
 	{
-		_dwellCallBack();
+		_operation->Execute(true);
 		if(!_dwelling)
 			_lastDwellTick = _dwellTask->ExecutedTick == 0? 1 : _dwellTask->ExecutedTick;
 		_dwelling = true;
@@ -140,7 +140,7 @@ namespace EFIGenie
 
 	void Operation_EngineScheduleIgnition::Ignite()
 	{
-		_igniteCallBack();
+		_operation->Execute(false);
 		_dwelling = false;
 	}
 
@@ -151,12 +151,11 @@ namespace EFIGenie
 		callback_t igniteCallBack = 0;
 
 		size_t size = 0;
+		//we own this operation now. Operation_EngineScheduleIgnition must delete it
 		AbstractOperation *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
-		dwellCallBack = [operation]() { operation->Execute(true); };
-		igniteCallBack = [operation]() { operation->Execute(false); };
 		
-		return new Operation_EngineScheduleIgnition(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), tdc, dwellCallBack, igniteCallBack);
+		return new Operation_EngineScheduleIgnition(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), operation, tdc);
 	}
 }
 #endif

@@ -8,12 +8,11 @@ using namespace EmbeddedIOOperations;
 #ifdef OPERATION_ENGINESCHEDULEINJECTION_H
 namespace EFIGenie
 {
-	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService * const timerService, const float tdc, const Operation_EngineScheduleInjection_InjectAt injectAt, const callback_t openCallBack, const callback_t closeCallBack) : 
+	Operation_EngineScheduleInjection::Operation_EngineScheduleInjection(ITimerService * const timerService, AbstractOperation * const operation, const float tdc, const Operation_EngineScheduleInjection_InjectAt injectAt) :
 		_timerService(timerService),
+		_operation(operation),
 		_tdc(tdc),
 		_injectAt(injectAt),
-		_openCallBack(openCallBack),
-		_closeCallBack(closeCallBack),
 		_openTask(new Task([this]() { this->Open(); })),
 		_closeTask(new Task([this]() { this->Close(); }))
 	{ }
@@ -25,6 +24,7 @@ namespace EFIGenie
 		_timerService->UnScheduleTask(_closeTask);
 		delete _openTask;
 		delete _closeTask;
+		delete _operation;
 	}
 
 	std::tuple<tick_t, tick_t> Operation_EngineScheduleInjection::Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionPosition)
@@ -144,7 +144,7 @@ namespace EFIGenie
 
 	void Operation_EngineScheduleInjection::Open()
 	{
-		_openCallBack();
+		_operation->Execute(true);
 		if(!_open)
 			_lastOpenTick = _openTask->ExecutedTick == 0? 1 : _openTask->ExecutedTick;
 		_open = true;
@@ -152,7 +152,7 @@ namespace EFIGenie
 
 	void Operation_EngineScheduleInjection::Close()
 	{
-		_closeCallBack();
+		_operation->Execute(false);
 		_open = false;
 	}
 
@@ -164,12 +164,11 @@ namespace EFIGenie
 		callback_t closeCallBack = 0;
 
 		size_t size = 0;
+		//we own this operation now. Operation_EngineScheduleInjection must delete it
 		AbstractOperation *operation = factory->Create(config, size);
 		Config::OffsetConfig(config, sizeOut, size);
-		openCallBack = [operation]() { operation->Execute(true); };
-		closeCallBack = [operation]() { operation->Execute(false); };
 
-		return new Operation_EngineScheduleInjection(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), tdc, injectAt, openCallBack, closeCallBack);
+		return new Operation_EngineScheduleInjection(serviceRegistry->TryGet<EmbeddedIOServices::ITimerService>(), operation, tdc, injectAt);
 	}
 }
 #endif

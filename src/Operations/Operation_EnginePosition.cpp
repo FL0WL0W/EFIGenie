@@ -7,10 +7,8 @@ using namespace ReluctorOperations;
 #ifdef OPERATION_ENGINEPOSITION_H
 namespace EFIGenie
 {
-	Operation_EnginePosition::Operation_EnginePosition(bool crankPriority)
-	{
-		_crankPriority = crankPriority;
-	}
+	Operation_EnginePosition::Operation_EnginePosition(const bool crankPriority) : _crankPriority(crankPriority)
+	{ }
 
 	EnginePosition Operation_EnginePosition::Execute(ReluctorResult crankPosition, ReluctorResult camPosition)
 	{

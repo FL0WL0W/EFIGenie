@@ -12,9 +12,8 @@ namespace EFIGenie
 	{
 	protected:
 		EmbeddedIOServices::ITimerService * const _timerService;
+		OperationArchitecture::AbstractOperation * const _operation;
 		const float _tdc;
-		const EmbeddedIOServices::callback_t _dwellCallBack;
-		const EmbeddedIOServices::callback_t _igniteCallBack;
 
 		EmbeddedIOServices::Task *_dwellTask;
 		EmbeddedIOServices::Task *_igniteTask;
@@ -22,7 +21,7 @@ namespace EFIGenie
 		volatile bool _dwelling = false;
 		bool _previousSequential = false;
 	public:		
-        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, const float tdc, const EmbeddedIOServices::callback_t dwellCallBack, const EmbeddedIOServices::callback_t igniteCallBack);
+        Operation_EngineScheduleIgnition(EmbeddedIOServices::ITimerService * const timerService, OperationArchitecture::AbstractOperation * const operation, const float tdc);
 		~Operation_EngineScheduleIgnition();
 
 		std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t> Execute(EnginePosition enginePosition, bool enable, float ignitionDwell, float ignitionAdvance, float ignitionDwellMaxDeviation) override;

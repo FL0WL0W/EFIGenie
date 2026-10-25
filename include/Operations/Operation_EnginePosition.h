@@ -17,9 +17,9 @@ namespace EFIGenie
 	protected:
 		EnginePosition _previousPreviousReluctorResult;
 		EnginePosition _previousReluctorResult;
-		bool _crankPriority;
+		const bool _crankPriority;
 	public:		
-        Operation_EnginePosition(bool crankPriority);
+        Operation_EnginePosition(const bool crankPriority);
 
 		EnginePosition Execute(ReluctorOperations::ReluctorResult crankPosition, ReluctorOperations::ReluctorResult camPosition) override;
 	};

@@ -20,17 +20,16 @@ namespace EFIGenie
 	{
 	protected:
 		EmbeddedIOServices::ITimerService * const _timerService;
+		OperationArchitecture::AbstractOperation * const _operation;
 		const float _tdc;
 		const Operation_EngineScheduleInjection_InjectAt _injectAt;
-		const EmbeddedIOServices::callback_t _openCallBack;
-		const EmbeddedIOServices::callback_t _closeCallBack;
 
 		EmbeddedIOServices::Task *_openTask;
 		EmbeddedIOServices::Task *_closeTask;
 		volatile EmbeddedIOServices::tick_t _lastOpenTick = 0;
 		volatile bool _open = false;
 	public:		
-        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, const float _tdc, const Operation_EngineScheduleInjection_InjectAt injectAt, const EmbeddedIOServices::callback_t openCallBack, const EmbeddedIOServices::callback_t closeCallBack);
+        Operation_EngineScheduleInjection(EmbeddedIOServices::ITimerService * const timerService, OperationArchitecture::AbstractOperation * const operation, const float _tdc, const Operation_EngineScheduleInjection_InjectAt injectAt);
 		~Operation_EngineScheduleInjection();
 
 		std::tuple<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t> Execute(EnginePosition enginePosition, bool enable, float injectionPulseWidth, float injectionPosition) override;
