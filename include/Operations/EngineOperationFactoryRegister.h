@@ -17,17 +17,15 @@ namespace EFIGenie
     extern Operation_EngineParameters Operation_EngineParametersInstance;
 
 	template<uint32_t idOffset, OperationArchitecture::OperationFactory *factory, EmbeddedIOOperations::ServiceRegistry *serviceRegistry>
-	inline std::array<OperationArchitecture::OperationFactoryEntry, 8> RegisterEngineOperationFactory() {
-    	return std::array<OperationArchitecture::OperationFactoryEntry, 8>{{
-        	{ idOffset + 1, Operation_CylinderAirMass_SD::Create },
-        	{ idOffset + 2, [](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, serviceRegistry, factory); } },
-        	{ idOffset + 3, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EnginePositionInstanceCrankPriority); } },
-        	{ idOffset + 4, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EnginePositionInstanceCamPriority); } },
-        	{ idOffset + 5, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EngineParametersInstance); } },
-        	{ idOffset + 6, [](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, serviceRegistry, factory); } },
-        	{ idOffset + 7, [](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, serviceRegistry, factory); } },
-        	{ idOffset + 8, Operation_InjectorDeadTime::Create }
-    	}};
-	}
+	constexpr std::array<OperationArchitecture::OperationFactoryEntry, 8> EngineOperationFactoryRegister = {{
+		{ idOffset + 1, Operation_CylinderAirMass_SD::Create },
+		{ idOffset + 2, [](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, serviceRegistry, factory); } },
+		{ idOffset + 3, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EnginePositionInstanceCrankPriority); } },
+		{ idOffset + 4, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EnginePositionInstanceCamPriority); } },
+		{ idOffset + 5, [](const void *config, size_t &sizeOut) { return static_cast<OperationArchitecture::AbstractOperation *>(&Operation_EngineParametersInstance); } },
+		{ idOffset + 6, [](const void *config, size_t &sizeOut) { return Operation_EngineScheduleIgnition::Create(config, sizeOut, serviceRegistry, factory); } },
+		{ idOffset + 7, [](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, serviceRegistry, factory); } },
+		{ idOffset + 8, Operation_InjectorDeadTime::Create }
+	}};
 }
 #endif

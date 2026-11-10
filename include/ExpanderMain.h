@@ -17,9 +17,9 @@ namespace EFIGenie
 	{
 		protected:
 		static constexpr auto _factoryEntries = OperationArchitecture::CombineEntries(
-			OperationArchitecture::RegisterOperationArchitecture<10000, operationFactory, variableMap>(),
-			EmbeddedIOOperations::RegisterEmbeddedIOOperationFactory<20000, operationFactory, serviceRegistry>(),
-			ReluctorOperations::RegisterReluctorOperationFactory<30000>()
+			OperationArchitecture::OperationArchitectureFactoryEntries<10000, operationFactory, variableMap>,
+			EmbeddedIOOperations::EmbeddedIOOperationFactoryEntries<20000, operationFactory, serviceRegistry>,
+			ReluctorOperations::ReluctorOperationFactoryEntries<30000>
 		);
 
 		OperationArchitecture::AbstractOperation *_mainLoopExecute = nullptr;
