@@ -17,7 +17,7 @@ namespace EFIGenie
     extern Operation_EngineParameters Operation_EngineParametersInstance;
 
 	template<uint32_t idOffset, OperationArchitecture::OperationFactory *factory, EmbeddedIOOperations::ServiceRegistry *serviceRegistry>
-	constexpr auto RegisterEngineOperationFactory = []() {
+	inline std::array<OperationArchitecture::OperationFactoryEntry, 8> RegisterEngineOperationFactory() {
     	return std::array<OperationArchitecture::OperationFactoryEntry, 8>{{
         	{ idOffset + 1, Operation_CylinderAirMass_SD::Create },
         	{ idOffset + 2, [](const void *config, size_t &sizeOut) { return Operation_EngineInjectorPrime::Create(config, sizeOut, serviceRegistry, factory); } },
@@ -28,6 +28,6 @@ namespace EFIGenie
         	{ idOffset + 7, [](const void *config, size_t &sizeOut) { return Operation_EngineScheduleInjection::Create(config, sizeOut, serviceRegistry, factory); } },
         	{ idOffset + 8, Operation_InjectorDeadTime::Create }
     	}};
-	};
+	}
 }
 #endif
