@@ -23,7 +23,6 @@ FetchContent_Declare(
     SOURCE_DIR  ${LIBRARIES_DIR}/OperationArchitecture
 )
 FetchContent_MakeAvailable(OperationArchitecture)
-execute_process(COMMAND git pull WORKING_DIRECTORY ${LIBRARIES_DIR}/OperationArchitecture)
 FetchContent_Declare(
     EmbeddedIOServices
     GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOServices
@@ -33,7 +32,6 @@ FetchContent_Declare(
     SOURCE_DIR  ${LIBRARIES_DIR}/EmbeddedIOServices
 )
 FetchContent_MakeAvailable(EmbeddedIOServices)
-execute_process(COMMAND git pull WORKING_DIRECTORY ${LIBRARIES_DIR}/EmbeddedIOServices)
 FetchContent_Declare(
     EmbeddedIOOperations
     GIT_REPOSITORY    https://github.com/FL0WL0W/EmbeddedIOOperations
@@ -43,7 +41,6 @@ FetchContent_Declare(
     SOURCE_DIR  ${LIBRARIES_DIR}/EmbeddedIOOperations
 )
 FetchContent_MakeAvailable(EmbeddedIOOperations)
-execute_process(COMMAND git pull WORKING_DIRECTORY ${LIBRARIES_DIR}/EmbeddedIOOperations)
 FetchContent_Declare(
     ReluctorOperations
     GIT_REPOSITORY    https://github.com/FL0WL0W/ReluctorOperations
@@ -53,7 +50,6 @@ FetchContent_Declare(
     SOURCE_DIR  ${LIBRARIES_DIR}/ReluctorOperations
 )
 FetchContent_MakeAvailable(ReluctorOperations)
-execute_process(COMMAND git pull WORKING_DIRECTORY ${LIBRARIES_DIR}/ReluctorOperations)
 
 # headers are always in include/
 file(GLOB_RECURSE HDRS CONFIGURE_DEPENDS ${HDR_DIR}/*.h)

@@ -21,7 +21,7 @@ namespace EFIGenie
 			OperationArchitecture::OperationArchitectureFactoryEntries<10000, operationFactory, variableMap>,
 			EmbeddedIOOperations::EmbeddedIOOperationFactoryEntries<20000, operationFactory, serviceRegistry>,
 			ReluctorOperations::ReluctorOperationFactoryEntries<30000>,
-			EngineOperationFactoryRegister::EngineOperationFactoryEntries<40000, operationFactory, serviceRegistry>
+			EngineOperationFactoryEntries<40000, operationFactory, serviceRegistry>
 		);
 
 		OperationArchitecture::AbstractOperation *_inputsExecute = nullptr;
