@@ -11,11 +11,11 @@ namespace EFIGenie
 		communicationhandler_efigenie_write_t writeCallback, 
 		communicationhandler_quit_t quitCallback, 
 		communicationhandler_start_t startCallback,
-		const void *config)
+		const void *config) :
+		_getVariableHandler(variableMap)
 	{
 		//Get Variable
-    	_getVariableHandler = new CommunicationHandler_GetVariable(variableMap);
-    	RegisterReceiveCallBack([this](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler->Receive(send, data, length);}, "g", 1);
+    	RegisterReceiveCallBack([this](communication_send_callback_t send, const void *data, size_t length){ return _getVariableHandler.Receive(send, data, length);}, "g", 1);
 
 		//Read
 		RegisterReceiveCallBack([](communication_send_callback_t send, const void *data, size_t length)
@@ -116,7 +116,6 @@ namespace EFIGenie
 	}
 
 	CommunicationHandler_EFIGenie::~CommunicationHandler_EFIGenie() {
-		delete _getVariableHandler;
 	}
 
 }

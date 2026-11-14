@@ -16,7 +16,7 @@ namespace EFIGenie
 	class CommunicationHandler_EFIGenie: public EmbeddedIOServices::CommunicationHandler_Prefix
 	{
 	protected:
-		EmbeddedIOOperations::CommunicationHandler_GetVariable *_getVariableHandler;
+		EmbeddedIOOperations::CommunicationHandler_GetVariable _getVariableHandler;
 	public:
 		CommunicationHandler_EFIGenie(OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap, 
 			communicationhandler_efigenie_write_t writeCallback, 
