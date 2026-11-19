@@ -28,7 +28,7 @@ namespace EFIGenie
 
 		bool RegisterPID(uint8_t pid, OperationArchitecture::AbstractOperation *operation);
 		void UnregisterPID(uint8_t pid);
-		size_t Receive(EmbeddedIOServices::communication_send_callback_t sendCallback,
+		size_t Receive(EmbeddedIOServices::ICommunicationService *sendService,
 			const void *data, size_t length);
 
 	private:

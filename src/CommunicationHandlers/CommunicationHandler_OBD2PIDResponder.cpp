@@ -10,9 +10,9 @@ namespace EFIGenie
 		if(_communicationService != nullptr)
 		{
 			_receiveCallbackId = _communicationService->RegisterReceiveCallBack(
-				[this](EmbeddedIOServices::communication_send_callback_t send, const void *data, size_t length)
+				[this](EmbeddedIOServices::ICommunicationService *sendService, const void *data, size_t length)
 				{
-					return Receive(send, data, length);
+					return Receive(sendService, data, length);
 				});
 		}
 	}
@@ -37,7 +37,7 @@ namespace EFIGenie
 		_operations.erase(pid);
 	}
 
-	size_t CommunicationHandler_OBD2PIDResponder::Receive(EmbeddedIOServices::communication_send_callback_t sendCallback,
+	size_t CommunicationHandler_OBD2PIDResponder::Receive(EmbeddedIOServices::ICommunicationService *sendService,
 		const void *data, size_t length)
 	{
 		if(data == nullptr || length == 0)
@@ -69,7 +69,8 @@ namespace EFIGenie
 			if(nextPagePID <= 0xff && _operations.upper_bound(static_cast<uint8_t>(nextPagePID)) != _operations.end())
 				supportedPIDs[3] |= 0x01;
 
-			sendCallback(response, sizeof(response));
+			if(sendService->Ready())
+				sendService->Send(response, sizeof(response));
 			return 2;
 		}
 
@@ -78,8 +79,8 @@ namespace EFIGenie
 			return 2;
 
 		std::vector<uint8_t> response = { 0x41, pid };
-		if(AppendOperationResult(operation->second, response))
-			sendCallback(response.data(), response.size());
+		if(AppendOperationResult(operation->second, response) && sendService->Ready())
+			sendService->Send(response.data(), response.size());
 
 		return 2;
 	}

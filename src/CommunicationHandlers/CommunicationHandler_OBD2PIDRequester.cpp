@@ -13,9 +13,9 @@ namespace EFIGenie
 		if(_communicationService != nullptr)
 		{
 			_receiveCallbackId = _communicationService->RegisterReceiveCallBack(
-				[this](EmbeddedIOServices::communication_send_callback_t send, const void *data, size_t length)
+				[this](EmbeddedIOServices::ICommunicationService *sendService, const void *data, size_t length)
 				{
-					return Receive(send, data, length);
+					return Receive(sendService, data, length);
 				});
 		}
 	}
@@ -64,7 +64,7 @@ namespace EFIGenie
 	}
 
 	size_t CommunicationHandler_OBD2PIDRequester::Receive(
-		EmbeddedIOServices::communication_send_callback_t, const void *data, size_t length)
+		EmbeddedIOServices::ICommunicationService *sendService, const void *data, size_t length)
 	{
 		if(data == nullptr || length == 0)
 			return 0;

@@ -1,20 +1,23 @@
 #include "CommunicationHandlers/CommunicationHandler_UDSDIDResponder.h"
 #include "CommunicationHandlers/CommunicationHandler_OBD2PIDResponder.h"
 #include "CommunicationHandlers/DiagnosticDataPayload.h"
+#include "CommunicationServiceShim.h"
+
+using namespace EmbeddedIOServices;
 
 namespace EFIGenie
 {
 	CommunicationHandler_UDSDIDResponder::CommunicationHandler_UDSDIDResponder(
-		EmbeddedIOServices::ICommunicationService *communicationService) :
+		ICommunicationService *communicationService) :
 		_communicationService(communicationService),
 		_receiveCallbackId(0)
 	{
 		if(_communicationService != nullptr)
 		{
 			_receiveCallbackId = _communicationService->RegisterReceiveCallBack(
-				[this](EmbeddedIOServices::communication_send_callback_t send, const void *data, size_t length)
+				[this](ICommunicationService *sendService, const void *data, size_t length)
 				{
-					return Receive(send, data, length);
+					return Receive(sendService, data, length);
 				});
 		}
 	}
@@ -53,7 +56,7 @@ namespace EFIGenie
 	}
 
 	size_t CommunicationHandler_UDSDIDResponder::Receive(
-		EmbeddedIOServices::communication_send_callback_t sendCallback, const void *data, size_t length)
+		ICommunicationService *sendService, const void *data, size_t length)
 	{
 		if(data == nullptr || length == 0)
 			return 0;
@@ -64,7 +67,8 @@ namespace EFIGenie
 		const auto sendNegative = [&](uint8_t code)
 		{
 			const uint8_t response[] = { 0x7f, 0x22, code };
-			sendCallback(response, sizeof(response));
+			if(sendService->Ready())
+				sendService->Send(response, sizeof(response));
 		};
 		if(length < 3 || (length - 1) % 2 != 0)
 		{
@@ -84,7 +88,24 @@ namespace EFIGenie
 			}
 		}
 
+		class PIDToDIDTranslationSendService : public ICommunicationService
+		{
+		private:
+			std::vector<uint8_t> &_response;
+		public:
+			PIDToDIDTranslationSendService(std::vector<uint8_t> &response) : _response(response) {}
+			uint8_t PID;
+			void Send(const void *data, size_t length) override { 
+				const uint8_t *pidResponse = static_cast<const uint8_t *>(data);
+				if(data != nullptr && length > 2 && pidResponse[0] == 0x41 && pidResponse[1] == PID)
+				{
+					_response.insert(_response.end(), pidResponse + 2, pidResponse + length);
+				}
+			}
+		};
+
 		std::vector<uint8_t> response(1, 0x62);
+		PIDToDIDTranslationSendService pidToDIDTranslationSendService(response);
 		for(size_t offset = 1; offset < length; offset += 2)
 		{
 			const uint16_t did = static_cast<uint16_t>(request[offset]) << 8 | request[offset + 1];
@@ -98,16 +119,16 @@ namespace EFIGenie
 			{
 				const uint8_t pid = request[offset + 1];
 				const uint8_t pidRequest[] = { 0x01, pid };
-				_pidMirrors.find(request[offset])->second->Receive(
-					[&](const void *data, size_t length)
+				CommunicationServiceShim shim([&](const void *data, size_t length)
+				{
+					const uint8_t *pidResponse = static_cast<const uint8_t *>(data);
+					if(data != nullptr && length > 2 && pidResponse[0] == 0x41 && pidResponse[1] == pid)
 					{
-						const uint8_t *pidResponse = static_cast<const uint8_t *>(data);
-						if(data != nullptr && length > 2 && pidResponse[0] == 0x41 && pidResponse[1] == pid)
-						{
-							response.insert(response.end(), pidResponse + 2, pidResponse + length);
-							success = true;
-						}
-					}, pidRequest, sizeof(pidRequest));
+						response.insert(response.end(), pidResponse + 2, pidResponse + length);
+						success = true;
+					}
+				});
+				_pidMirrors.find(request[offset])->second->Receive(&shim, pidRequest, sizeof(pidRequest));
 			}
 			if(!success)
 			{
@@ -115,7 +136,10 @@ namespace EFIGenie
 				return length;
 			}
 		}
-		sendCallback(response.data(), response.size());
+
+		if(!response.empty() && sendService->Ready())
+			sendService->Send(response.data(), response.size());
+			
 		return length;
 	}
 }

@@ -27,7 +27,7 @@ namespace EFIGenie
 		bool RequestDID(uint16_t did);
 		received_did_callback_id_t RegisterReceivedDID(uint16_t did, received_did_callback_t callback);
 		void UnregisterReceivedDID(received_did_callback_id_t callbackId);
-		size_t Receive(EmbeddedIOServices::communication_send_callback_t sendCallback,
+		size_t Receive(EmbeddedIOServices::ICommunicationService *sendService,
 			const void *data, size_t length);
 
 	private:
