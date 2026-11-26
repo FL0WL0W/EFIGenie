@@ -29,42 +29,18 @@ namespace EFIGenie
 			if(length < minDataSize)
 				return static_cast<size_t>(0);
 
-			const float interval = *reinterpret_cast<const float *>(data);
+			float interval;
+			std::memcpy(&interval, data, sizeof(float));
 			const tick_t intervalTick = _timerService->GetTicksPerSecond() * interval;
 			const uint32_t variableId = *reinterpret_cast<const uint32_t *>(reinterpret_cast<const uint8_t *>(data) + sizeof(float));
 
-			//find if subscription already exists for this sendService and variableId
-			auto itService = _subscriptions.find(sendService);
-			if(itService == _subscriptions.end())
-			{
-				_subscriptions[sendService] = std::map<tick_t, std::list<uint32_t>>();
-				itService = _subscriptions.find(sendService);
-			}
-			bool subscriptionExists = false;
-			for(auto itTick = itService->second.begin(); itTick != itService->second.end(); ++itTick)
-			{
-				if(std::find(itTick->second.begin(), itTick->second.end(), variableId) != itTick->second.end())
-				{
-					//subscription already exists. check if the intervalTick matches
-					if(itTick->first == intervalTick)
-					{
-						subscriptionExists = true;
-					}
-					else
-					{
-						//remove the variableId from the old intervalTick
-						itTick->second.remove(variableId);
-					}
-					break;
-				}
-			}
-			if(!subscriptionExists)
-			{
-				itService->second[intervalTick].push_back(variableId);
-			}
+			const char nack[1] = {21};
+			Subscription subscription{sendService, variableId, intervalTick};
+			if(!_subscriptionCommands.Push(subscription, 1))
+				sendService->Send(nack, sizeof(nack));
 
 			return minDataSize;
-		}, "d", 1);
+		}, "d", 1, false);
 
 		//Unsubscribe to Variables
     	RegisterReceiveCallBack([this](ICommunicationService *sendService, const void *data, size_t length){ 
@@ -74,18 +50,13 @@ namespace EFIGenie
 
 			const uint32_t variableId = *reinterpret_cast<const uint32_t *>(data);
 
-			//remove subscription for this sendService and variableId
-			auto itService = _subscriptions.find(sendService);
-			if(itService != _subscriptions.end())
-			{
-				for(auto itTick = itService->second.begin(); itTick != itService->second.end(); ++itTick)
-				{
-					itTick->second.remove(variableId);
-				}
-			}
+			const char nack[1] = {21};
+			Subscription subscription{sendService, variableId, 0};
+			if(!_subscriptionCommands.Push(subscription, 2))
+				sendService->Send(nack, sizeof(nack));
 			
 			return minDataSize;
-		}, "e", 1);
+		}, "e", 1, false);
 
 		//Read
 		RegisterReceiveCallBack([](ICommunicationService *sendService, const void *data, size_t length)
@@ -147,7 +118,7 @@ namespace EFIGenie
 			}
 
 			return static_cast<size_t>(0);
-		}, "q", 1, false);
+		}, "q", 1, true, false);
 
 		//start
 		RegisterReceiveCallBack([startCallback](ICommunicationService *sendService, const void *data, size_t length)
@@ -165,7 +136,7 @@ namespace EFIGenie
 			}
 				
 			return static_cast<size_t>(0);
-		}, "s", 1, false);
+		}, "s", 1, true, false);
 
 		//metadata read 64 bytes
 		RegisterReceiveCallBack([config](ICommunicationService *sendService, const void *data, size_t length)
@@ -198,7 +169,7 @@ namespace EFIGenie
 				sendService->Send(configLocation, sizeof(configLocation));
 			
 			return static_cast<size_t>(0);
-		}, "c", 1, false);
+		}, "c", 1, true, false);
 	}
 
 	CommunicationHandler_EFIGenie::~CommunicationHandler_EFIGenie() {
@@ -206,33 +177,94 @@ namespace EFIGenie
 
 	void CommunicationHandler_EFIGenie::SendSubscriptions() {
 
+		uint8_t state;
+		Subscription subscription;
+		while((state = _subscriptionCommands.Pop(subscription)) != 0)
+		{
+			if(state == 1)
+			{
+				//find if subscription already exists for this sendService and variableId
+				auto itService = _subscriptions.find(subscription.SendService);
+				if(itService == _subscriptions.end())
+				{
+					_subscriptions[subscription.SendService] = std::map<tick_t, std::list<uint32_t>>();
+					itService = _subscriptions.find(subscription.SendService);
+				}
+				bool subscriptionExists = false;
+				for(auto itTick = itService->second.begin(); itTick != itService->second.end(); ++itTick)
+				{
+					if(std::find(itTick->second.begin(), itTick->second.end(), subscription.VariableId) != itTick->second.end())
+					{
+						//subscription already exists. check if the intervalTick matches
+						if(itTick->first == subscription.IntervalTick)
+						{
+							subscriptionExists = true;
+						}
+						else
+						{
+							//remove the variableId from the old intervalTick
+							itTick->second.remove(subscription.VariableId);
+						}
+						break;
+					}
+				}
+				if(!subscriptionExists)
+				{
+					itService->second[subscription.IntervalTick].push_back(subscription.VariableId);
+				}
+				const char ack[2] = {'d', 6};
+				subscription.SendService->Send(ack, sizeof(ack));
+			}
+			else if(state == 2)
+			{
+				//remove subscription for this sendService and variableId
+				auto itService = _subscriptions.find(subscription.SendService);
+				if(itService != _subscriptions.end())
+				{
+					for(auto itTick = itService->second.begin(); itTick != itService->second.end(); ++itTick)
+					{
+						if(subscription.VariableId == 0xFFFFFFFF)
+						{
+							itTick->second.clear();
+						}
+						else
+						{
+							itTick->second.remove(subscription.VariableId);
+						}
+					}
+				}
+				const char ack[2] = {'e', 6};
+				subscription.SendService->Send(ack, sizeof(ack));
+			}
+		}
 
 		const tick_t currentTick = _timerService->GetTick();
 		//iterate through all subscriptions and send the data if needed
 		for(auto &serviceSubscriptionsPair : _subscriptions)
 		{
-			EmbeddedIOServices::ICommunicationService *sendService = serviceSubscriptionsPair.first;
+			ICommunicationService *sendService = serviceSubscriptionsPair.first;
 			if(!sendService->Ready())
 				continue;
 
 			std::list<uint32_t> variableIdsToSend;
 
 			auto &tickMap = serviceSubscriptionsPair.second;
+			std::list<tick_t> intervalsSent;
 			for(auto &tickPair : tickMap)
 			{
-				EmbeddedIOServices::tick_t intervalTick = tickPair.first;
+				tick_t intervalTick = tickPair.first;
 
 				auto itServiceLastSentTick = _subscriptionsLastSentTick.find(sendService);
 				if(itServiceLastSentTick == _subscriptionsLastSentTick.end())
 				{
-					_subscriptionsLastSentTick[sendService] = std::map<tick_t, EmbeddedIOServices::tick_t>();
+					_subscriptionsLastSentTick[sendService] = std::map<tick_t, tick_t>();
 					itServiceLastSentTick = _subscriptionsLastSentTick.find(sendService);
 				}
 				auto itIntervalLastSentTick = itServiceLastSentTick->second.find(intervalTick);
-				if(itIntervalLastSentTick != itServiceLastSentTick->second.end() && ITimerService::TickLessThanTick(itServiceLastSentTick->second[intervalTick], currentTick + intervalTick))
+				if(itIntervalLastSentTick != itServiceLastSentTick->second.end() && ITimerService::TickLessThanTick(currentTick, itServiceLastSentTick->second[intervalTick] + intervalTick))
 					continue;
 
-				itServiceLastSentTick->second[intervalTick] = currentTick;
+				intervalsSent.push_back(intervalTick);
 				
 				std::list<uint32_t> &variableIds = tickPair.second;
 				//send the data for each variableId if needed
@@ -246,6 +278,9 @@ namespace EFIGenie
 				continue;
 
 			std::vector<uint8_t> buffer;
+			const char stx[2] = {'d', 2};
+			buffer.insert(buffer.end(), reinterpret_cast<const uint8_t *>(stx), reinterpret_cast<const uint8_t *>(stx) + sizeof(stx));
+			buffer.insert(buffer.end(), reinterpret_cast<const uint8_t *>(&currentTick), reinterpret_cast<const uint8_t *>(&currentTick) + sizeof(currentTick));
 			CommunicationServiceShim shim([&](const void *data, size_t length)
 			{
 				buffer.insert(buffer.end(), static_cast<const uint8_t *>(data), static_cast<const uint8_t *>(data) + length);
@@ -256,8 +291,16 @@ namespace EFIGenie
 				buffer.insert(buffer.end(), reinterpret_cast<uint8_t *>(&variableId), reinterpret_cast<uint8_t *>(&variableId) + sizeof(variableId));
 				_getVariableHandler.Receive(&shim, &variableId, sizeof(variableId));
 			}
-			if(sendService->Ready())
+			const char etx[2] = {'d', 3};
+			buffer.insert(buffer.end(), reinterpret_cast<const uint8_t *>(etx), reinterpret_cast<const uint8_t *>(etx) + sizeof(etx));
+			if(sendService->Ready()) 
+			{
 				sendService->Send(buffer.data(), buffer.size());
+				for(tick_t intervalTick : intervalsSent)
+				{
+					_subscriptionsLastSentTick[sendService][intervalTick] = currentTick;
+				}
+			}
 		}
 	}
 }

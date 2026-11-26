@@ -6,6 +6,7 @@
 #include "ITimerService.h"
 #include <map>
 #include <list>
+#include "CircularBuffer.h"
 
 #ifndef COMMUNICATIONHANDLER_EFIGENIE_H
 #define COMMUNICATIONHANDLER_EFIGENIE_H
@@ -23,6 +24,14 @@ namespace EFIGenie
 		std::map<EmbeddedIOServices::ICommunicationService *, std::map<EmbeddedIOServices::tick_t, std::list<uint32_t>>> _subscriptions;
 		std::map<EmbeddedIOServices::ICommunicationService *, std::map<EmbeddedIOServices::tick_t, EmbeddedIOServices::tick_t>> _subscriptionsLastSentTick;
 
+		struct Subscription
+		{
+			EmbeddedIOServices::ICommunicationService *SendService;
+			uint32_t VariableId;
+			EmbeddedIOServices::tick_t IntervalTick;
+		};
+
+		EmbeddedIOServices::CircularBuffer<Subscription, 8> _subscriptionCommands;
 		EmbeddedIOServices::ITimerService *_timerService;
 	public:
 		CommunicationHandler_EFIGenie(OperationArchitecture::GeneratorMap<OperationArchitecture::Variable> *variableMap, 
