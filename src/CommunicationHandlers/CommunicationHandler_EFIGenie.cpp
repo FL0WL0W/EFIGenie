@@ -210,7 +210,12 @@ namespace EFIGenie
 				}
 				if(!subscriptionExists)
 				{
-					itService->second[subscription.IntervalTick].push_back(subscription.VariableId);
+					auto &variables = itService->second[subscription.IntervalTick];
+					// An inactive group may retain a timestamp from before a timer
+					// wrap. Start fresh without delaying other active subscribers.
+					if(variables.empty())
+						_subscriptionsLastSentTick[subscription.SendService].erase(subscription.IntervalTick);
+					variables.push_back(subscription.VariableId);
 				}
 				const char ack[2] = {'d', 6};
 				subscription.SendService->Send(ack, sizeof(ack));
